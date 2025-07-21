@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "title": "HUA Labs",
+    "subtitle": "혁신적인 개발 솔루션으로",
+    "description": "미래를 만들어갑니다",
+    "content": "숨어(SUM-LANG), 숨API, 숨다 등 혁신적인 제품군과 SDK를 통해 개발자들이 더 나은 미래를 만들 수 있도록 돕습니다",
+    "startButton": "시작하기",
+    "demoButton": "데모 보기",
+    "scrollText": "스크롤"
+  },
+  "nav": {
+    "about": "소개",
+    "services": "서비스",
+    "sdk": "SDK",
+    "contact": "연락처"
+  },
+  "sections": {
+    "about": {
+      "title": "HUA Labs 소개",
+      "content": "혁신적인 개발 솔루션을 통해 개발자들이 더 나은 미래를 만들 수 있도록 돕습니다."
+    },
+    "services": {
+      "title": "서비스",
+      "subtitle": "개발자들을 위한 혁신적인 제품군을 제공합니다."
+    },
+    "sdk": {
+      "title": "개발자 SDK",
+      "subtitle": "개발자들이 쉽게 사용할 수 있는 SDK를 제공합니다."
+    },
+    "contact": {
+      "title": "연락처",
+      "content": "궁금한 점이 있으시면 언제든 문의해주세요."
+    }
+  }
+} 

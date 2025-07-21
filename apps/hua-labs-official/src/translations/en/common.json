@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "title": "HUA Labs",
+    "subtitle": "Innovative Development Solutions",
+    "description": "Building the Future",
+    "content": "We help developers create a better future through innovative products and SDKs including SUM-LANG, SUM API, and SUMDA.",
+    "startButton": "Get Started",
+    "demoButton": "View Demo",
+    "scrollText": "Scroll"
+  },
+  "nav": {
+    "about": "About",
+    "services": "Services",
+    "sdk": "SDK",
+    "contact": "Contact"
+  },
+  "sections": {
+    "about": {
+      "title": "About HUA Labs",
+      "content": "We help developers create a better future through innovative development solutions."
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Providing innovative product suites for developers."
+    },
+    "sdk": {
+      "title": "Developer SDKs",
+      "subtitle": "Providing SDKs that developers can easily use."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "Please feel free to contact us if you have any questions."
+    }
+  }
+} 
