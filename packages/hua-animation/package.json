@@ -1,0 +1,21 @@
+{
+  "name": "@hua-labs/animation",
+  "version": "0.1.0",
+  "description": "Animation hooks and utilities for HUA Labs",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "react": "^18"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^18"
+  }
+} 
