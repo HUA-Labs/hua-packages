@@ -7,7 +7,7 @@ export interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement
   size?: "sm" | "md" | "lg" | "xl"
   variant?: "default" | "dots" | "bars" | "ring" | "ripple"
   text?: string
-  color?: "default" | "primary" | "secondary" | "success" | "warning" | "error"
+  color?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"
 }
 
 const LoadingSpinner = React.forwardRef<HTMLDivElement, LoadingSpinnerProps>(
@@ -25,7 +25,8 @@ const LoadingSpinner = React.forwardRef<HTMLDivElement, LoadingSpinnerProps>(
       secondary: "border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300",
       success: "border-green-300 border-t-green-600 dark:border-green-600 dark:border-t-green-300",
       warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-600 dark:border-t-yellow-300",
-      error: "border-red-300 border-t-red-600 dark:border-red-600 dark:border-t-red-300"
+      error: "border-red-300 border-t-red-600 dark:border-red-600 dark:border-t-red-300",
+      glass: "border-white/30 border-t-white/50 dark:border-slate-600/50 dark:border-t-slate-400/50"
     }
 
     const renderSpinner = () => {
@@ -40,10 +41,12 @@ const LoadingSpinner = React.forwardRef<HTMLDivElement, LoadingSpinnerProps>(
           )
         case "bars":
           return (
-            <div className="flex space-x-1"> {/* 4px 간격 */}
-              <div className="w-1 h-full bg-current animate-pulse" />
-              <div className="w-1 h-full bg-current animate-pulse delay-100" />
-              <div className="w-1 h-full bg-current animate-pulse delay-200" />
+            <div className="flex space-x-1 h-full items-end"> {/* 4px 간격, 높이 설정 */}
+              <div className="w-1 bg-current animate-pulse" style={{ height: '60%' }} />
+              <div className="w-1 bg-current animate-pulse delay-100" style={{ height: '80%' }} />
+              <div className="w-1 bg-current animate-pulse delay-200" style={{ height: '40%' }} />
+              <div className="w-1 bg-current animate-pulse delay-300" style={{ height: '100%' }} />
+              <div className="w-1 bg-current animate-pulse delay-500" style={{ height: '70%' }} />
             </div>
           )
         case "ring":

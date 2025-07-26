@@ -157,6 +157,43 @@ export const SkeletonAvatar = React.forwardRef<HTMLDivElement, React.HTMLAttribu
 )
 SkeletonAvatar.displayName = "SkeletonAvatar"
 
+export const SkeletonImage = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("space-y-2", className)} // 8px 간격
+      {...props}
+    >
+      <SkeletonRounded className="w-full h-48" /> {/* 192px 높이 */}
+      <SkeletonText className="h-4 w-1/2" />
+    </div>
+  )
+)
+SkeletonImage.displayName = "SkeletonImage"
+
+export const SkeletonUserProfile = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("space-y-4", className)} // 16px 간격
+      {...props}
+    >
+      <div className="flex items-center space-x-4"> {/* 16px 간격 */}
+        <SkeletonCircle className="w-16 h-16" /> {/* 64px 크기 */}
+        <div className="space-y-2 flex-1"> {/* 8px 간격 */}
+          <SkeletonText className="h-5 w-1/2" />
+          <SkeletonText className="h-3 w-1/3" />
+        </div>
+      </div>
+      <div className="space-y-2"> {/* 8px 간격 */}
+        <SkeletonText className="h-4 w-full" />
+        <SkeletonText className="h-4 w-5/6" />
+      </div>
+    </div>
+  )
+)
+SkeletonUserProfile.displayName = "SkeletonUserProfile"
+
 export const SkeletonList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div

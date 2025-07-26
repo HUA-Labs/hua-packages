@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "../lib/utils"
 
 export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  variant?: "default" | "outline" | "filled"
+  variant?: "default" | "outline" | "filled" | "glass"
   size?: "sm" | "md" | "lg"
   error?: boolean
   success?: boolean
@@ -38,7 +38,8 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     const variantClasses = {
       default: "border-gray-300 bg-white text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-blue-400",
       outline: "border-2 border-gray-200 bg-transparent text-blue-600 focus:ring-blue-500 dark:border-gray-700 dark:focus:ring-blue-400",
-      filled: "border-transparent bg-gray-50 text-blue-600 focus:bg-white focus:ring-blue-500 dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-blue-400"
+      filled: "border-transparent bg-gray-50 text-blue-600 focus:bg-white focus:ring-blue-500 dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-blue-400",
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-blue-400/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-blue-400/50 dark:focus:bg-slate-700/20"
     }
 
     const stateClasses = error 

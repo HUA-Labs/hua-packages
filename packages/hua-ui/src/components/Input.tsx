@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "../lib/utils"
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  variant?: "default" | "outline" | "filled" | "ghost"
+  variant?: "default" | "outline" | "filled" | "ghost" | "glass"
   size?: "sm" | "md" | "lg"
   error?: boolean
   success?: boolean
@@ -25,10 +25,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ...props 
   }, ref) => {
     const variantClasses = {
-      default: "border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400",
-      outline: "border-2 border-gray-200 bg-transparent text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400",
-      filled: "border-transparent bg-gray-50 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400",
-      ghost: "border-transparent bg-transparent text-gray-900 placeholder-gray-500 focus:bg-gray-50 focus:border-gray-300 focus:ring-gray-500 dark:text-white dark:placeholder-gray-400 dark:focus:bg-gray-800 dark:focus:border-gray-600 dark:focus:ring-gray-400"
+      default: "border-slate-300 bg-white text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400",
+      outline: "border-2 border-slate-200 bg-transparent text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400",
+      filled: "border-transparent bg-slate-50 text-slate-900 placeholder-slate-500 focus:bg-white focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:bg-slate-800 dark:focus:border-blue-400 dark:focus:ring-blue-400",
+      ghost: "border-transparent bg-transparent text-slate-900 placeholder-slate-500 focus:bg-slate-50 focus:border-slate-300 focus:ring-slate-500 dark:text-white dark:placeholder-slate-400 dark:focus:bg-slate-800 dark:focus:border-slate-600 dark:focus:ring-slate-400",
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white placeholder-white/60 focus:border-blue-400/50 focus:ring-blue-400/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:placeholder-slate-400 dark:focus:border-blue-400/50 dark:focus:ring-blue-400/20 dark:focus:bg-slate-700/20"
     }
 
     const sizeClasses = {

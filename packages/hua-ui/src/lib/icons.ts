@@ -132,7 +132,6 @@ import {
   RotateCw,
   Maximize,
   Minimize,
-  // Fullscreen,
   
   // Business & Productivity
   Briefcase,
@@ -144,11 +143,9 @@ import {
   UserCheck,
   UserX,
   UserCog,
-  // UserSearch,
   
   // Files & Documents
   File,
-  FileText as FileTextIcon,
   FileImage,
   FileVideo,
   FileAudio,
@@ -163,27 +160,18 @@ import {
   FileSearch,
   
   // Security & Privacy
-  Shield as ShieldIcon,
   ShieldCheck,
-  // ShieldX,
   ShieldAlert,
-  Lock as LockIcon,
-  Unlock as UnlockIcon,
   Key,
   Fingerprint,
-  Eye as EyeIcon,
-  EyeOff as EyeOffIcon,
   
   // Communication Extended
   MessageSquare,
-  MessageCircle as MessageCircleIcon,
-  Phone as PhoneIcon,
   PhoneCall,
   PhoneIncoming,
   PhoneOutgoing,
   PhoneMissed,
   PhoneOff,
-  Mail as MailIcon,
   MailOpen,
   MailCheck,
   MailX,
@@ -199,12 +187,12 @@ import {
   Youtube,
   Twitch,
   Github,
-  Gitlab,
   Slack,
-  
-  // Navigation Extended
-  Map,
-  MapPin,
+  Figma,
+  Chrome,
+  Codepen,
+  Codesandbox,
+
   Navigation,
   Navigation2,
   Compass,
@@ -212,9 +200,6 @@ import {
   Globe2,
   Flag,
   FlagTriangleRight,
-  Home as HomeIcon,
-  Building as BuildingIcon,
-  Store as StoreIcon,
   
   // Actions Extended
   Save,
@@ -236,33 +221,17 @@ import {
   ListChecks,
   
   // Feedback Extended
-  ThumbsUp as ThumbsUpIcon,
-  ThumbsDown as ThumbsDownIcon,
-  Heart as HeartIcon,
   HeartOff,
-  Star as StarIcon,
   StarOff,
-  Bookmark as BookmarkIcon,
   BookmarkPlus,
   BookmarkMinus,
-  // BookmarkX,
   
   // Status Extended
-  CheckCircle as CheckCircleIcon,
-  XCircle as XCircleIcon,
-  AlertCircle as AlertCircleIcon,
-  AlertTriangle as AlertTriangleIcon,
-  Info as InfoIcon,
-  HelpCircle as HelpCircleIcon,
   Circle,
   CircleDot,
   CircleSlash,
   
   // Weather Extended
-  Sun as SunIcon,
-  Moon as MoonIcon,
-  Cloud as CloudIcon,
-  CloudRain as CloudRainIcon,
   CloudSnow,
   CloudLightning,
   CloudFog,
@@ -272,18 +241,12 @@ import {
   Umbrella,
   
   // Time & Date
-  Clock as ClockIcon,
-  Timer as TimerIcon,
-  Calendar as CalendarIcon,
   CalendarDays,
   CalendarCheck,
   CalendarX,
   CalendarPlus,
   CalendarMinus,
   CalendarClock,
-  
-  // TypeScript types
-  LucideIcon,
   
   // 추가된 누락 아이콘들
   Palette,
@@ -297,8 +260,8 @@ import {
   Sparkles,
 } from 'lucide-react'
 
-// 아이콘 매핑 객체
-export const icons: Record<string, LucideIcon> = {
+// 아이콘 객체
+export const icons = {
   // Navigation & UI
   home: Home,
   menu: Menu,
@@ -318,7 +281,7 @@ export const icons: Record<string, LucideIcon> = {
   add: Plus,
   remove: Minus,
   check: Check,
-  alert: AlertCircle,
+  alertCircle: AlertCircle,
   info: Info,
   warning: AlertTriangle,
   chevronDown: ChevronDown,
@@ -330,7 +293,7 @@ export const icons: Record<string, LucideIcon> = {
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
   
-  // Communication & Social
+  // Communication
   message: MessageCircle,
   phone: Phone,
   mail: Mail,
@@ -341,7 +304,7 @@ export const icons: Record<string, LucideIcon> = {
   link: Link,
   externalLink: ExternalLink,
   
-  // Media & Entertainment
+  // Media
   play: Play,
   pause: Pause,
   skipBack: SkipBack,
@@ -355,7 +318,7 @@ export const icons: Record<string, LucideIcon> = {
   mic: Mic,
   headphones: Headphones,
   
-  // Emotion & Expression
+  // Emotions
   smile: Smile,
   frown: Frown,
   meh: Meh,
@@ -371,7 +334,7 @@ export const icons: Record<string, LucideIcon> = {
   trendingDown: TrendingDown,
   activity: Activity,
   database: Database,
-  file: FileText,
+  fileText: FileText,
   folder: Folder,
   calendar: Calendar,
   clock: Clock,
@@ -382,7 +345,7 @@ export const icons: Record<string, LucideIcon> = {
   refresh: RefreshCw,
   success: CheckCircle,
   error: XCircle,
-  help: HelpCircle,
+  helpCircle: HelpCircle,
   eye: Eye,
   eyeOff: EyeOff,
   lock: Lock,
@@ -394,7 +357,7 @@ export const icons: Record<string, LucideIcon> = {
   cloud: Cloud,
   rain: CloudRain,
   
-  // Finance & E-commerce
+  // Finance
   creditCard: CreditCard,
   dollarSign: DollarSign,
   euro: Euro,
@@ -425,15 +388,15 @@ export const icons: Record<string, LucideIcon> = {
   signal: Signal,
   battery: Battery,
   batteryCharging: BatteryCharging,
-  volume1: Volume1,
+  volume1: Volume,
+  volume2: Volume1,
   vibrate: Vibrate,
   rotateCcw: RotateCcw,
   rotateCw: RotateCw,
   maximize: Maximize,
   minimize: Minimize,
-  // fullscreen: Fullscreen,
   
-  // Business & Productivity
+  // Business
   briefcase: Briefcase,
   building: Building,
   building2: Building2,
@@ -443,10 +406,9 @@ export const icons: Record<string, LucideIcon> = {
   userCheck: UserCheck,
   userX: UserX,
   userCog: UserCog,
-  // userSearch: UserSearch,
   
-  // Files & Documents
-  fileText: FileTextIcon,
+  // Files
+  file: File,
   fileImage: FileImage,
   fileVideo: FileVideo,
   fileAudio: FileAudio,
@@ -460,16 +422,14 @@ export const icons: Record<string, LucideIcon> = {
   fileEdit: FileEdit,
   fileSearch: FileSearch,
   
-  // Security & Privacy
+  // Security
   shieldCheck: ShieldCheck,
-  // shieldX: ShieldX,
   shieldAlert: ShieldAlert,
   key: Key,
   fingerprint: Fingerprint,
   
   // Communication Extended
   messageSquare: MessageSquare,
-  messageCircle: MessageCircleIcon,
   phoneCall: PhoneCall,
   phoneIncoming: PhoneIncoming,
   phoneOutgoing: PhoneOutgoing,
@@ -490,12 +450,14 @@ export const icons: Record<string, LucideIcon> = {
   youtube: Youtube,
   twitch: Twitch,
   github: Github,
-  gitlab: Gitlab,
   slack: Slack,
+  figma: Figma,
+  chrome: Chrome,
+  codepen: Codepen,
+  codesandbox: Codesandbox,
+
   
   // Navigation Extended
-  map: Map,
-  mapPin: MapPin,
   navigation: Navigation,
   navigation2: Navigation2,
   compass: Compass,
@@ -528,7 +490,6 @@ export const icons: Record<string, LucideIcon> = {
   starOff: StarOff,
   bookmarkPlus: BookmarkPlus,
   bookmarkMinus: BookmarkMinus,
-  // bookmarkX: BookmarkX,
   
   // Status Extended
   circle: Circle,
@@ -569,7 +530,7 @@ export type IconName = keyof typeof icons
 
 // 아이콘 카테고리별 그룹화
 export const iconCategories = {
-  navigation: ['home', 'menu', 'close', 'search', 'settings', 'user', 'bell', 'map', 'mapPin', 'navigation', 'compass', 'globe', 'flag', 'sidebar'],
+  navigation: ['home', 'menu', 'close', 'search', 'settings', 'user', 'bell', 'navigation', 'compass', 'globe', 'flag', 'sidebar'],
   actions: ['edit', 'delete', 'add', 'remove', 'check', 'share', 'download', 'upload', 'save', 'undo', 'redo', 'copy', 'scissors', 'mousePointer', 'toggleLeft'],
   communication: ['message', 'phone', 'mail', 'send', 'reply', 'forward', 'messageSquare', 'phoneCall', 'mailOpen'],
   media: ['play', 'pause', 'skipBack', 'skipForward', 'volume', 'mute', 'music', 'video', 'image', 'camera', 'mic', 'headphones'],
@@ -581,8 +542,8 @@ export const iconCategories = {
   finance: ['creditCard', 'dollarSign', 'euro', 'poundSterling', 'bitcoin', 'shoppingCart', 'wallet', 'calculator'],
   business: ['briefcase', 'building', 'users', 'userPlus', 'userCheck', 'userCog'],
   files: ['fileText', 'fileImage', 'fileVideo', 'folder', 'fileCheck', 'bookOpen'],
-  social: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'github', 'slack'],
-  mobile: ['smartphone', 'tablet', 'monitor', 'laptop', 'bluetooth', 'signal', 'fullscreen'],
+  social: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'github', 'slack', 'figma', 'chrome', 'codepen', 'codesandbox'],
+  mobile: ['smartphone', 'tablet', 'monitor', 'laptop', 'bluetooth', 'signal', 'maximize'],
   editing: ['type', 'bold', 'italic', 'underline', 'alignLeft', 'alignCenter', 'list', 'listOrdered', 'palette', 'layers', 'square'],
   time: ['clock', 'timer', 'calendar', 'calendarDays', 'calendarCheck', 'calendarClock'],
 } as const

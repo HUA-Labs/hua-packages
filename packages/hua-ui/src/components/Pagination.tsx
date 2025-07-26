@@ -12,6 +12,7 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLDivElement> {
   maxVisiblePages?: number
   size?: "sm" | "md" | "lg"
   variant?: "default" | "outlined" | "minimal"
+  shape?: "square" | "circle"
 }
 
 const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
@@ -25,6 +26,7 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
     maxVisiblePages = 5,
     size = "md",
     variant = "default",
+    shape = "square",
     ...props 
   }, ref) => {
     const getVisiblePages = () => {
@@ -78,6 +80,15 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
       }
     }
 
+    const getShapeClasses = () => {
+      switch (shape) {
+        case "circle":
+          return "rounded-full aspect-square flex items-center justify-center"
+        default:
+          return "rounded-md"
+      }
+    }
+
     const getVariantClasses = (isActive: boolean = false) => {
       switch (variant) {
         case "outlined":
@@ -115,7 +126,10 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex items-center justify-center space-x-1", className)} // 4px 간격
+        className={cn(
+          "flex items-center justify-center gap-1",
+          className
+        )}
         {...props}
       >
         {/* 첫 페이지 버튼 */}
@@ -123,14 +137,15 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <button
             onClick={() => handlePageClick(1)}
             className={cn(
-              "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
               getSizeClasses(),
+              getShapeClasses(),
               getVariantClasses()
             )}
             aria-label="첫 페이지로 이동"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M19 19l-7-7 7-7" />
             </svg>
           </button>
         )}
@@ -140,8 +155,9 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <button
             onClick={() => handlePageClick(currentPage - 1)}
             className={cn(
-              "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
               getSizeClasses(),
+              getShapeClasses(),
               getVariantClasses()
             )}
             aria-label="이전 페이지로 이동"
@@ -166,8 +182,9 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               <button
                 onClick={() => handlePageClick(page as number)}
                 className={cn(
-                  "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                  "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                   getSizeClasses(),
+                  getShapeClasses(),
                   getVariantClasses(page === currentPage)
                 )}
                 aria-label={`${page}페이지로 이동`}
@@ -184,8 +201,9 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <button
             onClick={() => handlePageClick(currentPage + 1)}
             className={cn(
-              "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
               getSizeClasses(),
+              getShapeClasses(),
               getVariantClasses()
             )}
             aria-label="다음 페이지로 이동"
@@ -201,8 +219,9 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <button
             onClick={() => handlePageClick(totalPages)}
             className={cn(
-              "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
               getSizeClasses(),
+              getShapeClasses(),
               getVariantClasses()
             )}
             aria-label="마지막 페이지로 이동"
@@ -248,15 +267,26 @@ export const PaginationWithInfo = React.forwardRef<HTMLDivElement, PaginationPro
   }, ref) => {
     const startItem = (props.currentPage - 1) * itemsPerPage + 1
     const endItem = Math.min(props.currentPage * itemsPerPage, totalItems)
-
+    
     return (
-      <div ref={ref} className={cn("flex flex-col sm:flex-row items-center justify-between gap-4", className)}>
-        {showInfo && totalItems > 0 && (
+      <div className={cn("flex flex-col sm:flex-row items-center justify-between gap-4", className)}>
+        {showInfo && (
           <div className="text-sm text-gray-700 dark:text-gray-300">
-            {startItem}-{endItem} / {totalItems}개 항목
+            {totalItems > 0 ? (
+              <>
+                <span className="font-medium">{startItem}</span>
+                {" - "}
+                <span className="font-medium">{endItem}</span>
+                {" of "}
+                <span className="font-medium">{totalItems}</span>
+                {" results"}
+              </>
+            ) : (
+              "No results"
+            )}
           </div>
         )}
-        <Pagination {...props} />
+        <Pagination ref={ref} {...props} />
       </div>
     )
   }

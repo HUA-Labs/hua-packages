@@ -3,6 +3,9 @@ import { LucideProps } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../lib/icons'
 
+// React 19 호환성을 위한 타입 정의
+export type SvgIconComponent = React.ElementType<LucideProps>
+
 export interface IconProps extends Omit<LucideProps, 'size'> {
   name: IconName
   size?: number | string
@@ -63,8 +66,9 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(({
     'text-gray-500 dark:text-gray-500': variant === 'muted',
   })
 
+  const IconElement = IconComponent as SvgIconComponent
   return (
-    <IconComponent
+    <IconElement
       ref={ref}
       size={size}
       className={cn(
@@ -118,7 +122,7 @@ SuccessIcon.displayName = 'SuccessIcon'
 // 에러 상태 전용 아이콘
 export const ErrorIcon = React.forwardRef<SVGSVGElement, Omit<IconProps, 'name' | 'status'>>(
   (props, ref) => (
-    <Icon ref={ref} name="alert" status="error" variant="error" {...props} />
+    <Icon ref={ref} name="alertCircle" status="error" variant="error" {...props} />
   )
 )
 

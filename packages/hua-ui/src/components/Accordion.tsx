@@ -152,10 +152,10 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
   }, ref) => {
     const defaultIcon = (
       <Icon 
-                    name="chevronDown" 
+        name="chevronDown" 
         size={20} 
         className={cn(
-          "transition-transform duration-300 ease-out",
+          "transition-transform duration-300 ease-out text-gray-500 dark:text-gray-400",
           isOpen && "rotate-180"
         )} 
       />
@@ -213,7 +213,7 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
       >
         <div
           ref={contentRef}
-          className={cn("px-6 pb-4", className)}
+          className={cn("px-6 pt-2 pb-4", className)}
         >
           {children}
         </div>

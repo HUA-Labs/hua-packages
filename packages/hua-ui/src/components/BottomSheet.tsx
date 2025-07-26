@@ -132,7 +132,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         <div
           ref={ref}
           className={cn(
-            "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-2xl transition-transform duration-300 ease-out",
+            "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-2xl transition-transform duration-300 ease-out pb-safe",
             heightClasses[height],
             isAnimating ? (open ? "translate-y-0" : "translate-y-full") : "",
             className
@@ -182,7 +182,7 @@ const BottomSheetHeader = React.forwardRef<HTMLDivElement, BottomSheetHeaderProp
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors"
           >
-            <Icon name="x" size={20} />
+            <Icon name="close" size={20} />
           </button>
         )}
       </div>

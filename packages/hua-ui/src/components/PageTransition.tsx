@@ -9,7 +9,7 @@ export interface PageTransitionProps {
   className?: string
   duration?: number
   variant?: 'fade' | 'slide' | 'scale' | 'flip'
-  loadingVariant?: 'default' | 'rhythm' | 'flower' | 'heart' | 'star' | 'butterfly' | 'dots' | 'bars' | 'ring' | 'ripple'
+  loadingVariant?: 'default' | 'dots' | 'bars' | 'ring' | 'ripple'
   loadingText?: string
   showLoading?: boolean
   onTransitionStart?: () => void
@@ -21,7 +21,7 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   className,
   duration = 300,
   variant = 'fade',
-  loadingVariant = 'butterfly',
+  loadingVariant = 'ripple',
   loadingText = '페이지 로딩 중...',
   showLoading = true,
   onTransitionStart,
@@ -63,9 +63,11 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
 
   if (isLoading && showLoading) {
     return (
-      <div className={cn('flex items-center justify-center min-h-screen', className)}>
+      <div className={cn('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800', className)}>
         <LoadingSpinner
           size="lg"
+          variant={loadingVariant}
+          text={loadingText}
         />
       </div>
     )

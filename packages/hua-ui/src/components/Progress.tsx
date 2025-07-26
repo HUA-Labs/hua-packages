@@ -7,7 +7,7 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: number
   max?: number
   size?: "sm" | "md" | "lg"
-  variant?: "default" | "success" | "warning" | "error" | "info"
+  variant?: "default" | "success" | "warning" | "error" | "info" | "glass"
   showValue?: boolean
   animated?: boolean
   striped?: boolean
@@ -47,6 +47,8 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           return "bg-red-500 dark:bg-red-400"
         case "info":
           return "bg-blue-500 dark:bg-blue-400"
+        case "glass":
+          return "bg-white/50 backdrop-blur-sm"
         default:
           return "bg-gray-900 dark:bg-gray-100"
       }
@@ -79,7 +81,10 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         <div
           ref={ref}
           className={cn(
-            "relative w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700",
+            "relative w-full overflow-hidden rounded-full",
+            variant === "glass" 
+              ? "bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/10 dark:border-slate-700/50"
+              : "bg-gray-200 dark:bg-gray-700",
             sizeClasses[size]
           )}
         >

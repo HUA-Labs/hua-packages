@@ -58,7 +58,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       
       setCoords({ x, y })
       
-      timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = window.setTimeout(() => {
         setIsVisible(true)
       }, delay)
     }
@@ -133,12 +133,13 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
           <div
             ref={tooltipRef}
             className={cn(
-              "absolute z-50 px-3 py-2 text-sm rounded-lg whitespace-nowrap pointer-events-none", // 12px, 8px 패딩
-              getVariantClasses(),
-              getPositionClasses()
+              "fixed z-50 px-3 py-2 text-sm rounded-lg whitespace-nowrap pointer-events-none", // 12px, 8px 패딩
+              getVariantClasses()
             )}
             style={{
-              transform: `translate(${coords.x}px, ${coords.y}px)`
+              left: `${coords.x}px`,
+              top: `${coords.y}px`,
+              transform: 'translate(-50%, -50%)'
             }}
           >
             {content}
