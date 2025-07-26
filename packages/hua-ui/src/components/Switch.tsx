@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "../lib/utils"
 
 export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  variant?: "default" | "outline" | "filled"
+  variant?: "default" | "outline" | "filled" | "glass"
   size?: "sm" | "md" | "lg"
   error?: boolean
   success?: boolean
@@ -38,7 +38,8 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     const variantClasses = {
       default: "bg-gray-200 peer-checked:bg-blue-600 dark:bg-gray-700 dark:peer-checked:bg-blue-500",
       outline: "bg-transparent border-2 border-gray-300 peer-checked:border-blue-600 peer-checked:bg-blue-600 dark:border-gray-600 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500",
-      filled: "bg-gray-100 peer-checked:bg-blue-600 dark:bg-gray-800 dark:peer-checked:bg-blue-500"
+      filled: "bg-gray-100 peer-checked:bg-blue-600 dark:bg-gray-800 dark:peer-checked:bg-blue-500",
+      glass: "bg-white/20 backdrop-blur-sm border border-white/30 peer-checked:bg-blue-400/50 peer-checked:border-blue-300/50 dark:bg-slate-800/20 dark:border-slate-700/50 dark:peer-checked:bg-blue-400/50 dark:peer-checked:border-blue-300/50"
     }
 
     const stateClasses = error 

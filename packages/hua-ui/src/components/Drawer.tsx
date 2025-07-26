@@ -147,7 +147,7 @@ const DrawerHeader = React.forwardRef<HTMLDivElement, DrawerHeaderProps>(
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors"
           >
-            <Icon name="x" size={20} />
+            <Icon name="close" size={20} />
           </button>
         )}
       </div>

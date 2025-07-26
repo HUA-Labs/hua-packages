@@ -5,7 +5,7 @@ import { cn } from "../lib/utils"
 
 export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "horizontal" | "vertical"
-  variant?: "solid" | "dashed" | "dotted" | "gradient"
+  variant?: "solid" | "dashed" | "dotted" | "gradient" | "glass"
   size?: "sm" | "md" | "lg"
   spacing?: "none" | "sm" | "md" | "lg" | "xl"
   color?: "default" | "muted" | "primary" | "secondary"
@@ -38,7 +38,10 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
       dotted: "border-dotted",
       gradient: orientation === "horizontal" 
         ? "bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600"
-        : "bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600"
+        : "bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600",
+      glass: orientation === "horizontal"
+        ? "bg-gradient-to-r from-transparent via-white/30 to-transparent"
+        : "bg-gradient-to-b from-transparent via-white/30 to-transparent"
     }
 
     const colorClasses = {

@@ -5,6 +5,7 @@ import { cn } from "../lib/utils"
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg"
+  variant?: "default" | "glass"
 }
 
 export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
@@ -12,11 +13,16 @@ export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageEleme
 export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, size = "md", ...props }, ref) => {
+  ({ className, size = "md", variant = "default", ...props }, ref) => {
     const sizeClasses = {
       sm: "w-8 h-8",
       md: "w-10 h-10", 
       lg: "w-12 h-12"
+    }
+
+    const variantClasses = {
+      default: "",
+      glass: "ring-2 ring-white/30 backdrop-blur-sm"
     }
 
     return (
@@ -25,6 +31,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         className={cn(
           "relative flex shrink-0 overflow-hidden rounded-full",
           sizeClasses[size],
+          variantClasses[variant],
           className
         )}
         {...props}

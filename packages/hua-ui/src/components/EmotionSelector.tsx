@@ -101,7 +101,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
                   </span>
                 )}
               </div>
-              <span className="font-medium">{emotion.label}</span>
+              <span className="font-medium truncate max-w-[120px]">{emotion.label}</span>
             </div>
           </div>
         )
@@ -119,7 +119,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             )}
             onClick={() => handleEmotionClick(emotion.key)}
           >
-            {emotion.label}
+            <span className="truncate max-w-[100px]">{emotion.label}</span>
           </div>
         )
       }

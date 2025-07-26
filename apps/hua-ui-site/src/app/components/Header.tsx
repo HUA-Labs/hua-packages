@@ -1,7 +1,15 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { 
+  ThemeToggle, 
+  LanguageToggle, 
+  Icon,
+  Container,
+  Button
+} from '@hua-labs/ui'
 
 export default function Header() {
   const pathname = usePathname()
@@ -19,20 +27,23 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">✨</span>
+                {React.createElement(Icon as any, {
+                  name: "sparkles",
+                  className: "w-6 h-6 text-blue-600"
+                })}
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   HUA UI
                 </h1>
               </div>
-            </a>
+            </Link>
           </div>
           
           <div className="flex items-center gap-4">
             <nav className="hidden md:flex items-center gap-6">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`text-sm font-medium transition-colors ${
@@ -42,12 +53,15 @@ export default function Header() {
                   }`}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </nav>
-            <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-              🌙
-            </button>
+            
+            {/* SDK 컴포넌트들 사용 */}
+            <div className="flex items-center gap-2">
+              {React.createElement(LanguageToggle as any)}
+              {React.createElement(ThemeToggle as any)}
+            </div>
           </div>
         </div>
       </div>
