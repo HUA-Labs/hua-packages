@@ -1,17 +1,26 @@
 # @hua-labs/ui 🎨
 
-**HUA Labs의 모던 React UI 컴포넌트 라이브러리**
+**shadcn/ui보다 더 직관적이고 스마트한 React 컴포넌트 라이브러리**
 
-Beautiful, accessible, and customizable components for React applications.
+Beautiful, accessible, and customizable components for React applications with intuitive APIs and smart defaults.
 
 ## ✨ 주요 기능
 
-### 🎯 **15개의 핵심 컴포넌트**
-- **기본 UI**: Accordion, BottomSheet, Drawer, ConfirmModal, ScrollArea, Icon, Breadcrumb
-- **테마**: ThemeProvider, ThemeToggle
-- **스크롤**: ScrollToTop, ScrollIndicator, ScrollProgress
-- **전환**: PageTransition
-- **감정**: ChatMessage, EmotionAnalysis, EmotionSelector
+### 🎯 **직관적인 API**
+- **복잡한 variant 대신 간단한 prop**: `appearance`, `scale`, `style`
+- **스마트 기본값**: 자동으로 적절한 스타일 적용
+- **완벽한 TypeScript 지원**: 풍부한 타입 정의
+
+### 🧩 **컴포넌트 라이브러리**
+- **기본 컴포넌트**: Button, Input, Card, Tabs, Badge, Avatar
+- **스마트 컴포넌트**: Action, Panel, Navigation
+- **고급 컴포넌트**: EmotionAnalysis, ChatMessage, ConfirmModal
+- **유틸리티 컴포넌트**: ThemeProvider, HydrationProvider, ClientOnly
+
+### 🛠️ **스마트 유틸리티**
+- **merge**: 중복 클래스 자동 해결
+- **mergeIf**: 조건부 클래스 적용
+- **mergeMap**: 객체 기반 조건부 클래스
 
 ### 🌙 **다크모드 지원**
 - 자동 테마 감지
@@ -26,6 +35,11 @@ Beautiful, accessible, and customizable components for React applications.
 ### 📱 **반응형 디자인**
 - 모든 디바이스에서 완벽한 경험
 - 모바일 우선 설계
+
+### 🔄 **하위 호환성**
+- 기존 Button, Card, Tabs 컴포넌트 유지
+- 새로운 Action, Panel, Navigation 컴포넌트 추가
+- 점진적 마이그레이션 지원
 
 ## 🚀 시작하기
 
@@ -42,80 +56,222 @@ pnpm add @hua-labs/ui
 ### 기본 사용법
 
 ```tsx
-import { Accordion, ThemeProvider } from '@hua-labs/ui';
+import { Button, Input, Card, ThemeProvider } from '@hua-labs/ui';
 
 function App() {
   return (
     <ThemeProvider>
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>아코디언 제목</AccordionTrigger>
-          <AccordionContent>
-            아코디언 내용입니다.
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      <div>
+        <Button>기본 버튼</Button>
+        <Input placeholder="입력하세요" />
+        <Card>카드 내용</Card>
+      </div>
     </ThemeProvider>
+  );
+}
+```
+
+### 스마트 컴포넌트 사용
+
+```tsx
+import { Action, Panel, Navigation } from '@hua-labs/ui';
+
+function App() {
+  return (
+    <div>
+      <Action appearance="primary" scale="large">
+        스마트 액션
+      </Action>
+      <Panel style="elevated" padding="large">
+        고급 패널
+      </Panel>
+      <Navigation style="pills" scale="medium">
+        <NavigationItem value="tab1">탭 1</NavigationItem>
+        <NavigationItem value="tab2">탭 2</NavigationItem>
+      </Navigation>
+    </div>
   );
 }
 ```
 
 ## 📚 컴포넌트 가이드
 
-### Accordion (아코디언)
+### 기본 컴포넌트
 
+#### Button
 ```tsx
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@hua-labs/ui';
+import { Button } from '@hua-labs/ui';
 
-<Accordion type="single" collapsible>
-  <AccordionItem value="item-1">
-    <AccordionTrigger>첫 번째 항목</AccordionTrigger>
-    <AccordionContent>첫 번째 항목의 내용</AccordionContent>
-  </AccordionItem>
-  <AccordionItem value="item-2">
-    <AccordionTrigger>두 번째 항목</AccordionTrigger>
-    <AccordionContent>두 번째 항목의 내용</AccordionContent>
-  </AccordionItem>
-</Accordion>
+<Button>기본 버튼</Button>
+<Button variant="outline">아웃라인</Button>
+<Button variant="ghost">고스트</Button>
+<Button size="lg">큰 버튼</Button>
+<Button loading>로딩 중</Button>
 ```
 
-### ThemeProvider & ThemeToggle
-
+#### Input
 ```tsx
-import { ThemeProvider, ThemeToggle } from '@hua-labs/ui';
+import { Input } from '@hua-labs/ui';
+
+<Input placeholder="입력하세요" />
+<Input type="password" />
+<Input disabled />
+```
+
+#### Card
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
+
+<Card>
+  <CardHeader>
+    <CardTitle>카드 제목</CardTitle>
+  </CardHeader>
+  <CardContent>
+    카드 내용
+  </CardContent>
+</Card>
+```
+
+### 스마트 컴포넌트
+
+#### Action (고급 버튼)
+```tsx
+import { Action } from '@hua-labs/ui';
+
+<Action appearance="primary" scale="large">
+  스마트 액션
+</Action>
+<Action appearance="glass" loading>
+  글래스 로딩
+</Action>
+```
+
+#### Panel (고급 카드)
+```tsx
+import { Panel } from '@hua-labs/ui';
+
+<Panel style="elevated" padding="large">
+  고급 패널
+</Panel>
+<Panel style="outline" padding="none">
+  아웃라인 패널
+</Panel>
+```
+
+#### Navigation (고급 탭)
+```tsx
+import { Navigation, NavigationList, NavigationItem, NavigationContent } from '@hua-labs/ui';
+
+<Navigation defaultValue="tab1">
+  <NavigationList>
+    <NavigationItem value="tab1">탭 1</NavigationItem>
+    <NavigationItem value="tab2">탭 2</NavigationItem>
+  </NavigationList>
+  <NavigationContent value="tab1">탭 1 내용</NavigationContent>
+  <NavigationContent value="tab2">탭 2 내용</NavigationContent>
+</Navigation>
+```
+
+### 유틸리티 컴포넌트
+
+#### ThemeProvider
+```tsx
+import { ThemeProvider } from '@hua-labs/ui';
 
 function App() {
   return (
     <ThemeProvider>
-      <div>
-        <ThemeToggle />
-        {/* 다른 컴포넌트들 */}
-      </div>
+      <YourApp />
     </ThemeProvider>
   );
 }
 ```
 
-### BottomSheet (바텀시트)
-
+#### HydrationProvider
 ```tsx
-import { BottomSheet } from '@hua-labs/ui';
+import { HydrationProvider } from '@hua-labs/ui';
 
-function MyComponent() {
-  const [isOpen, setIsOpen] = useState(false);
-
+function App() {
   return (
-    <BottomSheet 
-      isOpen={isOpen} 
-      onClose={() => setIsOpen(false)}
-    >
-      <div className="p-6">
-        <h2>바텀시트 제목</h2>
-        <p>바텀시트 내용입니다.</p>
-      </div>
-    </BottomSheet>
+    <HydrationProvider>
+      <YourApp />
+    </HydrationProvider>
   );
 }
+```
+
+## 🛠️ 스마트 유틸리티
+
+### merge
+```tsx
+import { merge } from '@hua-labs/ui';
+
+// 중복 클래스 자동 해결
+const className = merge("px-2 py-1", "px-4") // "py-1 px-4"
+const className2 = merge("text-red-500", "text-blue-500") // "text-blue-500"
+```
+
+### mergeIf
+```tsx
+import { mergeIf } from '@hua-labs/ui';
+
+// 조건부 클래스 적용
+const className = mergeIf(isActive, "bg-blue-500", "bg-gray-200")
+const className2 = mergeIf(isLoading, "opacity-50 cursor-not-allowed")
+```
+
+### mergeMap
+```tsx
+import { mergeMap } from '@hua-labs/ui';
+
+// 객체 기반 조건부 클래스
+const className = mergeMap({
+  "bg-blue-500": isPrimary,
+  "bg-gray-500": !isPrimary,
+  "text-white": true,
+  "opacity-50": isDisabled
+})
+```
+
+## 🔄 마이그레이션 가이드
+
+### shadcn/ui에서 마이그레이션
+
+#### Button 마이그레이션
+```tsx
+// shadcn/ui
+<Button variant="outline" size="lg" className="w-full">Click</Button>
+
+// HUA UI
+<Action appearance="outline" scale="large" fullWidth>Click</Action>
+```
+
+#### Card 마이그레이션
+```tsx
+// shadcn/ui
+<Card className="p-6 rounded-lg shadow-md">
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>Content</CardContent>
+</Card>
+
+// HUA UI
+<Panel style="elevated" padding="large">
+  <h3>Title</h3>
+  <p>Content</p>
+</Panel>
+```
+
+### 기존 HUA UI에서 업그레이드
+
+#### 기존 Button → 새로운 Action
+```tsx
+// 기존 (여전히 지원됨)
+<Button variant="outline" size="lg">Click</Button>
+
+// 새로운 방식
+<Action appearance="outline" scale="large">Click</Action>
 ```
 
 ## 🎨 테마 커스터마이징
