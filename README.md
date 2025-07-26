@@ -119,8 +119,15 @@ pnpm test
 - **my-api**: REST API 서버
 - **my-app**: 감정 다이어리 애플리케이션
 - **hua-labs-official**: HUA Labs 공식 웹사이트
+- **hua-ui-site**: HUA UI 컴포넌트 라이브러리 데모 사이트
 
 ### Packages
+- **hua-ui**: 🎨 **shadcn/ui보다 더 직관적이고 스마트한 React 컴포넌트 라이브러리**
+  - 직관적인 API (복잡한 variant 대신 간단한 prop)
+  - 스마트 기본값 (자동 스타일 적용)
+  - 완벽한 TypeScript 지원
+  - 트리 쉐이킹으로 번들 크기 최적화
+  - 하위 호환성 보장
 - **hua-i18n-sdk**: 완전한 국제화 솔루션
 - **hua-my-api-sdk**: SUM API 클라이언트 SDK
 - **hua-utils**: 공통 유틸리티 함수들
@@ -140,6 +147,7 @@ MIT License
 ## 📚 문서
 
 ### 📖 공개 문서
+- **[HUA UI 라이브러리 문서](./docs/HUA_UI_LIBRARY.md)** - 🎨 shadcn/ui보다 더 직관적인 React 컴포넌트 라이브러리
 - **[모노레포 정리 계획](./docs/public/architecture/monorepo-cleanup-plan.md)** - 모노레포 구조 정리 계획
 - **[개발 로그](./docs/devlogs/)** - 개발 과정 기록 및 이슈 추적
 - **[API 문서](./docs/public/api/)** - API 스펙 및 문서
