@@ -50,7 +50,7 @@ export interface I18nConfig {
 
 // 에러 타입 정의
 export interface TranslationError extends Error {
-  code: 'MISSING_KEY' | 'LOAD_FAILED' | 'INVALID_KEY' | 'NETWORK_ERROR' | 'INITIALIZATION_ERROR' | 'VALIDATION_ERROR' | 'CACHE_ERROR';
+  code: 'MISSING_KEY' | 'LOAD_FAILED' | 'INVALID_KEY' | 'NETWORK_ERROR' | 'INITIALIZATION_ERROR' | 'VALIDATION_ERROR' | 'CACHE_ERROR' | 'FALLBACK_LOAD_FAILED' | 'INITIALIZATION_FAILED' | 'RETRY_FAILED';
   language?: string;
   namespace?: string;
   key?: string;
@@ -130,6 +130,8 @@ export interface I18nContextType {
   isLoading: boolean;
   error: TranslationError | null;
   supportedLanguages: LanguageConfig[];
+  // 초기화 상태
+  isInitialized: boolean;
   // 개발자 도구
   debug: {
     getCurrentLanguage: () => string;
@@ -328,6 +330,27 @@ export function createUserFriendlyError(error: TranslationError): UserFriendlyEr
       suggestion: '캐시를 초기화하고 다시 시도해주세요',
       action: '캐시 초기화',
       severity: 'low'
+    },
+    FALLBACK_LOAD_FAILED: {
+      code: 'FALLBACK_LOAD_FAILED',
+      message: '폴백 언어 로딩에 실패했습니다',
+      suggestion: '폴백 언어 파일을 확인해주세요',
+      action: '폴백 언어 파일 수정',
+      severity: 'medium'
+    },
+    INITIALIZATION_FAILED: {
+      code: 'INITIALIZATION_FAILED',
+      message: '초기화에 실패했습니다',
+      suggestion: '설정을 확인하고 다시 시도해주세요',
+      action: '설정 확인',
+      severity: 'critical'
+    },
+    RETRY_FAILED: {
+      code: 'RETRY_FAILED',
+      message: '재시도에 실패했습니다',
+      suggestion: '네트워크 연결을 확인해주세요',
+      action: '재시도',
+      severity: 'high'
     }
   };
 
