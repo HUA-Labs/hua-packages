@@ -1,55 +1,134 @@
 "use client"
 
-import React from "react"
+import * as React from "react"
 import { merge } from "../lib/utils"
+import { Button, ButtonProps } from "./Button"
 
-export interface ActionProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'loading'> {
-  appearance?: "primary" | "secondary" | "outline" | "ghost" | "glass"
-  scale?: "small" | "medium" | "large"
-  loading?: boolean
+// ButtonProps에서 'type'만 제외하고 상속 (href 포함)
+export interface ActionProps extends Omit<ButtonProps, 'type'> {
+  // 🆕 Action 전용 고급 속성들
+  actionType?: "primary" | "secondary" | "tertiary" | "magical" | "cyberpunk" | "ninja" | "wizard" | "sniper"
+  feedback?: "ripple" | "particle" | "sound" | "haptic" | "glitch" | "sparkle" | "smoke"
+  
+  // 고급 효과
+  particleEffect?: boolean
+  rippleEffect?: boolean
+  soundEffect?: boolean
+  hapticFeedback?: boolean
+  
+  // 고급 스타일링
+  transparency?: number        // 0-1 사이 투명도
+  blurIntensity?: number       // backdrop-blur 강도
+  glowIntensity?: number       // 글로우 강도
+  glowColor?: string           // 글로우 색상
+  
+  // 명시적으로 href 추가 (ButtonProps에서 상속받지만 명시적으로 선언)
+  href?: string
 }
 
 const Action = React.forwardRef<HTMLButtonElement, ActionProps>(
-  ({ className, appearance = "primary", scale = "medium", loading = false, disabled, children, ...props }, ref) => {
-    const appearanceClasses = {
-      primary: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-sm hover:shadow-md",
-      secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 shadow-sm hover:shadow-md",
-      outline: "border-2 border-slate-300 bg-transparent text-slate-900 hover:bg-slate-50 dark:border-slate-600 dark:bg-transparent dark:text-slate-100 dark:hover:bg-slate-800/50",
-      ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white",
-      glass: "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 dark:bg-slate-800/20 dark:border-slate-700/50 dark:text-slate-100 dark:hover:bg-slate-700/30"
+  ({ 
+    className,
+    actionType = "primary",
+    feedback = "ripple",
+    particleEffect = false,
+    rippleEffect = false,
+    soundEffect = false,
+    hapticFeedback = false,
+    transparency = 1,
+    blurIntensity = 0,
+    glowIntensity = 0,
+    glowColor = "blue",
+    children,
+    onClick,
+    href,
+    ...buttonProps 
+  }, ref): React.ReactElement => {
+    
+    // 고급 효과 처리 - useCallback으로 메모이제이션
+    const handleAdvancedEffects = React.useCallback(() => {
+      // 파티클 효과
+      if (particleEffect) {
+        console.log('Particle effect triggered')
+      }
+      
+      // 리플 효과
+      if (rippleEffect) {
+        console.log('Ripple effect triggered')
+      }
+      
+      // 사운드 효과
+      if (soundEffect) {
+        console.log('Sound effect triggered')
+      }
+      
+      // 햅틱 피드백
+      if (hapticFeedback && 'vibrate' in navigator) {
+        navigator.vibrate(50)
+      }
+    }, [particleEffect, rippleEffect, soundEffect, hapticFeedback])
+    
+    // 고급 스타일 계산 - useMemo로 메모이제이션
+    const advancedStyles = React.useMemo((): React.CSSProperties => {
+      const styles: React.CSSProperties = {
+        opacity: transparency,
+      }
+      
+      if (blurIntensity > 0) {
+        styles.backdropFilter = `blur(${blurIntensity}px)`
+      }
+      
+      if (glowIntensity > 0) {
+        styles.boxShadow = `0 0 ${glowIntensity * 10}px ${glowColor}`
+      }
+      
+      return styles
+    }, [transparency, blurIntensity, glowIntensity, glowColor])
+    
+    // 이벤트 핸들러 - useCallback으로 메모이제이션
+    const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+      handleAdvancedEffects()
+      
+      // 원래 onClick 핸들러 호출
+      if (onClick) {
+        onClick(e)
+      }
+    }, [handleAdvancedEffects, onClick])
+    
+    // Action 전용 클래스들 - useMemo로 메모이제이션
+    const actionClasses = React.useMemo(() => merge(
+      "action-component",
+      `action-${actionType}`,
+      `action-feedback-${feedback}`,
+      className
+    ), [actionType, feedback, className])
+    
+    // href가 있으면 링크로, 없으면 버튼으로 렌더링
+    const commonProps = {
+      ref,
+      className: actionClasses,
+      style: advancedStyles,
+      onClick: handleClick,
+      href,
+      ...buttonProps
     }
-
-    const scaleClasses = {
-      small: "h-9 px-4 py-2 text-sm rounded-lg",
-      medium: "h-11 px-6 py-3 text-base rounded-xl",
-      large: "h-13 px-8 py-4 text-lg rounded-xl"
-    }
-
+    
+    // Button 컴포넌트의 모든 props를 직접 전달
     return (
-      <button
-        className={merge(
-          "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          appearanceClasses[appearance],
-          scaleClasses[scale],
-          loading && "opacity-50 cursor-not-allowed",
-          className
-        )}
+      <Button 
         ref={ref}
-        disabled={loading || disabled}
-        {...props}
+        className={actionClasses}
+        style={advancedStyles}
+        onClick={handleClick}
+        href={href}
+        {...buttonProps}
       >
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            {children}
-          </div>
-        ) : (
-          children
-        )}
-      </button>
+        {children}
+      </Button>
     )
   }
 )
+
 Action.displayName = "Action"
 
 export { Action } 

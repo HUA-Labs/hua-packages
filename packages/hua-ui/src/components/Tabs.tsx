@@ -80,6 +80,8 @@ export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
 const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ({ 
     className, 
+    value,
+    onValueChange,
     orientation = "horizontal",
     variant = "default",
     size = "md",
@@ -89,24 +91,24 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "pills":
-          return "bg-gray-100 dark:bg-gray-800 p-1 rounded-lg"
+          return "bg-gray-100 dark:bg-gray-800 p-3 rounded-xl"
         case "underline":
           return "border-b border-gray-200 dark:border-gray-700"
         case "cards":
-          return "bg-gray-50 dark:bg-gray-900 p-1 rounded-lg"
+          return "bg-gray-50 dark:bg-gray-900 p-3 rounded-xl"
         default:
-          return "bg-gray-100 dark:bg-gray-800 p-1 rounded-lg"
+          return "bg-gray-100 dark:bg-gray-800 p-3 rounded-xl"
       }
     }
 
     const getSizeClasses = () => {
       switch (size) {
         case "sm":
-          return "h-8"
-        case "lg":
           return "h-12"
+        case "lg":
+          return "h-16"
         default:
-          return "h-10"
+          return "h-14"
       }
     }
 
@@ -114,7 +116,7 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       <div
         ref={ref}
         className={merge(
-          "inline-flex items-center justify-center",
+          "flex items-center justify-center",
           orientation === "vertical" && "flex-col",
           getVariantClasses(),
           getSizeClasses(),
@@ -125,6 +127,8 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
+              value,
+              onValueChange,
               orientation,
               variant,
               size
@@ -163,23 +167,31 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
       switch (variant) {
         case "pills":
           return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            active 
+              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
           )
         case "underline":
           return merge(
-            "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            active 
+              ? "border-blue-500 text-blue-600 dark:text-blue-400" 
+              : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           )
         case "cards":
           return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            active 
+              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
           )
         default:
           return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            active 
+              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
           )
       }
     }
@@ -187,11 +199,18 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
     const getSizeClasses = () => {
       switch (size) {
         case "sm":
-          return "h-8 px-2 py-1 text-xs"
+          return "h-10 px-4 py-2 text-xs"
         case "lg":
-          return "h-12 px-4 py-2 text-base"
+          return "h-14 px-6 py-3 text-base"
         default:
-          return "h-10 px-3 py-1.5 text-sm"
+          return "h-12 px-5 py-2.5 text-sm"
+      }
+    }
+
+    const handleClick = () => {
+      console.log('TabsTrigger clicked:', value, 'onValueChange:', !!onValueChange)
+      if (onValueChange) {
+        onValueChange(value)
       }
     }
 
@@ -203,7 +222,8 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
           getSizeClasses(),
           className
         )}
-        onClick={() => onValueChange?.(value)}
+        onClick={handleClick}
+        type="button"
         {...props}
       >
         {children}

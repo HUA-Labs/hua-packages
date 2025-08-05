@@ -94,6 +94,10 @@ import {
   Cloud,
   CloudRain,
   
+  // Authentication & User
+  LogIn,
+  LogOut,
+  
   // Finance & E-commerce
   CreditCard,
   DollarSign,
@@ -258,6 +262,31 @@ import {
   Sidebar,
   Gauge,
   Sparkles,
+  
+  // 문서 페이지용 아이콘들
+  Book,
+  Code,
+  Brain,
+  Rocket,
+  Target,
+  Lightbulb,
+  GraduationCap,
+  Award,
+  Trophy,
+  Medal,
+  Crown,
+  Gem,
+  Diamond,
+  
+  // Science & Lab
+  Beaker,
+  TestTube,
+  Flask,
+  FlaskConical,
+  Microscope,
+  Atom,
+  Droplets,
+  Thermometer,
 } from 'lucide-react'
 
 // 아이콘 객체
@@ -422,11 +451,13 @@ export const icons = {
   fileEdit: FileEdit,
   fileSearch: FileSearch,
   
-  // Security
+  // Security & Authentication
   shieldCheck: ShieldCheck,
   shieldAlert: ShieldAlert,
   key: Key,
   fingerprint: Fingerprint,
+  logIn: LogIn,
+  logOut: LogOut,
   
   // Communication Extended
   messageSquare: MessageSquare,
@@ -523,6 +554,31 @@ export const icons = {
   sidebar: Sidebar,
   gauge: Gauge,
   sparkles: Sparkles,
+  
+  // 문서 페이지용 아이콘들
+  book: Book,
+  code: Code,
+  brain: Brain,
+  rocket: Rocket,
+  target: Target,
+  lightbulb: Lightbulb,
+  graduationCap: GraduationCap,
+  award: Award,
+  trophy: Trophy,
+  medal: Medal,
+  crown: Crown,
+  gem: Gem,
+  diamond: Diamond,
+  
+  // Science & Lab
+  beaker: Beaker,
+  testTube: TestTube,
+  flask: Flask,
+  flaskConical: FlaskConical,
+  microscope: Microscope,
+  atom: Atom,
+  droplets: Droplets,
+  thermometer: Thermometer,
 }
 
 // 아이콘 이름 타입

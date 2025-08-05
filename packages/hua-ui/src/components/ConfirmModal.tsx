@@ -111,7 +111,6 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
 
     return (
       <Modal 
-        ref={ref}
         isOpen={isOpen} 
         onClose={onClose} 
         showCloseButton={false}

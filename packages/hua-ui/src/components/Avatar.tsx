@@ -6,6 +6,8 @@ import { cn } from "../lib/utils"
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg"
   variant?: "default" | "glass"
+  src?: string
+  alt?: string
 }
 
 export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
@@ -13,7 +15,7 @@ export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageEleme
 export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, size = "md", variant = "default", ...props }, ref) => {
+  ({ className, size = "md", variant = "default", src, alt, children, ...props }, ref) => {
     const sizeClasses = {
       sm: "w-8 h-8",
       md: "w-10 h-10", 
@@ -35,7 +37,15 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
           className
         )}
         {...props}
-      />
+      >
+        {src ? (
+          <AvatarImage src={src} alt={alt || "avatar"} />
+        ) : (
+          <AvatarFallback>
+            {children || (alt ? alt.charAt(0).toUpperCase() : "U")}
+          </AvatarFallback>
+        )}
+      </div>
     )
   }
 )
@@ -57,7 +67,7 @@ const AvatarFallback = React.forwardRef<HTMLDivElement, AvatarFallbackProps>(
     <div
       ref={ref}
       className={cn(
-        "flex h-full w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800",
+        "flex h-full w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium",
         className
       )}
       {...props}
