@@ -1,47 +1,76 @@
-# 📚 HUA Platform Documentation
+# HUA Platform
 
-이 폴더는 HUA Platform의 모든 문서를 관리합니다.
+HUA Platform은 모던 웹 개발을 위한 통합 개발 플랫폼입니다.
 
-## 📁 폴더 구조
+## 📚 문서
 
-### 📖 `public/` - 공개 문서 (Git에 포함)
-- **`api/`** - API 문서 및 스펙
-- **`guides/`** - 개발 가이드 및 튜토리얼
-- **`architecture/`** - 시스템 아키텍처 문서
-- **`user-manuals/`** - 사용자 매뉴얼
+### 핵심 문서
+- [아키텍처 개요](./ARCHITECTURE_OVERVIEW.md)
+- [기여 가이드](./CONTRIBUTING.md)
+- [점진적 마이그레이션 전략](./GRADUAL_MIGRATION_STRATEGY.md)
 
-### 🔒 `private/` - 비공개 문서 (Git에서 제외)
-- **`meetings/`** - 회의록 및 논의사항
-- **`internal/`** - 내부 문서 및 노트
-- **`security/`** - 보안 관련 문서
+### SDK 문서
+- [애니메이션 SDK 아키텍처](./ANIMATION_SDK_ARCHITECTURE.md) - 🎨 **새로 추가!**
+- [UI SDK 문서](./packages/hua-ui/README.md)
+- [i18n SDK 문서](./packages/hua-i18n-sdk/README.md)
 
-### 📋 `templates/` - 문서 템플릿
-- 문서 작성 시 사용할 템플릿들
+### 개발 로그
+- [개발 로그](./devlogs/)
 
-## 📝 문서 작성 가이드
+## 🚀 빠른 시작
 
-### 공개 문서 작성 시
-1. `docs/public/` 하위의 적절한 폴더에 작성
-2. 마크다운(.md) 형식 사용
-3. 한글과 영어 병기 권장
-4. 이미지는 `docs/public/assets/` 폴더에 저장
+### 애니메이션 SDK 사용하기
 
-### 비공개 문서 작성 시
-1. `docs/private/` 하위의 적절한 폴더에 작성
-2. `.gitignore`에 의해 Git에서 자동 제외됨
-3. 민감한 정보는 절대 공개 폴더에 저장하지 않음
+```typescript
+import { useSmartAnimation } from '@hua-labs/animation'
 
-## 🔍 문서 검색
+export default function HomePage() {
+  const heroRef = useSmartAnimation({ type: 'hero' })
+  const titleRef = useSmartAnimation({ type: 'title' })
+  const buttonRef = useSmartAnimation({ type: 'button' })
 
-- **API 문서**: `docs/public/api/`
-- **개발 가이드**: `docs/public/guides/`
-- **아키텍처**: `docs/public/architecture/`
-- **사용자 매뉴얼**: `docs/public/user-manuals/`
+  return (
+    <div>
+      <div ref={heroRef.ref} style={heroRef.style}>
+        <h1 ref={titleRef.ref} style={titleRef.style}>제목</h1>
+        <button ref={buttonRef.ref} style={buttonRef.style}>버튼</button>
+      </div>
+    </div>
+  )
+}
+```
 
-## 📋 문서 템플릿
+자세한 내용은 [애니메이션 SDK 문서](./ANIMATION_SDK_ARCHITECTURE.md)를 참조하세요!
 
-문서 작성 시 `docs/templates/` 폴더의 템플릿을 참고하세요.
+## 📦 패키지 구조
 
----
+```
+hua-platform/
+├── apps/                    # 애플리케이션들
+│   ├── my-api/            # API 사이트
+│   ├── hua-animation-site/ # 애니메이션 데모 사이트
+│   └── ...
+├── packages/               # 공유 패키지들
+│   ├── hua-ui/            # UI 컴포넌트
+│   ├── hua-animation/     # 애니메이션 SDK
+│   ├── hua-i18n-core/     # i18n 코어
+│   └── ...
+└── docs/                  # 문서
+```
 
-**⚠️ 주의사항**: `docs/private/` 폴더의 내용은 Git에 포함되지 않습니다. 중요한 정보는 별도로 백업하세요. 
+## 🛠️ 개발
+
+```bash
+# 의존성 설치
+pnpm install
+
+# 개발 서버 시작
+pnpm dev
+
+# 빌드
+pnpm build
+```
+
+## 📄 라이선스
+
+MIT License 

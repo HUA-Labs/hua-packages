@@ -145,3 +145,5 @@ apps/*/devlogs/
 
 # Public documentation (shared in Git)
 # docs/public/ - This folder IS tracked in Git
+
+*/back/
