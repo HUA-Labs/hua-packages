@@ -1,0 +1,63 @@
+{
+  "name": "@hua-labs/motion",
+  "version": "0.1.0",
+  "description": "순수 JavaScript/React로 구현된 모션 SDK - 3단계 추상화 시스템과 개별 모션 훅 제공",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "motion",
+    "animation",
+    "hooks",
+    "typescript",
+    "framer-motion-alternative",
+    "simple-motion",
+    "page-motion",
+    "smart-motion",
+    "intersection-observer",
+    "scroll-reveal",
+    "hover-motion"
+  ],
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hua-labs/hua-motion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hua-labs/hua-motion/issues"
+  },
+  "homepage": "https://github.com/hua-labs/hua-motion#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^18"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 

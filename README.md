@@ -148,6 +148,7 @@ MIT License
 
 ### 📖 공개 문서
 - **[HUA UI 라이브러리 문서](./docs/HUA_UI_LIBRARY.md)** - 🎨 shadcn/ui보다 더 직관적인 React 컴포넌트 라이브러리
+- **[HUA UI 개발 플랜](./docs/HUA_UI_DEVELOPMENT_PLAN.md)** - 🚀 개발 로드맵 및 차별화 전략
 - **[모노레포 정리 계획](./docs/public/architecture/monorepo-cleanup-plan.md)** - 모노레포 구조 정리 계획
 - **[개발 로그](./docs/devlogs/)** - 개발 과정 기록 및 이슈 추적
 - **[API 문서](./docs/public/api/)** - API 스펙 및 문서
