@@ -1,0 +1,70 @@
+{
+  "name": "@hua-labs/motion",
+  "version": "1.0.0",
+  "description": "HUA Labs - Advanced Motion & Animation Hooks for React - Smooth, performant, and customizable animations",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.3",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "keywords": [
+    "motion",
+    "animation",
+    "hooks",
+    "react",
+    "typescript",
+    "spring",
+    "fade",
+    "slide",
+    "scale",
+    "bounce",
+    "pulse",
+    "gradient",
+    "scroll",
+    "gesture",
+    "orchestration",
+    "korean",
+    "english"
+  ],
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
+} 

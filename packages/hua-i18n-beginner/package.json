@@ -1,7 +1,7 @@
 {
   "name": "@hua-labs/i18n-beginner",
-  "version": "1.0.0",
-  "description": "HUA Labs - 국제화 SDK 초보자용 (간단한 설정)",
+  "version": "2.0.0",
+  "description": "HUA Labs - Internationalization SDK for Beginners (Simple Setup) - Korean/English support out of the box, easy to add other languages",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -20,7 +20,6 @@
     "type-check": "echo 'Skipping type-check for hua-i18n-beginner'"
   },
   "dependencies": {
-    "@hua-labs/i18n-core": "workspace:*",
     "react": "^19.0.0"
   },
   "devDependencies": {
@@ -34,6 +33,29 @@
   "peerDependencies": {
     "react": ">=16.8.0"
   },
-  "keywords": ["i18n", "beginner", "easy", "simple", "react"],
-  "license": "MIT"
-} 
+  "keywords": [
+    "i18n",
+    "internationalization",
+    "localization",
+    "beginner",
+    "easy",
+    "simple",
+    "react",
+    "nextjs",
+    "typescript",
+    "korean",
+    "english",
+    "multilingual",
+    "translation"
+  ],
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
+}
