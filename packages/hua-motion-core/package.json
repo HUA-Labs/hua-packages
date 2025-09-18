@@ -1,7 +1,7 @@
 {
-  "name": "@hua-labs/ui",
+  "name": "@hua-labs/motion-core",
   "version": "1.0.0",
-  "description": "HUA Labs - Modern React UI Component Library - Beautiful, accessible, and customizable components for React applications",
+  "description": "HUA Motion Core - Essential animation hooks for React developers",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -9,16 +9,6 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./components/*": {
-      "import": "./dist/components/*.js",
-      "require": "./dist/components/*.js",
-      "types": "./dist/components/*.d.ts"
-    },
-    "./components/advanced/*": {
-      "import": "./dist/components/advanced/*.js",
-      "require": "./dist/components/advanced/*.js",
-      "types": "./dist/components/advanced/*.d.ts"
     }
   },
   "files": [
@@ -32,36 +22,37 @@
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0",
-    "lucide-react": "^0.263.1",
-    "@hua-labs/motion": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.8.3",
+    "eslint": "^8.0.0",
     "jest": "^29.0.0",
-    "@types/jest": "^29.0.0",
-    "eslint": "^8.0.0"
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
   "keywords": [
-    "ui",
-    "components",
+    "motion",
+    "animation",
+    "hooks",
     "react",
     "typescript",
-    "design-system",
-    "accessible",
-    "modern",
-    "tailwind",
-    "nextjs",
+    "fade",
+    "slide",
+    "scale",
+    "bounce",
+    "pulse",
+    "scroll",
+    "hover",
+    "click",
     "korean",
     "english"
   ],
@@ -75,4 +66,4 @@
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
-} 
+}

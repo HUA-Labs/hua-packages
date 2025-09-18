@@ -50,7 +50,7 @@ export function ThemeToggle({
     return resolvedTheme === "dark" ? (
       <Icon name="moon" size={iconSizes[size]} />
     ) : (
-      <Icon name="sun" size={iconSizes[size]} />
+      <Icon name="sun" size={iconSizes[size]} className="text-amber-600" />
     )
   }
 
@@ -59,8 +59,8 @@ export function ThemeToggle({
       setTheme("light")
     } else if (theme === "light") {
       setTheme("dark")
-    } else {
-      setTheme("system")
+    } else if (theme === "dark") {
+      setTheme("light")  // dark → light로 직접 전환
     }
   }
 
@@ -75,10 +75,10 @@ export function ThemeToggle({
         )}
         {...props}
       >
-        <div className="relative">
+        <div className="relative flex items-center justify-center w-full h-full">
           <div
             className={cn(
-              "absolute inset-0 transition-all duration-300",
+              "absolute inset-0 flex items-center justify-center transition-all duration-300",
               resolvedTheme === "dark" ? "rotate-0 opacity-100" : "rotate-90 opacity-0"
             )}
           >
@@ -86,11 +86,11 @@ export function ThemeToggle({
           </div>
           <div
             className={cn(
-              "transition-all duration-300",
+              "absolute inset-0 flex items-center justify-center transition-all duration-300",
               resolvedTheme === "dark" ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
             )}
           >
-            <Icon name="sun" size={iconSizes[size]} className="text-yellow-500" />
+            <Icon name="sun" size={iconSizes[size]} className="text-amber-600 dark:text-yellow-500" />
           </div>
         </div>
       </button>
@@ -117,7 +117,7 @@ export function ThemeToggle({
           )}
         />
         <div className="absolute inset-0 flex items-center justify-between px-1.5">
-          <Icon name="sun" size={12} className="text-yellow-500 opacity-0" />
+          <Icon name="sun" size={12} className="text-amber-600 dark:text-yellow-500 opacity-0" />
           <Icon name="moon" size={12} className="text-blue-500 opacity-0" />
         </div>
       </button>

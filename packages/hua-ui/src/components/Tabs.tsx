@@ -1,7 +1,34 @@
 "use client"
 
-import * as React from "react"
-import { merge } from "../lib/utils"
+import React from 'react'
+import { merge } from '../lib/utils'
+
+// TabsContent를 먼저 선언하여 타입 비교에 사용할 수 있도록 함
+export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  value: string
+  active?: boolean
+}
+
+const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
+  ({ className, value, active, children, ...props }, ref) => {
+    // active prop이 명시적으로 false로 설정된 경우에만 숨김
+    if (active === false) return null
+
+    return (
+      <div
+        ref={ref}
+        className={merge(
+          "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+TabsContent.displayName = "TabsContent"
 
 export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
@@ -53,6 +80,19 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
+            // TabsContent인 경우 active prop을 자동으로 설정
+            if (child.type === TabsContent) {
+              const childProps = child.props as { value: string }
+              return React.cloneElement(child, {
+                value: currentValue,
+                onValueChange: handleTabChange,
+                orientation,
+                variant,
+                size,
+                active: childProps.value === currentValue
+              } as any)
+            }
+            // 다른 컴포넌트들
             return React.cloneElement(child, {
               value: currentValue,
               onValueChange: handleTabChange,
@@ -91,13 +131,13 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "pills":
-          return "bg-gray-100 dark:bg-gray-800 p-3 rounded-xl"
+          return "bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
         case "underline":
           return "border-b border-gray-200 dark:border-gray-700"
         case "cards":
-          return "bg-gray-50 dark:bg-gray-900 p-3 rounded-xl"
+          return "bg-gray-50/80 dark:bg-gray-900/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
         default:
-          return "bg-gray-100 dark:bg-gray-800 p-3 rounded-xl"
+          return "bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
       }
     }
 
@@ -170,7 +210,7 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             active 
               ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
           )
         case "underline":
           return merge(
@@ -184,14 +224,14 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             active 
               ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
           )
         default:
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             active 
               ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-900/50"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
           )
       }
     }
@@ -232,31 +272,6 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   }
 )
 TabsTrigger.displayName = "TabsTrigger"
-
-export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: string
-  active?: boolean
-}
-
-const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
-  ({ className, value, active = false, children, ...props }, ref) => {
-    if (!active) return null
-
-    return (
-      <div
-        ref={ref}
-        className={merge(
-          "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    )
-  }
-)
-TabsContent.displayName = "TabsContent"
 
 // 편의 컴포넌트들
 const TabsPills = React.forwardRef<HTMLDivElement, TabsProps>(
