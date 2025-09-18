@@ -146,4 +146,66 @@ apps/*/devlogs/
 # Public documentation (shared in Git)
 # docs/public/ - This folder IS tracked in Git
 
+# Additional patterns from sub-projects
+# Test directories
+src/__tests__/
+**/__tests__/
+
+# Vim temporary files
+*.swp
+*.swo
+
+# Additional environment files
+.env.test
+.env.production
+
+# Cache directories
+.cache
+.parcel-cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Build outputs
+.next
+.nuxt
+.vuepress/dist
+dist-ssr
+
+# Serverless and other tools
+.serverless/
+.fusebox/
+.dynamodb/
+
+# Yarn 2+ files
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Additional macOS files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Additional Windows files
+ehthumbs.db
+
+# Visual Studio files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local files
+*.local
+
+# API keys and sensitive files
+api-keys.txt
+*.key
+
 */back/
