@@ -12,13 +12,13 @@ export default function ApiReferenceSection() {
           API 참조
         </h2>
 
-        {/* Simple Page Animation */}
+        {/* Simple Page Motion */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
           <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">기본 사용법</h4>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre><code>{`import { useSimplePageAnimation } from '@hua-labs/motion'
+            <pre><code>{`import { useSimpleMotion } from '@hua-labs/motion'
 
-const animations = useSimplePageAnimation('home')`}</code></pre>
+const motions = useSimpleMotion('home')`}</code></pre>
           </div>
           <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">지원하는 페이지 타입</h4>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
@@ -54,11 +54,11 @@ const animations = useSimplePageAnimation('home')`}</code></pre>
           </div>
         </div>
 
-        {/* Page Animations */}
+        {/* Page Motions */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
-          <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">페이지 애니메이션</h4>
+          <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">페이지 모션</h4>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre><code>{`import { usePageAnimations } from '@hua-labs/motion'
+            <pre><code>{`import { usePageMotions } from '@hua-labs/motion-core'
 
 const config = {
   hero: { type: 'hero' },
@@ -66,17 +66,17 @@ const config = {
   button: { type: 'button', hover: true, click: true }
 }
 
-const animations = usePageAnimations(config)`}</code></pre>
+const motions = usePageMotions(config)`}</code></pre>
           </div>
         </div>
 
-        {/* Smart Animation */}
+        {/* Smart Motion */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
-          <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">스마트 애니메이션</h4>
+          <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">스마트 모션</h4>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre><code>{`import { useSmartAnimation } from '@hua-labs/motion'
+            <pre><code>{`import { useMotion } from '@hua-labs/motion-core'
 
-const animation = useSmartAnimation({
+const motion = useMotion({
   type: 'hero',
   entrance: 'fadeIn',
   hover: true,
@@ -87,8 +87,8 @@ const animation = useSmartAnimation({
 })
 
 return (
-  <div ref={animation.ref} style={animation.style}>
-    스마트 애니메이션 요소
+  <div ref={motion.ref} style={motion.style}>
+    스마트 모션 요소
   </div>
 )`}</code></pre>
           </div>
@@ -119,7 +119,7 @@ return (
                 useGesture
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
-                제스처 기반 애니메이션을 위한 훅입니다.
+                제스처 기반 모션을 위한 훅입니다.
               </p>
               <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
                 <pre><code>{`const gesture = useGesture({
@@ -139,10 +139,10 @@ return <div ref={gesture.ref} style={gesture.style}>`}</code></pre>
                 useOrchestration
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
-                여러 애니메이션을 순차적으로 실행하는 훅입니다.
+                여러 모션을 순차적으로 실행하는 훅입니다.
               </p>
               <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
-                <pre><code>{`const chain = createAnimationChain([
+                <pre><code>{`const chain = createMotionChain([
   { hook: useFadeIn, config: { duration: 500 } },
   { hook: useSlideUp, config: { duration: 800 } },
   { hook: useScaleIn, config: { duration: 600 } }
@@ -152,17 +152,17 @@ const orchestration = useOrchestration(chain)`}</code></pre>
               </div>
             </div>
 
-            {/* useLayoutAnimation */}
+            {/* useLayoutMotion */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
                 <Icon name="move" size={20} className="mr-2 text-purple-600 dark:text-purple-400" />
-                useLayoutAnimation
+                useLayoutMotion
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
-                레이아웃 변경에 따른 애니메이션 훅입니다.
+                레이아웃 변경에 따른 모션 훅입니다.
               </p>
               <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
-                <pre><code>{`const layout = useLayoutAnimation({
+                <pre><code>{`const layout = useLayoutMotion({
   width: { from: 100, to: 200 },
   height: { from: 100, to: 200 }
 })
@@ -171,17 +171,17 @@ return <div ref={layout.ref} style={layout.style}>`}</code></pre>
               </div>
             </div>
 
-            {/* useSpring */}
+            {/* useSpringMotion */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
                 <Icon name="zap" size={20} className="mr-2 text-orange-600 dark:text-orange-400" />
-                useSpring
+                useSpringMotion
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
-                스프링 물리 기반 애니메이션 훅입니다.
+                스프링 물리 기반 모션 훅입니다.
               </p>
               <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
-                <pre><code>{`const spring = useSpring({ 
+                <pre><code>{`const spring = useSpringMotion({ 
   tension: 100, 
   friction: 10 
 })
@@ -200,12 +200,12 @@ return <div ref={spring.ref} style={{
               Easing 함수
             </h5>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              애니메이션의 가속도와 감속도를 제어하는 이징 함수들을 제공합니다.
+              모션의 가속도와 감속도를 제어하는 이징 함수들을 제공합니다.
             </p>
             <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-6 overflow-x-auto">
-              <pre><code>{`import { easeInBounce, easeOutElastic } from '@hua-labs/motion'
+              <pre><code>{`import { easeInBounce, easeOutElastic } from '@hua-labs/motion-core'
 
-const animation = useFadeIn({ 
+const motion = useFadeIn({ 
   duration: 1000, 
   easing: easeInBounce 
 })`}</code></pre>

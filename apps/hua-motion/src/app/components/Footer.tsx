@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+    <footer className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
       {/* 배경 애니메이션 효과 */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
@@ -15,7 +15,10 @@ export default function Footer() {
             <div className="flex items-center space-x-3 mb-6">
               <div className="relative">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <span className="text-white font-bold text-lg">A</span>
+                  {/* HUA 회사 로고 */}
+                  <svg className="w-8 h-8" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24.8164 0C38.0711 0.000219551 48.8164 10.7453 48.8164 24C48.8164 37.2547 38.0711 47.9998 24.8164 48C11.5616 48 0.816406 37.2548 0.816406 24C0.816406 10.7452 11.5616 0 24.8164 0ZM42.7754 25.1338C42.9249 24.7059 42.6914 23.9644 41.5166 25.1338C40.3418 26.3031 37.968 27.7919 35.2324 28.1279C31.7764 28.0319 32.5382 28.0154 23.4756 26.1777C14.413 24.3401 9.75283 26.7243 8.49414 28.0469C7.65516 29.049 8.72064 28.9622 9.41992 28.8926C9.41992 28.8926 12.5282 28.6565 16.9922 28.8965C21.6001 29.3582 25.7762 30.7681 27.252 31.3984C28.3009 31.8162 29.9996 33.2161 27.8809 34.9482C25.8669 36.7857 21.792 35.4238 21.168 34.7998C20.736 34.4638 20.2711 33.717 20.1191 34.3223C19.9685 35.1855 21.379 39.3336 26.2031 39.96C30.063 40.4609 32.5668 36.1317 33.3359 33.9043C33.3359 33.9043 33.5453 32.9438 36.9014 31.6074C40.2577 30.271 42.2159 26.7349 42.7754 25.1338ZM33.7549 8.01074C30.063 7.84381 28.9826 9.74037 28.8428 10.7148C28.8429 11.1324 29.49 11.0729 29.7695 10.9336C31.1514 10.2971 34.8037 10.3912 34.8037 14.9014C34.8037 19.4119 28.6501 19.1472 25.5732 18.4512C25.5272 18.4421 20.0622 17.3646 16.5527 17.1982C13.0559 17.2799 8.93052 19.9133 7.32227 21.375C6.62313 22.1406 6.10635 23.2541 9.62988 21.584C13.1542 19.9134 21.168 21.3051 24.7344 22.21C27.042 22.6972 32.497 23.2965 35.8535 21.793C39.2098 20.2893 39.7467 14.5916 39.4082 13.0557C39.1963 12.0952 37.2473 8.20836 33.7549 8.01074Z" fill="white"/>
+                  </svg>
                 </div>
                 {/* 글로우 효과 */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-500 rounded-2xl blur-lg opacity-30" />
@@ -28,7 +31,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-base text-gray-600 dark:text-gray-400 mb-6 max-w-lg leading-relaxed">
-              React 모션 훅과 유틸리티로 아름다운 웹 경험을 만들어보세요. 
+              React 모션 훅과 유틸리티로 아름다운 웹 경험을 만들어보세요. <br />
               성능 최적화된 모션 라이브러리입니다.
             </p>
             <div className="flex space-x-4 mb-6">
@@ -86,40 +89,28 @@ export default function Footer() {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-6">
               리소스
             </h3>
-            <ul className="space-y-3">
-              {[
-                { href: '/docs', label: '문서' },
-                { href: '/docs#api-reference', label: 'API 참조' },
-                { href: '/showcase', label: '예제' },
-                { href: 'https://github.com/hua-labs/hua-motion', label: 'GitHub' }
-              ].map((item) => (
-                <li key={item.href}>
-                  <a 
-                    href={item.href} 
-                    className="group text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center"
-                  >
-                    <span className="w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 group-hover:w-4 transition-all duration-300 mr-2" />
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+                         <ul className="space-y-3">
+               {[
+                 { href: '/docs', label: '문서', isInternal: false },
+                                   { href: '/docs#api-reference', label: 'API 참조', isInternal: false },
+                 { href: '/showcase', label: '예제', isInternal: false },
+                 { href: 'https://github.com/hua-labs/hua-motion', label: 'GitHub', isInternal: false }
+                               ].map((item) => (
+                  <li key={item.href}>
+                    <a 
+                      href={item.href} 
+                      className="group text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center"
+                    >
+                      <span className="w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 group-hover:w-4 transition-all duration-300 mr-2" />
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+             </ul>
           </div>
         </div>
 
-        {/* 하단 구분선 */}
-        <div className="mt-12 pt-8 border-t border-gray-200/50 dark:border-gray-700/50">
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Made with ❤️ by HUA Labs
-            </div>
-            <div className="flex space-x-6 text-sm text-gray-500 dark:text-gray-400">
-              <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">Privacy</a>
-              <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">Terms</a>
-              <a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">Contact</a>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </footer>
   )

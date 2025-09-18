@@ -11,7 +11,7 @@ export default function IndividualHooksSection() {
           개별 모션 훅
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          각각의 모션 훅을 독립적으로 사용하여 원하는 애니메이션을 정확히 구현하세요.
+          각각의 모션 훅을 독립적으로 사용하여 원하는 모션을 정확히 구현하세요.
         </p>
       </div>
 
@@ -23,7 +23,7 @@ export default function IndividualHooksSection() {
             useFadeIn
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            요소를 부드럽게 페이드인하는 애니메이션 훅입니다.
+            요소를 부드럽게 페이드인하는 모션 훅입니다.
           </p>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
             <pre><code>{`const fadeIn = useFadeIn({ 
@@ -39,11 +39,11 @@ return <div ref={fadeIn.ref} style={{ opacity: fadeIn.opacity }}>`}</code></pre>
         {/* useSlideUp */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-            <Icon name="arrow-up" size={24} className="mr-3 text-green-600 dark:text-green-400" />
+            <Icon name="arrowUp" size={24} className="mr-3 text-green-600 dark:text-green-400" />
             useSlideUp
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            요소를 아래에서 위로 슬라이드하는 애니메이션 훅입니다.
+            요소를 아래에서 위로 슬라이드하는 모션 훅입니다.
           </p>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
             <pre><code>{`const slideUp = useSlideUp({ 
@@ -64,7 +64,7 @@ return <div ref={slideUp.ref} style={{
             useScaleIn
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            요소를 스케일링하여 확대/축소하는 애니메이션 훅입니다.
+            요소를 스케일링하여 확대/축소하는 모션 훅입니다.
           </p>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
             <pre><code>{`const scaleIn = useScaleIn({ 
@@ -84,7 +84,7 @@ return <div ref={scaleIn.ref} style={{
             usePulse
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            요소를 주기적으로 펄스하는 애니메이션 훅입니다.
+            요소를 주기적으로 펄스하는 모션 훅입니다.
           </p>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
             <pre><code>{`const pulse = usePulse({ 

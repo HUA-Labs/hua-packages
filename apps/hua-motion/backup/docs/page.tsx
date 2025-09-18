@@ -4,8 +4,7 @@ import React from 'react'
 import { 
   Icon, 
   Button, 
-  Panel,
-  ScrollToTop
+  Panel
 } from '@hua-labs/ui'
 import { 
   useSmartAnimation, 
@@ -790,15 +789,7 @@ const animation = useFadeIn({
          </section>
        </div>
        
-       {/* 스크롤 투 탑 버튼 */}
-       <ScrollToTop 
-         threshold={300}
-         smooth={true}
-         size="lg"
-         variant="primary"
-         icon="arrowUp"
-         className="shadow-2xl shadow-blue-500/25"
-       />
+
      </div>
    )
  } 

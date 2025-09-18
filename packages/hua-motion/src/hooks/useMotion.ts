@@ -103,8 +103,8 @@ export function useMotion(
     return from + (to - from) * progress
   }, [])
 
-  // 애니메이션 업데이트
-  const updateAnimation = useCallback((progress: number) => {
+  // 모션 업데이트
+  const updateMotion = useCallback((progress: number) => {
     const easedProgress = easingFunction(progress)
     
     const newState: MotionState = {
@@ -162,7 +162,7 @@ export function useMotion(
       const elapsed = Date.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
       
-      updateAnimation(progress)
+      updateMotion(progress)
       
       if (progress < 1) {
         requestAnimationFrame(animate)
@@ -174,7 +174,7 @@ export function useMotion(
     setTimeout(() => {
       requestAnimationFrame(animate)
     }, delay)
-  }, [duration, delay, updateAnimation])
+  }, [duration, delay, updateMotion])
 
   const reset = useCallback(() => {
     setState({

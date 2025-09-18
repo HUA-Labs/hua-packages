@@ -27,7 +27,7 @@ export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(({
   spin = false,
   bounce = false,
   variant = 'default'
-}, ref): React.ReactElement => {
+}, ref) => {
   // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
   const [isClient, setIsClient] = React.useState(false)
   

@@ -7,6 +7,7 @@ import { Icon } from "./Icon"
 export interface BreadcrumbProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   separator?: React.ReactNode
+  variant?: 'default' | 'subtle' | 'transparent' | 'glass'
 }
 
 export interface BreadcrumbItemProps {
@@ -17,22 +18,29 @@ export interface BreadcrumbItemProps {
 }
 
 const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
-  ({ className, children, separator = <Icon name="chevronRight" className="w-4 h-4 text-slate-400" />, ...props }, ref) => {
+  ({ className, children, separator = <Icon name="chevronRight" className="w-3 h-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />, variant = 'default', ...props }, ref) => {
+    const variantStyles = {
+      default: "inline-flex items-center text-sm w-fit",
+      subtle: "inline-flex items-center text-xs bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-md px-3 py-2 border border-slate-200/30 dark:border-white/20 w-fit shadow-sm",
+      transparent: "inline-flex items-center text-xs w-fit",
+      glass: "inline-flex items-center text-xs bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg rounded-lg px-4 py-2 border border-slate-200/25 dark:border-white/15 w-fit shadow-lg"
+    }
+    
     return (
       <nav
         ref={ref}
         aria-label="Breadcrumb"
-        className={cn("flex items-center space-x-2 text-sm", className)}
+        className={cn(variantStyles[variant], className)}
         {...props}
       >
-        <ol className="flex items-center space-x-2">
+        <ol className="inline-flex items-center">
           {React.Children.map(children, (child, index) => {
             if (React.isValidElement(child)) {
               return (
                 <li key={index} className="flex items-center">
                   {child}
                   {index < React.Children.count(children) - 1 && (
-                    <span className="mx-2 text-slate-400" aria-hidden="true">
+                    <span className="mx-3 text-slate-400 dark:text-slate-500 flex items-center justify-center" aria-hidden="true">
                       {separator}
                     </span>
                   )}
@@ -56,7 +64,7 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
           ref={ref}
           aria-current="page"
           className={cn(
-            "text-slate-600 dark:text-slate-400 font-medium",
+            "text-slate-500 dark:text-slate-400 font-medium",
             className
           )}
           {...props}
@@ -71,7 +79,7 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
         <a
           href={href}
           className={cn(
-            "text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition-colors",
+            "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors",
             className
           )}
           {...props}
@@ -85,7 +93,7 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
       <span
         ref={ref}
         className={cn(
-          "text-slate-500 dark:text-slate-500",
+          "text-slate-400 dark:text-slate-500",
           className
         )}
         {...props}

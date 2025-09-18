@@ -1,22 +1,26 @@
 // ========================================
-// HUA Animation SDK - Type Definitions
+// HUA Motion SDK - Type Definitions
 // ========================================
 
+// 공통 타입들 import
+import { BaseMotionOptions, BaseMotionReturn } from './common'
+export * from './common'
+
 // ========================================
-// 1단계: useSimplePageAnimation (프리셋 기반)
+// 1단계: useSimplePageMotion (프리셋 기반)
 // ========================================
 
 export type PageType = 'home' | 'dashboard' | 'product' | 'blog'
 
 // ========================================
-// 2단계: usePageAnimations (페이지 레벨)
+// 2단계: usePageMotions (페이지 레벨)
 // ========================================
 
-export type AnimationType = 'hero' | 'title' | 'button' | 'card' | 'text' | 'image'
-export type EntranceType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
+export type MotionType = 'hero' | 'title' | 'button' | 'card' | 'text' | 'image'
+export type EntranceType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn' | 'flipIn'
 
-export interface AnimationElement {
-  type: AnimationType
+export interface PageMotionElement {
+  type: MotionType
   entrance?: EntranceType
   hover?: boolean
   click?: boolean
@@ -25,17 +29,17 @@ export interface AnimationElement {
   threshold?: number
 }
 
-export interface PageAnimationsConfig {
-  [elementId: string]: AnimationElement
+export interface PageMotionsConfig {
+  [elementId: string]: PageMotionElement
 }
 
-export interface AnimationState {
+export interface MotionState {
   // 상태 관리 분리 (먼팀장님 제안)
   internalVisibility: boolean    // 내부 로직 (초기화, 리셋 등)
   triggeredVisibility: boolean   // 외부 트리거 (Intersection Observer)
   finalVisibility: boolean       // 최종 계산된 상태
   
-  // 애니메이션 값
+  // 모션 값
   opacity: number
   translateY: number
   translateX: number
@@ -48,8 +52,8 @@ export interface AnimationState {
   isAnimating: boolean
 }
 
-export interface AnimationRef {
-  ref: React.RefObject<HTMLDivElement>
+export interface MotionRef<T extends HTMLElement = HTMLElement> {
+  ref: React.RefObject<T | null>
   style: React.CSSProperties
   isVisible: boolean
   isHovered: boolean
@@ -57,23 +61,17 @@ export interface AnimationRef {
 }
 
 // ========================================
-// 3단계: useSmartAnimation (개별 요소)
+// 3단계: useSmartMotion (개별 요소)
 // ========================================
 
-export interface SmartAnimationOptions {
-  type?: AnimationType
+export interface SmartMotionOptions<T extends HTMLElement = HTMLElement> extends BaseMotionOptions {
+  type?: MotionType
   entrance?: EntranceType
   hover?: boolean
   click?: boolean
-  delay?: number
-  duration?: number
-  threshold?: number
 }
 
-export interface SmartAnimationReturn {
-  ref: React.RefObject<HTMLDivElement>
-  style: React.CSSProperties
-  isVisible: boolean
+export interface SmartMotionReturn<T extends HTMLElement = HTMLElement> extends BaseMotionReturn {
   isHovered: boolean
   isClicked: boolean
 }
@@ -82,7 +80,7 @@ export interface SmartAnimationReturn {
 // 공통 프리셋 시스템
 // ========================================
 
-export interface AnimationPreset {
+export interface MotionPreset {
   entrance: EntranceType
   delay: number
   duration: number
@@ -91,11 +89,11 @@ export interface AnimationPreset {
 }
 
 export interface PresetConfig {
-  [key: string]: AnimationPreset
+  [key: string]: MotionPreset
 }
 
 // ========================================
-// 고급 애니메이션 타입
+// 고급 모션 타입
 // ========================================
 
 export interface SpringConfig {
@@ -118,4 +116,14 @@ export interface OrchestrationConfig {
   sequence?: 'sequential' | 'parallel' | 'stagger'
   staggerDelay?: number
   staggerDuration?: number
+} 
+
+// ========================================
+// Flip 효과 타입
+// ========================================
+
+export interface FlipInOptions extends BaseMotionOptions {
+  axis?: 'X' | 'Y' | 'Z'
+  perspective?: number
+  backfaceVisibility?: boolean
 } 

@@ -1,453 +1,171 @@
 'use client'
 
 import { useState } from 'react'
-import { Action, Panel, Icon } from '@hua-labs/ui'
+import Link from 'next/link'
+import { 
+  Action, 
+  Panel, 
+  Icon, 
+  Breadcrumb, 
+  BreadcrumbItem
+} from '@hua-labs/ui'
+import { useFadeIn, useSlideUp } from '@hua-labs/motion'
 import PageHeader from '../components/PageHeader'
-import { 
-  FadeInDemo, 
-  SlideUpDemo, 
-  SlideLeftDemo, 
-  SlideRightDemo, 
-  BounceInDemo, 
-  ScaleInDemo, 
-  SpringDemo, 
-  PulseDemo, 
-  GradientDemo, 
-  ScrollRevealDemo 
-} from './components/IndividualHookTests'
-import { 
-  ControlAPITest, 
-  GestureTriggersTest, 
-  SequencingTest 
-} from './components/AdvancedFeatures'
+ 
 
 export default function PlaygroundPage() {
-  const [activeTab, setActiveTab] = useState('individual')
-  const [codePanel, setCodePanel] = useState(true)
-  const [livePreview, setLivePreview] = useState(true)
-
-  // 개별 훅 테스트 탭들
-  const individualTabs = [
-    { 
-      id: 'fadeIn', 
-      name: 'Fade In', 
-      component: FadeInDemo,
-      description: '요소가 부드럽게 나타나는 페이드 인 애니메이션',
-      api: 'useFadeIn(options)',
-      parameters: ['delay', 'duration', 'threshold', 'easing']
-    },
-    { 
-      id: 'slideUp', 
-      name: 'Slide Up', 
-      component: SlideUpDemo,
-      description: '요소가 아래에서 위로 슬라이드하며 나타나는 애니메이션',
-      api: 'useSlideUp(options)',
-      parameters: ['delay', 'duration', 'distance', 'easing']
-    },
-    { 
-      id: 'slideLeft', 
-      name: 'Slide Left', 
-      component: SlideLeftDemo,
-      description: '요소가 오른쪽에서 왼쪽으로 슬라이드하는 애니메이션',
-      api: 'useSlideLeft(options)',
-      parameters: ['delay', 'duration', 'distance', 'easing']
-    },
-    { 
-      id: 'slideRight', 
-      name: 'Slide Right', 
-      component: SlideRightDemo,
-      description: '요소가 왼쪽에서 오른쪽으로 슬라이드하는 애니메이션',
-      api: 'useSlideRight(options)',
-      parameters: ['delay', 'duration', 'distance', 'easing']
-    },
-    { 
-      id: 'bounceIn', 
-      name: 'Bounce In', 
-      component: BounceInDemo,
-      description: '바운스 효과와 함께 나타나는 애니메이션',
-      api: 'useBounceIn(options)',
-      parameters: ['delay', 'duration', 'bounce', 'easing']
-    },
-    { 
-      id: 'scaleIn', 
-      name: 'Scale In', 
-      component: ScaleInDemo,
-      description: '요소가 확대되며 나타나는 스케일 애니메이션',
-      api: 'useScaleIn(options)',
-      parameters: ['delay', 'duration', 'scale', 'easing']
-    },
-    { 
-      id: 'spring', 
-      name: 'Spring', 
-      component: SpringDemo,
-      description: '스프링 물리 기반의 자연스러운 애니메이션',
-      api: 'useSpring(options)',
-      parameters: ['stiffness', 'damping', 'mass', 'velocity']
-    },
-    { 
-      id: 'pulse', 
-      name: 'Pulse', 
-      component: PulseDemo,
-      description: '요소가 맥박처럼 반복적으로 확대/축소되는 애니메이션',
-      api: 'usePulse(options)',
-      parameters: ['delay', 'duration', 'scale', 'repeat']
-    },
-    { 
-      id: 'gradient', 
-      name: 'Gradient', 
-      component: GradientDemo,
-      description: '그라데이션 색상이 변화하는 애니메이션',
-      api: 'useGradient(options)',
-      parameters: ['colors', 'duration', 'direction', 'repeat']
-    },
-    { 
-      id: 'scrollReveal', 
-      name: 'Scroll Reveal', 
-      component: ScrollRevealDemo,
-      description: '스크롤에 따라 요소가 나타나는 애니메이션',
-      api: 'useScrollReveal(options)',
-      parameters: ['threshold', 'rootMargin', 'trigger', 'once']
-    },
-  ]
-
-  // 고급 기능 테스트 탭들
-  const advancedTabs = [
-    { 
-      id: 'controlAPI', 
-      name: 'Control API', 
-      component: ControlAPITest,
-      description: '애니메이션을 프로그래밍 방식으로 제어하는 API',
-      api: 'useAnimationControl()',
-      parameters: ['play', 'pause', 'reverse', 'reset']
-    },
-    { 
-      id: 'gestureTriggers', 
-      name: 'Gesture Triggers', 
-      component: GestureTriggersTest,
-      description: '제스처와 터치 이벤트에 반응하는 애니메이션',
-      api: 'useGestureAnimation(options)',
-      parameters: ['drag', 'pinch', 'rotate', 'swipe']
-    },
-    { 
-      id: 'sequencing', 
-      name: 'Sequencing', 
-      component: SequencingTest,
-      description: '여러 애니메이션을 순차적으로 실행하는 기능',
-      api: 'useAnimationSequence(animations)',
-      parameters: ['stagger', 'delay', 'repeat', 'yoyo']
-    },
-  ]
-
-  const [activeIndividualTab, setActiveIndividualTab] = useState('fadeIn')
-  const [activeAdvancedTab, setActiveAdvancedTab] = useState('controlAPI')
-
-  const ActiveIndividualComponent = individualTabs.find(tab => tab.id === activeIndividualTab)?.component
-  const ActiveAdvancedComponent = advancedTabs.find(tab => tab.id === activeAdvancedTab)?.component
-  const activeTabData = activeTab === 'individual' 
-    ? individualTabs.find(tab => tab.id === activeIndividualTab)
-    : advancedTabs.find(tab => tab.id === activeAdvancedTab)
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* 헤더 */}
-        <PageHeader
-          title="Animation Playground"
-          description="개별 훅 테스트와 고급 기능을 모두 체험해보세요"
-          icon="code"
-          color="purple"
-          maxWidth="4xl"
-        >
-          {/* 개발자 도구 설명 */}
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-slate-700/20">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-              <Icon name="settings" size={20} className="mr-2" />
-              개발자 실험실
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              각 훅의 파라미터를 실시간으로 조정하고, 코드를 편집하며, 결과를 즉시 확인할 수 있습니다.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>실시간 파라미터 조정</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span>코드 편집 및 실행</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span>즉시 결과 확인</span>
-              </div>
-            </div>
-          </div>
-        </PageHeader>
-
-        {/* 메인 탭 네비게이션 */}
-        <Panel 
-          style="glass" 
-          padding="md" 
-          className="mb-8 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-        >
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Action
-              onClick={() => setActiveTab('individual')}
-              variant={activeTab === 'individual' ? 'gradient' : 'outline'}
-              gradient="blue"
-              size="md"
-              hapticFeedback={true}
-              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'individual'
-                  ? 'text-white'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              🎯 개별 훅 테스트
-            </Action>
-            <Action
-              onClick={() => setActiveTab('advanced')}
-              variant={activeTab === 'advanced' ? 'gradient' : 'outline'}
-              gradient="purple"
-              size="md"
-              hapticFeedback={true}
-              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === 'advanced'
-                  ? 'text-white'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              ⚡ 고급 기능 테스트
-            </Action>
-          </div>
-        </Panel>
-
-        {/* 서브 탭 네비게이션 */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
-            {(activeTab === 'individual' ? individualTabs : advancedTabs).map((tab) => (
-              <Action
-                key={tab.id}
-                onClick={() => {
-                  if (activeTab === 'individual') {
-                    setActiveIndividualTab(tab.id)
-                  } else {
-                    setActiveAdvancedTab(tab.id)
-                  }
-                }}
-                variant={
-                  (activeTab === 'individual' && activeIndividualTab === tab.id) ||
-                  (activeTab === 'advanced' && activeAdvancedTab === tab.id)
-                    ? 'gradient'
-                    : 'outline'
-                }
-                gradient="green"
-                size="sm"
-                className="px-4 py-2 text-xs"
-              >
-                {tab.name}
-              </Action>
-            ))}
-          </div>
-        </div>
-
-        {/* 현재 선택된 훅 정보 */}
-        {activeTabData && (
-          <Panel 
-            style="glass" 
-            padding="md" 
-            className="mb-8 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {activeTabData.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                  {activeTabData.description}
-                </p>
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                  <code className="text-sm text-gray-800 dark:text-gray-200 font-mono">
-                    {activeTabData.api}
-                  </code>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  📋 사용 가능한 파라미터
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {activeTabData.parameters.map((param, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs rounded-md"
-                    >
-                      {param}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Panel>
-        )}
-
-        {/* 컨트롤 패널 */}
-        <Panel 
-          style="glass" 
-          padding="md" 
-          className="mb-8 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-        >
-          <div className="flex flex-wrap gap-4 justify-center items-center">
-            <Action
-              onClick={() => setCodePanel(!codePanel)}
-              variant={codePanel ? 'gradient' : 'outline'}
-              gradient="blue"
-              size="sm"
-            >
-              💻 {codePanel ? '코드 패널 숨기기' : '코드 패널 보기'}
-            </Action>
-            <Action
-              onClick={() => setLivePreview(!livePreview)}
-              variant={livePreview ? 'gradient' : 'outline'}
-              gradient="green"
-              size="sm"
-            >
-              👁️ {livePreview ? '미리보기 숨기기' : '미리보기 보기'}
-            </Action>
-            <Action
-              onClick={() => window.location.reload()}
-              variant="outline"
-              size="sm"
-            >
-              🔄 리셋
-            </Action>
-          </div>
-        </Panel>
-
-        {/* 메인 컨텐츠 영역 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* 코드 편집 패널 */}
-          {codePanel && (
-            <Panel 
-              style="glass" 
-              padding="lg" 
-              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                💻 코드 편집기
-              </h3>
-              <div className="bg-gray-900 rounded-lg p-4 h-96 overflow-auto">
-                <pre className="text-green-400 text-sm">
-                  <code>{`// ${activeTabData?.name} 예제 코드
-import { ${activeTabData?.api.split('(')[0]} } from '@hua-labs/motion'
-
-function Example() {
-  const animation = ${activeTabData?.api}
+  const [activeTab, setActiveTab] = useState<'core' | 'advanced' | 'enterprise'>('core')
   
-  return (
-    <div 
-      ref={animation.ref}
-      style={animation.style}
-      className="p-4 bg-blue-500 rounded-lg"
-    >
-      애니메이션 요소
-    </div>
-  )
-}`}</code>
-                </pre>
-              </div>
-              <div className="mt-4 flex gap-2">
-                <Action variant="gradient" gradient="green" size="sm">
-                  ▶️ 실행
-                </Action>
-                <Action variant="outline" size="sm">
-                  📋 복사
-                </Action>
-              </div>
-            </Panel>
-          )}
+  // 모션 라이브러리 훅 사용
+  const breadcrumbRef = useFadeIn({ delay: 0, duration: 600 })
+  const headerRef = useFadeIn({ delay: 150, duration: 600 })
+  const tabsRef = useSlideUp({ delay: 300, duration: 600 })
+  
+  const tabs = [
+    {
+      id: 'core',
+      title: 'Core',
+      description: '기본 모션 훅들과 3단계 추상화',
+      icon: 'zap' as const,
+      color: 'blue',
+      status: 'available',
+      path: '/playground/core'
+    },
+    {
+      id: 'advanced',
+      title: 'Advanced',
+      description: '고급 페이지 전환과 애니메이션 (개발 중)',
+      icon: 'rocket' as const,
+      color: 'purple',
+      status: 'development',
+      path: '/playground/advanced'
+    },
+    {
+      id: 'enterprise',
+      title: 'Enterprise',
+      description: '전문가용 고급 기능',
+      icon: 'crown' as const,
+      color: 'gold',
+      status: 'planned',
+      path: '/playground/enterprise'
+    }
+  ]
 
-          {/* 라이브 미리보기 */}
-          {livePreview && (
-            <Panel 
-              style="glass" 
-              padding="lg" 
-              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                👁️ 라이브 미리보기
-              </h3>
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 h-96 flex items-center justify-center">
-                {ActiveIndividualComponent && <ActiveIndividualComponent />}
-                {ActiveAdvancedComponent && <ActiveAdvancedComponent />}
-              </div>
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  실시간으로 파라미터를 조정하고 결과를 확인하세요
-                </p>
-              </div>
-            </Panel>
-          )}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-6xl mx-auto p-4 sm:p-8">
+        {/* 브레드크럼 */}
+        <div ref={breadcrumbRef.ref} style={breadcrumbRef.style} className="flex justify-start">
+          <Breadcrumb variant="glass" className="mb-6">
+            <BreadcrumbItem href="/">Home</BreadcrumbItem>
+            <BreadcrumbItem isCurrent>Playground</BreadcrumbItem>
+          </Breadcrumb>
         </div>
 
-        {/* 파라미터 조정 패널 */}
-        <Panel 
-          style="glass" 
-          padding="lg" 
-          className="mt-8 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-        >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            🎛️ 파라미터 조정
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {activeTabData?.parameters.map((param, index) => (
-              <div key={index} className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {param}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1000"
-                  defaultValue="200"
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                />
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>0</span>
-                  <span>500</span>
-                  <span>1000</span>
-                </div>
+        {/* 통일된 페이지 헤더 */}
+        <div ref={headerRef.ref} style={headerRef.style}>
+          <PageHeader
+            title="HUA Motion Playground"
+            description="모션 훅들을 직접 체험하고 테스트해보세요. Core부터 Enterprise까지 단계별로 기능을 경험할 수 있습니다."
+            icon="play"
+            color="blue"
+            maxWidth="4xl"
+            variant="default"
+          />
+        </div>
+
+        {/* Package Selection Tabs */}
+        <section ref={tabsRef.ref} style={tabsRef.style}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {tabs.map((tab, index) => (
+              <div
+                key={tab.id}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${450 + index * 100}ms`, animationFillMode: 'both' }}
+              >
+                <Panel
+                  className={`relative overflow-hidden transition-all duration-300 hover:scale-105 min-h-[320px] flex flex-col ${
+                    tab.status === 'available' 
+                      ? 'border-2 border-blue-200 dark:border-blue-600/50 shadow-lg' 
+                      : tab.status === 'development'
+                      ? 'border-2 border-orange-200 dark:border-orange-600/50 shadow-md opacity-80'
+                      : 'border-2 border-gray-200 dark:border-gray-600/50 opacity-75'
+                  }`}
+                >
+                  {/* Status Badge */}
+                  <div className="absolute top-4 right-4">
+                    {tab.status === 'available' && (
+                      <span className="inline-flex items-center px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full border border-green-200 dark:border-green-700/50">
+                        <Icon name="check" className="w-3 h-3 mr-1" />
+                        사용 가능
+                      </span>
+                    )}
+                    {tab.status === 'development' && (
+                      <span className="inline-flex items-center px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs font-medium rounded-full border border-orange-200 dark:border-orange-700/50">
+                        <Icon name="code" className="w-3 h-3 mr-1" />
+                        개발 중
+                      </span>
+                    )}
+                    {tab.status === 'coming-soon' && (
+                      <span className="inline-flex items-center px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-xs font-medium rounded-full border border-yellow-200 dark:border-yellow-700/50">
+                        <Icon name="clock" className="w-3 h-3 mr-1" />
+                        준비 중
+                      </span>
+                    )}
+                    {tab.status === 'planned' && (
+                      <span className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800/30 text-gray-800 dark:text-gray-200 text-xs font-medium rounded-full border border-gray-200 dark:border-gray-700/50">
+                        <Icon name="calendar" className="w-3 h-3 mr-1" />
+                        계획됨
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Panel Content */}
+                  <div className="p-6 text-center flex-1 flex flex-col justify-center">
+                    <div className="mb-4">
+                      <Icon 
+                        name={tab.icon} 
+                        className={`w-16 h-16 mx-auto text-${tab.color}-500`}
+                      />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">{tab.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6 flex-1">{tab.description}</p>
+                    
+                    {tab.status === 'available' ? (
+                      <Link href={tab.path}>
+                        <Action 
+                          variant="default" 
+                          size="lg"
+                          className="w-full flex items-center justify-center"
+                        >
+                          시작하기
+                        </Action>
+                      </Link>
+                    ) : tab.status === 'development' ? (
+                      <Action 
+                        variant="secondary" 
+                        size="lg"
+                        className="w-full cursor-not-allowed opacity-50"
+                        disabled
+                      >
+                        개발 중
+                      </Action>
+                    ) : (
+                      <Action 
+                        variant="secondary" 
+                        size="lg"
+                        className="w-full cursor-not-allowed opacity-50"
+                        disabled
+                      >
+                        {tab.status === 'coming-soon' ? '준비 중' : '계획됨'}
+                      </Action>
+                    )}
+                  </div>
+                </Panel>
               </div>
             ))}
           </div>
-        </Panel>
-
-        {/* 다음 단계 안내 */}
-        <div className="mt-12 text-center">
-          <Panel 
-            style="glass" 
-            padding="lg" 
-            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              🚀 다음 단계
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              실험을 마친 후, 실제 프로젝트에 적용해보세요
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Action variant="gradient" gradient="blue" size="lg">
-                📚 문서 보기
-              </Action>
-              <Action variant="gradient" gradient="green" size="lg">
-                🧪 통합 테스트
-              </Action>
-              <Action variant="outline" size="lg">
-                🎨 쇼케이스 보기
-              </Action>
-            </div>
-          </Panel>
-        </div>
+        </section>
       </div>
     </div>
   )

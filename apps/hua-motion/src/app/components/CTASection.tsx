@@ -2,124 +2,65 @@
 
 import React from 'react'
 import { Icon, Action, Panel } from '@hua-labs/ui'
-import { useSmartAnimation, useFadeIn } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion'
 
 export default function CTASection() {
-  // 우아한 로딩 애니메이션
-  const ctaRef = useSmartAnimation({ 
-    type: 'card',
+  const ctaRef = useSmartMotion({
+    type: 'hero',
     entrance: 'fadeIn',
-    delay: 300,
-    threshold: 0.1,
-    duration: 800
-  })
-  
-  const titleRef = useSmartAnimation({ 
-    type: 'title',
-    entrance: 'slideUp',
-    delay: 500,
-    threshold: 0.1,
+    delay: 0,
     duration: 600
   })
-  
-  const buttonsRef = useSmartAnimation({ 
-    type: 'button',
-    entrance: 'fadeIn',
-    delay: 700,
-    threshold: 0.1,
+
+  const ctaTitleRef = useSmartMotion({
+    type: 'title',
+    entrance: 'slideUp',
+    delay: 200,
     duration: 500
   })
 
   return (
-    <div className="relative">
-      {/* 다크모드에 어울리는 배경 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-100/50 via-blue-50/30 to-indigo-100/50 dark:from-slate-800/50 dark:via-slate-700/30 dark:to-slate-800/50 rounded-3xl" />
-      
-      <div 
-        ref={ctaRef.ref}
-        style={ctaRef.style}
-      >
-        <Panel 
-          style="glass" 
-          padding="xl" 
-          className="text-center relative z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20"
-        >
+    <Panel 
+      ref={ctaRef.ref}
+      style="glass"
+      rounded="none"
+      padding="xl"
+      className="bg-gradient-to-r from-slate-50/50 via-blue-50/50 to-indigo-100/50 dark:from-slate-900/50 dark:via-slate-800/50 dark:to-slate-900/50 border border-slate-200/30 dark:border-slate-700/30"
+    >
+      <div className="text-center">
         <h2 
-          ref={titleRef.ref}
-          style={titleRef.style}
-          className="text-4xl font-bold mb-8 text-gray-900 dark:text-white"
+          ref={ctaTitleRef.ref}
+          style={ctaTitleRef.style}
+          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6"
         >
           지금 시작해보세요
         </h2>
-                 <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-2xl mx-auto">
-           HUA Motion과 함께 아름다운 웹 모션을 만들어보세요
-         </p>
-        <div 
-          ref={buttonsRef.ref}
-          style={buttonsRef.style}
-          className="flex flex-wrap justify-center gap-8"
-        >
+        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto">
+          HUA Motion으로 아름다운 웹 경험을 만들어보세요.
+          <br />
+          간단한 설정으로 바로 사용할 수 있습니다.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Action 
-            href="/test" 
-            variant="gradient"
-            gradient="blue"
+            href="/docs"
+            variant="default"
             size="md"
-            hapticFeedback={true}
-            glowIntensity={0.3}
-            glowColor="blue"
-            className="py-4 px-8 min-h-[56px] rounded-2xl transition-all duration-300"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 sm:px-8 sm:py-5 w-full sm:w-auto text-center flex items-center justify-center"
           >
-            <Icon name="zap" size={20} className="mr-3" />
-            테스트 랩
+            <Icon name="book" size={20} className="mr-2" />
+            문서 보기
           </Action>
-          
           <Action 
-            href="/playground" 
-            variant="gradient"
-            gradient="green"
+            href="https://www.npmjs.com/package/@hua-labs/motion"
+            variant="outline"
             size="md"
-            hover="glow"
-            hapticFeedback={true}
-            glowIntensity={0.3}
-            glowColor="green"
-            className="py-3 px-6 min-h-[48px] rounded-xl transition-all duration-300"
+            className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500 px-6 py-4 sm:px-8 sm:py-5 w-full sm:w-auto text-center flex items-center justify-center"
           >
-            <Icon name="settings" size={20} className="mr-3" />
-            플레이그라운드
-          </Action>
-          
-          <Action 
-            href="/docs" 
-            variant="gradient"
-            gradient="purple"
-            size="md"
-            hover="glow"
-            hapticFeedback={true}
-            glowIntensity={0.3}
-            glowColor="purple"
-            className="py-3 px-6 min-h-[48px] rounded-xl transition-all duration-300"
-          >
-            <Icon name="bookOpen" size={20} className="mr-3" />
-            문서
-          </Action>
-          
-          <Action 
-            href="/docs" 
-            variant="gradient"
-            gradient="orange"
-            size="lg"
-            hover="glow"
-            hapticFeedback={true}
-            glowIntensity={0.3}
-            glowColor="orange"
-            className="py-4 px-8 min-h-[56px] rounded-2xl transition-all duration-300"
-          >
-            <Icon name="settings" size={20} className="mr-3" />
-            고급 기능
+            <Icon name="package" size={20} className="mr-2" />
+            npm
           </Action>
         </div>
-        </Panel>
       </div>
-    </div>
+    </Panel>
   )
 } 

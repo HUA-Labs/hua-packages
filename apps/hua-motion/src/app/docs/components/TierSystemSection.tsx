@@ -36,10 +36,10 @@ export default function TierSystemSection() {
             </ul>
           </div>
           <Action 
-            href="/simple-animation"
+            href="/simple-motion"
             variant="outline"
             size="lg"
-            className="mt-auto border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:border-blue-300 transition-all duration-300"
+            className="mt-auto border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:border-blue-300 transition-all duration-300 flex items-center justify-center"
           >
             <Icon name="play" size={20} className="mr-3" />
             데모 보기
@@ -57,16 +57,16 @@ export default function TierSystemSection() {
               개별 요소를 세밀하게 제어하는 스마트 모션 시스템.
             </p>
             <ul className="text-left text-gray-700 dark:text-gray-300 mb-6 space-y-2">
-              <li>• 개별 요소별 애니메이션 제어</li>
+              <li>• 개별 요소별 모션 제어</li>
               <li>• 호버, 클릭 인터랙션</li>
               <li>• 중앙집중식 상태 관리</li>
             </ul>
           </div>
           <Action 
-            href="/page-animation"
+            href="/page-motion"
             variant="outline"
             size="lg"
-            className="mt-auto border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:border-green-300 transition-all duration-300"
+            className="mt-auto border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:border-green-300 transition-all duration-300 flex items-center justify-center"
           >
             <Icon name="play" size={20} className="mr-3" />
             데모 보기
@@ -85,15 +85,15 @@ export default function TierSystemSection() {
             </p>
             <ul className="text-left text-gray-700 dark:text-gray-300 mb-6 space-y-2">
               <li>• 개별 훅 조합 및 오케스트레이션</li>
-              <li>• 제스처 및 스프링 애니메이션</li>
+              <li>• 제스처 및 스프링 모션</li>
               <li>• 최대한의 유연성</li>
             </ul>
           </div>
           <Action 
-            href="/smart-animation"
+            href="/smart-motion"
             variant="outline"
             size="lg"
-            className="mt-auto border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900/20 dark:hover:border-purple-300 transition-all duration-300"
+            className="mt-auto border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900/20 dark:hover:border-purple-300 transition-all duration-300 flex items-center justify-center"
           >
             <Icon name="play" size={20} className="mr-3" />
             데모 보기

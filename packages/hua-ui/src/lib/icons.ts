@@ -29,6 +29,13 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowDown,
+  ArrowRightLeft,
+  Move,
+  MoveHorizontal,
+  Maximize2,
+  FlaskConical,
+  Hand,
+  Waves,
   
   // Communication & Social
   MessageCircle,
@@ -281,12 +288,8 @@ import {
   // Science & Lab
   Beaker,
   TestTube,
-  Flask,
-  FlaskConical,
   Microscope,
   Atom,
-  Droplets,
-  Thermometer,
 } from 'lucide-react'
 
 // 아이콘 객체
@@ -321,6 +324,13 @@ export const icons = {
   arrowRight: ArrowRight,
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
+  arrowRightLeft: ArrowRightLeft,
+  move: Move,
+  'move-horizontal': MoveHorizontal,
+  'maximize-2': Maximize2,
+  'flask-conical': FlaskConical,
+  hand: Hand,
+  waves: Waves,
   
   // Communication
   message: MessageCircle,
@@ -573,12 +583,8 @@ export const icons = {
   // Science & Lab
   beaker: Beaker,
   testTube: TestTube,
-  flask: Flask,
-  flaskConical: FlaskConical,
   microscope: Microscope,
   atom: Atom,
-  droplets: Droplets,
-  thermometer: Thermometer,
 }
 
 // 아이콘 이름 타입

@@ -24,6 +24,9 @@ export { Pagination, PaginationOutlined, PaginationMinimal, PaginationWithInfo }
 export { PageNavigation } from './components/PageNavigation';
 export { PageTransition } from './components/PageTransition';
 
+// UI Components - Advanced Page Transitions
+export * from './components/advanced';
+
 // UI Components - Data Display
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './components/Table';
 export { Badge } from './components/Badge';
@@ -51,6 +54,7 @@ export { Checkbox } from './components/Checkbox';
 export { Radio } from './components/Radio';
 export { Select, SelectOption } from './components/Select';
 export { Switch } from './components/Switch';
+export { Slider } from './components/Slider';
 export { Textarea } from './components/Textarea';
 
 // UI Components - Interactive
@@ -76,6 +80,7 @@ export { ScrollToTop } from './components/ScrollToTop';
 export { Scrollbar } from './components/scrollbar/scrollbar';
 export { ThemeProvider } from './components/ThemeProvider';
 export { ThemeToggle } from './components/ThemeToggle';
+export { useTheme } from './components/ThemeProvider';
 
 // Icons and Types
 export { iconCategories, emotionIcons, statusIcons } from './lib/icons';

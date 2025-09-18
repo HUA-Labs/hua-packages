@@ -1,4 +1,4 @@
-# 🚀 HUA Animation SDK 배포 가이드
+# 🚀 HUA Motion SDK 배포 가이드
 
 ## 📦 npm 배포 준비
 
@@ -33,19 +33,19 @@ npm publish --access public
 ## 🔧 배포 후 확인
 
 ### 1. npm 레지스트리에서 확인
-- https://www.npmjs.com/package/@hua-labs/animation
+- https://www.npmjs.com/package/@hua-labs/motion
 
 ### 2. 설치 테스트
 ```bash
-npm install @hua-labs/animation
+npm install @hua-labs/motion
 ```
 
 ### 3. 사용 테스트
 ```tsx
-import { useSimplePageAnimation } from '@hua-labs/animation'
+import { useSimplePageMotion } from '@hua-labs/motion'
 
 function TestComponent() {
-  const { ref, isVisible, style } = useSimplePageAnimation('fade-in')
+  const { ref, isVisible, style } = useSimplePageMotion('fade-in')
   
   return (
     <div ref={ref} style={style}>
@@ -85,7 +85,7 @@ npm login   # 다시 로그인
 
 ### 패키지 이름 충돌
 - npm 레지스트리에서 사용 가능한 이름인지 확인
-- 스코프 사용 고려 (`@hua-labs/animation`)
+- 스코프 사용 고려 (`@hua-labs/motion`)
 
 ## 📚 추가 리소스
 

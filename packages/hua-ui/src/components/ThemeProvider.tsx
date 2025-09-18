@@ -31,12 +31,12 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",  // system에서 light로 변경
   storageKey = "hua-ui-theme",
   enableSystem = true,
   enableTransition = true,
   ...props
-}: ThemeProviderProps) {
+}: ThemeProviderProps): React.ReactElement {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light")
 

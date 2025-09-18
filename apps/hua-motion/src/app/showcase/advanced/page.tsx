@@ -1,6 +1,6 @@
 'use client'
 
-import { useFadeIn, useSlideUp, useScaleIn, useBounceIn } from '@hua-labs/motion'
+import { useFadeIn, useSlideUp, useScaleIn, useBounceIn } from '@hua-labs/motion-core'
 import { Icon, Action } from '@hua-labs/ui'
 import ShowcasePageLayout from '../../components/ShowcasePageLayout'
 
@@ -12,9 +12,9 @@ export default function AdvancedPage() {
 
   return (
     <ShowcasePageLayout
-      title="Advanced Animation"
-      description="고급 애니메이션 기법과 복잡한 인터랙션을 위한 완전한 제어 시스템"
-      icon="zap"
+              title="Advanced Motion"
+              description="고급 모션 기법과 복잡한 인터랙션을 위한 완전한 제어 시스템"
+      icon="settings"
       color="orange"
       primaryButton={{
         text: "플레이그라운드",
@@ -147,7 +147,7 @@ export default function AdvancedPage() {
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-pink-500/10 border border-pink-200/50 dark:border-pink-800/50">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/25">
-                <Icon name="maximize2" size={24} className="text-white" />
+                <Icon name="maximize-2" size={24} className="text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Scale In</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -189,7 +189,7 @@ export default function AdvancedPage() {
           </p>
         </div>
         
-        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl shadow-pink-500/10 border border-pink-200/50 dark:border-pink-800/50">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 shadow-2xl shadow-pink-500/10 border border-pink-200/50 dark:border-pink-800/50">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* 애니메이션 체인 */}
             <div className="text-center">
