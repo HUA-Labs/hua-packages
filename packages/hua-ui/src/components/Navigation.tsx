@@ -75,6 +75,8 @@ export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivEl
 const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
   ({ 
     className, 
+    value,
+    onValueChange,
     style = "pills",
     scale = "medium",
     children,
@@ -115,7 +117,17 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
         )}
         {...props}
       >
-        {children}
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              value,
+              onValueChange,
+              style,
+              scale
+            } as any)
+          }
+          return child
+        })}
       </div>
     )
   }
