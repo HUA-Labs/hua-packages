@@ -7,7 +7,7 @@ export interface NavigationProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
-  style?: "pills" | "underline" | "cards"
+  variant?: "pills" | "underline" | "cards"
   scale?: "small" | "medium" | "large"
 }
 
@@ -17,7 +17,7 @@ const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
     value,
     defaultValue,
     onValueChange,
-    style = "pills",
+    variant = "pills",
     scale = "medium",
     children,
     ...props 
@@ -52,8 +52,7 @@ const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               value: currentValue,
-              onValueChange: handleTabChange,
-              style,
+              variant,
               scale
             } as any)
           }
@@ -68,7 +67,7 @@ Navigation.displayName = "Navigation"
 export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   value?: string
   onValueChange?: (value: string) => void
-  style?: "pills" | "underline" | "cards"
+  variant?: "pills" | "underline" | "cards"
   scale?: "small" | "medium" | "large"
 }
 
@@ -77,13 +76,13 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
     className, 
     value,
     onValueChange,
-    style = "pills",
+    variant = "pills",
     scale = "medium",
     children,
     ...props 
   }, ref) => {
     const getStyleClasses = () => {
-      switch (style) {
+      switch (variant) {
         case "pills":
           return "bg-slate-100 dark:bg-slate-800 p-1 rounded-xl"
         case "underline":
@@ -121,8 +120,7 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               value,
-              onValueChange,
-              style,
+              variant,
               scale
             } as any)
           }
@@ -137,7 +135,7 @@ NavigationList.displayName = "NavigationList"
 export interface NavigationItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'style'> {
   value: string
   onValueChange?: (value: string) => void
-  style?: "pills" | "underline" | "cards"
+  variant?: "pills" | "underline" | "cards"
   scale?: "small" | "medium" | "large"
   active?: boolean
 }
@@ -147,14 +145,14 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
     className, 
     value,
     onValueChange,
-    style = "pills",
+    variant = "pills",
     scale = "medium",
     active = false,
     children,
     ...props 
   }, ref) => {
     const getStyleClasses = () => {
-      switch (style) {
+      switch (variant) {
         case "pills":
           return merge(
             "rounded-lg px-3 py-2 text-sm font-medium transition-all",
