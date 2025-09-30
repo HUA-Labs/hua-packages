@@ -1,0 +1,57 @@
+{
+  "title": "hua-i18n-sdk 데모",
+  "description": "Next.js에서 국제화 SDK 사용 예제",
+  "features": {
+    "title": "주요 기능",
+    "ssr": "서버 사이드 렌더링 지원",
+    "csr": "클라이언트 사이드 렌더링 지원",
+    "typescript": "TypeScript 타입 안전성",
+    "fallback": "Fallback 언어 지원",
+    "namespaces": "네임스페이스 지원",
+    "dynamic": "동적 번역 로딩"
+  },
+  "examples": {
+    "title": "사용 예제",
+    "simple": "간단한 번역",
+    "withParams": "파라미터가 있는 번역",
+    "nested": "중첩된 키 번역",
+    "fallback": "Fallback 예제",
+    "missing": "누락된 키 처리"
+  },
+  "demo": {
+    "greeting": "안녕하세요, {{name}}님!",
+    "welcomeMessage": "{{appName}}에 오신 것을 환영합니다!",
+    "userCount": "현재 {{count}}명의 사용자가 있습니다.",
+    "lastLogin": "마지막 로그인: {{date}}",
+    "nested": {
+      "level1": {
+        "level2": "중첩된 번역 키입니다"
+      }
+    },
+    "koreanOnly": "이 메시지는 한국어에만 존재합니다! 🇰🇷",
+    "fallbackTest": "이 키는 영어에서 누락되어 한국어로 폴백됩니다"
+  },
+  "buttons": {
+    "changeLanguage": "언어 변경",
+    "toggleTheme": "테마 변경",
+    "reload": "새로고침",
+    "testFallback": "Fallback 테스트"
+  },
+  "messages": {
+    "languageChanged": "언어가 {{language}}로 변경되었습니다.",
+    "fallbackTriggered": "Fallback이 트리거되었습니다.",
+    "missingKey": "누락된 키: {{key}}"
+  },
+  "status": {
+    "title": "현재 상태",
+    "currentLanguage": "현재 언어",
+    "languageCode": "언어 코드"
+  },
+  "ui": {
+    "devMode": "🔧 개발 모드: Missing Key 표시",
+    "prodMode": "🚀 프로덕션 모드: 사용자 친화적 메시지",
+    "realtimeUpdate": "⏰ 실시간 업데이트 (1분마다)",
+    "namePlaceholder": "이름을 입력하세요",
+    "fallbackExplanation": "영어로 전환하면 이 메시지가 한국어로 폴백됩니다"
+  }
+} 
