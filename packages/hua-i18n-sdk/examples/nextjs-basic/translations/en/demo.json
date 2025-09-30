@@ -1,0 +1,55 @@
+{
+  "title": "hua-i18n-sdk Demo",
+  "description": "Internationalization SDK usage example in Next.js",
+  "features": {
+    "title": "Key Features",
+    "ssr": "Server-Side Rendering Support",
+    "csr": "Client-Side Rendering Support",
+    "typescript": "TypeScript Type Safety",
+    "fallback": "Fallback Language Support",
+    "namespaces": "Namespace Support",
+    "dynamic": "Dynamic Translation Loading"
+  },
+  "examples": {
+    "title": "Usage Examples",
+    "simple": "Simple Translation",
+    "withParams": "Translation with Parameters",
+    "nested": "Nested Key Translation",
+    "fallback": "Fallback Example",
+    "missing": "Missing Key Handling"
+  },
+  "demo": {
+    "greeting": "Hello, {{name}}!",
+    "welcomeMessage": "Welcome to {{appName}}!",
+    "userCount": "There are currently {{count}} users online.",
+    "lastLogin": "Last login: {{date}}",
+    "nested": {
+      "level1": {
+        "level2": "This is a nested translation key"
+      }
+    }
+  },
+  "buttons": {
+    "changeLanguage": "Change Language",
+    "toggleTheme": "Toggle Theme",
+    "reload": "Reload",
+    "testFallback": "Test Fallback"
+  },
+  "messages": {
+    "languageChanged": "Language changed to {{language}}.",
+    "fallbackTriggered": "Fallback triggered.",
+    "missingKey": "Missing key: {{key}}"
+  },
+  "status": {
+    "title": "Current Status",
+    "currentLanguage": "Current Language",
+    "languageCode": "Language Code"
+  },
+  "ui": {
+    "devMode": "🔧 Dev Mode: Missing Key Display",
+    "prodMode": "🚀 Production Mode: User-Friendly Message",
+    "realtimeUpdate": "⏰ Real-time Update (every minute)",
+    "namePlaceholder": "Enter your name",
+    "fallbackExplanation": "When you switch to English, this message will fallback to Korean"
+  }
+} 

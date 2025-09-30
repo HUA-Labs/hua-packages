@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Build package
+      run: npm run build
+
+    - name: Create Release
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const tag = context.ref.replace('refs/tags/', '');
+          
+          await github.rest.repos.createRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: tag,
+            name: 'Release ' + tag,
+            body: `## 🎉 Release ${tag}
+            
+            ### What's New
+            - Check the [CHANGELOG.md](https://github.com/HUA-Labs/i18n-sdk/blob/main/CHANGELOG.md) for detailed changes
+            
+            ### Installation
+            \`\`\`bash
+            npm install hua-i18n-sdk
+            \`\`\`
+            
+            ### Documentation
+            - [API Reference](https://github.com/HUA-Labs/i18n-sdk#api-reference)
+            - [Examples](https://github.com/HUA-Labs/i18n-sdk/tree/main/examples)
+            - [Getting Started](https://github.com/HUA-Labs/i18n-sdk#getting-started)
+            
+            ### Support
+            - [Issues](https://github.com/HUA-Labs/i18n-sdk/issues)
+            - [Discussions](https://github.com/HUA-Labs/i18n-sdk/discussions)`,
+            draft: false,
+            prerelease: false
+          }); 
