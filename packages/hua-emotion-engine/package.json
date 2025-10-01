@@ -1,0 +1,46 @@
+{
+  "name": "@hua-platform/hua-emotion-engine",
+  "version": "1.0.0",
+  "description": "HUA Emotion Engine - AI의 자율적 감정 해석과 전이를 가능케 하는 미들웨어",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "emotion",
+    "ai",
+    "analysis",
+    "korean",
+    "nlp",
+    "sentiment"
+  ],
+  "author": "HUA Platform",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.0.0",
+    "csv-parser": "^3.0.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/lodash": "^4.14.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "data",
+    "README.md"
+  ]
+}
