@@ -600,6 +600,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      openai:
+        specifier: ^6.0.0
+        version: 6.0.0(ws@8.18.3)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -5884,6 +5887,18 @@ packages:
     peerDependencies:
       ws: ^8.18.0
       zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
+  openai@6.0.0:
+    resolution: {integrity: sha512-J7LEmTn3WLZnbyEmMYcMPyT5A0fGzhPwSvVUcNRKy6j2hJIbqSFrJERnUHYNkcoCCalRumypnj9AVoe5bVHd3Q==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
     peerDependenciesMeta:
       ws:
         optional: true
@@ -13524,6 +13539,10 @@ snapshots:
       ws: 8.18.3
     transitivePeerDependencies:
       - encoding
+
+  openai@6.0.0(ws@8.18.3):
+    optionalDependencies:
+      ws: 8.18.3
 
   openid-client@5.7.1:
     dependencies:
