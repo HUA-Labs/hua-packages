@@ -70,10 +70,15 @@ export function Modal({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center p-4", // 16px 패딩
+        "fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center p-4 overflow-hidden", // PWA 호환성 개선
         centered ? "items-center" : "items-start pt-16", // 64px 상단 여백
         className
       )}
+      style={{
+        width: '100vw',
+        height: '100vh',
+        minHeight: '100vh'
+      }}
       onClick={handleOverlayClick}
     >
       {/* 배경 오버레이 */}
@@ -89,7 +94,10 @@ export function Modal({
           sizeClasses[size]
         )}
         style={{
-          animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+          animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          maxHeight: "90vh",
+          marginTop: centered ? 'auto' : '0',
+          marginBottom: centered ? 'auto' : '0'
         }}
       >
         {/* 그라데이션 배경 장식 */}
@@ -100,12 +108,24 @@ export function Modal({
         {/* 헤더 */}
         {title && (
           <div className="relative z-10 px-6 pt-6 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white pr-10">{title}</h2>
+            {/* 닫기 버튼 */}
+            {showCloseButton && (
+              <button
+                onClick={onClose}
+                className="absolute top-2 right-2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110 z-20"
+                aria-label="닫기"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
         )}
         
-        {/* 닫기 버튼 */}
-        {showCloseButton && (
+        {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
+        {!title && showCloseButton && (
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110 z-20"
