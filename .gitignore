@@ -146,6 +146,11 @@ apps/*/devlogs/
 # Public documentation (shared in Git)
 # docs/public/ - This folder IS tracked in Git
 
+# Personal diary files (should not be tracked)
+apps/my-app/docs/*Devin*
+apps/my-app/docs/*🌿*
+apps/my-app/docs/*Daily Echo Journal*
+
 # Additional patterns from sub-projects
 # Test directories
 src/__tests__/
