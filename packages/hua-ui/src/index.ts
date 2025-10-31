@@ -7,6 +7,7 @@ export { Icon } from './components/Icon';
 export { Avatar, AvatarImage, AvatarFallback } from './components/Avatar';
 export { Modal } from './components/Modal';
 export { FeatureCard } from './components/FeatureCard';
+export { InfoCard } from './components/InfoCard';
 export { HeroSection } from './components/HeroSection';
 
 // UI Components - Layout

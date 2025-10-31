@@ -3,6 +3,9 @@ packages:
   - packages/*
   - tools/*
 
+ignoredBuiltDependencies:
+  - '@prisma/client'
+
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
