@@ -11,6 +11,7 @@ export interface ModalProps {
   showCloseButton?: boolean
   closeOnOverlayClick?: boolean
   title?: string
+  description?: string
   showBackdrop?: boolean
   centered?: boolean
   className?: string
@@ -25,6 +26,7 @@ export function Modal({
   showCloseButton = true,
   closeOnOverlayClick = true,
   title,
+  description,
   showBackdrop = true,
   centered = true
 }: ModalProps) {
@@ -56,13 +58,13 @@ export function Modal({
     }
   }
 
-  // 모달 크기 클래스 (4의 배수, 8의 배수 스페이싱)
+  // 모달 크기 클래스 (반응형 포함)
   const sizeClasses = {
-    sm: "w-80 max-w-sm", // 320px
-    md: "w-96 max-w-md", // 384px
-    lg: "w-[500px] max-w-lg", // 500px
-    xl: "w-[600px] max-w-xl", // 600px
-    "2xl": "w-[800px] max-w-2xl" // 800px
+    sm: "md:w-80", // 20rem = 320px
+    md: "md:w-96", // 24rem = 384px
+    lg: "md:w-[32rem]", // 32rem = 512px
+    xl: "md:w-[38rem]", // 38rem = 608px
+    "2xl": "md:w-[50rem]" // 50rem = 800px
   }
 
   if (!isOpen) return null
@@ -90,8 +92,12 @@ export function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 mx-4 transform transition-all duration-300 ease-out overflow-hidden",
-          sizeClasses[size]
+          "relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out overflow-hidden",
+          // 반응형: 모바일 전체, 데스크톱 고정
+          "w-[calc(100vw-2rem)]", // 모바일: 화면 너비 - 패딩
+          sizeClasses[size],       // 데스크톱: md:w-[50rem]
+          "max-w-[calc(100vw-2rem)]", // 최대 너비 제한
+          "flex-none" // flex 컨테이너에서 크기 유지
         )}
         style={{
           animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -109,6 +115,9 @@ export function Modal({
         {title && (
           <div className="relative z-10 px-6 pt-6 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white pr-10">{title}</h2>
+            {description && (
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{description}</p>
+            )}
             {/* 닫기 버튼 */}
             {showCloseButton && (
               <button
@@ -138,7 +147,7 @@ export function Modal({
         )}
         
         {/* 모달 내용 */}
-        <div className={`relative z-10 ${title ? 'px-6 py-6' : 'p-6'}`}>
+        <div className={`relative z-10 ${title ? 'px-6 mb-6' : 'p-6'}`}>
           {children}
         </div>
       </div>
