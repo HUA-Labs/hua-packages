@@ -114,18 +114,14 @@ export function Modal({
         {/* 헤더 */}
         {title && (
           <div className="relative z-10 px-6 pt-6 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
-            <div className="flex items-start justify-between gap-4 pr-0">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
-                {description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{description}</p>
-                )}
-              </div>
-              {/* 닫기 버튼 - 고정 위치 */}
+            {/* 타이틀과 닫기 버튼 - 같은 줄, 양쪽 끝 */}
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex-1 min-w-0">{title}</h2>
+              {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="flex-shrink-0 p-2 -mt-1 -mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110 z-20"
+                  className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110 z-20"
                   aria-label="닫기"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,6 +130,10 @@ export function Modal({
                 </button>
               )}
             </div>
+            {/* 설명 - 아래 줄 */}
+            {description && (
+              <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+            )}
           </div>
         )}
         
