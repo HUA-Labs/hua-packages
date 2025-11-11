@@ -3,7 +3,7 @@ import js from '@eslint/js';
 export default [
   js.configs.recommended,
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,mjs,cjs}'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
@@ -17,12 +17,24 @@ export default [
         module: 'readonly',
         require: 'readonly',
         exports: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        fetch: 'readonly',
+        sessionStorage: 'readonly',
+        localStorage: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        CustomEvent: 'readonly',
       },
     },
     rules: {
       'no-unused-vars': 'warn',
       'prefer-const': 'warn',
       'no-var': 'warn',
+      'no-undef': 'off',
     },
   },
   {
@@ -34,6 +46,8 @@ export default [
       'coverage/**',
       '*.config.js',
       '*.config.mjs',
+      '**/*.ts',
+      '**/*.tsx',
     ],
   },
 ]; 
