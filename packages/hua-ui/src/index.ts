@@ -18,6 +18,35 @@ export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
 export { Panel } from './components/Panel';
 
+// UI Components - Dashboard
+export { 
+  StatCard, 
+  QuickActionCard, 
+  DashboardGrid, 
+  ActivityFeed,
+  ProfileCard,
+  MembershipBadge,
+  MiniBarChart,
+  SummaryCard,
+  NotificationCard,
+  MetricCard
+} from './components/dashboard';
+export type { 
+  StatCardProps, 
+  QuickActionCardProps, 
+  DashboardGridProps, 
+  ActivityFeedProps, 
+  ActivityItem,
+  ProfileCardProps,
+  MembershipTier,
+  MembershipBadgeProps,
+  MiniBarChartProps,
+  SummaryCardProps,
+  NotificationCardProps,
+  NotificationItem,
+  MetricCardProps
+} from './components/dashboard';
+
 // UI Components - Navigation
 export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
 export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';
