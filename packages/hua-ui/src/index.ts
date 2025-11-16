@@ -29,7 +29,8 @@ export {
   MiniBarChart,
   SummaryCard,
   NotificationCard,
-  MetricCard
+  MetricCard,
+  ProgressCard
 } from './components/dashboard';
 export type { 
   StatCardProps, 
@@ -44,7 +45,8 @@ export type {
   SummaryCardProps,
   NotificationCardProps,
   NotificationItem,
-  MetricCardProps
+  MetricCardProps,
+  ProgressCardProps
 } from './components/dashboard';
 
 // UI Components - Navigation
@@ -60,7 +62,7 @@ export * from './components/advanced';
 // UI Components - Data Display
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './components/Table';
 export { Badge } from './components/Badge';
-export { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressCard, ProgressGroup } from './components/Progress';
+export { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressGroup } from './components/Progress';
 export { Skeleton, SkeletonText, SkeletonCircle, SkeletonRectangle, SkeletonRounded, SkeletonCard, SkeletonAvatar, SkeletonImage, SkeletonUserProfile, SkeletonList, SkeletonTable } from './components/Skeleton';
 
 // UI Components - Feedback
