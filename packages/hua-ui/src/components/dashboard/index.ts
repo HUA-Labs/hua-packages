@@ -28,3 +28,6 @@ export type { NotificationCardProps, NotificationItem } from "./NotificationCard
 export { MetricCard } from "./MetricCard";
 export type { MetricCardProps } from "./MetricCard";
 
+export { ProgressCard } from "./ProgressCard";
+export type { ProgressCardProps } from "./ProgressCard";
+
