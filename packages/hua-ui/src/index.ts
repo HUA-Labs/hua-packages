@@ -18,6 +18,37 @@ export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
 export { Panel } from './components/Panel';
 
+// UI Components - Dashboard
+export { 
+  StatCard, 
+  QuickActionCard, 
+  DashboardGrid, 
+  ActivityFeed,
+  ProfileCard,
+  MembershipBadge,
+  MiniBarChart,
+  SummaryCard,
+  NotificationCard,
+  MetricCard,
+  ProgressCard
+} from './components/dashboard';
+export type { 
+  StatCardProps, 
+  QuickActionCardProps, 
+  DashboardGridProps, 
+  ActivityFeedProps, 
+  ActivityItem,
+  ProfileCardProps,
+  MembershipTier,
+  MembershipBadgeProps,
+  MiniBarChartProps,
+  SummaryCardProps,
+  NotificationCardProps,
+  NotificationItem,
+  MetricCardProps,
+  ProgressCardProps
+} from './components/dashboard';
+
 // UI Components - Navigation
 export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
 export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';
@@ -31,7 +62,7 @@ export * from './components/advanced';
 // UI Components - Data Display
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './components/Table';
 export { Badge } from './components/Badge';
-export { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressCard, ProgressGroup } from './components/Progress';
+export { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressGroup } from './components/Progress';
 export { Skeleton, SkeletonText, SkeletonCircle, SkeletonRectangle, SkeletonRounded, SkeletonCard, SkeletonAvatar, SkeletonImage, SkeletonUserProfile, SkeletonList, SkeletonTable } from './components/Skeleton';
 
 // UI Components - Feedback
