@@ -603,16 +603,24 @@ export class Translator implements TranslatorInterface {
   }
 
   /**
-   * 키 파싱 (네임스페이스:키 형식)
+   * 키 파싱 (네임스페이스:키 또는 네임스페이스.키 형식 지원)
+   * 우선순위: : > . (첫 번째 구분자 사용)
    */
   private parseKey(key: string): { namespace: string; key: string } {
-    const parts = key.split(':');
-    
-    if (parts.length === 1) {
-      return { namespace: 'common', key: parts[0] };
+    // : 구분자 우선 확인
+    const colonIndex = key.indexOf(':');
+    if (colonIndex !== -1) {
+      return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
     }
     
-    return { namespace: parts[0], key: parts.slice(1).join(':') };
+    // . 구분자 확인 (첫 번째 점만 네임스페이스 구분자로 사용)
+    const dotIndex = key.indexOf('.');
+    if (dotIndex !== -1) {
+      return { namespace: key.substring(0, dotIndex), key: key.substring(dotIndex + 1) };
+    }
+    
+    // 구분자가 없으면 common 네임스페이스로 간주
+    return { namespace: 'common', key };
   }
 
   /**
@@ -755,13 +763,20 @@ function getNestedValue(obj: unknown, path: string): unknown {
 }
 
 function parseKey(key: string): { namespace: string; key: string } {
-  const parts = key.split(':');
-  
-  if (parts.length === 1) {
-    return { namespace: 'common', key: parts[0] };
+  // : 구분자 우선 확인
+  const colonIndex = key.indexOf(':');
+  if (colonIndex !== -1) {
+    return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
   }
   
-  return { namespace: parts[0], key: parts.slice(1).join(':') };
+  // . 구분자 확인 (첫 번째 점만 네임스페이스 구분자로 사용)
+  const dotIndex = key.indexOf('.');
+  if (dotIndex !== -1) {
+    return { namespace: key.substring(0, dotIndex), key: key.substring(dotIndex + 1) };
+  }
+  
+  // 구분자가 없으면 common 네임스페이스로 간주
+  return { namespace: 'common', key };
 }
 
 // 서버 번역 함수 (고급 기능 포함)
