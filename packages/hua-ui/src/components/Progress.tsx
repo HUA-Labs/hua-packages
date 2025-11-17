@@ -144,7 +144,7 @@ export const ProgressInfo = React.forwardRef<HTMLDivElement, Omit<ProgressProps,
 ProgressInfo.displayName = "ProgressInfo"
 
 // 복합 Progress 컴포넌트들
-export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressProps & { title?: string }>(
+export const ProgressWrapper = React.forwardRef<HTMLDivElement, ProgressProps & { title?: string }>(
   ({ title, className, ...props }, ref) => (
     <div className={cn("p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700", className)}>
       {title && (
@@ -156,7 +156,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressProps & { t
     </div>
   )
 )
-ProgressCard.displayName = "ProgressCard"
+ProgressWrapper.displayName = "ProgressWrapper"
 
 export const ProgressGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (

@@ -12,6 +12,15 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**"
+      ],
+      "env": [
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_SES_REGION",
+        "AWS_SES_FROM_EMAIL"
       ]
     },
     "dev": {
