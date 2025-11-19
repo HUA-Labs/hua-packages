@@ -55,19 +55,63 @@ export function createCoreI18n(options?: {
   namespaces?: string[];
   debug?: boolean;
   loadTranslations?: (language: string, namespace: string) => Promise<Record<string, string>>;
+  /**
+   * 번역 파일 로딩 방식 설정
+   * - 'api': API route를 통해 동적 로드 (기본값, 권장)
+   * - 'static': 정적 파일 경로에서 로드
+   * - 'custom': loadTranslations 함수 사용
+   */
+  translationLoader?: 'api' | 'static' | 'custom';
+  /**
+   * API route 경로 (translationLoader가 'api'일 때 사용)
+   * 기본값: '/api/translations'
+   */
+  translationApiPath?: string;
 }) {
   const {
     defaultLanguage = 'ko',
     fallbackLanguage = 'en',
     namespaces = ['common'],
     debug = false,
-    loadTranslations
+    loadTranslations,
+    translationLoader = 'api',
+    translationApiPath = '/api/translations'
   } = options || {};
 
-  // 기본 파일 로더 (사용자 정의 로더가 없을 때 사용)
-  const defaultFileLoader = async (language: string, namespace: string) => {
+  // API route 기반 로더 (기본값, 권장)
+  const apiRouteLoader = async (language: string, namespace: string) => {
     try {
-      // 안전한 방식으로 번역 파일 로드 시도
+      // 클라이언트 사이드에서만 동적 로드
+      if (typeof window !== 'undefined') {
+        const apiUrl = `${translationApiPath}/${language}/${namespace}`;
+        const response = await fetch(apiUrl);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (debug) {
+            console.log(`✅ Loaded translation from API: ${language}/${namespace}`);
+          }
+          return data;
+        } else if (response.status === 404) {
+          if (debug) {
+            console.warn(`⚠️ Translation not found in API: ${language}/${namespace}`);
+          }
+        }
+      }
+      
+      // SSR 또는 API 실패 시 기본 번역 반환
+      return getDefaultTranslations(language, namespace);
+    } catch (error) {
+      if (debug) {
+        console.warn(`Failed to load translation from API: ${language}/${namespace}`, error);
+      }
+      return getDefaultTranslations(language, namespace);
+    }
+  };
+
+  // 정적 파일 로더 (하위 호환성)
+  const staticFileLoader = async (language: string, namespace: string) => {
+    try {
       let data: Record<string, string> | null = null;
       
       // 클라이언트 사이드에서만 동적 로드 시도
@@ -82,14 +126,15 @@ export function createCoreI18n(options?: {
 
         for (const path of possiblePaths) {
           try {
-            // fetch를 사용하여 안전하게 로드
             const response = await fetch(path);
             if (response.ok) {
               data = await response.json();
+              if (debug) {
+                console.log(`✅ Loaded translation from static path: ${path}`);
+              }
               break;
             }
           } catch (pathError) {
-            // 다음 경로 시도
             continue;
           }
         }
@@ -99,21 +144,30 @@ export function createCoreI18n(options?: {
         return data;
       }
 
-      // 모든 경로가 실패하면 기본 번역 반환
       return getDefaultTranslations(language, namespace);
-    }
-    catch (error) {
-      console.warn(`Failed to load translation file: ${language}/${namespace}.json`);
+    } catch (error) {
+      if (debug) {
+        console.warn(`Failed to load translation file: ${language}/${namespace}.json`);
+      }
       return getDefaultTranslations(language, namespace);
     }
   };
+
+  // 기본 파일 로더 선택
+  const defaultFileLoader = translationLoader === 'api' 
+    ? apiRouteLoader 
+    : translationLoader === 'static'
+    ? staticFileLoader
+    : loadTranslations || apiRouteLoader;
 
   const config: I18nConfig = {
     defaultLanguage,
     fallbackLanguage,
     supportedLanguages: defaultLanguages,
     namespaces,
-    loadTranslations: loadTranslations || defaultFileLoader,
+    loadTranslations: translationLoader === 'custom' && loadTranslations 
+      ? loadTranslations 
+      : defaultFileLoader,
     debug,
     missingKeyHandler: (key: string, language?: string, namespace?: string) => {
       if (debug) {
