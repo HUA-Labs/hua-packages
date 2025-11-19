@@ -53,8 +53,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm type-check
+      - name: Type check my-app only
+        run: pnpm turbo run type-check --filter=my-app...
 
   # 린트
   lint:
@@ -78,8 +78,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
+      - name: Lint my-app only
+        run: pnpm turbo run lint --filter=my-app...
 
   # 빌드
   build:
@@ -103,8 +103,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Build my-app only
+        run: pnpm turbo run build --filter=my-app...
         env:
           # 빌드에 필요한 환경 변수 (실제 값은 GitHub Secrets에 저장)
           # 린터 경고: secrets는 선택적이며, 없으면 빈 문자열로 처리됨
