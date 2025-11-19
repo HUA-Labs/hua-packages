@@ -118,6 +118,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared UI packages
+        run:
+          pnpm --filter=@hua-labs/ui build &&
+          pnpm --filter=@hua-labs/motion build &&
+          pnpm --filter=@hua-platform/hua-emotion-engine build
+
       - name: Assert DATABASE_URL is available
         run: |
           if [ -z "$DATABASE_URL" ]; then
