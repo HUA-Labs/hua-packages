@@ -43,8 +43,8 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
           !fluid && sizeClasses[size],
           paddingClasses[padding],
           centered && "mx-auto",
-          "bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl",
-          "dark:bg-slate-900/5 dark:border-slate-700/20",
+          "bg-white/5 backdrop-blur-sm rounded-xl shadow-xl",
+          "dark:bg-slate-900/5",
           className
         )}
         {...props}

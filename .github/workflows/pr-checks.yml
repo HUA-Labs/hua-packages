@@ -1,14 +1,11 @@
-name: CI
+name: PR Checks
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   pull_request:
     branches:
       - develop
       - main
+    types: [opened, synchronize, reopened]
 
 jobs:
   # 변경된 파일 확인
@@ -81,7 +78,7 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-  # 빌드
+  # 빌드 (변경된 앱/패키지만)
   build:
     runs-on: ubuntu-latest
     needs: changed-files
@@ -106,9 +103,46 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          # 빌드에 필요한 환경 변수 (실제 값은 GitHub Secrets에 저장)
-          # 린터 경고: secrets는 선택적이며, 없으면 빈 문자열로 처리됨
           SUPABASE_URL: ${{ secrets.SUPABASE_URL || '' }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY || '' }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+
+  # PR 체크리스트 검증
+  pr-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            
+            // 체크리스트 항목 확인
+            const checklistItems = [
+              '코드가 프로젝트의 코딩 스타일을 따릅니다',
+              '자체 코드 리뷰를 수행했습니다',
+              '변경 사항이 새로운 경고를 생성하지 않습니다',
+              '타입 체크가 통과합니다',
+              '린트가 통과합니다',
+              '빌드가 성공합니다'
+            ];
+            
+            const missingItems = [];
+            for (const item of checklistItems) {
+              // 체크리스트 항목이 체크되었는지 확인
+              const regex = new RegExp(`- \\[x\\].*${item}`, 'i');
+              if (!regex.test(body)) {
+                missingItems.push(item);
+              }
+            }
+            
+            if (missingItems.length > 0) {
+              core.warning(`다음 체크리스트 항목이 완료되지 않았습니다: ${missingItems.join(', ')}`);
+              // 경고만 표시하고 실패하지는 않음 (선택사항)
+            } else {
+              core.info('모든 필수 체크리스트 항목이 완료되었습니다.');
+            }
 
