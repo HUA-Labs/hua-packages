@@ -124,6 +124,10 @@ jobs:
           pnpm --filter=@hua-labs/motion build &&
           pnpm --filter=@hua-platform/hua-emotion-engine build
 
+      - name: Generate Prisma Client
+        working-directory: apps/my-app
+        run: pnpm exec prisma generate
+
       - name: Assert DATABASE_URL is available
         run: |
           if [ -z "$DATABASE_URL" ]; then
