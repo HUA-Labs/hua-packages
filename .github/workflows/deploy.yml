@@ -84,8 +84,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod=false --confirm'
-          working-directory: ./apps/my-app
+          vercel-args: '--prod=false --confirm --cwd ./apps/my-app --local-config ./apps/my-app/vercel.json'
 
   # Vercel 배포 (my-api)
   deploy-my-api:
@@ -133,8 +132,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod=false --confirm'
-          working-directory: ./apps/my-api
+          vercel-args: '--prod=false --confirm --cwd ./apps/my-api --local-config ./apps/my-api/vercel.json'
 
   # 프로덕션 배포 (main 브랜치)
   deploy-production:
@@ -187,8 +185,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod --confirm'
-          working-directory: ./apps/my-app
+          vercel-args: '--prod --confirm --cwd ./apps/my-app --local-config ./apps/my-app/vercel.json'
 
       - name: Deploy my-api to Vercel (Production)
         if: needs.detect-changes.outputs.my-api == 'true'
@@ -197,6 +194,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod --confirm'
-          working-directory: ./apps/my-api
+          vercel-args: '--prod --confirm --cwd ./apps/my-api --local-config ./apps/my-api/vercel.json'
 
