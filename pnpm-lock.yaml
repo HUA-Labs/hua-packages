@@ -1069,9 +1069,6 @@ importers:
 
   packages/hua-ui:
     dependencies:
-      '@hua-labs/motion':
-        specifier: workspace:*
-        version: link:../hua-motion
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
