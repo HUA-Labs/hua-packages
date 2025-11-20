@@ -78,13 +78,26 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Deploy to Vercel (Preview)
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod=false --confirm --cwd ./apps/my-app --local-config ./apps/my-app/vercel.json'
+      - name: Pull Vercel Environment (Preview)
+        working-directory: ./apps/my-app
+        run: pnpm dlx vercel pull --yes --environment=preview --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+
+      - name: Build with Vercel CLI (Preview)
+        working-directory: ./apps/my-app
+        run: pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+
+      - name: Deploy Prebuilt Output (Preview)
+        working-directory: ./apps/my-app
+        run: pnpm dlx vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
 
   # Vercel 배포 (my-api)
   deploy-my-api:
@@ -126,13 +139,26 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Deploy to Vercel (Preview)
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod=false --confirm --cwd ./apps/my-api --local-config ./apps/my-api/vercel.json'
+      - name: Pull Vercel Environment (Preview)
+        working-directory: ./apps/my-api
+        run: pnpm dlx vercel pull --yes --environment=preview --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
+
+      - name: Build with Vercel CLI (Preview)
+        working-directory: ./apps/my-api
+        run: pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
+
+      - name: Deploy Prebuilt Output (Preview)
+        working-directory: ./apps/my-api
+        run: pnpm dlx vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
 
   # 프로덕션 배포 (main 브랜치)
   deploy-production:
@@ -178,21 +204,33 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Pull Vercel Environment (Production)
+        if: needs.detect-changes.outputs.my-app == 'true' || needs.detect-changes.outputs.my-api == 'true'
+        run: pnpm dlx vercel pull --yes --environment=production --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+
+      - name: Build with Vercel CLI (Production)
+        if: needs.detect-changes.outputs.my-app == 'true' || needs.detect-changes.outputs.my-api == 'true'
+        run: pnpm dlx vercel build --prod --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod --confirm --cwd ./apps/my-app --local-config ./apps/my-app/vercel.json'
+        working-directory: ./apps/my-app
+        run: pnpm dlx vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
 
       - name: Deploy my-api to Vercel (Production)
         if: needs.detect-changes.outputs.my-api == 'true'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod --confirm --cwd ./apps/my-api --local-config ./apps/my-api/vercel.json'
+        working-directory: ./apps/my-api
+        run: pnpm dlx vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
 
