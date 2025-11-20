@@ -123,8 +123,7 @@ jobs:
 
       - name: Build shared UI packages
         run:
-          pnpm --filter=@hua-labs/ui build &&
-          pnpm --filter=@hua-labs/motion build
+          pnpm --filter=@hua-labs/ui build
 
       - name: Generate Prisma Client
         working-directory: apps/my-app
