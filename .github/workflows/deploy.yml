@@ -87,10 +87,14 @@ jobs:
 
       - name: Build with Vercel CLI (Preview)
         working-directory: ./apps/my-app
-        run: pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }}
+        run: pnpm dlx vercel build --prod=false --token ${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
 
       - name: Deploy Prebuilt Output (Preview)
         working-directory: ./apps/my-app
