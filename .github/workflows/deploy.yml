@@ -84,7 +84,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod=false'
+          vercel-args: '--prod=false --yes'
           working-directory: ./apps/my-app
 
   # Vercel 배포 (my-api)
@@ -133,7 +133,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod=false'
+          vercel-args: '--prod=false --yes'
           working-directory: ./apps/my-api
 
   # 프로덕션 배포 (main 브랜치)
@@ -187,7 +187,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod'
+          vercel-args: '--prod --yes'
           working-directory: ./apps/my-app
 
       - name: Deploy my-api to Vercel (Production)
@@ -197,6 +197,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod'
+          vercel-args: '--prod --yes'
           working-directory: ./apps/my-api
 
