@@ -57,16 +57,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup Prisma
-        working-directory: ./apps/my-app
         run: |
-          pnpm exec prisma generate
+          pnpm exec prisma generate --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations
-        working-directory: ./apps/my-app
         run: |
-          pnpm exec prisma migrate deploy
+          pnpm exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -149,16 +147,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup Prisma for my-app
-        working-directory: ./apps/my-app
         run: |
-          pnpm exec prisma generate
+          pnpm exec prisma generate --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations (Production)
-        working-directory: ./apps/my-app
         run: |
-          pnpm exec prisma migrate deploy
+          pnpm exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
