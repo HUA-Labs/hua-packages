@@ -68,8 +68,13 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Build shared packages
+        run: |
+          pnpm --filter @hua-labs/ui run build
+          pnpm --filter @hua-labs/i18n-core run build
+
       - name: Build app
-        run: pnpm turbo run build --filter=my-app
+        run: pnpm turbo run build --filter=my-app --no-deps
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -111,8 +116,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
+      - name: Build shared packages
+        run: |
+          pnpm --filter @hua-labs/ui run build
+          pnpm --filter @hua-labs/i18n-core run build
+
       - name: Build app
-        run: pnpm turbo run build --filter=hua-api
+        run: pnpm turbo run build --filter=hua-api --no-deps
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -167,13 +177,18 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
+      - name: Build shared packages
+        run: |
+          pnpm --filter @hua-labs/ui run build
+          pnpm --filter @hua-labs/i18n-core run build
+
       - name: Build my-app
         if: needs.detect-changes.outputs.my-app == 'true'
-        run: pnpm turbo run build --filter=my-app
+        run: pnpm turbo run build --filter=my-app --no-deps
 
       - name: Build my-api
         if: needs.detect-changes.outputs.my-api == 'true'
-        run: pnpm turbo run build --filter=hua-api
+        run: pnpm turbo run build --filter=hua-api --no-deps
 
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
