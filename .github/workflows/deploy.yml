@@ -76,7 +76,7 @@ jobs:
           pnpm --filter @hua-labs/i18n-core run build
 
       - name: Build app
-        run: pnpm turbo run build --filter=my-app --no-deps
+        run: pnpm turbo run build --filter=my-app
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -124,7 +124,7 @@ jobs:
           pnpm --filter @hua-labs/i18n-core run build
 
       - name: Build app
-        run: pnpm turbo run build --filter=hua-api --no-deps
+        run: pnpm turbo run build --filter=hua-api
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -186,11 +186,11 @@ jobs:
 
       - name: Build my-app
         if: needs.detect-changes.outputs.my-app == 'true'
-        run: pnpm turbo run build --filter=my-app --no-deps
+        run: pnpm turbo run build --filter=my-app
 
       - name: Build my-api
         if: needs.detect-changes.outputs.my-api == 'true'
-        run: pnpm turbo run build --filter=hua-api --no-deps
+        run: pnpm turbo run build --filter=hua-api
 
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
