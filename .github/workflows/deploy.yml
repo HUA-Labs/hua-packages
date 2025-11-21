@@ -58,13 +58,13 @@ jobs:
 
       - name: Setup Prisma
         run: |
-          pnpm exec prisma generate --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma generate --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations
         run: |
-          pnpm exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -103,10 +103,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup Prisma (if needed)
-        working-directory: ./apps/my-api
         run: |
-          if [ -f "prisma/schema.prisma" ]; then
-            pnpm exec prisma generate
+          if [ -f "apps/my-api/prisma/schema.prisma" ]; then
+            pnpm --filter=my-api exec prisma generate --schema=apps/my-api/prisma/schema.prisma
           fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -148,22 +147,21 @@ jobs:
 
       - name: Setup Prisma for my-app
         run: |
-          pnpm exec prisma generate --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma generate --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations (Production)
         run: |
-          pnpm exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Prisma for my-api
         if: needs.detect-changes.outputs.my-api == 'true'
-        working-directory: ./apps/my-api
         run: |
-          if [ -f "prisma/schema.prisma" ]; then
-            pnpm exec prisma generate
+          if [ -f "apps/my-api/prisma/schema.prisma" ]; then
+            pnpm --filter=my-api exec prisma generate --schema=apps/my-api/prisma/schema.prisma
           fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
