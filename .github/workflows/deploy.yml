@@ -70,6 +70,9 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Build dependencies (hua-ui)
+        run: pnpm build --filter=@hua-labs/ui
+
       - name: Build with Vercel (Preview)
         run: |
           pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod=false --yes
@@ -122,6 +125,9 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
+
+      - name: Build dependencies (hua-ui)
+        run: pnpm build --filter=@hua-labs/ui
 
       - name: Build with Vercel (Preview)
         run: |
@@ -190,6 +196,10 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
+
+      - name: Build dependencies (hua-ui)
+        if: needs.detect-changes.outputs.my-app == 'true' || needs.detect-changes.outputs.my-api == 'true'
+        run: pnpm build --filter=@hua-labs/ui
 
       - name: Build my-app with Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
