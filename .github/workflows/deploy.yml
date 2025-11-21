@@ -77,7 +77,6 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
           vercel-args: '--prod=false'
-          working-directory: ./apps/my-app
 
   # Vercel 배포 (my-api)
   # 프로덕션 배포 (main 브랜치)
@@ -122,5 +121,4 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
           vercel-args: '--prod'
-          working-directory: ./apps/my-app
 
