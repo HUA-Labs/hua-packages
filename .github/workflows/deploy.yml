@@ -58,13 +58,13 @@ jobs:
 
       - name: Setup Prisma
         run: |
-          pnpm --filter=my-app exec prisma generate --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma generate --schema=prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations
         run: |
-          pnpm --filter=my-app exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma migrate deploy --schema=prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -105,7 +105,7 @@ jobs:
       - name: Setup Prisma (if needed)
         run: |
           if [ -f "apps/my-api/prisma/schema.prisma" ]; then
-            pnpm --filter=my-api exec prisma generate --schema=apps/my-api/prisma/schema.prisma
+            pnpm --filter=my-api exec prisma generate --schema=prisma/schema.prisma
           fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -147,13 +147,13 @@ jobs:
 
       - name: Setup Prisma for my-app
         run: |
-          pnpm --filter=my-app exec prisma generate --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma generate --schema=prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Database Migrations (Production)
         run: |
-          pnpm --filter=my-app exec prisma migrate deploy --schema=apps/my-app/prisma/schema.prisma
+          pnpm --filter=my-app exec prisma migrate deploy --schema=prisma/schema.prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -161,7 +161,7 @@ jobs:
         if: needs.detect-changes.outputs.my-api == 'true'
         run: |
           if [ -f "apps/my-api/prisma/schema.prisma" ]; then
-            pnpm --filter=my-api exec prisma generate --schema=apps/my-api/prisma/schema.prisma
+            pnpm --filter=my-api exec prisma generate --schema=prisma/schema.prisma
           fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
