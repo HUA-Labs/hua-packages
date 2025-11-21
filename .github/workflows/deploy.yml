@@ -88,53 +88,6 @@ jobs:
           working-directory: ./apps/my-app
 
   # Vercel 배포 (my-api)
-  deploy-my-api:
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.my-api == 'true' && github.ref == 'refs/heads/develop'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.20.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prod=false
-
-      - name: Setup Prisma (if needed)
-        run: |
-          if [ -f "apps/my-api/prisma/schema.prisma" ]; then
-            pnpm --filter=my-api exec prisma generate --schema=prisma/schema.prisma
-          fi
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        continue-on-error: true
-
-      - name: Build shared packages
-        run: |
-          pnpm --filter @hua-labs/ui run build
-          pnpm --filter @hua-labs/i18n-core run build
-
-      - name: Build app
-        run: pnpm turbo run build --filter=hua-api
-
-      - name: Deploy to Vercel (Preview)
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod=false --prebuilt'
-          working-directory: ./apps/my-api
-
   # 프로덕션 배포 (main 브랜치)
   deploy-production:
     runs-on: ubuntu-latest
@@ -169,16 +122,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Setup Prisma for my-api
-        if: needs.detect-changes.outputs.my-api == 'true'
-        run: |
-          if [ -f "apps/my-api/prisma/schema.prisma" ]; then
-            pnpm --filter=my-api exec prisma generate --schema=prisma/schema.prisma
-          fi
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        continue-on-error: true
-
       - name: Build shared packages
         run: |
           pnpm --filter @hua-labs/ui run build
@@ -187,10 +130,6 @@ jobs:
       - name: Build my-app
         if: needs.detect-changes.outputs.my-app == 'true'
         run: pnpm turbo run build --filter=my-app
-
-      - name: Build my-api
-        if: needs.detect-changes.outputs.my-api == 'true'
-        run: pnpm turbo run build --filter=hua-api
 
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
@@ -201,14 +140,4 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
           vercel-args: '--prod --prebuilt'
           working-directory: ./apps/my-app
-
-      - name: Deploy my-api to Vercel (Production)
-        if: needs.detect-changes.outputs.my-api == 'true'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod --prebuilt'
-          working-directory: ./apps/my-api
 
