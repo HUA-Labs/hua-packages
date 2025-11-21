@@ -70,8 +70,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Build dependencies
-        run: pnpm build --filter=my-app...
+      - name: Build app
+        run: pnpm turbo run build --filter=my-app
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -79,7 +79,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod=false'
+          vercel-args: '--prod=false --prebuilt'
           working-directory: ./apps/my-app
 
   # Vercel 배포 (my-api)
@@ -114,8 +114,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
-      - name: Build dependencies
-        run: pnpm build --filter=hua-api...
+      - name: Build app
+        run: pnpm turbo run build --filter=hua-api
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -123,7 +123,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod=false'
+          vercel-args: '--prod=false --prebuilt'
           working-directory: ./apps/my-api
 
   # 프로덕션 배포 (main 브랜치)
@@ -173,13 +173,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
-      - name: Build dependencies for my-app
+      - name: Build my-app
         if: needs.detect-changes.outputs.my-app == 'true'
-        run: pnpm build --filter=my-app...
+        run: pnpm turbo run build --filter=my-app
 
-      - name: Build dependencies for my-api
+      - name: Build my-api
         if: needs.detect-changes.outputs.my-api == 'true'
-        run: pnpm build --filter=hua-api...
+        run: pnpm turbo run build --filter=hua-api
 
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
@@ -188,7 +188,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prod'
+          vercel-args: '--prod --prebuilt'
           working-directory: ./apps/my-app
 
       - name: Deploy my-api to Vercel (Production)
@@ -198,6 +198,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prod'
+          vercel-args: '--prod --prebuilt'
           working-directory: ./apps/my-api
 
