@@ -27,8 +27,10 @@ jobs:
             my-app:
               - 'apps/my-app/**'
               - 'packages/hua-ui/**'  # my-app가 의존하는 패키지
+              - '.github/workflows/deploy.yml'  # 배포 파이프라인 변경 시 강제 실행
             my-api:
               - 'apps/my-api/**'
+              - '.github/workflows/deploy.yml'
             my-chat:
               - 'apps/my-chat/**'
             hua-labs:
