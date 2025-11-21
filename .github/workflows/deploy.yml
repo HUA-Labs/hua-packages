@@ -70,20 +70,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Build dependencies (hua-ui)
-        run: pnpm build --filter=@hua-labs/ui
-
-      - name: Build with Vercel (Preview)
-        run: |
-          pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod=false --yes
-        working-directory: ./apps/my-app
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+      - name: Build dependencies
+        run: pnpm build --filter=my-app...
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -91,7 +79,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prebuilt --prod=false'
+          vercel-args: '--prod=false'
           working-directory: ./apps/my-app
 
   # Vercel 배포 (my-api)
@@ -126,20 +114,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
-      - name: Build dependencies (hua-ui)
-        run: pnpm build --filter=@hua-labs/ui
-
-      - name: Build with Vercel (Preview)
-        run: |
-          pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod=false --yes
-        working-directory: ./apps/my-api
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
+      - name: Build dependencies
+        run: pnpm build --filter=hua-api...
 
       - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -147,7 +123,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prebuilt --prod=false'
+          vercel-args: '--prod=false'
           working-directory: ./apps/my-api
 
   # 프로덕션 배포 (main 브랜치)
@@ -197,35 +173,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         continue-on-error: true
 
-      - name: Build dependencies (hua-ui)
-        if: needs.detect-changes.outputs.my-app == 'true' || needs.detect-changes.outputs.my-api == 'true'
-        run: pnpm build --filter=@hua-labs/ui
-
-      - name: Build my-app with Vercel (Production)
+      - name: Build dependencies for my-app
         if: needs.detect-changes.outputs.my-app == 'true'
-        run: |
-          pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
-        working-directory: ./apps/my-app
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
+        run: pnpm build --filter=my-app...
 
-      - name: Build my-api with Vercel (Production)
+      - name: Build dependencies for my-api
         if: needs.detect-changes.outputs.my-api == 'true'
-        run: |
-          pnpm dlx vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
-        working-directory: ./apps/my-api
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
+        run: pnpm build --filter=hua-api...
 
       - name: Deploy my-app to Vercel (Production)
         if: needs.detect-changes.outputs.my-app == 'true'
@@ -234,7 +188,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_DIARY }}
-          vercel-args: '--prebuilt --prod'
+          vercel-args: '--prod'
           working-directory: ./apps/my-app
 
       - name: Deploy my-api to Vercel (Production)
@@ -244,6 +198,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SUM_API }}
-          vercel-args: '--prebuilt --prod'
+          vercel-args: '--prod'
           working-directory: ./apps/my-api
 
