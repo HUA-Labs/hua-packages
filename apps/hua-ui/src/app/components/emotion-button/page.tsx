@@ -3,6 +3,12 @@
 import React, { useState } from "react"
 import { EmotionButton, Card, CardContent, ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const EMOTION_BUTTON_TYPES = {
+  size: '"sm" | "md" | "lg"',
+  sizeDefault: '"md"',
+}
+
 export default function EmotionButtonPage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string>("😊")
 
@@ -169,8 +175,8 @@ export default function EmotionButtonPage() {
                   </tr>
                   <tr>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">size</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"sm" | "md" | "lg"</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"md"</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_BUTTON_TYPES.size}</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_BUTTON_TYPES.sizeDefault}</td>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 text-slate-900 dark:text-white">버튼 크기</td>
                   </tr>
                   <tr>

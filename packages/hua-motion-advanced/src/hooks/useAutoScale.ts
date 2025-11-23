@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface AutoScaleOptions {
+export interface AutoScaleConfig {
   initialScale?: number // 초기 스케일 (0-2)
   targetScale?: number // 목표 스케일 (0-2)
   duration?: number // 모션 지속 시간 (ms)
@@ -29,7 +29,7 @@ interface AutoScaleReturn {
   toggle: () => void
 }
 
-export function useAutoScale(options: AutoScaleOptions = {}): AutoScaleReturn {
+export function useAutoScale(options: AutoScaleConfig = {}): AutoScaleReturn {
   const {
     initialScale = 0,
     targetScale = 1,
@@ -43,7 +43,7 @@ export function useAutoScale(options: AutoScaleOptions = {}): AutoScaleReturn {
     onComplete,
     onRepeat,
     showOnMount = false,
-    centerTransform = true
+    centerTransform: _centerTransform = true
   } = options
 
   const [scale, setScale] = useState(showOnMount ? initialScale : 0)

@@ -36,8 +36,7 @@
     "react": "^19.0.0",
     "clsx": "^2.0.0",
     "tailwind-merge": "^2.0.0",
-    "lucide-react": "^0.263.1",
-    "@hua-labs/motion": "workspace:*"
+    "lucide-react": "^0.263.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

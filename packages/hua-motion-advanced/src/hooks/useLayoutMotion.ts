@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 
-export interface LayoutConfig {
+export interface LayoutMotionConfig {
   from: {
     width?: number | string
     height?: number | string
@@ -35,7 +35,7 @@ export interface LayoutState {
   currentStyle: React.CSSProperties
 }
 
-export function useLayoutMotion(config: LayoutConfig) {
+export function useLayoutMotion(config: LayoutMotionConfig) {
   const {
     from,
     to,
@@ -211,9 +211,9 @@ export function useLayoutMotion(config: LayoutConfig) {
 
 // 레이아웃 전환 헬퍼
 export function createLayoutTransition(
-  from: LayoutConfig['from'],
-  to: LayoutConfig['to'],
-  options: Partial<LayoutConfig> = {}
+  from: LayoutMotionConfig['from'],
+  to: LayoutMotionConfig['to'],
+  options: Partial<LayoutMotionConfig> = {}
 ) {
   return {
     from,

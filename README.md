@@ -166,3 +166,15 @@ MIT License
 - [HUA Labs 공식 웹사이트](https://hua-labs.com)
 - [문서](https://docs.hua-labs.com)
 - [API 문서](https://api.hua-labs.com)
+
+## 🔐 GitHub Actions Secrets (배포 자동화)
+
+배포 워크플로(`.github/workflows/deploy.yml`)가 성공하려면 아래 시크릿을 GitHub 저장소 또는 조직 단위 Secrets에 등록해야 합니다:
+
+- `VERCEL_TOKEN`: Vercel 개인 계정 Settings → Tokens에서 생성한 Personal Token
+- `VERCEL_ORG_ID`: Vercel 팀 Settings → General에서 확인 가능한 Team ID
+- `VERCEL_PROJECT_ID_SUM_DIARY`: `my-app` 프로젝트 Settings → General의 Project ID
+- `VERCEL_PROJECT_ID_SUM_API`: `my-api` 프로젝트 Settings → General의 Project ID
+- `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `DATABASE_URL`: 기존 환경 변수와 동일하게 설정
+
+시크릿이 누락되면 `amondnet/vercel-action@v25` 단계에서 `Input required and not supplied: vercel-token` 오류로 배포가 중단되므로, 브랜치 보호 전 반드시 위 시크릿 유무를 확인하세요.

@@ -69,35 +69,60 @@ export { useGameLoop } from './hooks/useGameLoop'
 // Advanced 패키지 전용 타입들
 export type {
   // 오케스트레이션 타입들
-  OrchestrationConfig,
-  SequenceConfig,
-  MotionSequence,
-  
+  OrchestrationConfig
+} from './hooks/useOrchestration'
+export type {
+  SequenceConfig
+} from './hooks/useSequence'
+export type {
   // 고급 인터랙션 타입들
-  LayoutMotionConfig,
-  KeyboardToggleConfig,
-  ScrollDirectionConfig,
-  StickyToggleConfig,
-  ScrollToggleConfig,
-  VisibilityToggleConfig,
-  InteractiveConfig,
-  
+  LayoutMotionConfig
+} from './hooks/useLayoutMotion'
+export type {
+  KeyboardToggleConfig
+} from './hooks/useKeyboardToggle'
+export type {
+  ScrollDirectionConfig
+} from './hooks/useScrollDirection'
+export type {
+  StickyToggleConfig
+} from './hooks/useStickyToggle'
+export type {
+  ScrollToggleConfig
+} from './hooks/useScrollToggle'
+export type {
+  VisibilityToggleConfig
+} from './hooks/useVisibilityToggle'
+export type {
+  InteractiveConfig
+} from './hooks/useInteractive'
+export type {
   // 성능 최적화 타입들
-  PerformanceMetrics,
-  PerformanceConfig,
-  
+  PerformanceMonitorConfig as PerformanceConfig,
+  PerformanceMonitorState as PerformanceMetrics
+} from './hooks/usePerformanceMonitor'
+export type {
   // 국제화 타입들
-  LanguageConfig,
-  LocaleConfig,
-  
+  LanguageConfig
+} from './hooks/useLanguageAwareMotion'
+export type {
   // 게임 엔진 타입들
   GameLoopConfig,
-  GameState,
-  
+  GameState
+} from './hooks/useGameLoop'
+export type {
   // Auto 모션 타입들
-  AutoMotionConfig,
-  AutoSlideConfig,
-  AutoScaleConfig,
-  AutoFadeConfig,
+  AutoMotionConfig
+} from './hooks/useMotion'
+export type {
+  AutoSlideConfig
+} from './hooks/useAutoSlide'
+export type {
+  AutoScaleConfig
+} from './hooks/useAutoScale'
+export type {
+  AutoFadeConfig
+} from './hooks/useAutoFade'
+export type {
   AutoPlayConfig
-} from './types'
+} from './hooks/useAutoPlay'

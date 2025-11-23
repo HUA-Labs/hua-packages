@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface AutoPlayOptions {
+export interface AutoPlayConfig {
   interval?: number // 재생 간격 (ms)
   delay?: number // 시작 지연 시간 (ms)
   repeat?: number | 'infinite' // 반복 횟수
@@ -10,7 +10,7 @@ interface AutoPlayOptions {
   showOnMount?: boolean
 }
 
-export function useAutoPlay(options: AutoPlayOptions = {}) {
+export function useAutoPlay(options: AutoPlayConfig = {}) {
   const { 
     interval = 3000,
     delay = 0,

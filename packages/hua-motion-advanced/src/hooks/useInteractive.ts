@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback } from 'react'
 
 export interface InteractiveConfig {
   hoverScale?: number
@@ -16,7 +16,7 @@ export function useInteractive(config: InteractiveConfig = {}) {
   const {
     hoverScale = 1.05,
     clickScale = 0.95,
-    duration = 200
+    duration: _duration = 200
   } = config
 
   const ref = useRef<HTMLDivElement>(null)

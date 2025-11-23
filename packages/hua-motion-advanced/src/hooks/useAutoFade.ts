@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface AutoFadeOptions {
+export interface AutoFadeConfig {
   initialOpacity?: number // 초기 투명도 (0-1)
   targetOpacity?: number // 목표 투명도 (0-1)
   duration?: number // 모션 지속 시간 (ms)
@@ -28,7 +28,7 @@ interface AutoFadeReturn {
   toggle: () => void
 }
 
-export function useAutoFade(options: AutoFadeOptions = {}): AutoFadeReturn {
+export function useAutoFade(options: AutoFadeConfig = {}): AutoFadeReturn {
   const {
     initialOpacity = 0,
     targetOpacity = 1,

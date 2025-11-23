@@ -4,8 +4,7 @@ import React from "react"
 import { cn } from "../lib/utils"
 import { Icon } from "./Icon"
 import { IconName } from "../lib/icons"
-// @ts-ignore - workspace dependency
-import { useScrollToggle } from "@hua-labs/motion"
+import { useScrollToggle } from "../hooks/useScrollToggle"
 
 export interface ScrollToTopProps extends React.HTMLAttributes<HTMLButtonElement> {
   threshold?: number

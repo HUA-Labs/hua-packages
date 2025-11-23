@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 
-interface StickyToggleOptions {
+export interface StickyToggleConfig {
   offset?: number
   behavior?: 'smooth' | 'auto'
   showOnMount?: boolean
 }
 
-export function useStickyToggle(options: StickyToggleOptions = {}) {
+export function useStickyToggle(options: StickyToggleConfig = {}) {
   const { 
     offset = 0, 
-    behavior = 'smooth',
+    behavior: _behavior = 'smooth',
     showOnMount = false 
   } = options
   

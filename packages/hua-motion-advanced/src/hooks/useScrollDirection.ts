@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 
 type ScrollDirection = 'up' | 'down' | 'idle'
 
-interface ScrollDirectionOptions {
+export interface ScrollDirectionConfig {
   threshold?: number // 방향 변화를 감지할 최소 스크롤 거리
   idleDelay?: number // idle 상태로 전환되는 지연 시간 (ms)
   showOnMount?: boolean
 }
 
-export function useScrollDirection(options: ScrollDirectionOptions = {}) {
+export function useScrollDirection(options: ScrollDirectionConfig = {}) {
   const { 
     threshold = 10,
     idleDelay = 150,
@@ -18,7 +18,7 @@ export function useScrollDirection(options: ScrollDirectionOptions = {}) {
   const [direction, setDirection] = useState<ScrollDirection>(showOnMount ? 'idle' : 'idle')
   const [mounted, setMounted] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
-  const [idleTimeout, setIdleTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [idleTimeout, setIdleTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
 
   // 하이드레이션 이슈 해결을 위한 mounted 상태 관리
   useEffect(() => {

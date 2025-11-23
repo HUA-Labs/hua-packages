@@ -11,7 +11,7 @@ interface MotionStep {
   onError?: (error: Error) => void
 }
 
-interface OrchestrationOptions {
+export interface OrchestrationConfig {
   // 기본 설정
   autoStart?: boolean // 자동 시작 여부
   loop?: boolean // 반복 여부
@@ -77,7 +77,7 @@ interface OrchestrationReturn {
   getTotalDuration: () => number
 }
 
-export function useOrchestration(options: OrchestrationOptions = {}): OrchestrationReturn {
+export function useOrchestration(options: OrchestrationConfig = {}): OrchestrationReturn {
   const {
     autoStart = false,
     loop = false,
@@ -90,7 +90,7 @@ export function useOrchestration(options: OrchestrationOptions = {}): Orchestrat
     onStart,
     onComplete,
     onLoop,
-    onError,
+    onError: _onError,
     onProgress,
     onStepStart,
     onStepComplete
