@@ -16,7 +16,43 @@ declare global {
   interface Window {
     __I18N_DEBUG_MODE__?: boolean;
     __I18N_DEBUG_MISSING_KEYS__?: Record<string, string[]>;
-    __I18N_DEBUG_ERRORS__?: any[];
+    __I18N_DEBUG_ERRORS__?: Array<{
+      timestamp: string;
+      language: string;
+      namespace: string;
+      error: string;
+      stack?: string;
+    }>;
+    __I18N_PERFORMANCE_DATA__?: Record<string, number[]>;
+    __I18N_PERFORMANCE_ALERTS__?: Array<{
+      id: string;
+      type: 'warning' | 'error' | 'info';
+      severity: 'low' | 'medium' | 'high' | 'critical';
+      message: string;
+      metric: string;
+      value: number;
+      threshold: number;
+      timestamp: number;
+      resolved: boolean;
+    }>;
+    __I18N_ANALYTICS_DATA__?: {
+      missingKeys?: Set<string> | string[];
+      performance?: {
+        totalTime: number;
+        averageTime: number;
+        calls: number;
+      };
+      usage?: {
+        keys?: Map<string, number> | Record<string, number>;
+        languages?: Map<string, number> | Record<string, number>;
+        namespaces?: Map<string, number> | Record<string, number>;
+      };
+      errors?: Array<{
+        timestamp: number;
+        error: string;
+        context: string;
+      }>;
+    };
   }
 }
 

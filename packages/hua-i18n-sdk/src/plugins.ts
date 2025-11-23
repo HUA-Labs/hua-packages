@@ -350,6 +350,7 @@ export {
   analyticsPlugin, 
   cachePlugin 
 };
+export { gptTranslatorPlugin } from './plugins/builtin/gpt-translator';
 
 // 플러그인 타입들 export
 export type { 

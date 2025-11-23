@@ -4,6 +4,14 @@ import React, { useState } from "react"
 import { Navigation, NavigationList, NavigationItem, NavigationContent, Icon, Panel } from "@hua-labs/ui"
 import { ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const NAVIGATION_TYPES = {
+  variant: '"pills" | "underline" | "cards"',
+  variantDefault: '"pills"',
+  scale: '"small" | "medium" | "large"',
+  scaleDefault: '"medium"',
+}
+
 export default function NavigationPage() {
   const [activeTab, setActiveTab] = useState("tab1")
 
@@ -22,7 +30,7 @@ export default function NavigationPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">기본 사용법</h2>
         <div className="grid md:grid-cols-2 gap-4">
-          <Panel style="solid" padding="large">
+          <Panel padding="lg">
             <Navigation value={activeTab} onValueChange={setActiveTab}>
               <NavigationList>
                 <NavigationItem value="tab1">첫 번째 탭</NavigationItem>
@@ -49,7 +57,7 @@ export default function NavigationPage() {
               </NavigationContent>
             </Navigation>
           </Panel>
-          <Panel style="solid" padding="large">
+          <Panel padding="lg">
             <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
               <code>{`import { Navigation, NavigationList, NavigationItem, NavigationContent } from '@hua-labs/ui'
 
@@ -131,7 +139,7 @@ export default function NavigationPage() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Pills 스타일</h3>
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
-              <Navigation defaultValue="tab1" style="pills">
+              <Navigation defaultValue="tab1" variant="pills">
                 <NavigationList>
                   <NavigationItem value="tab1">탭 1</NavigationItem>
                   <NavigationItem value="tab2">탭 2</NavigationItem>
@@ -150,7 +158,7 @@ export default function NavigationPage() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Underline 스타일</h3>
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
-              <Navigation defaultValue="tab1" style="underline">
+              <Navigation defaultValue="tab1" variant="underline">
                 <NavigationList>
                   <NavigationItem value="tab1">탭 1</NavigationItem>
                   <NavigationItem value="tab2">탭 2</NavigationItem>
@@ -169,7 +177,7 @@ export default function NavigationPage() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Cards 스타일</h3>
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
-              <Navigation defaultValue="tab1" style="cards">
+              <Navigation defaultValue="tab1" variant="cards">
                 <NavigationList>
                   <NavigationItem value="tab1">탭 1</NavigationItem>
                   <NavigationItem value="tab2">탭 2</NavigationItem>
@@ -261,15 +269,15 @@ export default function NavigationPage() {
                    <td className="py-2">탭 변경 시 호출되는 콜백</td>
                  </tr>
                 <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <td className="py-2 font-mono">style</td>
-                  <td className="py-2 font-mono">"pills" | "underline" | "cards"</td>
-                  <td className="py-2 font-mono">"pills"</td>
+                  <td className="py-2 font-mono">variant</td>
+                  <td className="py-2 font-mono">{NAVIGATION_TYPES.variant}</td>
+                  <td className="py-2 font-mono">{NAVIGATION_TYPES.variantDefault}</td>
                   <td className="py-2">네비게이션의 스타일</td>
                 </tr>
                 <tr className="border-b border-slate-200 dark:border-slate-700">
                   <td className="py-2 font-mono">scale</td>
-                  <td className="py-2 font-mono">"small" | "medium" | "large"</td>
-                  <td className="py-2 font-mono">"medium"</td>
+                  <td className="py-2 font-mono">{NAVIGATION_TYPES.scale}</td>
+                  <td className="py-2 font-mono">{NAVIGATION_TYPES.scaleDefault}</td>
                   <td className="py-2">네비게이션의 크기</td>
                 </tr>
               </tbody>

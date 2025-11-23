@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface KeyboardToggleOptions {
+export interface KeyboardToggleConfig {
   initialState?: boolean // 초기 상태
   keys?: string[] // 토글할 키들 (기본값: [' '])
   keyCode?: number // 특정 키코드
@@ -31,7 +31,7 @@ interface KeyboardToggleReturn {
   ref: React.RefObject<HTMLElement | null>
 }
 
-export function useKeyboardToggle(options: KeyboardToggleOptions = {}): KeyboardToggleReturn {
+export function useKeyboardToggle(options: KeyboardToggleConfig = {}): KeyboardToggleReturn {
   const {
     initialState = false,
     keys = [' '],

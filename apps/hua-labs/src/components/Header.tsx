@@ -7,7 +7,7 @@ import { Moon, Sun, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import LanguageToggle from './LanguageToggle'
-import { useTranslation } from 'hua-i18n-sdk/easy'
+import { useTranslation } from '@hua-labs/i18n-sdk/easy'
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)

@@ -1,5 +1,13 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 
+export interface AutoMotionConfig {
+  duration?: number
+  delay?: number
+  autoStart?: boolean
+  easing?: string
+  type?: 'fade' | 'slide' | 'scale' | 'rotate'
+}
+
 export interface MotionConfig {
   duration?: number
   delay?: number

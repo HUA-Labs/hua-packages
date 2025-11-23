@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface GameLoopOptions {
+export interface GameLoopConfig {
   fps?: number // 목표 FPS (기본값: 60)
   autoStart?: boolean // 자동 시작 여부
   maxFPS?: number // 최대 FPS 제한
   minFPS?: number // 최소 FPS 경고
   showOnMount?: boolean
+}
+
+export interface GameState {
+  isRunning: boolean
+  fps: number
+  deltaTime: number
+  elapsedTime: number
+  frameCount: number
+  mounted: boolean
 }
 
 interface GameLoopReturn {
@@ -24,7 +33,7 @@ interface GameLoopReturn {
   onRender: (callback: (deltaTime: number, elapsedTime: number) => void) => void
 }
 
-export function useGameLoop(options: GameLoopOptions = {}): GameLoopReturn {
+export function useGameLoop(options: GameLoopConfig = {}): GameLoopReturn {
   const {
     fps = 60,
     autoStart = false,

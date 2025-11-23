@@ -22,6 +22,7 @@ export type TransitionType =
 
 export interface TransitionOptions extends Omit<MotionOptions, 'easing'> {
   type: TransitionType
+  easing?: (t: number) => number // easing을 다시 추가
   distance?: number // slide 거리 (px)
   scale?: number // scale 시작/끝 값
   perspective?: number // 3D 효과를 위한 원근감
@@ -43,13 +44,13 @@ export class TransitionEffects {
   /**
    * 페이드 인/아웃 전환
    */
-  fade(
+  async fade(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialOpacity = parseFloat(getComputedStyle(element).opacity) || 1
       const targetOpacity = options.direction === 'reverse' ? 0 : 1
       
@@ -63,7 +64,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { opacity: options.direction === 'reverse' ? initialOpacity : 0 } },
@@ -95,14 +96,14 @@ export class TransitionEffects {
   /**
    * 슬라이드 전환
    */
-  slide(
+  async slide(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const distance = options.distance || 100
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialTransform = getComputedStyle(element).transform
       const isReverse = options.direction === 'reverse'
       
@@ -114,7 +115,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { translateX: isReverse ? 0 : distance } },
@@ -147,14 +148,14 @@ export class TransitionEffects {
   /**
    * 스케일 전환
    */
-  scale(
+  async scale(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const scaleValue = options.scale || 0.8
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialTransform = getComputedStyle(element).transform
       const isReverse = options.direction === 'reverse'
       
@@ -166,7 +167,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { scale: isReverse ? 1 : scaleValue } },
@@ -199,14 +200,14 @@ export class TransitionEffects {
   /**
    * 플립 전환 (3D 회전)
    */
-  flip(
+  async flip(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const perspective = options.perspective || 1000
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialTransform = getComputedStyle(element).transform
       const isReverse = options.direction === 'reverse'
       
@@ -222,7 +223,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { rotateY: isReverse ? 0 : 90 } },
@@ -257,14 +258,14 @@ export class TransitionEffects {
   /**
    * 큐브 전환 (3D 큐브 회전)
    */
-  cube(
+  async cube(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const perspective = options.perspective || 1200
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialTransform = getComputedStyle(element).transform
       const isReverse = options.direction === 'reverse'
       
@@ -280,7 +281,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { rotateX: isReverse ? 0 : 90, rotateY: isReverse ? 0 : 45 } },
@@ -318,13 +319,13 @@ export class TransitionEffects {
   /**
    * 모프 전환 (복합 변형)
    */
-  morph(
+  async morph(
     element: HTMLElement, 
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const initialTransform = getComputedStyle(element).transform
       const isReverse = options.direction === 'reverse'
       
@@ -336,7 +337,7 @@ export class TransitionEffects {
       // GPU 가속 활성화
       this.enableGPUAcceleration(element)
 
-      const motionId = motionEngine.motion(
+      const motionId = await motionEngine.motion(
         element,
         [
           { progress: 0, properties: { scale: isReverse ? 1 : 0.9, rotate: isReverse ? 0 : 5 } },

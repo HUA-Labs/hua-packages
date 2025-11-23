@@ -108,7 +108,7 @@ export function useMotionOrchestra(options: MotionOrchestraOptions = {}) {
 
     const completedSteps = new Set<string>()
     
-    motionsRef.current.forEach((step, index) => {
+    motionsRef.current.forEach((step) => {
       const timeout = setTimeout(() => {
         step.motion()
         completedSteps.add(step.id)

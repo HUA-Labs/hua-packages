@@ -99,7 +99,7 @@ export const I18nTestComponent: React.FC = () => {
         analyticsPlugin,
         cachePlugin,
         Translator
-      } = await import('../../../sdk/i18n-sdk/src/index');
+      } = await import('@hua-labs/i18n-sdk');
       
       // 성능 모니터 생성
       const monitor = new PerformanceMonitor();
@@ -330,7 +330,7 @@ export const I18nTestComponent: React.FC = () => {
     
     try {
       // GPT 번역 플러그인 import
-      const { gptTranslatorPlugin } = await import('../../../sdk/i18n-sdk/src/plugins/builtin/gpt-translator');
+      const { gptTranslatorPlugin } = await import('@hua-labs/i18n-sdk/plugins');
       
       // GPT 번역 플러그인 생성
       const gptPlugin = gptTranslatorPlugin({

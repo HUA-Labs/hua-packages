@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 type SlideDirection = 'left' | 'right' | 'up' | 'down' | 'left-up' | 'left-down' | 'right-up' | 'right-down'
 
-interface AutoSlideOptions {
+export interface AutoSlideConfig {
   direction?: SlideDirection // 슬라이드 방향
   distance?: number // 슬라이드 거리 (px)
   initialPosition?: { x: number; y: number } // 초기 위치
@@ -32,7 +32,7 @@ interface AutoSlideReturn {
   toggle: () => void
 }
 
-export function useAutoSlide(options: AutoSlideOptions = {}): AutoSlideReturn {
+export function useAutoSlide(options: AutoSlideConfig = {}): AutoSlideReturn {
   const {
     direction = 'left',
     distance = 100,

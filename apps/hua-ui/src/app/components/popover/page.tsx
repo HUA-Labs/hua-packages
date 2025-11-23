@@ -3,6 +3,14 @@
 import React, { useState } from "react"
 import { Popover, Button, ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const POPOVER_TYPES = {
+  position: '"top" | "bottom" | "left" | "right"',
+  positionDefault: '"bottom"',
+  align: '"start" | "center" | "end"',
+  alignDefault: '"center"',
+}
+
 export default function PopoverPage() {
   // 각각의 팝오버 상태 관리
   const [open, setOpen] = useState(false)
@@ -235,14 +243,14 @@ export default function PopoverPage() {
                     </tr>
                     <tr>
                       <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">position</td>
-                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"top" | "bottom" | "left" | "right"</td>
-                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"bottom"</td>
+                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{POPOVER_TYPES.position}</td>
+                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{POPOVER_TYPES.positionDefault}</td>
                       <td className="border border-slate-200 dark:border-slate-700 p-2 text-slate-900 dark:text-white">팝오버 표시 위치</td>
                     </tr>
                     <tr>
                       <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">align</td>
-                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"start" | "center" | "end"</td>
-                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"center"</td>
+                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{POPOVER_TYPES.align}</td>
+                      <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{POPOVER_TYPES.alignDefault}</td>
                       <td className="border border-slate-200 dark:border-slate-700 p-2 text-slate-900 dark:text-white">팝오버 정렬 방식</td>
                     </tr>
                     <tr>

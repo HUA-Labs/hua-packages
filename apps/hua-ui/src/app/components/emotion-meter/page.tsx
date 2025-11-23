@@ -3,6 +3,14 @@
 import React, { useState } from "react"
 import { EmotionMeter, Card, CardContent, ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const EMOTION_METER_TYPES = {
+  size: '"sm" | "md" | "lg"',
+  sizeDefault: '"md"',
+  color: '"blue" | "green" | "yellow" | "red"',
+  colorDefault: '"blue"',
+}
+
 export default function EmotionMeterPage() {
   const [value, setValue] = useState<number>(50)
 
@@ -154,14 +162,14 @@ export default function EmotionMeterPage() {
                   </tr>
                   <tr>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">size</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"sm" | "md" | "lg"</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"md"</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_METER_TYPES.size}</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_METER_TYPES.sizeDefault}</td>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 text-slate-900 dark:text-white">미터 크기</td>
                   </tr>
                   <tr>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">color</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"blue" | "green" | "yellow" | "red"</td>
-                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">"blue"</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_METER_TYPES.color}</td>
+                    <td className="border border-slate-200 dark:border-slate-700 p-2 font-mono text-sm text-slate-900 dark:text-white">{EMOTION_METER_TYPES.colorDefault}</td>
                     <td className="border border-slate-200 dark:border-slate-700 p-2 text-slate-900 dark:text-white">미터 색상</td>
                   </tr>
                   <tr>

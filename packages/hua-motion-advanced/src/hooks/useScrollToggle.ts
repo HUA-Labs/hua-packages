@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 
-interface ScrollToggleOptions {
+export interface ScrollToggleConfig {
   threshold?: number
   showOnMount?: boolean
   smooth?: boolean
 }
 
-export function useScrollToggle(options: ScrollToggleOptions = {}) {
+export function useScrollToggle(options: ScrollToggleConfig = {}) {
   const { 
     threshold = 400, 
     showOnMount = false,
