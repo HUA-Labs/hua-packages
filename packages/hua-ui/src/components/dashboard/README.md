@@ -39,6 +39,27 @@ import { StatCard } from '@hua-labs/ui';
 />
 ```
 
+**Empty/Error 상태 예시**
+```tsx
+<StatCard
+  title="거래 승인율"
+  value="--"
+  description="잠시 후 다시 시도해주세요"
+  icon="alert-triangle"
+  variant="outline"
+/>
+
+<DashboardEmptyState
+  icon="database-backup"
+  title="거래 데이터가 없습니다"
+  description="필터를 조정하거나 날짜 범위를 변경해보세요."
+  actionText="필터 초기화"
+  actionOnClick={resetFilters}
+/>
+```
+
+또는 `emptyState` prop으로 커스텀 UI를 전달할 수 있습니다.
+
 ### QuickActionCard
 빠른 액션을 위한 카드 컴포넌트입니다.
 
@@ -66,6 +87,26 @@ import { QuickActionCard } from '@hua-labs/ui';
 />
 ```
 
+**Empty/Error 상태 예시**
+```tsx
+<QuickActionCard
+  title="새 결제 생성"
+  description="권한이 없습니다. 관리자에게 문의하세요."
+  icon="lock"
+  variant="outline"
+  disabled
+/>
+
+<DashboardEmptyState
+  icon="key-square"
+  title="실행 가능한 액션이 없습니다"
+  description="연결된 PG가 없거나 계정 권한이 부족합니다."
+  actionText="권한 요청"
+  actionOnClick={openAccessModal}
+  size="sm"
+/>
+```
+
 ### DashboardGrid
 대시보드 그리드 레이아웃 컴포넌트입니다.
 
@@ -84,6 +125,23 @@ import { DashboardGrid, StatCard } from '@hua-labs/ui';
   <StatCard title="분석" value={300} icon="brain" />
   <StatCard title="비용" value="$50" icon="dollarSign" />
 </DashboardGrid>
+```
+
+**Empty/Error 상태 예시**
+```tsx
+{widgets.length === 0 ? (
+  <DashboardEmptyState
+    icon="layout-dashboard"
+    title="표시할 위젯이 없습니다"
+    description="대시보드 편집 모드에서 필요한 카드를 추가하세요."
+    actionText="위젯 추가"
+    actionOnClick={openWidgetPicker}
+  />
+) : (
+  <DashboardGrid columns={4} gap="md">
+    {widgets.map((widget) => widget.render())}
+  </DashboardGrid>
+)}
 ```
 
 ### ActivityFeed
@@ -134,6 +192,29 @@ const activities = [
 />
 ```
 
+**Empty/Error 상태 예시**
+```tsx
+<ActivityFeed
+  title="최근 활동"
+  items={[]}
+  emptyState={
+    <DashboardEmptyState
+      icon="activity"
+      title="최근 활동이 없습니다"
+      description="사용자 행동이 기록되면 자동으로 업데이트됩니다."
+      size="sm"
+    />
+  }
+/>
+
+<DashboardEmptyState
+  icon="bell-off"
+  title="알림이 없습니다"
+  description="새로운 활동이 들어오면 여기에 표시됩니다."
+  size="sm"
+/>
+```
+
 ### ProfileCard
 사용자 프로필 정보를 표시하는 카드 컴포넌트입니다. 그라데이션 배경, 아바타, 멤버십 뱃지를 지원합니다.
 
@@ -165,6 +246,25 @@ import { ProfileCard } from '@hua-labs/ui';
   membershipTier="premium"
   variant="gradient"
   settingsHref="/settings"
+/>
+```
+
+**Empty/Error 상태 예시**
+```tsx
+<ProfileCard
+  name="연결된 사용자가 없습니다"
+  greeting="로그인이 만료되었습니다"
+  showSettings={false}
+  emptyState={
+    <DashboardEmptyState
+      icon="user-x"
+      title="세션이 만료되었습니다"
+      description="다시 로그인하면 계정 정보가 표시됩니다."
+      actionText="다시 로그인"
+      actionOnClick={redirectToLogin}
+      size="sm"
+    />
+  }
 />
 ```
 
@@ -243,6 +343,28 @@ import { SummaryCard } from '@hua-labs/ui';
 />
 ```
 
+**Empty/Error 상태 예시**
+```tsx
+<SummaryCard
+  title="정산 잔액"
+  value="--"
+  subtitle="정산 계정을 연결해주세요"
+  icon="wallet"
+  variant="outline"
+  showAction={false}
+  emptyState={
+    <DashboardEmptyState
+      icon="wallet"
+      title="정산 계정이 없습니다"
+      description="PG 계정을 연결하면 정산 잔액이 표시됩니다."
+      actionText="계정 연결"
+      actionOnClick={openSettlementModal}
+      size="sm"
+    />
+  }
+/>
+```
+
 ### NotificationCard
 알림 및 공지사항을 표시하는 카드 컴포넌트입니다.
 
@@ -287,6 +409,22 @@ const notifications = [
 />
 ```
 
+**Empty 상태 예시**
+```tsx
+<NotificationCard
+  title="알림 및 공지"
+  items={[]}
+  emptyState={
+    <DashboardEmptyState
+      icon="inbox"
+      title="알림이 없습니다"
+      description="시스템 공지가 올라오면 여기에 표시됩니다."
+      size="sm"
+    />
+  }
+/>
+```
+
 ### MetricCard
 차트와 트렌드를 포함한 정교한 통계 카드 컴포넌트입니다.
 
@@ -326,6 +464,462 @@ import { MetricCard } from '@hua-labs/ui';
     positive: true
   }}
 />
+```
+
+**Empty/Error 상태 예시**
+```tsx
+<MetricCard
+  title="승인 추이"
+  value="데이터 없음"
+  description="원천 시스템 응답을 기다리고 있습니다"
+  icon="refresh"
+  loading
+/>
+
+<MetricCard
+  title="실패 비율"
+  value="--"
+  description="데이터를 받아올 수 없습니다"
+  icon="alert-triangle"
+  variant="outline"
+  emptyState={
+    <DashboardEmptyState
+      icon="server-off"
+      title="데이터를 불러오지 못했습니다"
+      description="잠시 후 다시 시도하거나 API 키를 확인하세요."
+      actionText="다시 시도"
+      actionOnClick={retryFetch}
+      size="sm"
+    />
+  }
+/>
+```
+
+### TransactionsTable
+결제/거래 데이터를 위한 테이블 프리셋입니다.
+
+**Props:**
+- `rows`: `TransactionRow[]`
+- `columns`: 커스텀 컬럼 설정 (선택)
+- `isLoading`: 로딩 상태
+- `filters`: 필터/툴바 슬롯
+- `emptyState`: 빈 상태 대체 UI
+- `onRowClick`: 행 클릭 핸들러
+- `highlightRow`: 특정 행 강조 함수
+- `statusLabels`: 상태 라벨 커스터마이징
+- `statusRenderer`: 상태 렌더러 override
+- `amountFormatter`, `methodFormatter`, `dateFormatter`: 각 셀 포맷터
+- `locale`, `defaultCurrency`: 포맷 기본값
+- `footer`: 테이블 하단 영역 (페이지네이션 등)
+
+**예시:**
+```tsx
+import { TransactionsTable, type TransactionRow } from '@hua-labs/ui';
+
+const rows: TransactionRow[] = [
+  {
+    id: 'TXN-230011',
+    merchant: 'HUA Coffee',
+    amount: 125000,
+    currency: 'KRW',
+    status: 'approved',
+    method: '카드 (VISA)',
+    date: new Date(),
+    customer: '김민수',
+    fee: 3500,
+  },
+];
+
+<TransactionsTable
+  rows={rows}
+  footer={<div className="flex justify-between text-sm">1-10 / 312건</div>}
+  onRowClick={(row) => console.log(row)}
+/>;
+```
+
+### TransactionDetailDrawer
+거래 행 클릭 시 세부 정보를 Drawer로 노출하는 프리셋입니다. 결제/정산/이벤트 로그를 묶어 한 화면에서 확인할 수 있습니다.
+
+**Props:**
+- `open`, `onClose`: Drawer 제어
+- `transaction`: `{ id, status, amount, currency, merchant, method, createdAt, customer }`
+- `metadata`: `{ label, value, icon? }[]`
+- `settlement`: `{ status, amount, scheduledDate, bankAccount, note }`
+- `fees`: 수수료 배열
+- `events`: 타임라인 로그
+- `actions`: Footer slot
+
+**예시:**
+```tsx
+import { useState } from 'react';
+import { TransactionDetailDrawer, TransactionsTable, type TransactionRow } from '@hua-labs/ui';
+
+export default function TransactionsPage() {
+  const [selected, setSelected] = useState<TransactionRow | null>(null);
+
+  return (
+    <>
+      <TransactionsTable
+        rows={rows}
+        onRowClick={(row) => setSelected(row)}
+      />
+      <TransactionDetailDrawer
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        transaction={{
+          id: selected?.id ?? '',
+          status: selected?.status ?? 'pending',
+          amount: selected?.amount ?? 0,
+          currency: selected?.currency,
+          merchant: selected?.merchant,
+          method: selected?.method,
+          createdAt: selected?.date,
+          customer: selected?.customer,
+        }}
+        metadata={[
+          { label: "고객", value: selected?.customer ?? "-", icon: "user" },
+          { label: "결제 수단", value: selected?.method ?? "-", icon: "credit-card" },
+        ]}
+        settlement={{
+          status: "processing",
+          amount: selected?.amount,
+          scheduledDate: new Date(),
+          bankAccount: "Pays Bank ••2248",
+        }}
+        events={[
+          {
+            id: "auth",
+            title: "승인 요청",
+            description: "PG-KR 라인에서 승인 처리",
+            timestamp: selected?.date ?? new Date(),
+            status: "success",
+            icon: "shield-check",
+          },
+        ]}
+        actions={
+          <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+            이메일 영수증 전송
+          </button>
+        }
+      />
+    </>
+  );
+}
+```
+
+### SettlementTimeline
+정산 단계를 세로 타임라인 형태로 표시하는 컴포넌트입니다. `pending / processing / completed / failed` 상태를 색상으로 보여주며, 금액/일시/메모를 함께 노출할 수 있습니다.
+
+**Props:**
+- `items`: `{ id, title, description?, status, amount?, currency?, date?, meta? }[]`
+- `highlightedId`: 강조할 단계 ID
+- `locale`, `defaultCurrency`
+- `emptyState`
+
+**예시:**
+```tsx
+import { SettlementTimeline } from '@hua-labs/ui';
+
+const settlementSteps = [
+  {
+    id: "request",
+    title: "정산 요청",
+    status: "completed",
+    amount: 4200000,
+    date: "2025-11-20T09:00:00Z",
+    description: "PG-KR 라인에서 정산 요청 생성",
+  },
+  {
+    id: "processing",
+    title: "은행 처리",
+    status: "processing",
+    meta: "Pays Bank ••2248",
+    date: "2025-11-21T09:00:00Z",
+  },
+  {
+    id: "payout",
+    title: "지급 예정",
+    status: "pending",
+    description: "서류 검토 중",
+  },
+];
+
+<SettlementTimeline items={settlementSteps} highlightedId="processing" />;
+```
+
+### RoutingBreakdownCard
+PG 라우팅/결제수단 비중을 시각화하는 카드입니다. 상단에는 스택 바(bar)를, 하단에는 상세 리스트와 상태 배지를 제공합니다.
+
+**Props:**
+- `segments`: `{ id, label, value, color?, status?, detail? }[]`
+- `title`, `description`, `totalLabel`, `totalValue`
+- `highlightId`, `actions`, `formatter`
+- `emptyState`
+
+**예시:**
+```tsx
+import { RoutingBreakdownCard } from '@hua-labs/ui';
+
+const routing = [
+  { id: "visa", label: "VISA (PG-A)", value: 420, status: "normal" },
+  { id: "master", label: "MASTER (PG-A)", value: 210, status: "warning", detail: "승인율 92%" },
+  { id: "payco", label: "PAYCO (PG-B)", value: 120, status: "critical", detail: "장애 조치 중" },
+];
+
+<RoutingBreakdownCard
+  segments={routing}
+  totalLabel="총 거래"
+  totalValue="750건"
+  highlightId="payco"
+  actions={<button className="text-xs text-blue-600">라우팅 정책 관리</button>}
+/>;
+```
+
+### MerchantList
+가맹점 검색/요약을 카드 형태로 표시하는 프리셋입니다. 건강 상태(Health), 승인률, 거래금액 등을 함께 보여주고 클릭 시 세부 Drawer와 연동할 수 있습니다.
+
+**Props:**
+- `items`: `{ id, name, status?, health?, approvalRate?, volume?, currency?, category?, region?, metadata[] }[]`
+- `isLoading`, `filters`, `emptyState`
+- `onMerchantSelect`: 가맹점 클릭 핸들러
+
+**예시:**
+```tsx
+import { MerchantList } from '@hua-labs/ui';
+
+const merchants = [
+  {
+    id: "m-1001",
+    name: "HUA Coffee",
+    status: "Sandbox",
+    health: "normal",
+    approvalRate: 98.2,
+    volume: 42000000,
+    category: "F&B",
+    region: "Seoul, KR",
+    metadata: [
+      { label: "대표자", value: "김민수" },
+      { label: "최근 접속", value: "2분 전" },
+    ],
+  },
+  {
+    id: "m-1002",
+    name: "Lumos Market",
+    status: "Live",
+    health: "warning",
+    approvalRate: 92.4,
+    volume: 18000000,
+    tag: "서류 검토",
+  },
+];
+
+<MerchantList
+  items={merchants}
+  filters={<div className="text-xs text-slate-500">검색/필터 UI</div>}
+  onMerchantSelect={(merchant) => console.log(merchant)}
+/>;
+```
+
+**Empty/Error 상태 예시**
+```tsx
+<TransactionsTable
+  rows={[]}
+  filters={<DashboardToolbar title="거래 내역" />}
+  emptyState={
+    <DashboardEmptyState
+      icon="credit-card-off"
+      title="거래가 없습니다"
+      description="날짜 범위를 확장하거나 필터를 초기화해보세요."
+      actionText="필터 초기화"
+      actionOnClick={resetFilters}
+    />
+  }
+/>
+
+<TransactionsTable
+  rows={[]}
+  isLoading
+  emptyState={
+    <DashboardEmptyState
+      icon="loader"
+      title="거래 데이터를 불러오는 중입니다"
+      description="잠시만 기다려주세요"
+      size="sm"
+    />
+  }
+/>
+```
+
+### DashboardToolbar
+대시보드 상단 컨트롤 헤더입니다.
+
+**Props:**
+- `title`, `description`, `meta`
+- `variant`: "cards" | "plain"
+- `dateRange`: `{ value, presets[], onSelectPreset, onCustomRange, display }`
+- `filters`: ReactNode
+- `actions`: CTA 배열 (`ToolbarAction`)
+- `onRefresh`, `lastUpdated`
+
+**예시:**
+```tsx
+import { DashboardToolbar } from '@hua-labs/ui';
+
+const presets = [
+  { label: "오늘", value: "today" },
+  { label: "지난 7일", value: "7d" },
+  { label: "지난 30일", value: "30d" },
+];
+
+<DashboardToolbar
+  title="거래 현황"
+  description="PG 라우팅, 결제 수단별 데이터를 요약합니다."
+  dateRange={{
+    presets,
+    display: "지난 7일",
+    onSelectPreset: (preset) => console.log(preset),
+  }}
+  filters={<div className="flex gap-2 text-sm">승인률 97.2% · 환불 12건</div>}
+  actions={[
+    { label: "보고서 다운로드", icon: "download", appearance: "secondary" },
+    { label: "새 거래 추가", icon: "plus", appearance: "primary" },
+  ]}
+  onRefresh={() => console.log("refresh")}
+  lastUpdated="5분 전"
+/>;
+```
+
+### TrendChart
+승인/실패/대기 등 시계열 데이터를 시각화하는 라인/에어리어 차트 프리셋입니다. `categories`가 1개 이하이더라도 자동으로 좌표를 보정하며, `series.data` 길이가 다르면 마지막 카테고리 라벨을 사용합니다.
+
+**Props:**
+- `series`: `{ label, data[], color?, area? }[]`
+- `categories`: x축 라벨 배열
+- `palette`: `"approval" | "settlement" | "custom"`
+- `height`, `showLegend`, `showDots`, `showTooltip`
+
+**예시:**
+```tsx
+import { TrendChart } from '@hua-labs/ui';
+
+const series = [
+  { label: "승인", data: [82, 84, 86, 85, 88, 90], area: true },
+  { label: "실패", data: [12, 10, 9, 11, 8, 7] },
+  { label: "대기", data: [6, 6, 5, 4, 4, 3] },
+];
+
+<TrendChart
+  series={series}
+  categories={["월", "화", "수", "목", "금", "토"]}
+  palette="approval"
+  height={220}
+  showTooltip
+/>;
+```
+
+### DashboardSidebar
+좌측 폴딩 가능한 내비게이션 레일입니다.
+
+**Props:**
+- `logo`, `productSwitcher`, `sections`
+- `isCollapsed`, `defaultCollapsed`, `onToggleCollapsed`
+- `collapsedWidth`, `expandedWidth`
+- `footerActions`, `mobileBreakpoint`
+
+**예시:**
+```tsx
+import { DashboardSidebar } from '@hua-labs/ui';
+
+const sections = [
+  {
+    id: 'main',
+    label: '개요',
+    items: [
+      { id: 'overview', label: '대시보드', icon: 'layout-dashboard', active: true },
+      { id: 'transactions', label: '거래 내역', icon: 'credit-card' },
+      { id: 'settlements', label: '정산 현황', icon: 'wallet' },
+    ],
+  },
+  {
+    id: 'system',
+    label: '시스템',
+    items: [
+      { id: 'alerts', label: '알림 센터', icon: 'bell' },
+      { id: 'settings', label: '설정', icon: 'settings' },
+    ],
+  },
+];
+
+<DashboardSidebar
+  logo={<div className="text-xl font-bold">Pays</div>}
+  productSwitcher={<button className="text-sm text-slate-500">Sandbox</button>}
+  sections={sections}
+  footerActions={
+    <div className="flex flex-col gap-2">
+      <button className="rounded-lg bg-slate-100 px-3 py-2 text-sm">테마 전환</button>
+      <button className="rounded-lg bg-slate-100 px-3 py-2 text-sm">언어 설정</button>
+    </div>
+  }
+/>;
+```
+
+**상태 가이드**
+- **Collapsed**: `isCollapsed` 또는 `defaultCollapsed`로 제어, 아이콘만 표시되며 Tooltip으로 라벨 보조.
+- **Expanded**: `expandedWidth` 범위에서 텍스트/배지가 노출, 제품 스위처/메타 정보 포함.
+- **Mobile (< `mobileBreakpoint`)**: 추후 Drawer에 올리는 방식으로 확장 예정(현재는 width transition만 정의).
+- **Active Item**: `item.active` true 시 강조; `onClick` 이벤트로 라우팅 처리.
+- **Footer Actions**: 테마/언어 토글 등 추가 컨트롤 슬롯.
+- **Link Items**: `item.href`를 지정하면 자동으로 `<a>` 앵커로 렌더링되어 새 탭 열기 등의 브라우저 기본 동작을 사용할 수 있습니다.
+
+```tsx
+import { DashboardSidebar } from '@hua-labs/ui';
+import { useState } from 'react';
+
+const sections = [
+  {
+    id: 'system',
+    label: '시스템',
+    items: [
+      { id: 'overview', label: '대시보드', icon: 'layout-dashboard', active: true },
+      { id: 'alerts', label: '알림 센터', icon: 'bell' },
+    ],
+  },
+];
+
+export function SidebarExample() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <div className="flex">
+      <DashboardSidebar
+        sections={sections}
+        isCollapsed={collapsed}
+        onToggleCollapsed={setCollapsed}
+        collapsedWidth={72}
+        expandedWidth={256}
+        mobileBreakpoint={768}
+        overlayBackground="bg-slate-950/60"
+        footerActions={
+          <button className="rounded-md bg-slate-100 px-3 py-2 text-sm w-full">
+            로그아웃
+          </button>
+        }
+      />
+
+      <main className="flex-1 p-6">
+        <button
+          className="rounded-md border px-3 py-2 text-sm"
+          onClick={() => setCollapsed((prev) => !prev)}
+        >
+          {collapsed ? '확장' : '접기'}
+        </button>
+        <p className="mt-4 text-sm text-slate-500">
+          모바일 폭(768px 이하)에서는 Sidebar가 자동으로 overlay 모드로 전환됩니다.
+        </p>
+      </main>
+    </div>
+  );
+}
 ```
 
 ## 전체 예시
