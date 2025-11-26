@@ -18,84 +18,12 @@ export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
 export { Panel } from './components/Panel';
 
-// UI Components - Dashboard
-export {
-  StatCard,
-  QuickActionCard,
-  DashboardGrid,
-  ActivityFeed,
-  ProfileCard,
-  MembershipBadge,
-  MiniBarChart,
-  SummaryCard,
-  NotificationCard,
-  MetricCard,
-  ProgressCard,
-  DashboardEmptyState,
-  DashboardSidebar,
-  TransactionsTable,
-  DashboardToolbar,
-  TrendChart,
-  TransactionDetailDrawer,
-  SettlementTimeline,
-  RoutingBreakdownCard,
-  MerchantList,
-} from './components/dashboard';
-export type {
-  StatCardProps,
-  QuickActionCardProps,
-  DashboardGridProps,
-  ActivityFeedProps,
-  ActivityItem,
-  ProfileCardProps,
-  MembershipTier,
-  MembershipBadgeProps,
-  MiniBarChartProps,
-  SummaryCardProps,
-  NotificationCardProps,
-  NotificationItem,
-  MetricCardProps,
-  ProgressCardProps,
-  DashboardEmptyStateProps,
-  DashboardSidebarProps,
-  SidebarNavItem,
-  SidebarSection,
-  TransactionsTableProps,
-  TransactionRow,
-  TransactionColumnConfig,
-  TransactionColumnKey,
-  TransactionStatus,
-  DashboardToolbarProps,
-  ToolbarAction,
-  DateRangeConfig,
-  DatePreset,
-  TrendChartProps,
-  TrendSeries,
-  TransactionDetailDrawerProps,
-  TransactionDetail,
-  TransactionMetadataItem,
-  SettlementInfo,
-  FeeBreakdown,
-  TransactionEvent,
-  SettlementTimelineProps,
-  SettlementTimelineItem,
-  SettlementTimelineStatus,
-  RoutingBreakdownCardProps,
-  RoutingBreakdownSegment,
-  MerchantListProps,
-  MerchantListItem,
-  MerchantHealth,
-} from './components/dashboard';
-
 // UI Components - Navigation
 export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
 export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';
 export { Pagination, PaginationOutlined, PaginationMinimal, PaginationWithInfo } from './components/Pagination';
 export { PageNavigation } from './components/PageNavigation';
 export { PageTransition } from './components/PageTransition';
-
-// UI Components - Advanced Page Transitions
-export * from './components/advanced';
 
 // UI Components - Data Display
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './components/Table';
