@@ -19,7 +19,7 @@ export interface TranslatorInterface {
   getCurrentLanguage(): string;
   initialize(): Promise<void>;
   isReady(): boolean;
-  debug(): any;
+  debug(): unknown;
 }
 
 export class Translator implements TranslatorInterface {
@@ -788,7 +788,7 @@ export function serverTranslate({
   missingKeyHandler = (key: string) => key,
   options = {}
 }: {
-  translations: Record<string, any>; // 번역 데이터
+  translations: Record<string, unknown>; // 번역 데이터
   key: string; // 번역 키
   language?: string; // 언어 코드
   fallbackLanguage?: string; // 폴백 언어
@@ -828,7 +828,7 @@ export function serverTranslate({
 }
 
 function findInTranslations(
-  translations: Record<string, any>,
+  translations: Record<string, unknown>,
   key: string,
   language: string,
   fallbackLanguage: string,
@@ -855,7 +855,7 @@ function findInTranslations(
 }
 
 function findInNamespace(
-  translations: Record<string, any>,
+  translations: Record<string, unknown>,
   namespace: string,
   key: string,
   language: string
