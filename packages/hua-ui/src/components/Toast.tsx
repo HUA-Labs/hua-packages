@@ -201,7 +201,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
           : "translate-x-full opacity-0 scale-95"
       )}
       style={{
-        animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+        animation: isVisible ? "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)" : undefined
       }}
     >
       {/* 아이콘 */}
@@ -246,21 +246,6 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
           </svg>
         </button>
       </div>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes slideInRight {
-            from {
-              transform: translateX(100%) scale(0.95);
-              opacity: 0;
-            }
-            to {
-              transform: translateX(0) scale(1);
-              opacity: 1;
-            }
-          }
-        `
-      }} />
     </div>
   )
 }

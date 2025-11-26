@@ -7,7 +7,7 @@ import type { IconName } from "../../lib/icons";
 
 export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
-  value: string | number;
+  value: string | number | null | undefined;
   description?: string;
   icon?: IconName | React.ReactNode;
   trend?: {
@@ -18,6 +18,7 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "gradient" | "outline" | "elevated";
   color?: "blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray";
   loading?: boolean;
+  emptyState?: React.ReactNode;
 }
 
 const colorClasses = {
@@ -106,6 +107,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       variant = "elevated",
       color = "blue",
       loading = false,
+      emptyState,
       className,
       ...props
     },
@@ -128,6 +130,19 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       }
       return val;
     };
+
+    if (!loading && (value === null || value === undefined || value === "")) {
+      return emptyState ? (
+        <div className={className} {...props}>
+          {emptyState}
+        </div>
+      ) : (
+        <div className={merge("rounded-2xl border border-slate-100 dark:border-slate-800 p-6", className)} {...props}>
+          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</h3>
+          <p className="mt-2 text-sm text-slate-400">데이터가 없습니다.</p>
+        </div>
+      );
+    }
 
     return (
       <div
@@ -179,7 +194,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
             "text-3xl font-bold mb-1",
             isTextWhite ? "text-white" : "text-gray-800 dark:text-white"
           )}>
-            {formatValue(value)}
+            {formatValue(value ?? 0)}
           </h3>
         )}
 

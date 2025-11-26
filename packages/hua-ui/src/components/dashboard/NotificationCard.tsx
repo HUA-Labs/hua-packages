@@ -25,6 +25,7 @@ export interface NotificationCardProps extends React.HTMLAttributes<HTMLDivEleme
   viewAllLabel?: string;
   showHeader?: boolean;
   showCount?: boolean;
+  emptyState?: React.ReactNode;
 }
 
 const typeStyles = {
@@ -67,6 +68,7 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
       viewAllLabel = "모든 알림 보기",
       showHeader = true,
       showCount = true,
+      emptyState,
       className,
       ...props
     },
@@ -178,6 +180,8 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
               return <div key={item.id}>{content}</div>;
             })}
           </div>
+        ) : emptyState ? (
+          emptyState
         ) : (
           <div className="text-center py-8">
             <Icon name="bell" className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />

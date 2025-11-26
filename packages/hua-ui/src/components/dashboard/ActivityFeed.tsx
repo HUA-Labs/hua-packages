@@ -24,6 +24,7 @@ export interface ActivityFeedProps extends React.HTMLAttributes<HTMLDivElement> 
   maxItems?: number;
   onViewAll?: () => void;
   viewAllLabel?: string;
+  emptyState?: React.ReactNode;
 }
 
 export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
@@ -36,6 +37,7 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
       maxItems,
       onViewAll,
       viewAllLabel = "전체 보기",
+      emptyState,
       className,
       ...props
     },
@@ -175,6 +177,8 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
               </div>
             )}
           </div>
+        ) : emptyState ? (
+          emptyState
         ) : (
           <div className="text-center py-8">
             <span className="text-4xl mb-3 block">📭</span>
