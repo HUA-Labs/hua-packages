@@ -74,6 +74,8 @@ export interface TransactionsTableProps {
   defaultCurrency?: string;
   className?: string;
   footer?: React.ReactNode;
+  rowActionLabel?: (row: TransactionRow) => string;
+  rowActionHint?: string;
 }
 
 const STATUS_STYLES: Record<TransactionStatus, { label: string; badge: string }> = {
@@ -130,9 +132,22 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   defaultCurrency = "KRW",
   className,
   footer,
+  rowActionLabel,
+  rowActionHint,
 }) => {
   const columnList = columns.length > 0 ? columns : DEFAULT_COLUMNS;
   const hasRows = rows.length > 0;
+  const tableId = React.useId();
+  const rowActionHintId = rowActionHint ? `${tableId}-row-action-hint` : undefined;
+
+  const getRowActionLabel = React.useCallback(
+    (row: TransactionRow) => {
+      if (rowActionLabel) return rowActionLabel(row);
+      const baseLabel = row.id ? `거래 ${row.id}` : "거래 행";
+      return `${baseLabel} 상세 보기`;
+    },
+    [rowActionLabel]
+  );
 
   const renderStatus = (status: TransactionStatus, row: TransactionRow) => {
     if (statusRenderer) return statusRenderer(status, row);
@@ -278,11 +293,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   const clickable = Boolean(onRowClick);
                   const handleRowKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
                     if (!onRowClick) return;
-                    if (event.key === "Enter" || event.key === " ") {
+                    if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
                       event.preventDefault();
                       onRowClick(row);
                     }
                   };
+                  const rowLabel = clickable ? getRowActionLabel(row) : undefined;
                   return (
                     <TableRow
                       key={row.id}
@@ -290,6 +306,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                       role={clickable ? "button" : undefined}
                       onKeyDown={clickable ? handleRowKeyDown : undefined}
                       onClick={onRowClick ? () => onRowClick(row) : undefined}
+                      aria-label={rowLabel}
+                      aria-describedby={clickable && rowActionHintId ? rowActionHintId : undefined}
                       className={merge(
                         "text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70",
                         clickable && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60",
@@ -323,6 +341,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           )}
         </div>
       </div>
+      {rowActionHint && (
+        <p id={rowActionHintId} className="sr-only">
+          {rowActionHint}
+        </p>
+      )}
     </div>
   );
 };

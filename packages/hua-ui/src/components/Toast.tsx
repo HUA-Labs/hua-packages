@@ -201,7 +201,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
           : "translate-x-full opacity-0 scale-95"
       )}
       style={{
-        animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+        animation: isVisible ? "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)" : undefined
       }}
     >
       {/* 아이콘 */}
