@@ -19,7 +19,8 @@
       "import": "./dist/components/advanced/*.js",
       "require": "./dist/components/advanced/*.js",
       "types": "./dist/components/advanced/*.d.ts"
-    }
+    },
+    "./styles/toast.css": "./src/styles/toast.css"
   },
   "files": [
     "dist"
