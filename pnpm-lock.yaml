@@ -51,6 +51,9 @@ importers:
 
   apps/hua-labs:
     dependencies:
+      '@hua-labs/i18n-sdk':
+        specifier: file:../../packages/hua-i18n-sdk
+        version: link:../../packages/hua-i18n-sdk
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.2.7)(react@19.2.0)
@@ -585,15 +588,9 @@ importers:
       '@hua-labs/i18n-core':
         specifier: workspace:^
         version: link:../../packages/hua-i18n-core
-      '@hua-labs/motion':
-        specifier: workspace:*
-        version: link:../../packages/hua-motion
       '@hua-labs/ui':
         specifier: workspace:^
         version: link:../../packages/hua-ui
-      '@hua-platform/hua-emotion-engine':
-        specifier: workspace:*
-        version: link:../../packages/hua-emotion-engine
       '@next-auth/prisma-adapter':
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@6.18.0(prisma@6.18.0(typescript@5.9.3))(typescript@5.9.3))(next-auth@4.24.13(next@16.0.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
@@ -1147,9 +1144,6 @@ importers:
 
   packages/hua-ui:
     dependencies:
-      '@hua-labs/motion':
-        specifier: workspace:*
-        version: link:../hua-motion
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
