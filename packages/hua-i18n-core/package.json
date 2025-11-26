@@ -4,6 +4,10 @@
   "description": "HUA Labs - 국제화 SDK 핵심 기능",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
