@@ -3,22 +3,38 @@
   "version": "1.0.0",
   "description": "HUA Labs - Modern React UI Component Library - Beautiful, accessible, and customizable components for React applications",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./advanced": {
+      "types": "./dist/advanced.d.ts",
+      "import": "./dist/advanced.mjs",
+      "require": "./dist/advanced.js"
+    },
+    "./advanced/dashboard": {
+      "types": "./dist/advanced-dashboard.d.ts",
+      "import": "./dist/advanced-dashboard.mjs",
+      "require": "./dist/advanced-dashboard.js"
+    },
+    "./advanced/motion": {
+      "types": "./dist/advanced-motion.d.ts",
+      "import": "./dist/advanced-motion.mjs",
+      "require": "./dist/advanced-motion.js"
     },
     "./components/*": {
-      "import": "./dist/components/*.js",
-      "require": "./dist/components/*.js",
-      "types": "./dist/components/*.d.ts"
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.mjs",
+      "require": "./dist/components/*.js"
     },
     "./components/advanced/*": {
-      "import": "./dist/components/advanced/*.js",
-      "require": "./dist/components/advanced/*.js",
-      "types": "./dist/components/advanced/*.d.ts"
+      "types": "./dist/components/advanced/*.d.ts",
+      "import": "./dist/components/advanced/*.mjs",
+      "require": "./dist/components/advanced/*.js"
     },
     "./styles/toast.css": "./src/styles/toast.css"
   },
@@ -26,28 +42,42 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "test": "jest",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "analyze": "node scripts/analyze-bundle.js",
+    "build:analyze": "pnpm build && pnpm analyze",
     "lint": "eslint src --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^19.0.0",
+    "@hua-labs/motion": "workspace:*",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0",
     "lucide-react": "^0.263.1",
-    "@hua-labs/motion": "workspace:*"
+    "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "typescript": "^5.8.3",
-    "jest": "^29.0.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.0.0",
-    "eslint": "^8.0.0"
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "jest": "^29.0.0",
+    "jsdom": "^27.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
@@ -76,4 +106,4 @@
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
-} 
+}

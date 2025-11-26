@@ -1,3 +1,15 @@
+/**
+ * Toast Component Animations
+ * 
+ * This CSS file contains animations for the Toast component.
+ * Import this file in your application's global CSS or layout.
+ * 
+ * Usage:
+ *   import '@hua-labs/ui/styles/toast.css';
+ *   // or in your global CSS:
+ *   @import '@hua-labs/ui/styles/toast.css';
+ */
+
 @keyframes slideInRight {
   from {
     transform: translateX(100%) scale(0.95);

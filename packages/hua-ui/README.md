@@ -53,6 +53,29 @@ yarn add @hua-labs/ui
 pnpm add @hua-labs/ui
 ```
 
+### 엔트리 포인트
+
+HUA UI는 **Core**와 **Advanced** 두 가지 엔트리로 나뉩니다.
+
+| Entry | Path | 설명 |
+|-------|------|------|
+| Core | `@hua-labs/ui` | 버튼/폼/레이아웃 등 기본 컴포넌트와 유틸 |
+| Advanced (all) | `@hua-labs/ui/advanced` | 대시보드 위젯 + 고급 모션 전체 |
+| Dashboard widgets | `@hua-labs/ui/advanced/dashboard` | StatCard, TransactionsTable, TrendChart 등 데이터 위젯 |
+| Motion/Experimental | `@hua-labs/ui/advanced/motion` | AdvancedPageTransition 등 모션/실험 기능 |
+
+```tsx
+// Core 컴포넌트
+import { Button, Card } from '@hua-labs/ui';
+
+// Advanced 전체
+import { StatCard, DashboardSidebar } from '@hua-labs/ui/advanced';
+
+// 필요한 영역만 선택적으로
+import { TransactionsTable } from '@hua-labs/ui/advanced/dashboard';
+import { AdvancedPageTransition } from '@hua-labs/ui/advanced/motion';
+```
+
 ### 기본 사용법
 
 ```tsx
@@ -69,6 +92,22 @@ function App() {
     </ThemeProvider>
   );
 }
+```
+
+### CSS 스타일 import (Toast 컴포넌트 사용 시)
+
+Toast 컴포넌트의 애니메이션을 사용하려면 CSS 파일을 import해야 합니다:
+
+```css
+/* globals.css 또는 메인 CSS 파일에 추가 */
+@import '@hua-labs/ui/styles/toast.css';
+```
+
+또는 JavaScript/TypeScript에서:
+
+```tsx
+// app/layout.tsx 또는 _app.tsx
+import '@hua-labs/ui/styles/toast.css';
 ```
 
 ### 스마트 컴포넌트 사용
