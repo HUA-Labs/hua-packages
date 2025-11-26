@@ -246,21 +246,6 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
           </svg>
         </button>
       </div>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes slideInRight {
-            from {
-              transform: translateX(100%) scale(0.95);
-              opacity: 0;
-            }
-            to {
-              transform: translateX(0) scale(1);
-              opacity: 1;
-            }
-          }
-        `
-      }} />
     </div>
   )
 }
