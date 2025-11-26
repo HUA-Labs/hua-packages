@@ -359,10 +359,12 @@ export function I18nProvider({
         // 번역 데이터가 있으면 네임스페이스 추정
         if (debugInfo && debugInfo.allTranslations) {
           const namespaces = new Set<string>();
-          Object.values(debugInfo.allTranslations).forEach((langData: any) => {
-            Object.keys(langData).forEach(namespace => {
-              namespaces.add(namespace);
-            });
+          Object.values(debugInfo.allTranslations).forEach((langData: unknown) => {
+            if (langData && typeof langData === 'object') {
+              Object.keys(langData).forEach(namespace => {
+                namespaces.add(namespace);
+              });
+            }
           });
           return Array.from(namespaces);
         }

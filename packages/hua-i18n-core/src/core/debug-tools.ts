@@ -24,7 +24,7 @@ export interface DebugTools {
   };
   
   // 번역 데이터 검증
-  validateTranslations: (translations: Record<string, any>) => {
+  validateTranslations: (translations: Record<string, unknown>) => {
     missingKeys: string[];
     duplicateKeys: string[];
     invalidKeys: string[];
@@ -109,7 +109,7 @@ export function createDebugTools(): DebugTools | null {
       open: () => {
         const devTools = createDevToolsPanel();
         document.body.appendChild(devTools);
-        (devTools as any).isOpen = true;
+        (devTools as HTMLElement & { isOpen?: boolean }).isOpen = true;
       },
       close: () => {
         const existingPanel = document.getElementById('hua-i18n-devtools');
@@ -117,20 +117,20 @@ export function createDebugTools(): DebugTools | null {
           existingPanel.remove();
         }
         // devTools 변수는 이 스코프에서 접근할 수 없으므로 전역에서 관리
-        const globalDebugTools = (window as any).__HUA_I18N_DEBUG__;
+        const globalDebugTools = (window as Window & { __HUA_I18N_DEBUG__?: DebugTools }).__HUA_I18N_DEBUG__;
         if (globalDebugTools) {
           globalDebugTools.devTools.isOpen = false;
         }
       },
     },
 
-    validateTranslations: (translations: Record<string, any>) => {
+    validateTranslations: (translations: Record<string, unknown>) => {
       const missingKeys: string[] = [];
       const duplicateKeys: string[] = [];
       const invalidKeys: string[] = [];
       const seenKeys = new Set<string>();
 
-      const traverse = (obj: any, path: string = '') => {
+      const traverse = (obj: unknown, path: string = '') => {
         for (const [key, value] of Object.entries(obj)) {
           const currentPath = path ? `${path}.${key}` : key;
           
@@ -275,7 +275,7 @@ export function enableDebugTools(): void {
   if (!debugTools) return;
 
   // 전역 객체에 추가
-  (window as any).__HUA_I18N_DEBUG__ = debugTools;
+  (window as Window & { __HUA_I18N_DEBUG__?: DebugTools }).__HUA_I18N_DEBUG__ = debugTools;
 
   // 개발자 도구 열기
   debugTools.devTools.open();
@@ -287,9 +287,9 @@ export function enableDebugTools(): void {
  * 디버깅 도구 비활성화
  */
 export function disableDebugTools(): void {
-  const debugTools = (window as any).__HUA_I18N_DEBUG__;
+  const debugTools = (window as Window & { __HUA_I18N_DEBUG__?: DebugTools }).__HUA_I18N_DEBUG__;
   if (debugTools) {
     debugTools.devTools.close();
-    delete (window as any).__HUA_I18N_DEBUG__;
+    delete (window as Window & { __HUA_I18N_DEBUG__?: DebugTools }).__HUA_I18N_DEBUG__;
   }
 } 
