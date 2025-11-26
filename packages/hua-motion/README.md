@@ -177,6 +177,33 @@ const heroMotion = useSmartMotion({
 pnpm add @hua-labs/motion
 ```
 
+## 📦 엔트리 포인트
+
+| Entry | Path | 설명 |
+|-------|------|------|
+| Core (Stage 1) | `@hua-labs/motion` 또는 `@hua-labs/motion/core` | useSimpleMotion, 프리셋, 기본 easing |
+| Page (Stage 2) | `@hua-labs/motion/page` | usePageMotions, useMotionOrchestra, 레이아웃 전환 |
+| Element (Stage 3) | `@hua-labs/motion/element` | useSmartMotion, useMotionState, 제스처 기반 모션 |
+| Scroll Utilities | `@hua-labs/motion/scroll` | useScrollReveal, useScrollProgress 등 스크롤/가시성 제어 |
+| Experiments | `@hua-labs/motion/experiments` | useGameLoop, usePerformanceMonitor 등 실험적 훅 |
+
+```ts
+// Stage 1
+import { useSimpleMotion } from '@hua-labs/motion';
+
+// Stage 2
+import { usePageMotions } from '@hua-labs/motion/page';
+
+// Stage 3
+import { useSmartMotion } from '@hua-labs/motion/element';
+
+// Scroll utilities
+import { useScrollReveal } from '@hua-labs/motion/scroll';
+
+// Experimental hooks
+import { usePerformanceMonitor } from '@hua-labs/motion/experiments';
+```
+
 ```typescript
 import { 
   useSimpleMotion,    // 1단계

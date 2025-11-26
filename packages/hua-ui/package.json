@@ -35,7 +35,8 @@
       "types": "./dist/components/advanced/*.d.ts",
       "import": "./dist/components/advanced/*.mjs",
       "require": "./dist/components/advanced/*.js"
-    }
+    },
+    "./styles/toast.css": "./src/styles/toast.css"
   },
   "files": [
     "dist"
