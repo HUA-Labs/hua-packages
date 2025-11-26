@@ -131,6 +131,9 @@ export function createDebugTools(): DebugTools | null {
       const seenKeys = new Set<string>();
 
       const traverse = (obj: unknown, path: string = '') => {
+        if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+          return;
+        }
         for (const [key, value] of Object.entries(obj)) {
           const currentPath = path ? `${path}.${key}` : key;
           
