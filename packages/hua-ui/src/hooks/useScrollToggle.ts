@@ -1,22 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from "react"
 
-export interface ScrollToggleConfig {
+interface ScrollToggleOptions {
   threshold?: number
   showOnMount?: boolean
   smooth?: boolean
 }
 
-export function useScrollToggle(options: ScrollToggleConfig = {}) {
-  const { 
-    threshold = 400, 
+export function useScrollToggle(options: ScrollToggleOptions = {}) {
+  const {
+    threshold = 400,
     showOnMount = false,
-    smooth = true 
+    smooth = true,
   } = options
-  
+
   const [isVisible, setIsVisible] = useState(showOnMount)
   const [mounted, setMounted] = useState(false)
 
-  // 하이드레이션 이슈 해결을 위한 mounted 상태 관리
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -25,19 +24,11 @@ export function useScrollToggle(options: ScrollToggleConfig = {}) {
     if (!mounted) return
 
     const toggleVisibility = () => {
-      if (typeof window !== 'undefined') {
-        if (window.pageYOffset > threshold) {
-          setIsVisible(true)
-        } else {
-          setIsVisible(false)
-        }
-      }
+      if (typeof window === "undefined") return
+      setIsVisible(window.pageYOffset > threshold)
     }
 
-    // 초기 상태 확인
     toggleVisibility()
-
-    // 이벤트 리스너 등록
     window.addEventListener("scroll", toggleVisibility, { passive: true })
     window.addEventListener("resize", toggleVisibility, { passive: true })
 
@@ -48,21 +39,18 @@ export function useScrollToggle(options: ScrollToggleConfig = {}) {
   }, [threshold, mounted])
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
-      if (smooth) {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        })
-      } else {
-        window.scrollTo(0, 0)
-      }
+    if (typeof window === "undefined") return
+    if (smooth) {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    } else {
+      window.scrollTo(0, 0)
     }
   }
 
   return {
     isVisible,
     scrollToTop,
-    mounted
+    mounted,
   }
 }
+

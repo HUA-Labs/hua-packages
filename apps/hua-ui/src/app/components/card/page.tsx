@@ -8,6 +8,16 @@ import {
   ComponentLayout
 } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const PANEL_TYPES = {
+  style: '"solid" | "glass" | "outline" | "elevated"',
+  styleDefault: '"solid"',
+  padding: '"none" | "small" | "medium" | "large"',
+  paddingDefault: '"medium"',
+  className: 'string',
+  classNameDefault: 'undefined',
+}
+
 export default function PanelPage() {
   return (
     <ComponentLayout
@@ -219,19 +229,19 @@ export default function PanelPage() {
                   <tbody>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">style</td>
-                      <td className="py-2 font-mono">"solid" | "glass" | "outline" | "elevated"</td>
-                      <td className="py-2 font-mono">"solid"</td>
+                      <td className="py-2 font-mono">{PANEL_TYPES.style}</td>
+                      <td className="py-2 font-mono">{PANEL_TYPES.styleDefault}</td>
                       <td className="py-2">패널의 스타일</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">padding</td>
-                      <td className="py-2 font-mono">"none" | "small" | "medium" | "large"</td>
-                      <td className="py-2 font-mono">"medium"</td>
+                      <td className="py-2 font-mono">{PANEL_TYPES.padding}</td>
+                      <td className="py-2 font-mono">{PANEL_TYPES.paddingDefault}</td>
                       <td className="py-2">패널의 내부 패딩</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">className</td>
-                      <td className="py-2 font-mono">string</td>
+                      <td className="py-2 font-mono">{PANEL_TYPES.className}</td>
                       <td className="py-2 font-mono">-</td>
                       <td className="py-2">추가 CSS 클래스</td>
                     </tr>

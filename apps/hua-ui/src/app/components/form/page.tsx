@@ -211,7 +211,7 @@ export default function FormPage() {
                 <tr>
                   <td className="px-6 py-4 text-sm text-slate-900 dark:text-slate-100">variant</td>
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">&quot;default&quot; | &quot;glass&quot;</td>
-                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">"default"</td>
+                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">&quot;default&quot;</td>
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">폼의 스타일 변형</td>
                 </tr>
                 <tr>

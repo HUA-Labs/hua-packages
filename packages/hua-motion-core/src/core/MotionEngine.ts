@@ -58,7 +58,7 @@ export class MotionEngine {
     element: HTMLElement, 
     motionFrames: MotionFrame[], 
     options: MotionOptions
-  ): Promise<void> {
+  ): Promise<string> {
     return new Promise((resolve) => {
       const motionId = this.generateMotionId()
       
@@ -80,7 +80,6 @@ export class MotionEngine {
           ...options,
           onComplete: () => {
             options.onComplete?.()
-            resolve()
             this.motions.delete(motionId)
           }
         }
@@ -93,6 +92,9 @@ export class MotionEngine {
       }
 
       options.onStart?.()
+      
+      // motionId를 즉시 반환
+      resolve(motionId)
     })
   }
 

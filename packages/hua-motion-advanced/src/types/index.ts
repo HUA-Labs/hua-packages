@@ -64,14 +64,14 @@ export interface MotionRef<T extends HTMLElement = HTMLElement> {
 // 3단계: useSmartMotion (개별 요소)
 // ========================================
 
-export interface SmartMotionOptions<T extends HTMLElement = HTMLElement> extends BaseMotionOptions {
+export interface SmartMotionOptions<_T extends HTMLElement = HTMLElement> extends BaseMotionOptions {
   type?: MotionType
   entrance?: EntranceType
   hover?: boolean
   click?: boolean
 }
 
-export interface SmartMotionReturn<T extends HTMLElement = HTMLElement> extends BaseMotionReturn {
+export interface SmartMotionReturn<_T extends HTMLElement = HTMLElement> extends BaseMotionReturn {
   isHovered: boolean
   isClicked: boolean
 }

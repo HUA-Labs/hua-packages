@@ -8,6 +8,18 @@ console.log("Action component:", Action)
 console.log("Icon component:", Icon)
 console.log("ComponentLayout component:", ComponentLayout)
 
+// API 문서용 타입 정의
+const ACTION_TYPES = {
+  variant: '"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"',
+  variantDefault: '"default"',
+  size: '"sm" | "md" | "lg" | "xl" | "icon"',
+  sizeDefault: '"md"',
+  loading: 'boolean',
+  loadingDefault: 'false',
+  disabled: 'boolean',
+  disabledDefault: 'false',
+}
+
 export default function ActionPage() {
   return (
     <ComponentLayout
@@ -28,9 +40,9 @@ export default function ActionPage() {
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="flex flex-wrap gap-4">
                 <Action>기본 액션</Action>
-                <Action appearance="outline">아웃라인</Action>
-                <Action appearance="ghost">고스트</Action>
-                <Action appearance="glass">글래스</Action>
+                <Action variant="outline">아웃라인</Action>
+                <Action variant="ghost">고스트</Action>
+                <Action variant="glass">글래스</Action>
               </div>
             </div>
             <div className="mt-4">
@@ -38,9 +50,9 @@ export default function ActionPage() {
                 <code>{`import { Action } from "@hua-labs/ui"
 
 <Action>기본 액션</Action>
-<Action appearance="outline">아웃라인</Action>
-<Action appearance="ghost">고스트</Action>
-<Action appearance="glass">글래스</Action>`}</code>
+<Action variant="outline">아웃라인</Action>
+<Action variant="ghost">고스트</Action>
+<Action variant="glass">글래스</Action>`}</code>
               </pre>
             </div>
           </section>
@@ -51,11 +63,11 @@ export default function ActionPage() {
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <Action>기본</Action>
-                <Action appearance="secondary">보조</Action>
-                <Action appearance="outline">아웃라인</Action>
-                <Action appearance="ghost">고스트</Action>
+                <Action variant="secondary">보조</Action>
+                <Action variant="outline">아웃라인</Action>
+                <Action variant="ghost">고스트</Action>
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg">
-                  <Action appearance="glass">글래스</Action>
+                  <Action variant="glass">글래스</Action>
                 </div>
               </div>
             </div>
@@ -65,23 +77,23 @@ export default function ActionPage() {
               <h3 className="text-lg font-medium mb-4">아웃라인 액션 테스트</h3>
               <div className="space-y-4">
                 <div className="bg-white dark:bg-slate-800 p-4 rounded-lg">
-                  <Action appearance="outline">흰 배경 위 아웃라인</Action>
+                  <Action variant="outline">흰 배경 위 아웃라인</Action>
                 </div>
                 <div className="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg">
-                  <Action appearance="outline">회색 배경 위 아웃라인</Action>
+                  <Action variant="outline">회색 배경 위 아웃라인</Action>
                 </div>
                 <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
-                  <Action appearance="outline">파란 배경 위 아웃라인</Action>
+                  <Action variant="outline">파란 배경 위 아웃라인</Action>
                 </div>
               </div>
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
                 <code>{`<Action>기본</Action>
-<Action appearance="secondary">보조</Action>
-<Action appearance="outline">아웃라인</Action>
-<Action appearance="ghost">고스트</Action>
-<Action appearance="glass">글래스</Action>`}</code>
+<Action variant="secondary">보조</Action>
+<Action variant="outline">아웃라인</Action>
+<Action variant="ghost">고스트</Action>
+<Action variant="glass">글래스</Action>`}</code>
               </pre>
             </div>
           </section>
@@ -91,16 +103,16 @@ export default function ActionPage() {
             <h2 className="text-2xl font-semibold mb-4">크기</h2>
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="flex flex-wrap items-center gap-4">
-                <Action scale="small">작은 액션</Action>
+                <Action size="sm">작은 액션</Action>
                 <Action>기본 액션</Action>
-                <Action scale="large">큰 액션</Action>
+                <Action size="lg">큰 액션</Action>
               </div>
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`<Action scale="small">작은 액션</Action>
+                <code>{`<Action size="sm">작은 액션</Action>
 <Action>기본 액션</Action>
-<Action scale="large">큰 액션</Action>`}</code>
+<Action size="lg">큰 액션</Action>`}</code>
               </pre>
             </div>
           </section>
@@ -114,11 +126,11 @@ export default function ActionPage() {
                   <Icon name="download" className="w-4 h-4 mr-2" />
                   다운로드
                 </Action>
-                <Action appearance="outline">
+                <Action variant="outline">
                   <Icon name="heart" className="w-4 h-4 mr-2" />
                   좋아요
                 </Action>
-                <Action appearance="ghost">
+                <Action variant="ghost">
                   <Icon name="share" className="w-4 h-4 mr-2" />
                   공유
                 </Action>
@@ -130,11 +142,11 @@ export default function ActionPage() {
   <Icon name="download" className="w-4 h-4 mr-2" />
   다운로드
 </Action>
-<Action appearance="outline">
+<Action variant="outline">
   <Icon name="heart" className="w-4 h-4 mr-2" />
   좋아요
 </Action>
-<Action appearance="ghost">
+<Action variant="ghost">
   <Icon name="share" className="w-4 h-4 mr-2" />
   공유
 </Action>`}</code>
@@ -148,15 +160,15 @@ export default function ActionPage() {
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="flex flex-wrap gap-4">
                 <Action loading>로딩 중</Action>
-                <Action appearance="outline" loading>로딩 중</Action>
-                <Action appearance="ghost" loading>로딩 중</Action>
+                <Action variant="outline" loading>로딩 중</Action>
+                <Action variant="ghost" loading>로딩 중</Action>
               </div>
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
                 <code>{`<Action loading>로딩 중</Action>
-<Action appearance="outline" loading>로딩 중</Action>
-<Action appearance="ghost" loading>로딩 중</Action>`}</code>
+<Action variant="outline" loading>로딩 중</Action>
+<Action variant="ghost" loading>로딩 중</Action>`}</code>
               </pre>
             </div>
           </section>
@@ -167,15 +179,15 @@ export default function ActionPage() {
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="flex flex-wrap gap-4">
                 <Action disabled>비활성화</Action>
-                <Action appearance="outline" disabled>비활성화</Action>
-                <Action appearance="ghost" disabled>비활성화</Action>
+                <Action variant="outline" disabled>비활성화</Action>
+                <Action variant="ghost" disabled>비활성화</Action>
               </div>
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
                 <code>{`<Action disabled>비활성화</Action>
-<Action appearance="outline" disabled>비활성화</Action>
-<Action appearance="ghost" disabled>비활성화</Action>`}</code>
+<Action variant="outline" disabled>비활성화</Action>
+<Action variant="ghost" disabled>비활성화</Action>`}</code>
               </pre>
             </div>
           </section>
@@ -251,27 +263,27 @@ mergeMap({
                   </thead>
                   <tbody>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                      <td className="py-2 font-mono">appearance</td>
-                      <td className="py-2 font-mono">"primary" | "secondary" | "outline" | "ghost" | "glass"</td>
-                      <td className="py-2 font-mono">"primary"</td>
+                      <td className="py-2 font-mono">variant</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.variant}</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.variantDefault}</td>
                       <td className="py-2">액션의 외관 스타일</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                      <td className="py-2 font-mono">scale</td>
-                      <td className="py-2 font-mono">"small" | "medium" | "large"</td>
-                      <td className="py-2 font-mono">"medium"</td>
+                      <td className="py-2 font-mono">size</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.size}</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.sizeDefault}</td>
                       <td className="py-2">액션의 크기</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">loading</td>
-                      <td className="py-2 font-mono">boolean</td>
-                      <td className="py-2 font-mono">false</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.loading}</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.loadingDefault}</td>
                       <td className="py-2">로딩 상태 표시</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">disabled</td>
-                      <td className="py-2 font-mono">boolean</td>
-                      <td className="py-2 font-mono">false</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.disabled}</td>
+                      <td className="py-2 font-mono">{ACTION_TYPES.disabledDefault}</td>
                       <td className="py-2">비활성화 상태</td>
                     </tr>
                   </tbody>

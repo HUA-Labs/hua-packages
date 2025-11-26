@@ -1,6 +1,6 @@
 'use client';
-import { I18nProvider as BaseI18nProvider } from 'hua-i18n-sdk';
-import { I18nConfig } from 'hua-i18n-sdk';
+import { I18nProvider as BaseI18nProvider } from '@hua-labs/i18n-sdk';
+import { I18nConfig } from '@hua-labs/i18n-sdk';
 
 // JSON 파일을 로드하는 커스텀 로더
 const customFileLoader = async (language: string, namespace: string) => {

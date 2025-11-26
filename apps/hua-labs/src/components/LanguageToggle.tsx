@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLanguageChange } from 'hua-i18n-sdk/easy';
+import { useLanguageChange } from '@hua-labs/i18n-sdk/easy';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LanguageToggle() {

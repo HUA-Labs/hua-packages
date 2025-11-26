@@ -1,5 +1,10 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 
+export interface SequenceConfig {
+  autoStart?: boolean
+  loop?: boolean
+}
+
 interface SequenceItem {
   hook: () => any
   delay?: number
@@ -7,10 +12,7 @@ interface SequenceItem {
 
 export function useSequence(
   sequence: SequenceItem[],
-  options: {
-    autoStart?: boolean
-    loop?: boolean
-  } = {}
+  options: SequenceConfig = {}
 ) {
   const {
     autoStart = true,

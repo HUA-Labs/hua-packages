@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 
-interface LanguageAwareMotionOptions {
+export interface LanguageConfig {
   motionType: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
   duration?: number
   delay?: number
@@ -10,7 +10,7 @@ interface LanguageAwareMotionOptions {
   currentLanguage?: string // 외부에서 언어 정보를 받음
 }
 
-export function useLanguageAwareMotion(options: LanguageAwareMotionOptions) {
+export function useLanguageAwareMotion(options: LanguageConfig) {
   const {
     motionType,
     duration = 700,
@@ -29,7 +29,6 @@ export function useLanguageAwareMotion(options: LanguageAwareMotionOptions) {
   // 언어 변경 감지
   useEffect(() => {
     if (externalLanguage && internalLanguage !== externalLanguage) {
-      const prevLanguage = internalLanguage
       setInternalLanguage(externalLanguage)
 
       if (pauseOnLanguageChange && isVisible) {

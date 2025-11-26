@@ -298,7 +298,7 @@ export class PerformanceOptimizer {
     this.isMonitoring = false
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval)
-      this.monitoringInterval = null
+      this.monitoringInterval = undefined
     }
   }
 

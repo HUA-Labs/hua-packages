@@ -17,6 +17,14 @@ import {
 } from "@hua-labs/ui"
 import { ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const TABLE_TYPES = {
+  variant: "'default' | 'bordered' | 'striped'",
+  variantDefault: "'default'",
+  size: "'sm' | 'md' | 'lg'",
+  sizeDefault: "'md'",
+}
+
 export default function TablePage() {
   const sampleData = [
     { id: 1, name: "김철수", email: "kim@example.com", role: "관리자", status: "활성" },
@@ -501,14 +509,14 @@ function MyComponent() {
                   <tbody>
                     <tr>
                       <td className="px-4 py-2 font-mono">variant</td>
-                      <td className="px-4 py-2 font-mono">'default' | 'bordered' | 'striped'</td>
-                      <td className="px-4 py-2 font-mono">'default'</td>
+                      <td className="px-4 py-2 font-mono">{TABLE_TYPES.variant}</td>
+                      <td className="px-4 py-2 font-mono">{TABLE_TYPES.variantDefault}</td>
                       <td className="px-4 py-2">테이블 스타일</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 font-mono">size</td>
-                      <td className="px-4 py-2 font-mono">'sm' | 'md' | 'lg'</td>
-                      <td className="px-4 py-2 font-mono">'md'</td>
+                      <td className="px-4 py-2 font-mono">{TABLE_TYPES.size}</td>
+                      <td className="px-4 py-2 font-mono">{TABLE_TYPES.sizeDefault}</td>
                       <td className="px-4 py-2">테이블 크기</td>
                     </tr>
                   </tbody>

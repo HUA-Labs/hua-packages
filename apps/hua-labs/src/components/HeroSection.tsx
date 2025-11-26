@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, Play, ArrowRight } from 'lucide-react'
 import { useEffect, useState, useMemo } from 'react'
-import { useTranslation } from 'hua-i18n-sdk/easy'
+import { useTranslation } from '@hua-labs/i18n-sdk/easy'
 
 export function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })

@@ -3,6 +3,18 @@
 import React from "react"
 import { Button, Icon, ComponentLayout } from "@hua-labs/ui"
 
+// API 문서용 타입 정의
+const BUTTON_TYPES = {
+  variant: '"default" | "secondary" | "outline" | "ghost" | "glass"',
+  variantDefault: '"default"',
+  size: '"sm" | "md" | "lg"',
+  sizeDefault: '"md"',
+  loading: 'boolean',
+  loadingDefault: 'false',
+  disabled: 'boolean',
+  disabledDefault: 'false',
+}
+
 export default function ButtonPage() {
   return (
     <ComponentLayout
@@ -193,26 +205,26 @@ export default function ButtonPage() {
                   <tbody>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">variant</td>
-                      <td className="py-2 font-mono">"default" | "secondary" | "outline" | "ghost" | "glass"</td>
-                      <td className="py-2 font-mono">"default"</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.variant}</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.variantDefault}</td>
                       <td className="py-2">버튼의 외관 스타일</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">size</td>
-                      <td className="py-2 font-mono">"sm" | "md" | "lg"</td>
-                      <td className="py-2 font-mono">"md"</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.size}</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.sizeDefault}</td>
                       <td className="py-2">버튼의 크기</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">loading</td>
-                      <td className="py-2 font-mono">boolean</td>
-                      <td className="py-2 font-mono">false</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.loading}</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.loadingDefault}</td>
                       <td className="py-2">로딩 상태 표시</td>
                     </tr>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
                       <td className="py-2 font-mono">disabled</td>
-                      <td className="py-2 font-mono">boolean</td>
-                      <td className="py-2 font-mono">false</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.disabled}</td>
+                      <td className="py-2 font-mono">{BUTTON_TYPES.disabledDefault}</td>
                       <td className="py-2">비활성화 상태</td>
                     </tr>
                   </tbody>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-interface VisibilityToggleOptions {
+export interface VisibilityToggleConfig {
   threshold?: number // 가시성 변화를 감지할 임계값 (0-1)
   rootMargin?: string // 루트 마진 (CSS 마진 형식)
   trigger?: 'enter' | 'exit' | 'both' // 트리거 조건
@@ -8,7 +8,7 @@ interface VisibilityToggleOptions {
   showOnMount?: boolean
 }
 
-export function useVisibilityToggle(options: VisibilityToggleOptions = {}) {
+export function useVisibilityToggle(options: VisibilityToggleConfig = {}) {
   const { 
     threshold = 0.1,
     rootMargin = '0px',

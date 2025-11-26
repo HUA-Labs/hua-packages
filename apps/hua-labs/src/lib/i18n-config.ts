@@ -1,12 +1,15 @@
-import { withDefaultConfig } from 'hua-i18n-sdk'
+import { withDefaultConfig } from '@hua-labs/i18n-sdk'
+import { useI18n } from '@hua-labs/i18n-sdk'
 
-export const { useI18n, I18nProvider } = withDefaultConfig({
+export const I18nProvider = withDefaultConfig({
   defaultLanguage: 'ko',
   fallbackLanguage: 'ko',
   namespaces: ['common'],
   debug: false,
   autoLanguageSync: true
 })
+
+export { useI18n }
 
 // 번역 데이터
 export const translations = {

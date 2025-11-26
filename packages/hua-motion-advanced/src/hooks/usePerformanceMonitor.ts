@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 export interface PerformanceMonitorConfig {
   threshold?: number
