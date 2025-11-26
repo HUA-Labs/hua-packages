@@ -3,36 +3,79 @@
   "version": "1.0.0",
   "description": "HUA Labs - Advanced Motion & Animation Hooks for React - Smooth, performant, and customizable animations",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.mjs",
+      "require": "./dist/core.js"
+    },
+    "./page": {
+      "types": "./dist/page.d.ts",
+      "import": "./dist/page.mjs",
+      "require": "./dist/page.js"
+    },
+    "./element": {
+      "types": "./dist/element.d.ts",
+      "import": "./dist/element.mjs",
+      "require": "./dist/element.js"
+    },
+    "./scroll": {
+      "types": "./dist/scroll.d.ts",
+      "import": "./dist/scroll.mjs",
+      "require": "./dist/scroll.js"
+    },
+    "./experiments": {
+      "types": "./dist/experiments.d.ts",
+      "import": "./dist/experiments.mjs",
+      "require": "./dist/experiments.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "jest",
     "lint": "eslint src --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "analyze": "node scripts/analyze-bundle.js",
+    "build:analyze": "pnpm build && pnpm analyze"
   },
   "dependencies": {
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^3.1.0",
+    "@storybook/addon-docs": "^8.6.14",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/addon-onboarding": "^8.6.14",
+    "@storybook/builder-vite": "8.6.14",
+    "@storybook/react": "^8.6.14",
+    "@storybook/react-vite": "8.6.14",
+    "@storybook/testing-library": "^0.2.2",
+    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.8.3",
+    "chromatic": "^13.3.4",
+    "eslint": "^9.39.1",
     "jest": "^29.0.0",
-    "@types/jest": "^29.0.0",
-    "eslint": "^8.0.0"
+    "storybook": "8.6.14",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
@@ -67,4 +110,4 @@
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
-} 
+}

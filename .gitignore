@@ -215,3 +215,6 @@ api-keys.txt
 
 */back/
 workspace/
+*storybook.log
+storybook-static
+.storybook-cache/
