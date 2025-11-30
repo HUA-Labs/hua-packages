@@ -14,7 +14,7 @@ const shared = {
   treeshake: true,
   minify: true,
   target: 'es2019',
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', '@hua-labs/motion', 'lucide-react'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', '@hua-labs/motion', 'lucide-react', '@phosphor-icons/react'],
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },
@@ -40,4 +40,3 @@ export default defineConfig([
     outDir: 'dist',
   },
 ]);
-

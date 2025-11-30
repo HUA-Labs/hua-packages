@@ -122,28 +122,13 @@ export class EmotionAnalyzer {
   }
 
   /**
-   * 문장 분할 (감정 단위 고려)
+   * 문장 분할
    */
   private splitIntoSentences(text: string): string[] {
-    // 1차: 문장 부호로 분할
-    const sentences = text
-      .split(/[.!?。！？\n]/)
+    return text
+      .split(/[.!?。！？]/)
       .map(s => s.trim())
       .filter(s => s.length > 0);
-    
-    // 2차: 긴 문장은 접속사/쉼표로 세분화 (감정 변화 감지)
-    const refined: string[] = [];
-    for (const sentence of sentences) {
-      if (sentence.length > 50) {
-        // 긴 문장은 접속사로 분할
-        const chunks = sentence.split(/,|\s(그래서|그런데|하지만|그러나|그리고|그렇지만|근데)\s/);
-        refined.push(...chunks.filter(c => c && c.length > 5));
-      } else {
-        refined.push(sentence);
-      }
-    }
-    
-    return refined;
   }
 
   /**
@@ -153,43 +138,10 @@ export class EmotionAnalyzer {
     const emotions: string[] = [];
     const words = sentence.split(/\s+/);
     
-    // 제외할 일반 단어 (감정이 아닌 것)
-    const excludeWords = ['한', '할', '함', '합', '해', '하', '이', '가', '을', '를', '은', '는'];
-    
-    // 조사 목록
-    const particles = ['을', '를', '이', '가', '은', '는', '에', '에서', '로', '으로', '와', '과', '의', '도', '만', '부터', '까지', '처럼', '같이', '보다', '하고', '랑'];
-    
     for (const word of words) {
-      // 제외 단어는 스킵
-      if (excludeWords.includes(word)) {
-        continue;
-      }
-      
-      // "한 시간", "한 40분" 같은 패턴 제외
-      if (word === '한' || word.startsWith('한')) {
-        continue;
-      }
-      
       // 정확한 매치
       if (this.lexicon.hasWord(word)) {
         emotions.push(word);
-        continue;
-      }
-      
-      // 조사 제거 후 매치
-      let wordWithoutParticle = word;
-      for (const particle of particles) {
-        if (word.endsWith(particle) && word.length > particle.length) {
-          wordWithoutParticle = word.substring(0, word.length - particle.length);
-          if (this.lexicon.hasWord(wordWithoutParticle)) {
-            emotions.push(wordWithoutParticle);
-            break;
-          }
-        }
-      }
-      
-      // 조사 제거 후 매칭되었으면 다음 단어로
-      if (wordWithoutParticle !== word && this.lexicon.hasWord(wordWithoutParticle)) {
         continue;
       }
       
@@ -207,54 +159,12 @@ export class EmotionAnalyzer {
    * 어미 변화 제거하여 기본형 추출
    */
   private extractBaseWord(word: string): string | null {
-    // 한국어 형용사/동사 어미 패턴
-    const patterns = [
-      // 종결어미
-      /[아어여]요?$/,      // 해요, 했어요, 했어
-      /습니다$/,           // 합니다
-      /ㅂ니다$/,           // 슬픕니다
-      /네요?$/,            // 하네요, 하네
-      
-      // 관형형 어미
-      /[은는을를]$/,       // 슬픈, 기쁜
-      /ㄴ$/,              // 좋은 → 좋
-      
-      // 연결어미
-      /[고서]$/,          // 슬프고, 기뻐서
-      /지만$/,            // 슬프지만
-      /아서|어서$/,        // 슬퍼서, 기뻐서
-      
-      // 기본형
-      /다$/,              // 슬프다
-      /하다$/,            // 사랑하다
-      /스럽다$/,          // 사랑스럽다
-      /롭다$/,            // 즐겁다
-    ];
+    // 간단한 어미 제거 로직 (한국어 특성 고려)
+    const endings = ['다', '하다', '되다', '있다', '없다', '이다'];
     
-    let baseWord = word;
-    
-    // 패턴 매칭으로 어미 제거
-    for (const pattern of patterns) {
-      const match = baseWord.match(pattern);
-      if (match) {
-        baseWord = baseWord.replace(pattern, '');
-        
-        // 불규칙 활용 처리
-        if (baseWord.endsWith('ㅂ')) {
-          baseWord = baseWord.slice(0, -1) + '습'; // 어렵 → 어렵다
-        } else if (baseWord.endsWith('ㄹ')) {
-          baseWord = baseWord.slice(0, -1) + 'ㄹ'; // 즐겁 → 즐겁다  
-        }
-        
-        // 사전 형태로 변환 (다 붙이기)
-        if (!baseWord.endsWith('다')) {
-          const withDa = baseWord + '다';
-          if (this.lexicon.hasWord(withDa)) {
-            return withDa;
-          }
-        }
-        
-        return baseWord;
+    for (const ending of endings) {
+      if (word.endsWith(ending)) {
+        return word.slice(0, -ending.length);
       }
     }
     
@@ -319,24 +229,11 @@ export class EmotionAnalyzer {
       .map(count => count / emotions.length);
 
     // Shannon Entropy 계산
-    let entropy = -probabilities
+    const entropy = -probabilities
       .map(p => p > 0 ? p * Math.log2(p) : 0)
       .reduce((sum, entropy) => sum + entropy, 0);
 
-    // 지배적 감정 보정: 단일 감정이 60% 이상이면 엔트로피 하향 조정
-    const maxProbability = Math.max(...probabilities);
-    if (maxProbability >= 0.6) {
-      // 지배적 감정의 비율에 따라 엔트로피 감소
-      const dominanceFactor = (maxProbability - 0.6) / 0.4; // 0.6~1.0 → 0~1
-      entropy = entropy * (1 - dominanceFactor * 0.5); // 최대 50% 감소
-      
-      // 단일 감정이 80% 이상이면 1.0 이하로 제한
-      if (maxProbability >= 0.8) {
-        entropy = Math.min(entropy, 1.0);
-      }
-    }
-
-    return Math.max(0, entropy); // 음수 방지
+    return entropy;
   }
 
   /**

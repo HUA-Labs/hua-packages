@@ -18,6 +18,79 @@ export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
 export { Panel } from './components/Panel';
 
+// UI Components - Dashboard
+export {
+  StatCard,
+  QuickActionCard,
+  DashboardGrid,
+  ActivityFeed,
+  ProfileCard,
+  MembershipBadge,
+  MiniBarChart,
+  SummaryCard,
+  NotificationCard,
+  MetricCard,
+  ProgressCard,
+  DashboardEmptyState,
+  DashboardSidebar,
+  TransactionsTable,
+  DashboardToolbar,
+  TrendChart,
+  TransactionDetailDrawer,
+  SettlementTimeline,
+  RoutingBreakdownCard,
+  MerchantList,
+} from './components/dashboard';
+export { StatsPanel } from './components/StatsPanel';
+export { SectionHeader } from './components/SectionHeader';
+export type {
+  StatCardProps,
+  QuickActionCardProps,
+  DashboardGridProps,
+  ActivityFeedProps,
+  ActivityItem,
+  ProfileCardProps,
+  MembershipTier,
+  MembershipBadgeProps,
+  MiniBarChartProps,
+  SummaryCardProps,
+  NotificationCardProps,
+  NotificationItem,
+  MetricCardProps,
+  ProgressCardProps,
+  DashboardEmptyStateProps,
+  DashboardSidebarProps,
+  SidebarNavItem,
+  SidebarSection,
+  TransactionsTableProps,
+  TransactionRow,
+  TransactionColumnConfig,
+  TransactionColumnKey,
+  TransactionStatus,
+  DashboardToolbarProps,
+  ToolbarAction,
+  DateRangeConfig,
+  DatePreset,
+  TrendChartProps,
+  TrendSeries,
+  TransactionDetailDrawerProps,
+  TransactionDetail,
+  TransactionMetadataItem,
+  SettlementInfo,
+  FeeBreakdown,
+  TransactionEvent,
+  SettlementTimelineProps,
+  SettlementTimelineItem,
+  SettlementTimelineStatus,
+  RoutingBreakdownCardProps,
+  RoutingBreakdownSegment,
+  MerchantListProps,
+  MerchantListItem,
+  MerchantHealth,
+} from './components/dashboard';
+export type { StatsPanelProps, StatsPanelItem } from './components/StatsPanel';
+export type { SectionHeaderProps } from './components/SectionHeader';
+
 // UI Components - Navigation
 export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
 export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';

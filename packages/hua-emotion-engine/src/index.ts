@@ -6,7 +6,6 @@
 
 export { EmotionLexicon } from './lexicon/emotion-lexicon';
 export { EmotionAnalyzer } from './analyzer/emotion-analyzer';
-export { AIEmotionAnalyzer } from './analyzer/ai-emotion-analyzer';
 export { EmotionReasoner } from './reasoner/emotion-reasoner';
 export { EmotionVisualizer } from './visualizer/emotion-visualizer';
 

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { merge } from "../lib/utils";
 
 /** 공통 옵션 */
