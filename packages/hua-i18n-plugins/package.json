@@ -23,13 +23,18 @@
     "@hua-labs/i18n-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^19.0.0",
-    "typescript": "^5.8.3",
-    "jest": "^29.0.0",
     "@types/jest": "^29.0.0",
-    "eslint": "^8.0.0"
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.2.7",
+    "eslint": "^9.39.1",
+    "jest": "^29.0.0",
+    "typescript": "^5.9.3"
   },
-  "keywords": ["i18n", "plugins", "internationalization", "typescript"],
+  "keywords": [
+    "i18n",
+    "plugins",
+    "internationalization",
+    "typescript"
+  ],
   "license": "MIT"
-} 
+}

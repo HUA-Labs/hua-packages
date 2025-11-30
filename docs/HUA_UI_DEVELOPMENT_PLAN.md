@@ -23,6 +23,8 @@
 - [x] TypeScript 완전 지원
 - [x] 데모 사이트 구축
 - [x] 문서화 완료
+- [x] Core/Advanced 엔트리 분리 (번들 최적화)
+- [x] Advanced 서브 엔트리 (dashboard/motion) 세분화
 
 ### 🔄 진행 중인 작업
 - [ ] Action 컴포넌트 undefined 문제 해결
