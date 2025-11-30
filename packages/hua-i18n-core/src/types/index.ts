@@ -137,7 +137,7 @@ export interface I18nContextType {
     getCurrentLanguage: () => string;
     getSupportedLanguages: () => string[];
     getLoadedNamespaces: () => string[];
-    getAllTranslations: () => Record<string, Record<string, any>>;
+    getAllTranslations: () => Record<string, Record<string, unknown>>;
     isReady: () => boolean;
     getInitializationError: () => TranslationError | null;
     clearCache: () => void;
@@ -155,11 +155,11 @@ export interface TranslationParams {
 } 
 
 // 타입 안전한 번역 키 시스템 (단순화된 버전)
-export type TranslationKey<T> = T extends Record<string, any>
+export type TranslationKey<T> = T extends Record<string, unknown>
   ? {
       [K in keyof T]: T[K] extends string
         ? K
-        : T[K] extends Record<string, any>
+        : T[K] extends Record<string, unknown>
           ? `${K & string}.${TranslationKey<T[K]> & string}`
           : never;
     }[keyof T]
@@ -177,14 +177,14 @@ export interface TypedI18nContextType<T extends TranslationData> extends Omit<I1
 export type SimpleTranslationKey = string;
 
 // 고급 번역 키 타입 (제한된 깊이)
-export type TranslationKeyLegacy<T extends Record<string, any>, D extends number = 3> = 
+export type TranslationKeyLegacy<T extends Record<string, unknown>, D extends number = 3> = 
   [D] extends [never] 
     ? never 
-    : T extends Record<string, any>
+    : T extends Record<string, unknown>
       ? {
           [K in keyof T]: T[K] extends string 
             ? K 
-            : T[K] extends Record<string, any>
+            : T[K] extends Record<string, unknown>
               ? `${K & string}.${TranslationKeyLegacy<T[K], Prev<D>> & string}` 
               : never;
         }[keyof T]
@@ -193,11 +193,11 @@ export type TranslationKeyLegacy<T extends Record<string, any>, D extends number
 type Prev<T extends number> = T extends 0 ? never : T extends 1 ? 0 : T extends 2 ? 1 : T extends 3 ? 2 : never;
 
 // 유틸리티 타입들
-export type ExtractTranslationKeys<T> = T extends Record<string, any>
+export type ExtractTranslationKeys<T> = T extends Record<string, unknown>
   ? {
       [K in keyof T]: T[K] extends string
         ? K
-        : T[K] extends Record<string, any>
+        : T[K] extends Record<string, unknown>
           ? `${K & string}.${ExtractTranslationKeys<T[K]> & string}`
           : never;
     }[keyof T]
@@ -210,7 +210,7 @@ export type NamespaceKeys<T extends TranslationData, N extends keyof T> = Extrac
 export const createTranslationKey = <T extends TranslationData, N extends keyof T, K extends NamespaceKeys<T, N>>(
   namespace: N,
   key: K
-): `${N & string}.${K & string}` => `${String(namespace)}.${String(key)}` as any; 
+): `${N & string}.${K & string}` => `${String(namespace)}.${String(key)}` as `${N & string}.${K & string}`; 
 
 // 타입 가드 함수들
 export function isTranslationNamespace(value: unknown): value is TranslationNamespace {

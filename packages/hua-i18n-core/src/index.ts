@@ -223,7 +223,7 @@ export function createCoreI18n(options?: {
       }
       return key.split('.').pop() || key;
     },
-    errorHandler: (error: any, language: string, namespace: string) => {
+    errorHandler: (error: unknown, language: string, namespace: string) => {
       if (debug) {
         console.error(`Translation error for ${language}:${namespace}:`, error);
       }
