@@ -30,8 +30,11 @@
     "eslint": "^9.39.1",
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.4.0",
+<<<<<<< HEAD
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
+=======
+>>>>>>> origin/main
     "typescript": "^5.9.3"
   }
 }

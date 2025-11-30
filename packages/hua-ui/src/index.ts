@@ -98,9 +98,6 @@ export { Pagination, PaginationOutlined, PaginationMinimal, PaginationWithInfo }
 export { PageNavigation } from './components/PageNavigation';
 export { PageTransition } from './components/PageTransition';
 
-// UI Components - Advanced Page Transitions
-export * from './components/advanced';
-
 // UI Components - Data Display
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './components/Table';
 export { Badge } from './components/Badge';
