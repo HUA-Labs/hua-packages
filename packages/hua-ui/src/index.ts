@@ -32,6 +32,8 @@ export {
   MetricCard,
   ProgressCard
 } from './components/dashboard';
+export { StatsPanel } from './components/StatsPanel';
+export { SectionHeader } from './components/SectionHeader';
 export type { 
   StatCardProps, 
   QuickActionCardProps, 
@@ -48,6 +50,8 @@ export type {
   MetricCardProps,
   ProgressCardProps
 } from './components/dashboard';
+export type { StatsPanelProps, StatsPanelItem } from './components/StatsPanel';
+export type { SectionHeaderProps } from './components/SectionHeader';
 
 // UI Components - Navigation
 export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
