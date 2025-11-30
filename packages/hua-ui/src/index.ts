@@ -19,10 +19,10 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Panel } from './components/Panel';
 
 // UI Components - Dashboard
-export { 
-  StatCard, 
-  QuickActionCard, 
-  DashboardGrid, 
+export {
+  StatCard,
+  QuickActionCard,
+  DashboardGrid,
   ActivityFeed,
   ProfileCard,
   MembershipBadge,
@@ -30,15 +30,24 @@ export {
   SummaryCard,
   NotificationCard,
   MetricCard,
-  ProgressCard
+  ProgressCard,
+  DashboardEmptyState,
+  DashboardSidebar,
+  TransactionsTable,
+  DashboardToolbar,
+  TrendChart,
+  TransactionDetailDrawer,
+  SettlementTimeline,
+  RoutingBreakdownCard,
+  MerchantList,
 } from './components/dashboard';
 export { StatsPanel } from './components/StatsPanel';
 export { SectionHeader } from './components/SectionHeader';
-export type { 
-  StatCardProps, 
-  QuickActionCardProps, 
-  DashboardGridProps, 
-  ActivityFeedProps, 
+export type {
+  StatCardProps,
+  QuickActionCardProps,
+  DashboardGridProps,
+  ActivityFeedProps,
   ActivityItem,
   ProfileCardProps,
   MembershipTier,
@@ -48,7 +57,36 @@ export type {
   NotificationCardProps,
   NotificationItem,
   MetricCardProps,
-  ProgressCardProps
+  ProgressCardProps,
+  DashboardEmptyStateProps,
+  DashboardSidebarProps,
+  SidebarNavItem,
+  SidebarSection,
+  TransactionsTableProps,
+  TransactionRow,
+  TransactionColumnConfig,
+  TransactionColumnKey,
+  TransactionStatus,
+  DashboardToolbarProps,
+  ToolbarAction,
+  DateRangeConfig,
+  DatePreset,
+  TrendChartProps,
+  TrendSeries,
+  TransactionDetailDrawerProps,
+  TransactionDetail,
+  TransactionMetadataItem,
+  SettlementInfo,
+  FeeBreakdown,
+  TransactionEvent,
+  SettlementTimelineProps,
+  SettlementTimelineItem,
+  SettlementTimelineStatus,
+  RoutingBreakdownCardProps,
+  RoutingBreakdownSegment,
+  MerchantListProps,
+  MerchantListItem,
+  MerchantHealth,
 } from './components/dashboard';
 export type { StatsPanelProps, StatsPanelItem } from './components/StatsPanel';
 export type { SectionHeaderProps } from './components/SectionHeader';
