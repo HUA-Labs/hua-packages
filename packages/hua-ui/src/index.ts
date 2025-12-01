@@ -174,4 +174,7 @@ export { Card as Crd } from './components/Card';
 export { Table as Tbl } from './components/Table';
 export { Form as Frm } from './components/Form';
 export { Alert as Alt } from './components/Alert';
-export { LoadingSpinner as Loading } from './components/LoadingSpinner'; 
+export { LoadingSpinner as Loading } from './components/LoadingSpinner';
+
+// Advanced exports
+export * from './advanced'; 
