@@ -16,15 +16,17 @@ pnpm add @hua-labs/i18n-core
 
 ## Features
 
-- Lightweight core translation functionality
-- Multiple translation loader strategies (API, static files, custom)
-- Lazy loading support for namespaces
-- SSR/SSG support
-- TypeScript support
-- Zero external dependencies (except React)
-- Built-in caching
-- Error handling and fallback support
-- Debug mode for development
+- ✅ Lightweight core translation functionality
+- ✅ Multiple translation loader strategies (API, static files, custom)
+- ✅ Lazy loading support for namespaces
+- ✅ SSR/SSG support with initial translations
+- ✅ TypeScript support
+- ✅ Zero external dependencies (except React)
+- ✅ Built-in caching
+- ✅ Error handling and fallback support
+- ✅ Debug mode for development
+- ✅ **Language change flickering prevention**: Automatically shows previous language translation during language switch
+- ✅ **State management integration**: Works seamlessly with Zustand via `@hua-labs/i18n-core-zustand`
 
 ## Quick Start
 
@@ -59,8 +61,8 @@ function MyComponent() {
   
   return (
     <div>
-      <h1>{t('common.welcome')}</h1>
-      <p>{t('pages.home.title')}</p>
+      <h1>{t('common:welcome')}</h1>
+      <p>{t('pages:home.title')}</p>
     </div>
   );
 }
@@ -131,9 +133,9 @@ createCoreI18n({
 The loader will try these paths:
 - `/translations/{language}/{namespace}.json`
 - `../translations/{language}/{namespace}.json`
-- `./translations/{language}/{namespace}.json`
-- `translations/{language}/{namespace}.json`
-- `../../translations/{language}/{namespace}.json`
+- `./translations/{language}/${namespace}.json`
+- `translations/{language}/${namespace}.json`
+- `../../translations/{language}/${namespace}.json`
 
 ### 3. Custom Loader
 
@@ -210,8 +212,8 @@ function MyComponent() {
   
   return (
     <div>
-      <h1>{t('common.welcome')}</h1>
-      <p>{t('pages.home.title')}</p>
+      <h1>{t('common:welcome')}</h1>
+      <p>{t('pages:home.title')}</p>
     </div>
   );
 }
@@ -227,7 +229,7 @@ function MyComponent() {
   
   return (
     <div>
-      <p>{tWithParams('common.greeting', { name: 'John' })}</p>
+      <p>{tWithParams('common:greeting', { name: 'John' })}</p>
     </div>
   );
 }
@@ -292,7 +294,7 @@ function MyComponent() {
   
   return (
     <div>
-      <h1>{t('common.welcome')}</h1>
+      <h1>{t('common:welcome')}</h1>
       <p>Current language: {currentLanguage}</p>
       <p>Loaded namespaces: {debug.getLoadedNamespaces().join(', ')}</p>
     </div>
@@ -319,8 +321,8 @@ export async function getServerTranslations(language: string) {
   });
   
   return {
-    welcome: translator.translate('common.welcome'),
-    title: translator.translate('pages.home.title')
+    welcome: translator.translate('common:welcome'),
+    title: translator.translate('pages:home.title')
   };
 }
 
@@ -331,10 +333,41 @@ export function getStaticTranslations(language: string) {
   return {
     welcome: ssrTranslate({
       translations,
-      key: 'common.welcome',
+      key: 'common:welcome',
       language
     })
   };
+}
+```
+
+### SSR with Initial Translations (Recommended)
+
+```tsx
+// app/layout.tsx (Server Component)
+import { loadSSRTranslations } from './lib/ssr-translations';
+import { createCoreI18n } from '@hua-labs/i18n-core';
+
+export default async function RootLayout({ children }) {
+  // SSR에서 번역 데이터 로드
+  const ssrTranslations = await loadSSRTranslations('ko');
+  
+  const I18nProvider = createCoreI18n({
+    defaultLanguage: 'ko',
+    fallbackLanguage: 'en',
+    namespaces: ['common', 'navigation', 'footer'],
+    initialTranslations: ssrTranslations, // SSR 번역 데이터 전달
+    translationLoader: 'api'
+  });
+  
+  return (
+    <html lang="ko">
+      <body>
+        <I18nProvider>
+          {children}
+        </I18nProvider>
+      </body>
+    </html>
+  );
 }
 ```
 
@@ -345,9 +378,9 @@ export function getStaticTranslations(language: string) {
 Always include namespace in the key:
 
 ```tsx
-t('common.welcome')      // common.json -> welcome
-t('pages.home.title')    // pages.json -> home.title
-t('footer.brand_name')   // footer.json -> brand_name
+t('common:welcome')      // common.json -> welcome
+t('pages:home.title')   // pages.json -> home.title
+t('footer:brand_name')   // footer.json -> brand_name
 ```
 
 ### Common Namespace Shortcut
@@ -355,8 +388,8 @@ t('footer.brand_name')   // footer.json -> brand_name
 If the key doesn't include a namespace, it defaults to 'common':
 
 ```tsx
-t('welcome')    // same as t('common.welcome')
-t('hello')      // same as t('common.hello')
+t('welcome')    // same as t('common:welcome')
+t('hello')      // same as t('common:hello')
 ```
 
 ## Configuration Options
@@ -376,9 +409,61 @@ createCoreI18n({
   translationApiPath: '/api/translations',
   loadTranslations: async (language, namespace) => {
     // Custom loader function
-  }
+  },
+  
+  // SSR optimization: Pre-loaded translations (no network requests)
+  // Prevents missing key exposure during initial load
+  initialTranslations: {
+    ko: {
+      common: { /* ... */ },
+      navigation: { /* ... */ }
+    },
+    en: {
+      common: { /* ... */ },
+      navigation: { /* ... */ }
+    }
+  },
+  
+  // Auto language sync (disabled by default when using Zustand adapter)
+  autoLanguageSync: false
 })
 ```
+
+## State Management Integration
+
+### Zustand Integration
+
+For Zustand users, use the dedicated adapter package:
+
+```bash
+pnpm add @hua-labs/i18n-core-zustand zustand
+```
+
+```tsx
+import { createZustandI18n } from '@hua-labs/i18n-core-zustand';
+import { useAppStore } from './store/useAppStore';
+
+export const I18nProvider = createZustandI18n(useAppStore, {
+  fallbackLanguage: 'en',
+  namespaces: ['common', 'navigation'],
+  defaultLanguage: 'ko', // SSR initial language
+  initialTranslations: ssrTranslations // Optional: SSR translations
+});
+```
+
+See [@hua-labs/i18n-core-zustand README](../hua-i18n-core-zustand/README.md) for full documentation.
+
+## Language Change Optimization
+
+The library automatically prevents flickering during language changes by temporarily showing translations from the previous language while new translations are loading.
+
+**How it works:**
+1. When language changes, `translator.setLanguage()` is called
+2. If a translation key is not found in the new language yet, the library checks other loaded languages
+3. If found, it temporarily returns the previous language's translation
+4. Once the new language's translation is loaded, it automatically updates
+
+This ensures a smooth user experience without showing translation keys or empty strings.
 
 ## Debug Mode
 
@@ -414,41 +499,11 @@ The library includes built-in error handling:
 - Network error recovery
 - Cache invalidation on errors
 
-### Custom Error Handler
-
-```tsx
-createCoreI18n({
-  errorHandler: (error, language, namespace) => {
-    console.error(`Translation error: ${error.message}`);
-    // Custom error handling logic
-  },
-  missingKeyHandler: (key, language, namespace) => {
-    console.warn(`Missing key: ${key}`);
-    return `[MISSING: ${key}]`;
-  }
-})
-```
-
-## Supported Languages
-
-Default supported languages:
-- Korean (ko)
-- English (en)
-
-Additional languages can be configured through the `supportedLanguages` option in the config.
-
-## Performance
-
-- Lazy loading: Namespaces are loaded on-demand
-- Caching: Translations are cached after first load
-- Deduplication: Multiple requests for the same translation are deduplicated
-- SSR optimization: Server-side translations are pre-loaded
-
 ## API Reference
 
 ### createCoreI18n
 
-Main configuration function that returns a Provider component.
+Creates an i18n Provider component.
 
 ```tsx
 function createCoreI18n(options?: {
@@ -456,67 +511,60 @@ function createCoreI18n(options?: {
   fallbackLanguage?: string;
   namespaces?: string[];
   debug?: boolean;
+  loadTranslations?: (language: string, namespace: string) => Promise<Record<string, string>>;
   translationLoader?: 'api' | 'static' | 'custom';
   translationApiPath?: string;
-  loadTranslations?: (language: string, namespace: string) => Promise<Record<string, string>>;
-}): (props: { children: React.ReactNode }) => JSX.Element
+  initialTranslations?: Record<string, Record<string, Record<string, string>>>;
+  autoLanguageSync?: boolean;
+}): React.ComponentType<{ children: React.ReactNode }>
 ```
 
 ### useTranslation
 
-Hook for accessing translation functions and state.
+Hook for accessing translations and language state.
 
 ```tsx
 function useTranslation(): {
   t: (key: string, language?: string) => string;
-  tWithParams: (key: string, params?: Record<string, string | number>, language?: string) => string;
-  tAsync: (key: string, params?: Record<string, string | number>) => Promise<string>;
-  tSync: (key: string, namespace?: string, params?: Record<string, string | number>) => string;
+  tWithParams: (key: string, params: Record<string, string>) => string;
   currentLanguage: string;
-  setLanguage: (language: string) => void;
-  supportedLanguages: Array<{ code: string; name: string; nativeName: string }>;
+  setLanguage: (language: string) => Promise<void>;
   isLoading: boolean;
-  isInitialized: boolean;
   error: TranslationError | null;
+  supportedLanguages: LanguageConfig[];
+  isInitialized: boolean;
   debug: {
-    getCurrentLanguage: () => string;
-    getSupportedLanguages: () => string[];
     getLoadedNamespaces: () => string[];
-    getAllTranslations: () => Record<string, Record<string, unknown>>;
-    isReady: () => boolean;
-    getInitializationError: () => TranslationError | null;
-    clearCache: () => void;
-    reloadTranslations: () => Promise<void>;
-    getCacheStats: () => { size: number; hits: number; misses: number };
+    getCacheStats: () => { hits: number; misses: number };
   };
 }
 ```
 
 ### useLanguageChange
 
-Hook for language switching functionality.
+Hook for language switching.
 
 ```tsx
 function useLanguageChange(): {
   currentLanguage: string;
   changeLanguage: (language: string) => void;
-  supportedLanguages: Array<{ code: string; name: string; nativeName: string }>;
+  supportedLanguages: LanguageConfig[];
 }
 ```
 
 ### Translator
 
-Server-side translation class.
+Core translation class (for SSR or advanced use cases).
 
 ```tsx
 class Translator {
-  static create(config: I18nConfig): Promise<Translator>;
   translate(key: string, language?: string): string;
-  setLanguage(language: string): void;
+  setLanguage(lang: string): void;
   getCurrentLanguage(): string;
   initialize(): Promise<void>;
   isReady(): boolean;
-  clearCache(): void;
+  onTranslationLoaded(callback: () => void): () => void;
+  onLanguageChanged(callback: (language: string) => void): () => void;
   debug(): unknown;
 }
 ```
@@ -585,7 +633,7 @@ pnpm test
 
 ### Missing Keys
 
-1. Ensure namespace is included in key: `t('namespace.key')`
+1. Ensure namespace is included in key: `t('namespace:key')`
 2. Check translation files contain the key
 3. Verify namespace is included in config: `namespaces: ['namespace']`
 
@@ -596,10 +644,13 @@ pnpm test
 3. Ensure API route handles 404 errors gracefully
 4. Check CORS settings if loading from different domain
 
+## Related Packages
+
+- `@hua-labs/i18n-core-zustand`: Zustand state management integration adapter
+- `@hua-labs/i18n-loaders`: Production-ready loaders, caching, and preloading helpers
+- `@hua-labs/i18n-advanced`: Advanced features like pluralization, date formatting, etc.
+- `@hua-labs/i18n-debug`: Debug tools and development helpers
+
 ## License
 
-MIT License
-
-## Repository
-
-https://github.com/HUA-Labs/HUA-Labs-public
+MIT
