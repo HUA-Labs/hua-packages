@@ -1,7 +1,7 @@
 {
   "name": "@hua-labs/i18n-core",
   "version": "1.0.0",
-  "description": "HUA Labs - 국제화 SDK 핵심 기능",
+  "description": "HUA Labs - Core i18n functionality with SSR/CSR support and state management integration",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -41,7 +41,20 @@
     "i18n",
     "internationalization",
     "react",
-    "typescript"
+    "typescript",
+    "ssr",
+    "csr",
+    "zustand",
+    "state-management"
   ],
-  "license": "MIT"
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
 }
