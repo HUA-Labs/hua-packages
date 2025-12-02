@@ -1,9 +1,13 @@
 {
-  "name": "@hua-labs/i18n-ai",
+  "name": "@hua-labs/i18n-core-zustand",
   "version": "1.0.0",
-  "description": "HUA Labs - 국제화 SDK AI 번역 기능",
+  "description": "Zustand adapter for @hua-labs/i18n-core - 타입 안전한 상태관리 통합",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -15,33 +19,31 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "test": "jest",
-    "lint": "echo 'Skipping lint for hua-i18n-ai (ESLint 8, needs separate config)'",
+    "test": "echo \"No tests defined\"",
+    "lint": "echo 'Skipping lint for hua-i18n-core-zustand'",
     "type-check": "tsc --noEmit"
   },
   "sideEffects": false,
   "dependencies": {
-    "@hua-labs/i18n-core": "workspace:*",
-    "openai": "^4.0.0"
+    "@hua-labs/i18n-core": "workspace:*"
   },
   "peerDependencies": {
+    "zustand": "^4.0.0",
     "react": ">=16.8.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.7",
-    "eslint": "^9.39.1",
-    "jest": "^29.0.0",
-    "react": "^19.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zustand": "^4.0.0"
   },
   "keywords": [
     "i18n",
-    "ai",
-    "translation",
-    "openai",
-    "gpt"
+    "internationalization",
+    "zustand",
+    "state-management",
+    "adapter"
   ],
   "license": "MIT"
 }
+
