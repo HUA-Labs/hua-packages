@@ -1,8 +1,23 @@
 # @hua-labs/i18n-core
 
+**Type-safe i18n library with SSR/CSR support and state management integration**
+
 HUA Labs - Core Internationalization Library
 
 Lightweight i18n library for React applications with essential translation features only.
+
+## 🎯 Why @hua-labs/i18n-core?
+
+Struggling with flickering on language changes or hydration mismatches? @hua-labs/i18n-core provides a pragmatic, production-ready solution for React i18n.
+
+**Key advantages:**
+- ✅ **Zero flickering**: Automatically shows previous language translation during switch
+- ✅ **SSR-first**: Built-in hydration handling, no mismatch issues
+- ✅ **State management integration**: First-class Zustand support
+- ✅ **Small bundle**: ~2.8KB gzipped, zero dependencies (React only)
+- ✅ **Framework agnostic**: Works with Next.js, Remix, Vite, and more
+
+[📊 Compare with other libraries](./docs/COMPARISON_I18N_LIBRARIES.md)
 
 ## Installation
 
@@ -176,26 +191,26 @@ your-app/
 ## Translation File Format
 
 ```json
-// translations/ko/common.json
+// translations/en/common.json
 {
-  "welcome": "환영합니다",
-  "hello": "안녕하세요",
-  "goodbye": "안녕히 가세요",
-  "loading": "로딩 중...",
-  "error": "오류가 발생했습니다"
+  "welcome": "Welcome",
+  "hello": "Hello",
+  "goodbye": "Goodbye",
+  "loading": "Loading...",
+  "error": "An error occurred"
 }
 ```
 
 ```json
-// translations/ko/pages.json
+// translations/en/pages.json
 {
   "home": {
-    "title": "홈",
-    "description": "홈 페이지입니다"
+    "title": "Home",
+    "description": "Home page"
   },
   "about": {
-    "title": "소개",
-    "description": "소개 페이지입니다"
+    "title": "About",
+    "description": "About page"
   }
 }
 ```
@@ -348,14 +363,14 @@ import { loadSSRTranslations } from './lib/ssr-translations';
 import { createCoreI18n } from '@hua-labs/i18n-core';
 
 export default async function RootLayout({ children }) {
-  // SSR에서 번역 데이터 로드
+  // Load translation data from SSR
   const ssrTranslations = await loadSSRTranslations('ko');
   
   const I18nProvider = createCoreI18n({
     defaultLanguage: 'ko',
     fallbackLanguage: 'en',
     namespaces: ['common', 'navigation', 'footer'],
-    initialTranslations: ssrTranslations, // SSR 번역 데이터 전달
+    initialTranslations: ssrTranslations, // Pass SSR translation data
     translationLoader: 'api'
   });
   
@@ -587,9 +602,10 @@ Alias for `ssrTranslate`.
 
 ## Bundle Size
 
-- Gzipped: ~5KB
-- Minified: ~15KB
-- Zero dependencies (React only)
+- Main entry (index.js): **9.5 KB** (uncompressed)
+- Estimated gzip: **~2.8 KB**
+- Total JS files: ~106 KB (with tree shaking, only used modules are included)
+- Zero dependencies (React only as peer dependency)
 
 ## Requirements
 

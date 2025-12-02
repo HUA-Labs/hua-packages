@@ -583,6 +583,7 @@ export function useI18n(): I18nContextType {
       tWithParams: (key: string) => key,
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
+      getRawValue: () => undefined,
       isLoading: false,
       error: null,
       supportedLanguages: [

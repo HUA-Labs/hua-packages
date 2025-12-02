@@ -1,7 +1,7 @@
 {
   "name": "@hua-labs/i18n-core-zustand",
   "version": "1.0.0",
-  "description": "Zustand adapter for @hua-labs/i18n-core - 타입 안전한 상태관리 통합",
+  "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -44,6 +44,15 @@
     "state-management",
     "adapter"
   ],
-  "license": "MIT"
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
 }
 
