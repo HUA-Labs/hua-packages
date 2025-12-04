@@ -20,7 +20,7 @@
     "type-check": "echo 'Skipping type-check for hua-i18n-beginner'"
   },
   "dependencies": {
-    "react": "^19.2.0"
+    "react": "^19.2.1"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",
