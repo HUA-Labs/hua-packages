@@ -1,14 +1,16 @@
 ## 변경 사항
 
-- [x] 의존성 업데이트
+- [x] develop 브랜치를 main으로 머지
+- [x] 의존성 업데이트 및 정리
 - [x] 보안 업데이트
 - [x] 코드 리팩토링
-- [x] 설정 변경
+- [x] Vercel 빌드 오류 수정
+- [x] 문서화 (devlog, 패턴 문서)
 
 ## 브랜치 정보
 
-- **Base 브랜치**: `develop`
-- **Head 브랜치**: `fix/update-dependencies-and-cleanup`
+- **Base 브랜치**: `main`
+- **Head 브랜치**: `release/2025-12-04`
 
 ## Breaking Changes
 
@@ -16,9 +18,16 @@
 
 ## 변경 이유
 
-보안 취약점 해결을 위해 Next.js와 React 버전을 업데이트하고, ESLint 9 호환성을 위해 린트 패키지를 업데이트했습니다. 또한 사용하지 않는 패키지 38개를 제거하여 프로젝트를 정리했습니다.
+develop 브랜치의 모든 변경 사항을 main 브랜치로 통합합니다. 주요 변경 사항은 다음과 같습니다:
 
-## 변경 내용 상세
+1. **의존성 업데이트**: Next.js 16.0.7, React 19.2.1로 업데이트
+2. **보안 취약점 수정**: 최신 버전으로 업데이트하여 보안 취약점 해결
+3. **패키지 정리**: 사용하지 않는 패키지 38개 제거
+4. **린트 도구 업데이트**: ESLint 9 호환성을 위한 패키지 업데이트
+5. **bcrypt 마이그레이션**: bcryptjs에서 bcrypt로 마이그레이션 (성능 및 유지보수성 향상)
+6. **Vercel 빌드 오류 수정**: Supabase 클라이언트 lazy initialization 패턴 적용
+
+## 주요 변경 내용
 
 ### 1. 보안 업데이트
 
@@ -53,83 +62,70 @@
 #### YAML 패키지 통일
 - **js-yaml → yaml**: `loadEmotionWords.ts`에서 yaml 패키지로 통일
 - `@types/js-yaml` 제거 (더 이상 필요 없음)
-- 다른 파일들은 이미 yaml 패키지 사용 중
 
 #### 추가 패키지
 - **swagger-ui-react**: my-api에 추가 (API 문서화용)
 
-### 4. 사용하지 않는 패키지 제거 (총 38개)
+### 4. bcrypt 마이그레이션
+
+- `bcryptjs` → `bcrypt` (네이티브 모듈, 성능 향상)
+- 빌드 환경 설정 (로컬, GitHub Actions, Vercel)
+- 기존 해시와 완전 호환
+
+### 5. 사용하지 않는 패키지 제거 (총 38개)
 
 #### my-app (8개)
-- `@supabase/supabase-js` - 코드에서 사용 안 함
-- `@heroicons/react` - 코드에서 사용 안 함
-- `@phosphor-icons/react` - 코드에서 사용 안 함
-- `@radix-ui/react-slot` - 코드에서 사용 안 함
-- `@tailwindcss/typography` - 코드에서 사용 안 함
-- `browser-image-compression` - 코드에서 사용 안 함
-- `baseline-browser-mapping` - 경고만 발생, 실제 사용 안 함
-- `@eslint/eslintrc` - 사용 안 함
+- `@supabase/supabase-js`, `@heroicons/react`, `@phosphor-icons/react`, `@radix-ui/react-slot`, `@tailwindcss/typography`, `browser-image-compression`, `baseline-browser-mapping`, `@eslint/eslintrc`
 
 #### my-api (6개)
-- `socket.io` - 코드에서 사용 안 함
-- `socket.io-client` - 코드에서 사용 안 함
-- `framer-motion` - 코드에서 사용 안 함
-- `next-themes` - 코드에서 사용 안 함
-- `@tailwindcss/typography` - CSS 주석에만 언급
-- `@eslint/eslintrc` - 사용 안 함
+- `socket.io`, `socket.io-client`, `framer-motion`, `next-themes`, `@tailwindcss/typography`, `@eslint/eslintrc`
 
 #### my-chat (4개)
-- `commander` - 코드에서 사용 안 함
-- `ignore-loader` - 코드에서 사용 안 함
-- `@types/js-yaml` - js-yaml 제거로 불필요
-- `tailwindcss-animate` - 코드에서 사용 안 함
+- `commander`, `ignore-loader`, `@types/js-yaml`, `tailwindcss-animate`
 
 #### hua-ui (2개)
-- `@hua-labs/animation` - deprecated 패키지
-- `tailwindcss-animate` - 코드에서 사용 안 함
+- `@hua-labs/animation`, `tailwindcss-animate`
 
 #### hua-motion (1개)
-- `@tailwindcss/typography` - CSS 주석에만 언급, 실제 사용 안 함
+- `@tailwindcss/typography`
 
-### 변경된 파일
+### 6. Vercel 빌드 오류 수정
 
-**앱 (9개)**
-- `apps/my-app/package.json`
-- `apps/my-api/package.json`
-- `apps/my-chat/package.json`
-- `apps/my-chat/src/shared/loadEmotionWords.ts`
-- `apps/hua-ui/package.json`
-- `apps/hua-motion/package.json`
-- `apps/i18n-test/package.json`
-- `apps/hua-demo/web-demo/package.json`
-- `apps/hua-demo/hua-demo-clean/package.json`
-- `hua-email-service/package.json`
+#### 문제
+- 빌드 시점에 모듈이 실행되면서 환경 변수가 없어 `Error: supabaseUrl is required` 오류 발생
 
-**패키지 (10개)**
-- `packages/hua-hooks/package.json`
-- `packages/hua-i18n-core/package.json`
-- `packages/hua-i18n-core-zustand/package.json`
-- `packages/hua-i18n-advanced/package.json`
-- `packages/hua-i18n-ai/package.json`
-- `packages/hua-i18n-beginner/package.json`
-- `packages/hua-i18n-debug/package.json`
-- `packages/hua-i18n-loaders/package.json`
-- `packages/hua-i18n-plugins/package.json`
-- `packages/hua-i18n-sdk/examples/nextjs-basic/package.json`
-- `packages/hua-motion/package.json`
-- `packages/hua-ui/package.json`
-- `packages/hua-emotion-engine/package.json`
-- `packages/hua-i18n-sdk/package.json`
+#### 해결
+- **Lazy Initialization 패턴**: Supabase 클라이언트를 getter를 사용하여 필요할 때만 초기화
+- **Dynamic Import**: `test-daily-grant/route.ts`에서 static import를 dynamic import로 변경
+- **타입 오류 수정**: Supabase 쿼리 결과에 명시적 타입 어노테이션 추가
 
-**기타**
-- `pnpm-lock.yaml` (의존성 업데이트 반영)
+#### 변경된 파일
+- `apps/my-api/lib/credit-scheduler.ts`
+- `apps/my-api/lib/services/notification-service.ts`
+- `apps/my-api/app/api/admin/test-daily-grant/route.ts`
+- 기타 여러 API 라우트 파일들
+
+### 7. 문서화
+
+#### DevLog 추가
+- `docs/devlogs/DEVLOG_2025-12-04_VERCEL_BUILD_ERROR_FIX.md`: Vercel 빌드 오류 수정 과정 기록
+
+#### 패턴 문서 추가
+- `apps/my-app/docs/patterns/build-time-module-execution.md`: Next.js 빌드 타임 모듈 실행 문제 해결 패턴 문서화
+
+### 빌드 환경 설정
+
+#### 네이티브 모듈 지원
+- `.npmrc`: `ignore-scripts=false` 설정
+- GitHub Actions: build-essential, python3 설치
+- Vercel: 자동 네이티브 모듈 빌드 지원
 
 ## 체크리스트
 
 ### 코드 품질
 - [x] 코드가 프로젝트의 코딩 스타일을 따릅니다
 - [x] 자체 코드 리뷰를 수행했습니다
-- [x] 문서를 업데이트했습니다 (데브로그 추가)
+- [x] 문서를 업데이트했습니다 (devlog, 패턴 문서)
 
 ### 테스트 & 빌드
 - [x] 타입 체크가 통과합니다
@@ -138,6 +134,7 @@
   - ✅ my-api: 성공
   - ✅ my-chat: 성공
   - ✅ hua-i18n-core-zustand: 성공
+- [x] Vercel 빌드가 성공합니다
 - [x] 의존성 설치가 성공합니다 (`pnpm install`)
 
 ## 테스트
@@ -186,13 +183,20 @@ N/A
 
 ## 라벨
 
+- `release` - 프로덕션 배포
 - `chore` - 의존성 업데이트 및 정리
 - `security` - 보안 취약점 수정
 - `dependencies` - 패키지 관리
 - `cleanup` - 사용하지 않는 코드 제거
-- `needs-review` - 리뷰 필요
+- `bugfix` - Vercel 빌드 오류 수정
+- `docs` - 문서화
 
 ## 추가 정보
+
+### 변경 통계
+- develop 브랜치의 모든 커밋 포함
+- 의존성 업데이트 및 정리 작업 반영
+- Vercel 빌드 오류 수정 작업 반영
 
 ### 보안 취약점
 - Next.js 16.0.7: 보안 취약점 수정 포함
@@ -203,24 +207,27 @@ N/A
 - 업데이트된 패키지: 20개
 - 추가된 패키지: 1개 (swagger-ui-react)
 
-### 변경 통계
-- 총 27개 파일 수정
-- 추가: 1,791줄
-- 삭제: 1,450줄
-
 ### 참고 문서
-- [데브로그: 2025-12-04](./docs/devlogs/DEVLOG_2025-12-04_DEPENDENCY_UPDATE_AND_CLEANUP.md)
+- [DevLog: 2025-12-04 Vercel Build Error Fix](./docs/devlogs/DEVLOG_2025-12-04_VERCEL_BUILD_ERROR_FIX.md)
+- [DevLog: 2025-12-04 Dependency Update](./docs/devlogs/DEVLOG_2025-12-04_DEPENDENCY_UPDATE_AND_CLEANUP.md)
+- [Pattern: Build-Time Module Execution](./apps/my-app/docs/patterns/build-time-module-execution.md)
 - [Doppler Sync 가이드](./apps/my-app/DEPLOYMENT.md#방법-1-doppler-sync-권장-)
 
 ### 주의 사항
 
-1. **Zustand 5.x**: API 호환성은 유지되지만, 타입 정의가 약간 변경되었을 수 있습니다. 기존 코드는 정상 작동합니다.
+1. **bcrypt**: 네이티브 모듈이므로 빌드 환경이 올바르게 설정되어야 합니다.
 
-2. **@typescript-eslint 8.x**: ESLint 9와 완전 호환되며, Flat Config를 지원합니다. 기존 설정은 그대로 작동합니다.
+2. **환경 변수**: 배포 시 환경 변수가 올바르게 설정되어 있는지 확인하세요.
 
-3. **제거된 패키지**: 향후 필요할 수 있는 패키지는 다시 추가할 수 있습니다. 필요 시 알려주세요.
+3. **데이터베이스**: Prisma 마이그레이션이 필요할 수 있습니다.
 
-4. **빌드 검증**: 모든 주요 앱의 빌드가 성공적으로 완료되었습니다.
+4. **Zustand 5.x**: API 호환성은 유지되지만, 타입 정의가 약간 변경되었을 수 있습니다. 기존 코드는 정상 작동합니다.
+
+5. **@typescript-eslint 8.x**: ESLint 9와 완전 호환되며, Flat Config를 지원합니다. 기존 설정은 그대로 작동합니다.
+
+6. **제거된 패키지**: 향후 필요할 수 있는 패키지는 다시 추가할 수 있습니다. 필요 시 알려주세요.
+
+7. **빌드 검증**: 모든 주요 앱의 빌드가 성공적으로 완료되었습니다.
 
 ---
 
