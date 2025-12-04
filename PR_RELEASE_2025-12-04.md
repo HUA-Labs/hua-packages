@@ -176,6 +176,28 @@ N/A
 4. **Zustand 5.x**: API 호환성은 유지되지만, 타입 정의가 약간 변경되었을 수 있습니다.
 5. **@typescript-eslint 8.x**: ESLint 9와 완전 호환되며, Flat Config를 지원합니다.
 
+### 코드 리뷰 포인트
+
+#### 1. Bearer Token Handling 일관성
+- 대부분의 라우트에서 `Bearer ` 토큰 형식 검증
+- 일부 라우트는 메시지 형식이 다를 수 있음 (예: 'Unauthorized' vs 'Authorization header required')
+- 401/403 응답은 일관되게 처리됨
+
+#### 2. Supabase Client Memoization
+- `lib/supabase.ts`에서 모듈 레벨 캐시 사용
+- Next.js serverless 환경에서는 각 요청이 별도 인스턴스에서 실행되므로 thread-safe
+- 서비스 키를 사용하므로 사용자별 인증 정보는 `getUser(token)`으로 처리
+
+#### 3. CI/Vercel 변경사항
+- Vercel: `corepack use pnpm@10.24.0` + `corepack pnpm` 사용
+- GitHub Actions: build-essential, python3 설치로 네이티브 모듈 빌드 지원
+- Prisma generate는 각 앱의 build 스크립트에서 처리
+
+#### 4. Native bcrypt 빌드
+- `.npmrc`: `ignore-scripts=false` 설정
+- GitHub Actions: build-essential, python3 설치
+- Vercel: 자동 네이티브 모듈 빌드 지원
+
 ### 참고 문서
 - [DevLog: Vercel Build Error Fix](./docs/devlogs/DEVLOG_2025-12-04_VERCEL_BUILD_ERROR_FIX.md)
 - [DevLog: Dependency Update](./docs/devlogs/DEVLOG_2025-12-04_DEPENDENCY_UPDATE_AND_CLEANUP.md)
