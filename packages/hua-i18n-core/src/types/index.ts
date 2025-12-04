@@ -21,6 +21,8 @@ export interface I18nConfig {
   supportedLanguages: LanguageConfig[];
   namespaces?: string[];
   loadTranslations: (language: string, namespace: string) => Promise<TranslationNamespace>;
+  // SSR에서 전달된 초기 번역 데이터 (네트워크 요청 없이 사용)
+  initialTranslations?: Record<string, Record<string, TranslationNamespace>>;
   // 개발 모드 설정
   debug?: boolean;
   // 번역 키가 없을 때의 동작
@@ -127,6 +129,8 @@ export interface I18nContextType {
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
   // 기존 동기 번역 함수 (하위 호환성)
   tSync: (key: string, namespace?: string, params?: TranslationParams) => string;
+  // 원시 값 가져오기 (배열, 객체 포함)
+  getRawValue: (key: string, language?: string) => unknown;
   isLoading: boolean;
   error: TranslationError | null;
   supportedLanguages: LanguageConfig[];

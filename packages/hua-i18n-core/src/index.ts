@@ -103,6 +103,16 @@ export function createCoreI18n(options?: {
    * 기본값: '/api/translations'
    */
   translationApiPath?: string;
+  /**
+   * SSR에서 전달된 초기 번역 데이터 (네트워크 요청 없이 사용)
+   * 형식: { [language]: { [namespace]: { [key]: value } } }
+   */
+  initialTranslations?: Record<string, Record<string, Record<string, string>>>;
+  /**
+   * 자동 언어 동기화 활성화 여부
+   * 기본값: false (Zustand 어댑터 등 외부에서 직접 처리하는 경우)
+   */
+  autoLanguageSync?: boolean;
 }) {
   const {
     defaultLanguage = 'ko',
@@ -111,7 +121,9 @@ export function createCoreI18n(options?: {
     debug = false,
     loadTranslations,
     translationLoader = 'api',
-    translationApiPath = '/api/translations'
+    translationApiPath = '/api/translations',
+    initialTranslations,
+    autoLanguageSync = false // 기본값 false (Zustand 어댑터 등 외부에서 직접 처리)
   } = options || {};
 
   // API route 기반 로더 (기본값, 권장)
@@ -204,6 +216,7 @@ export function createCoreI18n(options?: {
     loadTranslations: translationLoader === 'custom' && loadTranslations 
       ? loadTranslations 
       : defaultFileLoader,
+    initialTranslations, // SSR 번역 데이터 전달
     debug,
     missingKeyHandler: (key: string, language?: string, namespace?: string) => {
       if (debug) {
@@ -228,7 +241,9 @@ export function createCoreI18n(options?: {
         console.error(`Translation error for ${language}:${namespace}:`, error);
       }
     },
-    autoLanguageSync: true
+    // autoLanguageSync는 기본적으로 false (Zustand 어댑터 등 외부에서 직접 처리하는 경우)
+    // 필요시 options에서 명시적으로 true로 설정 가능
+    autoLanguageSync: options?.autoLanguageSync ?? false
   };
 
   // Provider 컴포넌트 반환

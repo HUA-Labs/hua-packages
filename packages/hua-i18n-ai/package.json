@@ -19,9 +19,13 @@
     "lint": "echo 'Skipping lint for hua-i18n-ai (ESLint 8, needs separate config)'",
     "type-check": "tsc --noEmit"
   },
+  "sideEffects": false,
   "dependencies": {
     "@hua-labs/i18n-core": "workspace:*",
     "openai": "^4.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",
@@ -29,6 +33,7 @@
     "@types/react": "^19.2.7",
     "eslint": "^9.39.1",
     "jest": "^29.0.0",
+    "react": "^19.2.1",
     "typescript": "^5.9.3"
   },
   "keywords": [
