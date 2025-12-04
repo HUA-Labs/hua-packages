@@ -42,7 +42,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.20.0
+          version: 10.24.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -50,8 +50,13 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
+      - name: Install build tools for native modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts=false
 
       - name: Type check
         run: pnpm type-check
@@ -97,7 +102,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.20.0
+          version: 10.24.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -111,7 +116,7 @@ jobs:
           sudo apt-get install -y build-essential python3
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts=false
 
       - name: Build
         run: pnpm build
