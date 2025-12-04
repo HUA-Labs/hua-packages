@@ -28,14 +28,14 @@
     "@hua-labs/i18n-core": "workspace:*"
   },
   "peerDependencies": {
-    "zustand": "^4.0.0",
+    "zustand": "^5.0.0",
     "react": ">=16.8.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.7",
     "typescript": "^5.9.3",
-    "zustand": "^4.0.0"
+    "zustand": "^5.0.8"
   },
   "keywords": [
     "i18n",
