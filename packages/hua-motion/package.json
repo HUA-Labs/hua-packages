@@ -46,7 +46,7 @@
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "test": "jest",
-    "lint": "echo 'Skipping lint for hua-motion (ESLint 8, needs separate config)'",
+    "lint": "eslint . --max-warnings=0",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -54,7 +54,7 @@
     "build:analyze": "pnpm build && pnpm analyze"
   },
   "dependencies": {
-    "react": "^19.2.0"
+    "react": "^19.2.1"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.1.0",
