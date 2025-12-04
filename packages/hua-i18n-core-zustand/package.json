@@ -1,7 +1,7 @@
 {
-  "name": "@hua-labs/i18n-loaders",
-  "version": "0.1.0",
-  "description": "Production-ready loaders, caching, and preloading helpers for @hua-labs/i18n-core.",
+  "name": "@hua-labs/i18n-core-zustand",
+  "version": "1.0.0",
+  "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -20,7 +20,7 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "echo \"No tests defined\"",
-    "lint": "echo 'Skipping lint for hua-i18n-loaders (TypeScript only, linted by tsc)'",
+    "lint": "echo 'Skipping lint for hua-i18n-core-zustand'",
     "type-check": "tsc --noEmit"
   },
   "sideEffects": false,
@@ -28,21 +28,21 @@
     "@hua-labs/i18n-core": "workspace:*"
   },
   "peerDependencies": {
+    "zustand": "^4.0.0",
     "react": ">=16.8.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.7",
-    "eslint": "^8.0.0",
-    "react": "^19.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3",
+    "zustand": "^4.0.0"
   },
   "keywords": [
     "i18n",
     "internationalization",
-    "loader",
-    "preload",
-    "cache"
+    "zustand",
+    "state-management",
+    "adapter"
   ],
   "author": "HUA Labs",
   "license": "MIT",
