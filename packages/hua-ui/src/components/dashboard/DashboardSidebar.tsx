@@ -194,7 +194,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:text-slate-200"
               onClick={() => setIsMobileOpen(true)}
             >
-              <Icon name="sidebar" className="h-4 w-4" />
+              <Icon name="menu" className="h-4 w-4" />
               메뉴
             </button>
             {isMobileOpen && (
