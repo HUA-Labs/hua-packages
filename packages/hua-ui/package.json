@@ -54,7 +54,9 @@
     "analyze": "node scripts/analyze-bundle.js",
     "build:analyze": "pnpm build && pnpm analyze",
     "lint": "echo 'Skipping lint for hua-ui (ESLint 8, needs separate config)'",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate:icon-types": "tsx scripts/generate-icon-types.ts",
+    "generate:icon-snippets": "tsx scripts/generate-icon-snippets.ts"
   },
   "dependencies": {
     "@hua-labs/motion": "workspace:*",

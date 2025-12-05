@@ -15,7 +15,7 @@ import type { LucideIcon } from 'lucide-react'
 // Phosphor Icons - lazy loaded, tree-shakeable
 let PhosphorIcons: any = null
 
-// Icon Provider Type
+// Icon Provider Type (deprecated: IconSet 사용 권장)
 export type IconProvider = 'lucide' | 'phosphor' | 'untitled'
 
 // Icon Provider Configuration
@@ -31,6 +31,7 @@ export interface IconProviderConfig {
  */
 export const PROJECT_ICONS = {
   // Navigation & Layout
+  'home': { lucide: 'Home', phosphor: 'House', untitled: 'home' },
   'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour', untitled: 'layout-dashboard' },
   'folder': { lucide: 'Folder', phosphor: 'Folder', untitled: 'folder' },
   'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'alert-circle' },
@@ -44,29 +45,46 @@ export const PROJECT_ICONS = {
   'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight', untitled: 'chevron-right' },
   'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown', untitled: 'chevron-down' },
   'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp', untitled: 'chevron-up' },
+  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', untitled: 'arrow-left' },
+  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', untitled: 'arrow-right' },
+  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up' },
+  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down' },
   
   // Actions
   'add': { lucide: 'Plus', phosphor: 'Plus', untitled: 'add' },
   'edit': { lucide: 'Edit', phosphor: 'Pencil', untitled: 'edit' },
   'pencil': { lucide: 'Pencil', phosphor: 'Pencil', untitled: 'pencil' },
+  'delete': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash' },
   'trash': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash' },
   'upload': { lucide: 'Upload', phosphor: 'Upload', untitled: 'upload' },
+  'download': { lucide: 'Download', phosphor: 'Download', untitled: 'download' },
   'x': { lucide: 'X', phosphor: 'X', untitled: 'close' },
   'check': { lucide: 'Check', phosphor: 'Check', untitled: 'check' },
   'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', untitled: 'search' },
+  'share': { lucide: 'Share', phosphor: 'Share', untitled: 'share' },
+  'copy': { lucide: 'Copy', phosphor: 'Copy', untitled: 'copy' },
+  'save': { lucide: 'Save', phosphor: 'FloppyDisk', untitled: 'save' },
   
   // Status & Feedback
   'loader': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
   'loader2': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
   'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
   'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
+  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
+  'error': { lucide: 'XCircle', phosphor: 'XCircle', untitled: 'error' },
+  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'warning' },
+  'info': { lucide: 'Info', phosphor: 'Info', untitled: 'info' },
   'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh' },
   'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh' },
   'bell': { lucide: 'Bell', phosphor: 'Bell', untitled: 'bell' },
+  'heart': { lucide: 'Heart', phosphor: 'Heart', untitled: 'heart' },
+  'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star' },
+  'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark', untitled: 'bookmark' },
   
   // User & Auth
   'user': { lucide: 'User', phosphor: 'User', untitled: 'user' },
   'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', untitled: 'user-plus' },
+  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', untitled: 'log-in' },
   'logOut': { lucide: 'LogOut', phosphor: 'SignOut', untitled: 'log-out' },
   'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', untitled: 'chrome' },
   'github': { lucide: 'Github', phosphor: 'GithubLogo', untitled: 'github' },
@@ -76,10 +94,12 @@ export const PROJECT_ICONS = {
   'messageSquare': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
   'message-square': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
   'inbox': { lucide: 'Inbox', phosphor: 'Inbox', untitled: 'inbox' },
-  'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star' },
   'calendar': { lucide: 'Calendar', phosphor: 'Calendar', untitled: 'calendar' },
+  'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus', untitled: 'calendar-plus' },
   'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare', untitled: 'check-square' },
   'clock': { lucide: 'Clock', phosphor: 'Clock', untitled: 'clock' },
+  'book': { lucide: 'Book', phosphor: 'Book', untitled: 'book' },
+  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', untitled: 'book-open' },
   
   // Theme & UI
   'monitor': { lucide: 'Monitor', phosphor: 'Monitor', untitled: 'monitor' },
@@ -89,15 +109,58 @@ export const PROJECT_ICONS = {
   // AI & Features
   'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle', untitled: 'sparkles' },
   'lightbulb': { lucide: 'Lightbulb', phosphor: 'Lightbulb', untitled: 'lightbulb' },
+  'brain': { lucide: 'Brain', phosphor: 'Brain', untitled: 'brain' },
+  'zap': { lucide: 'Zap', phosphor: 'Lightning', untitled: 'zap' },
+  
+  // Data & Analytics
+  'chart': { lucide: 'BarChart3', phosphor: 'ChartBar', untitled: 'chart' },
+  'barChart': { lucide: 'BarChart', phosphor: 'ChartBar', untitled: 'bar-chart' },
+  'trendingUp': { lucide: 'TrendingUp', phosphor: 'TrendUp', untitled: 'trending-up' },
+  'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown', untitled: 'trending-down' },
+  'activity': { lucide: 'Activity', phosphor: 'Activity', untitled: 'activity' },
+  'database': { lucide: 'Database', phosphor: 'Database', untitled: 'database' },
+  
+  // Security
+  'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock' },
+  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', untitled: 'unlock' },
+  'shield': { lucide: 'Shield', phosphor: 'Shield', untitled: 'shield' },
+  'key': { lucide: 'Key', phosphor: 'Key', untitled: 'key' },
+  
+  // Media
+  'play': { lucide: 'Play', phosphor: 'Play', untitled: 'play' },
+  'pause': { lucide: 'Pause', phosphor: 'Pause', untitled: 'pause' },
+  'image': { lucide: 'Image', phosphor: 'Image', untitled: 'image' },
+  'video': { lucide: 'Video', phosphor: 'Video', untitled: 'video' },
+  'camera': { lucide: 'Camera', phosphor: 'Camera', untitled: 'camera' },
+  
+  // Files
+  'fileText': { lucide: 'FileText', phosphor: 'FileText', untitled: 'file-text' },
+  'file': { lucide: 'File', phosphor: 'File', untitled: 'file' },
+  
+  // Navigation
+  'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut', untitled: 'external-link' },
+  'link': { lucide: 'Link', phosphor: 'Link', untitled: 'link' },
+  'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline', untitled: 'more-horizontal' },
+  'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical', untitled: 'more-vertical' },
   
   // Priority
-  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up' },
-  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down' },
   'remove': { lucide: 'Minus', phosphor: 'Minus', untitled: 'remove' },
   
   // Eye (password)
   'eye': { lucide: 'Eye', phosphor: 'Eye', untitled: 'eye' },
   'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', untitled: 'eye-off' },
+  
+  // Emotions
+  'smile': { lucide: 'Smile', phosphor: 'Smiley', untitled: 'smile' },
+  'frown': { lucide: 'Frown', phosphor: 'SmileySad', untitled: 'frown' },
+  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh', untitled: 'meh' },
+  
+  // Social
+  'mail': { lucide: 'Mail', phosphor: 'Envelope', untitled: 'mail' },
+  'phone': { lucide: 'Phone', phosphor: 'Phone', untitled: 'phone' },
+  
+  // Additional
+  'flag': { lucide: 'Flag', phosphor: 'Flag', untitled: 'flag' },
 } as const
 
 /**
@@ -161,6 +224,9 @@ export function getIconFromProvider(
 
 /**
  * Direct icon lookup (fallback for icons not in PROJECT_ICONS)
+ * 
+ * 동적으로 Lucide 아이콘을 가져옵니다.
+ * icons.ts에 없는 아이콘도 사용 가능하도록 합니다.
  */
 function getIconDirect(
   iconName: string,
@@ -168,8 +234,18 @@ function getIconDirect(
 ): LucideIcon | React.ComponentType<any> | null {
   switch (provider) {
     case 'lucide':
+      // icons.ts에 없는 아이콘을 동적으로 찾기
+      // PascalCase 변환 시도
       const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
-      return (LucideIcons as any)[iconName] || (LucideIcons as any)[lucideName] || null
+      // camelCase도 시도
+      const camelCaseName = iconName.replace(/([A-Z])/g, (match, p1) => 
+        match === iconName[0] ? match.toLowerCase() : match
+      )
+      
+      return (LucideIcons as any)[lucideName] || 
+             (LucideIcons as any)[iconName] || 
+             (LucideIcons as any)[camelCaseName] || 
+             null
     
     case 'phosphor':
       if (!PhosphorIcons) {

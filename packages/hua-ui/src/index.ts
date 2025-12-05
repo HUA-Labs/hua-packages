@@ -3,7 +3,8 @@ export { Button } from './components/Button';
 export { Action } from './components/Action';
 export { Input } from './components/Input';
 export { Link } from './components/Link';
-export { Icon } from './components/Icon';
+export { Icon, EmotionIcon, StatusIcon, LoadingIcon, SuccessIcon, ErrorIcon } from './components/Icon';
+export type { IconProps } from './components/Icon';
 export { Avatar, AvatarImage, AvatarFallback } from './components/Avatar';
 export { Modal } from './components/Modal';
 export { FeatureCard } from './components/FeatureCard';
@@ -17,6 +18,8 @@ export { Stack } from './components/Stack';
 export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
 export { Panel } from './components/Panel';
+export { ActionToolbar } from './components/ActionToolbar';
+export type { ActionToolbarProps, ActionButton } from './components/ActionToolbar';
 
 // UI Components - Dashboard
 export {
@@ -156,6 +159,13 @@ export { useTheme } from './components/ThemeProvider';
 // Icons and Types
 export { iconCategories, emotionIcons, statusIcons } from './lib/icons';
 export type { IconName } from './lib/icons';
+export { iconNames, iconProviderMapping, isValidIconName, getIconNameForProvider } from './lib/icon-names';
+export type { ProjectIconName, AllIconName } from './lib/icon-names';
+export { ICON_ALIASES, resolveIconAlias, getIconAliases } from './lib/icon-aliases';
+export { IconProvider, useIconContext } from './components/Icon';
+export type { IconProviderProps } from './components/Icon';
+export type { IconSet, PhosphorWeight, IconConfig } from './components/Icon';
+export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
 
 // Utilities
 export { merge, mergeIf, mergeMap, cn } from './lib/utils';
