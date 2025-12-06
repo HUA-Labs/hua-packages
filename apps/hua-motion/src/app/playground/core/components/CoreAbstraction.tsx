@@ -9,7 +9,7 @@ import {
   useFadeIn,
   useSlideUp,
   useScaleIn
-} from '@hua-labs/motion'
+} from '@hua-labs/motion-core'
 
 export function CoreAbstraction() {
   const [activeDemo, setActiveDemo] = useState<'simple' | 'page' | 'smart' | 'basic'>('simple')

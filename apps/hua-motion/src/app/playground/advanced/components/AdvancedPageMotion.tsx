@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { usePageMotions } from '@hua-labs/motion'
+import { usePageMotions } from '@hua-labs/motion-core'
 import { 
   Button, 
   Card, 

@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Icon, Action, Panel } from '@hua-labs/ui'
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 
 export default function HeroSection() {
   // 스마트 모션

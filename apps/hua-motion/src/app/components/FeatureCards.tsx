@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Icon, Action, Panel } from '@hua-labs/ui'
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 
 export default function FeatureCards() {
   const featuresRef = useSmartMotion({ 

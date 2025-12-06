@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Icon, Drawer, DrawerHeader, DrawerContent, Action, ThemeToggle } from '@hua-labs/ui'
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 
 export default function Header() {
   const pathname = usePathname()
