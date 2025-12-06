@@ -26,17 +26,21 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
   const [opacity, setOpacity] = useState(autoStart ? 0 : 1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(autoStart ? false : true)
+  const [progress, setProgress] = useState(0)
 
   const start = useCallback(() => {
     setIsAnimating(true)
     setScale(0)
     setOpacity(0)
+    setProgress(0)
 
     setTimeout(() => {
+      setProgress(0.5)
       setScale(1 + intensity)
       setOpacity(1)
       
       setTimeout(() => {
+        setProgress(1)
         setScale(1)
         setIsVisible(true)
         setIsAnimating(false)
@@ -48,6 +52,7 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     // 즉시 초기 상태로 복원 (모션 없이)
     setScale(0)
     setOpacity(0)
+    setProgress(0)
     setIsVisible(false)
     setIsAnimating(false)
     
@@ -91,6 +96,7 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     style,
+    progress,
     start,
     reset,
     stop
