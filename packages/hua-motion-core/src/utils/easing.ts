@@ -199,11 +199,15 @@ export function getEasing(easingName: unknown): EasingFunction {
 
     const fallback = fallbackMap[easingName]
     if (fallback && fallback in easing) {
-      console.warn(`[HUA Motion] Unknown easing "${easingName}", using fallback "${fallback}".`)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[HUA Motion] Unknown easing "${easingName}", using fallback "${fallback}".`)
+      }
       return easing[fallback]
     }
 
-    console.warn(`[HUA Motion] Unknown easing "${easingName}", using default "easeOut".`)
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[HUA Motion] Unknown easing "${easingName}", using default "easeOut".`)
+    }
   }
 
   return easeOut
@@ -221,7 +225,9 @@ export function safeApplyEasing(t: number, easingName: unknown): number {
     const easingFn = getEasing(easingName)
     return easingFn(t)
   } catch (err) {
-    console.error(`[HUA Motion] Failed to apply easing "${easingName}":`, err)
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`[HUA Motion] Failed to apply easing "${easingName}":`, err)
+    }
     return easeOut(t)
   }
 }
