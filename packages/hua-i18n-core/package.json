@@ -17,8 +17,8 @@
     }
   },
   "scripts": {
-    "build": "node node_modules/tsup/dist/cli.mjs",
-    "dev": "node node_modules/tsup/dist/cli.mjs --watch",
+    "build": "node ../../node_modules/tsup/dist/cli.mjs",
+    "dev": "node ../../node_modules/tsup/dist/cli.mjs --watch",
     "clean": "rm -rf dist",
     "test": "jest",
     "lint": "echo 'Skipping lint for hua-i18n-core (ESLint 8, needs separate config)'",
