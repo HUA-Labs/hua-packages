@@ -16,8 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node_modules/.bin/tsup",
-    "dev": "node_modules/.bin/tsup --watch",
+    "build": "node node_modules/tsup/dist/cli-default.js",
+    "dev": "node node_modules/tsup/dist/cli-default.js --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
