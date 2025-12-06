@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "HUA Labs - Core i18n functionality with SSR/CSR support and state management integration",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
@@ -12,13 +11,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.js"
     }
   },
   "scripts": {
-    "build": "node node_modules/tsup/dist/cli-default.js",
-    "dev": "node node_modules/tsup/dist/cli-default.js --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "jest",
     "lint": "echo 'Skipping lint for hua-i18n-core (ESLint 8, needs separate config)'",
@@ -33,7 +32,6 @@
     "eslint": "^9.39.1",
     "jest": "^29.0.0",
     "react": "^19.2.1",
-    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
