@@ -9,7 +9,7 @@ import {
   Breadcrumb, 
   BreadcrumbItem
 } from '@hua-labs/ui'
-import { useFadeIn, useSlideUp } from '@hua-labs/motion'
+import { useFadeIn, useSlideUp } from '@hua-labs/motion-core'
 import PageHeader from '../components/PageHeader'
  
 

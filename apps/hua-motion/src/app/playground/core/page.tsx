@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Icon, Tabs, TabsContent, TabsList, TabsTrigger, Panel, Breadcrumb, BreadcrumbItem } from '@hua-labs/ui'
-import { useFadeIn, useSlideUp } from '@hua-labs/motion'
+import { useFadeIn, useSlideUp } from '@hua-labs/motion-core'
 import PageHeader from '@/app/components/PageHeader'
 import { CoreAbstraction } from './components/CoreAbstraction'
 import { CorePage } from './components/CorePage'

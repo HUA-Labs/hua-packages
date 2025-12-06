@@ -9,7 +9,7 @@ import {
   useSlideUp,
   useScaleIn,
   useBounceIn
-} from '@hua-labs/motion'
+} from '@hua-labs/motion-core'
 import { Icon, Button, Action, Panel, Tabs, TabsList, TabsTrigger, TabsContent, Breadcrumb, BreadcrumbItem } from '@hua-labs/ui'
 import PerformanceMonitor from '../components/PerformanceMonitor'
 import PageHeader from '../components/PageHeader'
