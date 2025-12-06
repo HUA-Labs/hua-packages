@@ -1,13 +1,24 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import type { IconName } from '../lib/icons';
 import { merge } from '../lib/utils';
 
 /**
- * 액션 버튼 정의
+ * ActionButton 인터페이스
+ * @typedef {Object} ActionButton
+ * @property {string} label - 버튼 라벨 (데스크톱)
+ * @property {string} [labelMobile] - 버튼 라벨 (모바일, 없으면 label 사용)
+ * @property {IconName} [icon] - 버튼 아이콘
+ * @property {() => void} onClick - 클릭 핸들러
+ * @property {boolean} [disabled] - 비활성화 여부
+ * @property {'default' | 'outline' | 'destructive' | 'ghost'} [variant='outline'] - 버튼 스타일
+ * @property {Object} [badge] - 배지 정보
+ * @property {number} badge.count - 배지 숫자
+ * @property {'blue' | 'red' | 'gray' | 'green'} [badge.color='gray'] - 배지 색상
+ * @property {string} [className] - 추가 CSS 클래스
  */
 export interface ActionButton {
   label: string;
@@ -24,7 +35,18 @@ export interface ActionButton {
 }
 
 /**
- * ActionToolbar Props
+ * ActionToolbar 컴포넌트의 props / ActionToolbar component props
+ * @typedef {Object} ActionToolbarProps
+ * @property {boolean} [isSelectMode=false] - 선택 모드 활성화 여부 / Enable select mode
+ * @property {number} [totalCount=0] - 전체 항목 개수 / Total item count
+ * @property {number} [selectedCount=0] - 선택된 항목 개수 / Selected item count
+ * @property {ActionButton[]} [actions=[]] - 일반 모드 액션 버튼들 / Normal mode action buttons
+ * @property {ActionButton[]} [selectModeActions=[]] - 선택 모드 액션 버튼들 / Select mode action buttons
+ * @property {() => void} [onToggleSelectMode] - 선택 모드 토글 함수 / Toggle select mode function
+ * @property {() => void} [onToggleSelectAll] - 전체 선택/해제 함수 / Toggle select all function
+ * @property {() => void} [onCancelSelect] - 선택 모드 취소 함수 / Cancel select mode function
+ * @property {boolean} [loading=false] - 로딩 상태 / Loading state
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 선택 모드 활성화 여부 */
@@ -48,12 +70,19 @@ export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement>
 }
 
 /**
- * 범용 액션 툴바 컴포넌트
+ * ActionToolbar 컴포넌트 / ActionToolbar component
  * 
- * 알림, 로그 관리, 대시보드 등에서 재사용 가능한 액션 버튼 영역
- * 선택 모드, 일괄 액션, 반응형 레이아웃 지원
+ * 범용 액션 툴바 컴포넌트입니다.
+ * 알림, 로그 관리, 대시보드 등에서 재사용 가능한 액션 버튼 영역을 제공합니다.
+ * 선택 모드, 일괄 액션, 반응형 레이아웃을 지원합니다.
  * 
+ * Universal action toolbar component.
+ * Provides reusable action button area for notifications, log management, dashboard, etc.
+ * Supports select mode, batch actions, and responsive layout.
+ * 
+ * @component
  * @example
+ * // 기본 사용 / Basic usage
  * ```tsx
  * <ActionToolbar
  *   isSelectMode={isSelectMode}
@@ -87,8 +116,12 @@ export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement>
  *   }}
  * />
  * ```
+ * 
+ * @param {ActionToolbarProps} props - ActionToolbar 컴포넌트의 props / ActionToolbar component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ActionToolbar 컴포넌트 / ActionToolbar component
  */
-export const ActionToolbar = React.forwardRef<HTMLDivElement, ActionToolbarProps>(
+const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarProps>(
   (
     {
       isSelectMode = false,
@@ -105,7 +138,7 @@ export const ActionToolbar = React.forwardRef<HTMLDivElement, ActionToolbarProps
     },
     ref
   ) => {
-    const getBadgeColor = (color?: string) => {
+    const getBadgeColor = useCallback((color?: string) => {
       switch (color) {
         case 'red':
           return 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
@@ -117,9 +150,9 @@ export const ActionToolbar = React.forwardRef<HTMLDivElement, ActionToolbarProps
         default:
           return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
       }
-    };
+    }, []);
 
-    const renderButton = (action: ActionButton, key: string) => (
+    const renderButton = useCallback((action: ActionButton, key: string) => (
       <Button
         key={key}
         variant={action.variant || 'outline'}
@@ -137,7 +170,7 @@ export const ActionToolbar = React.forwardRef<HTMLDivElement, ActionToolbarProps
           </span>
         )}
       </Button>
-    );
+    ), [getBadgeColor, loading]);
 
     return (
       <div
@@ -213,5 +246,7 @@ export const ActionToolbar = React.forwardRef<HTMLDivElement, ActionToolbarProps
   }
 );
 
-ActionToolbar.displayName = 'ActionToolbar';
+ActionToolbarComponent.displayName = 'ActionToolbar';
+
+export const ActionToolbar = React.memo(ActionToolbarComponent);
 

@@ -13,13 +13,16 @@ import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // Phosphor Icons - lazy loaded, tree-shakeable
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
 
 // Icon Provider Type (deprecated: IconSet 사용 권장)
+// @deprecated Use IconSet from './components/Icon/icon-store' instead
 export type IconProvider = 'lucide' | 'phosphor' | 'untitled'
 
 // Icon Provider Configuration
 export interface IconProviderConfig {
+  /** @deprecated Use IconSet from './components/Icon/icon-store' instead */
   provider: IconProvider
   prefix?: string
 }
@@ -119,6 +122,9 @@ export const PROJECT_ICONS = {
   'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown', untitled: 'trending-down' },
   'activity': { lucide: 'Activity', phosphor: 'Activity', untitled: 'activity' },
   'database': { lucide: 'Database', phosphor: 'Database', untitled: 'database' },
+  'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
+  'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
+  'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'currency' },
   
   // Security
   'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock' },
@@ -188,11 +194,15 @@ export async function initPhosphorIcons() {
 /**
  * Get icon from provider
  * Only resolves icons that are in PROJECT_ICONS for optimal bundle size
+ * 
+ * @param iconName - 아이콘 이름 / Icon name
+ * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @returns 아이콘 컴포넌트 또는 null / Icon component or null
  */
 export function getIconFromProvider(
   iconName: string,
-  provider: IconProvider = 'lucide'
-): LucideIcon | React.ComponentType<any> | null {
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' = 'lucide'
+): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   // Check if icon is in project icon list
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
   
@@ -205,13 +215,13 @@ export function getIconFromProvider(
   
   switch (provider) {
     case 'lucide':
-      return (LucideIcons as any)[mappedName] || null
+      return (LucideIcons as unknown as Record<string, LucideIcon>)[mappedName] || null
     
     case 'phosphor':
       if (!PhosphorIcons) {
         return null
       }
-      return (PhosphorIcons as any)?.[mappedName] || null
+      return PhosphorIcons?.[mappedName] || null
     
     case 'untitled':
       // Untitled Icons are SVG-based, handled separately
@@ -227,11 +237,18 @@ export function getIconFromProvider(
  * 
  * 동적으로 Lucide 아이콘을 가져옵니다.
  * icons.ts에 없는 아이콘도 사용 가능하도록 합니다.
+ * 
+ * Dynamically loads Lucide icons.
+ * Allows using icons not in icons.ts.
+ * 
+ * @param iconName - 아이콘 이름 / Icon name
+ * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @returns 아이콘 컴포넌트 또는 null / Icon component or null
  */
 function getIconDirect(
   iconName: string,
-  provider: IconProvider
-): LucideIcon | React.ComponentType<any> | null {
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled'
+): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   switch (provider) {
     case 'lucide':
       // icons.ts에 없는 아이콘을 동적으로 찾기
@@ -242,9 +259,9 @@ function getIconDirect(
         match === iconName[0] ? match.toLowerCase() : match
       )
       
-      return (LucideIcons as any)[lucideName] || 
-             (LucideIcons as any)[iconName] || 
-             (LucideIcons as any)[camelCaseName] || 
+      return (LucideIcons as unknown as Record<string, LucideIcon>)[lucideName] || 
+             (LucideIcons as unknown as Record<string, LucideIcon>)[iconName] || 
+             (LucideIcons as unknown as Record<string, LucideIcon>)[camelCaseName] || 
              null
     
     case 'phosphor':
@@ -256,9 +273,9 @@ function getIconDirect(
         .split(/(?=[A-Z])/)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join('')
-      return (PhosphorIcons as any)?.[phosphorName1] || 
-             (PhosphorIcons as any)?.[phosphorName2] ||
-             (PhosphorIcons as any)?.[iconName] ||
+      return PhosphorIcons?.[phosphorName1] || 
+             PhosphorIcons?.[phosphorName2] ||
+             PhosphorIcons?.[iconName] ||
              null
     
     case 'untitled':
@@ -271,10 +288,17 @@ function getIconDirect(
 
 /**
  * Get icon name for provider
+ * 
+ * 프로바이더별 아이콘 이름을 가져옵니다.
+ * Gets icon name for the specified provider.
+ * 
+ * @param iconName - 아이콘 이름 / Icon name
+ * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @returns 프로바이더별 아이콘 이름 / Icon name for provider
  */
 export function getIconNameForProvider(
   iconName: string,
-  provider: IconProvider
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled'
 ): string {
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
   if (iconMapping && iconMapping[provider]) {

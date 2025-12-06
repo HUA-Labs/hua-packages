@@ -2,9 +2,20 @@
 
 import React from "react"
 import { createContext, useContext, useState, useCallback } from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
-// Toast 타입 정의
+/**
+ * Toast 메시지 타입 / Toast message type
+ * @typedef {Object} Toast
+ * @property {string} id - Toast 고유 ID / Toast unique ID
+ * @property {"success" | "error" | "warning" | "info"} type - Toast 타입 / Toast type
+ * @property {string} [title] - Toast 제목 / Toast title
+ * @property {string} message - Toast 메시지 / Toast message
+ * @property {number} [duration] - 표시 시간(ms), 0이면 자동 제거 안 함 / Display duration (ms), 0 means no auto-remove
+ * @property {Object} [action] - 액션 버튼 / Action button
+ * @property {string} action.label - 액션 버튼 레이블 / Action button label
+ * @property {() => void} action.onClick - 액션 버튼 클릭 핸들러 / Action button click handler
+ */
 export interface Toast {
   id: string
   type: "success" | "error" | "warning" | "info"
@@ -28,7 +39,27 @@ interface ToastContextType {
 // Toast Context 생성
 const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
-// Toast Hook
+/**
+ * useToast Hook
+ * 
+ * Toast를 추가, 제거, 초기화하는 훅입니다.
+ * ToastProvider 내부에서만 사용 가능합니다.
+ * 
+ * Hook for adding, removing, and clearing toasts.
+ * Can only be used within ToastProvider.
+ * 
+ * @example
+ * const { addToast, removeToast, clearToasts } = useToast()
+ * 
+ * addToast({
+ *   type: "success",
+ *   message: "저장되었습니다",
+ *   duration: 3000
+ * })
+ * 
+ * @returns {ToastContextType} Toast 컨텍스트 값 / Toast context value
+ * @throws {Error} ToastProvider 외부에서 사용 시 에러 발생 / Error when used outside ToastProvider
+ */
 export function useToast() {
   const context = useContext(ToastContext)
   if (!context) {
@@ -37,14 +68,53 @@ export function useToast() {
   return context
 }
 
-// Toast Provider Props
+/**
+ * ToastProvider 컴포넌트의 props / ToastProvider component props
+ * @typedef {Object} ToastProviderProps
+ * @property {React.ReactNode} children - 자식 컴포넌트 / Child components
+ * @property {number} [maxToasts=5] - 최대 Toast 개수 / Maximum number of toasts
+ * @property {"top-right" | "top-left" | "bottom-right" | "bottom-left" | "top-center" | "bottom-center"} [position="top-right"] - Toast 표시 위치 / Toast display position
+ */
 interface ToastProviderProps {
   children: React.ReactNode
   maxToasts?: number
   position?: "top-right" | "top-left" | "bottom-right" | "bottom-left" | "top-center" | "bottom-center"
 }
 
-// Toast Provider
+/**
+ * ToastProvider 컴포넌트 / ToastProvider component
+ * 
+ * Toast 시스템의 컨텍스트를 제공하는 Provider 컴포넌트입니다.
+ * 앱의 루트 레벨에서 사용하여 전역 Toast 기능을 활성화합니다.
+ * 
+ * Provider component that provides context for the Toast system.
+ * Use at the root level of your app to enable global Toast functionality.
+ * 
+ * @component
+ * @example
+ * // App.tsx
+ * <ToastProvider position="top-center" maxToasts={3}>
+ *   <App />
+ * </ToastProvider>
+ * 
+ * @example
+ * // 컴포넌트에서 사용 / Usage in component
+ * const { addToast } = useToast()
+ * 
+ * const handleSave = () => {
+ *   addToast({
+ *     type: "success",
+ *     message: "저장되었습니다",
+ *     title: "성공"
+ *   })
+ * }
+ * 
+ * @param {ToastProviderProps} props - ToastProvider 컴포넌트의 props / ToastProvider component props
+ * @returns {JSX.Element} ToastProvider 컴포넌트 / ToastProvider component
+ * 
+ * @todo 접근성 개선: ToastItem에 role="alert" 또는 role="status" 추가 필요 / Accessibility: Add role="alert" or role="status" to ToastItem
+ * @todo 접근성 개선: aria-live="polite" 또는 aria-live="assertive" 추가 필요 / Accessibility: Add aria-live="polite" or aria-live="assertive"
+ */
 export function ToastProvider({ 
   children, 
   maxToasts = 5,
@@ -106,7 +176,7 @@ function ToastContainer({ toasts, removeToast, position }: ToastContainerProps) 
   if (toasts.length === 0) return null
 
   return (
-    <div className={cn(
+    <div className={merge(
       "fixed z-50 space-y-3 max-w-sm", // 12px 간격
       positionClasses[position as keyof typeof positionClasses]
     )}>
@@ -193,7 +263,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
 
   return (
     <div
-      className={cn(
+      className={merge(
         "flex items-start p-4 rounded-xl border shadow-lg backdrop-blur-sm transition-all duration-300 transform",
         getToastStyles(toast.type),
         isVisible 
@@ -205,7 +275,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       }}
     >
       {/* 아이콘 */}
-      <div className={cn("flex-shrink-0 mr-3", getIconStyles(toast.type))}> {/* 12px 여백 */}
+      <div className={merge("flex-shrink-0 mr-3", getIconStyles(toast.type))}> {/* 12px 여백 */}
         {getToastIcon(toast.type)}
       </div>
 
@@ -235,7 +305,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       <div className="flex-shrink-0 ml-4"> {/* 16px 여백 */}
         <button
           onClick={handleRemove}
-          className={cn(
+          className={merge(
             "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5",
             getIconStyles(toast.type)
           )}

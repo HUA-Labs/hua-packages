@@ -3,6 +3,14 @@
 import React from "react";
 import { merge } from "../../lib/utils";
 
+/**
+ * BarChartData 인터페이스 / BarChartData interface
+ * @typedef {Object} BarChartData
+ * @property {string} label - 막대 라벨 / Bar label
+ * @property {number} value - 막대 값 / Bar value
+ * @property {string} [color] - 커스텀 색상 / Custom color
+ * @property {boolean} [highlight] - 강조 표시 여부 / Highlight display
+ */
 export interface BarChartData {
   label: string;
   value: number;
@@ -10,6 +18,21 @@ export interface BarChartData {
   highlight?: boolean;
 }
 
+/**
+ * BarChart 컴포넌트의 props / BarChart component props
+ * @typedef {Object} BarChartProps
+ * @property {BarChartData[]} data - 차트 데이터 배열 / Chart data array
+ * @property {string} [title] - 차트 제목 / Chart title
+ * @property {number} [height=200] - 차트 높이 (px) / Chart height (px)
+ * @property {boolean} [showValues=true] - 값 표시 여부 / Show values
+ * @property {boolean} [showLabels=true] - 라벨 표시 여부 / Show labels
+ * @property {number} [maxValue] - 최대값 (자동 계산 시 생략) / Maximum value (omit for auto-calculation)
+ * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [colorScheme="blue"] - 색상 스킴 / Color scheme
+ * @property {"default" | "gradient"} [variant="gradient"] - 차트 스타일 변형 / Chart style variant
+ * @property {boolean} [showGrid=true] - 그리드 표시 여부 / Show grid
+ * @property {boolean} [showTooltip] - 툴팁 표시 여부 / Show tooltip
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
   data: BarChartData[];
   title?: string;
@@ -66,6 +89,44 @@ const colorSchemes = {
   },
 };
 
+/**
+ * BarChart 컴포넌트
+ * 
+ * 막대 차트를 표시하는 컴포넌트입니다.
+ * 다양한 색상 스킴과 그라디언트 스타일을 지원합니다.
+ * 
+ * Bar chart component that displays data in bar format.
+ * Supports various color schemes and gradient styles.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <BarChart
+ *   data={[
+ *     { label: "월", value: 100 },
+ *     { label: "화", value: 200 },
+ *     { label: "수", value: 150 }
+ *   ]}
+ *   title="주간 매출"
+ * />
+ * 
+ * @example
+ * // 커스텀 색상 및 강조 / Custom color and highlight
+ * <BarChart
+ *   data={[
+ *     { label: "1월", value: 1000, highlight: true },
+ *     { label: "2월", value: 1200 },
+ *     { label: "3월", value: 1500 }
+ *   ]}
+ *   colorScheme="green"
+ *   variant="gradient"
+ *   showTooltip
+ * />
+ * 
+ * @param {BarChartProps} props - BarChart 컴포넌트의 props / BarChart component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} BarChart 컴포넌트 / BarChart component
+ */
 export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
   (
     {
@@ -85,12 +146,29 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
     ref
   ) => {
     const colors = colorSchemes[colorScheme];
-    const max = maxValue || Math.max(...data.map((d) => d.value), 1);
+    
+    // 성능 최적화: max 값 계산을 useMemo로 메모이제이션
+    // Performance optimization: Memoize max value calculation with useMemo
+    const max = React.useMemo(() => {
+      return maxValue || Math.max(...data.map((d) => d.value), 1);
+    }, [maxValue, data]);
+    
+    // 성능 최적화: chartLabel 계산을 useMemo로 메모이제이션
+    // Performance optimization: Memoize chartLabel calculation with useMemo
+    const chartLabel = React.useMemo(() => {
+      return title 
+        ? `${title} 차트 - 총 ${data.length}개 항목, 최대값 ${max.toLocaleString()}`
+        : `막대 그래프 차트 - 총 ${data.length}개 항목, 최대값 ${max.toLocaleString()}`;
+    }, [title, data.length, max]);
+    
     const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
+    const chartId = React.useId();
 
     return (
       <div
         ref={ref}
+        role="img"
+        aria-label={chartLabel}
         className={merge(
           "bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6",
           className
@@ -103,7 +181,7 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
           </h3>
         )}
 
-        <div className="relative" style={{ height: `${height}px` }}>
+        <div className="relative" style={{ height: `${height}px` }} aria-hidden="true">
           {/* 그리드 라인 */}
           {showGrid && (
             <div className="absolute inset-0 flex flex-col justify-between">

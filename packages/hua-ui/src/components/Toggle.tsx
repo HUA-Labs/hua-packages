@@ -1,8 +1,21 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Toggle 컴포넌트의 props / Toggle component props
+ * @typedef {Object} ToggleProps
+ * @property {"default" | "outline" | "filled" | "ghost" | "glass"} [variant="default"] - Toggle 스타일 변형 / Toggle style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - Toggle 크기 / Toggle size
+ * @property {boolean} [pressed] - 제어 모드에서 눌림 상태 / Pressed state in controlled mode
+ * @property {(pressed: boolean) => void} [onPressedChange] - 상태 변경 콜백 / State change callback
+ * @property {string} [label] - Toggle 라벨 텍스트 / Toggle label text
+ * @property {string} [description] - Toggle 설명 텍스트 / Toggle description text
+ * @property {React.ReactNode} [icon] - 아이콘 / Icon
+ * @property {"left" | "right"} [iconPosition="left"] - 아이콘 위치 / Icon position
+ * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'>}
+ */
 export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
   variant?: "default" | "outline" | "filled" | "ghost" | "glass"
   size?: "sm" | "md" | "lg"
@@ -14,6 +27,41 @@ export interface ToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   iconPosition?: "left" | "right"
 }
 
+/**
+ * Toggle 컴포넌트 / Toggle component
+ * 
+ * 눌림 상태를 가지는 토글 버튼 컴포넌트입니다.
+ * Switch와 달리 버튼 형태로 표시되며, 여러 개를 그룹으로 사용할 수 있습니다.
+ * 
+ * Toggle button component with pressed state.
+ * Unlike Switch, displayed as a button and can be used in groups.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Toggle label="알림" />
+ * 
+ * @example
+ * // 제어 모드 / Controlled mode
+ * const [pressed, setPressed] = useState(false)
+ * <Toggle 
+ *   pressed={pressed}
+ *   onPressedChange={setPressed}
+ *   label="다크 모드"
+ *   icon={<Icon name="moon" />}
+ * />
+ * 
+ * @example
+ * // 아이콘만 / Icon only
+ * <Toggle 
+ *   icon={<Icon name="heart" />}
+ *   variant="ghost"
+ * />
+ * 
+ * @param {ToggleProps} props - Toggle 컴포넌트의 props / Toggle component props
+ * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
+ * @returns {JSX.Element} Toggle 컴포넌트 / Toggle component
+ */
 const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
   ({ 
     className, 
@@ -69,7 +117,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         <button
           type="button"
           ref={ref}
-          className={cn(
+          className={merge(
             "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200",
             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",

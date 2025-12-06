@@ -1,10 +1,22 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { merge, formatRelativeTime } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
+/**
+ * NotificationItem 인터페이스
+ * @typedef {Object} NotificationItem
+ * @property {string} id - 알림 고유 ID
+ * @property {string} title - 알림 제목
+ * @property {string} message - 알림 메시지
+ * @property {Date | string} timestamp - 알림 타임스탬프
+ * @property {"info" | "warning" | "error" | "success"} [type] - 알림 타입
+ * @property {IconName | React.ReactNode} [icon] - 아이콘
+ * @property {() => void} [onClick] - 클릭 핸들러
+ * @property {string} [href] - 링크 URL
+ */
 export interface NotificationItem {
   id: string;
   title: string;
@@ -16,6 +28,20 @@ export interface NotificationItem {
   href?: string;
 }
 
+/**
+ * NotificationCard 컴포넌트의 props / NotificationCard component props
+ * @typedef {Object} NotificationCardProps
+ * @property {string} [title="알림 및 공지"] - 카드 제목 / Card title
+ * @property {NotificationItem[]} items - 알림 항목 배열 / Notification items array
+ * @property {string} [emptyMessage="알림이 없습니다."] - 빈 상태 메시지 / Empty state message
+ * @property {number} [maxItems] - 최대 표시 항목 수 / Maximum items to display
+ * @property {() => void} [onViewAll] - 전체 보기 핸들러 / View all handler
+ * @property {string} [viewAllLabel="모든 알림 보기"] - 전체 보기 라벨 / View all label
+ * @property {boolean} [showHeader=true] - 헤더 표시 여부 / Show header
+ * @property {boolean} [showCount=true] - 개수 표시 여부 / Show count
+ * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface NotificationCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   items: NotificationItem[];
@@ -57,6 +83,44 @@ const defaultTypeStyles = {
   dot: "bg-gray-500",
 };
 
+/**
+ * NotificationCard 컴포넌트 / NotificationCard component
+ * 
+ * 알림 목록을 표시하는 카드 컴포넌트입니다.
+ * 여러 알림 항목을 표시하며, 타입별로 다른 스타일을 적용할 수 있습니다.
+ * 
+ * Card component that displays a list of notifications.
+ * Shows multiple notification items and can apply different styles by type.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <NotificationCard
+ *   items={[
+ *     {
+ *       id: "1",
+ *       title: "새 주문",
+ *       message: "주문 #1234가 생성되었습니다",
+ *       timestamp: new Date(),
+ *       type: "success"
+ *     }
+ *   ]}
+ * />
+ * 
+ * @example
+ * // 최대 항목 수 제한 / Maximum items limit
+ * <NotificationCard
+ *   title="최근 알림"
+ *   items={notifications}
+ *   maxItems={5}
+ *   onViewAll={() => navigate("/notifications")}
+ *   showCount
+ * />
+ * 
+ * @param {NotificationCardProps} props - NotificationCard 컴포넌트의 props / NotificationCard component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} NotificationCard 컴포넌트 / NotificationCard component
+ */
 export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCardProps>(
   (
     {
@@ -77,20 +141,6 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
     const displayItems = maxItems ? items.slice(0, maxItems) : items;
     const hasMore = maxItems && items.length > maxItems;
 
-    const formatTimestamp = (timestamp: Date | string): string => {
-      const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
-      const now = new Date();
-      const diff = now.getTime() - date.getTime();
-      const minutes = Math.floor(diff / 60000);
-      const hours = Math.floor(diff / 3600000);
-      const days = Math.floor(diff / 86400000);
-
-      if (minutes < 1) return "방금 전";
-      if (minutes < 60) return `${minutes}분 전`;
-      if (hours < 24) return `${hours}시간 전`;
-      if (days < 7) return `${days}일 전`;
-      return date.toLocaleDateString("ko-KR");
-    };
 
     const getTypeStyles = (type?: NotificationItem["type"]) => {
       if (!type) return defaultTypeStyles;
@@ -149,9 +199,12 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">
                           {item.title}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0">
-                          {formatTimestamp(item.timestamp)}
-                        </span>
+                        <time 
+                          dateTime={item.timestamp instanceof Date ? item.timestamp.toISOString() : typeof item.timestamp === 'string' ? item.timestamp : undefined}
+                          className="text-xs text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0"
+                        >
+                          {formatRelativeTime(item.timestamp)}
+                        </time>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         {item.message}

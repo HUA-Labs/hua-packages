@@ -1,8 +1,20 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Alert 컴포넌트의 props
+ * @typedef {Object} AlertProps
+ * @property {"default" | "success" | "warning" | "error" | "info"} [variant="default"] - Alert 스타일 변형
+ * @property {string} [title] - Alert 제목
+ * @property {string} [description] - Alert 설명
+ * @property {React.ReactNode} [icon] - 커스텀 아이콘
+ * @property {React.ReactNode} [action] - 액션 버튼/요소
+ * @property {boolean} [closable=false] - 닫기 버튼 표시 여부
+ * @property {() => void} [onClose] - 닫기 버튼 클릭 시 호출되는 콜백
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "success" | "warning" | "error" | "info"
   title?: string
@@ -13,6 +25,43 @@ export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void
 }
 
+/**
+ * Alert 컴포넌트 / Alert component
+ * 
+ * 사용자에게 중요한 정보나 경고를 표시하는 컴포넌트입니다.
+ * 다양한 변형(variant)을 지원하며, 아이콘, 제목, 설명, 액션 버튼을 포함할 수 있습니다.
+ * 
+ * Component for displaying important information or warnings to users.
+ * Supports various variants and can include icons, titles, descriptions, and action buttons.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Alert variant="info" title="정보" description="이것은 정보 메시지입니다." />
+ * 
+ * @example
+ * // 닫기 버튼 포함 / With close button
+ * <Alert 
+ *   variant="warning" 
+ *   title="경고" 
+ *   closable 
+ *   onClose={() => console.log('닫기')}
+ * />
+ * 
+ * @example
+ * // 커스텀 아이콘과 액션 / Custom icon and action
+ * <Alert 
+ *   variant="success"
+ *   icon={<Icon name="check" />}
+ *   action={<Button size="sm">확인</Button>}
+ * >
+ *   작업이 완료되었습니다.
+ * </Alert>
+ * 
+ * @param {AlertProps} props - Alert 컴포넌트의 props / Alert component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Alert 컴포넌트 / Alert component
+ */
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ 
     className, 
@@ -90,7 +139,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           "relative rounded-lg border p-4", // 16px 패딩
           getVariantClasses(),
           className
@@ -100,7 +149,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         <div className="flex items-start gap-3"> {/* 12px 간격 */}
           {/* 아이콘 */}
           {(icon || getDefaultIcon()) && (
-            <div className={cn("flex-shrink-0 mt-0.5", getIconClasses())}>
+            <div className={merge("flex-shrink-0 mt-0.5", getIconClasses())}>
               {icon || getDefaultIcon()}
             </div>
           )}
@@ -131,7 +180,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
               {closable && (
                 <button
                   onClick={onClose}
-                  className={cn(
+                  className={merge(
                     "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5",
                     getIconClasses()
                   )}

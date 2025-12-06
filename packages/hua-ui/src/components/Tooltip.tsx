@@ -1,8 +1,19 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Tooltip 컴포넌트의 props / Tooltip component props
+ * @typedef {Object} TooltipProps
+ * @property {string} content - Tooltip 내용 / Tooltip content
+ * @property {React.ReactNode} children - Tooltip이 연결될 요소 / Element to attach tooltip to
+ * @property {"top" | "bottom" | "left" | "right"} [position="top"] - Tooltip 표시 위치 / Tooltip display position
+ * @property {"default" | "light" | "dark"} [variant="default"] - Tooltip 스타일 변형 / Tooltip style variant
+ * @property {number} [delay=300] - Tooltip 표시 지연 시간(ms) / Tooltip display delay (ms)
+ * @property {boolean} [disabled=false] - Tooltip 비활성화 여부 / Disable tooltip
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface TooltipProps extends React.HTMLAttributes<HTMLDivElement> {
   content: string
   children: React.ReactNode
@@ -12,6 +23,42 @@ export interface TooltipProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
 }
 
+/**
+ * Tooltip 컴포넌트 / Tooltip component
+ * 
+ * 호버 시 추가 정보를 표시하는 툴팁 컴포넌트입니다.
+ * 마우스 호버 시 지연 시간 후 표시됩니다.
+ * 
+ * Tooltip component that displays additional information on hover.
+ * Appears after a delay when the mouse hovers over the element.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Tooltip content="이것은 도움말입니다">
+ *   <Button>호버하세요</Button>
+ * </Tooltip>
+ * 
+ * @example
+ * // 다양한 위치 / Different positions
+ * <Tooltip content="위치 변경" position="bottom">
+ *   <Icon name="info" />
+ * </Tooltip>
+ * 
+ * @example
+ * // 커스텀 스타일 / Custom styles
+ * <Tooltip content="라이트 스타일" variant="light" delay={500}>
+ *   <span>호버</span>
+ * </Tooltip>
+ * 
+ * @param {TooltipProps} props - Tooltip 컴포넌트의 props / Tooltip component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Tooltip 컴포넌트 / Tooltip component
+ * 
+ * @todo 접근성 개선: role="tooltip" 추가 필요 / Accessibility: Add role="tooltip"
+ * @todo 접근성 개선: aria-describedby 연결 필요 / Accessibility: Connect aria-describedby
+ * @todo 접근성 개선: 키보드 포커스 시 Tooltip 표시 필요 / Accessibility: Show tooltip on keyboard focus
+ */
 const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   ({ 
     className, 
@@ -122,7 +169,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
     return (
       <div
         ref={ref}
-        className={cn("relative inline-block", className)}
+        className={merge("relative inline-block", className)}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
         {...props}
@@ -132,7 +179,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
         {isVisible && (
           <div
             ref={tooltipRef}
-            className={cn(
+            className={merge(
               "fixed z-50 px-3 py-2 text-sm rounded-lg whitespace-nowrap pointer-events-none", // 12px, 8px 패딩
               getVariantClasses()
             )}
@@ -145,7 +192,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
             {content}
             {/* 화살표 */}
             <div
-              className={cn(
+              className={merge(
                 "absolute w-0 h-0 border-4 border-transparent",
                 getArrowClasses()
               )}

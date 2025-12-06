@@ -1,8 +1,18 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { cn } from '../lib/utils'
+import { merge } from '../lib/utils'
 
+/**
+ * ScrollProgress 컴포넌트의 props / ScrollProgress component props
+ * @typedef {Object} ScrollProgressProps
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {number} [height=2] - 진행률 바 높이 (px) / Progress bar height (px)
+ * @property {'default' | 'primary' | 'secondary' | 'gradient'} [color='gradient'] - 진행률 바 색상 / Progress bar color
+ * @property {'top' | 'bottom'} [position='top'] - 표시 위치 / Display position
+ * @property {boolean} [animated=true] - 애니메이션 활성화 여부 / Enable animation
+ * @property {boolean} [showPercentage=false] - 퍼센트 표시 여부 / Show percentage
+ */
 export interface ScrollProgressProps {
   className?: string
   height?: number
@@ -12,6 +22,33 @@ export interface ScrollProgressProps {
   showPercentage?: boolean
 }
 
+/**
+ * ScrollProgress 컴포넌트 / ScrollProgress component
+ * 
+ * 페이지 스크롤 진행률을 표시하는 컴포넌트입니다.
+ * 페이지 상단 또는 하단에 고정되어 표시됩니다.
+ * 
+ * Component that displays page scroll progress.
+ * Fixed at top or bottom of the page.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ScrollProgress />
+ * 
+ * @example
+ * // 하단에 표시, 퍼센트 포함 / Display at bottom with percentage
+ * <ScrollProgress 
+ *   position="bottom"
+ *   color="primary"
+ *   showPercentage
+ *   height={4}
+ * />
+ * 
+ * @param {ScrollProgressProps} props - ScrollProgress 컴포넌트의 props / ScrollProgress component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ScrollProgress 컴포넌트 / ScrollProgress component
+ */
 const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   className,
   height = 2,
@@ -43,7 +80,8 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
     }
   }, [])
 
-  const colorClasses = {
+  // ScrollProgress는 특정 색상만 사용 (스크롤 진행률 표시 특화)
+  const progressColors: Record<string, string> = {
     default: 'bg-blue-600',
     primary: 'bg-purple-600',
     secondary: 'bg-gray-600',
@@ -58,7 +96,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   return (
     <div
       ref={ref}
-      className={cn(
+      className={merge(
         'fixed z-50',
         positionClasses[position],
         className
@@ -71,9 +109,9 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
       
       {/* 진행률 바 */}
       <div
-        className={cn(
+        className={merge(
           'h-full origin-left transition-all duration-100 ease-out',
-          colorClasses[color]
+          progressColors[color] || progressColors.gradient
         )}
         style={{
           width: `${progress}%`,

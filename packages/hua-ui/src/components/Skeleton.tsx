@@ -1,8 +1,18 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Skeleton 컴포넌트의 props
+ * @typedef {Object} SkeletonProps
+ * @property {"text" | "circular" | "rectangular" | "rounded"} [variant="text"] - Skeleton 모양
+ * @property {string | number} [width] - 너비 (기본값: variant에 따라 다름)
+ * @property {string | number} [height] - 높이 (기본값: variant에 따라 다름)
+ * @property {"pulse" | "wave" | "shimmer"} [animation="pulse"] - 애니메이션 타입
+ * @property {string} [className] - 추가 CSS 클래스
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "text" | "circular" | "rectangular" | "rounded"
   width?: string | number
@@ -11,6 +21,37 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
+/**
+ * Skeleton 컴포넌트 / Skeleton component
+ * 
+ * 로딩 중 콘텐츠의 플레이스홀더를 표시하는 스켈레톤 컴포넌트입니다.
+ * 다양한 모양과 애니메이션을 지원합니다.
+ * 
+ * Skeleton component that displays placeholders for content while loading.
+ * Supports various shapes and animations.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 (텍스트) / Basic usage (text)
+ * <Skeleton />
+ * 
+ * @example
+ * // 원형 아바타 / Circular avatar
+ * <Skeleton variant="circular" width={40} height={40} />
+ * 
+ * @example
+ * // Wave 애니메이션 / Wave animation
+ * <Skeleton 
+ *   variant="rounded" 
+ *   width="100%" 
+ *   height={200}
+ *   animation="wave"
+ * />
+ * 
+ * @param {SkeletonProps} props - Skeleton 컴포넌트의 props / Skeleton component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Skeleton 컴포넌트 / Skeleton component
+ */
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({ 
     className, 
@@ -68,7 +109,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     return (
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           "block",
           getVariantClasses(),
           getAnimationClasses(),
@@ -119,7 +160,7 @@ export const SkeletonCard = React.forwardRef<HTMLDivElement, React.HTMLAttribute
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("space-y-4 p-6", className)} // 16px 간격, 24px 패딩
+      className={merge("space-y-4 p-6", className)} // 16px 간격, 24px 패딩
       {...props}
     >
       <div className="flex items-center space-x-4"> {/* 16px 간격 */}
@@ -144,7 +185,7 @@ export const SkeletonAvatar = React.forwardRef<HTMLDivElement, React.HTMLAttribu
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("flex items-center space-x-4", className)} // 16px 간격
+      className={merge("flex items-center space-x-4", className)} // 16px 간격
       {...props}
     >
       <SkeletonCircle className="w-12 h-12" /> {/* 48px 크기 */}
@@ -161,7 +202,7 @@ export const SkeletonImage = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("space-y-2", className)} // 8px 간격
+      className={merge("space-y-2", className)} // 8px 간격
       {...props}
     >
       <SkeletonRounded className="w-full h-48" /> {/* 192px 높이 */}
@@ -175,7 +216,7 @@ export const SkeletonUserProfile = React.forwardRef<HTMLDivElement, React.HTMLAt
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("space-y-4", className)} // 16px 간격
+      className={merge("space-y-4", className)} // 16px 간격
       {...props}
     >
       <div className="flex items-center space-x-4"> {/* 16px 간격 */}
@@ -198,7 +239,7 @@ export const SkeletonList = React.forwardRef<HTMLDivElement, React.HTMLAttribute
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("space-y-4", className)} // 16px 간격
+      className={merge("space-y-4", className)} // 16px 간격
       {...props}
     >
       {Array.from({ length: 3 }).map((_, index) => (
@@ -219,7 +260,7 @@ export const SkeletonTable = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("space-y-4", className)} // 16px 간격
+      className={merge("space-y-4", className)} // 16px 간격
       {...props}
     >
       {/* 헤더 */}

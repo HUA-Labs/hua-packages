@@ -38,6 +38,7 @@ import {
   Upload,
   RefreshCw,
   Save,
+  Copy,
   
   // Status & Feedback
   Loader2,
@@ -52,6 +53,7 @@ import {
   // User & Auth
   User,
   Users,
+  UserPlus,
   LogIn,
   LogOut,
   Eye,
@@ -144,6 +146,7 @@ export const icons = {
   upload: Upload,
   refresh: RefreshCw,
   save: Save,
+  copy: Copy,
   
   // Status & Feedback
   loader: Loader2,
@@ -159,6 +162,7 @@ export const icons = {
   // User & Auth
   user: User,
   users: Users,
+  userPlus: UserPlus,
   logIn: LogIn,
   logOut: LogOut,
   eye: Eye,
@@ -256,9 +260,9 @@ export const statusIcons = {
 // 아이콘 카테고리별 그룹화 (참고용)
 export const iconCategories = {
   navigation: ['home', 'arrowLeft', 'arrowRight', 'arrowUp', 'arrowDown', 'menu', 'close', 'search', 'settings', 'externalLink', 'chevronLeft', 'chevronRight', 'chevronDown', 'chevronUp'],
-  actions: ['edit', 'delete', 'add', 'remove', 'download', 'upload', 'refresh', 'save'],
+  actions: ['edit', 'delete', 'add', 'remove', 'download', 'upload', 'refresh', 'save', 'copy'],
   status: ['loader', 'success', 'error', 'alertCircle', 'warning', 'info', 'check', 'circle'],
-  user: ['user', 'users', 'logIn', 'logOut', 'eye', 'eyeOff'],
+  user: ['user', 'users', 'userPlus', 'logIn', 'logOut', 'eye', 'eyeOff'],
   data: ['chart', 'barChart', 'trendingUp', 'activity', 'database', 'zap'],
   files: ['fileText', 'file', 'folder', 'book'],
   communication: ['mail', 'message', 'phone'],

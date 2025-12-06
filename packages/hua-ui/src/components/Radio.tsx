@@ -1,8 +1,19 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Radio 컴포넌트의 props / Radio component props
+ * @typedef {Object} RadioProps
+ * @property {"default" | "outline" | "filled" | "glass"} [variant="default"] - Radio 스타일 변형 / Radio style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - Radio 크기 / Radio size
+ * @property {boolean} [error=false] - 에러 상태 표시 / Error state
+ * @property {boolean} [success=false] - 성공 상태 표시 / Success state
+ * @property {string} [label] - 라디오 버튼 레이블 텍스트 / Radio button label text
+ * @property {string} [description] - 라디오 버튼 설명 텍스트 / Radio button description text
+ * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>}
+ */
 export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: "default" | "outline" | "filled" | "glass"
   size?: "sm" | "md" | "lg"
@@ -12,6 +23,37 @@ export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   description?: string
 }
 
+/**
+ * Radio 컴포넌트 / Radio component
+ * 
+ * 라디오 버튼 입력 필드를 제공하는 컴포넌트입니다.
+ * 같은 name 속성을 가진 여러 Radio는 그룹으로 동작합니다.
+ * ARIA 속성을 자동으로 설정하여 접근성을 지원합니다.
+ * 
+ * Radio button input field component.
+ * Multiple Radio components with the same name attribute work as a group.
+ * Automatically sets ARIA attributes for accessibility support.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 (그룹) / Basic usage (group)
+ * <Radio name="option" value="1" label="옵션 1" />
+ * <Radio name="option" value="2" label="옵션 2" />
+ * <Radio name="option" value="3" label="옵션 3" />
+ * 
+ * @example
+ * // 에러 상태 / Error state
+ * <Radio 
+ *   name="gender"
+ *   value="male"
+ *   label="남성"
+ *   error
+ * />
+ * 
+ * @param {RadioProps} props - Radio 컴포넌트의 props / Radio component props
+ * @param {React.Ref<HTMLInputElement>} ref - input 요소 ref / input element ref
+ * @returns {JSX.Element} Radio 컴포넌트 / Radio component
+ */
 const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
   ({ 
     className, 
@@ -21,8 +63,12 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     success = false,
     label,
     description,
+    id,
     ...props 
   }, ref) => {
+    const radioId = id || React.useId()
+    const labelId = label ? `${radioId}-label` : undefined
+    const descriptionId = description ? `${radioId}-description` : undefined
     const sizeClasses = {
       sm: "w-4 h-4",
       md: "w-5 h-5",
@@ -53,15 +99,22 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
         <div className="relative">
           <input
             type="radio"
-            className={cn(
+            id={radioId}
+            className={merge(
               "peer sr-only",
               className
             )}
             ref={ref}
+            aria-checked={props.checked ?? false}
+            aria-invalid={error}
+            aria-label={!label ? props['aria-label'] : undefined}
+            aria-labelledby={label ? labelId : undefined}
+            aria-describedby={descriptionId}
+            role="radio"
             {...props}
           />
           <div
-            className={cn(
+            className={merge(
               "flex items-center justify-center rounded-full border transition-all duration-200 cursor-pointer",
               "peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
@@ -72,7 +125,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
             )}
           >
             <div
-              className={cn(
+              className={merge(
                 "rounded-full bg-blue-600 dark:bg-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity duration-200",
                 dotSizes[size]
               )}
@@ -82,12 +135,12 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
         {(label || description) && (
           <div className="flex flex-col">
             {label && (
-              <label className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+              <label htmlFor={radioId} id={labelId} className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
                 {label}
               </label>
             )}
             {description && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p id={descriptionId} className="text-sm text-gray-500 dark:text-gray-400">
                 {description}
               </p>
             )}
