@@ -15,14 +15,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm exec tsc",
-    "dev": "pnpm exec tsc --watch",
+    "build": "npx tsc",
+    "dev": "npx tsc --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "lint": "echo 'Skipping lint for hua-motion-core (ESLint 8, needs separate config)'",
-    "type-check": "pnpm exec tsc --noEmit"
+    "type-check": "npx tsc --noEmit"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.0.0",
