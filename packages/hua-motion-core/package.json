@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "HUA Motion Core - Essential animation hooks for React developers",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.js"
     }
   },
@@ -16,8 +15,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node node_modules/tsup/dist/cli-default.js",
-    "dev": "node node_modules/tsup/dist/cli-default.js --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -33,7 +32,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
-    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
   },
