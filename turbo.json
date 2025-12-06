@@ -18,18 +18,6 @@
       ],
       "persistent": false
     },
-    "@hua-labs/i18n-core#build": {
-      "command": "pnpm exec tsup",
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/motion-core#build": {
-      "command": "pnpm exec tsup",
-      "outputs": ["dist/**"]
-    },
-    "@hua-platform/hua-emotion-engine#build": {
-      "command": "pnpm exec tsup",
-      "outputs": ["dist/**"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
