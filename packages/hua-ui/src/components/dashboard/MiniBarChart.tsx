@@ -2,7 +2,22 @@
 
 import React from "react";
 import { merge } from "../../lib/utils";
+import type { Color } from "../../lib/types/common";
 
+/**
+ * MiniBarChart 컴포넌트의 props
+ * @typedef {Object} MiniBarChartProps
+ * @property {number[]} data - 차트 데이터 배열
+ * @property {string[]} [labels] - 라벨 배열
+ * @property {number} [maxValue] - 최대값 (자동 계산 시 생략)
+ * @property {number} [height=160] - 차트 높이 (px)
+ * @property {boolean} [showTooltip=true] - 툴팁 표시 여부
+ * @property {boolean} [showStats=true] - 통계 정보 표시 여부
+ * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color="blue"] - 색상
+ * @property {boolean} [highlightToday=true] - 오늘 항목 강조 여부
+ * @property {number} [todayIndex] - 오늘 인덱스 (기본값: 마지막 항목)
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface MiniBarChartProps extends React.HTMLAttributes<HTMLDivElement> {
   data: number[];
   labels?: string[];
@@ -10,12 +25,13 @@ export interface MiniBarChartProps extends React.HTMLAttributes<HTMLDivElement> 
   height?: number;
   showTooltip?: boolean;
   showStats?: boolean;
-  color?: "blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray";
+  color?: Color;
   highlightToday?: boolean;
   todayIndex?: number;
 }
 
-const colorClasses = {
+// 차트 전용 색상 (막대 그래프용 그라데이션)
+const chartColors: Record<Color, { default: string; highlight: string }> = {
   blue: {
     default: "bg-gradient-to-t from-blue-500 to-blue-400",
     highlight: "bg-gradient-to-t from-blue-600 to-blue-500 shadow-lg",
@@ -50,6 +66,37 @@ const colorClasses = {
   },
 };
 
+/**
+ * MiniBarChart 컴포넌트
+ * 
+ * 작은 막대 그래프 차트 컴포넌트입니다.
+ * 간단한 데이터 시각화에 적합하며, 오늘 항목 강조 기능을 제공합니다.
+ * 
+ * Small bar chart component for simple data visualization.
+ * Suitable for compact displays with today's item highlight feature.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <MiniBarChart
+ *   data={[10, 20, 15, 30, 25, 40, 35]}
+ *   labels={["월", "화", "수", "목", "금", "토", "일"]}
+ * />
+ * 
+ * @example
+ * // 커스텀 색상과 통계 / Custom color and stats
+ * <MiniBarChart
+ *   data={dailyData}
+ *   color="purple"
+ *   showStats={true}
+ *   highlightToday={true}
+ *   todayIndex={6}
+ * />
+ * 
+ * @param {MiniBarChartProps} props - MiniBarChart 컴포넌트의 props / MiniBarChart component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} MiniBarChart 컴포넌트 / MiniBarChart component
+ */
 export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
   (
     {
@@ -67,7 +114,7 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
     },
     ref
   ) => {
-    const colors = colorClasses[color];
+    const colors = chartColors[color];
     const calculatedMax = maxValue || Math.max(...data, 1);
     const fixedMax = Math.max(calculatedMax, 10);
     const todayIdx = todayIndex !== undefined ? todayIndex : data.length - 1;
@@ -81,9 +128,16 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
     const average = data.length > 0 ? Math.round(total / data.length) : 0;
     const max = Math.max(...data);
 
+    const chartId = React.useId();
+    const chartLabel = labels && labels.length > 0
+      ? `미니 막대 그래프 - ${labels.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`
+      : `미니 막대 그래프 - ${data.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`;
+
     return (
       <div
         ref={ref}
+        role="img"
+        aria-label={chartLabel}
         className={merge("w-full", className)}
         {...props}
       >

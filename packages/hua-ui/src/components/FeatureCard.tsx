@@ -5,6 +5,19 @@ import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
 
+/**
+ * FeatureCard 컴포넌트의 props / FeatureCard component props
+ * @typedef {Object} FeatureCardProps
+ * @property {IconName | string} [icon] - 아이콘 (IconName 또는 이미지 URL) / Icon (IconName or image URL)
+ * @property {string} title - 카드 제목 / Card title
+ * @property {string} description - 카드 설명 / Card description
+ * @property {"default" | "gradient" | "glass" | "neon"} [variant="default"] - FeatureCard 스타일 변형 / FeatureCard style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - FeatureCard 크기 / FeatureCard size
+ * @property {"scale" | "glow" | "slide" | "none"} [hover="scale"] - 호버 효과 / Hover effect
+ * @property {"blue" | "purple" | "green" | "orange" | "pink" | "custom"} [gradient="blue"] - 그라디언트 색상 / Gradient color
+ * @property {string} [customGradient] - 커스텀 그라디언트 클래스 / Custom gradient class
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: IconName | string
   title: string
@@ -16,6 +29,39 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
   customGradient?: string
 }
 
+/**
+ * FeatureCard 컴포넌트 / FeatureCard component
+ * 
+ * 기능을 소개하는 카드 컴포넌트입니다.
+ * 아이콘, 제목, 설명을 포함하며, 다양한 스타일과 호버 효과를 지원합니다.
+ * 
+ * Card component that introduces features.
+ * Includes icon, title, and description, supports various styles and hover effects.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <FeatureCard
+ *   icon="star"
+ *   title="고급 기능"
+ *   description="강력한 기능을 제공합니다"
+ * />
+ * 
+ * @example
+ * // Gradient 스타일 / Gradient style
+ * <FeatureCard
+ *   icon="zap"
+ *   title="빠른 성능"
+ *   description="최적화된 성능"
+ *   variant="gradient"
+ *   gradient="purple"
+ *   hover="glow"
+ * />
+ * 
+ * @param {FeatureCardProps} props - FeatureCard 컴포넌트의 props / FeatureCard component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} FeatureCard 컴포넌트 / FeatureCard component
+ */
 const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
   ({ 
     className, 

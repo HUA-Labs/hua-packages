@@ -1,6 +1,6 @@
 'use client'
 
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 import { Icon, Button } from '@hua-labs/ui'
 import ShowcasePageLayout from '../../components/ShowcasePageLayout'
 

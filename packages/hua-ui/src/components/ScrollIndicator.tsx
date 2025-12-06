@@ -3,13 +3,29 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from './Button'
 import { Icon } from './Icon'
-import { cn } from '../lib/utils'
+import { merge } from '../lib/utils'
+import type { IconName } from '../lib/icons'
 
+/**
+ * ScrollIndicator 컴포넌트의 props / ScrollIndicator component props
+ * @typedef {Object} ScrollIndicatorProps
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {string} [targetId] - 스크롤 대상 요소 ID / Target element ID to scroll to
+ * @property {string} [text='Scroll down'] - 표시 텍스트 / Display text
+ * @property {IconName} [iconName='arrowDown'] - 아이콘 이름 / Icon name
+ * @property {number} [iconSize=20] - 아이콘 크기 / Icon size
+ * @property {'bottom-center' | 'bottom-left' | 'bottom-right'} [position='bottom-center'] - 표시 위치 / Display position
+ * @property {'default' | 'primary' | 'secondary' | 'outline'} [variant='default'] - ScrollIndicator 스타일 변형 / ScrollIndicator style variant
+ * @property {'sm' | 'md' | 'lg'} [size='md'] - ScrollIndicator 크기 / ScrollIndicator size
+ * @property {boolean} [animated=true] - 애니메이션 활성화 여부 / Enable animation
+ * @property {boolean} [autoHide=true] - 자동 숨김 여부 / Auto hide
+ * @property {number} [hideThreshold=100] - 숨김 임계값 (px) / Hide threshold (px)
+ */
 export interface ScrollIndicatorProps {
   className?: string
   targetId?: string
   text?: string
-  iconName?: string
+  iconName?: IconName
   iconSize?: number
   position?: 'bottom-center' | 'bottom-left' | 'bottom-right'
   variant?: 'default' | 'primary' | 'secondary' | 'outline'
@@ -19,6 +35,32 @@ export interface ScrollIndicatorProps {
   hideThreshold?: number
 }
 
+/**
+ * ScrollIndicator 컴포넌트 / ScrollIndicator component
+ * 
+ * 스크롤 가능함을 나타내는 인디케이터 컴포넌트입니다.
+ * 클릭 시 지정된 요소로 스크롤하거나 다음 섹션으로 스크롤합니다.
+ * 
+ * Indicator component that shows scrollability.
+ * Scrolls to specified element or next section on click.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ScrollIndicator />
+ * 
+ * @example
+ * // 특정 요소로 스크롤 / Scroll to specific element
+ * <ScrollIndicator 
+ *   targetId="section-2"
+ *   text="다음 섹션으로"
+ *   position="bottom-right"
+ * />
+ * 
+ * @param {ScrollIndicatorProps} props - ScrollIndicator 컴포넌트의 props / ScrollIndicator component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ScrollIndicator 컴포넌트 / ScrollIndicator component
+ */
 const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>(({
   className,
   targetId,
@@ -92,7 +134,7 @@ const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>((
   return (
     <div
       ref={ref}
-      className={cn(
+      className={merge(
         'absolute z-10',
         positionClasses[position],
         className
@@ -103,7 +145,7 @@ const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>((
         onClick={scrollToTarget}
         variant="ghost"
         size="sm"
-        className={cn(
+        className={merge(
           'flex flex-col items-center space-y-2 transition-all duration-300',
           sizeClasses[size],
           variantClasses[variant],
@@ -113,9 +155,9 @@ const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>((
       >
         <span className="text-xs opacity-80">{text}</span>
         <Icon
-          name={iconName as any}
+          name={iconName}
           size={iconSize}
-          className={cn(
+          className={merge(
             animated && 'animate-bounce'
           )}
         />

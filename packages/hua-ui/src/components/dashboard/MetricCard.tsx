@@ -1,11 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { merge } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { MiniBarChart } from "./MiniBarChart";
+import { useColorStyles } from "../../lib/styles/colors";
+import { createVariantStyles } from "../../lib/styles/variants";
+import type { Color } from "../../lib/types/common";
 
+/**
+ * MetricCard 컴포넌트의 props / MetricCard component props
+ * @typedef {Object} MetricCardProps
+ * @property {string} title - 카드 제목 / Card title
+ * @property {string | number} value - 메트릭 값 / Metric value
+ * @property {string} [description] - 카드 설명 / Card description
+ * @property {IconName | React.ReactNode} [icon] - 아이콘 / Icon
+ * @property {Object} [trend] - 추세 정보 / Trend information
+ * @property {number} trend.value - 추세 값 / Trend value
+ * @property {string} trend.label - 추세 라벨 / Trend label
+ * @property {boolean} [trend.positive] - 긍정적 추세 여부 / Positive trend
+ * @property {number[]} [chartData] - 차트 데이터 / Chart data
+ * @property {string[]} [chartLabels] - 차트 라벨 / Chart labels
+ * @property {"default" | "gradient" | "outline" | "elevated"} [variant="default"] - 카드 스타일 변형 / Card style variant
+ * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color] - 카드 색상 / Card color
+ * @property {boolean} [loading] - 로딩 상태 / Loading state
+ * @property {boolean} [showChart] - 차트 표시 여부 / Show chart
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
@@ -19,86 +41,46 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   chartData?: number[];
   chartLabels?: string[];
   variant?: "default" | "gradient" | "outline" | "elevated";
-  color?: "blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray";
+  color?: Color;
   loading?: boolean;
   showChart?: boolean;
 }
 
-const colorClasses = {
-  blue: {
-    default: "border-blue-200 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10",
-    gradient: "bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 dark:border-blue-500",
-    outline: "border-2 border-blue-300 dark:border-blue-600 bg-transparent",
-    elevated: "border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
-    badge: "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-    text: "text-blue-600 dark:text-blue-400",
-  },
-  purple: {
-    default: "border-purple-200 dark:border-purple-700 bg-purple-50/50 dark:bg-purple-900/10",
-    gradient: "bg-gradient-to-br from-purple-500 to-purple-600 border-purple-400 dark:border-purple-500",
-    outline: "border-2 border-purple-300 dark:border-purple-600 bg-transparent",
-    elevated: "border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
-    badge: "bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300",
-    text: "text-purple-600 dark:text-purple-400",
-  },
-  green: {
-    default: "border-green-200 dark:border-green-700 bg-green-50/50 dark:bg-green-900/10",
-    gradient: "bg-gradient-to-br from-green-500 to-green-600 border-green-400 dark:border-green-500",
-    outline: "border-2 border-green-300 dark:border-green-600 bg-transparent",
-    elevated: "border-green-200 dark:border-green-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
-    badge: "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-    text: "text-green-600 dark:text-green-400",
-  },
-  orange: {
-    default: "border-orange-200 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-900/10",
-    gradient: "bg-gradient-to-br from-orange-500 to-orange-600 border-orange-400 dark:border-orange-500",
-    outline: "border-2 border-orange-300 dark:border-orange-600 bg-transparent",
-    elevated: "border-orange-200 dark:border-orange-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400",
-    badge: "bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
-    text: "text-orange-600 dark:text-orange-400",
-  },
-  red: {
-    default: "border-red-200 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10",
-    gradient: "bg-gradient-to-br from-red-500 to-red-600 border-red-400 dark:border-red-500",
-    outline: "border-2 border-red-300 dark:border-red-600 bg-transparent",
-    elevated: "border-red-200 dark:border-red-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
-    badge: "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300",
-    text: "text-red-600 dark:text-red-400",
-  },
-  indigo: {
-    default: "border-indigo-200 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-900/10",
-    gradient: "bg-gradient-to-br from-indigo-500 to-indigo-600 border-indigo-400 dark:border-indigo-500",
-    outline: "border-2 border-indigo-300 dark:border-indigo-600 bg-transparent",
-    elevated: "border-indigo-200 dark:border-indigo-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400",
-    badge: "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300",
-    text: "text-indigo-600 dark:text-indigo-400",
-  },
-  pink: {
-    default: "border-pink-200 dark:border-pink-700 bg-pink-50/50 dark:bg-pink-900/10",
-    gradient: "bg-gradient-to-br from-pink-500 to-pink-600 border-pink-400 dark:border-pink-500",
-    outline: "border-2 border-pink-300 dark:border-pink-600 bg-transparent",
-    elevated: "border-pink-200 dark:border-pink-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400",
-    badge: "bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300",
-    text: "text-pink-600 dark:text-pink-400",
-  },
-  gray: {
-    default: "border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/10",
-    gradient: "bg-gradient-to-br from-gray-500 to-gray-600 border-gray-400 dark:border-gray-500",
-    outline: "border-2 border-gray-300 dark:border-gray-600 bg-transparent",
-    elevated: "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg",
-    icon: "bg-gray-100 dark:bg-gray-900/30 text-gray-600 dark:text-gray-400",
-    badge: "bg-gray-50 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300",
-    text: "text-gray-600 dark:text-gray-400",
-  },
-};
 
+/**
+ * MetricCard 컴포넌트 / MetricCard component
+ * 
+ * 메트릭 정보를 표시하는 카드 컴포넌트입니다.
+ * StatCard와 유사하지만 차트 데이터를 포함할 수 있습니다.
+ * 
+ * Card component that displays metric information.
+ * Similar to StatCard but can include chart data.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <MetricCard
+ *   title="페이지뷰"
+ *   value="10,234"
+ *   description="오늘"
+ *   icon="eye"
+ * />
+ * 
+ * @example
+ * // 차트 포함 / With chart
+ * <MetricCard
+ *   title="방문자"
+ *   value="5,678"
+ *   chartData={[100, 200, 150, 300, 250]}
+ *   chartLabels={["월", "화", "수", "목", "금"]}
+ *   showChart
+ *   color="blue"
+ * />
+ * 
+ * @param {MetricCardProps} props - MetricCard 컴포넌트의 props / MetricCard component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} MetricCard 컴포넌트 / MetricCard component
+ */
 export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
   (
     {
@@ -118,16 +100,20 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
     },
     ref
   ) => {
-    const colors = colorClasses[color];
+    // 공통 색상 시스템 사용
+    const colorStyles = useColorStyles(color);
     const isGradient = variant === "gradient";
     const isTextWhite = isGradient;
 
-    const variantClasses = {
-      default: `rounded-2xl border ${colors.default}`,
-      gradient: `rounded-2xl border text-white ${colors.gradient}`,
-      outline: `rounded-2xl ${colors.outline}`,
-      elevated: `rounded-3xl border ${colors.elevated}`,
-    };
+    // Variant 스타일 생성 (elevated는 rounded-3xl로 커스터마이징)
+    const variantClass = useMemo(() => {
+      const baseClass = createVariantStyles(variant, colorStyles);
+      // elevated variant는 rounded-3xl 사용
+      if (variant === "elevated") {
+        return baseClass.replace("rounded-2xl", "rounded-3xl");
+      }
+      return baseClass;
+    }, [variant, colorStyles]);
 
     const formatValue = (val: string | number): string => {
       if (typeof val === "number") {
@@ -141,7 +127,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
         ref={ref}
         className={merge(
           "p-6 transition-all duration-200 hover:shadow-xl",
-          variantClasses[variant],
+          variantClass,
           className
         )}
         {...props}
@@ -151,7 +137,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
           {icon && (
             <div className={merge(
               "w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0",
-              isGradient ? "bg-white/20" : colors.icon
+              isGradient ? "bg-white/20" : colorStyles.icon
             )}>
               {typeof icon === "string" ? (
                 <Icon
@@ -171,7 +157,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
           {title && (
             <span className={merge(
               "text-sm px-3 py-1 rounded-full font-medium",
-              isGradient ? "bg-white/20 text-white" : colors.badge
+              isGradient ? "bg-white/20 text-white" : colorStyles.badge
             )}>
               {title}
             </span>

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 
 type MotionType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
 type ElementType = 'hero' | 'title' | 'button' | 'card' | 'text' | 'image'
@@ -277,9 +277,20 @@ export function useSmartMotion<T extends HTMLElement = HTMLDivElement>(options: 
 
   // 상태 변경 시 모션 값 업데이트 (무한 루프 방지)
   useEffect(() => {
-    const { opacity, translateY, translateX, scale } = calculateMotionValues(state)
-    setState(prev => ({ ...prev, opacity, translateY, translateX, scale }))
-  }, [state.isVisible, state.isHovered, state.isClicked])
+    setState(prev => {
+      const { opacity, translateY, translateX, scale } = calculateMotionValues(prev)
+      // 값이 실제로 변경되었을 때만 업데이트 (불필요한 리렌더링 방지)
+      if (
+        prev.opacity === opacity &&
+        prev.translateY === translateY &&
+        prev.translateX === translateX &&
+        prev.scale === scale
+      ) {
+        return prev // 변경 없으면 이전 상태 반환
+      }
+      return { ...prev, opacity, translateY, translateX, scale }
+    })
+  }, [state.isVisible, state.isHovered, state.isClicked, calculateMotionValues])
 
   // 언어 변경 감지 (간단한 버전)
   useEffect(() => {
@@ -301,7 +312,8 @@ export function useSmartMotion<T extends HTMLElement = HTMLDivElement>(options: 
     }
   }, [autoLanguageSync])
 
-  const motionStyle: React.CSSProperties = {
+  // 스타일 메모이제이션으로 불필요한 리렌더링 방지
+  const motionStyle: React.CSSProperties = useMemo(() => ({
     opacity: state.opacity,
     transform: `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`,
     transition: `all ${duration}ms ease-out`,
@@ -309,7 +321,7 @@ export function useSmartMotion<T extends HTMLElement = HTMLDivElement>(options: 
     pointerEvents: 'auto',
     // 강제로 스타일 적용
     willChange: 'transform, opacity'
-  }
+  }), [state.opacity, state.translateX, state.translateY, state.scale, duration])
 
   return {
     ref: elementRef,

@@ -20,7 +20,8 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
   },
   "include": [
     "src/**/*"

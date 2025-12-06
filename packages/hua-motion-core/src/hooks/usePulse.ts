@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 import { getEasing } from '../utils/easing'
 
@@ -26,6 +26,9 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const motionRef = useRef<number | null>(null)
+  
+  // 이징 함수 메모이제이션 (애니메이션 루프 내 반복 호출 방지)
+  const easingFn = useMemo(() => getEasing('easeInOut'), [])
 
   // 🚀 모션 시작
   const start = useCallback(() => {
@@ -40,7 +43,7 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
       const updateMotion = (currentTime: number) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
-        const easedProgress = getEasing('easeInOut')(progress)
+        const easedProgress = easingFn(progress)
 
         // Yoyo 효과
         const finalProgress = yoyo && repeatCount % 2 === 1 ? 1 - easedProgress : easedProgress
@@ -66,7 +69,7 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
     }
 
     animate(performance.now())
-  }, [duration, intensity, repeat, yoyo])
+  }, [duration, intensity, repeat, yoyo, easingFn])
 
   // 🛑 모션 정지
   const stop = useCallback(() => {
