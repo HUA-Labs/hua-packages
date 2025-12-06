@@ -16,7 +16,7 @@ export default function ApiReferenceSection() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
           <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">기본 사용법</h4>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre><code>{`import { useSimpleMotion } from '@hua-labs/motion'
+            <pre><code>{`import { useSimpleMotion } from '@hua-labs/motion-core'
 
 const motions = useSimpleMotion('home')`}</code></pre>
           </div>

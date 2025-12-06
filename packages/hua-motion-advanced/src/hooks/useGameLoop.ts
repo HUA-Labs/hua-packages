@@ -86,7 +86,9 @@ export function useGameLoop(options: GameLoopConfig = {}): GameLoopReturn {
         try {
           callback(delta, elapsedTime)
         } catch (error) {
-          console.error('Game loop update error:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Game loop update error:', error)
+          }
         }
       })
 
@@ -95,7 +97,9 @@ export function useGameLoop(options: GameLoopConfig = {}): GameLoopReturn {
         try {
           callback(delta, elapsedTime)
         } catch (error) {
-          console.error('Game loop render error:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Game loop render error:', error)
+          }
         }
       })
 
@@ -114,7 +118,7 @@ export function useGameLoop(options: GameLoopConfig = {}): GameLoopReturn {
         fpsUpdateTimeRef.current = currentTime
 
         // FPS 경고 (개발 모드에서만)
-        if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
           if (newFPS < minFPS) {
             console.warn(`Low FPS detected: ${newFPS} (min: ${minFPS})`)
           }

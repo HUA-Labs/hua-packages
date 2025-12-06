@@ -1,11 +1,33 @@
 'use client'
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./Card"
 import { Badge } from "./Badge"
 import { EmotionMeter } from "./EmotionMeter"
 
+/**
+ * EmotionAnalysis 컴포넌트의 props / EmotionAnalysis component props
+ * @typedef {Object} EmotionAnalysisProps
+ * @property {Object} [primaryEmotion] - 주요 감정 정보 / Primary emotion information
+ * @property {string} primaryEmotion.name - 감정 이름 / Emotion name
+ * @property {number} primaryEmotion.intensity - 감정 강도 (0-100) / Emotion intensity (0-100)
+ * @property {string} [primaryEmotion.color] - 감정 색상 / Emotion color
+ * @property {Array<Object>} [emotionDistribution] - 감정 분포 배열 / Emotion distribution array
+ * @property {string} emotionDistribution[].emotion - 감정 이름 / Emotion name
+ * @property {number} emotionDistribution[].percentage - 감정 비율 (0-100) / Emotion percentage (0-100)
+ * @property {string} emotionDistribution[].color - 감정 색상 / Emotion color
+ * @property {string[]} [keywords] - 키워드 배열 / Keywords array
+ * @property {number} [intensity=50] - 전체 강도 (0-100) / Overall intensity (0-100)
+ * @property {number} [positivity=70] - 긍정성 (0-100) / Positivity (0-100)
+ * @property {number} [energy=60] - 에너지 (0-100) / Energy (0-100)
+ * @property {boolean} [showMeter=true] - 강도 미터 표시 여부 / Show intensity meter
+ * @property {boolean} [showDistribution=true] - 분포 표시 여부 / Show distribution
+ * @property {boolean} [showKeywords=true] - 키워드 표시 여부 / Show keywords
+ * @property {boolean} [showMetrics=true] - 메트릭 표시 여부 / Show metrics
+ * @property {"compact" | "detailed" | "card"} [layout="detailed"] - 레이아웃 타입 / Layout type
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 interface EmotionAnalysisProps extends React.HTMLAttributes<HTMLDivElement> {
   primaryEmotion?: {
     name: string
@@ -28,6 +50,42 @@ interface EmotionAnalysisProps extends React.HTMLAttributes<HTMLDivElement> {
   layout?: "compact" | "detailed" | "card"
 }
 
+/**
+ * EmotionAnalysis 컴포넌트 / EmotionAnalysis component
+ * 
+ * 감정 분석 결과를 표시하는 컴포넌트입니다.
+ * 주요 감정, 감정 분포, 키워드, 메트릭(강도, 긍정성, 에너지)을 표시할 수 있습니다.
+ * 
+ * Component that displays emotion analysis results.
+ * Can display primary emotion, emotion distribution, keywords, and metrics (intensity, positivity, energy).
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <EmotionAnalysis
+ *   primaryEmotion={{ name: "기쁨", intensity: 80 }}
+ *   keywords={["행복", "만족"]}
+ * />
+ * 
+ * @example
+ * // 상세 레이아웃 / Detailed layout
+ * <EmotionAnalysis
+ *   primaryEmotion={{ name: "평온", intensity: 65, color: "green" }}
+ *   emotionDistribution={[
+ *     { emotion: "기쁨", percentage: 40, color: "yellow" },
+ *     { emotion: "평온", percentage: 60, color: "green" }
+ *   ]}
+ *   keywords={["안정", "편안"]}
+ *   intensity={65}
+ *   positivity={75}
+ *   energy={50}
+ *   layout="detailed"
+ * />
+ * 
+ * @param {EmotionAnalysisProps} props - EmotionAnalysis 컴포넌트의 props / EmotionAnalysis component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} EmotionAnalysis 컴포넌트 / EmotionAnalysis component
+ */
 const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
   ({ 
     className, 
@@ -66,7 +124,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
       return (
         <div
           ref={ref}
-          className={cn("space-y-3", className)}
+          className={merge("space-y-3", className)}
           {...props}
         >
           {primaryEmotion && (
@@ -130,7 +188,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
       return (
         <Card
           ref={ref}
-          className={cn("", className)}
+          className={merge("", className)}
           {...props}
         >
           <CardHeader>
@@ -207,7 +265,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
     return (
       <div
         ref={ref}
-        className={cn("space-y-6", className)}
+        className={merge("space-y-6", className)}
         {...props}
       >
         {primaryEmotion && (

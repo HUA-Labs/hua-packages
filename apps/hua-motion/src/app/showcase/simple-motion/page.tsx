@@ -1,6 +1,6 @@
 'use client'
 
-import { useSimpleMotion } from '@hua-labs/motion'
+import { useSimpleMotion } from '@hua-labs/motion-core'
 import { Icon } from '@hua-labs/ui'
 import ShowcasePageLayout from '../../components/ShowcasePageLayout'
 

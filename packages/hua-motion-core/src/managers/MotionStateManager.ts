@@ -127,7 +127,9 @@ export class MotionStateManager {
       try {
         listener(state)
       } catch (error) {
-        console.error(`MotionStateManager listener error for ${elementId}:`, error)
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`MotionStateManager listener error for ${elementId}:`, error)
+        }
       }
     })
   }
@@ -152,17 +154,19 @@ export class MotionStateManager {
    * 디버그용 상태 출력
    */
   debug(): void {
-    console.log('MotionStateManager Debug:')
-    this.states.forEach((state, elementId) => {
-      console.log(`  ${elementId}:`, {
-        internalVisibility: state.internalVisibility,
-        triggeredVisibility: state.triggeredVisibility,
-        finalVisibility: state.finalVisibility,
-        opacity: state.opacity,
-        translateY: state.translateY,
-        isAnimating: state.isAnimating
+    if (process.env.NODE_ENV === 'development') {
+      console.log('MotionStateManager Debug:')
+      this.states.forEach((state, elementId) => {
+        console.log(`  ${elementId}:`, {
+          internalVisibility: state.internalVisibility,
+          triggeredVisibility: state.triggeredVisibility,
+          finalVisibility: state.finalVisibility,
+          opacity: state.opacity,
+          translateY: state.translateY,
+          isAnimating: state.isAnimating
+        })
       })
-    })
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 
 export interface BounceInOptions {
@@ -75,14 +75,14 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     }
   }, [autoStart, start])
 
-  // 스타일 계산
-  const style = {
+  // 스타일 계산 - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => ({
     transform: `scale(${scale})`,
     opacity,
     transition: `all ${duration}ms ease-out`,
     '--motion-delay': `${delay}ms`,
     '--motion-duration': `${duration}ms`
-  } as const
+  } as const), [scale, opacity, duration, delay])
 
   return {
     ref,

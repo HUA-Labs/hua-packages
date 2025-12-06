@@ -1,8 +1,21 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Popover 컴포넌트의 props / Popover component props
+ * @typedef {Object} PopoverProps
+ * @property {React.ReactNode} children - Popover 내용 / Popover content
+ * @property {React.ReactNode} trigger - Popover를 열기 위한 트리거 요소 / Trigger element to open popover
+ * @property {boolean} [open] - 제어 모드에서 열림/닫힘 상태 / Open/close state in controlled mode
+ * @property {(open: boolean) => void} [onOpenChange] - 상태 변경 콜백 / State change callback
+ * @property {"top" | "bottom" | "left" | "right"} [position="bottom"] - Popover 표시 위치 / Popover display position
+ * @property {"start" | "center" | "end"} [align="center"] - Popover 정렬 / Popover alignment
+ * @property {number} [offset=8] - 트리거와 Popover 사이 간격 (px) / Spacing between trigger and popover (px)
+ * @property {boolean} [disabled=false] - Popover 비활성화 여부 / Disable popover
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   trigger: React.ReactNode
@@ -14,6 +27,38 @@ export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
 }
 
+/**
+ * Popover 컴포넌트 / Popover component
+ * 
+ * 트리거 요소를 클릭하면 표시되는 팝오버 컴포넌트입니다.
+ * 외부 클릭 시 자동으로 닫힙니다.
+ * 
+ * Popover component that appears when the trigger element is clicked.
+ * Automatically closes when clicking outside.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Popover trigger={<Button>열기</Button>}>
+ *   <div className="p-4">Popover 내용</div>
+ * </Popover>
+ * 
+ * @example
+ * // 제어 모드 / Controlled mode
+ * const [open, setOpen] = useState(false)
+ * <Popover 
+ *   open={open}
+ *   onOpenChange={setOpen}
+ *   trigger={<Button>제어 모드</Button>}
+ *   position="top"
+ * >
+ *   <div className="p-4">내용</div>
+ * </Popover>
+ * 
+ * @param {PopoverProps} props - Popover 컴포넌트의 props / Popover component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Popover 컴포넌트 / Popover component
+ */
 const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
   ({ 
     className, 
@@ -71,15 +116,15 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
       
       switch (position) {
         case "top":
-          return cn(baseClasses, "bottom-full left-0", `mb-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "bottom-full left-0", `mb-${Math.max(1, Math.floor(offset / 4))}`)
         case "bottom":
-          return cn(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
         case "left":
-          return cn(baseClasses, "right-full top-0", `mr-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "right-full top-0", `mr-${Math.max(1, Math.floor(offset / 4))}`)
         case "right":
-          return cn(baseClasses, "left-full top-0", `ml-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "left-full top-0", `ml-${Math.max(1, Math.floor(offset / 4))}`)
         default:
-          return cn(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
       }
     }
 
@@ -125,7 +170,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
     }
 
     return (
-      <div ref={ref} className={cn("relative", className)} {...props}>
+      <div ref={ref} className={merge("relative", className)} {...props}>
         {/* 트리거 */}
         <div
           ref={triggerRef}
@@ -139,7 +184,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
         {isOpen && (
           <div
             ref={popoverRef}
-            className={cn(
+            className={merge(
               "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 min-w-[200px]",
               getPositionClasses(),
               getAlignmentClasses()
@@ -165,7 +210,7 @@ export const PopoverTrigger = React.forwardRef<HTMLDivElement, React.HTMLAttribu
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("inline-block cursor-pointer", className)}
+      className={merge("inline-block cursor-pointer", className)}
       {...props}
     >
       {children}
@@ -178,7 +223,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, React.HTMLAttribu
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4", className)}
+      className={merge("bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4", className)}
       {...props}
     >
       {children}

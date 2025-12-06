@@ -4,6 +4,15 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "light" | "dark" | "system"
 
+/**
+ * ThemeProvider 컴포넌트의 props / ThemeProvider component props
+ * @typedef {Object} ThemeProviderProps
+ * @property {React.ReactNode} children - 자식 컴포넌트 / Child components
+ * @property {"light" | "dark" | "system"} [defaultTheme="light"] - 기본 테마 / Default theme
+ * @property {string} [storageKey="hua-ui-theme"] - localStorage 키 / localStorage key
+ * @property {boolean} [enableSystem=true] - 시스템 테마 감지 활성화 / Enable system theme detection
+ * @property {boolean} [enableTransition=true] - 테마 전환 애니메이션 활성화 / Enable theme transition animation
+ */
 interface ThemeProviderProps {
   children: React.ReactNode
   defaultTheme?: Theme
@@ -12,6 +21,14 @@ interface ThemeProviderProps {
   enableTransition?: boolean
 }
 
+/**
+ * ThemeProvider의 상태 타입 / ThemeProvider state type
+ * @typedef {Object} ThemeProviderState
+ * @property {"light" | "dark" | "system"} theme - 현재 테마 / Current theme
+ * @property {(theme: "light" | "dark" | "system") => void} setTheme - 테마 설정 함수 / Theme setter function
+ * @property {"light" | "dark"} resolvedTheme - 실제 적용된 테마 (system일 경우 시스템 테마) / Actually applied theme (system theme when system is selected)
+ * @property {() => void} toggleTheme - 테마 토글 함수 / Theme toggle function
+ */
 interface ThemeProviderState {
   theme: Theme
   setTheme: (theme: Theme) => void
@@ -28,6 +45,38 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
+/**
+ * ThemeProvider 컴포넌트 / ThemeProvider component
+ * 
+ * 테마 관리를 위한 Context Provider 컴포넌트입니다.
+ * localStorage에 테마를 저장하고, 시스템 테마를 감지할 수 있습니다.
+ * useTheme 훅을 통해 테마 상태에 접근할 수 있습니다.
+ * 
+ * Context Provider component for theme management.
+ * Saves theme to localStorage and can detect system theme.
+ * Access theme state through useTheme hook.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ThemeProvider>
+ *   <App />
+ * </ThemeProvider>
+ * 
+ * @example
+ * // 커스텀 설정 / Custom settings
+ * <ThemeProvider
+ *   defaultTheme="dark"
+ *   storageKey="my-app-theme"
+ *   enableSystem={true}
+ *   enableTransition={true}
+ * >
+ *   <App />
+ * </ThemeProvider>
+ * 
+ * @param {ThemeProviderProps} props - ThemeProvider 컴포넌트의 props / ThemeProvider component props
+ * @returns {JSX.Element} ThemeProvider 컴포넌트 / ThemeProvider component
+ */
 export function ThemeProvider({
   children,
   defaultTheme = "light",  // system에서 light로 변경
@@ -110,6 +159,21 @@ export function ThemeProvider({
   )
 }
 
+/**
+ * useTheme 훅 / useTheme hook
+ * 
+ * ThemeProvider의 테마 상태에 접근하는 훅입니다.
+ * ThemeProvider 내부에서만 사용할 수 있습니다.
+ * 
+ * Hook to access ThemeProvider's theme state.
+ * Can only be used inside ThemeProvider.
+ * 
+ * @example
+ * const { theme, setTheme, resolvedTheme, toggleTheme } = useTheme()
+ * 
+ * @returns {ThemeProviderState} 테마 상태와 함수들 / Theme state and functions
+ * @throws {Error} ThemeProvider 외부에서 사용 시 에러 발생 / Error when used outside ThemeProvider
+ */
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext)
 

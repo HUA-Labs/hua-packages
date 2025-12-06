@@ -1,8 +1,17 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Container 컴포넌트의 props
+ * @typedef {Object} ContainerProps
+ * @property {"sm" | "md" | "lg" | "xl" | "full"} [size="lg"] - 컨테이너 최대 너비
+ * @property {"none" | "sm" | "md" | "lg" | "xl"} [padding="md"] - 내부 패딩 크기
+ * @property {boolean} [centered=true] - 컨테이너를 중앙 정렬할지 여부
+ * @property {boolean} [fluid=false] - 최대 너비 제한 없이 전체 너비 사용
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg" | "xl" | "full"
   padding?: "none" | "sm" | "md" | "lg" | "xl"
@@ -10,6 +19,36 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   fluid?: boolean
 }
 
+/**
+ * Container 컴포넌트
+ * 
+ * 콘텐츠를 감싸는 컨테이너 컴포넌트입니다.
+ * 반응형 최대 너비와 패딩을 제공하여 일관된 레이아웃을 구성합니다.
+ * 
+ * @component
+ * @example
+ * // 기본 사용
+ * <Container>
+ *   <h1>제목</h1>
+ *   <p>내용</p>
+ * </Container>
+ * 
+ * @example
+ * // 작은 크기, 패딩 없음
+ * <Container size="sm" padding="none">
+ *   <div>콘텐츠</div>
+ * </Container>
+ * 
+ * @example
+ * // 전체 너비 사용
+ * <Container fluid padding="xl">
+ *   <div>전체 너비 콘텐츠</div>
+ * </Container>
+ * 
+ * @param {ContainerProps} props - Container 컴포넌트의 props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref
+ * @returns {JSX.Element} Container 컴포넌트
+ */
 const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
   ({ 
     className, 
@@ -38,7 +77,7 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           "w-full",
           !fluid && sizeClasses[size],
           paddingClasses[padding],
