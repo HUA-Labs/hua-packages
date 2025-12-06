@@ -18,14 +18,6 @@
       ],
       "persistent": false
     },
-    "@hua-labs/i18n-core#build": {
-      "command": "node_modules/.bin/tsc",
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/motion-core#build": {
-      "command": "node_modules/.bin/tsc",
-      "outputs": ["dist/**"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
