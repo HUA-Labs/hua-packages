@@ -515,9 +515,6 @@ importers:
       '@hua-labs/ui':
         specifier: workspace:^
         version: link:../../packages/hua-ui
-      '@hua-platform/hua-emotion-engine':
-        specifier: workspace:*
-        version: link:../../packages/hua-emotion-engine
       '@next-auth/prisma-adapter':
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@6.18.0(prisma@6.18.0(typescript@5.9.3))(typescript@5.9.3))(next-auth@4.24.13(next@16.0.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
