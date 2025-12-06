@@ -6,8 +6,8 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node node_modules/tsup/dist/cli.mjs",
-    "dev": "node node_modules/tsup/dist/cli.mjs --watch",
+    "build": "node ../../node_modules/tsup/dist/cli.mjs",
+    "dev": "node ../../node_modules/tsup/dist/cli.mjs --watch",
     "test": "jest",
     "lint": "echo 'Skipping lint for hua-emotion-engine (ESLint 8 compatibility issue with root flat config)'"
   },
