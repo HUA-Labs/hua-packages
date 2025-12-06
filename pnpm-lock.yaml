@@ -640,49 +640,6 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/hua-emotion-engine:
-    dependencies:
-      csv-parser:
-        specifier: ^3.0.0
-        version: 3.2.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      openai:
-        specifier: ^4.0.0
-        version: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@4.1.12)
-      react:
-        specifier: '>=18.0.0'
-        version: 19.1.0
-    devDependencies:
-      '@types/jest':
-        specifier: ^29.0.0
-        version: 29.5.14
-      '@types/lodash':
-        specifier: ^4.14.0
-        version: 4.17.20
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.17
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.0.0
-        version: 8.48.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.0.0
-        version: 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
-      eslint:
-        specifier: ^9.39.1
-        version: 9.39.1(jiti@2.6.1)
-      jest:
-        specifier: ^29.0.0
-        version: 29.7.0(@types/node@20.19.17)
-      tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.3)(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
   packages/hua-hooks:
     dependencies:
       react:
@@ -800,9 +757,6 @@ importers:
       react:
         specifier: ^19.2.1
         version: 19.2.1
-      tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.3)(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1090,9 +1044,6 @@ importers:
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
-      tsup:
-        specifier: ^8.5.1
-        version: 8.5.1(@swc/core@1.15.3)(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.1)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -4075,9 +4026,6 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/lodash@4.17.20':
-    resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
-
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -4977,11 +4925,6 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
-
-  csv-parser@3.2.0:
-    resolution: {integrity: sha512-fgKbp+AJbn1h2dcAHKIdKNSSjfp43BZZykXsCjzALjKy80VXQNHPFJ6T9Afwdzoj24aMkq8GwDS7KGcDPpejrA==}
-    engines: {node: '>= 10'}
-    hasBin: true
 
   d3-array@3.2.4:
     resolution: {integrity: sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==}
@@ -12802,8 +12745,6 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/lodash@4.17.20': {}
-
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -13873,8 +13814,6 @@ snapshots:
       css-tree: 3.1.0
 
   csstype@3.2.3: {}
-
-  csv-parser@3.2.0: {}
 
   d3-array@3.2.4:
     dependencies:
