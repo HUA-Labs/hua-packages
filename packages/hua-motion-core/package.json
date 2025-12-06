@@ -16,8 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node node_modules/tsup/dist/cli.mjs",
-    "dev": "node node_modules/tsup/dist/cli.mjs --watch",
+    "build": "node ../../node_modules/tsup/dist/cli.mjs",
+    "dev": "node ../../node_modules/tsup/dist/cli.mjs --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
