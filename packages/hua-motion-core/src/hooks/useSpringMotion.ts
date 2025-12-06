@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 
 interface SpringConfig {
@@ -46,6 +46,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     isAnimating: false
   })
   const [isVisible, setIsVisible] = useState(true)
+  const [progress, setProgress] = useState(0)
 
   const motionRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number>(0)
@@ -90,6 +91,11 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
       deltaTime
     )
 
+    // 진행률 계산
+    const range = Math.abs(to - from)
+    const currentProgress = range > 0 ? Math.min(Math.abs(value - from) / range, 1) : 1
+    setProgress(currentProgress)
+
     // 정지 조건 확인
     const isAtRest = Math.abs(value - to) < (config.restDelta || 0.01) && Math.abs(velocity) < (config.restSpeed || 0.01)
 
@@ -99,6 +105,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
         velocity: 0,
         isAnimating: false
       })
+      setProgress(1)
       onComplete?.()
       return
     }
@@ -144,6 +151,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
       velocity: 0,
       isAnimating: false
     })
+    setProgress(0)
     motionRef.current = null
   }, [from, stop])
 
@@ -163,10 +171,18 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     }
   }, [])
 
+  // 스타일 계산
+  const style = useMemo(() => ({
+    '--motion-progress': `${progress}`,
+    '--motion-value': `${springState.value}`
+  } as CSSProperties), [progress, springState.value])
+
   return {
     ref,
     isVisible,
     isAnimating: springState.isAnimating,
+    style,
+    progress,
     value: springState.value,
     velocity: springState.velocity,
     start,
