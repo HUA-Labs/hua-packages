@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 
 type MotionType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
@@ -59,8 +59,8 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     }
   }, [observerCallback, threshold, rootMargin])
 
-  // 모션 스타일 생성
-  const getMotionStyle = () => {
+  // 모션 스타일 생성 - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => {
     const baseTransition = 'all 700ms ease-out'
     
     if (!isVisible) {
@@ -114,7 +114,7 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
       transform: 'none',
       transition: baseTransition
     }
-  }
+  }, [isVisible, motionType])
 
   const start = useCallback(() => {
     setIsAnimating(true)
@@ -141,7 +141,7 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     progress,
-    style: getMotionStyle(),
+    style,
     start,
     reset,
     stop

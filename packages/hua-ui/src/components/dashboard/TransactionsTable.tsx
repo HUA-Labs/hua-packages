@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { merge } from "../../lib/utils";
 import {
   Table,
@@ -33,6 +33,20 @@ export type TransactionColumnKey =
   | "fee"
   | "customer";
 
+/**
+ * 거래 테이블 행 인터페이스
+ * @typedef {Object} TransactionRow
+ * @property {string} id - 거래 ID
+ * @property {string} merchant - 가맹점
+ * @property {number} amount - 거래 금액
+ * @property {string} [currency] - 통화
+ * @property {TransactionStatus} status - 거래 상태
+ * @property {string} [method] - 결제수단
+ * @property {string | Date} date - 거래 일시
+ * @property {string} [customer] - 고객 정보
+ * @property {number} [fee] - 수수료
+ * @property {string} [reference] - 참조 번호
+ */
 export interface TransactionRow {
   id: string;
   merchant: string;
@@ -47,6 +61,15 @@ export interface TransactionRow {
   [key: string]: unknown;
 }
 
+/**
+ * 거래 테이블 컬럼 설정 인터페이스
+ * @typedef {Object} TransactionColumnConfig
+ * @property {TransactionColumnKey} key - 컬럼 키
+ * @property {string} [label] - 컬럼 라벨
+ * @property {"left" | "center" | "right"} [align] - 정렬
+ * @property {string} [width] - 컬럼 너비
+ * @property {(row: TransactionRow) => React.ReactNode} [render] - 커스텀 렌더러
+ */
 export interface TransactionColumnConfig {
   key: TransactionColumnKey;
   label?: string;
@@ -55,6 +78,30 @@ export interface TransactionColumnConfig {
   render?: (row: TransactionRow) => React.ReactNode;
 }
 
+/**
+ * TransactionsTable 컴포넌트의 props
+ * @typedef {Object} TransactionsTableProps
+ * @property {TransactionRow[]} rows - 거래 행 배열
+ * @property {TransactionColumnConfig[]} [columns] - 컬럼 설정 배열
+ * @property {boolean} [isLoading=false] - 로딩 상태
+ * @property {number} [loadingRows] - 로딩 행 수
+ * @property {React.ReactNode} [caption] - 테이블 캡션
+ * @property {React.ReactNode} [filters] - 필터 컴포넌트
+ * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트
+ * @property {(row: TransactionRow) => void} [onRowClick] - 행 클릭 핸들러
+ * @property {(row: TransactionRow) => boolean} [highlightRow] - 행 강조 조건
+ * @property {Partial<Record<TransactionStatus, string>>} [statusLabels] - 상태 라벨 커스터마이징
+ * @property {(status: TransactionStatus, row: TransactionRow) => React.ReactNode} [statusRenderer] - 상태 커스텀 렌더러
+ * @property {(row: TransactionRow) => React.ReactNode} [amountFormatter] - 금액 커스텀 포맷터
+ * @property {(row: TransactionRow) => React.ReactNode} [methodFormatter] - 결제수단 커스텀 포맷터
+ * @property {(row: TransactionRow) => React.ReactNode} [dateFormatter] - 날짜 커스텀 포맷터
+ * @property {string} [locale="ko-KR"] - 로케일
+ * @property {string} [defaultCurrency="KRW"] - 기본 통화
+ * @property {string} [className] - 추가 클래스명
+ * @property {React.ReactNode} [footer] - 푸터 컴포넌트
+ * @property {(row: TransactionRow) => string} [rowActionLabel] - 행 액션 라벨 생성 함수
+ * @property {string} [rowActionHint] - 행 액션 힌트 텍스트
+ */
 export interface TransactionsTableProps {
   rows: TransactionRow[];
   columns?: TransactionColumnConfig[];
@@ -114,6 +161,49 @@ const DEFAULT_COLUMNS: TransactionColumnConfig[] = [
   { key: "date", label: "거래 일시", width: "180px" },
 ];
 
+/**
+ * TransactionsTable 컴포넌트
+ * 
+ * 거래 목록을 테이블 형태로 표시하는 컴포넌트입니다.
+ * 정렬, 필터링, 커스텀 렌더링 등을 지원합니다.
+ * 
+ * Table component that displays transaction list.
+ * Supports sorting, filtering, and custom rendering.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <TransactionsTable
+ *   rows={[
+ *     {
+ *       id: "tx_123",
+ *       merchant: "가맹점 A",
+ *       amount: 100000,
+ *       status: "approved",
+ *       method: "카드",
+ *       date: new Date()
+ *     }
+ *   ]}
+ *   onRowClick={(row) => console.log(row)}
+ * />
+ * 
+ * @example
+ * // 커스텀 컬럼과 포맷터 / Custom columns and formatters
+ * <TransactionsTable
+ *   rows={transactions}
+ *   columns={[
+ *     { key: "id", label: "ID" },
+ *     { key: "amount", label: "금액", align: "right" },
+ *     { key: "status", label: "상태" }
+ *   ]}
+ *   amountFormatter={(row) => `₩${row.amount.toLocaleString()}`}
+ *   statusRenderer={(status) => <CustomBadge status={status} />}
+ *   isLoading={loading}
+ * />
+ * 
+ * @param {TransactionsTableProps} props - TransactionsTable 컴포넌트의 props / TransactionsTable component props
+ * @returns {JSX.Element} TransactionsTable 컴포넌트 / TransactionsTable component
+ */
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   rows,
   columns = DEFAULT_COLUMNS,
@@ -244,7 +334,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       )}
       <div className="p-4 sm:p-6">
         <div className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <Table>
+          <Table
+            role="table"
+            aria-label={caption ? (typeof caption === "string" ? caption : "거래 목록 테이블") : "거래 목록 테이블"}
+          >
             {caption && <TableCaption>{caption}</TableCaption>}
             <TableHeader className="bg-slate-50/60 dark:bg-slate-900/40">
               <TableRow className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">

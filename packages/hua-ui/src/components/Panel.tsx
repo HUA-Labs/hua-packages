@@ -4,6 +4,35 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Card, CardProps } from "./Card"
 
+/**
+ * Panel 컴포넌트의 props / Panel component props
+ * @typedef {Object} PanelProps
+ * @property {"default" | "glass" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"} [style="default"] - Panel 스타일 / Panel style
+ * @property {"none" | "glow" | "shadow" | "gradient" | "animated"} [effect="none"] - Panel 효과 / Panel effect
+ * @property {number} [transparency=1] - 투명도 (0-1) / Transparency (0-1)
+ * @property {number} [blurIntensity=0] - backdrop-blur 강도 (px) / Backdrop blur intensity (px)
+ * @property {number} [borderOpacity=1] - 보더 투명도 (0-1) / Border opacity (0-1)
+ * @property {number} [shadowOpacity=1] - 그림자 투명도 (0-1) / Shadow opacity (0-1)
+ * @property {number} [glowIntensity=0] - 글로우 강도 (px) / Glow intensity (px)
+ * @property {string} [glowColor="blue"] - 글로우 색상 / Glow color
+ * @property {boolean} [particleEffect=false] - 파티클 효과 활성화 / Enable particle effect
+ * @property {boolean} [hoverEffect=false] - 호버 효과 활성화 / Enable hover effect
+ * @property {boolean} [animationEffect=false] - 애니메이션 효과 활성화 / Enable animation effect
+ * @property {"none" | "sm" | "md" | "lg" | "xl" | "custom"} [padding="md"] - 패딩 크기 / Padding size
+ * @property {string} [customPadding] - 커스텀 패딩 / Custom padding
+ * @property {"none" | "sm" | "md" | "lg" | "xl" | "full" | "custom"} [rounded="lg"] - 둥근 모서리 크기 / Rounded corner size
+ * @property {string} [customRounded] - 커스텀 둥근 모서리 / Custom rounded corners
+ * @property {"solid" | "gradient" | "pattern" | "image" | "video"} [background="solid"] - 배경 타입 / Background type
+ * @property {string[]} [gradientColors] - 그라디언트 색상 배열 / Gradient color array
+ * @property {"dots" | "lines" | "grid" | "waves" | "custom"} [patternType="dots"] - 패턴 타입 / Pattern type
+ * @property {string} [backgroundImage] - 배경 이미지 URL / Background image URL
+ * @property {string} [backgroundVideo] - 배경 비디오 URL / Background video URL
+ * @property {boolean} [interactive=false] - 인터랙티브 모드 활성화 / Enable interactive mode
+ * @property {number} [hoverScale=1.05] - 호버 시 스케일 / Scale on hover
+ * @property {number} [hoverRotate=0] - 호버 시 회전 각도 / Rotation angle on hover
+ * @property {boolean} [hoverGlow=false] - 호버 시 글로우 효과 / Glow effect on hover
+ * @extends {Omit<CardProps, 'variant' | 'style'>}
+ */
 export interface PanelProps extends Omit<CardProps, 'variant' | 'style'> {
   // 🆕 Panel 전용 고급 속성들
   style?: "default" | "glass" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"
@@ -42,6 +71,45 @@ export interface PanelProps extends Omit<CardProps, 'variant' | 'style'> {
   hoverGlow?: boolean
 }
 
+/**
+ * Panel 컴포넌트 / Panel component
+ * 
+ * 고급 스타일링 옵션을 가진 패널 컴포넌트입니다.
+ * 다양한 스타일, 효과, 배경 옵션을 지원합니다.
+ * Card 컴포넌트를 기반으로 하며, 추가적인 고급 기능을 제공합니다.
+ * 
+ * Panel component with advanced styling options.
+ * Supports various styles, effects, and background options.
+ * Based on Card component with additional advanced features.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Panel>
+ *   <div>내용</div>
+ * </Panel>
+ * 
+ * @example
+ * // Glass 스타일 / Glass style
+ * <Panel style="glass" effect="glow">
+ *   <div>Glass 패널</div>
+ * </Panel>
+ * 
+ * @example
+ * // 인터랙티브 패널 / Interactive panel
+ * <Panel 
+ *   style="neon"
+ *   interactive
+ *   hoverScale={1.1}
+ *   hoverGlow
+ * >
+ *   <div>호버 효과</div>
+ * </Panel>
+ * 
+ * @param {PanelProps} props - Panel 컴포넌트의 props / Panel component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Panel 컴포넌트 / Panel component
+ */
 const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
   ({ 
     className,

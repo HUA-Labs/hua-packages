@@ -1,9 +1,20 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 
+/**
+ * Bookmark 컴포넌트의 props / Bookmark component props
+ * @typedef {Object} BookmarkProps
+ * @property {string} id - 북마크 고유 ID / Bookmark unique ID
+ * @property {string} [storageKey='bookmarks'] - localStorage 키 / localStorage key
+ * @property {boolean} [defaultBookmarked=false] - 기본 북마크 상태 / Default bookmarked state
+ * @property {(bookmarked: boolean) => void} [onBookmarkChange] - 북마크 상태 변경 콜백 / Bookmark state change callback
+ * @property {'sm' | 'md' | 'lg'} [size='md'] - Bookmark 크기 / Bookmark size
+ * @property {'default' | 'filled' | 'outline'} [variant='default'] - Bookmark 스타일 변형 / Bookmark style variant
+ * @extends {React.HTMLAttributes<HTMLButtonElement>}
+ */
 export interface BookmarkProps extends React.HTMLAttributes<HTMLButtonElement> {
   id: string
   storageKey?: string
@@ -13,6 +24,32 @@ export interface BookmarkProps extends React.HTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'filled' | 'outline'
 }
 
+/**
+ * Bookmark 컴포넌트 / Bookmark component
+ * 
+ * 북마크 기능을 제공하는 버튼 컴포넌트입니다.
+ * localStorage에 북마크 상태를 저장하며, 여러 항목의 북마크를 관리할 수 있습니다.
+ * 
+ * Button component that provides bookmark functionality.
+ * Saves bookmark state to localStorage and can manage bookmarks for multiple items.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Bookmark id="article-1" />
+ * 
+ * @example
+ * // 상태 변경 감지 / State change detection
+ * <Bookmark 
+ *   id="article-1"
+ *   onBookmarkChange={(bookmarked) => console.log(bookmarked)}
+ *   variant="filled"
+ * />
+ * 
+ * @param {BookmarkProps} props - Bookmark 컴포넌트의 props / Bookmark component props
+ * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
+ * @returns {JSX.Element} Bookmark 컴포넌트 / Bookmark component
+ */
 const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
   ({ 
     className, 
@@ -75,7 +112,7 @@ const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
       <button
         ref={ref}
         onClick={toggleBookmark}
-        className={cn(
+        className={merge(
           "flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2",
           sizeClasses[size],
           variantClasses[variant],
@@ -85,7 +122,7 @@ const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
       >
         <Icon 
           name="star" 
-          className={cn(
+          className={merge(
             "transition-all duration-200",
             isBookmarked && "fill-current"
           )}
