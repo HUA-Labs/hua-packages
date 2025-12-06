@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 
 export interface LanguageConfig {
   motionType: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
@@ -158,11 +158,14 @@ export function useLanguageAwareMotion(options: LanguageConfig) {
     }, 100)
   }, [])
 
+  // Style 객체 메모이제이션 (불필요한 리렌더링 방지)
+  const motionStyle = useMemo(() => getMotionStyle(), [getMotionStyle])
+
   return {
     ref: elementRef,
     isVisible,
     isPaused,
-    style: getMotionStyle(),
+    style: motionStyle,
     pauseMotion,
     resumeMotion,
     restartMotion,

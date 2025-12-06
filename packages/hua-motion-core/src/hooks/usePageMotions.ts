@@ -111,7 +111,9 @@ export function usePageMotions(config: PageMotionsConfig) {
     
     // config가 유효하지 않으면 early return
     if (!config || typeof config !== 'object') {
-      console.warn('usePageMotions: config가 유효하지 않습니다:', config)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('usePageMotions: config가 유효하지 않습니다:', config)
+      }
       return
     }
     
@@ -126,7 +128,9 @@ export function usePageMotions(config: PageMotionsConfig) {
       
       // 초기 상태 가져오기
       const initialState = motionStateManager.getState(elementId)!
-      console.log(`초기 상태 [${elementId}]:`, initialState)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`초기 상태 [${elementId}]:`, initialState)
+      }
       const { opacity, translateY, translateX, scale } = calculateMotionValues(initialState, elementConfig)
 
       newMotions.set(elementId, {
@@ -151,18 +155,31 @@ export function usePageMotions(config: PageMotionsConfig) {
           const current = prev.get(elementId)
           if (!current) return prev
 
+          // 변경 감지: 실제로 값이 변경되었을 때만 업데이트
+          const transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
+          const hasChanged = 
+            current.style.opacity !== opacity ||
+            current.style.transform !== transform ||
+            current.isVisible !== newState.finalVisibility ||
+            current.isHovered !== newState.isHovered ||
+            current.isClicked !== newState.isClicked
+
+          // 변경이 없으면 이전 Map 반환 (불필요한 리렌더링 방지)
+          if (!hasChanged) return prev
+
           const newMotion: MotionRef = {
             ...current,
             style: {
               ...current.style,
               opacity,
-              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`
+              transform
             },
             isVisible: newState.finalVisibility,
             isHovered: newState.isHovered,
             isClicked: newState.isClicked
           }
 
+          // 변경된 항목만 업데이트하는 새 Map 생성
           const newMap = new Map(prev)
           newMap.set(elementId, newMotion)
           return newMap
@@ -207,7 +224,9 @@ export function usePageMotions(config: PageMotionsConfig) {
               setTimeout(() => {
                 // 외부 트리거로 가시성 설정
                 motionStateManager.setTriggeredVisibility(elementId, true)
-                console.log('모션 실행:', elementId, 'delay:', delay)
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('모션 실행:', elementId, 'delay:', delay)
+                }
               }, delay)
               
               observer.unobserve(entry.target)
@@ -271,12 +290,10 @@ export function usePageMotions(config: PageMotionsConfig) {
         element = element.parentElement
       }
       
-      // elementId가 있을 때만 로그 출력
-      if (elementId) {
-        console.log('호버 시작:', elementId)
-      }
-      
       if (elementId && config[elementId]?.hover) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('호버 시작:', elementId)
+        }
         updateMotionState(elementId, { isHovered: true })
       }
     }
@@ -298,7 +315,9 @@ export function usePageMotions(config: PageMotionsConfig) {
       }
       
       if (elementId && config[elementId]?.hover) {
-        console.log('호버 종료:', elementId)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('호버 종료:', elementId)
+        }
         updateMotionState(elementId, { isHovered: false })
       }
     }
@@ -319,9 +338,10 @@ export function usePageMotions(config: PageMotionsConfig) {
         element = element.parentElement
       }
       
-      // elementId가 있을 때만 로그 출력
       if (elementId && config[elementId]?.click) {
-        console.log('클릭 시작:', elementId)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('클릭 시작:', elementId)
+        }
         updateMotionState(elementId, { isClicked: true })
       }
     }
@@ -343,24 +363,28 @@ export function usePageMotions(config: PageMotionsConfig) {
       }
       
       if (elementId && config[elementId]?.click) {
-        console.log('클릭 종료:', elementId)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('클릭 종료:', elementId)
+        }
         updateMotionState(elementId, { isClicked: false })
       }
     }
 
+    // 이벤트 위임: bubble phase 사용 (capture phase보다 성능 우수)
+    // 각 요소에 직접 등록하는 대신 document에 한 번만 등록하여 메모리 효율성 향상
     const timer = setTimeout(() => {
-      document.addEventListener('mouseenter', handleMouseEnter, true)
-      document.addEventListener('mouseleave', handleMouseLeave, true)
-      document.addEventListener('mousedown', handleMouseDown, true)
-      document.addEventListener('mouseup', handleMouseUp, true)
+      document.addEventListener('mouseenter', handleMouseEnter, false)
+      document.addEventListener('mouseleave', handleMouseLeave, false)
+      document.addEventListener('mousedown', handleMouseDown, false)
+      document.addEventListener('mouseup', handleMouseUp, false)
     }, 200)
 
     return () => {
       clearTimeout(timer)
-      document.removeEventListener('mouseenter', handleMouseEnter, true)
-      document.removeEventListener('mouseleave', handleMouseLeave, true)
-      document.removeEventListener('mousedown', handleMouseDown, true)
-      document.removeEventListener('mouseup', handleMouseUp, true)
+      document.removeEventListener('mouseenter', handleMouseEnter, false)
+      document.removeEventListener('mouseleave', handleMouseLeave, false)
+      document.removeEventListener('mousedown', handleMouseDown, false)
+      document.removeEventListener('mouseup', handleMouseUp, false)
     }
   }, [config]) // config 직접 사용 (참조 안정성)
 

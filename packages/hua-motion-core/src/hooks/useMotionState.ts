@@ -89,7 +89,7 @@ export function useMotionState(options: MotionStateOptions = {}): MotionStateRet
     if (newElapsed >= duration) {
       if (loop) {
         // 루프: 처음부터 다시 시작
-        startTimeRef.current = timestamp
+        startTimeRef.current = timestamp || performance.now()
         totalPausedTimeRef.current = 0
         setElapsed(0)
         setProgress(currentDirection === 'reverse' ? 100 : 0)
@@ -124,7 +124,7 @@ export function useMotionState(options: MotionStateOptions = {}): MotionStateRet
     
     if (pauseTimeRef.current) {
       // 일시정지에서 재개
-      totalPausedTimeRef.current += Date.now() - pauseTimeRef.current
+      totalPausedTimeRef.current += performance.now() - pauseTimeRef.current
       pauseTimeRef.current = null
     } else {
       // 새로운 모션 시작
@@ -142,7 +142,7 @@ export function useMotionState(options: MotionStateOptions = {}): MotionStateRet
     if (state !== 'playing') return
     
     setState('paused')
-    pauseTimeRef.current = Date.now()
+    pauseTimeRef.current = performance.now()
     
     if (motionRef.current) {
       cancelAnimationFrame(motionRef.current)
