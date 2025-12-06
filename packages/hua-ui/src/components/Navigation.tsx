@@ -3,6 +3,16 @@
 import React from "react"
 import { merge } from "../lib/utils"
 
+/**
+ * Navigation 컴포넌트의 props / Navigation component props
+ * @typedef {Object} NavigationProps
+ * @property {string} [value] - 제어 모드에서 활성 탭 값 / Active tab value in controlled mode
+ * @property {string} [defaultValue] - 비제어 모드에서 기본 활성 탭 값 / Default active tab value in uncontrolled mode
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 / Tab change callback
+ * @property {"pills" | "underline" | "cards"} [variant="pills"] - Navigation 스타일 변형 / Navigation style variant
+ * @property {"small" | "medium" | "large"} [scale="medium"] - Navigation 크기 / Navigation size
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'style'>}
+ */
 export interface NavigationProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   value?: string
   defaultValue?: string
@@ -11,6 +21,30 @@ export interface NavigationProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   scale?: "small" | "medium" | "large"
 }
 
+/**
+ * Navigation 컴포넌트 / Navigation component
+ * 
+ * 탭 네비게이션 컴포넌트입니다.
+ * NavigationList, NavigationItem, NavigationContent와 함께 사용합니다.
+ * 
+ * Tab navigation component.
+ * Used with NavigationList, NavigationItem, and NavigationContent.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Navigation>
+ *   <Navigation.List>
+ *     <Navigation.Item value="tab1">탭 1</Navigation.Item>
+ *     <Navigation.Item value="tab2">탭 2</Navigation.Item>
+ *   </Navigation.List>
+ *   <Navigation.Content value="tab1">내용 1</Navigation.Content>
+ * </Navigation>
+ * 
+ * @param {NavigationProps} props - Navigation 컴포넌트의 props / Navigation component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Navigation 컴포넌트 / Navigation component
+ */
 const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
   ({ 
     className, 
@@ -54,7 +88,7 @@ const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
               value: currentValue,
               variant,
               scale
-            } as any)
+            } as Partial<NavigationListProps | NavigationItemProps>)
           }
           return child
         })}
@@ -64,6 +98,15 @@ const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
 )
 Navigation.displayName = "Navigation"
 
+/**
+ * NavigationList 컴포넌트의 props / NavigationList component props
+ * @typedef {Object} NavigationListProps
+ * @property {string} [value] - 활성 탭 값 / Active tab value
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 / Tab change callback
+ * @property {"pills" | "underline" | "cards"} [variant="pills"] - Navigation 스타일 변형 / Navigation style variant
+ * @property {"small" | "medium" | "large"} [scale="medium"] - Navigation 크기 / Navigation size
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'style'>}
+ */
 export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   value?: string
   onValueChange?: (value: string) => void
@@ -122,7 +165,7 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
               value,
               variant,
               scale
-            } as any)
+            } as Partial<NavigationItemProps>)
           }
           return child
         })}
@@ -132,6 +175,16 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
 )
 NavigationList.displayName = "NavigationList"
 
+/**
+ * NavigationItem 컴포넌트의 props / NavigationItem component props
+ * @typedef {Object} NavigationItemProps
+ * @property {string} value - 탭 값 / Tab value
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 / Tab change callback
+ * @property {"pills" | "underline" | "cards"} [variant] - Navigation 스타일 변형 (자동으로 설정됨) / Navigation style variant (auto-set)
+ * @property {"small" | "medium" | "large"} [scale] - Navigation 크기 (자동으로 설정됨) / Navigation size (auto-set)
+ * @property {boolean} [active] - 활성 상태 (자동으로 설정됨) / Active state (auto-set)
+ * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'style'>}
+ */
 export interface NavigationItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'style'> {
   value: string
   onValueChange?: (value: string) => void
@@ -218,6 +271,13 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
 )
 NavigationItem.displayName = "NavigationItem"
 
+/**
+ * NavigationContent 컴포넌트의 props / NavigationContent component props
+ * @typedef {Object} NavigationContentProps
+ * @property {string} value - 탭 값 / Tab value
+ * @property {boolean} [active] - 활성 상태 (자동으로 설정됨) / Active state (auto-set)
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface NavigationContentProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string
   active?: boolean

@@ -3,17 +3,63 @@
 import React from "react";
 import { merge } from "../lib/utils";
 
-/** 공통 옵션 */
+/**
+ * 버튼 스타일 변형 / Button style variant
+ * @typedef {"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"} Variant
+ */
 type Variant =
   | "default" | "destructive" | "outline" | "secondary"
   | "ghost" | "link" | "gradient" | "neon" | "glass";
+
+/**
+ * 버튼 크기 / Button size
+ * @typedef {"sm" | "md" | "lg" | "xl" | "icon"} Size
+ */
 type Size = "sm" | "md" | "lg" | "xl" | "icon";
+
+/**
+ * 버튼 모서리 둥글기 / Button border radius
+ * @typedef {"sm" | "md" | "lg" | "full"} Rounded
+ */
 type Rounded = "sm" | "md" | "lg" | "full";
+
+/**
+ * 버튼 그림자 / Button shadow
+ * @typedef {"none" | "sm" | "md" | "lg" | "xl"} Shadow
+ */
 type Shadow = "none" | "sm" | "md" | "lg" | "xl";
+
+/**
+ * 버튼 호버 효과 / Button hover effect
+ * @typedef {"scale" | "glow" | "slide" | "none"} Hover
+ */
 type Hover = "scale" | "glow" | "slide" | "none";
+
+/**
+ * 그라디언트 색상 이름 / Gradient color name
+ * @typedef {"blue" | "purple" | "green" | "orange" | "pink" | "custom"} GradientName
+ */
 type GradientName = "blue" | "purple" | "green" | "orange" | "pink" | "custom";
 
-/** disabled를 공통에 명시해 앵커/버튼 모두에서 사용 */
+/**
+ * Button 컴포넌트의 공통 props / Common props for Button component
+ * @typedef {Object} CommonProps
+ * @property {Variant} [variant="default"] - 버튼 스타일 변형 / Button style variant
+ * @property {Size} [size="md"] - 버튼 크기 / Button size
+ * @property {boolean} [loading=false] - 로딩 상태 (스피너 표시) / Loading state (shows spinner)
+ * @property {React.ReactNode} [icon] - 아이콘 요소 / Icon element
+ * @property {"left" | "right"} [iconPosition="left"] - 아이콘 위치 / Icon position
+ * @property {GradientName} [gradient="blue"] - 그라디언트 색상 (variant="gradient"일 때) / Gradient color (when variant="gradient")
+ * @property {string} [customGradient] - 커스텀 그라디언트 클래스 (variant="gradient"일 때) / Custom gradient class (when variant="gradient")
+ * @property {Rounded} [rounded="md"] - 모서리 둥글기 / Border radius
+ * @property {Shadow} [shadow="md"] - 그림자 크기 / Shadow size
+ * @property {Hover} [hover="scale"] - 호버 효과 / Hover effect
+ * @property {boolean} [fullWidth=false] - 전체 너비 사용 / Use full width
+ * @property {boolean} [iconOnly=false] - 아이콘만 표시 (aria-label 필수) / Icon only (aria-label required)
+ * @property {string} [aria-label] - 접근성을 위한 레이블 (iconOnly일 때 필수) / Accessibility label (required when iconOnly)
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {boolean} [disabled=false] - 비활성화 상태 / Disabled state
+ */
 type CommonProps = {
   variant?: Variant;
   size?: Size;
@@ -42,6 +88,12 @@ type NativeButtonProps = CommonProps &
     href?: undefined;
   };
 
+/**
+ * Button 컴포넌트의 props 타입 / Button component props type
+ * href가 제공되면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
+ * Renders as anchor tag if href is provided, otherwise as button tag.
+ * @typedef {AnchorProps | NativeButtonProps} ButtonProps
+ */
 export type ButtonProps = AnchorProps | NativeButtonProps;
 
 type AnchorOrButton = HTMLAnchorElement | HTMLButtonElement;
@@ -60,7 +112,48 @@ function useReducedMotion() {
   return reduce;
 }
 
-/** ✅ 내부 이름은 ButtonInner로, export는 마지막에 한 번만 */
+/**
+ * Button 컴포넌트 / Button component
+ * 
+ * 다양한 스타일과 크기를 지원하는 범용 버튼 컴포넌트입니다.
+ * href prop을 제공하면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
+ * 
+ * Universal button component supporting various styles and sizes.
+ * Renders as anchor tag if href prop is provided, otherwise as button tag.
+ * 
+ * @component
+ * @example
+ * // 기본 버튼 / Basic button
+ * <Button onClick={() => console.log('클릭')}>클릭하세요</Button>
+ * 
+ * @example
+ * // 다양한 변형 / Various variants
+ * <Button variant="destructive" size="lg">삭제</Button>
+ * <Button variant="outline" size="sm">취소</Button>
+ * <Button variant="ghost">보기</Button>
+ * 
+ * @example
+ * // 아이콘과 함께 사용 / With icon
+ * <Button icon={<Icon name="download" />} iconPosition="left">
+ *   다운로드
+ * </Button>
+ * 
+ * @example
+ * // 로딩 상태 / Loading state
+ * <Button loading disabled>저장 중...</Button>
+ * 
+ * @example
+ * // 링크 버튼 / Link button
+ * <Button href="/about" variant="link">자세히 보기</Button>
+ * 
+ * @example
+ * // 아이콘만 표시 (aria-label 필수) / Icon only (aria-label required)
+ * <Button iconOnly aria-label="닫기" icon={<Icon name="close" />} />
+ * 
+ * @param {ButtonProps} props - Button 컴포넌트의 props / Button component props
+ * @param {React.Ref<HTMLAnchorElement | HTMLButtonElement>} ref - ref 객체 / ref object
+ * @returns {JSX.Element} Button 컴포넌트 / Button component
+ */
 const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function ButtonInner(
   {
     variant = "default",
@@ -173,7 +266,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
 
   // 앵커 모드
   if ("href" in rest && rest.href) {
-    const { onClick, target, rel, href, ...anchorProps } = rest as AnchorProps;
+    const { onClick, target, rel, href, "aria-label": ariaLabel, ...anchorProps } = rest as AnchorProps;
     const isDisabled = !!disabled || loading;
 
     const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
@@ -187,6 +280,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
         href={href}
         className={base}
         onClick={handleAnchorClick}
+        aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
         tabIndex={isDisabled ? -1 : anchorProps.tabIndex}
         target={target}
@@ -200,13 +294,15 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
 
   // 버튼 모드
   const btnProps = rest as NativeButtonProps;
+  const isDisabled = !!disabled || loading;
   return (
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
       className={base}
       type="button"                 // 폼 기본 제출 방지
-      disabled={disabled || loading}
+      disabled={isDisabled}
       aria-busy={loading || undefined}
+      aria-disabled={isDisabled || undefined}
       {...btnProps}
     >
       {content}

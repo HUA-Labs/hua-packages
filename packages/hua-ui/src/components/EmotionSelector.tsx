@@ -1,10 +1,28 @@
 'use client'
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { EmotionButton } from "./EmotionButton"
 import { EmotionMeter } from "./EmotionMeter"
 
+/**
+ * EmotionSelector 컴포넌트의 props / EmotionSelector component props
+ * @typedef {Object} EmotionSelectorProps
+ * @property {string} [selectedEmotion] - 선택된 감정 키 / Selected emotion key
+ * @property {(emotion: string) => void} [onEmotionSelect] - 감정 선택 콜백 / Emotion selection callback
+ * @property {"grid" | "list" | "compact"} [layout="grid"] - 레이아웃 타입 / Layout type
+ * @property {boolean} [showIntensity=false] - 강도 조절 표시 여부 / Show intensity control
+ * @property {number} [intensity=50] - 감정 강도 (0-100) / Emotion intensity (0-100)
+ * @property {(intensity: number) => void} [onIntensityChange] - 강도 변경 콜백 / Intensity change callback
+ * @property {Array<Object>} [emotions] - 감정 목록 / Emotions list
+ * @property {string} emotions[].key - 감정 키 / Emotion key
+ * @property {string} emotions[].label - 감정 라벨 / Emotion label
+ * @property {string} [emotions[].icon] - 감정 아이콘 / Emotion icon
+ * @property {string} [emotions[].color] - 감정 색상 / Emotion color
+ * @property {"sm" | "md" | "lg"} [size="md"] - 감정 버튼 크기 / Emotion button size
+ * @property {"button" | "card" | "chip"} [variant="button"] - 감정 표시 스타일 / Emotion display style
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 interface EmotionSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
   selectedEmotion?: string
   onEmotionSelect?: (emotion: string) => void
@@ -33,6 +51,38 @@ const defaultEmotions = [
   { key: "loneliness", label: "외로움", icon: "user", color: "indigo" }
 ]
 
+/**
+ * EmotionSelector 컴포넌트 / EmotionSelector component
+ * 
+ * 감정을 선택하는 컴포넌트입니다.
+ * 여러 감정 옵션을 제공하며, 강도 조절 기능을 포함할 수 있습니다.
+ * 
+ * Component for selecting emotions.
+ * Provides multiple emotion options and can include intensity control.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <EmotionSelector
+ *   selectedEmotion="joy"
+ *   onEmotionSelect={(emotion) => console.log(emotion)}
+ * />
+ * 
+ * @example
+ * // 강도 조절 포함 / With intensity control
+ * <EmotionSelector
+ *   selectedEmotion="calm"
+ *   onEmotionSelect={handleEmotionSelect}
+ *   showIntensity
+ *   intensity={intensity}
+ *   onIntensityChange={setIntensity}
+ *   variant="card"
+ * />
+ * 
+ * @param {EmotionSelectorProps} props - EmotionSelector 컴포넌트의 props / EmotionSelector component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} EmotionSelector 컴포넌트 / EmotionSelector component
+ */
 const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
   ({ 
     className, 
@@ -58,11 +108,11 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
         return (
           <EmotionButton
             key={emotion.key}
-            emotion={emotion.key as any}
+            emotion={emotion.key}
             isSelected={isSelected}
             size={size}
             onClick={() => handleEmotionClick(emotion.key)}
-            className={cn(
+            className={merge(
               "transition-all duration-200",
               isSelected && "ring-2 ring-offset-2 ring-primary"
             )}
@@ -76,7 +126,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
         return (
           <div
             key={emotion.key}
-            className={cn(
+            className={merge(
               "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
               isSelected 
                 ? "border-primary bg-primary/5" 
@@ -85,7 +135,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             onClick={() => handleEmotionClick(emotion.key)}
           >
             <div className="flex items-center space-x-3">
-              <div className={cn(
+              <div className={merge(
                 "w-8 h-8 rounded-full flex items-center justify-center",
                 isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
               )}>
@@ -111,7 +161,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
         return (
           <div
             key={emotion.key}
-            className={cn(
+            className={merge(
               "px-3 py-1 rounded-full cursor-pointer transition-all duration-200 text-sm font-medium",
               isSelected 
                 ? "bg-primary text-primary-foreground" 
@@ -136,7 +186,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
     return (
       <div
         ref={ref}
-        className={cn("space-y-4", className)}
+        className={merge("space-y-4", className)}
         {...props}
       >
         <div className={layoutClasses[layout]}>

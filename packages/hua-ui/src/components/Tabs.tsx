@@ -3,12 +3,28 @@
 import React from 'react'
 import { merge } from '../lib/utils'
 
-// TabsContent를 먼저 선언하여 타입 비교에 사용할 수 있도록 함
+/**
+ * TabsContent 컴포넌트의 props / TabsContent component props
+ * @typedef {Object} TabsContentProps
+ * @property {string} value - 탭 패널의 고유 값 (TabsTrigger의 value와 일치해야 함) / Unique value for tab panel (must match TabsTrigger value)
+ * @property {boolean} [active] - 탭 패널 활성화 상태 (자동 설정됨) / Tab panel active state (auto-set)
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string
   active?: boolean
 }
 
+/**
+ * TabsContent 컴포넌트 / TabsContent component
+ * 탭의 콘텐츠 패널을 표시합니다. Tabs 컴포넌트 내부에서 사용됩니다.
+ * Displays the tab content panel. Used inside Tabs component.
+ * 
+ * @component
+ * @param {TabsContentProps} props - TabsContent 컴포넌트의 props / TabsContent component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} TabsContent 컴포넌트 / TabsContent component
+ */
 const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, value, active, children, ...props }, ref) => {
     // active prop이 명시적으로 false로 설정된 경우에만 숨김
@@ -17,6 +33,10 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
     return (
       <div
         ref={ref}
+        role="tabpanel"
+        id={`tabpanel-${value}`}
+        aria-labelledby={`tab-${value}`}
+        hidden={!active}
         className={merge(
           "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           className
@@ -30,6 +50,17 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
 )
 TabsContent.displayName = "TabsContent"
 
+/**
+ * Tabs 컴포넌트의 props / Tabs component props
+ * @typedef {Object} TabsProps
+ * @property {string} [value] - 현재 활성화된 탭 값 (제어 컴포넌트) / Currently active tab value (controlled component)
+ * @property {string} [defaultValue] - 초기 활성화된 탭 값 (비제어 컴포넌트) / Initial active tab value (uncontrolled component)
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 시 호출되는 콜백 / Callback when tab changes
+ * @property {"horizontal" | "vertical"} [orientation="horizontal"] - 탭 방향 / Tab orientation
+ * @property {"default" | "pills" | "underline" | "cards"} [variant="default"] - 탭 스타일 변형 / Tab style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - 탭 크기 / Tab size
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
   defaultValue?: string
@@ -39,6 +70,49 @@ export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg"
 }
 
+/**
+ * Tabs 컴포넌트 / Tabs component
+ * 
+ * 탭 네비게이션을 제공하는 컴포넌트입니다.
+ * 키보드 네비게이션(Arrow keys, Home/End)을 지원하며, ARIA 속성을 자동으로 설정합니다.
+ * 
+ * Component that provides tab navigation.
+ * Supports keyboard navigation (Arrow keys, Home/End) and automatically sets ARIA attributes.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Tabs defaultValue="tab1">
+ *   <TabsList>
+ *     <TabsTrigger value="tab1">탭 1</TabsTrigger>
+ *     <TabsTrigger value="tab2">탭 2</TabsTrigger>
+ *   </TabsList>
+ *   <TabsContent value="tab1">탭 1 내용</TabsContent>
+ *   <TabsContent value="tab2">탭 2 내용</TabsContent>
+ * </Tabs>
+ * 
+ * @example
+ * // 제어 컴포넌트 / Controlled component
+ * const [activeTab, setActiveTab] = useState("tab1")
+ * <Tabs value={activeTab} onValueChange={setActiveTab}>
+ *   <TabsList>
+ *     <TabsTrigger value="tab1">탭 1</TabsTrigger>
+ *   </TabsList>
+ *   <TabsContent value="tab1">내용</TabsContent>
+ * </Tabs>
+ * 
+ * @example
+ * // 다양한 변형 / Various variants
+ * <Tabs variant="pills" size="lg">
+ *   <TabsList>
+ *     <TabsTrigger value="tab1">Pills 스타일</TabsTrigger>
+ *   </TabsList>
+ * </Tabs>
+ * 
+ * @param {TabsProps} props - Tabs 컴포넌트의 props / Tabs component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} Tabs 컴포넌트 / Tabs component
+ */
 const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   ({ 
     className, 
@@ -82,7 +156,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
           if (React.isValidElement(child)) {
             // TabsContent인 경우 active prop을 자동으로 설정
             if (child.type === TabsContent) {
-              const childProps = child.props as { value: string }
+              const childProps = child.props as TabsContentProps
               return React.cloneElement(child, {
                 value: currentValue,
                 onValueChange: handleTabChange,
@@ -90,7 +164,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
                 variant,
                 size,
                 active: childProps.value === currentValue
-              } as any)
+              } as Partial<TabsContentProps>)
             }
             // 다른 컴포넌트들
             return React.cloneElement(child, {
@@ -99,7 +173,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
               orientation,
               variant,
               size
-            } as any)
+            } as Partial<TabsTriggerProps | TabsListProps>)
           }
           return child
         })}
@@ -109,6 +183,16 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 )
 Tabs.displayName = "Tabs"
 
+/**
+ * TabsList 컴포넌트의 props / TabsList component props
+ * @typedef {Object} TabsListProps
+ * @property {string} [value] - 현재 활성화된 탭 값 (Tabs에서 자동 전달) / Currently active tab value (auto-passed from Tabs)
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 (Tabs에서 자동 전달) / Tab change callback (auto-passed from Tabs)
+ * @property {"horizontal" | "vertical"} [orientation] - 탭 방향 (Tabs에서 자동 전달) / Tab orientation (auto-passed from Tabs)
+ * @property {"default" | "pills" | "underline" | "cards"} [variant] - 탭 스타일 (Tabs에서 자동 전달) / Tab style (auto-passed from Tabs)
+ * @property {"sm" | "md" | "lg"} [size] - 탭 크기 (Tabs에서 자동 전달) / Tab size (auto-passed from Tabs)
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string
   onValueChange?: (value: string) => void
@@ -117,6 +201,16 @@ export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg"
 }
 
+/**
+ * TabsList 컴포넌트 / TabsList component
+ * 탭 트리거 목록을 표시합니다. Tabs 컴포넌트 내부에서 사용됩니다.
+ * Displays the list of tab triggers. Used inside Tabs component.
+ * 
+ * @component
+ * @param {TabsListProps} props - TabsList 컴포넌트의 props / TabsList component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} TabsList 컴포넌트 / TabsList component
+ */
 const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ({ 
     className, 
@@ -128,6 +222,70 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     children,
     ...props 
   }, ref) => {
+    const listRef = React.useRef<HTMLDivElement>(null)
+    React.useImperativeHandle(ref, () => listRef.current as HTMLDivElement)
+    
+    // 모든 탭 트리거의 value를 수집
+    const tabValues = React.useMemo(() => {
+      const values: string[] = []
+      React.Children.forEach(children, (child) => {
+        if (React.isValidElement(child)) {
+          const childProps = child.props as { value?: string }
+          if (childProps.value) {
+            values.push(childProps.value)
+          }
+        }
+      })
+      return values
+    }, [children])
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!value || tabValues.length === 0) return
+
+      const currentIndex = tabValues.indexOf(value)
+      if (currentIndex === -1) return
+
+      let newIndex = currentIndex
+
+      if (orientation === "horizontal") {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault()
+          newIndex = currentIndex > 0 ? currentIndex - 1 : tabValues.length - 1
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault()
+          newIndex = currentIndex < tabValues.length - 1 ? currentIndex + 1 : 0
+        } else if (e.key === "Home") {
+          e.preventDefault()
+          newIndex = 0
+        } else if (e.key === "End") {
+          e.preventDefault()
+          newIndex = tabValues.length - 1
+        }
+      } else {
+        if (e.key === "ArrowUp") {
+          e.preventDefault()
+          newIndex = currentIndex > 0 ? currentIndex - 1 : tabValues.length - 1
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault()
+          newIndex = currentIndex < tabValues.length - 1 ? currentIndex + 1 : 0
+        } else if (e.key === "Home") {
+          e.preventDefault()
+          newIndex = 0
+        } else if (e.key === "End") {
+          e.preventDefault()
+          newIndex = tabValues.length - 1
+        }
+      }
+
+      if (newIndex !== currentIndex && tabValues[newIndex]) {
+        onValueChange?.(tabValues[newIndex])
+        // 포커스 이동
+        const triggerElement = listRef.current?.querySelector(
+          `[data-tab-value="${tabValues[newIndex]}"]`
+        ) as HTMLElement
+        triggerElement?.focus()
+      }
+    }
     const getVariantClasses = () => {
       switch (variant) {
         case "pills":
@@ -154,7 +312,10 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 
     return (
       <div
-        ref={ref}
+        ref={listRef}
+        role="tablist"
+        aria-orientation={orientation}
+        onKeyDown={handleKeyDown}
         className={merge(
           "flex items-center justify-center",
           orientation === "vertical" && "flex-col",
@@ -172,7 +333,7 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               orientation,
               variant,
               size
-            } as any)
+            } as Partial<TabsTriggerProps>)
           }
           return child
         })}
@@ -182,6 +343,17 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 )
 TabsList.displayName = "TabsList"
 
+/**
+ * TabsTrigger 컴포넌트의 props
+ * @typedef {Object} TabsTriggerProps
+ * @property {string} value - 탭 트리거의 고유 값 (TabsContent의 value와 일치해야 함)
+ * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 (TabsList에서 자동 전달)
+ * @property {"horizontal" | "vertical"} [orientation] - 탭 방향 (TabsList에서 자동 전달)
+ * @property {"default" | "pills" | "underline" | "cards"} [variant] - 탭 스타일 (TabsList에서 자동 전달)
+ * @property {"sm" | "md" | "lg"} [size] - 탭 크기 (TabsList에서 자동 전달)
+ * @property {boolean} [active] - 탭 활성화 상태 (자동 설정됨)
+ * @extends {React.ButtonHTMLAttributes<HTMLButtonElement>}
+ */
 export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string
   onValueChange?: (value: string) => void
@@ -191,6 +363,16 @@ export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonE
   active?: boolean
 }
 
+/**
+ * TabsTrigger 컴포넌트 / TabsTrigger component
+ * 탭을 활성화하는 버튼입니다. TabsList 컴포넌트 내부에서 사용됩니다.
+ * Button that activates a tab. Used inside TabsList component.
+ * 
+ * @component
+ * @param {TabsTriggerProps} props - TabsTrigger 컴포넌트의 props / TabsTrigger component props
+ * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
+ * @returns {JSX.Element} TabsTrigger 컴포넌트 / TabsTrigger component
+ */
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ 
     className, 
@@ -257,6 +439,12 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
     return (
       <button
         ref={ref}
+        role="tab"
+        aria-selected={active}
+        aria-controls={`tabpanel-${value}`}
+        id={`tab-${value}`}
+        data-tab-value={value}
+        tabIndex={active ? 0 : -1}
         className={merge(
           getVariantClasses(),
           getSizeClasses(),

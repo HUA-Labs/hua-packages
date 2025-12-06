@@ -277,18 +277,32 @@ export const ICON_ALIASES: Record<string, string> = {
 
 /**
  * Resolve icon alias to actual icon name
+ * 
+ * @param iconName - 아이콘 이름 또는 별칭 / Icon name or alias
+ * @returns 실제 아이콘 이름 / Actual icon name
+ * @throws {TypeError} iconName이 문자열이 아닌 경우
  */
 export function resolveIconAlias(iconName: string): string {
-  return ICON_ALIASES[iconName] || iconName
+  if (typeof iconName !== 'string') {
+    throw new TypeError('iconName must be a string');
+  }
+  return ICON_ALIASES[iconName] || iconName;
 }
 
 /**
  * Get all aliases for an icon name
+ * 
+ * @param iconName - 아이콘 이름 / Icon name
+ * @returns 해당 아이콘의 모든 별칭 배열 / Array of all aliases for the icon
+ * @throws {TypeError} iconName이 문자열이 아닌 경우
  */
 export function getIconAliases(iconName: string): string[] {
+  if (typeof iconName !== 'string') {
+    throw new TypeError('iconName must be a string');
+  }
   return Object.entries(ICON_ALIASES)
     .filter(([_, target]) => target === iconName)
-    .map(([alias]) => alias)
+    .map(([alias]) => alias);
 }
 
 

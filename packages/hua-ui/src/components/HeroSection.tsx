@@ -4,6 +4,26 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Button } from "./Button"
 
+/**
+ * HeroSection 컴포넌트의 props / HeroSection component props
+ * @typedef {Object} HeroSectionProps
+ * @property {string} title - 히어로 섹션 제목 / Hero section title
+ * @property {string} [subtitle] - 히어로 섹션 부제목 / Hero section subtitle
+ * @property {string} description - 히어로 섹션 설명 / Hero section description
+ * @property {Object} [primaryAction] - 주요 액션 버튼 / Primary action button
+ * @property {string} primaryAction.label - 버튼 라벨 / Button label
+ * @property {string} primaryAction.href - 버튼 링크 / Button link
+ * @property {string} [primaryAction.icon] - 버튼 아이콘 / Button icon
+ * @property {Object} [secondaryAction] - 보조 액션 버튼 / Secondary action button
+ * @property {string} secondaryAction.label - 버튼 라벨 / Button label
+ * @property {string} secondaryAction.href - 버튼 링크 / Button link
+ * @property {string} [secondaryAction.icon] - 버튼 아이콘 / Button icon
+ * @property {"default" | "gradient" | "glass" | "neon"} [variant="default"] - HeroSection 스타일 변형 / HeroSection style variant
+ * @property {"none" | "gradient" | "particles" | "video"} [background="gradient"] - 배경 타입 / Background type
+ * @property {string} [customBackground] - 커스텀 배경 / Custom background
+ * @property {"sm" | "md" | "lg" | "xl"} [size="lg"] - HeroSection 크기 / HeroSection size
+ * @extends {React.HTMLAttributes<HTMLElement>}
+ */
 export interface HeroSectionProps extends React.HTMLAttributes<HTMLElement> {
   title: string
   subtitle?: string
@@ -24,6 +44,40 @@ export interface HeroSectionProps extends React.HTMLAttributes<HTMLElement> {
   size?: "sm" | "md" | "lg" | "xl"
 }
 
+/**
+ * HeroSection 컴포넌트 / HeroSection component
+ * 
+ * 랜딩 페이지의 히어로 섹션을 제공하는 컴포넌트입니다.
+ * 제목, 설명, 액션 버튼을 포함하며, 다양한 배경 효과를 지원합니다.
+ * 
+ * Component that provides hero section for landing pages.
+ * Includes title, description, and action buttons, supports various background effects.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <HeroSection
+ *   title="환영합니다"
+ *   description="우리 서비스를 소개합니다"
+ *   primaryAction={{ label: "시작하기", href: "/start" }}
+ * />
+ * 
+ * @example
+ * // Gradient 배경, 두 개의 액션 버튼 / Gradient background, two action buttons
+ * <HeroSection
+ *   title="혁신적인 솔루션"
+ *   subtitle="차세대 플랫폼"
+ *   description="최신 기술로 만든 플랫폼"
+ *   variant="gradient"
+ *   background="gradient"
+ *   primaryAction={{ label: "시작하기", href: "/start", icon: "arrowRight" }}
+ *   secondaryAction={{ label: "더 알아보기", href: "/about" }}
+ * />
+ * 
+ * @param {HeroSectionProps} props - HeroSection 컴포넌트의 props / HeroSection component props
+ * @param {React.Ref<HTMLElement>} ref - section 요소 ref / section element ref
+ * @returns {JSX.Element} HeroSection 컴포넌트 / HeroSection component
+ */
 const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
   ({ 
     className, 

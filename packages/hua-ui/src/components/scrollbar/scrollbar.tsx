@@ -1,5 +1,5 @@
 import React from "react"
-import { cn } from "../../lib/utils"
+import { merge } from "../../lib/utils"
 
 export interface ScrollbarProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -61,7 +61,7 @@ const Scrollbar = React.forwardRef<HTMLDivElement, ScrollbarProps>(
       }
     }
 
-    const baseClasses = cn(
+    const baseClasses = merge(
       "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-full transition-all duration-200",
       getVariantClasses(),
       getSizeClasses(),

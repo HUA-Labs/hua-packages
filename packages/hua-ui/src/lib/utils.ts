@@ -43,6 +43,43 @@ export function mergeIf(
 }
 
 /**
+ * 상대 시간 포맷팅 유틸리티
+ * 
+ * 날짜를 상대 시간 형식으로 포맷팅합니다 (예: "방금 전", "5분 전", "2시간 전", "3일 전").
+ * 7일 이상 경과한 경우 절대 날짜를 반환합니다.
+ * 
+ * Formats a date as relative time (e.g., "방금 전", "5분 전", "2시간 전", "3일 전").
+ * Returns absolute date for dates older than 7 days.
+ * 
+ * @param timestamp - 포맷팅할 날짜 (Date 객체 또는 ISO 문자열) / Date to format (Date object or ISO string)
+ * @param locale - 로케일 (기본값: "ko-KR") / Locale (default: "ko-KR")
+ * @returns 포맷팅된 상대 시간 문자열 / Formatted relative time string
+ * 
+ * @example
+ * ```tsx
+ * formatRelativeTime(new Date()) // "방금 전"
+ * formatRelativeTime(new Date(Date.now() - 5 * 60000)) // "5분 전"
+ * formatRelativeTime(new Date(Date.now() - 2 * 3600000)) // "2시간 전"
+ * formatRelativeTime(new Date(Date.now() - 3 * 86400000)) // "3일 전"
+ * formatRelativeTime(new Date("2024-01-01")) // "2024. 1. 1." (7일 이상 경과)
+ * ```
+ */
+export function formatRelativeTime(timestamp: Date | string, locale = "ko-KR"): string {
+  const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return locale === "ko-KR" ? "방금 전" : "just now";
+  if (minutes < 60) return locale === "ko-KR" ? `${minutes}분 전` : `${minutes}m ago`;
+  if (hours < 24) return locale === "ko-KR" ? `${hours}시간 전` : `${hours}h ago`;
+  if (days < 7) return locale === "ko-KR" ? `${days}일 전` : `${days}d ago`;
+  return date.toLocaleDateString(locale);
+}
+
+/**
  * 객체 기반 클래스 병합 유틸리티
  * 객체의 키-값 쌍을 기반으로 조건부 클래스를 병합합니다.
  * 

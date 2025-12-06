@@ -41,7 +41,7 @@ export const iconNames = [
   
   // Data & Analytics
   'chart', 'barChart', 'pieChart', 'trendingUp', 'trendingDown',
-  'activity', 'database', 'zap', 'circle',
+  'activity', 'database', 'zap', 'circle', 'dollarSign', 'dollar', 'currency',
   
   // Files & Content
   'fileText', 'file', 'folder', 'book', 'bookOpen',
@@ -90,7 +90,7 @@ export const iconProviderMapping: Record<string, {
  * 아이콘 이름이 유효한지 확인
  */
 export function isValidIconName(name: string): name is AllIconName {
-  return name in PROJECT_ICONS || iconNames.includes(name as any)
+  return name in PROJECT_ICONS || (iconNames as readonly string[]).includes(name)
 }
 
 /**
