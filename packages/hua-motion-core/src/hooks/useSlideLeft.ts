@@ -28,13 +28,16 @@ export function useSlideLeft<T extends MotionElement = HTMLDivElement>(
   const [opacity, setOpacity] = useState(autoStart ? 0 : 1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(autoStart ? false : true)
+  const [progress, setProgress] = useState(autoStart ? 0 : 1)
 
   const start = useCallback(() => {
     setIsAnimating(true)
     setTranslateX(distance)
     setOpacity(0)
+    setProgress(0)
 
     setTimeout(() => {
+      setProgress(1)
       setTranslateX(0)
       setOpacity(1)
       setIsVisible(true)
@@ -46,6 +49,7 @@ export function useSlideLeft<T extends MotionElement = HTMLDivElement>(
     // 즉시 초기 상태로 복원 (모션 없이)
     setTranslateX(distance)
     setOpacity(0)
+    setProgress(0)
     setIsVisible(false)
     setIsAnimating(false)
     
@@ -90,6 +94,7 @@ export function useSlideLeft<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     style,
+    progress,
     start,
     reset,
     stop
