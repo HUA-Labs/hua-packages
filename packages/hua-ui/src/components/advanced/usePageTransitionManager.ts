@@ -66,7 +66,7 @@ export const usePageTransitionManager = (
   const activeTransitionsRef = useRef<Map<string, { timer: NodeJS.Timeout; config: TransitionConfig }>>(new Map())
   const transitionCounterRef = useRef(0)
 
-  const logDebug = useCallback((message: string, data?: any) => {
+  const logDebug = useCallback((message: string, data?: unknown) => {
     if (enableDebug) {
       console.log(`[PageTransitionManager] ${message}`, data)
     }
