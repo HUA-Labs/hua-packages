@@ -1066,8 +1066,8 @@ importers:
   packages/hua-ui:
     dependencies:
       '@hua-labs/motion-core':
-        specifier: workspace:*
-        version: link:../hua-motion-core
+        specifier: '*'
+        version: 2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
@@ -2119,6 +2119,12 @@ packages:
     resolution: {integrity: sha512-LMcepvRaS9LYHJGsF0zzmgKCUim/X3N/DQKc4jepAXJ7l8QxJ1PmxJzqplF2Z3FE4PqBAIGyJAQ/w4B5dsqbtQ==}
     peerDependencies:
       react: '>= 16 || ^19.0.0-rc'
+
+  '@hua-labs/motion-core@2.0.0':
+    resolution: {integrity: sha512-bt88uVhXfi8c/iaRWO5s4awItrqC6FCxg/NKxooX2wKQ7LAOmgJv98I2MBAQHrYTTNC2c8YG4p4HYu5cysGccA==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -10204,6 +10210,11 @@ snapshots:
   '@heroicons/react@2.2.0(react@19.2.1)':
     dependencies:
       react: 19.2.1
+
+  '@hua-labs/motion-core@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
+    dependencies:
+      react: 19.2.1
+      react-dom: 19.2.1(react@19.2.1)
 
   '@humanfs/core@0.19.1': {}
 
