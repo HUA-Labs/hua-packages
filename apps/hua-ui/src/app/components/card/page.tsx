@@ -170,8 +170,8 @@ export default function PanelPage() {
                     고급 기능들을 포함한 프리미엄 패키지입니다.
                   </p>
                   <div className="flex gap-2">
-                    <Action scale="small">자세히 보기</Action>
-                    <Action appearance="outline" scale="small">구매하기</Action>
+                    <Action size="sm">자세히 보기</Action>
+                    <Action appearance="outline" size="sm">구매하기</Action>
                   </div>
                 </Panel>
 
