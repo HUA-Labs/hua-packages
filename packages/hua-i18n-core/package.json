@@ -16,7 +16,7 @@
     }
   },
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "build": "corepack pnpm exec tsc",
     "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rm -rf dist",
     "test": "jest",
