@@ -91,7 +91,7 @@ export function AdvancedPageTransition() {
       {/* 컨트롤 패널 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="settings" className="w-5 h-5 mr-2 text-blue-600" />
+          <Icon name={"settings" as any} className="w-5 h-5 mr-2 text-blue-600" />
           전환 효과 설정
         </h3>
         
@@ -183,7 +183,7 @@ export function AdvancedPageTransition() {
       {/* 페이지 컨텐츠 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="layers" className="w-5 h-5 mr-2 text-purple-600" />
+          <Icon name={"layers" as any} className="w-5 h-5 mr-2 text-purple-600" />
           페이지 전환 데모 (HUA Motion 라이브러리 사용)
         </h3>
         
@@ -217,7 +217,7 @@ export function AdvancedPageTransition() {
       {/* 코드 예제 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="code" className="w-5 h-5 mr-2 text-green-600" />
+          <Icon name={"code" as any} className="w-5 h-5 mr-2 text-green-600" />
           HUA Motion 라이브러리 사용 예제
         </h3>
         
@@ -312,7 +312,7 @@ function PageTransitionDemo() {
   )
 }`)}
           >
-            <Icon name="copy" className="w-4 h-5 mr-2" />
+            <Icon name={"copy" as any} className="w-4 h-5 mr-2" />
             코드 복사
           </Action>
         </div>
@@ -321,7 +321,7 @@ function PageTransitionDemo() {
       {/* 기능 설명 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="info" className="w-5 h-5 mr-2 text-cyan-600" />
+          <Icon name={"info" as any} className="w-5 h-5 mr-2 text-cyan-600" />
           HUA Motion 라이브러리 기반 페이지 전환
         </h3>
         

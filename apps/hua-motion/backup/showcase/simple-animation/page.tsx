@@ -19,7 +19,7 @@ export default function SimpleAnimationPage() {
         <header className="text-center mb-16 sm:mb-20">
           <div className="inline-flex items-center space-x-3 mb-6">
             <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
-              <Icon name="zap" size={24} className="text-white" />
+              <Icon name={"zap" as any} size={24} className="text-white" />
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Simple Animation
@@ -33,7 +33,7 @@ export default function SimpleAnimationPage() {
           <div className="max-w-6xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl shadow-indigo-500/10 border border-indigo-200/50 dark:border-indigo-800/50">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Icon name="bookOpen" size={20} className="text-white" />
+                <Icon name={"bookOpen" as any} size={20} className="text-white" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 사용법 가이드
@@ -82,7 +82,7 @@ export default function SimpleAnimationPage() {
             
             <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 p-6 rounded-2xl border border-indigo-300/30 dark:border-indigo-700/30">
               <div className="flex items-start space-x-3">
-                                 <Icon name="zap" size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
+                                 <Icon name={"zap" as any} size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">💡 중요 팁</h4>
                   <p className="text-gray-700 dark:text-gray-300 mb-3">
@@ -153,7 +153,7 @@ export default function SimpleAnimationPage() {
             {/* 디버그 정보 */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-600">
               <h4 className="font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-                <Icon name="activity" size={20} className="mr-2 text-indigo-600" />
+                <Icon name={"activity" as any} size={20} className="mr-2 text-indigo-600" />
                 디버그 정보
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

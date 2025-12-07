@@ -141,7 +141,7 @@ export default function DemosPage() {
                   size="lg"
                   className="w-full group-hover:scale-105 transition-transform duration-300"
                 >
-                  <Icon name="arrowRight" size={20} className="mr-2" />
+                  <Icon name={"arrowRight" as any} size={20} className="mr-2" />
                   데모 보기
                 </Button>
               </div>
@@ -165,7 +165,7 @@ export default function DemosPage() {
                 gradient="blue"
                 size="lg"
               >
-                <Icon name="zap" size={20} className="mr-2" />
+                <Icon name={"zap" as any} size={20} className="mr-2" />
                 테스트 랩
               </Button>
               <Button
@@ -174,7 +174,7 @@ export default function DemosPage() {
                 gradient="green"
                 size="lg"
               >
-                <Icon name="settings" size={20} className="mr-2" />
+                <Icon name={"settings" as any} size={20} className="mr-2" />
                 플레이그라운드
               </Button>
             </div>

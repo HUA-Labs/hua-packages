@@ -7,7 +7,7 @@ export default function IndividualHooksSection() {
     <section className="mb-24">
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
-          <Icon name="brain" size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
+          <Icon name={"brain" as any} size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
           개별 모션 훅
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -19,7 +19,7 @@ export default function IndividualHooksSection() {
         {/* useFadeIn */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-            <Icon name="eye" size={24} className="mr-3 text-blue-600 dark:text-blue-400" />
+            <Icon name={"eye" as any} size={24} className="mr-3 text-blue-600 dark:text-blue-400" />
             useFadeIn
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -39,7 +39,7 @@ return <div ref={fadeIn.ref} style={{ opacity: fadeIn.opacity }}>`}</code></pre>
         {/* useSlideUp */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-            <Icon name="arrowUp" size={24} className="mr-3 text-green-600 dark:text-green-400" />
+            <Icon name={"arrowUp" as any} size={24} className="mr-3 text-green-600 dark:text-green-400" />
             useSlideUp
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -60,7 +60,7 @@ return <div ref={slideUp.ref} style={{
         {/* useScaleIn */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-            <Icon name="maximize" size={24} className="mr-3 text-purple-600 dark:text-purple-400" />
+            <Icon name={"maximize" as any} size={24} className="mr-3 text-purple-600 dark:text-purple-400" />
             useScaleIn
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -80,7 +80,7 @@ return <div ref={scaleIn.ref} style={{
         {/* usePulse */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center">
-            <Icon name="activity" size={24} className="mr-3 text-orange-600 dark:text-orange-400" />
+            <Icon name={"activity" as any} size={24} className="mr-3 text-orange-600 dark:text-orange-400" />
             usePulse
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">

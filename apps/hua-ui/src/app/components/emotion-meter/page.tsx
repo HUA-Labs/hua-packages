@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { EmotionMeter, Card, CardContent, ComponentLayout } from "@hua-labs/ui"
+import { EmotionMeter } from "@hua-labs/ui/advanced"
+import { Card, CardContent, ComponentLayout } from "@hua-labs/ui"
 
 // API 문서용 타입 정의
 const EMOTION_METER_TYPES = {
@@ -191,7 +192,7 @@ export default function EmotionMeterPage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { EmotionMeter } from "@hua-labs/ui"
+{`import { EmotionMeter } from "@hua-labs/ui/advanced"
 
 // 기본 미터
 <EmotionMeter value={50} />`}

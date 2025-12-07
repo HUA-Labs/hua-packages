@@ -59,7 +59,7 @@ export default function FeatureCards() {
                 transition: 'transform 0.3s ease-in-out'
               }}
             >
-              <Icon name="zap" size={32} className="text-white" />
+              <Icon name={"zap" as any} size={32} className="text-white" />
             </div>
           </div>
           <h3 
@@ -110,7 +110,7 @@ export default function FeatureCards() {
                 transition: 'transform 0.3s ease-in-out'
               }}
             >
-              <Icon name="sparkles" size={32} className="text-white" />
+              <Icon name={"sparkles" as any} size={32} className="text-white" />
             </div>
           </div>
           <h3 
@@ -161,7 +161,7 @@ export default function FeatureCards() {
                 transition: 'transform 0.3s ease-in-out'
               }}
             >
-              <Icon name="heart" size={32} className="text-white" />
+              <Icon name={"heart" as any} size={32} className="text-white" />
             </div>
           </div>
           <h3 

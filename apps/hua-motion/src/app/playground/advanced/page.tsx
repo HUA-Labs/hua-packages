@@ -87,7 +87,7 @@ export default function AdvancedPlaygroundPage() {
                   active={activeTab === tab.id}
                   className="flex items-center gap-2"
                 >
-                  <Icon name={tab.icon} className="w-5 h-5" />
+                  <Icon name={tab.icon as any} className="w-5 h-5" />
                   <span className="hidden sm:inline">{tab.name}</span>
                   <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
                 </TabsTrigger>

@@ -78,13 +78,13 @@ export function EnterprisePhysics() {
           {/* Enterprise Only 데모 */}
           <Panel className="p-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Icon name="crown" className="w-5 h-5 mr-2 text-yellow-600" />
+              <Icon name={"crown" as any} className="w-5 h-5 mr-2 text-yellow-600" />
               Enterprise Only
             </h4>
             
             <div className="flex justify-center">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8 rounded-lg text-center min-w-[300px]">
-                <Icon name="zap" className="w-16 h-16 mx-auto mb-4" />
+                <Icon name={"zap" as any} className="w-16 h-16 mx-auto mb-4" />
                 <h5 className="text-xl font-bold mb-2">{activeDemoData.title}</h5>
                 <p>{activeDemoData.description}</p>
                 <div className="mt-4 p-3 bg-white/20 rounded-lg">
@@ -102,7 +102,7 @@ export function EnterprisePhysics() {
           {/* 코드 예제 */}
           <Panel className="p-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Icon name="code" className="w-5 h-5 mr-2 text-blue-600" />
+              <Icon name={"code" as any} className="w-5 h-5 mr-2 text-blue-600" />
               사용 예제
             </h4>
             <div className="bg-gray-900 rounded-lg p-4 overflow-auto">
@@ -112,11 +112,11 @@ export function EnterprisePhysics() {
             </div>
             <div className="mt-4 flex gap-2">
               <Action variant="gradient" gradient="green" size="sm">
-                <Icon name="copy" className="w-4 h-4 mr-2" />
+                <Icon name={"copy" as any} className="w-4 h-4 mr-2" />
                 코드 복사
               </Action>
               <Action variant="outline" size="sm">
-                <Icon name="externalLink" className="w-4 h-4 mr-2" />
+                <Icon name={"externalLink" as any} className="w-4 h-4 mr-2" />
                 문서 보기
               </Action>
             </div>

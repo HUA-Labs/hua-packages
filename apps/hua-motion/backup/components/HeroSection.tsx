@@ -71,7 +71,7 @@ export default function HeroSection() {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             <span className="relative flex items-center">
-              <Icon name="layers" size={24} className="mr-3" />
+              <Icon name={"layers" as any} size={24} className="mr-3" />
               3단계 데모
             </span>
           </Button>
@@ -85,7 +85,7 @@ export default function HeroSection() {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             <span className="relative flex items-center">
-              <Icon name="zap" size={24} className="mr-3" />
+              <Icon name={"zap" as any} size={24} className="mr-3" />
               테스트 랩
             </span>
           </Button>
@@ -98,7 +98,7 @@ export default function HeroSection() {
             className="border-white/30 text-white hover:bg-white/10"
           >
             <span className="flex items-center">
-              <Icon name="settings" size={24} className="mr-3" />
+              <Icon name={"settings" as any} size={24} className="mr-3" />
               플레이그라운드
             </span>
           </Button>

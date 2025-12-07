@@ -96,25 +96,25 @@ export default function PlaygroundPage() {
                   <div className="absolute top-4 right-4">
                     {tab.status === 'available' && (
                       <span className="inline-flex items-center px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-medium rounded-full border border-green-200 dark:border-green-700/50">
-                        <Icon name="check" className="w-3 h-3 mr-1" />
+                        <Icon name={"check" as any} className="w-3 h-3 mr-1" />
                         사용 가능
                       </span>
                     )}
                     {tab.status === 'development' && (
                       <span className="inline-flex items-center px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs font-medium rounded-full border border-orange-200 dark:border-orange-700/50">
-                        <Icon name="code" className="w-3 h-3 mr-1" />
+                        <Icon name={"code" as any} className="w-3 h-3 mr-1" />
                         개발 중
                       </span>
                     )}
                     {tab.status === 'coming-soon' && (
                       <span className="inline-flex items-center px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-xs font-medium rounded-full border border-yellow-200 dark:border-yellow-700/50">
-                        <Icon name="clock" className="w-3 h-3 mr-1" />
+                        <Icon name={"clock" as any} className="w-3 h-3 mr-1" />
                         준비 중
                       </span>
                     )}
                     {tab.status === 'planned' && (
                       <span className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-800/30 text-gray-800 dark:text-gray-200 text-xs font-medium rounded-full border border-gray-200 dark:border-gray-700/50">
-                        <Icon name="calendar" className="w-3 h-3 mr-1" />
+                        <Icon name={"calendar" as any} className="w-3 h-3 mr-1" />
                         계획됨
                       </span>
                     )}
@@ -124,7 +124,7 @@ export default function PlaygroundPage() {
                   <div className="p-6 text-center flex-1 flex flex-col justify-center">
                     <div className="mb-4">
                       <Icon 
-                        name={tab.icon} 
+                        name={tab.icon as any} 
                         className={`w-16 h-16 mx-auto text-${tab.color}-500`}
                       />
                     </div>

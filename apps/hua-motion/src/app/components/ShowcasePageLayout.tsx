@@ -148,7 +148,7 @@ export default function ShowcasePageLayout({
             <div className="max-w-6xl mx-auto p-8">
               <div className="flex items-center space-x-3 mb-6">
                 <div className={`w-10 h-10 bg-gradient-to-r ${config.iconGradient} rounded-xl flex items-center justify-center`}>
-                  <Icon name="bookOpen" size={20} className="text-white" />
+                  <Icon name={"bookOpen" as any} size={20} className="text-white" />
                 </div>
                 <h2 className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r ${config.titleGradient} bg-clip-text text-transparent`}>
                   사용법 가이드
@@ -197,10 +197,10 @@ export default function ShowcasePageLayout({
               
                              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm p-6 rounded-2xl border border-gray-200/50 dark:border-gray-600/50">
                 <div className="flex items-start space-x-3">
-                  <Icon name="zap" size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
+                  <Icon name={"zap" as any} size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold mb-2 text-gray-900 dark:text-white flex items-center">
-                      <Icon name="lightbulb" size={16} className="mr-2" />
+                      <Icon name={"lightbulb" as any} size={16} className="mr-2" />
                       중요 팁
                     </h4>
                     <p className="text-gray-700 dark:text-gray-300">

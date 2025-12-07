@@ -96,31 +96,31 @@ export default function TooltipPage() {
           <div className="flex flex-wrap gap-6">
             <Tooltip content="설정 메뉴">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name="settings" className="w-6 h-6" />
+                <Icon name={"settings" as any} className="w-6 h-6" />
               </button>
             </Tooltip>
             
             <Tooltip content="도움말 보기">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name="helpCircle" className="w-6 h-6" />
+                <Icon name={"helpCircle" as any} className="w-6 h-6" />
               </button>
             </Tooltip>
             
             <Tooltip content="알림 확인">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name="bell" className="w-6 h-6" />
+                <Icon name={"bell" as any} className="w-6 h-6" />
               </button>
             </Tooltip>
             
             <Tooltip content="사용자 프로필">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name="user" className="w-6 h-6" />
+                <Icon name={"user" as any} className="w-6 h-6" />
               </button>
             </Tooltip>
             
             <Tooltip content="검색하기">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name="search" className="w-6 h-6" />
+                <Icon name={"search" as any} className="w-6 h-6" />
               </button>
             </Tooltip>
           </div>
@@ -175,7 +175,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="파일을 업로드합니다">
                     <Button size="sm">
-                      <Icon name="upload" className="w-4 h-4 mr-2" />
+                      <Icon name={"upload" as any} className="w-4 h-4 mr-2" />
                       업로드
                     </Button>
                   </Tooltip>
@@ -184,7 +184,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="변경사항을 저장합니다">
                     <Button size="sm" variant="outline">
-                      <Icon name="save" className="w-4 h-4 mr-2" />
+                      <Icon name={"save" as any} className="w-4 h-4 mr-2" />
                       저장
                     </Button>
                   </Tooltip>
@@ -193,7 +193,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="작업을 되돌립니다">
                     <Button size="sm" variant="ghost">
-                      <Icon name="undo" className="w-4 h-4 mr-2" />
+                      <Icon name={"undo" as any} className="w-4 h-4 mr-2" />
                       되돌리기
                     </Button>
                   </Tooltip>

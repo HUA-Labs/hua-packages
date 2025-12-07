@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Action, Panel, Icon } from '@hua-labs/ui'
 import { 
-  useSimpleMotion, 
+  useSimplePageMotion, 
   usePageMotions,
   useSmartMotion,
   useFadeIn,
@@ -18,9 +18,9 @@ export function CoreAbstraction() {
   const demos = [
     {
       id: 'simple',
-      title: 'useSimpleMotion',
+      title: 'useSimplePageMotion',
       description: '1단계: 가장 간단한 모션 - 프리셋 기반',
-      code: `const motions = useSimpleMotion('home')`,
+      code: `const motions = useSimplePageMotion('home')`,
       component: <SimpleMotionDemo />
     },
     {
@@ -95,7 +95,7 @@ const scaleIn = useScaleIn({ delay: 400 })`,
           {/* 실제 동작하는 데모 */}
           <Panel className="p-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Icon name="play" className="w-5 h-5 mr-2 text-green-600" />
+              <Icon name={"play" as any} className="w-5 h-5 mr-2 text-green-600" />
               실시간 데모
             </h4>
             
@@ -107,7 +107,7 @@ const scaleIn = useScaleIn({ delay: 400 })`,
           {/* 코드 예제 */}
           <Panel className="p-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Icon name="code" className="w-5 h-5 mr-2 text-blue-600" />
+              <Icon name={"code" as any} className="w-5 h-5 mr-2 text-blue-600" />
               사용 예제
             </h4>
             <div className="bg-gray-900 rounded-lg p-4 overflow-auto">
@@ -122,11 +122,11 @@ const scaleIn = useScaleIn({ delay: 400 })`,
                 size="md"
                 onClick={() => navigator.clipboard.writeText(activeDemoData.code)}
               >
-                <Icon name="copy" className="w-4 h-4 mr-2" />
+                <Icon name={"copy" as any} className="w-4 h-4 mr-2" />
                 코드 복사
               </Action>
               <Action variant="outline" size="md">
-                <Icon name="externalLink" className="w-4 h-4 mr-2" />
+                <Icon name={"externalLink" as any} className="w-4 h-4 mr-2" />
                 문서 보기
               </Action>
             </div>
@@ -139,7 +139,7 @@ const scaleIn = useScaleIn({ delay: 400 })`,
 
 // 1단계: Simple Motion Demo - 가장 단순한 모션
 function SimpleMotionDemo() {
-  const motions = useSimpleMotion('home')
+  const motions = useSimplePageMotion('home')
 
   return (
     <div className="text-center space-y-6">
@@ -182,7 +182,7 @@ function PageMotionDemo() {
     hero: { type: 'hero', hover: true, duration: 800 },
     cards: { type: 'card', duration: 700, delay: 200 },
     cta: { type: 'button', click: true, duration: 600, delay: 400 }
-  })
+  }) as any
   
   return (
     <div className="space-y-6">

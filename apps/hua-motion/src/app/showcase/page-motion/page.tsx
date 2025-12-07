@@ -5,7 +5,7 @@ import { Icon, Button } from '@hua-labs/ui'
 import ShowcasePageLayout from '../../components/ShowcasePageLayout'
 
 export default function PageMotionPage() {
-  const pageAnimations = usePageMotions()
+  const pageAnimations = usePageMotions({} as any) as any
 
   return (
     <ShowcasePageLayout
@@ -28,7 +28,7 @@ export default function PageMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="arrowRightLeft" size={32} className="mr-3" />
+            <Icon name={"arrowRightLeft" as any} size={32} className="mr-3" />
             페이지 전환 애니메이션
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -41,7 +41,7 @@ export default function PageMotionPage() {
             {/* 진입 애니메이션 */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                <Icon name="logIn" size={24} className="mr-2 text-green-600" />
+                <Icon name={"logIn" as any} size={24} className="mr-2 text-green-600" />
                 진입 애니메이션
               </h3>
               <div className="space-y-4">
@@ -80,7 +80,7 @@ export default function PageMotionPage() {
             {/* 퇴장 애니메이션 */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                <Icon name="logOut" size={24} className="mr-2 text-emerald-600" />
+                <Icon name={"logOut" as any} size={24} className="mr-2 text-emerald-600" />
                 퇴장 애니메이션
               </h3>
               <div className="space-y-4">
@@ -123,7 +123,7 @@ export default function PageMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="move" size={32} className="mr-3" />
+            <Icon name={"move" as any} size={32} className="mr-3" />
             레이아웃 애니메이션
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -136,7 +136,7 @@ export default function PageMotionPage() {
             {/* 리사이즈 애니메이션 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/25">
-                <Icon name="maximize-2" size={32} className="text-white" />
+                <Icon name={"maximize-2" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">리사이즈</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -150,7 +150,7 @@ export default function PageMotionPage() {
             {/* 리포지션 애니메이션 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
-                <Icon name="move" size={32} className="text-white" />
+                <Icon name={"move" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">리포지션</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -164,7 +164,7 @@ export default function PageMotionPage() {
             {/* 리오더 애니메이션 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/25">
-                <Icon name="list" size={32} className="text-white" />
+                <Icon name={"list" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">리오더</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -182,7 +182,7 @@ export default function PageMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="mousePointer" size={32} className="mr-3" />
+            <Icon name={"mousePointer" as any} size={32} className="mr-3" />
             인터랙티브 데모
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -194,7 +194,7 @@ export default function PageMotionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/25">
-                <Icon name="play" size={24} className="text-white" />
+                <Icon name={"play" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">페이지 진입</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -207,7 +207,7 @@ export default function PageMotionPage() {
             
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-cyan-500/25">
-                <Icon name="pause" size={24} className="text-white" />
+                <Icon name={"pause" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">페이지 퇴장</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">

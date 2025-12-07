@@ -190,7 +190,7 @@ export default function ComponentsPage() {
           />
           <Action
             onClick={() => setShowBookmarks(!showBookmarks)}
-            appearance={showBookmarks ? 'secondary' : 'outline'}
+            variant={showBookmarks ? 'secondary' : 'outline'}
             className="w-full sm:w-auto"
           >
             {showBookmarks ? '북마크 숨기기' : '북마크 보기'}

@@ -9,7 +9,7 @@ export default function TierSystemSection() {
     <section className="mb-24">
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
-          <Icon name="layers" size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
+          <Icon name={"layers" as any} size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
           3단계 모션 시스템
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -23,7 +23,7 @@ export default function TierSystemSection() {
         <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
           <div className="flex-1">
             <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Icon name="zap" size={32} className="text-white" />
+              <Icon name={"zap" as any} size={32} className="text-white" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Tier 1: Simple</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -41,7 +41,7 @@ export default function TierSystemSection() {
             size="lg"
             className="mt-auto border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:border-blue-300 transition-all duration-300 flex items-center justify-center"
           >
-            <Icon name="play" size={20} className="mr-3" />
+            <Icon name={"play" as any} size={20} className="mr-3" />
             데모 보기
           </Action>
         </Panel>
@@ -50,7 +50,7 @@ export default function TierSystemSection() {
         <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
           <div className="flex-1">
             <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/25">
-              <Icon name="layers" size={32} className="text-white" />
+              <Icon name={"layers" as any} size={32} className="text-white" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Tier 2: Smart</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -68,7 +68,7 @@ export default function TierSystemSection() {
             size="lg"
             className="mt-auto border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:border-green-300 transition-all duration-300 flex items-center justify-center"
           >
-            <Icon name="play" size={20} className="mr-3" />
+            <Icon name={"play" as any} size={20} className="mr-3" />
             데모 보기
           </Action>
         </Panel>
@@ -77,7 +77,7 @@ export default function TierSystemSection() {
         <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
           <div className="flex-1">
             <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25">
-              <Icon name="sparkles" size={32} className="text-white" />
+              <Icon name={"sparkles" as any} size={32} className="text-white" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Tier 3: Advanced</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -95,7 +95,7 @@ export default function TierSystemSection() {
             size="lg"
             className="mt-auto border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900/20 dark:hover:border-purple-300 transition-all duration-300 flex items-center justify-center"
           >
-            <Icon name="play" size={20} className="mr-3" />
+            <Icon name={"play" as any} size={20} className="mr-3" />
             데모 보기
           </Action>
         </Panel>
