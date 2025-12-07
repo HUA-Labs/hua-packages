@@ -61,9 +61,9 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "tsup && node ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly",
-    "build:watch": "tsup --watch",
-    "dev": "tsup --watch",
+    "build": "npx tsup && node ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly",
+    "build:watch": "npx tsup --watch",
+    "dev": "npx tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
