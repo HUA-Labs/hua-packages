@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "build": "pnpm exec tsc",
-    "dev": "pnpm exec tsc --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "jest",
     "lint": "echo 'Skipping lint for hua-i18n-core (ESLint 8, needs separate config)'",
