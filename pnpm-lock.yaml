@@ -506,12 +506,6 @@ importers:
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
-      '@hua-labs/i18n-core':
-        specifier: workspace:^
-        version: link:../../packages/hua-i18n-core
-      '@hua-labs/motion':
-        specifier: workspace:*
-        version: link:../../packages/hua-motion
       '@hua-labs/ui':
         specifier: workspace:^
         version: link:../../packages/hua-ui
