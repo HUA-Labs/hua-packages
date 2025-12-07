@@ -7,7 +7,7 @@ import { Card, CardProps } from "./Card"
 /**
  * Panel 컴포넌트의 props / Panel component props
  * @typedef {Object} PanelProps
- * @property {"default" | "glass" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"} [style="default"] - Panel 스타일 / Panel style
+ * @property {"default" | "solid" | "glass" | "outline" | "elevated" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"} [style="default"] - Panel 스타일 / Panel style
  * @property {"none" | "glow" | "shadow" | "gradient" | "animated"} [effect="none"] - Panel 효과 / Panel effect
  * @property {number} [transparency=1] - 투명도 (0-1) / Transparency (0-1)
  * @property {number} [blurIntensity=0] - backdrop-blur 강도 (px) / Backdrop blur intensity (px)
@@ -18,7 +18,7 @@ import { Card, CardProps } from "./Card"
  * @property {boolean} [particleEffect=false] - 파티클 효과 활성화 / Enable particle effect
  * @property {boolean} [hoverEffect=false] - 호버 효과 활성화 / Enable hover effect
  * @property {boolean} [animationEffect=false] - 애니메이션 효과 활성화 / Enable animation effect
- * @property {"none" | "sm" | "md" | "lg" | "xl" | "custom"} [padding="md"] - 패딩 크기 / Padding size
+ * @property {"none" | "small" | "sm" | "medium" | "md" | "large" | "lg" | "xl" | "custom"} [padding="md"] - 패딩 크기 / Padding size
  * @property {string} [customPadding] - 커스텀 패딩 / Custom padding
  * @property {"none" | "sm" | "md" | "lg" | "xl" | "full" | "custom"} [rounded="lg"] - 둥근 모서리 크기 / Rounded corner size
  * @property {string} [customRounded] - 커스텀 둥근 모서리 / Custom rounded corners
@@ -35,7 +35,7 @@ import { Card, CardProps } from "./Card"
  */
 export interface PanelProps extends Omit<CardProps, 'variant' | 'style'> {
   // 🆕 Panel 전용 고급 속성들
-  style?: "default" | "glass" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"
+  style?: "default" | "solid" | "glass" | "outline" | "elevated" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"
   effect?: "none" | "glow" | "shadow" | "gradient" | "animated"
   
   // 고급 스타일링
@@ -52,7 +52,7 @@ export interface PanelProps extends Omit<CardProps, 'variant' | 'style'> {
   animationEffect?: boolean
   
   // 레이아웃 옵션
-  padding?: "none" | "sm" | "md" | "lg" | "xl" | "custom"
+  padding?: "none" | "small" | "sm" | "medium" | "md" | "large" | "lg" | "xl" | "custom"
   customPadding?: string
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full" | "custom"
   customRounded?: string
@@ -146,8 +146,14 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
       const baseClasses = "transition-all duration-300"
       
       switch (style) {
+        case "solid":
+          return merge(baseClasses, "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700")
         case "glass":
           return merge(baseClasses, "bg-white/10 backdrop-blur-md border border-white/20")
+        case "outline":
+          return merge(baseClasses, "bg-transparent border border-gray-300 dark:border-gray-600")
+        case "elevated":
+          return merge(baseClasses, "bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700")
         case "neon":
           return merge(baseClasses, "bg-gray-900 border border-cyan-400/30 shadow-lg shadow-cyan-400/20")
         case "holographic":
@@ -185,8 +191,11 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
       
       switch (padding) {
         case "none": return "p-0"
+        case "small":
         case "sm": return "p-3"
+        case "medium":
         case "md": return "p-6"
+        case "large":
         case "lg": return "p-8"
         case "xl": return "p-12"
         default: return "p-6"
