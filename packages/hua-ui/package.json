@@ -61,7 +61,7 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly",
+    "build": "tsup && node ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly",
     "build:watch": "tsup --watch",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
