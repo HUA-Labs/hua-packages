@@ -1,7 +1,7 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
-
 import js from '@eslint/js';
+
+// Storybook plugin is optional - only used in packages that have storybook
+// If needed, install eslint-plugin-storybook in the root package.json
 
 export default [js.configs.recommended, {
   files: ['**/*.{js,jsx,mjs,cjs}'],
@@ -49,4 +49,4 @@ export default [js.configs.recommended, {
     '**/*.ts',
     '**/*.tsx',
   ],
-}, ...storybook.configs["flat/recommended"]]; 
+}]; 

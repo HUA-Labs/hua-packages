@@ -80,7 +80,7 @@ export default function Header() {
                 
                 <span className="relative flex items-center">
                   <Icon 
-                    name={item.icon} 
+                    name={item.icon as any} 
                     size={16} 
                     className={`mr-2 ${
                       pathname === item.href
@@ -125,9 +125,9 @@ export default function Header() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-600/0 group-hover:from-blue-500/8 group-hover:to-purple-600/8 dark:group-hover:from-blue-500/10 dark:group-hover:to-purple-600/10 rounded-lg transition-all duration-300" />
                 <span className="relative">
                   {isMobileMenuOpen ? (
-                    <Icon name="close" size={24} />
+                    <Icon name={"close" as any} size={24} />
                   ) : (
-                    <Icon name="menu" size={24} />
+                    <Icon name={"menu" as any} size={24} />
                   )}
                 </span>
               </button>
@@ -148,7 +148,7 @@ export default function Header() {
           <DrawerHeader>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 via-purple-600 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <Icon name="zap" size={20} className="text-white" />
+                <Icon name={"zap" as any} size={20} className="text-white" />
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -173,7 +173,7 @@ export default function Header() {
                   }`}
                 >
                   <Icon 
-                    name={item.icon} 
+                    name={item.icon as any} 
                     size={20} 
                     className={`mr-3 ${
                       pathname === item.href

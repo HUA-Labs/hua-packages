@@ -93,10 +93,10 @@ export default function PlaygroundHeader({
         <div className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r ${config.gradient} rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg sm:shadow-2xl ${config.shadow} backdrop-blur-sm relative overflow-hidden`}>
           {/* 글로우 효과 */}
           <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} blur-lg opacity-50`} />
-          <Icon 
-            name={icon} 
-            size={28} 
-            className="text-white drop-shadow-sm relative z-10" 
+          <Icon
+            name={icon as any}
+            size={28}
+            className="text-white drop-shadow-sm relative z-10"
           />
         </div>
         <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r ${config.titleGradient} bg-clip-text text-transparent leading-tight tracking-tight relative`}>

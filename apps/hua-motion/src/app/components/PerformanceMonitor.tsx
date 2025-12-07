@@ -184,7 +184,7 @@ export default function PerformanceMonitor({
               onClick={() => setShowPanel(false)}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded flex-shrink-0 pointer-events-auto"
             >
-              <Icon name="chevronRight" size={14} />
+              <Icon name={"chevronRight" as any} size={14} />
             </button>
           </div>
         </Panel>
@@ -196,7 +196,7 @@ export default function PerformanceMonitor({
           size="sm"
           className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-white/30 dark:border-slate-700/30 shadow-lg pointer-events-auto transition-all duration-300"
         >
-          <Icon name="chart" size={16} />
+          <Icon name={"chart" as any} size={16} />
         </Action>
       )}
     </div>

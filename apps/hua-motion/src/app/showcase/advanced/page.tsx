@@ -32,7 +32,7 @@ export default function AdvancedPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="brain" size={32} className="mr-3" />
+            <Icon name={"brain" as any} size={32} className="mr-3" />
             고급 애니메이션 기법
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -58,7 +58,7 @@ export default function AdvancedPage() {
               style={titleRef.style}
               className="text-4xl sm:text-5xl font-bold mb-6 flex items-center justify-center"
             >
-              <Icon name="sparkles" size={40} className="mr-3" />
+              <Icon name={"sparkles" as any} size={40} className="mr-3" />
               완전한 제어 시스템
             </h3>
             <p className="text-xl mb-8 opacity-90 leading-relaxed max-w-3xl mx-auto">
@@ -77,7 +77,7 @@ export default function AdvancedPage() {
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold"
               >
-                <Icon name="code" size={20} className="mr-2" />
+                <Icon name={"code" as any} size={20} className="mr-2" />
                 플레이그라운드
               </Action>
               <Action 
@@ -86,7 +86,7 @@ export default function AdvancedPage() {
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold border-white/30 text-white hover:bg-white/10"
               >
-                <Icon name="book" size={20} className="mr-2" />
+                <Icon name={"book" as any} size={20} className="mr-2" />
                 고급 가이드
               </Action>
             </div>
@@ -98,7 +98,7 @@ export default function AdvancedPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="layers" size={32} className="mr-3" />
+            <Icon name={"layers" as any} size={32} className="mr-3" />
             개별 애니메이션 훅
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -115,7 +115,7 @@ export default function AdvancedPage() {
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-orange-500/10 border border-orange-200/50 dark:border-orange-800/50">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/25">
-                <Icon name="eye" size={24} className="text-white" />
+                <Icon name={"eye" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Fade In</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -131,7 +131,7 @@ export default function AdvancedPage() {
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-red-500/10 border border-red-200/50 dark:border-red-800/50">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-500/25">
-                <Icon name="arrowUp" size={24} className="text-white" />
+                <Icon name={"arrowUp" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Slide Up</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -147,7 +147,7 @@ export default function AdvancedPage() {
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-pink-500/10 border border-pink-200/50 dark:border-pink-800/50">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/25">
-                <Icon name="maximize-2" size={24} className="text-white" />
+                <Icon name={"maximize-2" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Scale In</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -163,7 +163,7 @@ export default function AdvancedPage() {
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl shadow-rose-500/10 border border-rose-200/50 dark:border-rose-800/50">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/25">
-                <Icon name="zap" size={24} className="text-white" />
+                <Icon name={"zap" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Bounce In</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -181,7 +181,7 @@ export default function AdvancedPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="settings" size={32} className="mr-3" />
+            <Icon name={"settings" as any} size={32} className="mr-3" />
             고급 기능
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -194,7 +194,7 @@ export default function AdvancedPage() {
             {/* 애니메이션 체인 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-pink-500/25">
-                <Icon name="link" size={32} className="text-white" />
+                <Icon name={"link" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">애니메이션 체인</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -208,7 +208,7 @@ export default function AdvancedPage() {
             {/* 제스처 애니메이션 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/25">
-                <Icon name="hand" size={32} className="text-white" />
+                <Icon name={"hand" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">제스처 애니메이션</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -222,7 +222,7 @@ export default function AdvancedPage() {
             {/* 스프링 애니메이션 */}
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-500/25">
-                <Icon name="waves" size={32} className="text-white" />
+                <Icon name={"waves" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">스프링 애니메이션</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -241,7 +241,7 @@ export default function AdvancedPage() {
         <div className="bg-gradient-to-r from-orange-500/10 via-red-500/10 to-pink-500/10 dark:from-orange-500/20 dark:via-red-500/20 dark:to-pink-500/20 rounded-3xl p-12 border border-orange-300/30 dark:border-orange-700/30">
           <div className="text-center">
             <div className="w-24 h-24 bg-gradient-to-r from-orange-500 via-red-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-orange-500/25">
-              <Icon name="code" size={40} className="text-white" />
+              <Icon name={"code" as any} size={40} className="text-white" />
             </div>
             <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
               플레이그라운드에서 실험해보세요
@@ -258,7 +258,7 @@ export default function AdvancedPage() {
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold"
               >
-                <Icon name="play" size={20} className="mr-2" />
+                <Icon name={"play" as any} size={20} className="mr-2" />
                 플레이그라운드 시작
               </Action>
               <Action 
@@ -267,7 +267,7 @@ export default function AdvancedPage() {
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold"
               >
-                <Icon name="book" size={20} className="mr-2" />
+                <Icon name={"book" as any} size={20} className="mr-2" />
                 고급 가이드
               </Action>
             </div>

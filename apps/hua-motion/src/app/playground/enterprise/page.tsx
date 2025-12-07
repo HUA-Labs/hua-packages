@@ -134,7 +134,7 @@ export default function EnterprisePlaygroundPage() {
                 feedback="ripple"
                 className="min-w-[200px] flex items-center justify-center"
               >
-                <Icon name={tab.icon} className="w-5 h-5 mr-2" />
+                <Icon name={tab.icon as any} className="w-5 h-5 mr-2" />
                 {tab.title}
               </Action>
             ))}
@@ -155,7 +155,7 @@ export default function EnterprisePlaygroundPage() {
                   'bg-pink-100'
                 } flex items-center justify-center mb-6`}>
                   <Icon 
-                    name={activeTabData.icon} 
+                    name={activeTabData.icon as any} 
                     className={`w-10 h-10 ${
                       activeTabData.color === 'blue' ? 'text-blue-600' : 
                       activeTabData.color === 'green' ? 'text-green-600' : 
@@ -196,19 +196,19 @@ export default function EnterprisePlaygroundPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/playground">
               <Action variant="outline" size="lg" hover="glow" className="flex items-center justify-center">
-                <Icon name="arrowLeft" className="w-4 h-4 mr-2" />
+                <Icon name={"arrowLeft" as any} className="w-4 h-4 mr-2" />
                 플레이그라운드 메인
               </Action>
             </Link>
             <Link href="/playground/core">
               <Action variant="gradient" gradient="blue" size="lg" hover="glow" className="flex items-center justify-center">
-                <Icon name="zap" className="w-4 h-4 mr-2" />
+                <Icon name={"zap" as any} className="w-4 h-4 mr-2" />
                 Core 플레이그라운드
               </Action>
             </Link>
             <Link href="/playground/advanced">
               <Action variant="gradient" gradient="purple" size="lg" hover="glow" className="flex items-center justify-center">
-                <Icon name="zap" className="w-4 h-4 mr-2" />
+                <Icon name={"zap" as any} className="w-4 h-4 mr-2" />
                 Advanced 플레이그라운드
               </Action>
             </Link>

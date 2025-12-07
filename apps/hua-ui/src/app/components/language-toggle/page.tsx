@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { LanguageToggle, Card, CardContent, ComponentLayout } from "@hua-labs/ui"
+import { LanguageToggle } from "@hua-labs/ui/advanced"
+import { Card, CardContent, ComponentLayout } from "@hua-labs/ui"
 
 export default function LanguageTogglePage() {
   return (
@@ -100,7 +101,7 @@ export default function LanguageTogglePage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { LanguageToggle } from "@hua-labs/ui"
+{`import { LanguageToggle } from "@hua-labs/ui/advanced"
 
 // 기본 언어 토글
 <LanguageToggle />`}

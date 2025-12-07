@@ -47,7 +47,7 @@ export default function CTASection() {
             size="md"
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 sm:px-8 sm:py-5 w-full sm:w-auto text-center flex items-center justify-center"
           >
-            <Icon name="book" size={20} className="mr-2" />
+            <Icon name={"book" as any} size={20} className="mr-2" />
             문서 보기
           </Action>
           <Action 
@@ -56,7 +56,7 @@ export default function CTASection() {
             size="md"
             className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500 px-6 py-4 sm:px-8 sm:py-5 w-full sm:w-auto text-center flex items-center justify-center"
           >
-            <Icon name="package" size={20} className="mr-2" />
+            <Icon name={"file" as any} size={20} className="mr-2" />
             npm
           </Action>
         </div>

@@ -29,7 +29,7 @@ export default function PageAnimationPage() {
         <header className="text-center mb-20">
           <div className="inline-flex items-center space-x-4 mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/25">
-              <Icon name="layers" size={32} className="text-white" />
+              <Icon name={"layers" as any} size={32} className="text-white" />
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Page Animation
@@ -43,7 +43,7 @@ export default function PageAnimationPage() {
           <div className="max-w-6xl mx-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl shadow-blue-500/10 border border-blue-200/50 dark:border-blue-800/50">
             <div className="flex items-center space-x-3 mb-8">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                <Icon name="bookOpen" size={24} className="text-white" />
+                <Icon name={"bookOpen" as any} size={24} className="text-white" />
               </div>
               <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 사용법 가이드
@@ -96,7 +96,7 @@ export default function PageAnimationPage() {
             
             <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-6 rounded-2xl border border-blue-300/30 dark:border-blue-700/30">
               <div className="flex items-start space-x-3">
-                <Icon name="zap" size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
+                <Icon name={"zap" as any} size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">💡 중요 팁</h4>
                   <p className="text-gray-700 dark:text-gray-300 mb-3">
@@ -187,7 +187,7 @@ export default function PageAnimationPage() {
             >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/25">
-                  <Icon name="layers" size={24} className="text-white" />
+                  <Icon name={"layers" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">기본 카드</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -206,7 +206,7 @@ export default function PageAnimationPage() {
             >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/25">
-                  <Icon name="mousePointer" size={24} className="text-white" />
+                  <Icon name={"mousePointer" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">호버 카드</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -225,7 +225,7 @@ export default function PageAnimationPage() {
             >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/25">
-                  <Icon name="zap" size={24} className="text-white" />
+                  <Icon name={"zap" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">클릭 카드</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -259,7 +259,7 @@ export default function PageAnimationPage() {
             
             <div className="relative z-10 text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-purple-500/25">
-                <Icon name="sparkles" size={32} className="text-white" />
+                <Icon name={"sparkles" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
                 완벽한 페이지 애니메이션

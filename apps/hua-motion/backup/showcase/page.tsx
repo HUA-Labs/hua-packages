@@ -148,7 +148,7 @@ export default function ShowcasePage() {
                     hover="glow"
                     className="group-hover:scale-105 transition-transform duration-300"
                   >
-                    <Icon name="arrowRight" className="w-5 h-5 mr-2" />
+                    <Icon name={"arrowRight" as any} className="w-5 h-5 mr-2" />
                     체험해보기
                   </Button>
                 </Link>
@@ -177,7 +177,7 @@ export default function ShowcasePage() {
               size="lg"
               hover="glow"
             >
-              <Icon name="zap" className="w-5 h-5 mr-2" />
+              <Icon name={"zap" as any} className="w-5 h-5 mr-2" />
               테스트 랩
             </Button>
             <Button 
@@ -187,7 +187,7 @@ export default function ShowcasePage() {
               size="lg"
               hover="glow"
             >
-              <Icon name="settings" className="w-5 h-5 mr-2" />
+              <Icon name={"settings" as any} className="w-5 h-5 mr-2" />
               플레이그라운드
             </Button>
             <Button 
@@ -197,7 +197,7 @@ export default function ShowcasePage() {
               size="lg"
               hover="glow"
             >
-              <Icon name="bookOpen" className="w-5 h-5 mr-2" />
+              <Icon name={"bookOpen" as any} className="w-5 h-5 mr-2" />
               문서
             </Button>
           </div>

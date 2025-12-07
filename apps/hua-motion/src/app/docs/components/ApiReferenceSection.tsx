@@ -8,7 +8,7 @@ export default function ApiReferenceSection() {
     <section id="api-reference" className="mb-24">
       <Panel style="glass" padding="lg">
         <h2 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white text-center">
-          <Icon name="code" size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
+          <Icon name={"code" as any} size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
           API 참조
         </h2>
 
@@ -16,9 +16,9 @@ export default function ApiReferenceSection() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
           <h4 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">기본 사용법</h4>
           <div className="prose prose-base dark:prose-invert max-w-none bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre><code>{`import { useSimpleMotion } from '@hua-labs/motion-core'
+            <pre><code>{`import { useSimplePageMotion } from '@hua-labs/motion-core'
 
-const motions = useSimpleMotion('home')`}</code></pre>
+const motions = useSimplePageMotion('home')`}</code></pre>
           </div>
           <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">지원하는 페이지 타입</h4>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
@@ -107,7 +107,7 @@ return (
         {/* 고급 모션 훅 */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
           <h4 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-            <Icon name="sparkles" size={28} className="align-text-bottom mr-2 text-purple-600 dark:text-purple-400" />
+            <Icon name={"sparkles" as any} size={28} className="align-text-bottom mr-2 text-purple-600 dark:text-purple-400" />
             고급 모션 훅
           </h4>
           
@@ -115,7 +115,7 @@ return (
             {/* useGesture */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
-                <Icon name="hand" size={20} className="mr-2 text-blue-600 dark:text-blue-400" />
+                <Icon name={"hand" as any} size={20} className="mr-2 text-blue-600 dark:text-blue-400" />
                 useGesture
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
@@ -135,7 +135,7 @@ return <div ref={gesture.ref} style={gesture.style}>`}</code></pre>
             {/* useOrchestration */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
-                <Icon name="music" size={20} className="mr-2 text-green-600 dark:text-green-400" />
+                <Icon name={"music" as any} size={20} className="mr-2 text-green-600 dark:text-green-400" />
                 useOrchestration
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
@@ -155,7 +155,7 @@ const orchestration = useOrchestration(chain)`}</code></pre>
             {/* useLayoutMotion */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
-                <Icon name="move" size={20} className="mr-2 text-purple-600 dark:text-purple-400" />
+                <Icon name={"move" as any} size={20} className="mr-2 text-purple-600 dark:text-purple-400" />
                 useLayoutMotion
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
@@ -174,7 +174,7 @@ return <div ref={layout.ref} style={layout.style}>`}</code></pre>
             {/* useSpringMotion */}
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <h5 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white flex items-center">
-                <Icon name="zap" size={20} className="mr-2 text-orange-600 dark:text-orange-400" />
+                <Icon name={"zap" as any} size={20} className="mr-2 text-orange-600 dark:text-orange-400" />
                 useSpringMotion
               </h5>
               <p className="text-gray-600 dark:text-gray-400 mb-3">
@@ -196,7 +196,7 @@ return <div ref={spring.ref} style={{
           {/* Easing 함수 */}
           <div className="mt-8">
             <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              <Icon name="gauge" size={20} className="align-text-bottom mr-2 text-blue-600 dark:text-blue-400" />
+              <Icon name={"gauge" as any} size={20} className="align-text-bottom mr-2 text-blue-600 dark:text-blue-400" />
               Easing 함수
             </h5>
             <p className="text-gray-600 dark:text-gray-400 mb-4">

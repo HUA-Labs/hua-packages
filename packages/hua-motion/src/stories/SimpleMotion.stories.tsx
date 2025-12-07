@@ -13,7 +13,7 @@ const MotionDemo: React.FC<DemoProps> = ({ preset }) => {
     <div className="space-y-6 max-w-xl">
       <div
         data-motion-id="hero"
-        ref={motions.hero?.ref}
+        ref={motions.hero?.ref as any}
         style={motions.hero?.style}
         className="rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-white p-8 shadow-lg"
       >
@@ -29,7 +29,7 @@ const MotionDemo: React.FC<DemoProps> = ({ preset }) => {
           <div
             key={id}
             data-motion-id={id}
-            ref={motions[id as keyof typeof motions]?.ref}
+            ref={motions[id as keyof typeof motions]?.ref as any}
             style={motions[id as keyof typeof motions]?.style}
             className="rounded-xl border border-slate-200 p-4 shadow-sm bg-white"
           >

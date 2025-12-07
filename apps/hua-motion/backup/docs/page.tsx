@@ -107,7 +107,7 @@ export default function DocsPage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <span className="relative flex items-center">
-                  <Icon name="zap" size={24} className="mr-3" />
+                  <Icon name={"zap" as any} size={24} className="mr-3" />
                   시작하기
                 </span>
               </Button>
@@ -120,7 +120,7 @@ export default function DocsPage() {
                 className="border-white/30 text-white hover:bg-white/10"
               >
                 <span className="flex items-center">
-                  <Icon name="type" size={24} className="mr-3" />
+                  <Icon name={"type" as any} size={24} className="mr-3" />
                   API 참조
                 </span>
               </Button>
@@ -169,7 +169,7 @@ export default function DocsPage() {
                         transition: 'transform 0.3s ease-in-out'
                       }}
                     >
-                      <Icon name="download" size={32} className="text-white" />
+                      <Icon name={"download" as any} size={32} className="text-white" />
                     </div>
                   </div>
                   <h3 
@@ -221,7 +221,7 @@ export default function DocsPage() {
                         transition: 'transform 0.3s ease-in-out'
                       }}
                     >
-                      <Icon name="type" size={32} className="text-white" />
+                      <Icon name={"type" as any} size={32} className="text-white" />
                     </div>
                   </div>
                   <h3 
@@ -273,7 +273,7 @@ export default function DocsPage() {
                         transition: 'transform 0.3s ease-in-out'
                       }}
                     >
-                      <Icon name="sparkles" size={32} className="text-white" />
+                      <Icon name={"sparkles" as any} size={32} className="text-white" />
                     </div>
                   </div>
                   <h3 
@@ -351,7 +351,7 @@ function MyFirstAnimation() {
             <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
               <div className="flex-1">
                 <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <Icon name="zap" size={32} className="text-white" />
+                  <Icon name={"zap" as any} size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                   Tier 1: Simple Animation
@@ -374,7 +374,7 @@ function MyFirstAnimation() {
                 hover="glow"
                 className="mt-auto"
               >
-                <Icon name="play" size={20} className="mr-3" />
+                <Icon name={"play" as any} size={20} className="mr-3" />
                 데모 보기
               </Button>
             </Panel>
@@ -383,7 +383,7 @@ function MyFirstAnimation() {
             <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
               <div className="flex-1">
                 <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/25">
-                  <Icon name="layers" size={32} className="text-white" />
+                  <Icon name={"layers" as any} size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                   Tier 2: Page Animation
@@ -406,7 +406,7 @@ function MyFirstAnimation() {
                 hover="glow"
                 className="mt-auto"
               >
-                <Icon name="play" size={20} className="mr-3" />
+                <Icon name={"play" as any} size={20} className="mr-3" />
                 데모 보기
               </Button>
             </Panel>
@@ -415,7 +415,7 @@ function MyFirstAnimation() {
             <Panel style="glass" padding="lg" className="text-center flex flex-col h-full">
               <div className="flex-1">
                 <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25">
-                  <Icon name="sparkles" size={32} className="text-white" />
+                  <Icon name={"sparkles" as any} size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                   Tier 3: Smart Animation
@@ -438,7 +438,7 @@ function MyFirstAnimation() {
                 hover="glow"
                 className="mt-auto"
               >
-                <Icon name="play" size={20} className="mr-3" />
+                <Icon name={"play" as any} size={20} className="mr-3" />
                 데모 보기
               </Button>
             </Panel>

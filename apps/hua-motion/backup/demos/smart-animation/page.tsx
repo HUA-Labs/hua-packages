@@ -29,7 +29,7 @@ export default function SmartAnimationPage() {
         <header className="text-center mb-20">
           <div className="inline-flex items-center space-x-4 mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-green-500 via-emerald-600 to-teal-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-green-500/25">
-              <Icon name="sparkles" size={32} className="text-white" />
+              <Icon name={"sparkles" as any} size={32} className="text-white" />
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
               Smart Animation
@@ -43,7 +43,7 @@ export default function SmartAnimationPage() {
           <div className="max-w-6xl mx-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl shadow-green-500/10 border border-green-200/50 dark:border-green-800/50">
             <div className="flex items-center space-x-3 mb-8">
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
-                <Icon name="bookOpen" size={24} className="text-white" />
+                <Icon name={"bookOpen" as any} size={24} className="text-white" />
               </div>
               <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 사용법 가이드
@@ -85,7 +85,7 @@ const buttonRef = useSmartAnimation({
             
             <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 dark:from-green-500/20 dark:to-emerald-500/20 p-6 rounded-2xl border border-green-300/30 dark:border-green-700/30">
               <div className="flex items-start space-x-3">
-                <Icon name="zap" size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
+                <Icon name={"zap" as any} size={20} className="text-yellow-500 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">실시간 제어</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -173,7 +173,7 @@ const buttonRef = useSmartAnimation({
             <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-green-500/10 border border-green-200/50 dark:border-green-800/50 hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/25">
-                  <Icon name="mousePointer" size={24} className="text-white" />
+                  <Icon name={"mousePointer" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">호버 효과</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -192,7 +192,7 @@ const buttonRef = useSmartAnimation({
             <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-emerald-500/10 border border-emerald-200/50 dark:border-emerald-800/50 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
-                                     <Icon name="mousePointer" size={24} className="text-white" />
+                                     <Icon name={"mousePointer" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">클릭 효과</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -211,7 +211,7 @@ const buttonRef = useSmartAnimation({
             <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-teal-500/10 border border-teal-200/50 dark:border-teal-800/50 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/25">
-                  <Icon name="zap" size={24} className="text-white" />
+                  <Icon name={"zap" as any} size={24} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">호버 + 클릭</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -253,7 +253,7 @@ const buttonRef = useSmartAnimation({
             
             <div className="relative z-10 text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-teal-500/25">
-                <Icon name="layers" size={32} className="text-white" />
+                <Icon name={"layers" as any} size={32} className="text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
                 카드 애니메이션
@@ -298,7 +298,7 @@ const buttonRef = useSmartAnimation({
             
             <div className="relative z-10 text-center text-white">
               <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <Icon name="image" size={40} className="text-white" />
+                <Icon name={"image" as any} size={40} className="text-white" />
               </div>
               <h3 className="text-3xl font-bold mb-6">
                 이미지 애니메이션
@@ -309,7 +309,7 @@ const buttonRef = useSmartAnimation({
               </p>
               <div className="inline-block p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
                 <div className="w-32 h-32 bg-gradient-to-r from-white/30 to-white/10 rounded-xl flex items-center justify-center">
-                  <Icon name="image" size={48} className="text-white" />
+                  <Icon name={"image" as any} size={48} className="text-white" />
                 </div>
               </div>
             </div>
