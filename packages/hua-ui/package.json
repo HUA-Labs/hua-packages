@@ -61,7 +61,7 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "node ../../node_modules/tsup/dist/cli-default.js && node ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly",
+    "build": "npx tsup && npx tsc --emitDeclarationOnly",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
