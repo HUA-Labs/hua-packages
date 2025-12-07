@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "npx tsc",
+    "dev": "npx tsc --watch",
     "clean": "rm -rf dist",
     "test": "jest",
     "lint": "echo 'Skipping lint for hua-i18n-core (ESLint 8, needs separate config)'",
