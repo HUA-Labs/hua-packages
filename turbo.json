@@ -41,6 +41,11 @@
         "^build"
       ],
       "outputs": []
+    },
+    "@hua-labs/ui#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"],
+      "env": []
     }
   }
 }
