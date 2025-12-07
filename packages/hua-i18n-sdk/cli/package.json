@@ -7,7 +7,7 @@
     "hua-i18n-sdk": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js"
   },
