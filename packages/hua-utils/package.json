@@ -15,8 +15,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "npx tsc",
-    "dev": "npx tsc --watch",
+    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"
   },
