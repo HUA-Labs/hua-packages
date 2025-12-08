@@ -111,7 +111,7 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
   ({ className, ...props }, ref) => (
     <img
       ref={ref}
-      className={merge("aspect-square h-full w-full", className)}
+      className={merge("aspect-square h-full w-full object-cover object-center", className)}
       {...props}
     />
   )
