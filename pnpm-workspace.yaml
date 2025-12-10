@@ -5,8 +5,13 @@ packages:
 
 ignoredBuiltDependencies:
   - '@prisma/client'
+  - '@scarf/scarf'
+  - '@tree-sitter-grammars/tree-sitter-yaml'
   - bcrypt
+  - core-js-pure
   - esbuild
+  - tree-sitter
+  - tree-sitter-json
 
 onlyBuiltDependencies:
   - '@prisma/client'
