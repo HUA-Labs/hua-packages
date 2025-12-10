@@ -227,9 +227,22 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     none: "",
   };
 
+  // variant별 포커스 스타일
+  const focusClasses: Record<Variant, string> = {
+    default: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+    destructive: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500 focus-visible:ring-offset-1",
+    outline: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-600 focus-visible:ring-offset-0",
+    secondary: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 focus-visible:ring-offset-1",
+    ghost: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 focus-visible:ring-offset-0",
+    link: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 focus-visible:ring-offset-0",
+    gradient: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+    neon: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 focus-visible:ring-offset-1",
+    glass: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400/50 focus-visible:ring-offset-0",
+  };
+
   const base = merge(
     "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+    focusClasses[variant],
     "disabled:pointer-events-none disabled:opacity-50 min-w-fit",
     fullWidth && "w-full",
     variantClasses[variant],
