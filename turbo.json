@@ -74,14 +74,12 @@
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node ../../node_modules/typescript/lib/tsc.js"
+      "env": []
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node ../../node_modules/typescript/lib/tsc.js"
+      "env": []
     }
   }
 }
