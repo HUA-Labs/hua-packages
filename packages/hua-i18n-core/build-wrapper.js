@@ -44,7 +44,29 @@ log({
 });
 // #endregion
 
-const tscPath = path.resolve(__dirname, '../../node_modules/typescript/lib/tsc.js');
+// Use require.resolve to find typescript, which works with both regular and .pnpm structures
+let tscPath = null;
+try {
+  // Try require.resolve first (works with pnpm hoisting and .pnpm structure)
+  tscPath = require.resolve('typescript/lib/tsc.js');
+  // #region agent log
+  log({
+    hypothesisId: 'B1',
+    message: 'found tsc.js via require.resolve',
+    data: { tscPath, exists: fs.existsSync(tscPath) }
+  });
+  // #endregion
+} catch (e) {
+  // Fallback to direct path
+  tscPath = path.resolve(__dirname, '../../node_modules/typescript/lib/tsc.js');
+  // #region agent log
+  log({
+    hypothesisId: 'B2',
+    message: 'require.resolve failed, using fallback path',
+    data: { tscPath, error: e.message, exists: fs.existsSync(tscPath) }
+  });
+  // #endregion
+}
 
 // #region agent log
 log({
