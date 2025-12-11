@@ -45,26 +45,22 @@
     "@hua-labs/ui#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node scripts/build-tsc.js"
+      "env": []
     },
     "@hua-labs/motion#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node scripts/build-tsc.js"
+      "env": []
     },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node scripts/build-tsc.js"
+      "env": []
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": [],
-      "command": "node scripts/build-tsc.js"
+      "env": []
     }
   }
 }
