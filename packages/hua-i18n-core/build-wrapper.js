@@ -85,7 +85,18 @@ log({
 
 try {
   // Use process.execPath to avoid PATH issues
-  execSync(`${process.execPath} ${tscPath}`, {
+  // Quote paths if they contain spaces (Windows)
+  const nodePath = process.execPath;
+  const quotedNodePath = nodePath.includes(' ') ? `"${nodePath}"` : nodePath;
+  const quotedTscPath = tscPath.includes(' ') ? `"${tscPath}"` : tscPath;
+  // #region agent log
+  log({
+    hypothesisId: 'D2',
+    message: 'using process.execPath for node',
+    data: { nodePath, quotedNodePath, tscPath, quotedTscPath, command: `${quotedNodePath} ${quotedTscPath}` }
+  });
+  // #endregion
+  execSync(`${quotedNodePath} ${quotedTscPath}`, {
     stdio: 'inherit',
     cwd: __dirname,
     env: { ...process.env, PATH: process.env.PATH || '' }
