@@ -25,5 +25,6 @@ PACKAGE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PACKAGE_DIR"
 
 # Execute build command
-exec "$NODE_PATH" ../../node_modules/tsx/dist/cli.mjs ../../node_modules/tsup/dist/cli-default.js && "$NODE_PATH" ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly
+"$NODE_PATH" ../../node_modules/tsx/dist/cli.mjs ../../node_modules/tsup/dist/cli-default.js
+"$NODE_PATH" ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly
 
