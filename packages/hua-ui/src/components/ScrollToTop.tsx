@@ -1,11 +1,23 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { IconName } from "../lib/icons"
 import { useScrollToggle } from "../hooks/useScrollToggle"
 
+/**
+ * ScrollToTop 컴포넌트의 props / ScrollToTop component props
+ * @typedef {Object} ScrollToTopProps
+ * @property {number} [threshold=400] - 표시 임계값 (px, 이 값 이상 스크롤 시 표시) / Display threshold (px, shows when scrolled beyond this value)
+ * @property {boolean} [smooth=true] - 부드러운 스크롤 여부 / Smooth scroll
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {IconName} [icon='arrowUp'] - 아이콘 이름 / Icon name
+ * @property {"sm" | "md" | "lg"} [size="md"] - 버튼 크기 / Button size
+ * @property {"default" | "primary" | "secondary" | "outline" | "ghost"} [variant="default"] - 버튼 스타일 변형 / Button style variant
+ * @property {boolean} [showOnMount=false] - 마운트 시 즉시 표시 여부 / Show immediately on mount
+ * @extends {React.HTMLAttributes<HTMLButtonElement>}
+ */
 export interface ScrollToTopProps extends React.HTMLAttributes<HTMLButtonElement> {
   threshold?: number
   smooth?: boolean
@@ -16,6 +28,32 @@ export interface ScrollToTopProps extends React.HTMLAttributes<HTMLButtonElement
   showOnMount?: boolean
 }
 
+/**
+ * ScrollToTop 컴포넌트 / ScrollToTop component
+ * 
+ * 페이지 상단으로 스크롤하는 버튼 컴포넌트입니다.
+ * 지정된 임계값 이상 스크롤 시 자동으로 표시됩니다.
+ * 
+ * Button component that scrolls to top of page.
+ * Automatically appears when scrolled beyond specified threshold.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ScrollToTop />
+ * 
+ * @example
+ * // 커스텀 설정 / Custom settings
+ * <ScrollToTop 
+ *   threshold={500}
+ *   variant="primary"
+ *   size="lg"
+ *   icon="arrowUp"
+ * />
+ * 
+ * @param {ScrollToTopProps} props - ScrollToTop 컴포넌트의 props / ScrollToTop component props
+ * @returns {JSX.Element} ScrollToTop 컴포넌트 / ScrollToTop component
+ */
 const ScrollToTop = ({ 
   className, 
   threshold = 400, 
@@ -52,7 +90,7 @@ const ScrollToTop = ({
     return (
       <button
         onClick={scrollToTop}
-        className={cn(
+        className={merge(
           "fixed z-[9999] rounded-full transition-all duration-500 ease-in-out",
           "flex items-center justify-center",
           "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",

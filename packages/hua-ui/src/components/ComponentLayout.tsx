@@ -1,9 +1,26 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Breadcrumb, BreadcrumbItem } from "./Breadcrumb"
 
+/**
+ * ComponentLayout 컴포넌트의 props / ComponentLayout component props
+ * @typedef {Object} ComponentLayoutProps
+ * @property {string} title - 페이지 제목 / Page title
+ * @property {string} description - 페이지 설명 / Page description
+ * @property {React.ReactNode} children - 페이지 내용 / Page content
+ * @property {Object} [prevPage] - 이전 페이지 정보 / Previous page information
+ * @property {string} prevPage.title - 이전 페이지 제목 / Previous page title
+ * @property {string} prevPage.href - 이전 페이지 링크 / Previous page link
+ * @property {Object} [nextPage] - 다음 페이지 정보 / Next page information
+ * @property {string} nextPage.title - 다음 페이지 제목 / Next page title
+ * @property {string} nextPage.href - 다음 페이지 링크 / Next page link
+ * @property {Array<Object>} [breadcrumbItems] - Breadcrumb 항목들 / Breadcrumb items
+ * @property {string} breadcrumbItems[].label - Breadcrumb 라벨 / Breadcrumb label
+ * @property {string} [breadcrumbItems[].href] - Breadcrumb 링크 / Breadcrumb link
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface ComponentLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string
   description: string
@@ -22,6 +39,40 @@ export interface ComponentLayoutProps extends React.HTMLAttributes<HTMLDivElemen
   }>
 }
 
+/**
+ * ComponentLayout 컴포넌트 / ComponentLayout component
+ * 
+ * 컴포넌트 문서 페이지 레이아웃을 제공하는 컴포넌트입니다.
+ * 제목, 설명, Breadcrumb, 이전/다음 페이지 네비게이션을 포함합니다.
+ * 
+ * Component that provides layout for component documentation pages.
+ * Includes title, description, Breadcrumb, and previous/next page navigation.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ComponentLayout
+ *   title="Button 컴포넌트"
+ *   description="버튼 컴포넌트 사용법"
+ * >
+ *   <Button>예제</Button>
+ * </ComponentLayout>
+ * 
+ * @example
+ * // 이전/다음 페이지 네비게이션 포함 / With previous/next page navigation
+ * <ComponentLayout
+ *   title="Input 컴포넌트"
+ *   description="입력 컴포넌트 사용법"
+ *   prevPage={{ title: "Button", href: "/components/button" }}
+ *   nextPage={{ title: "Select", href: "/components/select" }}
+ * >
+ *   <Input placeholder="입력하세요" />
+ * </ComponentLayout>
+ * 
+ * @param {ComponentLayoutProps} props - ComponentLayout 컴포넌트의 props / ComponentLayout component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ComponentLayout 컴포넌트 / ComponentLayout component
+ */
 const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
   ({ 
     className, 
@@ -84,7 +135,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
         {/* 메인 콘텐츠 */}
         <div
           ref={ref}
-          className={cn("container mx-auto px-4 py-8", className)}
+          className={merge("container mx-auto px-4 py-8", className)}
           {...props}
         >
           <div className="max-w-4xl mx-auto">

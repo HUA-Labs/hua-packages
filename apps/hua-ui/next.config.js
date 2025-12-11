@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@hua-labs/ui', '@hua-labs/i18n-sdk'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // typescript: {
+  //   ignoreBuildErrors: true,
+  // },
   // 하이드레이션 문제 해결을 위한 설정
   experimental: {
     // 서버 컴포넌트에서 클라이언트 컴포넌트로의 전환 최적화

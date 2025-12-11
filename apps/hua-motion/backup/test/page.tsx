@@ -86,7 +86,7 @@ export default function TestPage() {
         <header className="text-center mb-12">
           <div className="inline-flex items-center space-x-4 mb-6">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/25">
-              <Icon name="zap" size={32} className="text-white" />
+              <Icon name={"zap" as any} size={32} className="text-white" />
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Animation Test Lab
@@ -105,7 +105,7 @@ export default function TestPage() {
               onClick={startAllAnimations}
               disabled={isAnimating}
             >
-              <Icon name="play" size={20} className="mr-2" />
+              <Icon name={"play" as any} size={20} className="mr-2" />
               Start All
             </Button>
             <Button 
@@ -115,7 +115,7 @@ export default function TestPage() {
               disabled={!isAnimating}
               className="border-red-500 text-red-600 hover:bg-red-50"
             >
-              <Icon name="pause" size={20} className="mr-2" />
+              <Icon name={"pause" as any} size={20} className="mr-2" />
               Stop All
             </Button>
             <Button 
@@ -124,7 +124,7 @@ export default function TestPage() {
               onClick={resetAnimations}
               className="border-blue-500 text-blue-600 hover:bg-blue-50"
             >
-              <Icon name="refresh" size={20} className="mr-2" />
+              <Icon name={"refresh" as any} size={20} className="mr-2" />
               Reset
             </Button>
           </div>
@@ -200,7 +200,7 @@ function SimpleAnimationTab({ animations }: { animations: any }) {
           style={animations.hero?.style}
           className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="star" size={48} className="mx-auto mb-4" />
+          <Icon name={"star" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Hero Section</h3>
           <p>자동으로 애니메이션이 적용됩니다</p>
         </div>
@@ -210,7 +210,7 @@ function SimpleAnimationTab({ animations }: { animations: any }) {
           style={animations.title?.style}
           className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="type" size={48} className="mx-auto mb-4" />
+          <Icon name={"type" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Title Section</h3>
           <p>타이틀 애니메이션 효과</p>
         </div>
@@ -220,7 +220,7 @@ function SimpleAnimationTab({ animations }: { animations: any }) {
           style={animations.description?.style}
           className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="fileText" size={48} className="mx-auto mb-4" />
+          <Icon name={"fileText" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Description</h3>
           <p>설명 텍스트 애니메이션</p>
         </div>
@@ -230,7 +230,7 @@ function SimpleAnimationTab({ animations }: { animations: any }) {
           style={animations.cta?.style}
           className="bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="zap" size={48} className="mx-auto mb-4" />
+          <Icon name={"zap" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Call to Action</h3>
           <p>CTA 버튼 애니메이션</p>
         </div>
@@ -268,7 +268,7 @@ function SmartAnimationTab({
           style={heroRef.style}
           className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="sparkles" size={48} className="mx-auto mb-4" />
+          <Icon name={"sparkles" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Hero Element</h3>
           <p>개별 제어 가능한 히어로</p>
         </div>
@@ -278,7 +278,7 @@ function SmartAnimationTab({
           style={titleRef.style}
           className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="type" size={48} className="mx-auto mb-4" />
+          <Icon name={"type" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Title Element</h3>
           <p>개별 제어 가능한 타이틀</p>
         </div>
@@ -288,13 +288,13 @@ function SmartAnimationTab({
           style={cardRef.style}
           className="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="layers" size={48} className="mx-auto mb-4" />
+          <Icon name={"layers" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Card Element</h3>
           <p>호버/클릭 효과 포함</p>
         </div>
         
         <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-8 text-white text-center">
-          <Icon name="mousePointer" size={48} className="mx-auto mb-4" />
+          <Icon name={"mousePointer" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Interactive Button</h3>
           <p>호버와 클릭 효과를 체험해보세요</p>
           <button
@@ -328,7 +328,7 @@ function PageAnimationTab({ animations }: { animations: any }) {
           style={animations.enter?.style}
           className="bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="logIn" size={48} className="mx-auto mb-4" />
+          <Icon name={"logIn" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Enter Animation</h3>
           <p>페이지 진입 애니메이션</p>
         </div>
@@ -337,7 +337,7 @@ function PageAnimationTab({ animations }: { animations: any }) {
           style={animations.exit?.style}
           className="bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="logOut" size={48} className="mx-auto mb-4" />
+          <Icon name={"logOut" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Exit Animation</h3>
           <p>페이지 종료 애니메이션</p>
         </div>
@@ -346,7 +346,7 @@ function PageAnimationTab({ animations }: { animations: any }) {
           style={animations.layout?.style}
           className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="layers" size={48} className="mx-auto mb-4" />
+          <Icon name={"layers" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Layout Animation</h3>
           <p>레이아웃 변화 애니메이션</p>
         </div>
@@ -355,7 +355,7 @@ function PageAnimationTab({ animations }: { animations: any }) {
           style={animations.transition?.style}
           className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="arrowRight" size={48} className="mx-auto mb-4" />
+          <Icon name={"arrowRight" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Transition</h3>
           <p>부드러운 전환 효과</p>
         </div>
@@ -393,7 +393,7 @@ function AdvancedAnimationTab({
           style={fadeInAnimation.style}
           className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="eye" size={48} className="mx-auto mb-4" />
+          <Icon name={"eye" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Fade In</h3>
           <p>페이드 인 애니메이션</p>
         </div>
@@ -403,7 +403,7 @@ function AdvancedAnimationTab({
           style={slideUpAnimation.style}
           className="bg-gradient-to-br from-cyan-500 to-teal-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="arrowUp" size={48} className="mx-auto mb-4" />
+          <Icon name={"arrowUp" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Slide Up</h3>
           <p>슬라이드 업 애니메이션</p>
         </div>
@@ -413,7 +413,7 @@ function AdvancedAnimationTab({
           style={scaleInAnimation.style}
           className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="maximize" size={48} className="mx-auto mb-4" />
+          <Icon name={"maximize" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Scale In</h3>
           <p>스케일 인 애니메이션</p>
         </div>
@@ -423,7 +423,7 @@ function AdvancedAnimationTab({
           style={bounceInAnimation.style}
           className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="zap" size={48} className="mx-auto mb-4" />
+          <Icon name={"zap" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Bounce In</h3>
           <p>바운스 인 애니메이션</p>
         </div>

@@ -21,7 +21,7 @@ export default function GettingStartedSection({ scrollToSection }: GettingStarte
           style={titleRef.style}
           className="text-4xl font-bold mb-6 text-gray-900 dark:text-white"
         >
-          <Icon name="target" size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
+          <Icon name={"target" as any} size={40} className="inline-block align-text-bottom mr-3 text-blue-600 dark:text-blue-400" />
           시작하기
         </h2>
         <p 
@@ -37,7 +37,7 @@ export default function GettingStartedSection({ scrollToSection }: GettingStarte
       {/* 첫 번째 모션 예제 */}
       <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 dark:from-gray-800 dark:to-gray-700 p-8 rounded-2xl shadow-lg border border-blue-100/50 dark:border-gray-600 text-left">
         <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-          <Icon name="target" size={28} className="align-text-bottom mr-1 text-blue-600 dark:text-blue-400" />
+          <Icon name={"target" as any} size={28} className="align-text-bottom mr-1 text-blue-600 dark:text-blue-400" />
           첫 번째 모션 만들기
         </h3>
         
@@ -76,7 +76,7 @@ export default function GettingStartedSection({ scrollToSection }: GettingStarte
             onClick={() => scrollToSection('api-reference')}
             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            <Icon name="code" size={20} className="mr-2" />
+            <Icon name={"code" as any} size={20} className="mr-2" />
             더 많은 예제 보기
           </button>
         </div>

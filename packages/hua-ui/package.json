@@ -18,14 +18,31 @@
       "require": "./dist/advanced.js"
     },
     "./advanced/dashboard": {
-      "types": "./dist/advanced-dashboard.d.ts",
-      "import": "./dist/advanced-dashboard.mjs",
-      "require": "./dist/advanced-dashboard.js"
+      "types": "./src/advanced/dashboard.ts",
+      "import": "./src/advanced/dashboard.ts",
+      "require": "./src/advanced/dashboard.ts",
+      "default": "./dist/advanced-dashboard.mjs"
     },
     "./advanced/motion": {
-      "types": "./dist/advanced-motion.d.ts",
-      "import": "./dist/advanced-motion.mjs",
-      "require": "./dist/advanced-motion.js"
+      "types": "./src/advanced/motion.ts",
+      "import": "./src/advanced/motion.ts",
+      "require": "./src/advanced/motion.ts",
+      "default": "./dist/advanced-motion.mjs"
+    },
+    "./form": {
+      "types": "./dist/form.d.ts",
+      "import": "./dist/form.mjs",
+      "require": "./dist/form.js"
+    },
+    "./navigation": {
+      "types": "./dist/navigation.d.ts",
+      "import": "./dist/navigation.mjs",
+      "require": "./dist/navigation.js"
+    },
+    "./feedback": {
+      "types": "./dist/feedback.d.ts",
+      "import": "./dist/feedback.mjs",
+      "require": "./dist/feedback.js"
     },
     "./components/*": {
       "types": "./dist/components/*.d.ts",
@@ -44,9 +61,9 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly",
-    "build:watch": "tsup --watch",
-    "dev": "tsup --watch",
+    "build": "node ../../node_modules/tsx/dist/cli.mjs ../../node_modules/tsup/dist/cli-default.js && node ../../node_modules/typescript/lib/tsc.js --emitDeclarationOnly",
+    "build:watch": "pnpm exec tsup --watch",
+    "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -54,10 +71,11 @@
     "analyze": "node scripts/analyze-bundle.js",
     "build:analyze": "pnpm build && pnpm analyze",
     "lint": "echo 'Skipping lint for hua-ui (ESLint 8, needs separate config)'",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate:icon-types": "tsx scripts/generate-icon-types.ts",
+    "generate:icon-snippets": "tsx scripts/generate-icon-snippets.ts"
   },
   "dependencies": {
-    "@hua-labs/motion": "workspace:*",
     "clsx": "^2.0.0",
     "lucide-react": "^0.263.1",
     "tailwind-merge": "^2.0.0"
@@ -85,7 +103,8 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "@phosphor-icons/react": "*"
+    "@phosphor-icons/react": "*",
+    "@hua-labs/motion-core": "*"
   },
   "keywords": [
     "ui",

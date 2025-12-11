@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { FadeInOptions, BaseMotionReturn, MotionElement } from '../types'
 
 export function useFadeIn<T extends MotionElement = HTMLDivElement>(
@@ -114,15 +114,15 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
     }
   }, [stop])
 
-  // 스타일 계산 (React 19 호환)
-  const style = {
+  // 스타일 계산 (React 19 호환) - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => ({
     opacity: isVisible ? targetOpacity : initialOpacity,
     transition: `opacity ${duration}ms ${easing}`,
-          '--motion-delay': `${delay}ms`,
-      '--motion-duration': `${duration}ms`,
-      '--motion-easing': easing,
-      '--motion-progress': `${progress}`
-  } as const
+    '--motion-delay': `${delay}ms`,
+    '--motion-duration': `${duration}ms`,
+    '--motion-easing': easing,
+    '--motion-progress': `${progress}`
+  } as const), [isVisible, targetOpacity, initialOpacity, duration, easing, delay, progress])
 
   return {
     ref,

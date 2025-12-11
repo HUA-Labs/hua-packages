@@ -1,628 +1,247 @@
+/**
+ * Core Icons
+ * 
+ * 핵심 아이콘만 포함하여 번들 크기를 최적화합니다.
+ * 나머지 아이콘은 동적 fallback으로 처리됩니다.
+ * 
+ * 포함 기준:
+ * 1. my-app에서 실제 사용 중인 아이콘
+ * 2. UI 컴포넌트에서 자주 사용되는 아이콘
+ * 3. 각 카테고리의 대표 아이콘
+ * 
+ * 새로운 아이콘이 필요하면 동적 fallback이 자동으로 처리합니다.
+ */
+
 import {
-  // Navigation & UI
+  // Navigation
   Home,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
   Menu,
   X,
   Search,
   Settings,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  
+  // Actions
+  Edit,
+  Trash2,
+  Plus,
+  Minus,
+  Download,
+  Upload,
+  RefreshCw,
+  Save,
+  Copy,
+  
+  // Status & Feedback
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Info,
+  Check,
+  Circle,
+  HelpCircle,
+  
+  // User & Auth
   User,
+  Users,
+  UserPlus,
+  LogIn,
+  LogOut,
+  Eye,
+  EyeOff,
+  
+  // Data & Analytics
+  BarChart3,
+  TrendingUp,
+  Activity,
+  Database,
+  Zap,
+  
+  // Files & Content
+  FileText,
+  File,
+  Folder,
+  Book,
+  BookOpen,
+  
+  // Communication
+  Mail,
+  MessageCircle,
+  Phone,
+  
+  // Media
+  Image,
+  Video,
+  Camera,
+  
+  // Emotions
+  Smile,
+  Frown,
+  Meh,
+  
+  // Security
+  Lock,
+  Unlock,
+  Shield,
+  Wallet,
+  Key,
+  
+  // Time & Date
+  Clock,
+  Calendar,
+  CalendarPlus,
+  
+  // UI Elements
   Bell,
   Heart,
   Star,
   Bookmark,
   Share,
-  Download,
-  Upload,
-  Edit,
-  Trash2,
-  Plus,
-  Minus,
-  Check,
-  AlertCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  ChevronLeft,
-  ChevronRight,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  ArrowRightLeft,
-  Move,
-  MoveHorizontal,
-  MoreHorizontal,
-  MoreVertical,
-  Maximize2,
-  FlaskConical,
-  Hand,
-  Waves,
   
-  // Communication & Social
-  MessageCircle,
-  Phone,
-  Mail,
-  Send,
-  Reply,
-  Forward,
-  Copy,
-  Link,
-  ExternalLink,
-  
-  // Media & Entertainment
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Volume2,
-  VolumeX,
-  Music,
-  Video,
-  Image,
-  Camera,
-  Mic,
-  Headphones,
-  
-  // Emotion & Expression
-  Smile,
-  Frown,
-  Meh,
-  Laugh,
-  Angry,
-  ThumbsUp,
-  ThumbsDown,
-  
-  // Data & Analytics
-  BarChart3,
-  PieChart,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Database,
-  FileText,
-  Folder,
-  Calendar,
-  Clock,
-  Timer,
-  
-  // Status & Feedback
-  Loader2,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  HelpCircle,
-  Eye,
-  EyeOff,
-  Lock,
-  Unlock,
-  Shield,
-  Zap,
+  // Theme
+  Monitor,
   Sun,
   Moon,
-  Cloud,
-  CloudRain,
   
-  // Authentication & User
-  LogIn,
-  LogOut,
-  
-  // Finance & E-commerce
-  CreditCard,
-  DollarSign,
-  Euro,
-  PoundSterling,
-  Bitcoin,
-  ShoppingCart,
-  ShoppingBag,
-  Package,
-  Truck,
-  Store,
-  Tag,
-  Percent,
-  Calculator,
-  Receipt,
-  Wallet,
-  PiggyBank,
-  BarChart,
-  LineChart,
-  
-  // Mobile & App
-  Smartphone,
-  Tablet,
-  Monitor,
-  Laptop,
-  Wifi,
-  WifiOff,
-  Bluetooth,
-  Signal,
-  Battery,
-  BatteryCharging,
-  Volume,
-  Volume1,
-  Vibrate,
-  RotateCcw,
-  RotateCw,
-  Maximize,
-  Minimize,
-  
-  // Business & Productivity
-  Briefcase,
-  Building,
-  Building2,
-  Users,
-  UserPlus,
-  UserMinus,
-  UserCheck,
-  UserX,
-  UserCog,
-  
-  // Files & Documents
-  File,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  FileArchive,
-  FileCode,
-  FileSpreadsheet,
-  FileCheck,
-  FileX,
-  FilePlus,
-  FileMinus,
-  FileEdit,
-  FileSearch,
-  
-  // Security & Privacy
-  ShieldCheck,
-  ShieldAlert,
-  Key,
-  Fingerprint,
-  
-  // Communication Extended
-  MessageSquare,
-  PhoneCall,
-  PhoneIncoming,
-  PhoneOutgoing,
-  PhoneMissed,
-  PhoneOff,
-  MailOpen,
-  MailCheck,
-  MailX,
-  MailPlus,
-  MailMinus,
-  MailSearch,
-  
-  // Social Media
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Youtube,
-  Twitch,
-  Github,
-  Slack,
-  Figma,
-  Chrome,
-  Codepen,
-  Codesandbox,
-
-  Navigation,
-  Navigation2,
-  Compass,
-  Globe,
-  Globe2,
-  Flag,
-  FlagTriangleRight,
-  
-  // Actions Extended
-  Save,
-  SaveAll,
-  Undo,
-  Redo,
-  Scissors,
-  Type,
-  Bold,
-  Italic,
-  Underline,
-  Strikethrough,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  List,
-  ListOrdered,
-  ListChecks,
-  
-  // Feedback Extended
-  HeartOff,
-  StarOff,
-  BookmarkPlus,
-  BookmarkMinus,
-  
-  // Status Extended
-  Circle,
-  CircleDot,
-  CircleSlash,
-  
-  // Weather Extended
-  CloudSnow,
-  CloudLightning,
-  CloudFog,
-  Wind,
-  Thermometer,
-  Droplets,
-  Umbrella,
-  
-  // Time & Date
-  CalendarDays,
-  CalendarCheck,
-  CalendarX,
-  CalendarPlus,
-  CalendarMinus,
-  CalendarClock,
-  
-  // 추가된 누락 아이콘들
-  Palette,
-  BookOpen,
-  Layers,
-  MousePointer,
-  ToggleLeft,
-  Square,
-  Sidebar,
-  Gauge,
-  Sparkles,
-  
-  // 문서 페이지용 아이콘들
-  Book,
-  Code,
-  Brain,
-  Rocket,
-  Target,
+  // Additional
   Lightbulb,
-  GraduationCap,
-  Award,
-  Trophy,
-  Medal,
-  Crown,
-  Gem,
-  Diamond,
-  
-  // Science & Lab
-  Beaker,
-  TestTube,
-  Microscope,
-  Atom,
+  Brain,
+  Flag,
+  Square,
 } from 'lucide-react'
 
-// 아이콘 객체
+// 핵심 아이콘 객체
 export const icons = {
-  // Navigation & UI
+  // Navigation
   home: Home,
-  menu: Menu,
-  close: X,
-  search: Search,
-  settings: Settings,
-  user: User,
-  bell: Bell,
-  heart: Heart,
-  star: Star,
-  bookmark: Bookmark,
-  share: Share,
-  download: Download,
-  upload: Upload,
-  edit: Edit,
-  delete: Trash2,
-  add: Plus,
-  remove: Minus,
-  check: Check,
-  alertCircle: AlertCircle,
-  info: Info,
-  warning: AlertCircle,
-  chevronDown: ChevronDown,
-  chevronUp: ChevronUp,
-  chevronLeft: ChevronLeft,
-  chevronRight: ChevronRight,
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
-  arrowRightLeft: ArrowRightLeft,
-  move: Move,
-  'move-horizontal': MoveHorizontal,
-  moreHorizontal: MoreHorizontal,
-  moreVertical: MoreVertical,
-  'maximize-2': Maximize2,
-  'flask-conical': FlaskConical,
-  hand: Hand,
-  waves: Waves,
+  menu: Menu,
+  close: X,
+  search: Search,
+  settings: Settings,
+  externalLink: ExternalLink,
+  chevronLeft: ChevronLeft,
+  chevronRight: ChevronRight,
+  chevronDown: ChevronDown,
+  chevronUp: ChevronUp,
+  
+  // Actions
+  edit: Edit,
+  delete: Trash2,
+  add: Plus,
+  remove: Minus,
+  download: Download,
+  upload: Upload,
+  refresh: RefreshCw,
+  save: Save,
+  copy: Copy,
+  
+  // Status & Feedback
+  loader: Loader2,
+  success: CheckCircle,
+  error: XCircle,
+  alertCircle: AlertCircle,
+  warning: AlertCircle, // warning은 alertCircle과 동일
+  info: Info,
+  check: Check,
+  circle: Circle,
+  helpCircle: HelpCircle,
+  
+  // User & Auth
+  user: User,
+  users: Users,
+  userPlus: UserPlus,
+  logIn: LogIn,
+  logOut: LogOut,
+  eye: Eye,
+  eyeOff: EyeOff,
+  
+  // Data & Analytics
+  chart: BarChart3,
+  barChart: BarChart3,
+  trendingUp: TrendingUp,
+  activity: Activity,
+  database: Database,
+  zap: Zap,
+  
+  // Files & Content
+  fileText: FileText,
+  file: File,
+  folder: Folder,
+  book: Book,
+  bookOpen: BookOpen,
   
   // Communication
+  mail: Mail,
   message: MessageCircle,
   phone: Phone,
-  mail: Mail,
-  send: Send,
-  reply: Reply,
-  forward: Forward,
-  copy: Copy,
-  link: Link,
-  externalLink: ExternalLink,
   
   // Media
-  play: Play,
-  pause: Pause,
-  skipBack: SkipBack,
-  skipForward: SkipForward,
-  volume: Volume2,
-  mute: VolumeX,
-  music: Music,
-  video: Video,
   image: Image,
+  video: Video,
   camera: Camera,
-  mic: Mic,
-  headphones: Headphones,
   
   // Emotions
   smile: Smile,
   frown: Frown,
   meh: Meh,
-  laugh: Laugh,
-  angry: Angry,
-  thumbsUp: ThumbsUp,
-  thumbsDown: ThumbsDown,
   
-  // Data & Analytics
-  chart: BarChart3,
-  pieChart: PieChart,
-  trendingUp: TrendingUp,
-  trendingDown: TrendingDown,
-  activity: Activity,
-  database: Database,
-  fileText: FileText,
-  folder: Folder,
-  calendar: Calendar,
-  clock: Clock,
-  timer: Timer,
-  
-  // Status & Feedback
-  loader: Loader2,
-  refresh: RefreshCw,
-  success: CheckCircle,
-  error: XCircle,
-  helpCircle: HelpCircle,
-  eye: Eye,
-  eyeOff: EyeOff,
+  // Security
   lock: Lock,
   unlock: Unlock,
   shield: Shield,
-  zap: Zap,
-  sun: Sun,
-  moon: Moon,
-  cloud: Cloud,
-  rain: CloudRain,
-  
-  // Finance
-  creditCard: CreditCard,
-  dollarSign: DollarSign,
-  euro: Euro,
-  poundSterling: PoundSterling,
-  bitcoin: Bitcoin,
-  shoppingCart: ShoppingCart,
-  shoppingBag: ShoppingBag,
-  package: Package,
-  truck: Truck,
-  store: Store,
-  tag: Tag,
-  percent: Percent,
-  calculator: Calculator,
-  receipt: Receipt,
   wallet: Wallet,
-  piggyBank: PiggyBank,
-  barChart: BarChart,
-  lineChart: LineChart,
-  
-  // Mobile & App
-  smartphone: Smartphone,
-  tablet: Tablet,
-  monitor: Monitor,
-  laptop: Laptop,
-  wifi: Wifi,
-  wifiOff: WifiOff,
-  bluetooth: Bluetooth,
-  signal: Signal,
-  battery: Battery,
-  batteryCharging: BatteryCharging,
-  volume1: Volume,
-  volume2: Volume1,
-  vibrate: Vibrate,
-  rotateCcw: RotateCcw,
-  rotateCw: RotateCw,
-  maximize: Maximize,
-  minimize: Minimize,
-  
-  // Business
-  briefcase: Briefcase,
-  building: Building,
-  building2: Building2,
-  users: Users,
-  userPlus: UserPlus,
-  userMinus: UserMinus,
-  userCheck: UserCheck,
-  userX: UserX,
-  userCog: UserCog,
-  
-  // Files
-  file: File,
-  fileImage: FileImage,
-  fileVideo: FileVideo,
-  fileAudio: FileAudio,
-  fileArchive: FileArchive,
-  fileCode: FileCode,
-  fileSpreadsheet: FileSpreadsheet,
-  fileCheck: FileCheck,
-  fileX: FileX,
-  filePlus: FilePlus,
-  fileMinus: FileMinus,
-  fileEdit: FileEdit,
-  fileSearch: FileSearch,
-  
-  // Security & Authentication
-  shieldCheck: ShieldCheck,
-  shieldAlert: ShieldAlert,
   key: Key,
-  fingerprint: Fingerprint,
-  logIn: LogIn,
-  logOut: LogOut,
-  
-  // Communication Extended
-  messageSquare: MessageSquare,
-  phoneCall: PhoneCall,
-  phoneIncoming: PhoneIncoming,
-  phoneOutgoing: PhoneOutgoing,
-  phoneMissed: PhoneMissed,
-  phoneOff: PhoneOff,
-  mailOpen: MailOpen,
-  mailCheck: MailCheck,
-  mailX: MailX,
-  mailPlus: MailPlus,
-  mailMinus: MailMinus,
-  mailSearch: MailSearch,
-  
-  // Social Media
-  facebook: Facebook,
-  twitter: Twitter,
-  instagram: Instagram,
-  linkedin: Linkedin,
-  youtube: Youtube,
-  twitch: Twitch,
-  github: Github,
-  slack: Slack,
-  figma: Figma,
-  chrome: Chrome,
-  codepen: Codepen,
-  codesandbox: Codesandbox,
-
-  
-  // Navigation Extended
-  navigation: Navigation,
-  navigation2: Navigation2,
-  compass: Compass,
-  globe: Globe,
-  globe2: Globe2,
-  flag: Flag,
-  flagTriangleRight: FlagTriangleRight,
-  
-  // Actions Extended
-  save: Save,
-  saveAll: SaveAll,
-  undo: Undo,
-  redo: Redo,
-  scissors: Scissors,
-  type: Type,
-  bold: Bold,
-  italic: Italic,
-  underline: Underline,
-  strikethrough: Strikethrough,
-  alignLeft: AlignLeft,
-  alignCenter: AlignCenter,
-  alignRight: AlignRight,
-  alignJustify: AlignJustify,
-  list: List,
-  listOrdered: ListOrdered,
-  listChecks: ListChecks,
-  
-  // Feedback Extended
-  heartOff: HeartOff,
-  starOff: StarOff,
-  bookmarkPlus: BookmarkPlus,
-  bookmarkMinus: BookmarkMinus,
-  
-  // Status Extended
-  circle: Circle,
-  circleDot: CircleDot,
-  circleSlash: CircleSlash,
-  
-  // Weather Extended
-  cloudSnow: CloudSnow,
-  cloudLightning: CloudLightning,
-  cloudFog: CloudFog,
-  wind: Wind,
-  thermometer: Thermometer,
-  droplets: Droplets,
-  umbrella: Umbrella,
   
   // Time & Date
-  calendarDays: CalendarDays,
-  calendarCheck: CalendarCheck,
-  calendarX: CalendarX,
+  clock: Clock,
+  calendar: Calendar,
   calendarPlus: CalendarPlus,
-  calendarMinus: CalendarMinus,
-  calendarClock: CalendarClock,
   
-  // 추가된 누락 아이콘들
-  palette: Palette,
-  bookOpen: BookOpen,
-  layers: Layers,
-  mousePointer: MousePointer,
-  toggleLeft: ToggleLeft,
-  square: Square,
-  sidebar: Sidebar,
-  gauge: Gauge,
-  sparkles: Sparkles,
+  // UI Elements
+  bell: Bell,
+  heart: Heart,
+  star: Star,
+  bookmark: Bookmark,
+  share: Share,
   
-  // 문서 페이지용 아이콘들
-  book: Book,
-  code: Code,
-  brain: Brain,
-  rocket: Rocket,
-  target: Target,
+  // Theme
+  monitor: Monitor,
+  sun: Sun,
+  moon: Moon,
+  
+  // Additional
   lightbulb: Lightbulb,
-  graduationCap: GraduationCap,
-  award: Award,
-  trophy: Trophy,
-  medal: Medal,
-  crown: Crown,
-  gem: Gem,
-  diamond: Diamond,
-  
-  // Science & Lab
-  beaker: Beaker,
-  testTube: TestTube,
-  microscope: Microscope,
-  atom: Atom,
-}
+  brain: Brain,
+  flag: Flag,
+  square: Square,
+} as const
 
 // 아이콘 이름 타입
 export type IconName = keyof typeof icons
-
-// 아이콘 카테고리별 그룹화
-export const iconCategories = {
-  navigation: ['home', 'menu', 'close', 'search', 'settings', 'user', 'bell', 'navigation', 'compass', 'globe', 'flag', 'sidebar'],
-  actions: ['edit', 'delete', 'add', 'remove', 'check', 'share', 'download', 'upload', 'save', 'undo', 'redo', 'copy', 'scissors', 'mousePointer', 'toggleLeft'],
-  communication: ['message', 'phone', 'mail', 'send', 'reply', 'forward', 'messageSquare', 'phoneCall', 'mailOpen'],
-  media: ['play', 'pause', 'skipBack', 'skipForward', 'volume', 'mute', 'music', 'video', 'image', 'camera', 'mic', 'headphones'],
-  emotions: ['smile', 'frown', 'meh', 'laugh', 'angry'],
-  feedback: ['thumbsUp', 'thumbsDown', 'success', 'error', 'warning', 'info', 'heart', 'star', 'bookmark'],
-  data: ['chart', 'pieChart', 'trendingUp', 'trendingDown', 'activity', 'database', 'barChart', 'lineChart'],
-  status: ['loader', 'refresh', 'lock', 'unlock', 'eye', 'eyeOff', 'shield', 'battery', 'wifi'],
-  weather: ['sun', 'moon', 'cloud', 'rain', 'cloudSnow', 'cloudLightning', 'wind', 'thermometer'],
-  finance: ['creditCard', 'dollarSign', 'euro', 'poundSterling', 'bitcoin', 'shoppingCart', 'wallet', 'calculator'],
-  business: ['briefcase', 'building', 'users', 'userPlus', 'userCheck', 'userCog'],
-  files: ['fileText', 'fileImage', 'fileVideo', 'folder', 'fileCheck', 'bookOpen'],
-  social: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'github', 'slack', 'figma', 'chrome', 'codepen', 'codesandbox'],
-  mobile: ['smartphone', 'tablet', 'monitor', 'laptop', 'bluetooth', 'signal', 'maximize'],
-  editing: ['type', 'bold', 'italic', 'underline', 'alignLeft', 'alignCenter', 'list', 'listOrdered', 'palette', 'layers', 'square'],
-  time: ['clock', 'timer', 'calendar', 'calendarDays', 'calendarCheck', 'calendarClock'],
-} as const
 
 // 감정별 아이콘 매핑
 export const emotionIcons = {
   happy: 'smile',
   sad: 'frown',
   neutral: 'meh',
-  excited: 'laugh',
-  angry: 'angry',
+  excited: 'smile', // laugh 대신 smile 사용
+  angry: 'frown', // angry 대신 frown 사용
   love: 'heart',
-  like: 'thumbsUp',
-  dislike: 'thumbsDown',
+  like: 'heart', // thumbsUp 대신 heart 사용
+  dislike: 'frown', // thumbsDown 대신 frown 사용
 } as const
 
 // 상태별 아이콘 매핑
@@ -636,4 +255,21 @@ export const statusIcons = {
   unlocked: 'unlock',
   visible: 'eye',
   hidden: 'eyeOff',
-} as const 
+} as const
+
+// 아이콘 카테고리별 그룹화 (참고용)
+export const iconCategories = {
+  navigation: ['home', 'arrowLeft', 'arrowRight', 'arrowUp', 'arrowDown', 'menu', 'close', 'search', 'settings', 'externalLink', 'chevronLeft', 'chevronRight', 'chevronDown', 'chevronUp'],
+  actions: ['edit', 'delete', 'add', 'remove', 'download', 'upload', 'refresh', 'save', 'copy'],
+  status: ['loader', 'success', 'error', 'alertCircle', 'warning', 'info', 'check', 'circle'],
+  user: ['user', 'users', 'userPlus', 'logIn', 'logOut', 'eye', 'eyeOff'],
+  data: ['chart', 'barChart', 'trendingUp', 'activity', 'database', 'zap'],
+  files: ['fileText', 'file', 'folder', 'book'],
+  communication: ['mail', 'message', 'phone'],
+  media: ['image', 'video', 'camera'],
+  emotions: ['smile', 'frown', 'meh'],
+  security: ['lock', 'unlock', 'shield'],
+  time: ['clock', 'calendar'],
+  ui: ['bell', 'heart', 'star', 'bookmark', 'share'],
+  theme: ['monitor', 'sun', 'moon'],
+} as const

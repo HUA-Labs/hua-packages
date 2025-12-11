@@ -1,6 +1,8 @@
-# HUA Platform
+# HUA Platform Documentation
 
 HUA Platform은 모던 웹 개발을 위한 통합 개발 플랫폼입니다.
+
+> **문서 인덱스**: [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)에서 모든 문서를 확인할 수 있습니다.
 
 ## 📚 문서
 

@@ -207,10 +207,15 @@ const fadeIn: BaseMotionReturn<HTMLDivElement> = useFadeIn({
 } as FadeInOptions);
 ```
 
+## Related Packages
+
+- **[@hua-labs/motion-advanced](../../hua-motion-advanced)** - Advanced motion hooks and orchestration
+- **[@hua-labs/motion](../../hua-motion)** - Unified package (Core + Advanced re-export)
+
 ## Roadmap
 
-- **Motion Core** - Essential hooks (Current)
-- **Motion Advanced** - Complex animations (In Development)
+- **Motion Core** - Essential hooks ✅ (Current)
+- **Motion Advanced** - Complex animations ✅ (Available)
 - **Motion Enterprise** - Team solutions (Planned)
 
 ## Browser Support

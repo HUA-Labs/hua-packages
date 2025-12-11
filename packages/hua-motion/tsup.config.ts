@@ -16,7 +16,7 @@ const shared = {
   treeshake: true,
   minify: true,
   target: 'es2019',
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', '@hua-labs/motion-core', '@hua-labs/motion-advanced'],
   esbuildOptions(options: any) {
     options.jsx = 'automatic';
   },
@@ -30,6 +30,8 @@ export default defineConfig([
     dts: {
       compilerOptions: {
         incremental: false,
+        skipLibCheck: true,
+        moduleResolution: 'bundler',
       },
     },
     outDir: 'dist',

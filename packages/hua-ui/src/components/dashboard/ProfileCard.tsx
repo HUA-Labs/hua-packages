@@ -5,11 +5,36 @@ import { merge } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
+/**
+ * 멤버십 등급 인터페이스
+ * @typedef {Object} MembershipTier
+ * @property {"basic" | "pro" | "premium" | "admin"} tier - 등급
+ * @property {string} label - 등급 라벨
+ */
 export interface MembershipTier {
   tier: "basic" | "pro" | "premium" | "admin";
   label: string;
 }
 
+/**
+ * ProfileCard 컴포넌트의 props / ProfileCard component props
+ * @typedef {Object} ProfileCardProps
+ * @property {string} name - 사용자 이름 / User name
+ * @property {string} [email] - 이메일 / Email
+ * @property {string} [avatar] - 아바타 이미지 URL / Avatar image URL
+ * @property {string} [avatarAlt] - 아바타 대체 텍스트 / Avatar alt text
+ * @property {string} [greeting] - 인사말 / Greeting
+ * @property {Date | string} [memberSince] - 가입일 / Member since date
+ * @property {MembershipTier["tier"]} [membershipTier] - 멤버십 등급 / Membership tier
+ * @property {string} [membershipLabel] - 멤버십 라벨 / Membership label
+ * @property {() => void} [onSettingsClick] - 설정 클릭 핸들러 / Settings click handler
+ * @property {string} [settingsHref] - 설정 링크 URL / Settings link URL
+ * @property {"default" | "gradient" | "minimal"} [variant="default"] - 스타일 변형 / Style variant
+ * @property {boolean} [showAvatar=true] - 아바타 표시 여부 / Show avatar
+ * @property {boolean} [showMembership=true] - 멤버십 표시 여부 / Show membership
+ * @property {boolean} [showSettings=true] - 설정 버튼 표시 여부 / Show settings button
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface ProfileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   email?: string;
@@ -53,6 +78,40 @@ const tierLabels = {
   admin: "Admin",
 };
 
+/**
+ * ProfileCard 컴포넌트
+ * 
+ * 사용자 프로필 정보를 표시하는 카드 컴포넌트입니다.
+ * 아바타, 이름, 이메일, 멤버십 등급 등을 표시할 수 있습니다.
+ * 
+ * Card component that displays user profile information.
+ * Can show avatar, name, email, membership tier, and more.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ProfileCard
+ *   name="홍길동"
+ *   email="hong@example.com"
+ *   avatar="/avatar.jpg"
+ *   membershipTier="premium"
+ *   memberSince={new Date("2024-01-01")}
+ * />
+ * 
+ * @example
+ * // 그라디언트 스타일 / Gradient style
+ * <ProfileCard
+ *   name="김철수"
+ *   greeting="안녕하세요"
+ *   variant="gradient"
+ *   membershipTier="pro"
+ *   onSettingsClick={() => navigate("/settings")}
+ * />
+ * 
+ * @param {ProfileCardProps} props - ProfileCard 컴포넌트의 props / ProfileCard component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ProfileCard 컴포넌트 / ProfileCard component
+ */
 export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
   (
     {

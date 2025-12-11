@@ -7,7 +7,6 @@ import {
   ProgressWarning, 
   ProgressError, 
   ProgressInfo,
-  ProgressCard,
   ProgressGroup,
   Card, 
   CardContent,

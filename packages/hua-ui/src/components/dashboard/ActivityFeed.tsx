@@ -1,10 +1,22 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { merge, formatRelativeTime } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
+/**
+ * ActivityItem 인터페이스 / ActivityItem interface
+ * @typedef {Object} ActivityItem
+ * @property {string} id - 활동 항목 고유 ID / Activity item unique ID
+ * @property {string} title - 활동 제목 / Activity title
+ * @property {string} [description] - 활동 설명 / Activity description
+ * @property {Date | string} timestamp - 활동 타임스탬프 / Activity timestamp
+ * @property {IconName | React.ReactNode} [icon] - 아이콘 / Icon
+ * @property {string | React.ReactNode} [badge] - 배지 / Badge
+ * @property {() => void} [onClick] - 클릭 핸들러 / Click handler
+ * @property {Record<string, unknown>} [metadata] - 추가 메타데이터 / Additional metadata
+ */
 export interface ActivityItem {
   id: string;
   title: string;
@@ -13,9 +25,22 @@ export interface ActivityItem {
   icon?: IconName | React.ReactNode;
   badge?: string | React.ReactNode;
   onClick?: () => void;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
+/**
+ * ActivityFeed 컴포넌트의 props / ActivityFeed component props
+ * @typedef {Object} ActivityFeedProps
+ * @property {string} [title] - 피드 제목 / Feed title
+ * @property {ActivityItem[]} items - 활동 항목 배열 / Activity items array
+ * @property {string} [emptyMessage="활동 내역이 없습니다."] - 빈 상태 메시지 / Empty state message
+ * @property {boolean} [showHeader=true] - 헤더 표시 여부 / Show header
+ * @property {number} [maxItems] - 최대 표시 항목 수 / Maximum items to display
+ * @property {() => void} [onViewAll] - 전체 보기 핸들러 / View all handler
+ * @property {string} [viewAllLabel="전체 보기"] - 전체 보기 라벨 / View all label
+ * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface ActivityFeedProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   items: ActivityItem[];
@@ -27,6 +52,44 @@ export interface ActivityFeedProps extends React.HTMLAttributes<HTMLDivElement> 
   emptyState?: React.ReactNode;
 }
 
+/**
+ * ActivityFeed 컴포넌트 / ActivityFeed component
+ * 
+ * 활동 내역을 표시하는 피드 컴포넌트입니다.
+ * 타임스탬프를 상대 시간으로 표시하며, 최대 항목 수 제한을 지원합니다.
+ * 
+ * Feed component that displays activity history.
+ * Shows timestamps as relative time and supports maximum items limit.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ActivityFeed
+ *   title="최근 활동"
+ *   items={[
+ *     {
+ *       id: "1",
+ *       title: "새 주문 생성",
+ *       description: "주문 #1234",
+ *       timestamp: new Date(),
+ *       icon: "shoppingCart"
+ *     }
+ *   ]}
+ * />
+ * 
+ * @example
+ * // 최대 항목 수 제한 / Maximum items limit
+ * <ActivityFeed
+ *   title="활동 내역"
+ *   items={activities}
+ *   maxItems={10}
+ *   onViewAll={() => navigate("/activities")}
+ * />
+ * 
+ * @param {ActivityFeedProps} props - ActivityFeed 컴포넌트의 props / ActivityFeed component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ActivityFeed 컴포넌트 / ActivityFeed component
+ */
 export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
   (
     {
@@ -46,21 +109,6 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
     const displayItems = maxItems ? items.slice(0, maxItems) : items;
     const hasMore = maxItems && items.length > maxItems;
 
-    const formatTimestamp = (timestamp: Date | string): string => {
-      const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
-      const now = new Date();
-      const diff = now.getTime() - date.getTime();
-      const minutes = Math.floor(diff / 60000);
-      const hours = Math.floor(diff / 3600000);
-      const days = Math.floor(diff / 86400000);
-
-      if (minutes < 1) return "방금 전";
-      if (minutes < 60) return `${minutes}분 전`;
-      if (hours < 24) return `${hours}시간 전`;
-      if (days < 7) return `${days}일 전`;
-      return date.toLocaleDateString("ko-KR");
-    };
-
     return (
       <div
         ref={ref}
@@ -79,6 +127,7 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
             {onViewAll && (
               <button
                 onClick={onViewAll}
+                aria-label={`${viewAllLabel} - ${title || "활동 내역"}`}
                 className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium text-sm transition-colors"
               >
                 {viewAllLabel} →
@@ -158,7 +207,9 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
 
                 {/* 타임스탬프 */}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {formatTimestamp(item.timestamp)}
+                  <time dateTime={item.timestamp instanceof Date ? item.timestamp.toISOString() : typeof item.timestamp === 'string' ? item.timestamp : undefined}>
+                    {formatRelativeTime(item.timestamp)}
+                  </time>
                 </p>
               </div>
             ))}
@@ -168,6 +219,7 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
               <div className="p-4 text-center border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={onViewAll}
+                  aria-label={`더 많은 활동 보기 - ${items.length - (maxItems || 0)}개 더`}
                   className="inline-flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors"
                 >
                   <span>더 많은 활동 보기</span>

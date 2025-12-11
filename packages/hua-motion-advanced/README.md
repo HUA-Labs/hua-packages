@@ -91,8 +91,8 @@ function AdvancedMotionExample() {
 
 ## 🔗 관련 패키지
 
-- **[@hua-labs/motion-core](../hua-motion-core)** - 기본 모션 기능
-- **[@hua-labs/motion-enterprise](../hua-motion-enterprise)** - 엔터프라이즈 기능 (계획)
+- **[@hua-labs/motion-core](../hua-motion-core)** - 기본 모션 기능 (필수 의존성)
+- **[@hua-labs/motion](../../hua-motion)** - 통합 패키지 (Core + Advanced re-export)
 
 ## �� 라이선스
 

@@ -3,9 +3,9 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { LanguageToggle } from '@hua-labs/ui/advanced'
 import { 
   ThemeToggle, 
-  LanguageToggle, 
   Icon,
   Container,
   Button

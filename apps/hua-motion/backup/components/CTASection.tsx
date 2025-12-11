@@ -62,7 +62,7 @@ export default function CTASection() {
             hover="glow"
             className="py-4 px-8 min-h-[56px]"
           >
-            <Icon name="testTube" size={20} className="mr-3" />
+            <Icon name={"testTube" as any} size={20} className="mr-3" />
             테스트 랩
           </Button>
           
@@ -74,7 +74,7 @@ export default function CTASection() {
             hover="glow"
             className="py-4 px-8 min-h-[56px]"
           >
-            <Icon name="code" size={20} className="mr-3" />
+            <Icon name={"code" as any} size={20} className="mr-3" />
             플레이그라운드
           </Button>
           
@@ -86,7 +86,7 @@ export default function CTASection() {
             hover="glow"
             className="py-4 px-8 min-h-[56px]"
           >
-            <Icon name="bookOpen" size={20} className="mr-3" />
+            <Icon name={"bookOpen" as any} size={20} className="mr-3" />
             문서
           </Button>
           
@@ -98,7 +98,7 @@ export default function CTASection() {
             hover="glow"
             className="py-4 px-8 min-h-[56px]"
           >
-            <Icon name="settings" size={20} className="mr-3" />
+            <Icon name={"settings" as any} size={20} className="mr-3" />
             고급 기능
           </Button>
         </div>

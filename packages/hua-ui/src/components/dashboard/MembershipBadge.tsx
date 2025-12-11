@@ -3,6 +3,15 @@
 import React from "react";
 import { merge } from "../../lib/utils";
 
+/**
+ * MembershipBadge 컴포넌트의 props / MembershipBadge component props
+ * @typedef {Object} MembershipBadgeProps
+ * @property {"basic" | "pro" | "premium" | "admin"} tier - 멤버십 등급 / Membership tier
+ * @property {string} [label] - 커스텀 라벨 (기본값: 등급별 라벨) / Custom label (default: tier-specific label)
+ * @property {"sm" | "md" | "lg"} [size="md"] - 배지 크기 / Badge size
+ * @property {boolean} [showIcon=true] - 아이콘 표시 여부 / Show icon
+ * @extends {React.HTMLAttributes<HTMLSpanElement>}
+ */
 export interface MembershipBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   tier: "basic" | "pro" | "premium" | "admin";
   label?: string;
@@ -44,6 +53,33 @@ const sizeClasses = {
   },
 };
 
+/**
+ * MembershipBadge 컴포넌트
+ * 
+ * 멤버십 등급을 표시하는 배지 컴포넌트입니다.
+ * 등급별로 다른 그라디언트 색상과 아이콘을 제공합니다.
+ * 
+ * Badge component that displays membership tier.
+ * Provides different gradient colors and icons for each tier.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <MembershipBadge tier="premium" />
+ * 
+ * @example
+ * // 커스텀 라벨과 크기 / Custom label and size
+ * <MembershipBadge
+ *   tier="pro"
+ *   label="프로 플랜"
+ *   size="lg"
+ *   showIcon={false}
+ * />
+ * 
+ * @param {MembershipBadgeProps} props - MembershipBadge 컴포넌트의 props / MembershipBadge component props
+ * @param {React.Ref<HTMLSpanElement>} ref - span 요소 ref / span element ref
+ * @returns {JSX.Element} MembershipBadge 컴포넌트 / MembershipBadge component
+ */
 export const MembershipBadge = React.forwardRef<HTMLSpanElement, MembershipBadgeProps>(
   (
     {

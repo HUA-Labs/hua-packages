@@ -1,9 +1,25 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 
+/**
+ * BottomSheet 컴포넌트의 props / BottomSheet component props
+ * @typedef {Object} BottomSheetProps
+ * @property {boolean} open - BottomSheet 열림/닫힘 상태 / BottomSheet open/close state
+ * @property {(open: boolean) => void} onOpenChange - 상태 변경 콜백 / State change callback
+ * @property {React.ReactNode} children - BottomSheet 내용 / BottomSheet content
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {"sm" | "md" | "lg" | "xl" | "full"} [height="md"] - BottomSheet 높이 / BottomSheet height
+ * @property {boolean} [showBackdrop=true] - 배경 오버레이 표시 여부 / Show backdrop overlay
+ * @property {string} [backdropClassName] - 배경 오버레이 추가 CSS 클래스 / Backdrop overlay additional CSS class
+ * @property {boolean} [closeOnBackdropClick=true] - 배경 클릭 시 닫기 여부 / Close on backdrop click
+ * @property {boolean} [closeOnEscape=true] - ESC 키로 닫기 여부 / Close on ESC key
+ * @property {boolean} [showDragHandle=true] - 드래그 핸들 표시 여부 / Show drag handle
+ * @property {number[]} [snapPoints=[25, 50, 75, 100]] - 스냅 포인트 (퍼센트) / Snap points (percentage)
+ * @property {number} [defaultSnap=50] - 기본 스냅 포인트 (퍼센트) / Default snap point (percentage)
+ */
 interface BottomSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -11,6 +27,7 @@ interface BottomSheetProps {
   className?: string
   height?: "sm" | "md" | "lg" | "xl" | "full"
   showBackdrop?: boolean
+  backdropClassName?: string
   closeOnBackdropClick?: boolean
   closeOnEscape?: boolean
   showDragHandle?: boolean
@@ -18,6 +35,45 @@ interface BottomSheetProps {
   defaultSnap?: number
 }
 
+/**
+ * BottomSheet 컴포넌트 / BottomSheet component
+ * 
+ * 화면 하단에서 올라오는 시트 컴포넌트입니다.
+ * 모바일 친화적인 UI를 제공하며, 드래그로 높이를 조절할 수 있습니다.
+ * 스냅 포인트를 지원하여 특정 높이에서 멈출 수 있습니다.
+ * 
+ * Sheet component that slides up from the bottom of the screen.
+ * Provides mobile-friendly UI and allows height adjustment by dragging.
+ * Supports snap points to stop at specific heights.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * const [open, setOpen] = useState(false)
+ * 
+ * <BottomSheet open={open} onOpenChange={setOpen}>
+ *   <BottomSheetHeader>제목</BottomSheetHeader>
+ *   <BottomSheetContent>내용</BottomSheetContent>
+ * </BottomSheet>
+ * 
+ * @example
+ * // 커스텀 스냅 포인트 / Custom snap points
+ * <BottomSheet 
+ *   open={open} 
+ *   onOpenChange={setOpen}
+ *   snapPoints={[30, 60, 90]}
+ *   defaultSnap={30}
+ * >
+ *   <BottomSheetContent>내용</BottomSheetContent>
+ * </BottomSheet>
+ * 
+ * @param {BottomSheetProps} props - BottomSheet 컴포넌트의 props / BottomSheet component props
+ * @param {React.Ref<HTMLDivElement>} ref - BottomSheet 컨테이너 ref / BottomSheet container ref
+ * @returns {JSX.Element} BottomSheet 컴포넌트 / BottomSheet component
+ * 
+ * @todo 접근성 개선: role="dialog", aria-modal="true" 추가 필요 / Accessibility: Add role="dialog", aria-modal="true"
+ * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
+ */
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
   ({ 
     open, 
@@ -26,6 +82,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     className,
     height = "md",
     showBackdrop = true,
+    backdropClassName,
     closeOnBackdropClick = true,
     closeOnEscape = true,
     showDragHandle = true,
@@ -120,9 +177,10 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         {/* Backdrop */}
         {showBackdrop && (
           <div
-            className={cn(
-              "absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300",
-              isAnimating ? (open ? "opacity-100" : "opacity-0") : ""
+            className={merge(
+              "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
+              isAnimating ? (open ? "opacity-100" : "opacity-0") : "",
+              backdropClassName
             )}
             onClick={closeOnBackdropClick ? () => onOpenChange(false) : undefined}
           />
@@ -131,8 +189,8 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         {/* Bottom Sheet */}
         <div
           ref={ref}
-          className={cn(
-            "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-2xl transition-transform duration-300 ease-out pb-safe",
+          className={merge(
+            "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
             heightClasses[height],
             isAnimating ? (open ? "translate-y-0" : "translate-y-full") : "",
             className
@@ -161,6 +219,14 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
 )
 BottomSheet.displayName = "BottomSheet"
 
+/**
+ * BottomSheetHeader 컴포넌트의 props / BottomSheetHeader component props
+ * @typedef {Object} BottomSheetHeaderProps
+ * @property {React.ReactNode} children - 헤더 내용 / Header content
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {boolean} [showCloseButton=true] - 닫기 버튼 표시 여부 / Show close button
+ * @property {() => void} [onClose] - 닫기 버튼 클릭 콜백 / Close button click callback
+ */
 interface BottomSheetHeaderProps {
   children: React.ReactNode
   className?: string
@@ -168,12 +234,22 @@ interface BottomSheetHeaderProps {
   onClose?: () => void
 }
 
+/**
+ * BottomSheetHeader 컴포넌트 / BottomSheetHeader component
+ * BottomSheet의 헤더 영역을 표시합니다.
+ * Displays the header area of a BottomSheet.
+ * 
+ * @component
+ * @param {BottomSheetHeaderProps} props - BottomSheetHeader 컴포넌트의 props / BottomSheetHeader component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} BottomSheetHeader 컴포넌트 / BottomSheetHeader component
+ */
 const BottomSheetHeader = React.forwardRef<HTMLDivElement, BottomSheetHeaderProps>(
   ({ children, className, showCloseButton = true, onClose, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={cn("flex items-center justify-between px-6 py-4", className)}
+        className={merge("flex items-center justify-between px-6 py-4", className)}
         {...props}
       >
         <div className="flex-1">{children}</div>
@@ -191,17 +267,33 @@ const BottomSheetHeader = React.forwardRef<HTMLDivElement, BottomSheetHeaderProp
 )
 BottomSheetHeader.displayName = "BottomSheetHeader"
 
+/**
+ * BottomSheetContent 컴포넌트의 props / BottomSheetContent component props
+ * @typedef {Object} BottomSheetContentProps
+ * @property {React.ReactNode} children - 콘텐츠 / Content
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ */
 interface BottomSheetContentProps {
   children: React.ReactNode
   className?: string
 }
 
+/**
+ * BottomSheetContent 컴포넌트 / BottomSheetContent component
+ * BottomSheet의 메인 콘텐츠 영역을 표시합니다.
+ * Displays the main content area of a BottomSheet.
+ * 
+ * @component
+ * @param {BottomSheetContentProps} props - BottomSheetContent 컴포넌트의 props / BottomSheetContent component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} BottomSheetContent 컴포넌트 / BottomSheetContent component
+ */
 const BottomSheetContent = React.forwardRef<HTMLDivElement, BottomSheetContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={cn("flex-1 px-6 pb-6 overflow-y-auto", className)}
+        className={merge("flex-1 px-6 pb-6 overflow-y-auto", className)}
         {...props}
       >
         {children}

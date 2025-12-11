@@ -121,7 +121,7 @@ export default function PageHeader({
           {/* 글로우 효과 */}
           <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} blur-lg opacity-50`} />
           <Icon 
-            name={icon} 
+            name={icon as any} 
             size={variant === 'compact' ? 18 : variant === 'hero' ? 32 : 20} 
             className="text-white drop-shadow-sm relative z-10" 
           />

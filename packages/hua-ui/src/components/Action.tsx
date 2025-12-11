@@ -25,7 +25,21 @@ type ActionExtras = {
   glowColor?: string;       // css color
 };
 
-/** 👉 Action은 ButtonProps에 ActionExtras를 더한 *같은* 분기형 union을 그대로 사용 */
+/**
+ * Action 컴포넌트의 props / Action component props
+ * @typedef {Object} ActionProps
+ * @property {ActionKind} [actionType="primary"] - Action 타입 / Action type
+ * @property {FeedbackKind} [feedback="ripple"] - 피드백 타입 / Feedback type
+ * @property {boolean} [particleEffect=false] - 파티클 효과 활성화 / Enable particle effect
+ * @property {boolean} [rippleEffect=false] - 리플 효과 활성화 / Enable ripple effect
+ * @property {boolean} [soundEffect=false] - 사운드 효과 활성화 / Enable sound effect
+ * @property {boolean} [hapticFeedback=false] - 햅틱 피드백 활성화 / Enable haptic feedback
+ * @property {number} [transparency=1] - 투명도 (0-1) / Transparency (0-1)
+ * @property {number} [blurIntensity=0] - blur 강도 (px) / Blur intensity (px)
+ * @property {number} [glowIntensity=0] - 글로우 강도 (px) / Glow intensity (px)
+ * @property {string} [glowColor="rgba(91,140,255,.8)"] - 글로우 색상 / Glow color
+ * @extends {ButtonProps}
+ */
 export type ActionProps = ButtonProps & ActionExtras;
 
 type AnchorEl = HTMLAnchorElement;
@@ -46,6 +60,35 @@ function useReducedMotion() {
   return reduce;
 }
 
+/**
+ * Action 컴포넌트 / Action component
+ * 
+ * 고급 효과를 가진 액션 버튼 컴포넌트입니다.
+ * Button 컴포넌트를 기반으로 하며, 파티클, 리플, 사운드, 햅틱 피드백 등을 지원합니다.
+ * 
+ * Action button component with advanced effects.
+ * Based on Button component, supports particle, ripple, sound, haptic feedback, etc.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <Action>클릭</Action>
+ * 
+ * @example
+ * // 고급 효과 / Advanced effects
+ * <Action 
+ *   actionType="magical"
+ *   feedback="particle"
+ *   particleEffect
+ *   rippleEffect
+ * >
+ *   마법 버튼
+ * </Action>
+ * 
+ * @param {ActionProps} props - Action 컴포넌트의 props / Action component props
+ * @param {React.Ref<AnchorOrButton>} ref - button 또는 anchor 요소 ref / button or anchor element ref
+ * @returns {JSX.Element} Action 컴포넌트 / Action component
+ */
 export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
   (
     {
@@ -70,20 +113,130 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
   ) => {
     const reduced = useReducedMotion();
 
-    const runEffects = React.useCallback(() => {
+    const runEffects = React.useCallback((event: React.MouseEvent) => {
       if (hapticFeedback && isBrowser && "vibrate" in navigator && !reduced) {
         try { navigator.vibrate?.(30); } catch {}
       }
-      if (soundEffect && !reduced) {
-        // TODO: lazy load & play
+      
+      if (soundEffect && !reduced && isBrowser) {
+        // 간단한 클릭 사운드 효과 (선택적)
+        try {
+          const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+          if (!AudioContextClass) return;
+          const audioContext = new AudioContextClass();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.value = 800;
+          oscillator.type = 'sine';
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.1);
+        } catch (e) {
+          // 오디오 컨텍스트를 지원하지 않는 환경에서는 무시
+        }
       }
-      if (rippleEffect && !reduced) {
-        // TODO: data-ripple 토글
+      
+      if (rippleEffect && !reduced && event.currentTarget) {
+        // Ripple 효과: 클릭 위치에 원형 애니메이션 생성
+        const button = event.currentTarget as HTMLElement;
+        const rect = button.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const size = Math.max(rect.width, rect.height);
+        
+        const ripple = document.createElement('span');
+        ripple.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.6);
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x - size / 2}px;
+          top: ${y - size / 2}px;
+          pointer-events: none;
+          animation: ripple-animation 0.6s ease-out;
+        `;
+        
+        // CSS 애니메이션 정의 (한 번만)
+        if (!document.getElementById('ripple-animation-style')) {
+          const style = document.createElement('style');
+          style.id = 'ripple-animation-style';
+          style.textContent = `
+            @keyframes ripple-animation {
+              to {
+                transform: scale(4);
+                opacity: 0;
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        button.style.position = 'relative';
+        button.style.overflow = 'hidden';
+        button.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
       }
-      if (particleEffect && !reduced) {
-        // TODO: spawn particles
+      
+      if (particleEffect && !reduced && event.currentTarget) {
+        // 간단한 파티클 효과: 클릭 위치에서 작은 원들이 퍼져나감
+        const button = event.currentTarget as HTMLElement;
+        const rect = button.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        for (let i = 0; i < 5; i++) {
+          const particle = document.createElement('span');
+          const angle = (Math.PI * 2 * i) / 5;
+          const velocity = 30 + Math.random() * 20;
+          const vx = Math.cos(angle) * velocity;
+          const vy = Math.sin(angle) * velocity;
+          
+          particle.style.cssText = `
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: ${glowColor || 'rgba(91,140,255,0.8)'};
+            border-radius: 50%;
+            left: ${x}px;
+            top: ${y}px;
+            pointer-events: none;
+            animation: particle-animation-${i} 0.5s ease-out forwards;
+          `;
+          
+          // CSS 애니메이션 정의
+          if (!document.getElementById(`particle-animation-${i}`)) {
+            const style = document.createElement('style');
+            style.id = `particle-animation-${i}`;
+            style.textContent = `
+              @keyframes particle-animation-${i} {
+                to {
+                  transform: translate(${vx}px, ${vy}px) scale(0);
+                  opacity: 0;
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          
+          button.style.position = 'relative';
+          button.appendChild(particle);
+          
+          setTimeout(() => {
+            particle.remove();
+          }, 500);
+        }
       }
-    }, [hapticFeedback, soundEffect, rippleEffect, particleEffect, reduced]);
+    }, [hapticFeedback, soundEffect, rippleEffect, particleEffect, reduced, glowColor]);
 
     const styleVars = React.useMemo<React.CSSProperties>(() => ({
       "--action-opacity": String(transparency),
@@ -110,7 +263,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
 
       const handleClick: React.MouseEventHandler<AnchorEl> = (e) => {
         if (disabled || loading) { e.preventDefault(); e.stopPropagation(); return; }
-        runEffects();
+        runEffects(e);
         onClick?.(e);
       };
 
@@ -139,7 +292,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
 
     const handleClick: React.MouseEventHandler<ButtonEl> = (e) => {
       if (disabled || loading) return;
-      runEffects();
+      runEffects(e);
       onClick?.(e);
     };
 

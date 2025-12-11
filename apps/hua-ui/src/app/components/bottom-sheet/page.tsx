@@ -51,7 +51,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpen(false)}
                 >
-                  <Icon name="x" className="w-4 h-4" />
+                  <Icon name="close" className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
@@ -119,7 +119,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenSmall(false)}
                 >
-                  <Icon name="x" className="w-4 h-4" />
+                  <Icon name="close" className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4">
@@ -139,7 +139,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenLarge(false)}
                 >
-                  <Icon name="x" className="w-4 h-4" />
+                  <Icon name="close" className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
@@ -203,7 +203,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenCustom(false)}
                 >
-                  <Icon name="x" className="w-4 h-4" />
+                  <Icon name="close" className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
