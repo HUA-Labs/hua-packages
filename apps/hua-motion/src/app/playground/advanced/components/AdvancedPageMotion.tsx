@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { usePageMotions } from '@hua-labs/motion'
+import { usePageMotions } from '@hua-labs/motion-core'
 import { 
   Button, 
   Card, 
@@ -206,14 +206,14 @@ export function AdvancedPageMotion() {
   // 모션 강도에 따른 설정 조정
   const adjustedConfig = { ...activePreset.config }
   Object.keys(adjustedConfig).forEach(key => {
-    const element = adjustedConfig[key as keyof typeof adjustedConfig]
+    const element = adjustedConfig[key as keyof typeof adjustedConfig] as any
     if (element) {
       element.duration = Math.round(element.duration! * motionIntensity)
       element.delay = Math.round(element.delay! * motionIntensity)
     }
   })
 
-  const motions = usePageMotions(adjustedConfig)
+  const motions = usePageMotions(adjustedConfig as any)
 
   // 모션 요소 렌더링
   const renderMotionElement = (elementId: string, children: React.ReactNode) => {
@@ -413,15 +413,15 @@ export function AdvancedPageMotion() {
         
         <div className="flex flex-wrap justify-center gap-4 mb-6">
           <Badge variant="outline" className="text-blue-600 border-blue-600">
-            <Icon name="zap" className="w-4 h-4 mr-2" />
+            <Icon name={"zap" as any} className="w-4 h-4 mr-2" />
             고급 프리셋
           </Badge>
           <Badge variant="outline" className="text-green-600 border-green-600">
-            <Icon name="layers" className="w-4 h-4 mr-2" />
+            <Icon name={"layers" as any} className="w-4 h-4 mr-2" />
             모션 오케스트라
           </Badge>
           <Badge variant="outline" className="text-purple-600 border-purple-600">
-            <Icon name="settings" className="w-4 h-4 mr-2" />
+            <Icon name={"settings" as any} className="w-4 h-4 mr-2" />
             성능 최적화
           </Badge>
         </div>
@@ -448,7 +448,7 @@ export function AdvancedPageMotion() {
             <label className="block text-sm font-medium mb-2">모션 강도: {motionIntensity.toFixed(1)}x</label>
             <Slider
               value={motionIntensity}
-              onValueChange={setMotionIntensity}
+              onValueChange={(value) => setMotionIntensity(Array.isArray(value) ? value[0] : value)}
               min={0.5}
               max={2.0}
               step={0.1}
@@ -489,7 +489,7 @@ export function AdvancedPageMotion() {
         <h3 className="text-lg font-semibold mb-4">실시간 데모</h3>
         <div className="mb-4">
           <Badge variant="secondary" className="text-green-600 bg-green-100 dark:bg-green-900/20">
-            <Icon name="play" className="w-4 h-4 mr-2" />
+            <Icon name={"play" as any} className="w-4 h-4 mr-2" />
             {activePreset.title}
           </Badge>
         </div>
@@ -528,7 +528,7 @@ const motions = usePageMotions({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="zap" className="w-5 h-5 mr-2 text-yellow-500" />
+            <Icon name={"zap" as any} className="w-5 h-5 mr-2 text-yellow-500" />
             고급 프리셋 시스템
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -539,7 +539,7 @@ const motions = usePageMotions({
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="layers" className="w-5 h-5 mr-2 text-blue-500" />
+            <Icon name={"layers" as any} className="w-5 h-5 mr-2 text-blue-500" />
             모션 오케스트레이션
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -550,7 +550,7 @@ const motions = usePageMotions({
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="settings" className="w-5 h-5 mr-2 text-green-500" />
+            <Icon name={"settings" as any} className="w-5 h-5 mr-2 text-green-500" />
             성능 최적화
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -561,7 +561,7 @@ const motions = usePageMotions({
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="mousePointer" className="w-5 h-5 mr-2 text-purple-500" />
+            <Icon name={"mousePointer" as any} className="w-5 h-5 mr-2 text-purple-500" />
             고급 인터랙션
           </h3>
           <p className="text-gray-600 dark:text-gray-400">

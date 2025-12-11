@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { merge } from "../../lib/utils";
 import { DashboardEmptyState } from "./EmptyState";
 import { Icon } from "../Icon";
@@ -8,6 +8,17 @@ import type { IconName } from "../../lib/icons";
 
 type RoutingStatus = "normal" | "warning" | "critical";
 
+/**
+ * 라우팅 분할 세그먼트 인터페이스 / RoutingBreakdownSegment interface
+ * @typedef {Object} RoutingBreakdownSegment
+ * @property {string} id - 세그먼트 고유 ID / Segment unique ID
+ * @property {string} label - 세그먼트 라벨 / Segment label
+ * @property {number} value - 세그먼트 값 / Segment value
+ * @property {string} [color] - 커스텀 색상 / Custom color
+ * @property {RoutingStatus} [status] - 상태 / Status
+ * @property {string} [icon] - 아이콘 이름 / Icon name
+ * @property {string} [detail] - 상세 정보 / Detail information
+ */
 export interface RoutingBreakdownSegment {
   id: string;
   label: string;
@@ -18,6 +29,20 @@ export interface RoutingBreakdownSegment {
   detail?: string;
 }
 
+/**
+ * RoutingBreakdownCard 컴포넌트의 props / RoutingBreakdownCard component props
+ * @typedef {Object} RoutingBreakdownCardProps
+ * @property {string} [title="PG / 결제수단 비중"] - 카드 제목 / Card title
+ * @property {string} [description="라우팅별 처리 비율과 상태"] - 카드 설명 / Card description
+ * @property {RoutingBreakdownSegment[]} segments - 세그먼트 배열 / Segments array
+ * @property {string} [totalLabel="총 거래"] - 총계 라벨 / Total label
+ * @property {React.ReactNode} [totalValue] - 총계 값 / Total value
+ * @property {string} [highlightId] - 강조할 세그먼트 ID / Highlighted segment ID
+ * @property {React.ReactNode} [actions] - 액션 컴포넌트 / Actions component
+ * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
+ * @property {(segment: RoutingBreakdownSegment, percentage: number) => React.ReactNode} [formatter] - 커스텀 포맷터 / Custom formatter
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface RoutingBreakdownCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
@@ -43,6 +68,44 @@ const formatPercentage = (value: number, total: number) => {
   return `${Math.round((value / total) * 1000) / 10}%`;
 };
 
+/**
+ * RoutingBreakdownCard 컴포넌트
+ * 
+ * PG 라우팅 또는 결제수단별 비중을 표시하는 카드 컴포넌트입니다.
+ * 진행 바와 세그먼트별 상세 정보를 제공합니다.
+ * 
+ * Card component that displays PG routing or payment method breakdown.
+ * Provides progress bar and detailed information for each segment.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <RoutingBreakdownCard
+ *   title="PG 라우팅 비중"
+ *   segments={[
+ *     { id: "pg1", label: "PG A", value: 5000, status: "normal" },
+ *     { id: "pg2", label: "PG B", value: 3000, status: "warning" },
+ *     { id: "pg3", label: "PG C", value: 2000, status: "normal" }
+ *   ]}
+ *   totalValue="10,000"
+ * />
+ * 
+ * @example
+ * // 강조 기능 / Highlight feature
+ * <RoutingBreakdownCard
+ *   segments={segments}
+ *   highlightId="pg1"
+ *   formatter={(segment, percentage) => (
+ *     <div>
+ *       <span>{segment.value.toLocaleString()}</span>
+ *       <span>{percentage}%</span>
+ *     </div>
+ *   )}
+ * />
+ * 
+ * @param {RoutingBreakdownCardProps} props - RoutingBreakdownCard 컴포넌트의 props / RoutingBreakdownCard component props
+ * @returns {JSX.Element} RoutingBreakdownCard 컴포넌트 / RoutingBreakdownCard component
+ */
 export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
   title = "PG / 결제수단 비중",
   description = "라우팅별 처리 비율과 상태",

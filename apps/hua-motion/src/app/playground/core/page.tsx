@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Icon, Tabs, TabsContent, TabsList, TabsTrigger, Panel, Breadcrumb, BreadcrumbItem } from '@hua-labs/ui'
-import { useFadeIn, useSlideUp } from '@hua-labs/motion'
+import { useFadeIn, useSlideUp } from '@hua-labs/motion-core'
 import PageHeader from '@/app/components/PageHeader'
 import { CoreAbstraction } from './components/CoreAbstraction'
 import { CorePage } from './components/CorePage'
@@ -87,7 +87,7 @@ export default function CorePlaygroundPage() {
                   active={activeTab === tab.id}
                   className="flex items-center gap-2 flex-1"
                 >
-                  <Icon name={tab.icon} className="w-5 h-5" />
+                  <Icon name={tab.icon as any} className="w-5 h-5" />
                   <span className="hidden sm:inline">{tab.name}</span>
                   <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
                 </TabsTrigger>

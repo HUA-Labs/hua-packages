@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Action, Panel, Icon } from '@hua-labs/ui'
-import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn, useFlipIn } from '@hua-labs/motion'
+import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn } from '@hua-labs/motion-core'
 
 export function AdvancedPageTransition() {
   const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'contact'>('home')
-  const [transitionType, setTransitionType] = useState<'slide' | 'fade' | 'scale' | 'bounce' | 'flip'>('slide')
+  const [transitionType, setTransitionType] = useState<'slide' | 'fade' | 'scale' | 'bounce'>('slide')
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [transitionDuration, setTransitionDuration] = useState(500)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -17,7 +17,7 @@ export function AdvancedPageTransition() {
   const slideRightRef = useSlideRight({ delay: 0, duration: transitionDuration, autoStart: false })
   const scaleInRef = useScaleIn({ delay: 0, duration: transitionDuration, autoStart: false })
   const bounceInRef = useBounceIn({ delay: 0, duration: transitionDuration, autoStart: false })
-  const flipInRef = useFlipIn({ delay: 0, duration: transitionDuration, autoStart: false })
+  // useFlipIn은 현재 Core에 없으므로 제거
 
   const pages = {
     home: {
@@ -52,12 +52,10 @@ export function AdvancedPageTransition() {
         return { ref: scaleInRef.ref, style: scaleInRef.style, start: scaleInRef.start, reset: scaleInRef.reset }
       case 'bounce':
         return { ref: bounceInRef.ref, style: bounceInRef.style, start: bounceInRef.start, reset: bounceInRef.reset }
-      case 'flip':
-        return { ref: flipInRef.ref, style: flipInRef.style, start: flipInRef.start, reset: flipInRef.reset }
       default:
         return { ref: fadeInRef.ref, style: fadeInRef.style, start: fadeInRef.start, reset: fadeInRef.reset }
     }
-  }, [transitionType, slideDirection, transitionDuration, fadeInRef, slideLeftRef, slideRightRef, scaleInRef, bounceInRef, flipInRef])
+  }, [transitionType, slideDirection, transitionDuration, fadeInRef, slideLeftRef, slideRightRef, scaleInRef, bounceInRef])
 
   const handlePageChange = async (page: 'home' | 'about' | 'contact') => {
     if (isTransitioning || currentPage === page) return
@@ -65,17 +63,7 @@ export function AdvancedPageTransition() {
     setIsTransitioning(true)
     
     // 모든 효과에 대해 일관된 처리
-    if (transitionType === 'flip') {
-      // 플립 효과의 경우 먼저 리셋 후 시작
-      currentMotion.reset?.()
-      // reset 완료를 기다린 후 start 호출
-      setTimeout(() => {
-        currentMotion.start?.()
-      }, 100) // 100ms로 늘려서 reset 완료 보장
-    } else {
-      // 다른 효과들은 즉시 시작
-      currentMotion.start?.()
-    }
+    currentMotion.start?.()
     
     // 페이지 변경
     setCurrentPage(page)
@@ -103,7 +91,7 @@ export function AdvancedPageTransition() {
       {/* 컨트롤 패널 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="settings" className="w-5 h-5 mr-2 text-blue-600" />
+          <Icon name={"settings" as any} className="w-5 h-5 mr-2 text-blue-600" />
           전환 효과 설정
         </h3>
         
@@ -122,7 +110,6 @@ export function AdvancedPageTransition() {
               <option value="fade">Fade (페이드)</option>
               <option value="scale">Scale (스케일)</option>
               <option value="bounce">Bounce (바운스)</option>
-              <option value="flip">Flip (플립)</option>
             </select>
           </div>
 
@@ -196,7 +183,7 @@ export function AdvancedPageTransition() {
       {/* 페이지 컨텐츠 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="layers" className="w-5 h-5 mr-2 text-purple-600" />
+          <Icon name={"layers" as any} className="w-5 h-5 mr-2 text-purple-600" />
           페이지 전환 데모 (HUA Motion 라이브러리 사용)
         </h3>
         
@@ -221,7 +208,7 @@ export function AdvancedPageTransition() {
               <strong>HUA Motion 라이브러리 사용:</strong> {transitionType === 'fade' ? 'useFadeIn' : 
                                                            transitionType === 'slide' ? (slideDirection === 'left' ? 'useSlideLeft' : 'useSlideRight') : 
                                                            transitionType === 'scale' ? 'useScaleIn' : 
-                                                           transitionType === 'bounce' ? 'useBounceIn' : 'useFlipIn'} 훅
+                                                           transitionType === 'bounce' ? 'useBounceIn' : 'useFadeIn'} 훅
             </p>
           </div>
         </div>
@@ -230,13 +217,13 @@ export function AdvancedPageTransition() {
       {/* 코드 예제 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="code" className="w-5 h-5 mr-2 text-green-600" />
+          <Icon name={"code" as any} className="w-5 h-5 mr-2 text-green-600" />
           HUA Motion 라이브러리 사용 예제
         </h3>
         
         <div className="bg-gray-900 rounded-lg p-4 overflow-auto">
           <pre className="text-green-400 text-sm">
-            <code>{`import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn, useFlipIn } from '@hua-labs/motion'
+            <code>{`import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn } from '@hua-labs/motion-core'
 
 function PageTransitionDemo() {
   const [transitionType, setTransitionType] = useState('slide')
@@ -248,7 +235,7 @@ function PageTransitionDemo() {
   const slideRightRef = useSlideRight({ delay: 0, duration: 500, autoStart: false })
   const scaleInRef = useScaleIn({ delay: 0, duration: 500, autoStart: false })
   const bounceInRef = useBounceIn({ delay: 0, duration: 500, autoStart: false })
-  const flipInRef = useFlipIn({ delay: 0, duration: 500, autoStart: false })
+  // useFlipIn은 Core에 없으므로 제거
   
   const getCurrentMotion = () => {
     switch (transitionType) {
@@ -258,7 +245,7 @@ function PageTransitionDemo() {
         : { ref: slideRightRef.ref, style: slideRightRef.style, start: slideRightRef.start }
       case 'scale': return { ref: scaleInRef.ref, style: scaleInRef.style, start: scaleInRef.start }
       case 'bounce': return { ref: bounceInRef.ref, style: bounceInRef.style, start: bounceInRef.start }
-      case 'flip': return { ref: flipInRef.ref, style: flipInRef.style, start: flipInRef.start }
+      default: return { ref: fadeInRef.ref, style: fadeInRef.style, start: fadeInRef.start }
     }
   }
   
@@ -284,7 +271,7 @@ function PageTransitionDemo() {
             variant="gradient" 
             gradient="green" 
             size="sm"
-            onClick={() => navigator.clipboard.writeText(`import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn, useFlipIn } from '@hua-labs/motion'
+            onClick={() => navigator.clipboard.writeText(`import { useFadeIn, useSlideLeft, useSlideRight, useScaleIn, useBounceIn } from '@hua-labs/motion-core'
 
 function PageTransitionDemo() {
   const [transitionType, setTransitionType] = useState('slide')
@@ -296,7 +283,7 @@ function PageTransitionDemo() {
   const slideRightRef = useSlideRight({ delay: 0, duration: 500, autoStart: false })
   const scaleInRef = useScaleIn({ delay: 0, duration: 500, autoStart: false })
   const bounceInRef = useBounceIn({ delay: 0, duration: 500, autoStart: false })
-  const flipInRef = useFlipIn({ delay: 0, duration: 500, autoStart: false })
+  // useFlipIn은 Core에 없으므로 제거
   
   const getCurrentMotion = () => {
     switch (transitionType) {
@@ -306,7 +293,7 @@ function PageTransitionDemo() {
         : { ref: slideRightRef.ref, style: slideRightRef.style, start: slideRightRef.start }
       case 'scale': return { ref: scaleInRef.ref, style: scaleInRef.style, start: scaleInRef.start }
       case 'bounce': return { ref: bounceInRef.ref, style: bounceInRef.style, start: bounceInRef.start }
-      case 'flip': return { ref: flipInRef.ref, style: flipInRef.style, start: flipInRef.start }
+      default: return { ref: fadeInRef.ref, style: fadeInRef.style, start: fadeInRef.start }
     }
   }
   
@@ -325,7 +312,7 @@ function PageTransitionDemo() {
   )
 }`)}
           >
-            <Icon name="copy" className="w-4 h-5 mr-2" />
+            <Icon name={"copy" as any} className="w-4 h-5 mr-2" />
             코드 복사
           </Action>
         </div>
@@ -334,7 +321,7 @@ function PageTransitionDemo() {
       {/* 기능 설명 */}
       <Panel className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Icon name="info" className="w-5 h-5 mr-2 text-cyan-600" />
+          <Icon name={"info" as any} className="w-5 h-5 mr-2 text-cyan-600" />
           HUA Motion 라이브러리 기반 페이지 전환
         </h3>
         
@@ -347,7 +334,6 @@ function PageTransitionDemo() {
               <li>• <strong>useSlideRight:</strong> 오른쪽으로 슬라이드 전환</li>
               <li>• <strong>useScaleIn:</strong> 확대/축소 기반 전환</li>
               <li>• <strong>useBounceIn:</strong> 탄력있는 바운스 효과</li>
-              <li>• <strong>useFlipIn:</strong> 3D 플립 효과</li>
             </ul>
           </div>
           

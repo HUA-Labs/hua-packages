@@ -119,7 +119,7 @@ function IconExample() {
       id: 'emotion-selector',
       name: '감정 선택기',
       description: '감정 표현 컴포넌트',
-      code: `import { EmotionSelector } from '@hua-labs/ui'
+      code: `import { EmotionSelector } from '@hua-labs/ui/advanced'
 
 function EmotionExample() {
   const [selectedEmotion, setSelectedEmotion] = React.useState('')

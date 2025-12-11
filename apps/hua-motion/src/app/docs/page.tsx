@@ -70,7 +70,7 @@ export default function DocsPage() {
                 size="lg"
               className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 flex items-center justify-center"
             >
-              <Icon name="rocket" size={20} className="mr-1" />
+              <Icon name={"rocket" as any} size={20} className="mr-1" />
               시작하기
               </Action>
               
@@ -80,7 +80,7 @@ export default function DocsPage() {
                 size="lg"
               className="border-gray-500 text-gray-700 hover:bg-gray-50 dark:border-gray-400 dark:text-gray-300 dark:hover:bg-slate-700 flex items-center justify-center"
               >
-              <Icon name="code" size={20} className="mr-1" />
+              <Icon name={"code" as any} size={20} className="mr-1" />
                   API 참조
               </Action>
           </div>

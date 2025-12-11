@@ -1,9 +1,21 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 
+/**
+ * PageNavigation 컴포넌트의 props / PageNavigation component props
+ * @typedef {Object} PageNavigationProps
+ * @property {Object} [prevPage] - 이전 페이지 정보 / Previous page information
+ * @property {string} prevPage.title - 이전 페이지 제목 / Previous page title
+ * @property {string} prevPage.href - 이전 페이지 링크 / Previous page link
+ * @property {Object} [nextPage] - 다음 페이지 정보 / Next page information
+ * @property {string} nextPage.title - 다음 페이지 제목 / Next page title
+ * @property {string} nextPage.href - 다음 페이지 링크 / Next page link
+ * @property {boolean} [showOnMobile=false] - 모바일에서 표시 여부 / Show on mobile
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface PageNavigationProps extends React.HTMLAttributes<HTMLDivElement> {
   prevPage?: {
     title: string
@@ -16,6 +28,27 @@ export interface PageNavigationProps extends React.HTMLAttributes<HTMLDivElement
   showOnMobile?: boolean
 }
 
+/**
+ * PageNavigation 컴포넌트 / PageNavigation component
+ * 
+ * 이전/다음 페이지로 이동하는 네비게이션 컴포넌트입니다.
+ * 문서 페이지나 가이드 페이지에서 사용하기 적합합니다.
+ * 
+ * Navigation component for moving to previous/next pages.
+ * Suitable for documentation or guide pages.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <PageNavigation
+ *   prevPage={{ title: "이전 페이지", href: "/prev" }}
+ *   nextPage={{ title: "다음 페이지", href: "/next" }}
+ * />
+ * 
+ * @param {PageNavigationProps} props - PageNavigation 컴포넌트의 props / PageNavigation component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} PageNavigation 컴포넌트 / PageNavigation component
+ */
 const PageNavigation = React.forwardRef<HTMLDivElement, PageNavigationProps>(
   ({ 
     className, 
@@ -31,7 +64,7 @@ const PageNavigation = React.forwardRef<HTMLDivElement, PageNavigationProps>(
     return (
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           "flex items-center justify-between py-4",
           !showOnMobile && "hidden md:flex",
           className

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 
 export interface BounceInOptions {
@@ -26,17 +26,21 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
   const [opacity, setOpacity] = useState(autoStart ? 0 : 1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(autoStart ? false : true)
+  const [progress, setProgress] = useState(0)
 
   const start = useCallback(() => {
     setIsAnimating(true)
     setScale(0)
     setOpacity(0)
+    setProgress(0)
 
     setTimeout(() => {
+      setProgress(0.5)
       setScale(1 + intensity)
       setOpacity(1)
       
       setTimeout(() => {
+        setProgress(1)
         setScale(1)
         setIsVisible(true)
         setIsAnimating(false)
@@ -48,6 +52,7 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     // 즉시 초기 상태로 복원 (모션 없이)
     setScale(0)
     setOpacity(0)
+    setProgress(0)
     setIsVisible(false)
     setIsAnimating(false)
     
@@ -75,14 +80,14 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     }
   }, [autoStart, start])
 
-  // 스타일 계산
-  const style = {
+  // 스타일 계산 - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => ({
     transform: `scale(${scale})`,
     opacity,
     transition: `all ${duration}ms ease-out`,
     '--motion-delay': `${delay}ms`,
     '--motion-duration': `${duration}ms`
-  } as const
+  } as const), [scale, opacity, duration, delay])
 
   return {
     ref,
@@ -91,6 +96,7 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     style,
+    progress,
     start,
     reset,
     stop

@@ -8,9 +8,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rimraf dist",
+    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "prebuild": "npm run clean"
   },
   "keywords": [

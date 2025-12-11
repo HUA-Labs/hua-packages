@@ -1,6 +1,6 @@
 'use client'
 
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 import { Icon, Button } from '@hua-labs/ui'
 import ShowcasePageLayout from '../../components/ShowcasePageLayout'
 
@@ -38,7 +38,7 @@ export default function SmartMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="layers" size={32} className="mr-3" />
+            <Icon name={"layers" as any} size={32} className="mr-3" />
             히어로 섹션
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -64,7 +64,7 @@ export default function SmartMotionPage() {
               style={titleRef.style}
               className="text-4xl sm:text-5xl font-bold mb-6 flex items-center justify-center"
             >
-              <Icon name="rocket" size={40} className="mr-3" />
+              <Icon name={"rocket" as any} size={40} className="mr-3" />
               개별 요소 제어
             </h3>
             <p 
@@ -80,7 +80,7 @@ export default function SmartMotionPage() {
               style={buttonRef.style}
               className="px-10 py-4 bg-white text-purple-600 rounded-2xl font-semibold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 text-lg flex items-center mx-auto"
             >
-              <Icon name="target" size={20} className="mr-2" />
+              <Icon name={"target" as any} size={20} className="mr-2" />
               시작하기
             </button>
           </div>
@@ -91,7 +91,7 @@ export default function SmartMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="mousePointer" size={32} className="mr-3" />
+            <Icon name={"mousePointer" as any} size={32} className="mr-3" />
             인터랙티브 데모
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -103,7 +103,7 @@ export default function SmartMotionPage() {
           <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-purple-500/10 border border-purple-200/50 dark:border-purple-800/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/25">
-                <Icon name="mousePointer" size={24} className="text-white" />
+                <Icon name={"mousePointer" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">호버 효과</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -122,7 +122,7 @@ export default function SmartMotionPage() {
           <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-pink-500/10 border border-pink-200/50 dark:border-pink-800/50 hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-pink-500/25">
-                <Icon name="mousePointer" size={24} className="text-white" />
+                <Icon name={"mousePointer" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">클릭 효과</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -141,7 +141,7 @@ export default function SmartMotionPage() {
           <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl shadow-rose-500/10 border border-rose-200/50 dark:border-rose-800/50 hover:shadow-2xl hover:shadow-rose-500/20 transition-all duration-300">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/25">
-                <Icon name="zap" size={24} className="text-white" />
+                <Icon name={"zap" as any} size={24} className="text-white" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">호버 + 클릭</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -163,7 +163,7 @@ export default function SmartMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="layers" size={32} className="mr-3" />
+            <Icon name={"layers" as any} size={32} className="mr-3" />
             카드 애니메이션
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -184,7 +184,7 @@ export default function SmartMotionPage() {
           
           <div className="relative z-10 text-center">
             <div className="w-20 h-20 bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-rose-500/25">
-              <Icon name="layers" size={32} className="text-white" />
+              <Icon name={"layers" as any} size={32} className="text-white" />
             </div>
             <h3 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
               카드 애니메이션
@@ -209,7 +209,7 @@ export default function SmartMotionPage() {
       <section className="mb-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent flex items-center justify-center">
-            <Icon name="image" size={32} className="mr-3" />
+            <Icon name={"image" as any} size={32} className="mr-3" />
             이미지 애니메이션
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
@@ -230,7 +230,7 @@ export default function SmartMotionPage() {
           
           <div className="relative z-10 text-center text-white">
             <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-              <Icon name="image" size={40} className="text-white" />
+              <Icon name={"image" as any} size={40} className="text-white" />
             </div>
             <h3 className="text-3xl font-bold mb-6">
               이미지 애니메이션
@@ -241,7 +241,7 @@ export default function SmartMotionPage() {
             </p>
             <div className="inline-block p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
               <div className="w-32 h-32 bg-gradient-to-r from-white/30 to-white/10 rounded-xl flex items-center justify-center">
-                <Icon name="image" size={48} className="text-white" />
+                <Icon name={"image" as any} size={48} className="text-white" />
               </div>
             </div>
           </div>

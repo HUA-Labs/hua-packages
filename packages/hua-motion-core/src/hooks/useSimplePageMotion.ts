@@ -112,7 +112,9 @@ function useSimplePageMotions(config: PageMotionsConfig) {
                   return newMap
                 })
                 
-                console.log('모션 실행:', elementId, 'delay:', delay)
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('모션 실행:', elementId, 'delay:', delay)
+                }
               }, delay)
               
               observer.unobserve(entry.target)

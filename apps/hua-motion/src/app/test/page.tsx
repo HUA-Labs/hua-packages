@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { 
-  useSimpleMotion,
+  useSimplePageMotion,
   usePageMotions,
   useSmartMotion,
   useFadeIn,
   useSlideUp,
   useScaleIn,
   useBounceIn
-} from '@hua-labs/motion'
+} from '@hua-labs/motion-core'
 import { Icon, Button, Action, Panel, Tabs, TabsList, TabsTrigger, TabsContent, Breadcrumb, BreadcrumbItem } from '@hua-labs/ui'
 import PerformanceMonitor from '../components/PerformanceMonitor'
 import PageHeader from '../components/PageHeader'
@@ -122,7 +122,7 @@ export default function TestPage() {
                     setActiveTab(tab.id)
                   }}
                 >
-                  <Icon name={tab.icon} className="w-5 h-5" />
+                  <Icon name={tab.icon as any} className="w-5 h-5" />
                   <span className="hidden sm:inline">{tab.name}</span>
                   <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
                 </TabsTrigger>
@@ -159,7 +159,7 @@ export default function TestPage() {
               {
                 title: "Simple Motion",
                 description: "프리셋 기반, 빠른 설정",
-                code: "useSimpleMotion('home')",
+                code: "useSimplePageMotion('home')",
                 color: "blue"
               },
               {
@@ -184,7 +184,7 @@ export default function TestPage() {
 
 // Simple Motion Sample Component
 function SimpleMotionSample() {
-  const motions = useSimpleMotion('home')
+  const motions = useSimplePageMotion('home')
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -195,7 +195,7 @@ function SimpleMotionSample() {
         className="text-center py-16 px-4 sm:px-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl text-white"
       >
         <div className="max-w-3xl mx-auto">
-          <Icon name="star" size={64} className="mx-auto mb-6 opacity-90" />
+          <Icon name={"star" as any} size={64} className="mx-auto mb-6 opacity-90" />
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             HUA Motion SDK
           </h1>
@@ -215,7 +215,7 @@ function SimpleMotionSample() {
           style={motions.title?.style}
           className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 lg:p-8 text-white text-center"
         >
-          <Icon name="zap" size={40} className="mx-auto mb-4" />
+          <Icon name={"zap" as any} size={40} className="mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-3">빠른 설정</h3>
           <p className="text-purple-100">한 줄의 코드로 모션 시작</p>
         </div>
@@ -225,7 +225,7 @@ function SimpleMotionSample() {
           style={motions.description?.style}
           className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-6 lg:p-8 text-white text-center"
         >
-          <Icon name="layers" size={40} className="mx-auto mb-4" />
+          <Icon name={"layers" as any} size={40} className="mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-3">3단계 추상화</h3>
           <p className="text-pink-100">Simple → Smart → Advanced</p>
         </div>
@@ -235,7 +235,7 @@ function SimpleMotionSample() {
           style={motions.cta?.style}
           className="bg-gradient-to-br from-rose-500 to-red-600 rounded-2xl p-6 lg:p-8 text-white text-center"
         >
-          <Icon name="sparkles" size={40} className="mx-auto mb-4" />
+          <Icon name={"sparkles" as any} size={40} className="mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-3">성능 최적화</h3>
           <p className="text-rose-100">60fps 부드러운 모션</p>
         </div>
@@ -291,7 +291,7 @@ function SimpleMotionTab() {
       {/* 헤더 섹션 */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
-          <Icon name="zap" size={24} />
+          <Icon name={"zap" as any} size={24} />
           Simple Motion
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -304,7 +304,7 @@ function SimpleMotionTab() {
           disabled={isAnimating}
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Icon name="refresh" size={16} className={isAnimating ? 'animate-spin' : ''} />
+          <Icon name={"refresh" as any} size={16} className={isAnimating ? 'animate-spin' : ''} />
           모션 재실행
         </button>
       </div>
@@ -334,7 +334,7 @@ function SmartMotionSample() {
           style={heroRef.style}
           className="max-w-3xl mx-auto"
         >
-          <Icon name="sparkles" size={64} className="mx-auto mb-6 opacity-90" />
+          <Icon name={"sparkles" as any} size={64} className="mx-auto mb-6 opacity-90" />
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             Smart Motion
           </h1>
@@ -354,7 +354,7 @@ function SmartMotionSample() {
           style={titleRef.style}
           className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="type" size={48} className="mx-auto mb-4" />
+          <Icon name={"type" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Title Element</h3>
           <p>개별 제어 가능한 타이틀</p>
         </div>
@@ -364,13 +364,13 @@ function SmartMotionSample() {
           style={cardRef.style}
           className="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="layers" size={48} className="mx-auto mb-4" />
+          <Icon name={"layers" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Card Element</h3>
           <p>호버/클릭 효과 포함</p>
         </div>
         
         <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-8 text-white text-center">
-          <Icon name="mousePointer" size={48} className="mx-auto mb-4" />
+          <Icon name={"mousePointer" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Interactive Button</h3>
           <p>호버와 클릭 효과를 체험해보세요</p>
           <button
@@ -383,7 +383,7 @@ function SmartMotionSample() {
         </div>
         
         <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white text-center">
-          <Icon name="settings" size={48} className="mx-auto mb-4" />
+          <Icon name={"settings" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Custom Control</h3>
           <p>각 요소별 개별 설정 가능</p>
         </div>
@@ -423,7 +423,7 @@ function SmartMotionTab() {
       {/* 헤더 섹션 */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
-          <Icon name="sparkles" size={24} />
+          <Icon name={"sparkles" as any} size={24} />
           Smart Motion
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -436,7 +436,7 @@ function SmartMotionTab() {
           disabled={isAnimating}
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Icon name="refresh" size={16} className={isAnimating ? 'animate-spin' : ''} />
+          <Icon name={"refresh" as any} size={16} className={isAnimating ? 'animate-spin' : ''} />
           모션 재실행
         </button>
       </div>
@@ -459,7 +459,7 @@ function PageMotionSample() {
     layout: { type: 'card' },
     transition: { type: 'button' },
     flow: { type: 'card', delay: 400, threshold: 0.1 } // threshold를 낮춰서 더 빨리 트리거되도록
-  }), []))
+  }), []) as any)
 
   // 안전한 접근을 위한 헬퍼 함수
   const getMotionRef = (id: string) => {
@@ -481,7 +481,7 @@ function PageMotionSample() {
           style={getMotionRef('enter')?.style}
           className="max-w-3xl mx-auto"
         >
-          <Icon name="logIn" size={64} className="mx-auto mb-6 opacity-90" />
+          <Icon name={"logIn" as any} size={64} className="mx-auto mb-6 opacity-90" />
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             Page Motion
           </h1>
@@ -502,7 +502,7 @@ function PageMotionSample() {
           style={getMotionRef('exit')?.style}
           className="bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="logOut" size={48} className="mx-auto mb-4" />
+          <Icon name={"logOut" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Exit Motion</h3>
           <p>페이지 종료 모션</p>
         </div>
@@ -513,7 +513,7 @@ function PageMotionSample() {
           style={getMotionRef('layout')?.style}
           className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="layers" size={48} className="mx-auto mb-4" />
+          <Icon name={"layers" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Layout Motion</h3>
           <p>레이아웃 변화 모션</p>
         </div>
@@ -524,7 +524,7 @@ function PageMotionSample() {
           style={getMotionRef('transition')?.style}
           className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="arrowRight" size={48} className="mx-auto mb-4" />
+          <Icon name={"arrowRight" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Transition</h3>
           <p>부드러운 전환 효과</p>
         </div>
@@ -535,7 +535,7 @@ function PageMotionSample() {
           style={getMotionRef('flow')?.style}
           className="bg-gradient-to-br from-cyan-500 to-teal-600 rounded-2xl p-8 text-white text-center"
         >
-          <Icon name="navigation" size={48} className="mx-auto mb-4" />
+          <Icon name={"navigation" as any} size={48} className="mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">Page Flow</h3>
           <p>페이지 간 자연스러운 흐름</p>
         </div>
@@ -575,7 +575,7 @@ function PageMotionTab() {
       {/* 헤더 섹션 */}
       <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
-            <Icon name="layers" size={24} />
+            <Icon name={"layers" as any} size={24} />
             Page Motion
           </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -588,7 +588,7 @@ function PageMotionTab() {
           disabled={isAnimating}
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-violet-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Icon name="refresh" size={16} className={isAnimating ? 'animate-spin' : ''} />
+          <Icon name={"refresh" as any} size={16} className={isAnimating ? 'animate-spin' : ''} />
           애니메이션 재실행
         </button>
       </div>
@@ -618,7 +618,7 @@ function AdvancedMotionTab() {
           style={titleRef.style}
           className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent flex items-center justify-center gap-2"
         >
-          <Icon name="settings" size={24} />
+          <Icon name={"settings" as any} size={24} />
           Advanced Motion
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -635,7 +635,7 @@ function AdvancedMotionTab() {
           className="text-center py-16 px-4 sm:px-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl text-white"
         >
           <div className="max-w-3xl mx-auto">
-            <Icon name="settings" size={64} className="mx-auto mb-6 opacity-90" />
+            <Icon name={"settings" as any} size={64} className="mx-auto mb-6 opacity-90" />
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               Motion Playground
             </h1>
@@ -655,25 +655,25 @@ function AdvancedMotionTab() {
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
         >
           <div className="bg-gradient-to-br from-cyan-500 to-teal-600 rounded-2xl p-8 text-white text-center">
-            <Icon name="eye" size={48} className="mx-auto mb-4" />
+            <Icon name={"eye" as any} size={48} className="mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">useFadeIn</h3>
             <p>페이드 인 애니메이션</p>
           </div>
           
           <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white text-center">
-            <Icon name="arrowUp" size={48} className="mx-auto mb-4" />
+            <Icon name={"arrowUp" as any} size={48} className="mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">useSlideUp</h3>
             <p>슬라이드 업 애니메이션</p>
           </div>
           
           <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-8 text-white text-center">
-            <Icon name="maximize" size={48} className="mx-auto mb-4" />
+            <Icon name={"maximize" as any} size={48} className="mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">useScaleIn</h3>
             <p>스케일 인 애니메이션</p>
           </div>
           
           <div className="bg-gradient-to-br from-green-500 to-lime-600 rounded-2xl p-8 text-white text-center">
-            <Icon name="zap" size={48} className="mx-auto mb-4" />
+            <Icon name={"zap" as any} size={48} className="mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">useBounceIn</h3>
             <p>바운스 인 애니메이션</p>
           </div>

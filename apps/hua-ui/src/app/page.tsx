@@ -94,21 +94,21 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
               <Action 
-                appearance="glass"
-                scale="large"
+                variant="glass"
+                size="lg"
                 className="w-full sm:w-auto hover:scale-105 transition-all duration-300 shadow-lg"
                 onClick={() => window.location.href = '/components'}
               >
-                <Icon name="download" className="w-5 h-5 mr-2" />
+                <Icon name={"download" as any} className="w-5 h-5 mr-2" />
                 시작하기
               </Action>
               <Action 
-                appearance="outline"
-                scale="large"
+                variant="outline"
+                size="lg"
                 className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 hover:scale-105 transition-all duration-300 shadow-lg"
                 onClick={() => window.open('https://github.com/hua-labs/hua-ui', '_blank')}
               >
-                <Icon name="github" className="w-5 h-5 mr-2" />
+                <Icon name={"github" as any} className="w-5 h-5 mr-2" />
                 GitHub
               </Action>
             </div>
@@ -120,7 +120,7 @@ export default function HomePage() {
           {features.map((feature, index) => (
             <Panel key={index} style="elevated" padding="large" className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
               <div className={`w-16 h-16 ${getColorClasses(feature.color)} rounded-full flex items-center justify-center mx-auto mb-6`}>
-                <Icon name={feature.icon} className="w-8 h-8" />
+                <Icon name={feature.icon as any} className="w-8 h-8" />
               </div>
               <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-slate-900 dark:text-white">
                 {feature.title}
@@ -156,7 +156,7 @@ export default function HomePage() {
             ].map((component, index) => (
               <Panel key={index} style="solid" padding="medium" className="hover:shadow-lg transition-all duration-300 hover:scale-105">
                 <div className="flex items-center gap-3 mb-3">
-                  <Icon name={component.icon} className="w-6 h-6 text-blue-600" />
+                  <Icon name={component.icon as any} className="w-6 h-6 text-blue-600" />
                   <h3 className="font-semibold text-slate-900 dark:text-white">{component.name}</h3>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">{component.description}</p>
@@ -175,20 +175,20 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Action 
-              scale="large" 
+              size="lg" 
               className="w-full sm:w-auto"
               onClick={() => window.location.href = '/components'}
             >
-              <Icon name="layers" className="w-5 h-5 mr-2" />
+              <Icon name={"layers" as any} className="w-5 h-5 mr-2" />
               컴포넌트 보기
             </Action>
             <Action 
-              appearance="outline" 
-              scale="large" 
+              variant="outline" 
+              size="lg" 
               className="w-full sm:w-auto"
               onClick={() => window.location.href = '/docs'}
             >
-              <Icon name="bookOpen" className="w-5 h-5 mr-2" />
+              <Icon name={"bookOpen" as any} className="w-5 h-5 mr-2" />
               문서 읽기
             </Action>
           </div>

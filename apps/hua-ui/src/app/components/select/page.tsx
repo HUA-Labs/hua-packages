@@ -221,7 +221,7 @@ export default function SelectPage() {
                   <Label htmlFor="icon-select">아이콘이 있는 선택</Label>
                   <Select 
                     id="icon-select" 
-                    leftIcon={<Icon name="globe" size={16} />}
+                    leftIcon={<Icon name={"globe" as any} size={16} />}
                     placeholder="국가를 선택하세요"
                   >
                     <SelectOption value="kr">대한민국</SelectOption>
@@ -233,7 +233,7 @@ export default function SelectPage() {
                   <Label htmlFor="user-select">사용자 아이콘</Label>
                   <Select 
                     id="user-select" 
-                    leftIcon={<Icon name="user" size={16} />}
+                    leftIcon={<Icon name={"user" as any} size={16} />}
                     placeholder="사용자를 선택하세요"
                   >
                     <SelectOption value="user1">김철수</SelectOption>
@@ -248,7 +248,7 @@ export default function SelectPage() {
                 <code>{`import { Icon } from "@hua-labs/ui"
 
 <Select 
-  leftIcon={<Icon name="globe" size={16} />}
+  leftIcon={<Icon name={"globe" as any} size={16} />}
   placeholder="국가를 선택하세요"
 >
   <SelectOption value="kr">대한민국</SelectOption>
@@ -257,7 +257,7 @@ export default function SelectPage() {
 </Select>
 
 <Select 
-  leftIcon={<Icon name="user" size={16} />}
+  leftIcon={<Icon name={"user" as any} size={16} />}
   placeholder="사용자를 선택하세요"
 >
   <SelectOption value="user1">김철수</SelectOption>

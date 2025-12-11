@@ -9,9 +9,8 @@
     "lint": "echo 'Skipping lint for hua-motion (ESLint 9 compatibility issue)'"
   },
   "dependencies": {
-    "@hua-labs/motion": "workspace:*",
-    "@hua-labs/motion-advanced": "workspace:*",
     "@hua-labs/motion-core": "workspace:*",
+    "@hua-labs/motion-advanced": "workspace:*",
     "@hua-labs/ui": "workspace:^",
     "next": "16.0.7",
     "react": "19.2.1",
@@ -23,6 +22,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.15",
     "autoprefixer": "^10.0.1",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.0.7",

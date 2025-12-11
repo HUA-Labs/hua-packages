@@ -5,6 +5,14 @@ import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
 
+/**
+ * InfoCard 컴포넌트의 props / InfoCard component props
+ * @typedef {Object} InfoCardProps
+ * @property {string} title - 카드 제목 / Card title
+ * @property {IconName} icon - 카드 아이콘 / Card icon
+ * @property {"blue" | "purple" | "green" | "orange"} [tone="blue"] - InfoCard 톤 색상 / InfoCard tone color
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface InfoCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string
   icon: IconName
@@ -38,6 +46,36 @@ const toneClasses: Record<NonNullable<InfoCardProps["tone"]>, { container: strin
   },
 }
 
+/**
+ * InfoCard 컴포넌트 / InfoCard component
+ * 
+ * 정보를 표시하는 카드 컴포넌트입니다.
+ * 아이콘, 제목, 내용을 포함하며, 다양한 톤 색상을 지원합니다.
+ * 
+ * Card component that displays information.
+ * Includes icon, title, and content, supports various tone colors.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <InfoCard
+ *   icon="info"
+ *   title="정보"
+ *   tone="blue"
+ * >
+ *   이것은 정보 카드입니다.
+ * </InfoCard>
+ * 
+ * @example
+ * // 다양한 톤 / Various tones
+ * <InfoCard icon="check" title="성공" tone="green">
+ *   작업이 완료되었습니다.
+ * </InfoCard>
+ * 
+ * @param {InfoCardProps} props - InfoCard 컴포넌트의 props / InfoCard component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} InfoCard 컴포넌트 / InfoCard component
+ */
 export const InfoCard = React.forwardRef<HTMLDivElement, InfoCardProps>(({ className, title, icon, tone = "blue", children, ...props }, ref) => {
   const t = toneClasses[tone]
   return (

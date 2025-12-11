@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { usePageMotions } from '@hua-labs/motion'
+import { usePageMotions } from '@hua-labs/motion-core'
 import { 
   Button, 
   Card, 
@@ -113,7 +113,7 @@ export function CorePage() {
   }
 
   const activeTemplate = templates[selectedTemplate]
-  const motions = usePageMotions(activeTemplate.config)
+  const motions = usePageMotions(activeTemplate.config as any)
 
   // 모션 요소 렌더링
   const renderMotionElement = (elementId: string, children: React.ReactNode) => {
@@ -247,15 +247,15 @@ export function CorePage() {
         
         <div className="flex flex-wrap justify-center gap-4 mb-6">
           <Badge variant="outline" className="text-blue-600 border-blue-600">
-            <Icon name="layers" className="w-4 h-4 mr-2" />
+            <Icon name={"layers" as any} className="w-4 h-4 mr-2" />
             프리셋 기반
           </Badge>
           <Badge variant="outline" className="text-green-600 border-green-600">
-            <Icon name="mousePointer" className="w-4 h-4 mr-2" />
+            <Icon name={"mousePointer" as any} className="w-4 h-4 mr-2" />
             인터랙션 지원
           </Badge>
           <Badge variant="outline" className="text-purple-600 border-purple-600">
-            <Icon name="fileText" className="w-4 h-4 mr-2" />
+            <Icon name={"fileText" as any} className="w-4 h-4 mr-2" />
             템플릿 시스템
           </Badge>
         </div>
@@ -287,7 +287,7 @@ export function CorePage() {
         <h3 className="text-lg font-semibold mb-4">실시간 데모</h3>
         <div className="mb-4">
           <Badge variant="secondary" className="text-green-600 bg-green-100 dark:bg-green-900/20">
-            <Icon name="play" className="w-4 h-4 mr-2" />
+            <Icon name={"play" as any} className="w-4 h-4 mr-2" />
             {activeTemplate.title}
           </Badge>
         </div>
@@ -317,7 +317,7 @@ const motions = usePageMotions(${JSON.stringify(activeTemplate.config, null, 2)}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="zap" className="w-5 h-5 mr-2 text-yellow-500" />
+            <Icon name={"zap" as any} className="w-5 h-5 mr-2 text-yellow-500" />
             자동 프리셋 적용
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -328,7 +328,7 @@ const motions = usePageMotions(${JSON.stringify(activeTemplate.config, null, 2)}
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="mousePointer" className="w-5 h-5 mr-2 text-blue-500" />
+            <Icon name={"mousePointer" as any} className="w-5 h-5 mr-2 text-blue-500" />
             인터랙션 지원
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -339,7 +339,7 @@ const motions = usePageMotions(${JSON.stringify(activeTemplate.config, null, 2)}
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="fileText" className="w-5 h-5 mr-2 text-green-500" />
+            <Icon name={"fileText" as any} className="w-5 h-5 mr-2 text-green-500" />
             템플릿 시스템
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -350,7 +350,7 @@ const motions = usePageMotions(${JSON.stringify(activeTemplate.config, null, 2)}
         
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name="layers" className="w-5 h-5 mr-2 text-purple-500" />
+            <Icon name={"layers" as any} className="w-5 h-5 mr-2 text-purple-500" />
             단계별 추상화
           </h3>
           <p className="text-gray-600 dark:text-gray-400">

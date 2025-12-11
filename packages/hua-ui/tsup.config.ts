@@ -5,6 +5,9 @@ const entry = {
   advanced: 'src/advanced.ts',
   'advanced-dashboard': 'src/advanced/dashboard.ts',
   'advanced-motion': 'src/advanced/motion.ts',
+  form: 'src/form.ts',
+  navigation: 'src/navigation.ts',
+  feedback: 'src/feedback.ts',
 };
 
 const shared = {
@@ -14,7 +17,7 @@ const shared = {
   treeshake: true,
   minify: true,
   target: 'es2019',
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', '@hua-labs/motion', 'lucide-react', '@phosphor-icons/react'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', '@hua-labs/motion-core', '@hua-labs/motion-advanced', 'lucide-react', '@phosphor-icons/react'],
   esbuildOptions(options) {
     options.jsx = 'automatic';
   },

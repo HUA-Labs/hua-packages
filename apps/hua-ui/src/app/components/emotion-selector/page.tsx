@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { EmotionSelector, ComponentLayout } from "@hua-labs/ui"
+import { EmotionSelector } from "@hua-labs/ui/advanced"
+import { ComponentLayout } from "@hua-labs/ui"
 
 export default function EmotionSelectorPage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string>("")
@@ -182,7 +183,7 @@ export default function EmotionSelectorPage() {
             <div>
               <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
               <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { EmotionSelector } from "@hua-labs/ui"
+{`import { EmotionSelector } from "@hua-labs/ui/advanced"
 import { useState } from "react"
 
 // 기본 이모션 셀렉터

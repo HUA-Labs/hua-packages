@@ -61,8 +61,8 @@
     "docs/CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "jest",

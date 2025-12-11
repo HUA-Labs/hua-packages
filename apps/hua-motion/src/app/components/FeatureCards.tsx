@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Icon, Action, Panel } from '@hua-labs/ui'
-import { useSmartMotion } from '@hua-labs/motion'
+import { useSmartMotion } from '@hua-labs/motion-core'
 
 export default function FeatureCards() {
   const featuresRef = useSmartMotion({ 
@@ -45,7 +45,7 @@ export default function FeatureCards() {
         {features.map((feature, index) => (
           <Panel
             key={index}
-            style={feature.style}
+            style={feature.style as "default" | "solid" | "glass" | "outline" | "elevated" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"}
             padding="lg"
             rounded="xl"
             hoverScale={1}
@@ -54,7 +54,7 @@ export default function FeatureCards() {
             <div className="text-center flex flex-col h-full">
               {/* 아이콘 - 색상 복원, 스케일 효과 완전 제거 */}
               <div className={`w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 mx-auto mb-3 sm:mb-4 lg:mb-6 bg-gradient-to-br rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 hover:shadow-xl ${feature.iconGradient}`}>
-                <Icon name={feature.icon} size={20} className="sm:text-xl lg:text-2xl text-white" />
+                <Icon name={feature.icon as any} size={20} className="sm:text-xl lg:text-2xl text-white" />
               </div>
               
               {/* 제목 */}

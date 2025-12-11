@@ -1,8 +1,26 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Slider 컴포넌트의 props
+ * @typedef {Object} SliderProps
+ * @property {"default" | "primary" | "success" | "warning" | "danger"} [variant="default"] - Slider 스타일 변형
+ * @property {"sm" | "md" | "lg"} [size="md"] - Slider 크기
+ * @property {boolean} [showValue=false] - 현재 값 표시 여부
+ * @property {boolean} [showLabel=false] - 라벨 표시 여부
+ * @property {string} [label] - 라벨 텍스트
+ * @property {number} [min=0] - 최소값
+ * @property {number} [max=100] - 최대값
+ * @property {number} [step=1] - 단계값
+ * @property {number | number[]} [value=0] - 현재 값 (배열이면 범위 슬라이더)
+ * @property {(value: number | number[]) => void} [onValueChange] - 값 변경 콜백
+ * @property {"horizontal" | "vertical"} [orientation="horizontal"] - Slider 방향
+ * @property {boolean} [disabled=false] - 비활성화 여부
+ * @property {string} [className] - 추가 CSS 클래스
+ * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange' | 'size'>}
+ */
 export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange' | 'size'> {
   variant?: "default" | "primary" | "success" | "warning" | "danger"
   size?: "sm" | "md" | "lg"
@@ -19,6 +37,44 @@ export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
   className?: string
 }
 
+/**
+ * Slider 컴포넌트 / Slider component
+ * 
+ * 숫자 값을 선택하는 슬라이더 컴포넌트입니다.
+ * 단일 값 또는 범위 값을 선택할 수 있습니다.
+ * 
+ * Slider component for selecting numeric values.
+ * Supports single value or range value selection.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * const [value, setValue] = useState(50)
+ * <Slider value={value} onValueChange={setValue} />
+ * 
+ * @example
+ * // 범위 슬라이더 / Range slider
+ * const [range, setRange] = useState([20, 80])
+ * <Slider 
+ *   value={range} 
+ *   onValueChange={setRange}
+ *   showValue
+ *   label="가격 범위"
+ * />
+ * 
+ * @example
+ * // 세로 슬라이더 / Vertical slider
+ * <Slider 
+ *   orientation="vertical"
+ *   variant="primary"
+ *   size="lg"
+ *   className="h-64"
+ * />
+ * 
+ * @param {SliderProps} props - Slider 컴포넌트의 props / Slider component props
+ * @param {React.Ref<HTMLInputElement>} ref - input 요소 ref / input element ref
+ * @returns {JSX.Element} Slider 컴포넌트 / Slider component
+ */
 const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   ({ 
     className,
@@ -98,7 +154,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         onChange={handleChange}
         data-index={index}
         disabled={disabled}
-        className={cn(
+        className={merge(
           "appearance-none cursor-pointer rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           sizeClasses[size],
           variantClasses[variant],
@@ -138,7 +194,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     }
 
     return (
-      <div className={cn("flex items-center gap-4", orientationClasses)}>
+      <div className={merge("flex items-center gap-4", orientationClasses)}>
         {showLabel && label && (
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-0">
             {label}
@@ -146,9 +202,9 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         )}
         
         <div className="flex-1 relative">
-          <div className={cn("relative", orientation === "vertical" ? "h-full" : "w-full")}>
+          <div className={merge("relative", orientation === "vertical" ? "h-full" : "w-full")}>
             {/* 배경 트랙 */}
-            <div className={cn(
+            <div className={merge(
               "absolute rounded-full",
               sizeClasses[size],
               variantClasses[variant],
@@ -158,7 +214,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             {/* 활성 트랙 (값에 따른 채워진 부분) */}
             {isRange ? (
               // 범위 슬라이더
-              <div className={cn(
+              <div className={merge(
                 "absolute rounded-full bg-blue-500 dark:bg-blue-400",
                 sizeClasses[size],
                 orientation === "vertical" 
@@ -178,7 +234,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               }} />
             ) : (
               // 단일 슬라이더
-              <div className={cn(
+              <div className={merge(
                 "absolute rounded-full bg-blue-500 dark:bg-blue-400",
                 sizeClasses[size],
                 orientation === "vertical" 
@@ -198,7 +254,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               currentValue.map((_, index) => (
                 <div
                   key={index}
-                  className={cn(
+                  className={merge(
                     "absolute rounded-full border-2 border-white shadow-lg transition-all duration-200 hover:scale-110",
                     thumbSizeClasses[size],
                     thumbVariantClasses[variant],
@@ -217,7 +273,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             ) : (
               // 단일 슬라이더 핸들
               <div
-                className={cn(
+                className={merge(
                   "absolute rounded-full border-2 border-white shadow-lg transition-all duration-200 hover:scale-110",
                   thumbSizeClasses[size],
                   thumbVariantClasses[variant],

@@ -18,7 +18,7 @@ export default function ShowcasePage() {
       color: 'blue' as ColorPreset,
       features: ['자동 모션', '프리셋 시스템', '빠른 설정'],
       highlight: '가장 쉬운 시작점',
-              codeExample: 'useSimpleMotion("home")',
+              codeExample: 'useSimplePageMotion("home")',
       useCase: '간단한 웹사이트, 프로토타입, 빠른 개발'
     },
     {
@@ -123,7 +123,7 @@ export default function ShowcasePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-in">
-                  <Icon name="zap" size={32} className="text-blue-600 dark:text-blue-400" />
+                  <Icon name={"zap" as any} size={32} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">빠른 시작</h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -132,7 +132,7 @@ export default function ShowcasePage() {
               </div>
               <div className="text-center animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
                 <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-in" style={{ animationDelay: '300ms' }}>
-                  <Icon name="layers" size={32} className="text-green-600 dark:text-green-400" />
+                  <Icon name={"layers" as any} size={32} className="text-green-600 dark:text-green-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">체계적 관리</h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -141,7 +141,7 @@ export default function ShowcasePage() {
               </div>
               <div className="text-center animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
                 <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-in" style={{ animationDelay: '500ms' }}>
-                  <Icon name="sparkles" size={32} className="text-purple-600 dark:text-purple-400" />
+                  <Icon name={"sparkles" as any} size={32} className="text-purple-600 dark:text-purple-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">완전한 제어</h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -198,7 +198,7 @@ export default function ShowcasePage() {
                    
                    {/* 하이라이트 배지 */}
                     <div className="relative inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 border border-white/30">
-                      <Icon name="star" size={16} className="mr-2 text-yellow-300" />
+                      <Icon name={"star" as any} size={16} className="mr-2 text-yellow-300" />
                       <span className="text-sm font-semibold">{showcase.highlight}</span>
                     </div>
                  </div>
@@ -209,7 +209,7 @@ export default function ShowcasePage() {
                    <div className="space-y-3">
                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3">
-                         <Icon name="target" size={16} className="text-blue-600 dark:text-blue-400" />
+                         <Icon name={"target" as any} size={16} className="text-blue-600 dark:text-blue-400" />
                        </div>
                        사용 사례
                      </h4>
@@ -222,7 +222,7 @@ export default function ShowcasePage() {
                    <div className="space-y-3">
                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mr-3">
-                         <Icon name="code" size={16} className="text-green-600 dark:text-green-400" />
+                         <Icon name={"code" as any} size={16} className="text-green-600 dark:text-green-400" />
                        </div>
                        코드 예시
                      </h4>
@@ -237,7 +237,7 @@ export default function ShowcasePage() {
                    <div className="space-y-3">
                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mr-3">
-                         <Icon name="zap" size={16} className="text-purple-600 dark:text-purple-400" />
+                         <Icon name={"zap" as any} size={16} className="text-purple-600 dark:text-purple-400" />
                        </div>
                        주요 기능
                      </h4>
@@ -263,7 +263,7 @@ export default function ShowcasePage() {
                       >
                         <span className="flex items-center justify-center">
                           <span className="mr-2">체험해보기</span>
-                          <Icon name="externalLink" size={20} className="transition-transform duration-300 group-hover:translate-x-1" />
+                          <Icon name={"externalLink" as any} size={20} className="transition-transform duration-300 group-hover:translate-x-1" />
                         </span>
                       </Action>
                     </div>

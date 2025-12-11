@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 
 export interface SlideRightOptions {
@@ -28,13 +28,16 @@ export function useSlideRight<T extends MotionElement = HTMLDivElement>(
   const [opacity, setOpacity] = useState(autoStart ? 0 : 1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(autoStart ? false : true)
+  const [progress, setProgress] = useState(autoStart ? 0 : 1)
 
   const start = useCallback(() => {
     setIsAnimating(true)
     setTranslateX(-distance)
     setOpacity(0)
+    setProgress(0)
 
     setTimeout(() => {
+      setProgress(1)
       setTranslateX(0)
       setOpacity(1)
       setIsVisible(true)
@@ -46,6 +49,7 @@ export function useSlideRight<T extends MotionElement = HTMLDivElement>(
     // 즉시 초기 상태로 복원 (모션 없이)
     setTranslateX(-distance)
     setOpacity(0)
+    setProgress(0)
     setIsVisible(false)
     setIsAnimating(false)
     
@@ -73,15 +77,15 @@ export function useSlideRight<T extends MotionElement = HTMLDivElement>(
     }
   }, [autoStart, start])
 
-  // 스타일 계산
-  const style = {
+  // 스타일 계산 - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => ({
     transform: `translateX(${translateX}px)`,
     opacity,
     transition: `all ${duration}ms ${easing}`,
     '--motion-delay': `${delay}ms`,
     '--motion-duration': `${duration}ms`,
     '--motion-easing': easing
-  } as const
+  } as const), [translateX, opacity, duration, easing, delay])
 
   return {
     ref,
@@ -90,6 +94,7 @@ export function useSlideRight<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     style,
+    progress,
     start,
     reset,
     stop
