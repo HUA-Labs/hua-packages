@@ -16,46 +16,49 @@ console.log('[@hua-labs/ui] PATH:', process.env.PATH);
 
 // Try to find node executable in common locations
 let nodePath = process.execPath;
-const commonNodePaths = [
-  '/usr/bin/node',
-  '/usr/local/bin/node',
-  '/opt/homebrew/bin/node',
-  process.execPath
-];
+const isWindows = process.platform === 'win32';
+const isLinux = process.platform === 'linux';
 
+console.log('[@hua-labs/ui] Platform:', process.platform);
 console.log('[@hua-labs/ui] Trying to find node executable...');
-for (const testPath of commonNodePaths) {
-  console.log('[@hua-labs/ui] Checking:', testPath);
-  if (fs.existsSync(testPath)) {
-    nodePath = testPath;
-    console.log('[@hua-labs/ui] Found node at:', nodePath);
-    break;
-  }
-}
 
-// Also try which/where command
-try {
-  const whichResult = spawnSync('which', ['node'], { encoding: 'utf8', stdio: 'pipe' });
-  if (whichResult.stdout && whichResult.stdout.trim()) {
-    const foundPath = whichResult.stdout.trim();
-    console.log('[@hua-labs/ui] which node found:', foundPath);
-    if (fs.existsSync(foundPath)) {
-      nodePath = foundPath;
+// On Windows, use process.execPath directly (most reliable)
+if (isWindows) {
+  nodePath = process.execPath;
+  console.log('[@hua-labs/ui] Windows detected, using process.execPath:', nodePath);
+} else {
+  // On Linux/Unix, try common paths
+  const commonNodePaths = [
+    '/usr/bin/node',
+    '/usr/local/bin/node',
+    '/opt/homebrew/bin/node',
+    '/vercel/.nodejs/bin/node',
+    process.execPath
+  ];
+
+  for (const testPath of commonNodePaths) {
+    console.log('[@hua-labs/ui] Checking:', testPath);
+    if (fs.existsSync(testPath)) {
+      nodePath = testPath;
+      console.log('[@hua-labs/ui] Found node at:', nodePath);
+      break;
     }
   }
-} catch (e) {
-  console.log('[@hua-labs/ui] which command failed, trying where...');
-  try {
-    const whereResult = spawnSync('where', ['node'], { encoding: 'utf8', stdio: 'pipe' });
-    if (whereResult.stdout && whereResult.stdout.trim()) {
-      const foundPath = whereResult.stdout.trim().split('\n')[0];
-      console.log('[@hua-labs/ui] where node found:', foundPath);
-      if (fs.existsSync(foundPath)) {
-        nodePath = foundPath;
+
+  // Also try which command (Linux/Unix only)
+  if (nodePath === process.execPath) {
+    try {
+      const whichResult = spawnSync('which', ['node'], { encoding: 'utf8', stdio: 'pipe' });
+      if (whichResult.stdout && whichResult.stdout.trim()) {
+        const foundPath = whichResult.stdout.trim();
+        console.log('[@hua-labs/ui] which node found:', foundPath);
+        if (fs.existsSync(foundPath)) {
+          nodePath = foundPath;
+        }
       }
+    } catch (e) {
+      console.log('[@hua-labs/ui] which command failed:', e.message);
     }
-  } catch (e2) {
-    console.log('[@hua-labs/ui] where command also failed');
   }
 }
 
