@@ -39,7 +39,7 @@
     "storybook": "8.6.14",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
-    "turbo": "^2.5.8",
+    "turbo": "2.3.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
   },
@@ -52,9 +52,9 @@
       "prettier --write"
     ]
   },
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.25.0",
   "engines": {
-    "node": ">=18.0.0",
+    "node": "22.x",
     "pnpm": ">=10.17.0"
   },
   "dependencies": {
