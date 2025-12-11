@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "pnpm exec tsup",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
