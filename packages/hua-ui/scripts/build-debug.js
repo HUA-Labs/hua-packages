@@ -117,3 +117,101 @@ if (testResult.error) {
 console.log('[@hua-labs/ui] Node version:', testResult.stdout.toString().trim());
 console.log('[@hua-labs/ui] All checks passed!');
 
+// Now execute the actual build
+console.log('[@hua-labs/ui] Starting actual build...');
+
+// #region agent log
+logDebug({
+  location: 'build-debug.js:before-build',
+  message: 'Before executing build commands',
+  data: {
+    tsupPath,
+    tsupExists: fs.existsSync(tsupPath),
+    tsxPath,
+    tsxExists: fs.existsSync(tsxPath),
+    tscPath,
+    tscExists: fs.existsSync(tscPath)
+  },
+  hypothesisId: 'D'
+});
+// #endregion
+
+// Execute tsup first
+if (!fs.existsSync(tsxPath) || !fs.existsSync(tsupPath)) {
+  console.error('[@hua-labs/ui] Missing required files:', {
+    tsx: tsxPath,
+    tsxExists: fs.existsSync(tsxPath),
+    tsup: tsupPath,
+    tsupExists: fs.existsSync(tsupPath)
+  });
+  process.exit(1);
+}
+
+console.log('[@hua-labs/ui] Executing tsup...');
+const tsupResult = spawnSync(process.execPath, [tsxPath, tsupPath], {
+  cwd: path.join(__dirname, '..'),
+  stdio: 'inherit',
+  env: process.env
+});
+
+// #region agent log
+logDebug({
+  location: 'build-debug.js:tsup-result',
+  message: 'tsup execution result',
+  data: {
+    status: tsupResult.status,
+    error: tsupResult.error?.message,
+    signal: tsupResult.signal
+  },
+  hypothesisId: 'D'
+});
+// #endregion
+
+if (tsupResult.error) {
+  console.error('[@hua-labs/ui] tsup error:', tsupResult.error.message);
+  process.exit(1);
+}
+
+if (tsupResult.status !== 0) {
+  console.error('[@hua-labs/ui] tsup exited with code:', tsupResult.status);
+  process.exit(tsupResult.status || 1);
+}
+
+// Execute tsc for type declarations
+if (!fs.existsSync(tscPath)) {
+  console.error('[@hua-labs/ui] TypeScript compiler not found at:', tscPath);
+  process.exit(1);
+}
+
+console.log('[@hua-labs/ui] Executing tsc for type declarations...');
+const tscResult = spawnSync(process.execPath, [tscPath, '--emitDeclarationOnly'], {
+  cwd: path.join(__dirname, '..'),
+  stdio: 'inherit',
+  env: process.env
+});
+
+// #region agent log
+logDebug({
+  location: 'build-debug.js:tsc-result',
+  message: 'tsc execution result',
+  data: {
+    status: tscResult.status,
+    error: tscResult.error?.message,
+    signal: tscResult.signal
+  },
+  hypothesisId: 'D'
+});
+// #endregion
+
+if (tscResult.error) {
+  console.error('[@hua-labs/ui] tsc error:', tscResult.error.message);
+  process.exit(1);
+}
+
+if (tscResult.status !== 0) {
+  console.error('[@hua-labs/ui] tsc exited with code:', tscResult.status);
+  process.exit(tscResult.status || 1);
+}
+
+console.log('[@hua-labs/ui] Build completed successfully!');
+
