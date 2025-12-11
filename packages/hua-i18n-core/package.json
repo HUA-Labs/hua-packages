@@ -16,7 +16,7 @@
     }
   },
   "scripts": {
-    "build": "pnpm exec tsx scripts/build-tsc.ts",
+    "build": "node scripts/build-tsc.js",
     "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rm -rf dist",
     "test": "jest",
