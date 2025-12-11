@@ -274,24 +274,71 @@ try {
   const packageDir = path.join(__dirname, '..');
   log('[@hua-labs/ui] Building in directory: ' + packageDir);
   
+  // Try to use require.resolve to execute tsc directly if spawnSync fails
+  // This is a fallback for when node executable cannot be found
+  let useDirectRequire = false;
+  
   // #region agent log
   logDebug({
     location: 'build-tsc.js:spawn-before',
     message: 'About to spawn tsc',
-    data: { nodePath, tscPath, packageDir, env: { PATH: process.env.PATH } },
+    data: { 
+      nodePath, 
+      tscPath, 
+      packageDir, 
+      nodePathExists: fs.existsSync(nodePath),
+      tscPathExists: fs.existsSync(tscPath),
+      env: { PATH: process.env.PATH },
+      useDirectRequire
+    },
     hypothesisId: 'D'
   });
   // #endregion
   
-  const result = spawnSync(nodePath, [tscPath], {
-    cwd: packageDir,
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      NODE_OPTIONS: ''
-    },
-    shell: false
-  });
+  // First, verify nodePath exists
+  if (!fs.existsSync(nodePath)) {
+    log('[@hua-labs/ui] WARNING: Node path does not exist: ' + nodePath);
+    // #region agent log
+    logDebug({
+      location: 'build-tsc.js:node-path-not-exists',
+      message: 'Node path does not exist, trying direct require',
+      data: { nodePath },
+      hypothesisId: 'D'
+    });
+    // #endregion
+    
+    // Try to use require.resolve and execute directly
+    useDirectRequire = true;
+  }
+  
+  let result;
+  if (useDirectRequire) {
+    // Fallback: require and execute tsc directly
+    log('[@hua-labs/ui] Using direct require for TypeScript compiler');
+    // #region agent log
+    logDebug({
+      location: 'build-tsc.js:direct-require',
+      message: 'Using direct require for tsc',
+      data: { tscPath },
+      hypothesisId: 'D'
+    });
+    // #endregion
+    
+    // Change to package directory and require tsc
+    process.chdir(packageDir);
+    require(tscPath);
+    result = { status: 0, error: null };
+  } else {
+    result = spawnSync(nodePath, [tscPath], {
+      cwd: packageDir,
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NODE_OPTIONS: ''
+      },
+      shell: false
+    });
+  }
   
   // #region agent log
   logDebug({
