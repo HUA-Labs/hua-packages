@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -12,6 +12,54 @@ console.log('[@hua-labs/ui] Package directory:', path.join(__dirname, '..'));
 console.log('[@hua-labs/ui] Process exec path:', process.execPath);
 console.log('[@hua-labs/ui] Node version:', process.version);
 console.log('[@hua-labs/ui] Platform:', process.platform);
+console.log('[@hua-labs/ui] PATH:', process.env.PATH);
+
+// Try to find node executable in common locations
+let nodePath = process.execPath;
+const commonNodePaths = [
+  '/usr/bin/node',
+  '/usr/local/bin/node',
+  '/opt/homebrew/bin/node',
+  process.execPath
+];
+
+console.log('[@hua-labs/ui] Trying to find node executable...');
+for (const testPath of commonNodePaths) {
+  console.log('[@hua-labs/ui] Checking:', testPath);
+  if (fs.existsSync(testPath)) {
+    nodePath = testPath;
+    console.log('[@hua-labs/ui] Found node at:', nodePath);
+    break;
+  }
+}
+
+// Also try which/where command
+try {
+  const whichResult = spawnSync('which', ['node'], { encoding: 'utf8', stdio: 'pipe' });
+  if (whichResult.stdout && whichResult.stdout.trim()) {
+    const foundPath = whichResult.stdout.trim();
+    console.log('[@hua-labs/ui] which node found:', foundPath);
+    if (fs.existsSync(foundPath)) {
+      nodePath = foundPath;
+    }
+  }
+} catch (e) {
+  console.log('[@hua-labs/ui] which command failed, trying where...');
+  try {
+    const whereResult = spawnSync('where', ['node'], { encoding: 'utf8', stdio: 'pipe' });
+    if (whereResult.stdout && whereResult.stdout.trim()) {
+      const foundPath = whereResult.stdout.trim().split('\n')[0];
+      console.log('[@hua-labs/ui] where node found:', foundPath);
+      if (fs.existsSync(foundPath)) {
+        nodePath = foundPath;
+      }
+    }
+  } catch (e2) {
+    console.log('[@hua-labs/ui] where command also failed');
+  }
+}
+
+console.log('[@hua-labs/ui] Final node path:', nodePath);
 
 // Check if typescript is available
 let tscPath;
@@ -50,8 +98,7 @@ try {
   }
 }
 
-// Use process.execPath to get absolute path to current Node.js executable
-const nodePath = process.execPath;
+// nodePath is already set above (from the node path detection code)
 
 try {
   console.log(`[@hua-labs/ui] Building with TypeScript compiler at: ${tscPath}`);
