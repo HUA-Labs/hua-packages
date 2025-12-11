@@ -61,7 +61,7 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "corepack pnpm exec tsup && corepack pnpm exec tsc --emitDeclarationOnly",
+    "build": "node scripts/build.js",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
