@@ -1,7 +1,17 @@
 // #region agent log
+// Immediate console log to verify script execution
+console.error('[@hua-labs/i18n-core] build.js: Script started at', new Date().toISOString());
+console.error('[@hua-labs/i18n-core] build.js: __dirname =', __dirname);
+console.error('[@hua-labs/i18n-core] build.js: process.cwd() =', process.cwd());
+console.error('[@hua-labs/i18n-core] build.js: process.platform =', process.platform);
+console.error('[@hua-labs/i18n-core] build.js: process.version =', process.version);
+
 const fs = require('fs');
 const path = require('path');
-const LOG_PATH = path.join(__dirname, '../../..', '.cursor', 'debug.log');
+
+// Try to create log directory if it doesn't exist
+const LOG_DIR = path.join(__dirname, '../../..', '.cursor');
+const LOG_PATH = path.join(LOG_DIR, 'debug.log');
 const SERVER_ENDPOINT = 'http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d';
 
 function log(data) {
@@ -12,20 +22,63 @@ function log(data) {
     runId: process.env.RUN_ID || 'run1'
   }) + '\n';
   
+  // Always log to console first for immediate visibility
+  console.error('[@hua-labs/i18n-core] LOG:', JSON.stringify(data, null, 2));
+  
   try {
+    // Ensure log directory exists
+    if (!fs.existsSync(LOG_DIR)) {
+      fs.mkdirSync(LOG_DIR, { recursive: true });
+    }
     fs.appendFileSync(LOG_PATH, logEntry);
   } catch (err) {
+    // If file write fails, try HTTP (but don't fail if that also fails)
     try {
-      require('http').request(SERVER_ENDPOINT, {
+      const http = require('http');
+      const url = new URL(SERVER_ENDPOINT);
+      const options = {
+        hostname: url.hostname,
+        port: url.port || 80,
+        path: url.pathname,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
-      }, () => {}).end(logEntry);
-    } catch (e) {}
+      };
+      const req = http.request(options, () => {});
+      req.on('error', () => {});
+      req.write(logEntry);
+      req.end();
+    } catch (e) {
+      // Silently fail - we already logged to console
+    }
   }
 }
 // #endregion
 
+// Log immediately after function definition
+log({
+  location: 'hua-i18n-core/build.js:module-load',
+  message: 'Module loaded successfully',
+  data: { 
+    nodeVersion: process.version,
+    platform: process.platform,
+    cwd: process.cwd(),
+    __dirname: __dirname
+  },
+  hypothesisId: 'A'
+});
+
 const { execSync } = require('child_process');
+
+log({
+  location: 'hua-i18n-core/build.js:requires-loaded',
+  message: 'All requires loaded successfully',
+  data: { 
+    execSyncType: typeof execSync,
+    fsType: typeof fs,
+    pathType: typeof path
+  },
+  hypothesisId: 'A'
+});
 
 let tscPath = path.join(__dirname, '../../..', 'node_modules', 'typescript', 'lib', 'tsc.js');
 const packageDir = path.join(__dirname, '..');
