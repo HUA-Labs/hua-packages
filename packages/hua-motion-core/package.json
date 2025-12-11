@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node build.js",
+    "build": "node ../../node_modules/typescript/lib/tsc.js",
     "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
