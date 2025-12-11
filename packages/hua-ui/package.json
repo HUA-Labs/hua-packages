@@ -61,7 +61,7 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "build": "corepack pnpm exec tsc",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
