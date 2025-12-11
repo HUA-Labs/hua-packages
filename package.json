@@ -54,7 +54,7 @@
   },
   "packageManager": "pnpm@10.25.0",
   "engines": {
-    "node": ">=18.0.0",
+    "node": "20.x",
     "pnpm": ">=10.17.0"
   },
   "dependencies": {
