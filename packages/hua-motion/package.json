@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "corepack pnpm exec tsc",
+    "build": "npx tsc",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
