@@ -4,6 +4,10 @@ const { spawnSync, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:8',message:'Build script started',data:{platform:process.platform,execPath:process.execPath,path:process.env.PATH},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
+
 // Debug: Log environment information
 console.log('[@hua-labs/i18n-core] Build script started');
 console.log('[@hua-labs/i18n-core] Process exec path:', process.execPath);
@@ -61,12 +65,28 @@ if (isWindows) {
 console.log('[@hua-labs/i18n-core] Final node path:', nodePath);
 
 // Use require.resolve to get absolute path to tsc.js
-const tscPath = require.resolve('typescript/lib/tsc.js');
+let tscPath;
+try {
+  tscPath = require.resolve('typescript/lib/tsc.js');
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:64',message:'TypeScript compiler path resolved',data:{tscPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+  // #endregion
+} catch (error) {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:68',message:'TypeScript compiler path resolution failed',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
+  throw error;
+}
+
 // nodePath is already set above
 
 try {
   console.log(`[@hua-labs/i18n-core] Building with TypeScript compiler at: ${tscPath}`);
   console.log(`[@hua-labs/i18n-core] Using Node.js at: ${nodePath}`);
+  
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:75',message:'Before spawnSync',data:{nodePath,tscPath,cwd:path.join(__dirname,'..')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
   
   const result = spawnSync(nodePath, [tscPath], {
     cwd: path.join(__dirname, '..'),
@@ -78,16 +98,33 @@ try {
     shell: false
   });
   
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:89',message:'After spawnSync',data:{status:result.status,error:result.error?.message,signal:result.signal},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+  // #endregion
+  
   if (result.error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:93',message:'spawnSync error',data:{error:result.error.message,code:result.error.code},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+    // #endregion
     throw result.error;
   }
   
   if (result.status !== 0) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:99',message:'Build failed with non-zero exit code',data:{status:result.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
     process.exit(result.status || 1);
   }
   
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:105',message:'Build completed successfully',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+  // #endregion
+  
   console.log('[@hua-labs/i18n-core] Build completed successfully');
 } catch (error) {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e26607ce-6a75-4b7a-9d1f-af0070217f4d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'build-tsc.js:110',message:'Build exception caught',data:{error:error.message,stack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+  // #endregion
   console.error(`[@hua-labs/i18n-core] Build failed: ${error.message}`);
   if (error.stderr) console.error(error.stderr.toString());
   if (error.stdout) console.error(error.stdout.toString());
