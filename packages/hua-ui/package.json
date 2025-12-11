@@ -61,7 +61,7 @@
     "src/styles"
   ],
   "scripts": {
-    "build": "bash scripts/build.sh",
+    "build": "sh -c 'node scripts/build-direct.js'",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
