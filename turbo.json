@@ -14,7 +14,26 @@
         "dist/**"
       ],
       "env": [
-        "NODE_ENV"
+        "NODE_ENV",
+        "DATABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "NEXTAUTH_URL",
+        "NEXTAUTH_SECRET",
+        "KAKAO_CLIENT_ID",
+        "KAKAO_CLIENT_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "ENCRYPTION_KEY",
+        "DEFAULT_AI_PROVIDER",
+        "OPENAI_API_KEY",
+        "GEMINI_API_KEY",
+        "GEMINI_GEMINI_2_5_FLASH_INPUT_PER_1K_USD",
+        "GEMINI_GEMINI_2_5_FLASH_OUTPUT_PER_1K_USD",
+        "OPENAI_GPT5_MINI_INPUT_PER_1K_USD",
+        "OPENAI_GPT5_MINI_OUTPUT_PER_1K_USD",
+        "OPENAI_GPT4O_MINI_INPUT_PER_1K_USD",
+        "OPENAI_GPT4O_MINI_OUTPUT_PER_1K_USD",
+        "DIRECT_URL"
       ],
       "persistent": false
     },
@@ -46,6 +65,23 @@
       "dependsOn": [],
       "outputs": ["dist/**"],
       "env": []
+    },
+    "@hua-labs/motion#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"],
+      "env": []
+    },
+    "@hua-labs/i18n-core#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"],
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
+    },
+    "@hua-labs/motion-core#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"],
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     }
   }
 }
