@@ -74,12 +74,14 @@
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": []
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": []
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     }
   }
 }
