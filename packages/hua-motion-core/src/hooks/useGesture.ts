@@ -162,7 +162,7 @@ export function useGesture(options: GestureOptions = {}): GestureReturn {
   const startGesture = useCallback((x: number, y: number, touchCount: number = 1) => {
     if (!enabled) return
 
-    const now = Date.now()
+    const now = performance.now()
     stateRef.current = {
       ...stateRef.current,
       isActive: true,
@@ -195,7 +195,7 @@ export function useGesture(options: GestureOptions = {}): GestureReturn {
   const updateGesture = useCallback((x: number, y: number, touches?: Touch[]) => {
     if (!enabled || !stateRef.current.isActive) return
 
-    const now = Date.now()
+    const now = performance.now()
     const state = stateRef.current
     const deltaX = x - state.startX
     const deltaY = y - state.startY
@@ -262,7 +262,7 @@ export function useGesture(options: GestureOptions = {}): GestureReturn {
     if (!enabled || !stateRef.current.isActive) return
 
     const state = stateRef.current
-    const now = Date.now()
+    const now = performance.now()
     const deltaX = x - state.startX
     const deltaY = y - state.startY
     const distance = getDistance(state.startX, state.startY, x, y)

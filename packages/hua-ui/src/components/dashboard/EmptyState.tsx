@@ -5,6 +5,19 @@ import { merge } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
+/**
+ * DashboardEmptyState 컴포넌트의 props / DashboardEmptyState component props
+ * @typedef {Object} DashboardEmptyStateProps
+ * @property {IconName | React.ReactNode} [icon="inbox"] - 아이콘 / Icon
+ * @property {string} title - 제목 / Title
+ * @property {string} [description] - 설명 / Description
+ * @property {string} [actionText] - 액션 버튼 텍스트 / Action button text
+ * @property {string} [actionHref] - 액션 버튼 링크 URL / Action button link URL
+ * @property {() => void} [actionOnClick] - 액션 버튼 클릭 핸들러 / Action button click handler
+ * @property {"default" | "warning" | "info" | "error" | "success"} [variant="default"] - 스타일 변형 / Style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface DashboardEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: IconName | React.ReactNode;
   title: string;
@@ -68,6 +81,40 @@ const sizeStyles = {
   },
 };
 
+/**
+ * DashboardEmptyState 컴포넌트
+ * 
+ * 대시보드에서 빈 상태를 표시하는 컴포넌트입니다.
+ * 데이터가 없을 때 사용자에게 안내 메시지와 액션을 제공합니다.
+ * 
+ * Empty state component for dashboards.
+ * Displays a message and action when there is no data to show.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <DashboardEmptyState
+ *   icon="inbox"
+ *   title="데이터가 없습니다"
+ *   description="새로운 데이터를 추가해보세요"
+ *   actionText="데이터 추가"
+ *   actionOnClick={handleAdd}
+ * />
+ * 
+ * @example
+ * // 경고 스타일 / Warning style
+ * <DashboardEmptyState
+ *   icon="warning"
+ *   title="오류가 발생했습니다"
+ *   description="잠시 후 다시 시도해주세요"
+ *   variant="warning"
+ *   size="lg"
+ * />
+ * 
+ * @param {DashboardEmptyStateProps} props - DashboardEmptyState 컴포넌트의 props / DashboardEmptyState component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} DashboardEmptyState 컴포넌트 / DashboardEmptyState component
+ */
 export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmptyStateProps>(
   (
     {
@@ -92,8 +139,9 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
         {actionHref ? (
           <a
             href={actionHref}
+            aria-label={actionText}
             className={merge(
-              "inline-flex items-center justify-center rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 hover:shadow-lg transition-all duration-200",
+              "inline-flex items-center justify-center rounded-lg font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 transition-colors duration-200",
               sizes.button
             )}
           >
@@ -102,8 +150,9 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
         ) : (
           <button
             onClick={actionOnClick}
+            aria-label={actionText}
             className={merge(
-              "inline-flex items-center justify-center rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 hover:shadow-lg transition-all duration-200",
+              "inline-flex items-center justify-center rounded-lg font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 transition-colors duration-200",
               sizes.button
             )}
           >

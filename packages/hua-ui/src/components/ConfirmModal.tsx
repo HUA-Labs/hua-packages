@@ -1,10 +1,34 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Modal } from "./Modal"
 import { Button } from "./Button"
 
+/**
+ * ConfirmModal 컴포넌트의 props / ConfirmModal component props
+ * @typedef {Object} ConfirmModalProps
+ * @property {boolean} isOpen - 모달 열림/닫힘 상태 / Modal open/close state
+ * @property {() => void} onClose - 닫기 콜백 / Close callback
+ * @property {() => void} onConfirm - 확인 콜백 / Confirm callback
+ * @property {string} title - 모달 제목 / Modal title
+ * @property {string} message - 모달 메시지 / Modal message
+ * @property {string} [warning] - 경고 메시지 / Warning message
+ * @property {string} [confirmText="확인"] - 확인 버튼 텍스트 / Confirm button text
+ * @property {string} [cancelText="취소"] - 취소 버튼 텍스트 / Cancel button text
+ * @property {string} [confirmButtonText] - 확인 버튼 커스텀 텍스트 / Custom confirm button text
+ * @property {"danger" | "warning" | "info" | "success" | "error"} [type="danger"] - 모달 타입 / Modal type
+ * @property {boolean} [loading=false] - 로딩 상태 / Loading state
+ * @property {boolean} [disabled=false] - 비활성화 여부 / Disabled state
+ * @property {boolean} [showInput=false] - 입력 필드 표시 여부 / Show input field
+ * @property {string} [inputValue=""] - 입력 필드 값 / Input field value
+ * @property {(value: string) => void} [onInputChange] - 입력 값 변경 콜백 / Input value change callback
+ * @property {string} [inputPlaceholder] - 입력 필드 플레이스홀더 / Input field placeholder
+ * @property {string} [inputLabel] - 입력 필드 라벨 / Input field label
+ * @property {string} [requiredInputValue] - 필수 입력 값 (확인 버튼 활성화 조건) / Required input value (confirm button activation condition)
+ * @property {boolean} [showCancel=true] - 취소 버튼 표시 여부 / Show cancel button
+ * @property {"sm" | "md" | "lg" | "xl" | "2xl"} [size="md"] - 모달 크기 / Modal size
+ */
 export interface ConfirmModalProps {
   isOpen: boolean
   onClose: () => void
@@ -28,6 +52,47 @@ export interface ConfirmModalProps {
   size?: "sm" | "md" | "lg" | "xl" | "2xl"
 }
 
+/**
+ * ConfirmModal 컴포넌트 / ConfirmModal component
+ * 
+ * 확인/취소가 필요한 모달 컴포넌트입니다.
+ * 다양한 타입(danger, warning, info, success, error)을 지원하며,
+ * 입력 필드와 필수 입력 값 검증을 지원합니다.
+ * 
+ * Modal component that requires confirmation/cancellation.
+ * Supports various types (danger, warning, info, success, error),
+ * and supports input fields and required input value validation.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ConfirmModal
+ *   isOpen={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   onConfirm={handleConfirm}
+ *   title="삭제 확인"
+ *   message="정말 삭제하시겠습니까?"
+ * />
+ * 
+ * @example
+ * // 입력 필드와 함께 / With input field
+ * <ConfirmModal
+ *   isOpen={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   onConfirm={handleDelete}
+ *   title="삭제 확인"
+ *   message="삭제하려면 'DELETE'를 입력하세요"
+ *   showInput
+ *   inputLabel="확인 입력"
+ *   requiredInputValue="DELETE"
+ *   inputValue={inputValue}
+ *   onInputChange={setInputValue}
+ * />
+ * 
+ * @param {ConfirmModalProps} props - ConfirmModal 컴포넌트의 props / ConfirmModal component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ConfirmModal 컴포넌트 / ConfirmModal component
+ */
 const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
   ({
     isOpen,
@@ -118,7 +183,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
       >
         <div className="text-center">
           {/* 아이콘 */}
-          <div className={cn(
+          <div className={merge(
             "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-6", // 64px 아이콘, 24px 여백
             config.bgColor
           )}>
@@ -138,7 +203,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
             
             {/* 경고 메시지 */}
             {warning && (
-              <p className={cn(
+              <p className={merge(
                 "text-sm mt-3 font-medium", // 12px 여백
                 config.textColor
               )}>
@@ -165,7 +230,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
           )}
 
           {/* 버튼 */}
-          <div className={cn(
+          <div className={merge(
             "flex gap-3", // 12px 간격
             showCancel ? "justify-center" : "justify-center"
           )}>
@@ -183,7 +248,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
               variant="default"
               onClick={onConfirm}
               disabled={isDisabled}
-              className={cn(
+              className={merge(
                 "px-6 py-3", // 24px, 12px 패딩
                 config.buttonColor
               )}

@@ -1,10 +1,22 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { useTheme } from "./ThemeProvider"
 
+/**
+ * ThemeToggle 컴포넌트의 props / ThemeToggle component props
+ * @typedef {Object} ThemeToggleProps
+ * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {"sm" | "md" | "lg"} [size="md"] - Toggle 크기 / Toggle size
+ * @property {"button" | "icon" | "switch"} [variant="button"] - Toggle 스타일 변형 / Toggle style variant
+ * @property {boolean} [showLabel=false] - 라벨 표시 여부 / Show label
+ * @property {Object} [label] - 커스텀 라벨 텍스트 / Custom label text
+ * @property {string} [label.light="라이트"] - 라이트 모드 라벨 / Light mode label
+ * @property {string} [label.dark="다크"] - 다크 모드 라벨 / Dark mode label
+ * @property {string} [label.system="시스템"] - 시스템 모드 라벨 / System mode label
+ */
 interface ThemeToggleProps {
   className?: string
   size?: "sm" | "md" | "lg"
@@ -17,6 +29,38 @@ interface ThemeToggleProps {
   }
 }
 
+/**
+ * ThemeToggle 컴포넌트 / ThemeToggle component
+ * 
+ * 테마를 전환하는 토글 컴포넌트입니다.
+ * ThemeProvider와 함께 사용하며, light/dark/system 테마를 지원합니다.
+ * 
+ * Toggle component for switching themes.
+ * Used with ThemeProvider, supports light/dark/system themes.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 (버튼 스타일) / Basic usage (button style)
+ * <ThemeToggle />
+ * 
+ * @example
+ * // 아이콘만 표시 / Icon only
+ * <ThemeToggle variant="icon" size="lg" />
+ * 
+ * @example
+ * // Switch 스타일 / Switch style
+ * <ThemeToggle variant="switch" />
+ * 
+ * @example
+ * // 라벨과 함께 / With label
+ * <ThemeToggle 
+ *   showLabel
+ *   label={{ light: "밝게", dark: "어둡게" }}
+ * />
+ * 
+ * @param {ThemeToggleProps} props - ThemeToggle 컴포넌트의 props / ThemeToggle component props
+ * @returns {JSX.Element} ThemeToggle 컴포넌트 / ThemeToggle component
+ */
 export function ThemeToggle({
   className,
   size = "md",
@@ -68,7 +112,7 @@ export function ThemeToggle({
     return (
       <button
         onClick={handleClick}
-        className={cn(
+        className={merge(
           "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2",
           sizeClasses[size],
           className
@@ -77,7 +121,7 @@ export function ThemeToggle({
       >
         <div className="relative flex items-center justify-center w-full h-full">
           <div
-            className={cn(
+            className={merge(
               "absolute inset-0 flex items-center justify-center transition-all duration-300",
               resolvedTheme === "dark" ? "rotate-0 opacity-100" : "rotate-90 opacity-0"
             )}
@@ -85,7 +129,7 @@ export function ThemeToggle({
             <Icon name="moon" size={iconSizes[size]} className="text-blue-500" />
           </div>
           <div
-            className={cn(
+            className={merge(
               "absolute inset-0 flex items-center justify-center transition-all duration-300",
               resolvedTheme === "dark" ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
             )}
@@ -101,7 +145,7 @@ export function ThemeToggle({
     return (
       <button
         onClick={handleClick}
-        className={cn(
+        className={merge(
           "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2",
           resolvedTheme === "dark" 
             ? "bg-blue-600" 
@@ -111,7 +155,7 @@ export function ThemeToggle({
         {...props}
       >
         <span
-          className={cn(
+          className={merge(
             "inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-lg",
             resolvedTheme === "dark" ? "translate-x-6" : "translate-x-1"
           )}
@@ -127,7 +171,7 @@ export function ThemeToggle({
   return (
     <button
       onClick={handleClick}
-      className={cn(
+      className={merge(
         "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
         className
       )}

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { BaseMotionReturn, MotionElement } from '../types'
 import { getEasing } from '../utils/easing'
 
@@ -25,7 +25,11 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
   const ref = useRef<T>(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
+  const [progress, setProgress] = useState(0)
   const motionRef = useRef<number | null>(null)
+  
+  // 이징 함수 메모이제이션 (애니메이션 루프 내 반복 호출 방지)
+  const easingFn = useMemo(() => getEasing('easeInOut'), [])
 
   // 🚀 모션 시작
   const start = useCallback(() => {
@@ -40,7 +44,7 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
       const updateMotion = (currentTime: number) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
-        const easedProgress = getEasing('easeInOut')(progress)
+        const easedProgress = easingFn(progress)
 
         // Yoyo 효과
         const finalProgress = yoyo && repeatCount % 2 === 1 ? 1 - easedProgress : easedProgress
@@ -48,6 +52,7 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
         // 펄스 효과 (투명도 변화)
         const opacity = 0.3 + (0.7 * finalProgress * intensity)
         element.style.opacity = opacity.toString()
+        setProgress(progress)
 
         if (progress < 1) {
           motionRef.current = requestAnimationFrame(updateMotion)
@@ -66,7 +71,7 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
     }
 
     animate(performance.now())
-  }, [duration, intensity, repeat, yoyo])
+  }, [duration, intensity, repeat, yoyo, easingFn])
 
   // 🛑 모션 정지
   const stop = useCallback(() => {
@@ -118,10 +123,18 @@ export function usePulse<T extends MotionElement = HTMLDivElement>(
     }
   }, [])
 
+  // 스타일 계산
+  const style = useMemo(() => ({
+    opacity: isAnimating ? 0.3 + (0.7 * progress * intensity) : 1,
+    transition: isAnimating ? 'none' : 'opacity 0.3s ease-in-out'
+  }), [isAnimating, progress, intensity])
+
   return {
     ref,
     isVisible,
     isAnimating,
+    style,
+    progress,
     start,
     stop,
     reset

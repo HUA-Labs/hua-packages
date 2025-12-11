@@ -70,7 +70,9 @@ export class PerformanceOptimizer {
         
         this.performanceObserver.observe({ entryTypes: ['measure', 'navigation'] })
       } catch (error) {
-        console.warn('Performance monitoring not supported:', error)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Performance monitoring not supported:', error)
+        }
       }
     }
   }
@@ -121,7 +123,9 @@ export class PerformanceOptimizer {
       this.registerLayer(element)
       
     } catch (error) {
-      console.warn('GPU acceleration failed:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('GPU acceleration failed:', error)
+      }
     }
   }
 
@@ -144,7 +148,9 @@ export class PerformanceOptimizer {
       this.checkLayerLimit()
       
     } catch (error) {
-      console.warn('Layer optimization failed:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Layer optimization failed:', error)
+      }
     }
   }
 
@@ -183,7 +189,9 @@ export class PerformanceOptimizer {
    */
   private checkLayerLimit(): void {
     if (this.metrics.layerCount > this.config.maxLayerCount) {
-      console.warn(`Layer count (${this.metrics.layerCount}) exceeds limit (${this.config.maxLayerCount})`)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Layer count (${this.metrics.layerCount}) exceeds limit (${this.config.maxLayerCount})`)
+      }
       
       // 오래된 레이어들 정리
       this.cleanupOldLayers()
@@ -212,7 +220,9 @@ export class PerformanceOptimizer {
       this.metrics.memoryUsage = memory.usedJSHeapSize
       
       if (memory.usedJSHeapSize > this.config.memoryThreshold) {
-        console.warn('Memory usage high, cleaning up...')
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Memory usage high, cleaning up...')
+        }
         this.cleanupMemory()
       }
     }

@@ -143,6 +143,12 @@ apps/my-api/transactions_new.json
 # Development logs (moved to root docs/devlogs)
 apps/*/devlogs/
 
+# PR documents (auto-generated, temporary)
+PR_DESCRIPTION*.md
+PR_*.md
+!docs/templates/pr-*.md
+!docs/templates/PR_*.md
+
 # Public documentation (shared in Git)
 # docs/public/ - This folder IS tracked in Git
 

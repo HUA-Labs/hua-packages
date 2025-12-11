@@ -1,8 +1,21 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * ContextMenu 컴포넌트의 props / ContextMenu component props
+ * @typedef {Object} ContextMenuProps
+ * @property {React.ReactNode} children - ContextMenu 내용 / ContextMenu content
+ * @property {boolean} [open] - 제어 모드에서 열림/닫힘 상태 / Open/close state in controlled mode
+ * @property {(open: boolean) => void} [onOpenChange] - 상태 변경 콜백 / State change callback
+ * @property {React.ReactNode} [trigger] - ContextMenu를 열기 위한 트리거 요소 (우클릭 이벤트) / Trigger element to open context menu (right-click event)
+ * @property {"top" | "bottom" | "left" | "right"} [placement="bottom"] - ContextMenu 표시 위치 / ContextMenu display position
+ * @property {"start" | "center" | "end"} [align="start"] - ContextMenu 정렬 / ContextMenu alignment
+ * @property {number} [offset=8] - 트리거와 ContextMenu 사이 간격 (px) / Spacing between trigger and context menu (px)
+ * @property {boolean} [disabled=false] - ContextMenu 비활성화 여부 / Disable context menu
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   open?: boolean
@@ -14,6 +27,43 @@ export interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
 }
 
+/**
+ * ContextMenu 컴포넌트 / ContextMenu component
+ * 
+ * 우클릭 시 표시되는 컨텍스트 메뉴 컴포넌트입니다.
+ * 트리거 요소에 우클릭 이벤트를 자동으로 연결합니다.
+ * 
+ * Context menu component that appears on right-click.
+ * Automatically connects right-click events to the trigger element.
+ * 
+ * @component
+ * @example
+ * // 기본 사용 / Basic usage
+ * <ContextMenu trigger={<div>우클릭하세요</div>}>
+ *   <div className="p-2">
+ *     <button>항목 1</button>
+ *     <button>항목 2</button>
+ *   </div>
+ * </ContextMenu>
+ * 
+ * @example
+ * // 제어 모드 / Controlled mode
+ * const [open, setOpen] = useState(false)
+ * <ContextMenu 
+ *   open={open}
+ *   onOpenChange={setOpen}
+ *   trigger={<div>우클릭</div>}
+ * >
+ *   <Menu>
+ *     <MenuItem>복사</MenuItem>
+ *     <MenuItem>삭제</MenuItem>
+ *   </Menu>
+ * </ContextMenu>
+ * 
+ * @param {ContextMenuProps} props - ContextMenu 컴포넌트의 props / ContextMenu component props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
+ * @returns {JSX.Element} ContextMenu 컴포넌트 / ContextMenu component
+ */
 const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
   ({ 
     className, 
@@ -112,7 +162,7 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     }, [isOpen])
 
     return (
-      <div ref={ref} className={cn("relative", className)} {...props}>
+      <div ref={ref} className={merge("relative", className)} {...props}>
         {/* 트리거 */}
         {trigger && (
           <div
@@ -128,7 +178,7 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         {isOpen && (
           <div
             ref={menuRef}
-            className={cn(
+            className={merge(
               "fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl backdrop-blur-sm", // 보더 대신 섀도우 사용
               "min-w-[200px] py-2", // 16px 패딩
               "border-0" // 보더 제거
@@ -176,7 +226,7 @@ const ContextMenuItem = React.forwardRef<HTMLButtonElement, ContextMenuItemProps
     return (
       <button
         ref={ref}
-        className={cn(
+        className={merge(
           "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700", // 16px, 12px 패딩
           getVariantClasses(),
           className
@@ -202,7 +252,7 @@ const ContextMenuSeparator = React.forwardRef<HTMLDivElement, ContextMenuSeparat
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("h-px bg-gray-200 dark:bg-gray-700 my-2", className)} // 8px 여백
+      className={merge("h-px bg-gray-200 dark:bg-gray-700 my-2", className)} // 8px 여백
       {...props}
     />
   )
@@ -215,7 +265,7 @@ const ContextMenuLabel = React.forwardRef<HTMLDivElement, ContextMenuLabelProps>
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide", className)} // 16px, 8px 패딩
+      className={merge("px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide", className)} // 16px, 8px 패딩
       {...props}
     >
       {children}
@@ -229,7 +279,7 @@ const ContextMenuGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("py-1", className)} // 4px 패딩
+      className={merge("py-1", className)} // 4px 패딩
       {...props}
     >
       {children}

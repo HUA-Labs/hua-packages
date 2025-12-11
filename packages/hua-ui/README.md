@@ -4,9 +4,12 @@ HUA Labs - Modern React UI Component Library
 
 Beautiful, accessible, and customizable components for React applications with TypeScript support.
 
+> **문서**: [아키텍처 문서](./docs/ARCHITECTURE.md) | [개발 가이드](./docs/DEVELOPMENT_GUIDE.md) | [패키지 구조](./docs/PACKAGE_STRUCTURE.md)
+
 ## Features
 
 - 70+ production-ready components
+- Modular entry points for bundle optimization
 - Full TypeScript support
 - Dark mode support
 - Accessible (ARIA attributes, keyboard navigation)
@@ -37,18 +40,31 @@ npm install @phosphor-icons/react
 
 ### 엔트리 포인트
 
-HUA UI는 **Core**와 **Advanced** 두 가지 엔트리로 나뉩니다.
+HUA UI는 **Core**, **Form**, **Advanced** 엔트리로 나뉩니다. 필요한 컴포넌트만 선택적으로 import하여 번들 크기를 최적화할 수 있습니다.
 
 | Entry | Path | 설명 |
 |-------|------|------|
-| Core | `@hua-labs/ui` | 버튼/폼/레이아웃 등 기본 컴포넌트와 유틸 |
+| Core | `@hua-labs/ui` | 버튼/레이아웃/데이터 표시 등 기본 컴포넌트와 유틸 (대부분의 일반적인 앱 개발 가능) |
+| Form | `@hua-labs/ui/form` | 모든 폼 컴포넌트 (Input, Select, DatePicker, Upload, Autocomplete 등) |
+| Navigation | `@hua-labs/ui/navigation` | 대규모 앱 구조에 필요한 네비게이션 (PageNavigation, PageTransition) |
+| Feedback | `@hua-labs/ui/feedback` | 글로벌 상태 관리가 필요한 Toast (ToastProvider, useToast) |
 | Advanced (all) | `@hua-labs/ui/advanced` | 대시보드 위젯 + 고급 모션 전체 |
 | Dashboard widgets | `@hua-labs/ui/advanced/dashboard` | StatCard, TransactionsTable, TrendChart 등 데이터 위젯 |
 | Motion/Experimental | `@hua-labs/ui/advanced/motion` | AdvancedPageTransition 등 모션/실험 기능 |
 
 ```tsx
-// Core 컴포넌트
-import { Button, Card } from '@hua-labs/ui';
+// Core 컴포넌트 (가장 자주 사용되는 컴포넌트들)
+import { Button, Card, Table, Badge, Alert, Modal, Drawer } from '@hua-labs/ui';
+
+// Form 컴포넌트만 (번들 최적화)
+import { Input, Select, DatePicker, Form } from '@hua-labs/ui/form';
+
+// Navigation 컴포넌트 (대규모 앱에서만 필요)
+import { PageNavigation, PageTransition } from '@hua-labs/ui/navigation';
+
+// Feedback 컴포넌트 (Toast - 글로벌 상태 관리)
+import { ToastProvider, useToast } from '@hua-labs/ui/feedback';
+import '@hua-labs/ui/styles/toast.css';
 
 // Advanced 전체
 import { StatCard, DashboardSidebar } from '@hua-labs/ui/advanced';
@@ -57,6 +73,53 @@ import { StatCard, DashboardSidebar } from '@hua-labs/ui/advanced';
 import { TransactionsTable } from '@hua-labs/ui/advanced/dashboard';
 import { AdvancedPageTransition } from '@hua-labs/ui/advanced/motion';
 ```
+
+**참고**: 서브패키지 분리 분석 문서는 [`docs/SUBPACKAGE_ANALYSIS.md`](./docs/SUBPACKAGE_ANALYSIS.md)를 참고하세요.
+
+## Bundle Optimization
+
+HUA UI는 모듈 단위 번들링과 tree-shaking을 지원합니다. 필요한 컴포넌트만 선택적으로 import하여 번들 크기를 최적화할 수 있습니다.
+
+### 번들 최적화 전략
+
+- **Core**: 가장 자주 사용하는 80% 컴포넌트 포함 (대부분의 일반적인 앱 개발 가능)
+- **Form / Navigation / Feedback**: 필요한 경우에만 선택적으로 import
+- **Advanced / Dashboard / Motion**: 대규모 앱에서만 사용하는 특수 컴포넌트
+
+### 사용 예시
+
+#### Next.js (Turbopack)
+
+```tsx
+// 권장: 필요한 서브패키지만 import (tree-shaking 자동 적용)
+import { Input, Select, DatePicker } from '@hua-labs/ui/form';
+import { PageTransition } from '@hua-labs/ui/navigation';
+import { ToastProvider, useToast } from '@hua-labs/ui/feedback';
+
+// Core 전체를 불러오지 않으므로 번들 크기 최적화
+```
+
+#### Vite / Webpack
+
+```tsx
+// 권장: 서브패키지 사용
+import { Input } from '@hua-labs/ui/form';
+import { PageTransition } from '@hua-labs/ui/navigation';
+
+// 비권장: Core에서 모든 컴포넌트 import (번들 크기 증가)
+import { Input, PageTransition, ToastProvider } from '@hua-labs/ui';
+```
+
+### Tree-shaking
+
+모든 엔트리 포인트는 ESM 형식으로 제공되며, 최신 번들러(Next.js Turbopack, Vite, Webpack 5+)에서 tree-shaking이 자동으로 적용됩니다.
+
+**최적화 팁**:
+- 필요한 컴포넌트만 import
+- 서브패키지 활용 (Form, Navigation, Feedback)
+- Advanced 컴포넌트는 실제로 사용할 때만 import
+
+**참고**: Core에서도 모든 컴포넌트를 import할 수 있습니다 (하위 호환성). 서브패키지는 번들 크기 최적화를 위한 선택사항입니다. Next.js + Turbopack 환경에서 tree-shaking이 자동 적용됩니다.
 
 ## Quick Start
 
@@ -866,6 +929,20 @@ import { cn } from '@hua-labs/ui';
 const className = cn("px-2", "py-1");
 ```
 
+### formatRelativeTime
+
+Format a date as relative time (e.g., "방금 전", "5분 전", "2시간 전", "3일 전"). Returns absolute date for dates older than 7 days.
+
+```tsx
+import { formatRelativeTime } from '@hua-labs/ui';
+
+formatRelativeTime(new Date()) // "방금 전"
+formatRelativeTime(new Date(Date.now() - 5 * 60000)) // "5분 전"
+formatRelativeTime(new Date(Date.now() - 2 * 3600000)) // "2시간 전"
+formatRelativeTime(new Date(Date.now() - 3 * 86400000)) // "3일 전"
+formatRelativeTime(new Date("2024-01-01")) // "2024. 1. 1." (7일 이상 경과)
+```
+
 ## Icon Support
 
 The Icon component supports multiple icon libraries:
@@ -948,6 +1025,16 @@ pnpm test
 ## License
 
 MIT License
+
+## 문서
+
+- [아키텍처 문서](./docs/ARCHITECTURE.md) - 전체 아키텍처 및 설계 원칙
+- [패키지 구조](./docs/PACKAGE_STRUCTURE.md) - 디렉토리 구조 및 파일 조직
+- [개발 가이드](./docs/DEVELOPMENT_GUIDE.md) - 컴포넌트 추가 및 개발 가이드
+- [모노레포/멀티레포 호환성](./docs/MONOREPO_COMPATIBILITY.md) - 모노레포 및 멀티레포 환경 호환성
+- [서브패키지 분석](./docs/SUBPACKAGE_ANALYSIS.md) - 서브패키지 분리 전략
+- [아이콘 시스템](./docs/ICON_SYSTEM.md) - 아이콘 시스템 가이드
+- [개선 사항](./docs/IMPROVEMENTS_2025-12-06.md) - 개선 이력
 
 ## Repository
 

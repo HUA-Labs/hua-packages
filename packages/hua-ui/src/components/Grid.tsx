@@ -1,8 +1,18 @@
 "use client"
 
 import React from "react"
-import { cn } from "../lib/utils"
+import { merge } from "../lib/utils"
 
+/**
+ * Grid 컴포넌트의 props
+ * @typedef {Object} GridProps
+ * @property {1|2|3|4|5|6|7|8|9|10|11|12} [cols=1] - 그리드 열 개수
+ * @property {"none" | "sm" | "md" | "lg" | "xl"} [gap="md"] - 그리드 아이템 간 간격
+ * @property {"none" | "sm" | "md" | "lg" | "xl"} [gapX] - 가로 간격 (gap보다 우선)
+ * @property {"none" | "sm" | "md" | "lg" | "xl"} [gapY] - 세로 간격
+ * @property {boolean} [responsive=true] - 반응형 그리드 활성화 (모바일: 1열, 태블릿: 2열, 데스크톱: 지정 열)
+ * @extends {React.HTMLAttributes<HTMLDivElement>}
+ */
 export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   cols?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   gap?: "none" | "sm" | "md" | "lg" | "xl"
@@ -11,6 +21,37 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   responsive?: boolean
 }
 
+/**
+ * Grid 컴포넌트
+ * 
+ * CSS Grid를 사용한 그리드 레이아웃 컴포넌트입니다.
+ * 반응형 그리드를 지원하여 모바일부터 데스크톱까지 최적화된 레이아웃을 제공합니다.
+ * 
+ * @component
+ * @example
+ * // 기본 3열 그리드
+ * <Grid cols={3} gap="md">
+ *   <div>아이템 1</div>
+ *   <div>아이템 2</div>
+ *   <div>아이템 3</div>
+ * </Grid>
+ * 
+ * @example
+ * // 가로/세로 간격 분리
+ * <Grid cols={4} gapX="lg" gapY="sm">
+ *   {items.map(item => <div key={item.id}>{item.content}</div>)}
+ * </Grid>
+ * 
+ * @example
+ * // 반응형 비활성화 (고정 그리드)
+ * <Grid cols={6} responsive={false} gap="lg">
+ *   <div>고정 6열</div>
+ * </Grid>
+ * 
+ * @param {GridProps} props - Grid 컴포넌트의 props
+ * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref
+ * @returns {JSX.Element} Grid 컴포넌트
+ */
 const Grid = React.forwardRef<HTMLDivElement, GridProps>(
   ({ 
     className, 
@@ -63,7 +104,7 @@ const Grid = React.forwardRef<HTMLDivElement, GridProps>(
     return (
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           "grid",
           responsive ? colsClasses[cols] : `grid-cols-${cols}`,
           gapX ? gapXClasses[gapX] : gapClasses[gap],

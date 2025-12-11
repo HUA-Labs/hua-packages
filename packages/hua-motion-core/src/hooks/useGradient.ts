@@ -95,6 +95,7 @@ export function useGradient<T extends MotionElement = HTMLDivElement>(
     isVisible,
     isAnimating,
     style: getGradientStyle(),
+    progress: motionProgress / 100,
     start,
     pause,
     resume,

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { cn } from '../../lib/utils'
+import { merge } from '../../lib/utils'
 
 export type TransitionType = 
   | 'fade' 
@@ -211,7 +211,7 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
   return (
     <div className="relative">
       {showProgress && (
-        <div className={cn(
+        <div className={merge(
           'fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 shadow-lg border',
           progressClassName
         )}>
@@ -229,7 +229,7 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
       
       <div
         ref={ref}
-        className={cn(
+        className={merge(
           'transition-all duration-500 ease-out',
           className
         )}

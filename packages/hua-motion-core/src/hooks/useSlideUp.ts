@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { SlideOptions, BaseMotionReturn, MotionElement } from '../types'
 
 export function useSlideUp<T extends MotionElement = HTMLDivElement>(
@@ -125,18 +125,21 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
     }
   }, [stop])
 
-  // 스타일 계산 (React 19 호환)
-  const style = {
+  // 초기 transform 값 메모이제이션
+  const initialTransform = useMemo(() => getInitialTransform(), [direction, distance])
+
+  // 스타일 계산 (React 19 호환) - 메모이제이션으로 불필요한 리렌더링 방지
+  const style = useMemo(() => ({
     opacity: isVisible ? 1 : 0,
-    transform: isVisible ? 'translateY(0)' : getInitialTransform(),
+    transform: isVisible ? 'translateY(0)' : initialTransform,
     transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}`,
-            '--motion-delay': `${delay}ms`,
-        '--motion-duration': `${duration}ms`,
-        '--motion-easing': easing,
-        '--motion-progress': `${progress}`,
-        '--motion-direction': direction,
-        '--motion-distance': `${distance}px`
-  } as const
+    '--motion-delay': `${delay}ms`,
+    '--motion-duration': `${duration}ms`,
+    '--motion-easing': easing,
+    '--motion-progress': `${progress}`,
+    '--motion-direction': direction,
+    '--motion-distance': `${distance}px`
+  } as const), [isVisible, initialTransform, duration, easing, delay, progress, direction, distance])
 
   return {
     ref,

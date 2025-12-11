@@ -61,21 +61,21 @@ export interface BaseMotionReturn<T extends MotionElement = HTMLDivElement> {
   isVisible: boolean
   /** 모션이 진행 중인지 여부 */
   isAnimating: boolean
-  /** 적용할 CSS 스타일 (React 19 호환) */
-  style?: MotionStyle
+  /** 적용할 CSS 스타일 (React 19 호환) - useFadeIn 등에서는 항상 반환됨 */
+  style: MotionStyle
   /** 적용할 CSS 클래스명 */
   className?: string
-  /** 모션 진행률 (0-1) */
-  progress?: number
-  /** 모션 시작 함수 */
-  start?: () => void
-  /** 모션 리셋 함수 */
-  reset?: () => void
-  /** 모션 중단 함수 */
-  stop?: () => void
-  /** 모션 일시정지 함수 */
+  /** 모션 진행률 (0-1) - useFadeIn 등에서는 항상 반환됨 */
+  progress: number
+  /** 모션 시작 함수 - useFadeIn 등에서는 항상 반환됨 */
+  start: () => void
+  /** 모션 리셋 함수 - useFadeIn 등에서는 항상 반환됨 */
+  reset: () => void
+  /** 모션 중단 함수 - useFadeIn 등에서는 항상 반환됨 */
+  stop: () => void
+  /** 모션 일시정지 함수 - 일부 훅에서만 제공 */
   pause?: () => void
-  /** 모션 재개 함수 */
+  /** 모션 재개 함수 - 일부 훅에서만 제공 */
   resume?: () => void
 }
 
