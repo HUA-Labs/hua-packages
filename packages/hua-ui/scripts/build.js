@@ -1,6 +1,6 @@
 // #region agent log
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const path = require('path');
 
 const LOG_PATH = path.join(__dirname, '../../..', '.cursor', 'debug.log');
@@ -143,13 +143,54 @@ try {
 log({
   location: 'hua-ui/build.js:node-check',
   message: 'Node path check',
-  data: { nodePath, processExecPath: process.execPath },
+  data: { nodePath, processExecPath: process.execPath, hasSpaces: process.execPath.includes(' ') },
   hypothesisId: 'G'
 });
 
 try {
-  // Try method 1: Use process.execPath (most reliable)
+  // Use process.execPath (most reliable)
+  // execSync with array automatically handles spaces, but we need to ensure proper encoding
   const execNode = process.execPath;
+  
+  // Set encoding explicitly for Windows
+  // Use 'pipe' instead of 'inherit' to avoid Windows stdio encoding issues
+  const execOptions = {
+    cwd: packageDir,
+    stdio: 'pipe',
+    env: { 
+      ...process.env, 
+      NODE_OPTIONS: '',
+      PYTHONIOENCODING: 'utf-8'
+    },
+    encoding: 'utf8',
+    shell: false
+  };
+  
+  // Helper to execute and handle output using spawnSync (supports array args)
+  function execWithOutput(command, args, options) {
+    const result = spawnSync(command, args, options);
+    
+    if (result.stdout) {
+      process.stdout.write(result.stdout.toString('utf8'));
+    }
+    if (result.stderr) {
+      process.stderr.write(result.stderr.toString('utf8'));
+    }
+    
+    if (result.error) {
+      throw result.error;
+    }
+    
+    if (result.status !== 0) {
+      const error = new Error(`Command failed with exit code ${result.status}`);
+      error.status = result.status;
+      error.stdout = result.stdout;
+      error.stderr = result.stderr;
+      throw error;
+    }
+    
+    return result;
+  }
   
   // Try method 1: node + tsx + tsup (current approach)
   if (tsxActualPath || paths.tsupPath2.exists) {
@@ -161,6 +202,7 @@ try {
       message: 'Attempting tsup via tsx',
       data: { 
         execNode,
+        execNodeLength: execNode.length,
         tsxPath, 
         tsupTarget, 
         tsxExists: fs.existsSync(tsxPath), 
@@ -170,11 +212,7 @@ try {
     });
     
     if (fs.existsSync(tsxPath) && fs.existsSync(tsupTarget)) {
-      execSync(execNode, [tsxPath, tsupTarget], {
-        cwd: packageDir,
-        stdio: 'inherit',
-        env: { ...process.env, NODE_OPTIONS: '' }
-      });
+      execWithOutput(execNode, [tsxPath, tsupTarget], execOptions);
       log({
         location: 'hua-ui/build.js:tsx-success',
         message: 'tsup via tsx succeeded',
@@ -194,11 +232,7 @@ try {
         hypothesisId: 'E'
       });
       
-      execSync(execNode, [tsupPath], {
-        cwd: packageDir,
-        stdio: 'inherit',
-        env: { ...process.env, NODE_OPTIONS: '' }
-      });
+      execWithOutput(execNode, [tsupPath], execOptions);
       log({
         location: 'hua-ui/build.js:direct-success',
         message: 'Direct node execution succeeded',
@@ -221,11 +255,7 @@ try {
     hypothesisId: 'F'
   });
   
-  execSync(process.execPath, [tscPath, '--emitDeclarationOnly'], {
-    cwd: packageDir,
-    stdio: 'inherit',
-    env: { ...process.env, NODE_OPTIONS: '' }
-  });
+  execWithOutput(execNode, [tscPath, '--emitDeclarationOnly'], execOptions);
   
   log({
     location: 'hua-ui/build.js:tsc-success',
