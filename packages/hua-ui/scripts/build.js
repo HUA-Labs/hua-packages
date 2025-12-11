@@ -122,7 +122,35 @@ if (!paths.tsupPath2.exists) {
   }
 }
 
+// Check if node is available
+let nodePath = 'node';
 try {
+  const nodeCheck = execSync('which node', { encoding: 'utf8', stdio: 'pipe' }).trim();
+  if (nodeCheck) {
+    nodePath = nodeCheck;
+  }
+} catch (e) {
+  try {
+    const nodeCheck = execSync('where node', { encoding: 'utf8', stdio: 'pipe' }).trim();
+    if (nodeCheck) {
+      nodePath = nodeCheck.split('\n')[0];
+    }
+  } catch (e2) {
+    // Use default 'node'
+  }
+}
+
+log({
+  location: 'hua-ui/build.js:node-check',
+  message: 'Node path check',
+  data: { nodePath, processExecPath: process.execPath },
+  hypothesisId: 'G'
+});
+
+try {
+  // Try method 1: Use process.execPath (most reliable)
+  const execNode = process.execPath;
+  
   // Try method 1: node + tsx + tsup (current approach)
   if (tsxActualPath || paths.tsupPath2.exists) {
     const tsxPath = tsxActualPath || tsupPath2;
@@ -131,14 +159,21 @@ try {
     log({
       location: 'hua-ui/build.js:try-tsx',
       message: 'Attempting tsup via tsx',
-      data: { tsxPath, tsupTarget, tsxExists: fs.existsSync(tsxPath), tsupExists: fs.existsSync(tsupTarget) },
+      data: { 
+        execNode,
+        tsxPath, 
+        tsupTarget, 
+        tsxExists: fs.existsSync(tsxPath), 
+        tsupExists: fs.existsSync(tsupTarget) 
+      },
       hypothesisId: 'D'
     });
     
     if (fs.existsSync(tsxPath) && fs.existsSync(tsupTarget)) {
-      execSync('node', [tsxPath, tsupTarget], {
+      execSync(execNode, [tsxPath, tsupTarget], {
         cwd: packageDir,
-        stdio: 'inherit'
+        stdio: 'inherit',
+        env: { ...process.env, NODE_OPTIONS: '' }
       });
       log({
         location: 'hua-ui/build.js:tsx-success',
@@ -155,13 +190,14 @@ try {
       log({
         location: 'hua-ui/build.js:try-direct',
         message: 'Attempting direct node execution',
-        data: { tsupPath, exists: fs.existsSync(tsupPath) },
+        data: { execNode, tsupPath, exists: fs.existsSync(tsupPath) },
         hypothesisId: 'E'
       });
       
-      execSync('node', [tsupPath], {
+      execSync(execNode, [tsupPath], {
         cwd: packageDir,
-        stdio: 'inherit'
+        stdio: 'inherit',
+        env: { ...process.env, NODE_OPTIONS: '' }
       });
       log({
         location: 'hua-ui/build.js:direct-success',
@@ -185,9 +221,10 @@ try {
     hypothesisId: 'F'
   });
   
-  execSync('node', [tscPath, '--emitDeclarationOnly'], {
+  execSync(process.execPath, [tscPath, '--emitDeclarationOnly'], {
     cwd: packageDir,
-    stdio: 'inherit'
+    stdio: 'inherit',
+    env: { ...process.env, NODE_OPTIONS: '' }
   });
   
   log({
