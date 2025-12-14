@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "hua-i18n-sdk": "^1.0.2",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
