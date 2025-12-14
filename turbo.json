@@ -64,7 +64,8 @@
     "@hua-labs/ui#build": {
       "dependsOn": [],
       "outputs": ["dist/**"],
-      "env": []
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     },
     "@hua-labs/motion#build": {
       "dependsOn": [],
