@@ -68,9 +68,10 @@
       "passThroughEnv": ["PATH", "NODE"]
     },
     "@hua-labs/motion#build": {
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "env": []
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
