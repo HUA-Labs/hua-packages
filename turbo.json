@@ -82,6 +82,12 @@
       "outputs": ["dist/**"],
       "env": [],
       "passThroughEnv": ["PATH", "NODE"]
+    },
+    "@hua-labs/utils#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"],
+      "env": [],
+      "passThroughEnv": ["PATH", "NODE"]
     }
   }
 }
