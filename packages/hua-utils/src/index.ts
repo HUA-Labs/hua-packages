@@ -40,4 +40,13 @@ export {
   toKebabCase,
   capitalize,
   titleCase
-} from './string' 
+} from './string'
+
+// Sanitization utilities
+export {
+  sanitizeInput,
+  sanitizeTitle,
+  sanitizeEmail,
+  sanitizeName,
+  escapeHtml
+} from './sanitize' 
