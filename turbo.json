@@ -3,6 +3,7 @@
   "globalDependencies": [
     "**/.env.*local"
   ],
+  "globalPassThroughEnv": ["PATH", "NODE"],
   "tasks": {
     "build": {
       "dependsOn": [
@@ -63,33 +64,23 @@
     },
     "@hua-labs/ui#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"],
-      "env": [],
-      "passThroughEnv": ["PATH", "NODE"]
+      "outputs": ["dist/**"]
     },
     "@hua-labs/motion#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
-      "env": [],
-      "passThroughEnv": ["PATH", "NODE"]
+      "outputs": ["dist/**"]
     },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"],
-      "env": [],
-      "passThroughEnv": ["PATH", "NODE"]
+      "outputs": ["dist/**"]
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"],
-      "env": [],
-      "passThroughEnv": ["PATH", "NODE"]
+      "outputs": ["dist/**"]
     },
     "@hua-labs/utils#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"],
-      "env": [],
-      "passThroughEnv": ["PATH", "NODE"]
+      "outputs": ["dist/**"]
     }
   }
 }
