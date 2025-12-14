@@ -12,7 +12,7 @@
     "@hua-labs/motion-core": "workspace:*",
     "@hua-labs/motion-advanced": "workspace:*",
     "@hua-labs/ui": "workspace:^",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "zustand": "^5.0.6"
