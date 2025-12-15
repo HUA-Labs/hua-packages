@@ -4,6 +4,7 @@
     "**/.env.*local"
   ],
   "globalPassThroughEnv": ["PATH", "NODE"],
+  "globalEnv": ["DATABASE_URL", "NODE_ENV", "DIRECT_URL"],
   "tasks": {
     "build": {
       "dependsOn": [
@@ -79,6 +80,14 @@
       "outputs": ["dist/**"]
     },
     "@hua-labs/utils#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"]
+    },
+    "@hua-labs/i18n-ai#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"]
+    },
+    "@hua-labs/i18n-plugins#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
     }
