@@ -60,7 +60,7 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined)
  * @returns {ToastContextType} Toast 컨텍스트 값 / Toast context value
  * @throws {Error} ToastProvider 외부에서 사용 시 에러 발생 / Error when used outside ToastProvider
  */
-export function useToast() {
+export function useToast(): ToastContextType {
   const context = useContext(ToastContext)
   if (!context) {
     throw new Error("useToast must be used within a ToastProvider")
