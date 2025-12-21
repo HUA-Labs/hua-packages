@@ -1683,7 +1683,138 @@ const lockKey = generateAdvisoryLockKey({
 
 ---
 
+## 16. Turbo PATH 문제 해결 및 Vercel 빌드 안정화 ✅
+
+### 16.1 문제 상황
+
+**증상**:
+- Vercel 빌드에서 `@hua-labs/utils`, `@hua-labs/ui`, `@hua-labs/motion` 패키지 빌드 실패
+- 오류: `spawnSync /vercel/.local/share/pnpm/.tools/pnpm/10.24.0/bin/pnpm ENOENT`
+- 오류: `Cannot find module '/vercel/.local/share/pnpm/.tools/pnpm/10.24.0/bin/pnpm'`
+- 오류: `No such file or directory (os error 2)`
+
+**근본 원인**:
+- Turbo가 `package.json` 스크립트를 실행할 때 PATH 환경 변수를 제대로 상속받지 못함
+- `vercel.json`의 `buildCommand`는 작동 (쉘에서 직접 실행)
+- `package.json`의 스크립트는 실패 (Turbo가 실행)
+- Turbo가 자식 프로세스를 생성할 때 PATH를 상속받지 않음
+
+### 16.2 시도한 해결 방법들
+
+#### 1단계: Turbo 버전 업데이트 ✅
+- **변경**: 2.3.3 → 2.6.3
+- **결과**: 로컬 빌드 성공, Vercel에서는 여전히 문제 존재
+
+#### 2단계: globalPassThroughEnv 설정 ✅
+- **변경**: `turbo.json`에 `PATH`, `NODE`, `PNPM_HOME`, `NPM_CONFIG_PREFIX`, `COREPACK_HOME` 추가
+- **결과**: 로컬 빌드 성공, Vercel에서는 여전히 문제 존재
+
+#### 3단계: envMode: "loose" 설정 ✅ (Turbo v2 Native)
+- **변경**: `turbo.json`에 `"envMode": "loose"` 추가
+- **이유**: Turbo v2.0부터 도입된 설정으로, 프로세스의 모든 환경 변수를 그대로 자식 프로세스에 전달
+- **결과**: 로컬 빌드 성공, Vercel에서는 여전히 문제 존재
+
+#### 4단계: --env-mode=loose 플래그 사용 ❌
+- **변경**: `vercel.json`의 `buildCommand`에 `--env-mode=loose` 플래그 추가
+- **결과**: 실패 (Turbo가 package.json 스크립트 실행 시 PATH를 찾지 못함)
+
+#### 5단계: Node.js 스크립트 래퍼 사용 ❌
+- **변경**: `scripts/vercel-build.js` 생성하여 Turbo 실행
+- **결과**: 실패 (동일한 PATH 문제)
+
+#### 6단계: corepack pnpm exec turbo 패턴 ❌
+- **변경**: 이전 성공 패턴인 `corepack pnpm exec turbo` 사용
+- **결과**: 실패 (Turbo가 package.json 스크립트 실행 시 PATH를 찾지 못함)
+
+### 16.3 최종 해결 방법
+
+**결론**: pnpm filter 사용 (전략적 선택)
+
+**최종 설정** (`apps/my-app/vercel.json`):
+```json
+{
+  "framework": "nextjs",
+  "installCommand": "corepack enable && corepack use pnpm@10.24.0 && cd ../.. && corepack pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter=my-app... run build",
+  "devCommand": "cd ../.. && pnpm --filter my-app run dev",
+  "build": {
+    "env": {
+      "VERCEL_FORCE_NO_EDGE_RUNTIME": "1",
+      "ENABLE_EXPERIMENTAL_COREPACK": "1"
+    }
+  }
+}
+```
+
+**효과**:
+- ✅ Vercel에서 안정적으로 작동 (Turbo PATH 문제 우회)
+- ✅ pnpm filter는 PATH 문제에 덜 민감함
+- ✅ my-api와 동일한 패턴으로 통일
+- ✅ 빠르고 안정적인 빌드
+
+### 16.4 적용된 설정
+
+#### turbo.json
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["PATH", "NODE", "PNPM_HOME", "NPM_CONFIG_PREFIX", "COREPACK_HOME"],
+  "envMode": "loose",
+  "tasks": {
+    // ...
+  }
+}
+```
+
+#### package.json
+```json
+{
+  "packageManager": "pnpm@10.24.0+sha512...",
+  "engines": {
+    "node": "22.x",
+    "pnpm": ">=10.17.0"
+  }
+}
+```
+
+### 16.5 학습 내용
+
+**핵심 인사이트**:
+1. **Turbo의 PATH 상속 문제**: Vercel 환경에서 Turbo가 `package.json` 스크립트 실행 시 PATH를 찾지 못하는 것은 Turbo의 내부 구현 문제로 보임
+2. **pnpm filter의 안정성**: pnpm filter는 Turbo보다 PATH 문제에 덜 민감하며, Vercel에서 가장 안정적인 빌드 방법
+3. **전략적 선택**: pnpm filter 사용은 "패배"가 아니라 현명한 전략적 선택
+4. **Turbo v2 Native 방법**: `envMode: "loose"`는 로컬에서는 작동하지만, Vercel 환경에서는 여전히 문제 존재
+
+**향후 전환 시도 순서** (선택사항):
+1. ✅ `turbo.json`에 `"envMode": "loose"` 추가 (완료)
+2. ✅ `globalPassThroughEnv`에 `COREPACK_HOME` 추가 (완료)
+3. `vercel.json`의 빌드 커맨드를 `turbo run build --filter=my-app --env-mode=loose`로 변경
+4. 배포 시도
+5. 성공하면: pnpm filter 우회 없이 깔끔한 Turbo 파이프라인 사용
+6. 실패하면: 현재 pnpm filter 방식 유지
+
+### 16.6 결과
+
+**현재 상태**:
+- ✅ 로컬 빌드: Turbo 2.6.3 + `envMode: "loose"` + `globalPassThroughEnv`로 정상 작동
+- ✅ Vercel 빌드: pnpm filter로 안정적으로 빌드 중 (my-api, my-app 모두 성공)
+- ✅ `packageManager` 필드 명시 (`pnpm@10.24.0`)
+- ✅ `ENABLE_EXPERIMENTAL_COREPACK=1` 환경 변수 설정
+
+**성능**:
+- 빌드 시간: 합리적 (pnpm filter도 충분히 빠름)
+- 안정성: 높음 (PATH 문제 완전 우회)
+
+### 관련 파일
+- `turbo.json`: Turbo 설정 (envMode, globalPassThroughEnv)
+- `apps/my-app/vercel.json`: Vercel 빌드 설정 (pnpm filter 사용)
+- `apps/my-api/vercel.json`: 참고용 설정 (동일한 패턴)
+- `apps/my-app/docs/TURBO_PATH_FIX.md`: 상세 가이드 문서
+- `package.json`: packageManager 필드 설정
+
+---
+
 **작성일**: 2025-12-14  
 **작성자**: HUA Platform 개발팀  
-**태그**: `#devlog` `#uuidv7` `#guest-id` `#migration` `#concurrency` `#race-condition` `#atomic-increment` `#critical-fix` `#security` `#performance` `#schema-review` `#gemini` `#client-side-search` `#fuse.js` `#indexeddb` `#nextjs-caching` `#unstable-cache` `#log-ttl` `#cleanup` `#cross-schema-fk` `#data-integrity` `#crisis-alert` `#storage-optimization` `#subscription` `#billing` `#deployment-ready` `#batch-delete` `#draft-deletion` `#performance-optimization` `#email` `#aws-ses` `#contact-inquiry` `#sanitization` `#xss-prevention` `#input-validation` `#security-hardening` `#form-ux` `#email-input` `#select-component` `#style-unification` `#vercel-build` `#turbo` `#path-inheritance` `#build-optimization` `#rate-limiting` `#advisory-lock` `#postgresql` `#atomicity`
+**태그**: `#devlog` `#uuidv7` `#guest-id` `#migration` `#concurrency` `#race-condition` `#atomic-increment` `#critical-fix` `#security` `#performance` `#schema-review` `#gemini` `#client-side-search` `#fuse.js` `#indexeddb` `#nextjs-caching` `#unstable-cache` `#log-ttl` `#cleanup` `#cross-schema-fk` `#data-integrity` `#crisis-alert` `#storage-optimization` `#subscription` `#billing` `#deployment-ready` `#batch-delete` `#draft-deletion` `#performance-optimization` `#email` `#aws-ses` `#contact-inquiry` `#sanitization` `#xss-prevention` `#input-validation` `#security-hardening` `#form-ux` `#email-input` `#select-component` `#style-unification` `#vercel-build` `#turbo` `#path-inheritance` `#build-optimization` `#rate-limiting` `#advisory-lock` `#postgresql` `#atomicity` `#turbo-path-fix` `#pnpm-filter` `#vercel-monorepo` `#corepack`
 
