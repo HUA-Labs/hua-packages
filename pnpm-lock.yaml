@@ -512,6 +512,15 @@ importers:
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
+      '@hua-labs/i18n-core':
+        specifier: workspace:*
+        version: link:../../packages/hua-i18n-core
+      '@hua-labs/i18n-core-zustand':
+        specifier: workspace:*
+        version: link:../../packages/hua-i18n-core-zustand
+      '@hua-labs/i18n-loaders':
+        specifier: workspace:*
+        version: link:../../packages/hua-i18n-loaders
       '@hua-labs/ui':
         specifier: workspace:*
         version: link:../../packages/hua-ui
@@ -11117,6 +11126,10 @@ snapshots:
     dependencies:
       hono: 4.10.6
 
+  '@hono/node-server@1.19.6(hono@4.10.6)':
+    dependencies:
+      hono: 4.10.6
+
   '@hua-labs/motion-core@2.0.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
     dependencies:
       react: 19.2.1
@@ -11255,7 +11268,7 @@ snapshots:
   '@jest/console@29.7.0':
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 22.19.3
+      '@types/node': 20.19.17
       chalk: 4.1.2
       jest-message-util: 29.7.0
       jest-util: 29.7.0
@@ -11264,7 +11277,7 @@ snapshots:
   '@jest/console@30.1.2':
     dependencies:
       '@jest/types': 30.0.5
-      '@types/node': 22.19.3
+      '@types/node': 22.18.6
       chalk: 4.1.2
       jest-message-util: 30.1.0
       jest-util: 30.0.5
@@ -11277,14 +11290,14 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.19.3
+      '@types/node': 20.19.17
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.9.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@22.19.3)
+      jest-config: 29.7.0(@types/node@20.19.17)
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
