@@ -1,0 +1,143 @@
+# HUA Platform - Cursor Rules
+
+## 프로젝트 개요
+- **이름**: HUA Platform (HUA Labs - 감정 인터페이스 플랫폼)
+- **구조**: Monorepo (pnpm workspaces)
+- **주요 기술**: TypeScript, Next.js 15, React 19, Tailwind CSS
+- **패키지 매니저**: pnpm 10.24.0+
+
+## 스킬 사용
+
+이 프로젝트는 Agent Skills 형식을 사용합니다. `.cursor/skills/` 폴더의 스킬들을 참고하여 작업하세요.
+
+### 주요 스킬
+- **컴포넌트 생성**: `create-component/SKILL.md` → SDK 사용 스킬 참고
+- **SDK 사용**: `use-sdk/SKILL.md` → 실제 컴포넌트 목록 확인
+- **모노레포 작업**: `monorepo-workflow/SKILL.md`
+- **커밋 컨벤션**: `commit-convention/SKILL.md` (영어만 사용)
+- **Git Flow**: `git-flow/SKILL.md` → PR 생성 전 참고
+- **PR 생성**: `create-pull-request/SKILL.md` → Git Flow, 커밋 컨벤션 참고
+- **코드 리뷰**: `code-review/SKILL.md` → 커밋 컨벤션 참고
+- **에러 처리**: `error-handling/SKILL.md` → API/컴포넌트 개발 시 참고
+- **테스트 작성**: `write-tests/SKILL.md` → Vitest 사용 가이드
+- **API 라우트 생성**: `create-api-route/SKILL.md` → 에러 처리 스킬 참고
+- **타입 정의**: `define-types/SKILL.md` → TypeScript 타입 정의 가이드
+- **데브로그 작성**: `write-devlog/SKILL.md` → 매일 작성, 자동 생성 스크립트 활용
+- **디버깅 로그**: `write-debugging-log/SKILL.md` → 실패 기록 및 패턴 추출
+- **패턴 문서화**: `document-patterns/SKILL.md` → 중요한 패턴을 별도 문서에 기록
+
+작업 전에 관련 스킬을 확인하고, 스킬의 지시사항을 따라주세요.
+
+## 코딩 규칙
+
+### 언어 및 스타일
+- **언어**: TypeScript (strict mode)
+- **코드 스타일**: ESLint + Prettier 자동 포맷팅
+- **주석**: 복잡한 로직에는 한국어 주석 허용
+- **응답 언어**: 항상 한국어로 응답
+
+### 네이밍 컨벤션
+- **컴포넌트**: PascalCase (예: `DiaryList.tsx`, `InfoCard.tsx`)
+- **훅/유틸**: camelCase (예: `useCalendar.ts`, `dateUtils.ts`)
+- **에셋/스타일**: kebab-case (예: `diary-list.css`, `empty-state.svg`)
+- **테스트/스토리**: `OriginalName.test.tsx`, `OriginalName.stories.tsx`
+
+### 폴더 구조
+- **Feature-first 구조** (apps 내부):
+  - `components/` - 컴포넌트
+  - `hooks/` - 커스텀 훅
+  - `lib/` - 라이브러리 코드
+  - `ui/` - 로컬 전용 UI 래퍼 (SDK 우선 사용)
+- **공유 UI는 `packages/hua-ui`에 위치**
+
+### SDK-First 원칙
+- **우선순위**: `@hua-labs/ui` 패키지의 컴포넌트를 우선 사용
+- **사용 가능한 컴포넌트**: Buttons, Icons, Cards, Modals, Badges, Toasts, Spinners
+- **로컬 재구현 금지**: SDK에 없는 컴포넌트는 SDK에 제안 후 사용
+- **로컬 UI 래퍼**: SDK 컴포넌트가 없을 때만 `ui/` 폴더에 생성
+
+### TypeScript 규칙
+- **엄격한 타입 체크**: `strict: true`
+- **타입 명시**: 가능한 한 명시적으로 타입 작성
+- **any 사용 금지**: `any` 타입 사용 지양, `unknown` 사용 권장
+- **타입 가드**: 타입 안전성을 위한 타입 가드 활용
+
+### React 규칙
+- **함수형 컴포넌트**: 클래스 컴포넌트 대신 함수형 컴포넌트 사용
+- **훅 규칙**: React Hooks 규칙 준수
+- **성능 최적화**: `useMemo`, `useCallback` 적절히 활용
+- **서버 컴포넌트**: Next.js App Router의 Server Components 우선 사용
+
+### 모노레포 규칙
+- **워크스페이스**: `apps/*`, `packages/*` 구조
+- **의존성 관리**: 루트에서 `pnpm install` 실행
+- **빌드**: Turbo를 사용한 병렬 빌드
+- **필터링**: 특정 앱/패키지만 작업 시 `--filter` 옵션 사용
+
+### 커밋 컨벤션
+- **형식**: Conventional Commits (영어만 사용)
+- **타입**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **스코프**: `i18n`, `api`, `ui`, `auth`, `db`, `config` 등
+- **예시**: `feat(i18n): add Korean language support`
+- **규칙**: 첫 글자 소문자, 마침표 없음, 명령형, 50자 이내, 영어만 사용
+- **스킬**: `.cursor/skills/commit-convention/SKILL.md` 참고
+
+### 코드 리뷰 체크리스트
+- ✅ 타입 안전성 확인
+- ✅ ESLint/Prettier 규칙 준수
+- ✅ SDK 컴포넌트 우선 사용 확인
+- ✅ 네이밍 컨벤션 준수
+- ✅ 테스트 작성 (필요 시)
+- ✅ 문서 업데이트 (필요 시)
+
+### 파일 생성 규칙
+- **새 컴포넌트**: PascalCase로 파일명 작성
+- **새 훅**: `use` 접두사 사용
+- **새 유틸**: camelCase로 파일명 작성
+- **타입 정의**: `types/` 폴더 또는 파일 상단에 정의
+
+### 주의사항
+- **절대 경로 사용**: `@/*`, `@hua-labs/*` 경로 별칭 활용
+- **환경 변수**: `.env` 파일 사용, `.env.example` 업데이트
+- **에러 처리**: 적절한 에러 바운더리 및 에러 핸들링
+- **접근성**: a11y 규칙 준수 (aria-label, semantic HTML 등)
+
+## 작업 시 체크리스트
+
+코드를 작성하거나 수정할 때 다음을 확인하세요:
+
+1. ✅ 관련 스킬 확인 (`.cursor/skills/` 폴더)
+2. ✅ TypeScript 타입 오류 없음
+3. ✅ ESLint 경고/오류 없음
+4. ✅ Prettier 포맷팅 적용됨
+5. ✅ SDK 컴포넌트 우선 사용 확인
+6. ✅ 네이밍 컨벤션 준수
+7. ✅ 한국어 주석 (복잡한 로직에만)
+8. ✅ 커밋 메시지 컨벤션 준수
+
+## 자주 사용하는 명령어
+
+```bash
+# 개발 서버 시작
+pnpm dev
+pnpm dev --filter=my-app
+
+# 빌드
+pnpm build
+
+# 타입 체크
+pnpm type-check
+
+# 린트
+pnpm lint
+
+# 테스트
+pnpm test
+```
+
+## 참고 문서
+- `docs/CONTRIBUTING.md` - 기여 가이드
+- `docs/CODE_REVIEW_CHECKLIST.md` - 코드 리뷰 체크리스트
+- `docs/archive/completed-tasks/codestyle-and-structure.md` - 코드 스타일 가이드
+- `.cursor/skills/` - Agent Skills (작업별 가이드)
+- `.cursor/skills/README.md` - 스킬 목록 및 사용법
