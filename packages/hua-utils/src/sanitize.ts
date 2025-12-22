@@ -107,3 +107,34 @@ export function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
 }
+
+/**
+ * 이메일 주소 마스킹 (PII 보호용, 로그 출력 시 사용)
+ * GDPR/CCPA 준수를 위해 이메일 주소를 마스킹합니다.
+ * 
+ * @param email 이메일 주소
+ * @param visibleChars 앞부분에 표시할 문자 수 (기본값: 3)
+ * @returns 마스킹된 이메일 주소 (예: "abc***@***")
+ * 
+ * @example
+ * ```typescript
+ * maskEmailForLog('user@example.com') // "use***@***"
+ * maskEmailForLog('test@domain.co.kr', 2) // "te***@***"
+ * ```
+ */
+export function maskEmailForLog(email: string | null | undefined, visibleChars: number = 3): string | undefined {
+  if (!email || typeof email !== 'string') return undefined;
+  
+  const atIndex = email.indexOf('@');
+  if (atIndex === -1) return '***@***';
+  
+  const localPart = email.substring(0, atIndex);
+  
+  // 로컬 파트 마스킹 (앞부분 일부만 표시)
+  const maskedLocal = localPart.length > visibleChars 
+    ? `${localPart.substring(0, visibleChars)}***`
+    : '***';
+  
+  // 도메인은 항상 마스킹 (PII 보호)
+  return `${maskedLocal}@***`;
+}
