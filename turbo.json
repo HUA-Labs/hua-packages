@@ -3,8 +3,7 @@
   "globalDependencies": [
     "**/.env.*local"
   ],
-  "globalPassThroughEnv": ["PATH", "NODE", "PNPM_HOME", "NPM_CONFIG_PREFIX", "COREPACK_HOME"],
-  "envMode": "loose",
+  "globalPassThroughEnv": ["PATH", "NODE"],
   "globalEnv": ["DATABASE_URL", "NODE_ENV", "DIRECT_URL"],
   "tasks": {
     "build": {
