@@ -1,0 +1,157 @@
+---
+name: Monorepo Workflow
+description: HUA Platform 모노레포에서 작업하는 방법을 안내합니다
+license: MIT
+compatibility:
+  - cursor
+---
+
+# 모노레포 워크플로우 스킬
+
+이 스킬은 HUA Platform 모노레포에서 작업하는 올바른 방법을 안내합니다.
+
+## 프로젝트 구조
+
+```
+hua-platform/
+├── apps/                    # 애플리케이션들
+│   ├── my-chat/
+│   ├── my-api/
+│   ├── my-app/
+│   └── ...
+├── packages/               # 공통 패키지들
+│   ├── hua-ui/
+│   ├── hua-i18n-sdk/
+│   └── ...
+└── scripts/                # 공통 스크립트
+```
+
+## 패키지 매니저
+
+- **사용**: pnpm 10.24.0+
+- **설치**: 루트에서 `pnpm install` 실행
+- **워크스페이스**: `apps/*`, `packages/*` 자동 인식
+
+## 작업 위치 결정
+
+### 앱 작업
+- **위치**: `apps/{app-name}/`
+- **예시**: `apps/my-app/`
+
+### 패키지 작업
+- **위치**: `packages/{package-name}/`
+- **예시**: `packages/hua-ui/`
+
+### 공통 스크립트
+- **위치**: `scripts/`
+- **사용**: 루트에서 `pnpm run {script-name}`
+
+## 명령어 실행
+
+### 루트에서 전체 실행
+
+```bash
+# 모든 앱 개발 서버 시작
+pnpm dev
+
+# 모든 패키지 빌드
+pnpm build
+
+# 모든 패키지 타입 체크
+pnpm type-check
+
+# 모든 패키지 린트
+pnpm lint
+```
+
+### 특정 앱/패키지만 실행
+
+```bash
+# 특정 앱 개발
+pnpm dev --filter=my-app
+
+# 특정 패키지 빌드
+pnpm build --filter=hua-ui
+
+# 특정 앱 타입 체크
+pnpm type-check --filter=my-api
+```
+
+### 앱 내부에서 실행
+
+```bash
+# 앱 폴더로 이동
+cd apps/my-app
+
+# 로컬 명령어 실행
+pnpm dev
+pnpm build
+```
+
+## 의존성 관리
+
+### 패키지 간 의존성
+
+```json
+// apps/my-app/package.json
+{
+  "dependencies": {
+    "@hua-labs/ui": "workspace:*",
+    "@hua-labs/i18n-sdk": "workspace:*"
+  }
+}
+```
+
+### 새 패키지 추가
+
+```bash
+# 루트에서 실행
+pnpm add {package-name} --filter=my-app
+
+# 또는 앱 폴더에서
+cd apps/my-app
+pnpm add {package-name}
+```
+
+## 경로 별칭
+
+### TypeScript 경로
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@hua-labs/*": ["./packages/*/src"]
+    }
+  }
+}
+```
+
+### 사용 예시
+
+```typescript
+// 앱에서 패키지 import
+import { Button } from '@hua-labs/ui'
+import { useI18n } from '@hua-labs/i18n-sdk'
+
+// 앱 내부 import
+import { Component } from '@/components'
+```
+
+## Turbo 빌드
+
+- **사용**: Turbo를 사용한 병렬 빌드
+- **설정**: `turbo.json` 파일 참조
+- **캐싱**: 자동 빌드 캐싱 지원
+
+## 체크리스트
+
+모노레포 작업 시 다음을 확인하세요:
+
+- [ ] 올바른 위치에서 작업하고 있는가? (apps/ 또는 packages/)
+- [ ] 루트에서 `pnpm install`을 실행했는가?
+- [ ] `--filter` 옵션을 올바르게 사용했는가?
+- [ ] 패키지 간 의존성이 올바르게 설정되었는가?
+- [ ] 경로 별칭을 올바르게 사용했는가?
