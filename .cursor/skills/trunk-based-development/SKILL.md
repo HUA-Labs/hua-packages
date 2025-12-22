@@ -233,10 +233,13 @@ gt track --parent main <branch-name>
 
 ## 주의사항
 
-1. **작은 PR 유지**: Graphite로 논리적 단위 분리 필수
-2. **빌드 오류 수정을 먼저**: 기초 작업을 스택 1번에 배치
-3. **Vercel Preview 활용**: 모든 테스트를 Preview에서 수행
-4. **main 브랜치 직접 푸시 금지**: 항상 PR을 통해서만 병합
+1. **⚠️ main 브랜치 직접 푸시 절대 금지**: 항상 `gt create` → `gt submit` → PR 병합 순서로만 작업
+   - `git push origin main` 사용 금지
+   - 모든 변경은 PR을 통해서만 병합
+   - 이 원칙을 위반하면 CI/CD 파이프라인과 협업 워크플로우가 깨질 수 있음
+2. **작은 PR 유지**: Graphite로 논리적 단위 분리 필수
+3. **빌드 오류 수정을 먼저**: 기초 작업을 스택 1번에 배치
+4. **Vercel Preview 활용**: 모든 테스트를 Preview에서 수행
 
 ## 체크리스트
 
