@@ -22,9 +22,6 @@ Vercel 빌드 시 tsup, tsc 등 빌드 도구 실행 오류의 원인 분석과 
 ### 6. [Lazy Cleanup 패턴 분석](./LAZY_CLEANUP_PATTERN_ANALYSIS.md)
 서버리스 환경에서 메모리 누수 방지를 위한 Lazy Cleanup 패턴 분석 및 최적화
 
-### 7. [Vercel + Turbo PATH 문제 해결 패턴](./vercel-turbo-path-issue.md) ⭐
-Vercel 환경에서 Turbo가 PATH를 상속받지 못하는 문제 해결 방법 및 pnpm filter 전략
-
 ---
 
 ## 🎯 목적
