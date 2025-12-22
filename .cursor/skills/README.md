@@ -29,10 +29,16 @@
 - **용도**: Graphite(gt CLI)를 사용한 Stacked Diff 방식 워크플로우
 - **사용 시점**: 작업을 논리적 단위로 분리하여 커밋할 때
 
-### 6. Git Flow Workflow
+### 6. Git Flow Workflow ⚠️ DEPRECATED
 - **경로**: `git-flow/SKILL.md`
-- **용도**: Git Flow 워크플로우 따르기
-- **사용 시점**: 브랜치 생성 및 관리할 때
+- **용도**: ~~Git Flow 워크플로우 따르기~~ (더 이상 사용 안 함)
+- **상태**: Deprecated - Trunk-Based Development로 전환됨
+- **대체**: [Graphite Workflow Manager](#5-graphite-workflow-manager) 및 [Trunk-Based Development](#16-trunk-based-development) 사용
+
+### 16. Trunk-Based Development
+- **경로**: `trunk-based-development/SKILL.md`
+- **용도**: Graphite와 Vercel을 사용한 트렁크 기반 개발 워크플로우
+- **사용 시점**: 브랜치 생성 및 PR 관리할 때
 
 ### 7. Create Pull Request
 - **경로**: `create-pull-request/SKILL.md`
