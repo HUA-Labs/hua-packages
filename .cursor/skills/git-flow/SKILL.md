@@ -1,6 +1,6 @@
 ---
 name: Git Flow Workflow
-description: HUA Platform의 Git Flow 워크플로우를 따르는 방법을 안내합니다
+description: ⚠️ DEPRECATED - HUA Platform은 Trunk-Based Development로 전환되었습니다. Graphite 워크플로우를 사용하세요.
 license: MIT
 compatibility:
   - cursor
@@ -8,13 +8,43 @@ compatibility:
 
 # Git Flow 워크플로우 스킬
 
-이 스킬은 HUA Platform의 Git Flow 워크플로우를 따르는 방법을 안내합니다.
+⚠️ **이 스킬은 더 이상 사용되지 않습니다 (Deprecated)**
 
-## 브랜치 전략
+**HUA Platform은 2025년 12월 Trunk-Based Development로 전환되었습니다.**
+
+## 현재 워크플로우
+
+**권장**: [Graphite Workflow Manager](./graphite-workflow/SKILL.md)와 [Trunk-Based Development](./trunk-based-development/SKILL.md) 스킬을 참고하세요.
+
+### 주요 변경사항
+- ❌ `develop` 브랜치 제거됨
+- ✅ `main` 브랜치 중심 개발
+- ✅ Graphite Stacked PRs 사용
+- ✅ Vercel Preview를 테스트 환경으로 활용
+
+### 빠른 전환 가이드
+
+```bash
+# 기존 Git Flow 방식 (더 이상 사용 안 함)
+git checkout develop
+git checkout -b feature/new-feature
+
+# 새로운 Trunk-Based 방식 (권장)
+gt create -m "feat: new feature"
+gt submit
+```
+
+---
+
+## 레거시 문서 (참고용)
+
+아래 내용은 이전 Git Flow 워크플로우에 대한 참고 자료입니다.
+
+## 브랜치 전략 (레거시)
 
 ### 주요 브랜치
 - **main**: 프로덕션 배포용 (보호됨)
-- **develop**: 개발 통합용 (보호됨)
+- **develop**: ~~개발 통합용 (보호됨)~~ **제거됨 (2025-12)**
 
 ### 작업 브랜치
 - **feature/**: 새로운 기능 개발
@@ -170,7 +200,26 @@ git push origin hotfix/security-patch
 - [ ] PR을 올바른 타겟 브랜치로 생성했는가?
 - [ ] PR 머지 후 브랜치를 정리했는가?
 
+## 전환 가이드
+
+### Git Flow에서 Trunk-Based Development로
+
+1. **Graphite 워크플로우 학습**
+   - [Graphite Workflow Manager](./graphite-workflow/SKILL.md) 참고
+   - `gt create`로 스택 생성
+   - `gt submit`으로 PR 제출
+
+2. **develop 브랜치 제거**
+   - 이미 완료됨 (2025-12)
+   - 모든 변경은 `main`으로 직접 PR
+
+3. **Vercel Preview 활용**
+   - 모든 PR에 자동 Preview URL 생성
+   - develop 브랜치 같은 중간 대기실 불필요
+
 ## 참고
 
-- Git Flow 스크립트: `apps/my-app/scripts/gitflow/`
+- ⚠️ **현재 워크플로우**: [Graphite Workflow Manager](./graphite-workflow/SKILL.md)
+- ⚠️ **Trunk-Based Development**: [Trunk-Based Development](./trunk-based-development/SKILL.md)
+- 레거시 Git Flow 스크립트: `apps/my-app/scripts/gitflow/` (더 이상 사용 안 함)
 - 브랜치 보호 설정: `docs/archive/completed-tasks/git-branch-protection.md`

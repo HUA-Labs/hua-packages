@@ -71,6 +71,39 @@ gt create -m "feat: add user stats api"
 - **UI 변경**: 컴포넌트, 페이지, 스타일
 - **테스트**: 각 스택에 해당하는 테스트 포함
 
+### 2-1. 모노레포에서의 스택 분리 (특별 가이드)
+
+**시나리오**: 패키지 간 의존성 변경 (예: `hua-ui` 패키지 업데이트)
+
+**올바른 분리 방법**:
+1. 하위 패키지부터 먼저 스택 생성
+   ```bash
+   gt create -m "feat(packages/hua-ui): update Button API"
+   ```
+
+2. 의존하는 앱들을 순차적으로 스택 생성
+   ```bash
+   gt create -m "feat(apps/my-app): migrate to new Button API"
+   gt create -m "feat(apps/my-api): migrate to new Button API"
+   ```
+
+3. 병합 순서: 하위 패키지 → 상위 앱 순서로 병합
+   - PR 1 (hua-ui) 먼저 병합
+   - PR 2 (my-app) 다음 병합
+   - PR 3 (my-api) 마지막 병합
+
+**주의사항**:
+- ⚠️ **의존성 방향 준수**: 하위 패키지부터 먼저 병합
+- ⚠️ **순환 의존성 방지**: `motion-core → ui` 같은 금지된 의존성 확인
+- ⚠️ **Turbo 빌드**: `dependsOn: ["^build"]` 설정으로 자동 처리되지만, 스택 분리 시 빌드 순서 확인
+
+**잘못된 예시**:
+```bash
+# ❌ 앱 변경을 먼저 스택 생성 (의존성 오류 발생)
+gt create -m "feat(apps/my-app): use new Button API"  # hua-ui 변경 전
+gt create -m "feat(packages/hua-ui): update Button API"  # 나중에
+```
+
 ### 3. 작업 흐름 가이드
 
 #### 최신 상태 동기화
@@ -134,6 +167,52 @@ gt stack submit
 # 베이스 브랜치 지정하여 제출 (main 사용 권장)
 gt submit --base main
 ```
+
+## 모노레포 특화 워크플로우
+
+### 패키지 간 의존성 변경 시나리오
+
+**시나리오**: `hua-i18n-core` 패키지 API 변경 후 모든 앱 업데이트
+
+**올바른 스택 분리**:
+```bash
+# 1. 패키지 변경 (하위 레벨)
+gt create -m "feat(packages/hua-i18n-core): add new translation API"
+
+# 2. SDK 패키지 업데이트 (중간 레벨)
+gt create -m "feat(packages/hua-i18n-sdk): update to use new core API"
+
+# 3. 앱들 업데이트 (상위 레벨)
+gt create -m "feat(apps/my-app): migrate to new i18n API"
+gt create -m "feat(apps/my-api): migrate to new i18n API"
+gt create -m "feat(apps/my-chat): migrate to new i18n API"
+```
+
+**병합 순서**:
+1. PR 1 (hua-i18n-core) → 먼저 병합
+2. PR 2 (hua-i18n-sdk) → 다음 병합
+3. PR 3-5 (앱들) → 병렬 또는 순차 병합
+
+### Turbo 빌드와의 통합
+
+**Turbo의 `dependsOn: ["^build"]` 설정**:
+- Graphite 스택 분리와 잘 작동
+- 각 PR에서 관련 패키지만 빌드하여 효율적
+- 빌드 실패 시 해당 PR만 롤백 가능
+
+**주의사항**:
+- 패키지 빌드 순서는 Turbo가 자동 관리
+- 스택 분리 시 빌드 의존성 고려 필요
+
+### 순환 의존성 방지
+
+**금지된 의존성 규칙**:
+- `motion-core → ui` (순환 의존성)
+- `motion-core → motion-advanced` (역방향 의존성)
+
+**Graphite 사용 시**:
+- 스택 분리 시 의존성 방향 확인 필수
+- 하위 패키지부터 먼저 변경 및 병합
 
 ## 작업 흐름 예시
 
@@ -269,6 +348,13 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 - [ ] `gt up`으로 최신 상태를 동기화했는가?
 - [ ] `gt submit`으로 PR을 제출했는가?
 - [ ] 복잡한 `git rebase` 대신 `gt sync`와 `gt restack`을 적절히 사용했는가?
+
+### 모노레포 특화 체크리스트
+
+- [ ] 패키지 간 의존성 변경 시 하위 패키지부터 스택을 생성했는가?
+- [ ] 순환 의존성 규칙을 위반하지 않았는가? (`motion-core → ui` 금지 등)
+- [ ] 병합 순서가 올바른가? (하위 패키지 → 상위 앱)
+- [ ] Turbo 빌드 의존성을 고려했는가?
 
 ## 주의사항
 
