@@ -48,5 +48,6 @@ export {
   sanitizeTitle,
   sanitizeEmail,
   sanitizeName,
-  escapeHtml
+  escapeHtml,
+  maskEmailForLog
 } from './sanitize' 
