@@ -272,12 +272,15 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 
 ## 주의사항
 
-1. **베이스 브랜치 신경 쓰지 않기**: Graphite가 자동으로 관리
-2. **복잡한 Git 명령어 피하기**: Graphite 명령어로 대체
-3. **작은 단위로 분리**: 하나의 스택은 하나의 논리적 변경만 포함
-4. **능동적 제안**: 많은 파일 수정 시 중간에 스택 생성 제안
-5. **리베이스 금지**: Graphite는 merge commit 방식 사용, `git rebase` 사용 금지
-6. **충돌 해결**: `gt restack`이 rebase를 사용할 수 있어 충돌이 반복될 경우, 수동으로 `git merge main --no-ff` 사용 권장
+1. **⚠️ main 브랜치 직접 푸시 절대 금지**: 항상 `gt create` → `gt submit` → PR 병합 순서로만 작업
+   - `git push origin main` 사용 금지
+   - 모든 변경은 PR을 통해서만 병합
+2. **베이스 브랜치 신경 쓰지 않기**: Graphite가 자동으로 관리
+3. **복잡한 Git 명령어 피하기**: Graphite 명령어로 대체
+4. **작은 단위로 분리**: 하나의 스택은 하나의 논리적 변경만 포함
+5. **능동적 제안**: 많은 파일 수정 시 중간에 스택 생성 제안
+6. **리베이스 금지**: Graphite는 merge commit 방식 사용, `git rebase` 사용 금지
+7. **충돌 해결**: `gt restack`이 rebase를 사용할 수 있어 충돌이 반복될 경우, 수동으로 `git merge main --no-ff` 사용 권장
 
 ## 트러블슈팅
 
