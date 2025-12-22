@@ -83,22 +83,34 @@ git checkout feature-branch
 gt up  # 최신 상태로 동기화
 ```
 
-#### 스택 정리
+#### 스택 정리 및 동기화
 ```bash
 # ❌ 하지 말 것
 git rebase -i main
+git rebase main  # Graphite는 merge commit 방식 사용
 
 # ✅ 권장
-gt sync --restack  # 스택 정리 및 재정렬
+gt sync  # trunk와 동기화 및 병합된 브랜치 정리
+gt restack  # 스택 재정렬 (내부적으로 rebase 사용 가능, 주의 필요)
+
+# 주의: gt restack은 내부적으로 rebase를 사용할 수 있어 충돌이 반복될 수 있음
+# 충돌이 많을 경우 수동으로 merge commit 생성 권장
 ```
 
-#### 베이스 브랜치 변경
+#### 베이스 브랜치 설정 및 변경
 ```bash
 # ❌ 하지 말 것
-git rebase main
+git rebase main  # Graphite는 merge commit 방식 사용
 
 # ✅ 권장
-gt stack submit --base main  # 베이스 브랜치 지정하여 제출
+# 1. 브랜치를 main의 parent로 추적 설정
+gt track --parent main <branch-name>
+
+# 2. 베이스 브랜치 지정하여 제출
+gt submit --base main
+
+# 3. 또는 Graphite 설정 파일에서 trunk 설정
+# .git/.graphite_repo_config에서 trunk: "main" 설정
 ```
 
 ### 4. PR 제출 자동화
@@ -212,6 +224,35 @@ gt squash
 gt split
 ```
 
+### PR 병합 및 관리
+
+```bash
+# trunk부터 현재 브랜치까지의 모든 PR 병합
+gt merge
+
+# 확인 없이 병합
+gt merge --confirm
+
+# 병합 전 미리보기 (실제 병합하지 않음)
+gt merge --dry-run
+
+# 주의: gt downstack merge는 deprecated, gt merge 사용
+```
+
+### 브랜치 정리
+
+```bash
+# 병합된 브랜치 자동 정리
+gt sync
+
+# 원격 브랜치 정리
+git fetch --prune origin
+
+# 특정 브랜치 삭제
+git branch -d <branch-name>
+git push origin --delete <branch-name>
+```
+
 ## 체크리스트
 
 Graphite 워크플로우 사용 시 다음을 확인하세요:
@@ -229,6 +270,8 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 2. **복잡한 Git 명령어 피하기**: Graphite 명령어로 대체
 3. **작은 단위로 분리**: 하나의 스택은 하나의 논리적 변경만 포함
 4. **능동적 제안**: 많은 파일 수정 시 중간에 스택 생성 제안
+5. **리베이스 금지**: Graphite는 merge commit 방식 사용, `git rebase` 사용 금지
+6. **충돌 해결**: `gt restack`이 rebase를 사용할 수 있어 충돌이 반복될 경우, 수동으로 `git merge main --no-ff` 사용 권장
 
 ## 참고
 

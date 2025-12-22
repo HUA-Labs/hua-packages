@@ -101,7 +101,27 @@ gt stack submit --base main
 
 1. **PR 리뷰**: 각 스택 PR을 독립적으로 리뷰
 2. **테스트**: Vercel Preview에서 확인
-3. **병합**: 아래에서 위로 순차적으로 병합
+3. **병합**: Graphite CLI 또는 GitHub CLI 사용
+   
+   **Graphite CLI로 병합**:
+   ```bash
+   # trunk부터 현재 브랜치까지의 모든 PR 병합
+   gt merge
+   
+   # 확인 없이 병합
+   gt merge --confirm
+   ```
+   
+   **GitHub CLI로 병합** (리뷰어 없이):
+   ```bash
+   # Squash merge (권장)
+   gh pr merge <pr-number> --squash --admin
+   
+   # 또는 Graphite CLI 사용
+   gt merge
+   ```
+   
+   **병합 순서**: 아래에서 위로 순차적으로 병합
    - 스택 1 (기초) → 먼저 병합
    - 스택 2 (API) → 다음 병합
    - 스택 3 (UI) → 마지막 병합
@@ -156,19 +176,30 @@ gt stack submit --base main
 
 ## Git Flow에서 전환하기
 
-### 1. develop 브랜치 제거 (선택사항)
+### 1. develop 브랜치 제거
 
 **주의**: 기존 develop 브랜치에 중요한 변경사항이 있다면 먼저 main으로 병합
 
 ```bash
-# develop 브랜치의 변경사항을 main으로 병합
+# 1. develop 브랜치의 변경사항을 main으로 병합
 git checkout main
-git merge develop
+git merge origin/develop --no-ff -m "chore: merge develop into main (trunk-based development migration)"
 
-# develop 브랜치 삭제 (선택사항)
+# 충돌 발생 시 develop 버전 우선 (대부분의 경우)
+git merge origin/develop --no-ff -X theirs
+
+# 2. GitHub Actions 워크플로우에서 develop 제거
+# .github/workflows/ci.yml, deploy.yml, pr-checks.yml 수정
+
+# 3. develop 브랜치 삭제
 git branch -d develop
 git push origin --delete develop
+
+# 4. 원격 브랜치 캐시 정리
+git fetch --prune origin
 ```
+
+**참고**: Graphite 스택으로 재구성할 필요 없음. merge commit으로 통합하는 것이 실용적.
 
 ### 2. GitHub 설정 변경
 
@@ -184,6 +215,17 @@ git push origin --delete develop
 기존 Git Flow 스크립트가 있다면:
 - `baseBranch = 'develop'` → `baseBranch = 'main'`으로 변경
 - 또는 스크립트를 Graphite 명령어로 대체
+
+### 4. Graphite 설정 업데이트
+
+```bash
+# Graphite가 main을 trunk로 인식하도록 설정
+# .git/.graphite_repo_config 파일 확인
+# trunk: "main" 설정 확인
+
+# 브랜치를 main의 parent로 추적
+gt track --parent main <branch-name>
+```
 
 ## 주의사항
 
