@@ -19,8 +19,9 @@ compatibility:
 
 ### 2. Git 명령어 대신 Graphite 명령어 사용
 - `git commit` 대신 `gt create` 사용
-- `git rebase` 대신 `gt sync --restack` 사용
-- `git checkout` 대신 `gt up` 사용
+- `git rebase` 금지 (Graphite는 merge commit 방식)
+- `gt sync`로 trunk와 동기화
+- `gt checkout` 대신 `gt checkout` 또는 `gt up` 사용 (스택 내 이동)
 
 ## 주요 워크플로우 규칙
 
@@ -80,7 +81,11 @@ git pull origin main
 git checkout feature-branch
 
 # ✅ 권장
-gt up  # 최신 상태로 동기화
+gt sync  # trunk와 동기화 및 병합된 브랜치 정리
+# 또는
+git checkout main
+git pull origin main
+gt checkout <branch-name>  # Graphite로 브랜치 체크아웃
 ```
 
 #### 스택 정리 및 동기화
@@ -126,8 +131,8 @@ gt submit
 # 특정 스택만 제출
 gt stack submit
 
-# 베이스 브랜치 지정하여 제출
-gt stack submit --base develop
+# 베이스 브랜치 지정하여 제출 (main 사용 권장)
+gt submit --base main
 ```
 
 ## 작업 흐름 예시
@@ -196,7 +201,8 @@ gt create -m "feat: <message>"
 gt up
 
 # 스택 정리 및 재정렬
-gt sync --restack
+gt sync  # trunk와 동기화
+gt restack  # 스택 재정렬 (별도 명령어, 주의: rebase 사용 가능)
 
 # PR 제출
 gt submit
@@ -262,7 +268,7 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 - [ ] 각 스택이 독립적으로 리뷰 가능한가?
 - [ ] `gt up`으로 최신 상태를 동기화했는가?
 - [ ] `gt submit`으로 PR을 제출했는가?
-- [ ] 복잡한 `git rebase` 대신 `gt sync --restack`을 사용했는가?
+- [ ] 복잡한 `git rebase` 대신 `gt sync`와 `gt restack`을 적절히 사용했는가?
 
 ## 주의사항
 
@@ -273,8 +279,60 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 5. **리베이스 금지**: Graphite는 merge commit 방식 사용, `git rebase` 사용 금지
 6. **충돌 해결**: `gt restack`이 rebase를 사용할 수 있어 충돌이 반복될 경우, 수동으로 `git merge main --no-ff` 사용 권장
 
+## 트러블슈팅
+
+### 충돌이 반복될 때
+
+**문제**: `gt restack` 실행 시 충돌이 반복적으로 발생
+
+**해결**:
+```bash
+# 1. restack 중단
+gt abort  # 또는 git rebase --abort
+
+# 2. 수동으로 merge commit 생성
+git merge main --no-ff -m "chore: merge main into <branch-name>"
+
+# 3. 충돌 해결 후
+git add -A
+git commit --amend --no-edit
+
+# 4. Graphite에 반영
+gt sync
+```
+
+### PR이 제출되지 않을 때
+
+**문제**: `gt submit` 실행 시 "already merged" 오류
+
+**원인**: 스택의 하위 PR이 이미 병합되었지만 trunk에 반영되지 않음
+
+**해결**:
+```bash
+# 1. trunk 최신화
+git checkout main
+git pull origin main
+
+# 2. Graphite 동기화
+gt sync
+
+# 3. 다시 제출
+gt submit
+```
+
+### 브랜치가 추적되지 않을 때
+
+**문제**: `gt log`에 브랜치가 표시되지 않음
+
+**해결**:
+```bash
+# 브랜치를 main의 parent로 추적 설정
+gt track --parent main <branch-name>
+```
+
 ## 참고
 
 - Graphite 공식 문서: https://docs.graphite.dev/
 - Graphite CLI 설치: `npm install -g @graphite-io/cli`
 - 스택 관리 가이드: `gt help stack`
+- 명령어 도움말: `gt help <command>`

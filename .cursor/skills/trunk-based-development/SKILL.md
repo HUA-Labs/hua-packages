@@ -60,10 +60,14 @@ Feature Stack → main (PR & Merge) → Production
 
 ```bash
 # main 브랜치 최신화
-gt up main
+git checkout main
+git pull origin main
 
-# 또는 Graphite로 main 추적
-gt track --parent main
+# Graphite로 trunk와 동기화
+gt sync
+
+# 새 작업 시작 (Graphite가 자동으로 main에서 분기)
+gt create -m "feat: your feature description"
 ```
 
 ### 2. 스택 생성 (Graphite)
