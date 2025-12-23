@@ -90,6 +90,14 @@
     "@hua-labs/i18n-plugins#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
+    },
+    "@hua-labs/i18n-core-zustand#build": {
+      "dependsOn": ["@hua-labs/i18n-core#build"],
+      "outputs": ["dist/**"]
+    },
+    "@hua-labs/i18n-loaders#build": {
+      "dependsOn": ["@hua-labs/i18n-core#build"],
+      "outputs": ["dist/**"]
     }
   }
 }
