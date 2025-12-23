@@ -103,14 +103,14 @@
 - [x] `app/api/admin/notifications/test-data/route.ts`
 
 #### 클라이언트 페이지 (9개)
-- [ ] `app/admin/monitoring/errors/page.tsx`
-- [ ] `app/admin/monitoring/performance/page.tsx`
-- [ ] `app/admin/users/[id]/page.tsx`
-- [ ] `app/admin/users/[id]/status/page.tsx`
-- [ ] `app/admin/users/[id]/moderation/page.tsx`
-- [ ] `app/admin/notifications/[id]/page.tsx`
-- [ ] `app/admin/announcements/page.tsx`
-- [ ] `app/admin/announcements/[id]/page.tsx`
+- [x] `app/admin/monitoring/errors/page.tsx`
+- [x] `app/admin/monitoring/performance/page.tsx`
+- [x] `app/admin/users/[id]/page.tsx`
+- [x] `app/admin/users/[id]/status/page.tsx`
+- [x] `app/admin/users/[id]/moderation/page.tsx`
+- [x] `app/admin/notifications/[id]/page.tsx`
+- [x] `app/admin/announcements/page.tsx`
+- [x] `app/admin/announcements/[id]/page.tsx`
 
 ### 🟡 P1 - 사용자 권한 확인 (3개)
 
@@ -244,7 +244,7 @@ export async function GET(
 
 ### 구현 중
 - [x] 관리자 API 권한 확인 구현 (6개 완료)
-- [ ] 관리자 페이지 권한 확인 구현 (9개 남음)
+- [x] 관리자 페이지 권한 확인 구현 (9개 완료)
 - [ ] 일기 소유권 확인 구현
 - [ ] 사용자 권한 확인 구현
 
