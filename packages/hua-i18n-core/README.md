@@ -89,16 +89,24 @@ The library supports three translation loading strategies:
 
 ### 1. API Loader (Default, Recommended)
 
-Loads translations through API routes. Best for production environments.
+Loads translations through API routes. Best for production environments. **Now supports server-side rendering!**
 
 ```tsx
 createCoreI18n({
   translationLoader: 'api',
   translationApiPath: '/api/translations', // default
   defaultLanguage: 'ko',
-  namespaces: ['common', 'pages']
+  namespaces: ['common', 'pages'],
+  // Server-side support (optional)
+  baseUrl: 'https://example.com', // Explicit base URL for server-side
+  localFallbackBaseUrl: 'http://localhost:3000' // Local dev fallback
 })
 ```
+
+**Server-Side Support:**
+- Automatically detects `NEXT_PUBLIC_SITE_URL` or `VERCEL_URL` environment variables
+- Falls back to `http://localhost:3000` in development if no base URL is provided
+- Works seamlessly on both server and client without additional configuration
 
 **API Route Example (Next.js):**
 
@@ -426,6 +434,10 @@ createCoreI18n({
     // Custom loader function
   },
   
+  // Server-side support (for API loader)
+  baseUrl?: string, // Explicit base URL for server-side requests
+  localFallbackBaseUrl?: string, // Local dev fallback (default: 'http://localhost:3000')
+  
   // SSR optimization: Pre-loaded translations (no network requests)
   // Prevents missing key exposure during initial load
   initialTranslations: {
@@ -529,6 +541,8 @@ function createCoreI18n(options?: {
   loadTranslations?: (language: string, namespace: string) => Promise<Record<string, string>>;
   translationLoader?: 'api' | 'static' | 'custom';
   translationApiPath?: string;
+  baseUrl?: string; // Server-side base URL
+  localFallbackBaseUrl?: string; // Local dev fallback URL
   initialTranslations?: Record<string, Record<string, Record<string, string>>>;
   autoLanguageSync?: boolean;
 }): React.ComponentType<{ children: React.ReactNode }>
@@ -659,6 +673,8 @@ pnpm test
 2. Check API route returns valid JSON
 3. Ensure API route handles 404 errors gracefully
 4. Check CORS settings if loading from different domain
+5. **Server-side**: Ensure `baseUrl` is set or `NEXT_PUBLIC_SITE_URL`/`VERCEL_URL` environment variables are configured
+6. **Server-side**: Check that the API route is accessible from the server (not just client)
 
 ## Related Packages
 
