@@ -1,5 +1,15 @@
 # @hua-labs/i18n-core
 
+## 1.1.0
+
+### Features
+
+- **Server-side support for API loader**: The default API loader now supports server-side rendering
+  - Added `baseUrl` option for explicit server-side base URL
+  - Added `localFallbackBaseUrl` option for local development fallback
+  - Automatic environment variable detection (`NEXT_PUBLIC_SITE_URL`, `VERCEL_URL`)
+  - Works seamlessly on both server and client without additional configuration
+
 ## 1.0.0
 
 ### Major Changes

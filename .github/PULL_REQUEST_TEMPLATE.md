@@ -13,7 +13,7 @@
 
 ## 브랜치 정보
 
-- **Base 브랜치**: `develop` (또는 `main`)
+- **Base 브랜치**: `main`
 - **Head 브랜치**: `fix/nextauth-cookie-config` (또는 해당 브랜치명)
 
 ## Breaking Changes
