@@ -95,12 +95,12 @@
 ### 🔴 P0 - 관리자 권한 확인 (15개)
 
 #### API 라우트 (6개)
-- [ ] `app/api/admin/diary/status/route.ts`
-- [ ] `app/api/admin/diary/deleted/route.ts`
-- [ ] `app/api/admin/diary/[id]/restore/route.ts`
-- [ ] `app/api/admin/diary/[id]/delete/route.ts`
-- [ ] `app/api/admin/dashboard/route.ts`
-- [ ] `app/api/admin/notifications/test-data/route.ts`
+- [x] `app/api/admin/diary/status/route.ts`
+- [x] `app/api/admin/diary/deleted/route.ts`
+- [x] `app/api/admin/diary/[id]/restore/route.ts`
+- [x] `app/api/admin/diary/[id]/delete/route.ts`
+- [x] `app/api/admin/dashboard/route.ts`
+- [x] `app/api/admin/notifications/test-data/route.ts`
 
 #### 클라이언트 페이지 (9개)
 - [ ] `app/admin/monitoring/errors/page.tsx`
@@ -240,11 +240,11 @@ export async function GET(
 ### 구현 전
 - [x] 문제 상황 파악
 - [x] Goal Tree 문서 생성
-- [ ] Graphite 스택 생성
+- [x] Graphite 스택 생성
 
 ### 구현 중
-- [ ] 관리자 API 권한 확인 구현
-- [ ] 관리자 페이지 권한 확인 구현
+- [x] 관리자 API 권한 확인 구현 (6개 완료)
+- [ ] 관리자 페이지 권한 확인 구현 (9개 남음)
 - [ ] 일기 소유권 확인 구현
 - [ ] 사용자 권한 확인 구현
 
