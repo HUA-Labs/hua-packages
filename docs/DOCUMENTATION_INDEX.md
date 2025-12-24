@@ -28,13 +28,20 @@ HUA Platform 프로젝트의 주요 문서들을 정리한 인덱스입니다.
 개발 과정에서 발견된 반복되는 패턴과 해결 방법을 정리한 문서들입니다.
 
 - [README](patterns/README.md) - 패턴 문서 인덱스
+- [README](patterns/README.md) - 패턴 문서 인덱스
 - [build-errors](patterns/build-errors.md) - 빌드 오류 패턴
 - [type-errors](patterns/type-errors.md) - 타입 오류 패턴
 - [dependency-management](patterns/dependency-management.md) - 의존성 관리 패턴
 - [environment-setup](patterns/environment-setup.md) - 환경 설정 패턴
 - [code-quality](patterns/code-quality.md) - 코드 품질 패턴
 - [deployment](patterns/deployment.md) - 배포 패턴
-- [TEMP_SOLUTIONS_STATUS](patterns/TEMP_SOLUTIONS_STATUS.md) - 임시 해결책 상태
+- [validation-patterns](patterns/validation-patterns.md) - Zod 검증 패턴
+- [database-patterns](patterns/database-patterns.md) - DB 관련 패턴
+- [performance-patterns](patterns/performance-patterns.md) - 성능 최적화 패턴
+- [security-patterns](patterns/security-patterns.md) - 보안 패턴
+- [code-organization-patterns](patterns/code-organization-patterns.md) - 코드 구조 패턴
+- [concepts/typescript-module-augmentation](patterns/concepts/typescript-module-augmentation.md) - TypeScript 모듈 확장 컨셉
+- [concepts/nextauth-type-augmentation](patterns/concepts/nextauth-type-augmentation.md) - NextAuth 타입 확장 컨셉
 
 ---
 
@@ -95,6 +102,7 @@ HUA Platform 프로젝트의 주요 문서들을 정리한 인덱스입니다.
 - [DEPENDENCY_MANAGEMENT](DEPENDENCY_MANAGEMENT.md) - 의존성 관리
 - [DEPLOYMENT_AUTOMATION](DEPLOYMENT_AUTOMATION.md) - 배포 자동화
 - [PNPM_SETUP](PNPM_SETUP.md) - pnpm 설정
+- [ENVIRONMENT_VARIABLE_MANAGEMENT](ENVIRONMENT_VARIABLE_MANAGEMENT.md) - 환경 변수 관리 (로컬: Doppler, 프로덕션: Vercel)
 
 ---
 
