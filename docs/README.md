@@ -10,6 +10,7 @@ HUA Platform은 모던 웹 개발을 위한 통합 개발 플랫폼입니다.
 - [아키텍처 개요](./ARCHITECTURE_OVERVIEW.md)
 - [기여 가이드](./CONTRIBUTING.md)
 - [점진적 마이그레이션 전략](./GRADUAL_MIGRATION_STRATEGY.md)
+- [환경 변수 관리](./ENVIRONMENT_VARIABLE_MANAGEMENT.md) - 로컬(Doppler) 및 프로덕션(Vercel) 환경 변수 관리 현황
 
 ### SDK 문서
 - [애니메이션 SDK 아키텍처](./ANIMATION_SDK_ARCHITECTURE.md) - 🎨 **새로 추가!**
