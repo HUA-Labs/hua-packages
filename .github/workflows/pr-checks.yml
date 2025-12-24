@@ -136,42 +136,64 @@ jobs:
   #     - name: Build
   #       run: pnpm build
 
-  # PR 체크리스트 검증
+  # PR 체크리스트 및 체인지 파일 검증
   pr-checklist:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Check PR description
+      - name: Check PR description and change files
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request;
             const body = pr.body || '';
             
-            // 체크리스트 항목 확인
-            const checklistItems = [
-              '코드가 프로젝트의 코딩 스타일을 따릅니다',
-              '자체 코드 리뷰를 수행했습니다',
-              '변경 사항이 새로운 경고를 생성하지 않습니다',
-              '타입 체크가 통과합니다',
-              '린트가 통과합니다',
-              '빌드가 성공합니다'
-            ];
+            // Graphite PR 감지 (브랜치 네이밍 패턴: MM-DD-타입_설명)
+            const isGraphitePR = pr.head.ref.match(/^\d{2}-\d{2}-/) || 
+                                 pr.head.ref.includes('graphite') || 
+                                 pr.title?.includes('[graphite]') ||
+                                 pr.body?.includes('graphite') ||
+                                 pr.body?.includes('Graphite') ||
+                                 pr.body?.includes('app.graphite.com');
             
-            const missingItems = [];
-            for (const item of checklistItems) {
-              // 체크리스트 항목이 체크되었는지 확인
-              const regex = new RegExp(`- \\[x\\].*${item}`, 'i');
-              if (!regex.test(body)) {
-                missingItems.push(item);
-              }
-            }
-            
-            if (missingItems.length > 0) {
-              core.warning(`다음 체크리스트 항목이 완료되지 않았습니다: ${missingItems.join(', ')}`);
-              // 경고만 표시하고 실패하지는 않음 (선택사항)
+            if (isGraphitePR) {
+              core.info(`Graphite PR 감지됨 (브랜치: ${pr.head.ref})`);
+              core.info('Graphite PR은 자체 PR 템플릿을 사용하므로 GitHub PR 템플릿 체크를 건너뜁니다.');
+              
+              // Graphite PR의 경우 체인지 파일 체크도 건너뛰기
+              // Graphite는 자체 변경 추적 시스템을 사용
+              core.info('Graphite는 자체 변경 추적 시스템을 사용하므로 체인지 파일 체크를 건너뜁니다.');
             } else {
-              core.info('모든 필수 체크리스트 항목이 완료되었습니다.');
+              // 일반 PR의 경우 체크리스트 확인
+              const checklistItems = [
+                '코드가 프로젝트의 코딩 스타일을 따릅니다',
+                '자체 코드 리뷰를 수행했습니다',
+                '변경 사항이 새로운 경고를 생성하지 않습니다',
+                '타입 체크가 통과합니다',
+                '린트가 통과합니다',
+                '빌드가 성공합니다'
+              ];
+              
+              const missingItems = [];
+              for (const item of checklistItems) {
+                const regex = new RegExp(`- \\[x\\].*${item}`, 'i');
+                if (!regex.test(body)) {
+                  missingItems.push(item);
+                }
+              }
+              
+              if (missingItems.length > 0) {
+                core.warning(`다음 체크리스트 항목이 완료되지 않았습니다: ${missingItems.join(', ')}`);
+                // 경고만 표시 (실패하지 않음) - 개발 워크플로우 유연성 유지
+              } else {
+                core.info('모든 필수 체크리스트 항목이 완료되었습니다.');
+              }
+              
+              // 체인지 파일 체크 (일반 PR의 경우)
+              // 이 프로젝트는 changeset을 사용하지 않으므로 체인지 파일 체크는 선택사항
+              core.info('이 프로젝트는 changeset을 사용하지 않으므로 체인지 파일 체크를 건너뜁니다.');
             }
 
