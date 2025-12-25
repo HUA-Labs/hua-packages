@@ -71,6 +71,9 @@ HUA Platform 프로젝트의 주요 문서들을 정리한 인덱스입니다.
 - `deprecated/` - 더 이상 사용되지 않는 문서
 - `temporary/` - 임시 문서 및 예시 파일
 - `devlogs/` - 오래된 개발 로그
+- `prs/` - 완료된 Pull Request 문서
+  - [develop-to-main-2025-12-04](archive/prs/develop-to-main-2025-12-04.md)
+  - [release-2025-12-04](archive/prs/release-2025-12-04.md)
 
 ---
 
@@ -78,8 +81,15 @@ HUA Platform 프로젝트의 주요 문서들을 정리한 인덱스입니다.
 
 ### 일반 가이드
 - [CONTRIBUTING](CONTRIBUTING.md) - 기여 가이드
-- [CODE_REVIEW_CHECKLIST](CODE_REVIEW_CHECKLIST.md) - 코드 리뷰 체크리스트
+- [PR_GUIDE](PR_GUIDE.md) - Pull Request 가이드
 - [VERSIONING_AND_RELEASE_GUIDE](VERSIONING_AND_RELEASE_GUIDE.md) - 버전 관리 및 릴리즈 가이드
+
+### 코드 리뷰 (`docs/code-review/`)
+- [README](code-review/README.md) - 코드 리뷰 가이드
+- [checklist](code-review/checklist.md) - 최근 코드 리뷰 체크리스트 (2025-12-04)
+- [fixes](code-review/fixes.md) - 코드 리뷰 수정 사항
+- [verification](code-review/verification.md) - 코드 리뷰 검증 결과
+- [general-checklist](code-review/general-checklist.md) - 일반적인 코드 리뷰 체크리스트
 
 ### 템플릿
 - [템플릿 README](templates/README.md) - 템플릿 사용 가이드
