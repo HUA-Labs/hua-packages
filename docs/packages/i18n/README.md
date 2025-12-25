@@ -1,6 +1,6 @@
 # @hua-labs/i18n-core 문서 인덱스
 
-## 📚 전체 문서 목록
+## 전체 문서 목록
 
 ### 시작하기
 
@@ -37,6 +37,31 @@
    - 실제 코드 예제
    - 베스트 프랙티스
 
+6. **[배열 타입 번역 키 접근 가이드](./ARRAY_TRANSLATION_KEYS.md)**
+   - 배열 타입 번역 키 접근 방법
+   - `month_names`, `day_names` 등 배열 데이터 사용
+   - 현재 해결 방법 및 향후 개선 계획
+
+7. **[i18n-date 패키지](../i18n-date/README.md)**
+   - 날짜 포맷팅 및 현지화 유틸리티
+   - `useDateFormatter` 훅 사용법
+   - 월/요일 이름 자동 추출
+   - 타임존 처리 및 상대 시간 포맷팅
+
+8. **[i18n-number 패키지](../i18n-number/README.md)**
+   - 숫자 포맷팅 및 현지화 유틸리티
+   - `useNumberFormatter` 훅 사용법
+   - 천 단위 구분자, 소수점, 퍼센트, 컴팩트 표기
+
+9. **[i18n-currency 패키지](../i18n-currency/README.md)**
+   - 화폐 포맷팅 및 현지화 유틸리티
+   - `useCurrencyFormatter` 훅 사용법
+   - 언어별 통화 자동 감지 및 포맷팅
+
+10. **[포맷터 통합 가이드](./FORMATTERS_GUIDE.md)**
+    - 모든 포맷터 패키지 통합 사용법
+    - 실제 사용 사례 및 예제
+
 ### 개발 관련
 
 6. **[개발 플랜](./I18N_CORE_DEVELOPMENT_PLAN.md)**
@@ -51,7 +76,7 @@
 
 ---
 
-## 🎯 문서 선택 가이드
+## 문서 선택 가이드
 
 ### 처음 사용하는 경우
 1. [빠른 시작 가이드](./I18N_CORE_QUICK_START.md) → 기본 설정 및 사용법
@@ -72,7 +97,7 @@
 
 ---
 
-## 📖 빠른 참조
+## 빠른 참조
 
 ### 가장 자주 사용하는 기능
 
@@ -117,7 +142,7 @@ const stats = i18nResourceManager.getCacheStats();
 
 ---
 
-## 🔍 문제 해결
+## 문제 해결
 
 ### 번역이 로드되지 않는 경우
 - [빠른 시작 가이드 - 문제 해결](./I18N_CORE_QUICK_START.md#문제-해결)

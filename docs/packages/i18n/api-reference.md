@@ -332,6 +332,49 @@ function AdvancedComponent() {
 }
 ```
 
+#### 배열 타입 번역 키 접근
+
+번역 파일에 배열 타입의 데이터가 있을 때 (예: `month_names`, `day_names`), `t()` 함수는 문자열만 반환하므로 `debug.getAllTranslations()`를 사용해야 합니다.
+
+**번역 파일 예시**:
+```json
+{
+  "month_names": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+  "day_names": ["월", "화", "수", "목", "금", "토", "일"]
+}
+```
+
+**사용 예시**:
+```typescript
+import { useI18n } from '@hua-labs/i18n-core';
+
+function CalendarComponent() {
+  const { debug, currentLanguage } = useI18n();
+  
+  // 모든 번역 데이터 가져오기
+  const allTranslations = debug.getAllTranslations();
+  const commonTranslations = (allTranslations[currentLanguage]?.common || allTranslations['ko']?.common || {}) as Record<string, unknown>;
+  
+  // 배열 데이터 접근
+  const monthNames = (Array.isArray(commonTranslations.month_names) 
+    ? commonTranslations.month_names 
+    : []) as string[];
+  const dayNames = (Array.isArray(commonTranslations.day_names) 
+    ? commonTranslations.day_names 
+    : []) as string[];
+  
+  return (
+    <div>
+      {monthNames.map((month, index) => (
+        <span key={index}>{month}</span>
+      ))}
+    </div>
+  );
+}
+```
+
+> **참고**: 배열 타입 번역 키 접근에 대한 자세한 가이드는 [배열 타입 번역 키 접근 가이드](./ARRAY_TRANSLATION_KEYS.md)를 참고하세요.
+
 ---
 
 ### useLanguageChange
