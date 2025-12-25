@@ -10,6 +10,38 @@ compatibility:
 
 이 스킬은 HUA Platform의 에러 처리 패턴을 따르는 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 에러 처리 구현 시 필수 확인
+
+```
+IF (에러 처리를 구현할 때) THEN
+  1. unknown 타입 사용 확인 (any 금지)
+  2. 타입 가드 사용 확인
+  3. 사용자 친화적 메시지 확인
+  4. 표준 API 응답 형식 확인
+  5. 에러 로깅 확인
+END IF
+```
+
+### 자동 검증 로직
+
+```
+IF (에러 처리 코드 작성) THEN
+  IF (any 타입 사용) THEN
+    → "any 대신 unknown 타입을 사용하세요."
+  END IF
+  
+  IF (에러 메시지가 기술적임) THEN
+    → "사용자 친화적인 메시지로 변경하세요."
+  END IF
+  
+  IF (API 응답 형식이 표준과 다름) THEN
+    → "표준 API 응답 형식을 사용하세요: { success, data?, error? }"
+  END IF
+END IF
+```
+
 ## 에러 처리 원칙
 
 ### 1. 사용자 친화적 메시지
@@ -72,7 +104,7 @@ interface ApiResponse<T> {
 }
 ```
 
-### API 라우트에서 에러 처리
+### ✅ 올바른 예시: API 라우트에서 에러 처리
 
 ```typescript
 // app/api/example/route.ts
@@ -104,9 +136,28 @@ export async function GET() {
 }
 ```
 
+### ❌ 잘못된 예시
+
+```typescript
+// ❌ any 타입 사용
+catch (error: any) {
+  console.error(error.message)
+}
+
+// ❌ 기술적 에러 메시지 직접 노출
+catch (error) {
+  return NextResponse.json({ error: error.stack })
+}
+
+// ❌ 표준 형식 미사용
+catch (error) {
+  return NextResponse.json({ message: 'Error' })
+}
+```
+
 ## 클라이언트 컴포넌트 에러 처리
 
-### try-catch 사용
+### ✅ 올바른 예시: try-catch 사용
 
 ```typescript
 'use client'
@@ -135,7 +186,7 @@ export function MyComponent() {
 }
 ```
 
-### 에러 바운더리 사용
+### ✅ 올바른 예시: 에러 바운더리 사용
 
 ```typescript
 'use client'
@@ -162,7 +213,7 @@ export function App() {
 
 ## 커스텀 에러 클래스
 
-### 에러 타입 정의
+### ✅ 올바른 예시: 에러 타입 정의
 
 ```typescript
 // lib/errors/types.ts
@@ -217,7 +268,7 @@ function checkAuth(user: User | null) {
 
 ## 에러 로깅
 
-### 에러 로깅 패턴
+### ✅ 올바른 예시: 에러 로깅 패턴
 
 ```typescript
 import { getErrorMessage } from '@/app/utils/errorHandler'
@@ -240,13 +291,24 @@ try {
 }
 ```
 
-## 체크리스트
+## AI 어시스턴트 실행 체크리스트
 
-에러 처리 시 다음을 확인하세요:
+에러 처리 시 다음을 자동으로 확인하세요:
 
+### 타입 안전성
+- [ ] `unknown` 타입을 사용했는가? (any 금지)
+- [ ] 타입 가드를 적용했는가?
+- [ ] 명시적 에러 타입을 정의했는가?
+
+### 사용자 경험
 - [ ] 사용자 친화적인 에러 메시지를 제공하는가?
-- [ ] `unknown` 타입을 사용하고 타입 가드를 적용했는가?
-- [ ] API 응답 형식이 표준화되어 있는가?
+- [ ] 기술적인 에러 메시지를 직접 노출하지 않았는가?
+
+### API 응답
+- [ ] API 응답 형식이 표준화되어 있는가? (`{ success, data?, error? }`)
+- [ ] 적절한 HTTP 상태 코드를 사용하는가?
+
+### 에러 처리
 - [ ] 에러 바운더리를 적절히 사용했는가?
 - [ ] 에러 로깅이 적절히 구현되었는가?
 - [ ] 커스텀 에러 클래스를 사용했는가? (필요한 경우)
@@ -255,3 +317,4 @@ try {
 
 - 에러 처리 유틸리티: `apps/my-app/app/utils/errorHandler.ts`
 - API 에러 처리: `apps/my-api/docs/TECHNICAL_IMPLEMENTATION.md`
+- 에러 처리 스킬: `.cursor/skills/error-handling/SKILL.md`

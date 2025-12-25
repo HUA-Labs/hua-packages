@@ -10,6 +10,38 @@ compatibility:
 
 이 스킬은 HUA Platform의 테스트 작성 가이드를 따르는 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 테스트 작성 시 필수 확인
+
+```
+IF (테스트를 작성할 때) THEN
+  1. Vitest 사용 확인 (jest 금지)
+  2. 파일 위치 확인
+  3. 파일명 형식 확인 (*.test.ts 또는 *.test.tsx)
+  4. 비동기 테스트에 await 사용 확인
+  5. 모킹에 vi 사용 확인
+END IF
+```
+
+### 자동 검증 로직
+
+```
+IF (테스트 작성) THEN
+  IF (jest 사용) THEN
+    → "jest 대신 vitest를 사용하세요. vi를 사용하세요."
+  END IF
+  
+  IF (파일명이 *.test.ts 형식이 아님) THEN
+    → "테스트 파일명은 *.test.ts 또는 *.test.tsx 형식이어야 합니다."
+  END IF
+  
+  IF (비동기 테스트에 await 없음) THEN
+    → "비동기 테스트에는 await와 findBy*를 사용하세요."
+  END IF
+END IF
+```
+
 ## 테스트 프레임워크
 
 - **프레임워크**: Vitest
@@ -32,7 +64,7 @@ compatibility:
 
 ## 기본 테스트 구조
 
-### 컴포넌트 테스트
+### ✅ 올바른 예시: 컴포넌트 테스트
 
 ```typescript
 import { describe, it, expect, vi } from 'vitest'
@@ -55,7 +87,7 @@ describe('Button', () => {
 })
 ```
 
-### 훅 테스트
+### ✅ 올바른 예시: 훅 테스트
 
 ```typescript
 import { describe, it, expect } from 'vitest'
@@ -80,7 +112,7 @@ describe('useCounter', () => {
 })
 ```
 
-### 유틸리티 테스트
+### ✅ 올바른 예시: 유틸리티 테스트
 
 ```typescript
 import { describe, it, expect } from 'vitest'
@@ -105,9 +137,9 @@ describe('formatDate', () => {
 - `it` 또는 `test` - 개별 테스트
 - `expect` - 어설션
 - `beforeEach`, `afterEach` - 전후 처리
-- `vi` - 모킹 유틸리티
+- `vi` - 모킹 유틸리티 (⚠️ jest.fn() 금지!)
 
-### 모킹
+### ✅ 올바른 예시: 모킹
 
 ```typescript
 import { vi } from 'vitest'
@@ -132,9 +164,20 @@ const spy = vi.spyOn(console, 'log')
 spy.mockRestore()
 ```
 
+### ❌ 잘못된 예시
+
+```typescript
+// ❌ jest 사용 (금지!)
+import { jest } from '@jest/globals'
+const mockFn = jest.fn()
+
+// ❌ jest.fn() 사용 (금지!)
+const mockFn = jest.fn()
+```
+
 ## React 컴포넌트 테스트
 
-### 렌더링 및 쿼리
+### ✅ 올바른 예시: 렌더링 및 쿼리
 
 ```typescript
 import { render, screen } from '@testing-library/react'
@@ -153,7 +196,7 @@ screen.queryByText('text') // 없어도 에러 안 남
 screen.findByText('text') // 비동기 요소
 ```
 
-### 이벤트 테스트
+### ✅ 올바른 예시: 이벤트 테스트
 
 ```typescript
 import { fireEvent } from '@testing-library/react'
@@ -167,7 +210,7 @@ it('handles click event', () => {
 })
 ```
 
-### 비동기 테스트
+### ✅ 올바른 예시: 비동기 테스트
 
 ```typescript
 it('loads data asynchronously', async () => {
@@ -184,7 +227,7 @@ it('loads data asynchronously', async () => {
 
 ## API 라우트 테스트
 
-### Next.js API 라우트 테스트
+### ✅ 올바른 예시: Next.js API 라우트 테스트
 
 ```typescript
 import { describe, it, expect } from 'vitest'
@@ -212,7 +255,7 @@ describe('GET /api/example', () => {
 
 ## 테스트 설정
 
-### vitest.config.ts
+### ✅ 올바른 예시: vitest.config.ts
 
 ```typescript
 import { defineConfig } from 'vitest/config'
@@ -254,17 +297,28 @@ pnpm test:watch
 pnpm test:coverage
 ```
 
-## 체크리스트
+## AI 어시스턴트 실행 체크리스트
 
-테스트 작성 시 다음을 확인하세요:
+테스트 작성 시 다음을 자동으로 확인하세요:
 
+### 파일 구조
 - [ ] 테스트 파일이 올바른 위치에 있는가?
 - [ ] 파일명이 `*.test.ts` 또는 `*.test.tsx` 형식인가?
+
+### Vitest 사용
 - [ ] Vitest API를 올바르게 사용했는가? (`vi` 사용, `jest` 사용 금지)
 - [ ] React 컴포넌트 테스트에 `@testing-library/react`를 사용했는가?
+
+### 비동기 테스트
 - [ ] 비동기 테스트에 `await`와 `findBy*`를 사용했는가?
+
+### 모킹
 - [ ] 모킹이 적절히 사용되었는가?
+- [ ] `vi.fn()`을 사용했는가? (jest.fn() 금지)
+
+### 테스트 독립성
 - [ ] 테스트가 독립적으로 실행 가능한가?
+- [ ] beforeEach/afterEach로 상태 초기화를 했는가?
 
 ## 참고
 

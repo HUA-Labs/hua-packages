@@ -10,6 +10,43 @@ compatibility:
 
 이 스킬은 HUA Platform의 Pull Request를 올바르게 생성하는 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### PR 생성 전 필수 확인
+
+```
+IF (PR을 생성하려고 할 때) THEN
+  1. 모든 변경사항 커밋 확인
+  2. 타입 체크 통과 확인
+  3. 린트 통과 확인
+  4. 빌드 성공 확인
+  5. 커밋 메시지 컨벤션 확인
+  6. Graphite 사용 확인 (gt submit)
+END IF
+```
+
+### 자동 검증 로직
+
+```
+IF (PR 생성) THEN
+  IF (타입 체크 실패) THEN
+    → "타입 체크를 통과해야 합니다. pnpm type-check를 실행하세요."
+  END IF
+  
+  IF (린트 실패) THEN
+    → "린트를 통과해야 합니다. pnpm lint를 실행하세요."
+  END IF
+  
+  IF (빌드 실패) THEN
+    → "빌드가 성공해야 합니다. pnpm build를 실행하세요."
+  END IF
+  
+  IF (GitHub에서 수동 PR 생성) THEN
+    → "Graphite를 사용하여 PR을 생성하세요. gt submit을 사용하세요."
+  END IF
+END IF
+```
+
 ## PR 생성 전 확인사항
 
 ### 필수 체크리스트
@@ -19,14 +56,30 @@ compatibility:
 - [ ] 린트가 통과하는가? (`pnpm lint`)
 - [ ] 빌드가 성공하는가? (`pnpm build`)
 - [ ] 커밋 메시지가 컨벤션을 따르는가? (`.cursor/skills/commit-convention/SKILL.md` 참고)
-- [ ] 브랜치가 올바른가? (`.cursor/skills/git-flow/SKILL.md` 참고)
+- [ ] Graphite를 사용하여 PR을 생성하는가? (`gt submit`)
 
 ## PR 자동 생성
 
-### 스크립트 사용 (권장)
+### Graphite 사용 (⚠️ 권장)
 
 ```bash
-# 기본 사용 (develop 기준)
+# Graphite로 PR 제출
+gt submit
+
+# 베이스 브랜치 지정
+gt submit --base main
+```
+
+**기능:**
+- 변경된 파일 자동 분석
+- 커밋 메시지 분석
+- 변경 타입 자동 감지
+- PR 템플릿 자동 채우기
+
+### 스크립트 사용 (보조)
+
+```bash
+# PR 설명 생성 (Graphite와 함께 사용)
 pnpm generate:pr
 
 # 특정 베이스 브랜치 지정
@@ -35,12 +88,6 @@ pnpm generate:pr --base=main
 # 파일로 저장
 pnpm generate:pr --output=pr-description.md
 ```
-
-**기능:**
-- 변경된 파일 자동 분석
-- 커밋 메시지 분석
-- 변경 타입 자동 감지
-- PR 템플릿 자동 채우기
 
 ## PR 템플릿 구조
 
@@ -75,17 +122,15 @@ pnpm generate:pr --output=pr-description.md
 
 ## 타겟 브랜치 결정
 
-### 일반 개발
-- **From**: `feature/*`, `fix/*`
-- **To**: `develop`
+### Trunk-Based Development (현재 방식)
 
-### 릴리스
-- **From**: `develop`
-- **To**: `main`
+- **From**: Feature 브랜치 (Graphite 스택)
+- **To**: `main` (항상 main)
 
-### 긴급 수정
-- **From**: `hotfix/*`
-- **To**: `main` (그리고 `develop`)
+### ❌ 사용 안 함 (Git Flow)
+
+- ~~From: `feature/*`, `fix/*`~~
+- ~~To: `develop`~~
 
 ## PR 설명 작성 가이드
 
@@ -161,38 +206,37 @@ pnpm generate:pr --output=pr-description.md
 ### 브랜치 정리
 
 ```bash
-# 로컬 브랜치 정리
-pnpm gitflow:cleanup
+# Graphite로 병합된 브랜치 정리
+gt sync
 
-# 원격 브랜치도 정리
-pnpm gitflow:cleanup --remote
+# 또는 수동 정리
+git branch -d <branch-name>
+git push origin --delete <branch-name>
 ```
 
-### develop 동기화 (hotfix인 경우)
+## AI 어시스턴트 실행 체크리스트
 
-hotfix를 main에 머지한 경우, develop에도 머지:
+PR 생성 시 다음을 자동으로 확인하세요:
 
-```bash
-git checkout develop
-git pull origin develop
-git merge main
-git push origin develop
-```
-
-## 체크리스트
-
-PR 생성 시 다음을 확인하세요:
-
+### 생성 전 확인
 - [ ] 모든 변경사항이 커밋되었는가?
+- [ ] 타입 체크가 통과하는가?
+- [ ] 린트가 통과하는가?
+- [ ] 빌드가 성공하는가?
+
+### PR 제목 및 설명
 - [ ] PR 제목이 컨벤션을 따르는가?
-- [ ] 타겟 브랜치가 올바른가?
+- [ ] 타겟 브랜치가 올바른가? (main)
 - [ ] PR 설명이 충분히 상세한가?
 - [ ] 체크리스트를 모두 확인했는가?
-- [ ] 리뷰어를 지정했는가?
-- [ ] 적절한 라벨을 지정했는가?
+
+### Graphite 사용
+- [ ] Graphite를 사용하여 PR을 생성했는가? (`gt submit`)
+- [ ] GitHub에서 수동으로 PR을 생성하지 않았는가?
 
 ## 참고
 
-- PR 템플릿: `docs/templates/pr-template.md`
+- PR 템플릿: `docs/templates/PR_TEMPLATE.md`
 - PR 생성 스크립트: `scripts/generate-pr.ts`
-- 자동 생성 예시: `PR_DEVELOP_TO_MAIN.md`
+- Graphite 워크플로우: `.cursor/skills/graphite-workflow/SKILL.md`
+- Trunk-Based Development: `.cursor/skills/trunk-based-development/SKILL.md`
