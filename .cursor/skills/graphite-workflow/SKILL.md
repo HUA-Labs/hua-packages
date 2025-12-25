@@ -10,6 +10,57 @@ compatibility:
 
 이 스킬은 Graphite(gt CLI)의 Stacked Diff 방식을 사용하여 거대한 PR(Monster PR)을 피하고 논리적인 작은 단위로 작업을 분리하는 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 절대 금지 사항
+- ❌ `git commit` 사용 금지 → 반드시 `gt create` 사용
+- ❌ `git rebase` 사용 금지 → Graphite는 merge commit 방식 사용
+- ❌ 작업 완료 후에만 스택 생성 제안 → 작업 중간에 제안해야 함
+- ❌ main 브랜치에 직접 푸시 → 항상 PR을 통해서만 병합
+
+### 필수 실행 규칙
+
+#### 규칙 1: 파일 수정 시작 시 즉시 체크
+```
+IF (수정 중인 파일이 5개 이상) THEN
+  → 즉시 사용자에게 제안:
+    "여러 파일을 수정하고 계시네요. 논리적 단위로 나눠서 스택을 생성하시겠어요?"
+    "예를 들어, DB 변경만 완료하셨다면 여기서 `gt create`로 스택을 만들고 다음 작업을 진행하시겠어요?"
+END IF
+```
+
+#### 규칙 2: 논리적 단위 완성 시 즉시 제안
+```
+IF (다음 중 하나라도 해당) THEN
+  - DB 스키마 변경 완료 → API 작업 시작 전
+  - 패키지 작업 완료 → 앱 작업 시작 전
+  - API 엔드포인트 완료 → UI 작업 시작 전
+  - 한 영역의 작업 완료 → 다른 영역으로 넘어가기 전
+THEN
+  → 즉시 사용자에게 제안:
+    "지금까지 [완료한 작업]이 완료되었습니다. 여기서 스택을 생성하고 다음 작업을 진행하시겠어요?"
+    "명령어: gt create -m 'feat: [완료한 작업 요약]'"
+END IF
+```
+
+#### 규칙 3: 작업 중간 체크 (10개 이상 파일)
+```
+IF (수정 중인 파일이 10개 이상) AND (아직 스택 생성 안 함) THEN
+  → 즉시 사용자에게 제안:
+    "작업이 많이 쌓였습니다. 현재까지의 논리적 단위를 스택으로 저장하시겠어요?"
+    "이렇게 하면 작업을 안전하게 보관하고 다음 단계로 진행할 수 있습니다."
+END IF
+```
+
+#### 규칙 4: 작업 완료 시
+```
+IF (사용자가 작업 완료를 알림) OR (모든 변경사항이 완료됨) THEN
+  → 사용자에게 제안:
+    "이 변경 사항을 새로운 스택으로 쌓을까요?"
+    "명령어: gt create -m 'feat: [작업 내용]'"
+END IF
+```
+
 ## 핵심 원칙
 
 ### 1. Stacked Diff 방식
@@ -18,30 +69,22 @@ compatibility:
 - 각 스택은 독립적으로 리뷰 가능하도록 구성
 
 ### 2. Git 명령어 대신 Graphite 명령어 사용
-- `git commit` 대신 `gt create` 사용
-- `git rebase` 금지 (Graphite는 merge commit 방식)
-- `gt sync`로 trunk와 동기화
-- `gt checkout` 대신 `gt checkout` 또는 `gt up` 사용 (스택 내 이동)
+- `git commit` → `gt create` 사용
+- `git rebase` → 금지 (Graphite는 merge commit 방식)
+- `gt sync` → trunk와 동기화
+- `gt checkout` → 스택 내 이동
 
 ## 주요 워크플로우 규칙
 
 ### 1. 커밋 대신 스택 생성
 
-**금지 사항**:
-- `git commit` 사용 금지
-- 베이스 브랜치를 신경 쓰는 복잡한 작업 흐름
-
-**권장 사항**:
-- 작업 완료 시 "이 변경 사항을 새로운 스택으로 쌓을까요?"라고 제안
-- `gt create -m "feat: <message>"` 명령어 사용
-- 현재 작업 위에 바로 쌓는 흐름 유지
-
-**예시**:
+**❌ 절대 하지 말 것:**
 ```bash
-# ❌ 하지 말 것
 git commit -m "feat: add user stats"
+```
 
-# ✅ 권장
+**✅ 반드시 이렇게:**
+```bash
 gt create -m "feat: add user stats api"
 ```
 
@@ -49,62 +92,56 @@ gt create -m "feat: add user stats api"
 
 **시나리오**: DB 스키마 수정 → API 로직 → UI 작업을 한꺼번에 수행한 경우
 
-**분리 방법**:
-1. DB 변경점만 먼저 스택 생성
-   ```bash
-   gt create -m "fix: update user schema"
-   ```
+**올바른 분리 방법:**
+```bash
+# 1단계: DB 변경만 먼저 스택 생성
+gt create -m "fix: update user schema"
 
-2. API 변경점을 다음 스택으로 생성
-   ```bash
-   gt create -m "feat: add user stats api"
-   ```
+# 2단계: API 변경을 다음 스택으로 생성
+gt create -m "feat: add user stats api"
 
-3. UI 변경점을 마지막 스택으로 생성
-   ```bash
-   gt create -m "feat: add user stats dashboard"
-   ```
+# 3단계: UI 변경을 마지막 스택으로 생성
+gt create -m "feat: add user stats dashboard"
+```
 
-**분리 기준**:
-- **DB 변경**: 스키마 수정, 마이그레이션
-- **API 변경**: 엔드포인트 추가/수정, 비즈니스 로직
-- **UI 변경**: 컴포넌트, 페이지, 스타일
+**분리 기준:**
+- **DB 변경**: 스키마 수정, 마이그레이션 → 스택 1
+- **API 변경**: 엔드포인트 추가/수정, 비즈니스 로직 → 스택 2
+- **UI 변경**: 컴포넌트, 페이지, 스타일 → 스택 3
 - **테스트**: 각 스택에 해당하는 테스트 포함
 
-### 2-1. 모노레포에서의 스택 분리 (특별 가이드)
+### 3. 모노레포에서의 스택 분리 (특별 가이드)
 
 **시나리오**: 패키지 간 의존성 변경 (예: `hua-ui` 패키지 업데이트)
 
-**올바른 분리 방법**:
-1. 하위 패키지부터 먼저 스택 생성
-   ```bash
-   gt create -m "feat(packages/hua-ui): update Button API"
-   ```
-
-2. 의존하는 앱들을 순차적으로 스택 생성
-   ```bash
-   gt create -m "feat(apps/my-app): migrate to new Button API"
-   gt create -m "feat(apps/my-api): migrate to new Button API"
-   ```
-
-3. 병합 순서: 하위 패키지 → 상위 앱 순서로 병합
-   - PR 1 (hua-ui) 먼저 병합
-   - PR 2 (my-app) 다음 병합
-   - PR 3 (my-api) 마지막 병합
-
-**주의사항**:
-- ⚠️ **의존성 방향 준수**: 하위 패키지부터 먼저 병합
-- ⚠️ **순환 의존성 방지**: `motion-core → ui` 같은 금지된 의존성 확인
-- ⚠️ **Turbo 빌드**: `dependsOn: ["^build"]` 설정으로 자동 처리되지만, 스택 분리 시 빌드 순서 확인
-
-**잘못된 예시**:
+**✅ 올바른 순서:**
 ```bash
-# ❌ 앱 변경을 먼저 스택 생성 (의존성 오류 발생)
+# 1. 하위 패키지부터 먼저 스택 생성
+gt create -m "feat(packages/hua-ui): update Button API"
+
+# 2. 의존하는 앱들을 순차적으로 스택 생성
+gt create -m "feat(apps/my-app): migrate to new Button API"
+gt create -m "feat(apps/my-api): migrate to new Button API"
+```
+
+**❌ 잘못된 순서:**
+```bash
+# 앱 변경을 먼저 스택 생성 (의존성 오류 발생)
 gt create -m "feat(apps/my-app): use new Button API"  # hua-ui 변경 전
 gt create -m "feat(packages/hua-ui): update Button API"  # 나중에
 ```
 
-### 3. 작업 흐름 가이드
+**병합 순서:**
+1. PR 1 (hua-ui) → 먼저 병합
+2. PR 2 (my-app) → 다음 병합
+3. PR 3 (my-api) → 마지막 병합
+
+**주의사항:**
+- ⚠️ **의존성 방향 준수**: 하위 패키지부터 먼저 병합
+- ⚠️ **순환 의존성 방지**: `motion-core → ui` 같은 금지된 의존성 확인
+- ⚠️ **Turbo 빌드**: `dependsOn: ["^build"]` 설정으로 자동 처리되지만, 스택 분리 시 빌드 순서 확인
+
+### 4. 작업 흐름 가이드
 
 #### 최신 상태 동기화
 ```bash
@@ -115,10 +152,6 @@ git checkout feature-branch
 
 # ✅ 권장
 gt sync  # trunk와 동기화 및 병합된 브랜치 정리
-# 또는
-git checkout main
-git pull origin main
-gt checkout <branch-name>  # Graphite로 브랜치 체크아웃
 ```
 
 #### 스택 정리 및 동기화
@@ -146,17 +179,14 @@ gt track --parent main <branch-name>
 
 # 2. 베이스 브랜치 지정하여 제출
 gt submit --base main
-
-# 3. 또는 Graphite 설정 파일에서 trunk 설정
-# .git/.graphite_repo_config에서 trunk: "main" 설정
 ```
 
-### 4. PR 제출 자동화
+### 5. PR 제출 자동화
 
-**금지 사항**:
+**❌ 금지 사항:**
 - GitHub 웹사이트로 가서 수동으로 PR 생성
 
-**권장 사항**:
+**✅ 권장 사항:**
 ```bash
 # 전체 스택을 PR로 제출
 gt submit
@@ -174,7 +204,7 @@ gt submit --base main
 
 **시나리오**: `hua-i18n-core` 패키지 API 변경 후 모든 앱 업데이트
 
-**올바른 스택 분리**:
+**올바른 스택 분리:**
 ```bash
 # 1. 패키지 변경 (하위 레벨)
 gt create -m "feat(packages/hua-i18n-core): add new translation API"
@@ -188,29 +218,29 @@ gt create -m "feat(apps/my-api): migrate to new i18n API"
 gt create -m "feat(apps/my-chat): migrate to new i18n API"
 ```
 
-**병합 순서**:
+**병합 순서:**
 1. PR 1 (hua-i18n-core) → 먼저 병합
 2. PR 2 (hua-i18n-sdk) → 다음 병합
 3. PR 3-5 (앱들) → 병렬 또는 순차 병합
 
 ### Turbo 빌드와의 통합
 
-**Turbo의 `dependsOn: ["^build"]` 설정**:
+**Turbo의 `dependsOn: ["^build"]` 설정:**
 - Graphite 스택 분리와 잘 작동
 - 각 PR에서 관련 패키지만 빌드하여 효율적
 - 빌드 실패 시 해당 PR만 롤백 가능
 
-**주의사항**:
+**주의사항:**
 - 패키지 빌드 순서는 Turbo가 자동 관리
 - 스택 분리 시 빌드 의존성 고려 필요
 
 ### 순환 의존성 방지
 
-**금지된 의존성 규칙**:
+**금지된 의존성 규칙:**
 - `motion-core → ui` (순환 의존성)
 - `motion-core → motion-advanced` (역방향 의존성)
 
-**Graphite 사용 시**:
+**Graphite 사용 시:**
 - 스택 분리 시 의존성 방향 확인 필수
 - 하위 패키지부터 먼저 변경 및 병합
 
@@ -218,13 +248,12 @@ gt create -m "feat(apps/my-chat): migrate to new i18n API"
 
 ### 시나리오: 사용자 통계 대시보드 개발
 
-**작업 내용**:
+**작업 내용:**
 1. DB: User 테이블에 stats 필드 추가
 2. API: GET /api/user/stats 엔드포인트 생성
 3. UI: 대시보드 컴포넌트 생성
 
-**올바른 스택 분리**:
-
+**✅ 올바른 스택 분리:**
 ```bash
 # 1. DB 변경만 스택 생성
 gt create -m "feat(db): add user stats fields to schema"
@@ -236,36 +265,10 @@ gt create -m "feat(api): add user stats endpoint"
 gt create -m "feat(ui): add user stats dashboard component"
 ```
 
-**잘못된 예시**:
+**❌ 잘못된 예시:**
 ```bash
-# ❌ 모든 변경을 하나의 커밋으로
+# 모든 변경을 하나의 커밋으로
 git commit -m "feat: add user stats feature"
-```
-
-## 능동적 제안
-
-### 많은 파일 수정 시
-
-**상황**: 수십 개의 파일을 수정하고 있는 경우
-
-**제안**:
-> "잠깐! 너무 많이 쌓였습니다. 여기서 한번 `gt create`로 저장하고 갈까요?"
-
-**명령어**:
-```bash
-gt create -m "feat: <현재까지의 작업 요약>"
-```
-
-### 작업 완료 시
-
-**상황**: 작업을 마치고 커밋하려고 하는 경우
-
-**제안**:
-> "이 변경 사항을 새로운 스택으로 쌓을까요?"
-
-**명령어**:
-```bash
-gt create -m "feat: <작업 내용>"
 ```
 
 ## Graphite 명령어 요약
@@ -273,23 +276,16 @@ gt create -m "feat: <작업 내용>"
 ### 기본 명령어
 
 ```bash
-# 스택 생성
+# 스택 생성 (가장 중요!)
 gt create -m "feat: <message>"
 
 # 최신 상태 동기화
-gt up
-
-# 스택 정리 및 재정렬
-gt sync  # trunk와 동기화
-gt restack  # 스택 재정렬 (별도 명령어, 주의: rebase 사용 가능)
+gt sync  # trunk와 동기화 및 병합된 브랜치 정리
 
 # PR 제출
 gt submit
 
 # 스택 상태 확인
-gt stack
-
-# 스택 로그 확인
 gt log
 ```
 
@@ -320,8 +316,6 @@ gt merge --confirm
 
 # 병합 전 미리보기 (실제 병합하지 않음)
 gt merge --dry-run
-
-# 주의: gt downstack merge는 deprecated, gt merge 사용
 ```
 
 ### 브랜치 정리
@@ -334,27 +328,35 @@ gt sync
 git fetch --prune origin
 
 # 특정 브랜치 삭제
-git branch -d <branch-name>
-git push origin --delete <branch-name>
+gt branch delete <branch-name>
 ```
 
-## 체크리스트
+## AI 어시스턴트 실행 체크리스트
 
-Graphite 워크플로우 사용 시 다음을 확인하세요:
+작업을 시작하기 전에 다음을 확인하세요:
 
-- [ ] `git commit` 대신 `gt create`를 사용했는가?
-- [ ] 논리적으로 스택을 분리했는가? (DB, API, UI 등)
-- [ ] 각 스택이 독립적으로 리뷰 가능한가?
-- [ ] `gt up`으로 최신 상태를 동기화했는가?
-- [ ] `gt submit`으로 PR을 제출했는가?
-- [ ] 복잡한 `git rebase` 대신 `gt sync`와 `gt restack`을 적절히 사용했는가?
+### 작업 시작 시
+- [ ] `gt sync`로 최신 상태 확인
+- [ ] 현재 브랜치 확인 (`gt log`)
 
-### 모노레포 특화 체크리스트
+### 파일 수정 중
+- [ ] 5개 이상 파일 수정 시작 → 즉시 스택 생성 제안
+- [ ] 10개 이상 파일 수정 → 즉시 스택 생성 제안
+- [ ] 논리적 단위 완성 → 즉시 스택 생성 제안
 
-- [ ] 패키지 간 의존성 변경 시 하위 패키지부터 스택을 생성했는가?
-- [ ] 순환 의존성 규칙을 위반하지 않았는가? (`motion-core → ui` 금지 등)
-- [ ] 병합 순서가 올바른가? (하위 패키지 → 상위 앱)
-- [ ] Turbo 빌드 의존성을 고려했는가?
+### 스택 생성 시
+- [ ] `git commit` 대신 `gt create` 사용
+- [ ] 논리적으로 스택 분리 (DB, API, UI 등)
+- [ ] 각 스택이 독립적으로 리뷰 가능한지 확인
+
+### 모노레포 작업 시
+- [ ] 패키지 간 의존성 변경 시 하위 패키지부터 스택 생성
+- [ ] 순환 의존성 규칙 위반하지 않았는지 확인
+- [ ] 병합 순서가 올바른지 확인 (하위 패키지 → 상위 앱)
+
+### PR 제출 시
+- [ ] `gt submit`으로 PR 제출
+- [ ] `gt sync`로 동기화 확인
 
 ## 주의사항
 
@@ -364,7 +366,7 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 2. **베이스 브랜치 신경 쓰지 않기**: Graphite가 자동으로 관리
 3. **복잡한 Git 명령어 피하기**: Graphite 명령어로 대체
 4. **작은 단위로 분리**: 하나의 스택은 하나의 논리적 변경만 포함
-5. **능동적 제안**: 많은 파일 수정 시 중간에 스택 생성 제안
+5. **🚨 능동적 제안 필수**: 작업 중간에 논리적 단위가 완성될 때마다 스택 생성 제안 (작업 완료 후가 아님!)
 6. **리베이스 금지**: Graphite는 merge commit 방식 사용, `git rebase` 사용 금지
 7. **충돌 해결**: `gt restack`이 rebase를 사용할 수 있어 충돌이 반복될 경우, 수동으로 `git merge main --no-ff` 사용 권장
 
@@ -374,7 +376,7 @@ Graphite 워크플로우 사용 시 다음을 확인하세요:
 
 **문제**: `gt restack` 실행 시 충돌이 반복적으로 발생
 
-**해결**:
+**해결:**
 ```bash
 # 1. restack 중단
 gt abort  # 또는 git rebase --abort
@@ -396,7 +398,7 @@ gt sync
 
 **원인**: 스택의 하위 PR이 이미 병합되었지만 trunk에 반영되지 않음
 
-**해결**:
+**해결:**
 ```bash
 # 1. trunk 최신화
 git checkout main
@@ -413,7 +415,7 @@ gt submit
 
 **문제**: `gt log`에 브랜치가 표시되지 않음
 
-**해결**:
+**해결:**
 ```bash
 # 브랜치를 main의 parent로 추적 설정
 gt track --parent main <branch-name>

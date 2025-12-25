@@ -10,6 +10,37 @@ compatibility:
 
 이 스킬은 Graphite와 Vercel을 사용한 **트렁크 기반 개발(Trunk-Based Development)** 워크플로우를 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 브랜치 작업 시 필수 확인
+
+```
+IF (브랜치 작업 시작) THEN
+  1. Base 브랜치가 main인지 확인 (develop 사용 안 함)
+  2. Graphite 명령어 사용 확인 (gt create, gt submit)
+  3. main 브랜치 직접 푸시 금지 확인
+  4. 작은 PR로 분리 확인
+END IF
+```
+
+### 자동 검증 로직
+
+```
+IF (브랜치 작업) THEN
+  IF (develop 브랜치 사용) THEN
+    → "develop 브랜치는 사용하지 않습니다. main 브랜치를 사용하세요."
+  END IF
+  
+  IF (main 브랜치에 직접 푸시 시도) THEN
+    → "main 브랜치에 직접 푸시할 수 없습니다. PR을 통해서만 병합하세요."
+  END IF
+  
+  IF (큰 PR 생성) THEN
+    → "Graphite로 논리적 단위로 분리하세요."
+  END IF
+END IF
+```
+
 ## 핵심 원칙
 
 ### 1. Main 브랜치 중심 개발
@@ -241,19 +272,29 @@ gt track --parent main <branch-name>
 3. **빌드 오류 수정을 먼저**: 기초 작업을 스택 1번에 배치
 4. **Vercel Preview 활용**: 모든 테스트를 Preview에서 수행
 
-## 체크리스트
+## AI 어시스턴트 실행 체크리스트
 
-Trunk-Based Development 사용 시 다음을 확인하세요:
+Trunk-Based Development 사용 시 다음을 자동으로 확인하세요:
 
+### 브랜치 확인
 - [ ] Base 브랜치가 `main`으로 설정되었는가?
+- [ ] develop 브랜치를 사용하지 않았는가?
+
+### Graphite 사용
 - [ ] Graphite 스택이 `main`을 기준으로 생성되었는가?
 - [ ] `gt submit` 시 `--base main`을 사용했는가?
-- [ ] Vercel Preview에서 테스트를 완료했는가?
+
+### PR 관리
 - [ ] 작은 PR로 논리적 단위를 분리했는가?
-- [ ] develop 브랜치를 사용하지 않았는가?
+- [ ] Vercel Preview에서 테스트를 완료했는가?
+
+### 병합 확인
+- [ ] main 브랜치에 직접 푸시하지 않았는가?
+- [ ] PR을 통해서만 병합했는가?
 
 ## 참고
 
 - [Trunk-Based Development 가이드](https://trunkbaseddevelopment.com/)
 - [Graphite 공식 문서](https://docs.graphite.dev/)
 - [Vercel Preview Deployments](https://vercel.com/docs/deployments/preview-deployments)
+- Graphite 워크플로우: `.cursor/skills/graphite-workflow/SKILL.md`

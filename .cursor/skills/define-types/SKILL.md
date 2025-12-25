@@ -10,19 +10,52 @@ compatibility:
 
 이 스킬은 HUA Platform의 TypeScript 타입 정의 가이드를 따르는 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 타입 정의 시 필수 확인
+
+```
+IF (타입을 정의할 때) THEN
+  1. any 타입 사용 금지 확인
+  2. 타입 위치 확인 (공유 vs 로컬)
+  3. 명시적 타입 정의 확인
+  4. Prisma 타입 활용 확인
+  5. 유틸리티 타입 활용 확인
+END IF
+```
+
+### 자동 검증 로직
+
+```
+IF (타입 정의) THEN
+  IF (any 타입 사용) THEN
+    → "any 타입은 사용할 수 없습니다. unknown을 사용하거나 명시적 타입을 정의하세요."
+  END IF
+  
+  IF (공유 타입을 로컬에 정의) THEN
+    → "여러 파일에서 사용하는 타입은 types/ 폴더에 정의하세요."
+  END IF
+  
+  IF (Prisma 타입을 재정의) THEN
+    → "Prisma 타입을 확장하여 사용하세요."
+  END IF
+END IF
+```
+
 ## 타입 정의 위치
 
-### 공유 타입
-- **앱 공유 타입**: `apps/{app-name}/app/types/`
-- **예시**: `apps/my-app/app/types/api.ts`
+### 위치 선택 로직
 
-### 패키지 타입
-- **패키지 타입**: `packages/{package-name}/src/types/`
-- **예시**: `packages/hua-i18n-sdk/src/types/index.ts`
+```
+IF (여러 파일에서 사용) THEN
+  → types/ 폴더에 정의
+ELSE IF (단일 파일에서만 사용) THEN
+  → 파일 내부에 정의
+END IF
+```
 
-### 로컬 타입
-- **컴포넌트 타입**: 컴포넌트 파일 내부에 정의
-- **함수 타입**: 함수 파일 내부에 정의
+- **공유 타입**: `apps/{app-name}/app/types/` 또는 `packages/{package-name}/src/types/`
+- **로컬 타입**: 컴포넌트/함수 파일 내부에 정의
 
 ## 타입 정의 규칙
 
@@ -42,11 +75,11 @@ compatibility:
 
 ## 기본 타입 정의
 
-### 인터페이스
+### ✅ 올바른 예시: 인터페이스
 
 ```typescript
 // apps/my-app/app/types/api.ts
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
@@ -60,7 +93,7 @@ export interface ApiError {
 }
 ```
 
-### 타입 별칭
+### ✅ 올바른 예시: 타입 별칭
 
 ```typescript
 export type UserId = string
@@ -70,7 +103,7 @@ export type Timestamp = number
 export type Status = 'pending' | 'completed' | 'failed'
 ```
 
-### 유니온 타입
+### ✅ 올바른 예시: 유니온 타입
 
 ```typescript
 export type Theme = 'light' | 'dark' | 'system'
@@ -80,7 +113,7 @@ export type UserRole = 'user' | 'admin' | 'moderator'
 
 ## Prisma 타입 활용
 
-### Prisma Enum 타입
+### ✅ 올바른 예시: Prisma Enum 타입
 
 ```typescript
 import { 
@@ -98,7 +131,7 @@ export interface User {
 }
 ```
 
-### Prisma 타입 확장
+### ✅ 올바른 예시: Prisma 타입 확장
 
 ```typescript
 import { User as PrismaUser } from '@prisma/client'
@@ -111,7 +144,7 @@ export interface User extends PrismaUser {
 
 ## 유틸리티 타입 활용
 
-### 기본 유틸리티 타입
+### ✅ 올바른 예시: 기본 유틸리티 타입
 
 ```typescript
 // Partial - 모든 속성을 선택적으로
@@ -130,7 +163,7 @@ type UserWithoutId = Omit<User, 'id'>
 type UserMap = Record<string, User>
 ```
 
-### ComponentProps 활용
+### ✅ 올바른 예시: ComponentProps 활용
 
 ```typescript
 import { ComponentProps } from 'react'
@@ -144,7 +177,7 @@ type CustomButtonProps = ComponentProps<typeof Button> & {
 
 ## 타입 가드
 
-### 사용자 정의 타입 가드
+### ✅ 올바른 예시: 사용자 정의 타입 가드
 
 ```typescript
 export function isApiError(error: unknown): error is ApiError {
@@ -166,7 +199,7 @@ try {
 }
 ```
 
-### 타입 좁히기
+### ✅ 올바른 예시: 타입 좁히기
 
 ```typescript
 function processValue(value: string | number) {
@@ -182,7 +215,7 @@ function processValue(value: string | number) {
 
 ## 제네릭 타입
 
-### 기본 제네릭
+### ✅ 올바른 예시: 기본 제네릭
 
 ```typescript
 export interface ApiResponse<T> {
@@ -198,7 +231,7 @@ const userResponse: ApiResponse<User> = {
 }
 ```
 
-### 제약 조건
+### ✅ 올바른 예시: 제약 조건
 
 ```typescript
 interface Identifiable {
@@ -215,7 +248,7 @@ function findById<T extends Identifiable>(
 
 ## 데이터베이스 타입
 
-### Supabase Database 타입
+### ✅ 올바른 예시: Supabase Database 타입
 
 ```typescript
 // lib/types/database.ts
@@ -234,7 +267,7 @@ export interface Database {
 
 ## 타입 export
 
-### 인덱스 파일
+### ✅ 올바른 예시: 인덱스 파일
 
 ```typescript
 // types/index.ts
@@ -243,7 +276,7 @@ export type { User, UserProfile } from './user'
 export type { Database } from './database'
 ```
 
-### 패키지 타입 export
+### ✅ 올바른 예시: 패키지 타입 export
 
 ```typescript
 // packages/hua-i18n-sdk/src/index.ts
@@ -254,17 +287,27 @@ export type {
 }
 ```
 
-## 체크리스트
+## AI 어시스턴트 실행 체크리스트
 
-타입 정의 시 다음을 확인하세요:
+타입 정의 시 다음을 자동으로 확인하세요:
 
+### 타입 위치
 - [ ] 타입이 올바른 위치에 있는가? (공유 vs 로컬)
+- [ ] 여러 파일에서 사용하는 타입은 types/ 폴더에 있는가?
+
+### 타입 안전성
 - [ ] `any` 타입을 사용하지 않았는가?
 - [ ] 명시적으로 타입이 정의되었는가?
+- [ ] `unknown` 타입을 적절히 사용했는가?
+
+### 타입 활용
 - [ ] Prisma 타입을 적절히 활용했는가?
 - [ ] 유틸리티 타입을 적절히 사용했는가?
 - [ ] 타입 가드가 필요한 곳에 구현되었는가?
+
+### 타입 export
 - [ ] 타입이 적절히 export되었는가?
+- [ ] 인덱스 파일을 사용했는가? (여러 타입인 경우)
 
 ## 참고
 

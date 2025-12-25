@@ -10,6 +10,31 @@ compatibility:
 
 이 스킬은 HUA Platform 모노레포에서 작업하는 올바른 방법을 안내합니다.
 
+## 🚨 AI 어시스턴트 필수 준수 사항
+
+### 작업 시작 전 필수 확인
+
+```
+IF (모노레포에서 작업 시작) THEN
+  1. 작업 위치 확인 (apps/ 또는 packages/)
+  2. 패키지 매니저 확인 (pnpm 사용)
+  3. 의존성 확인 (workspace:* 사용)
+  4. Graphite 사용 시 의존성 순서 확인
+END IF
+```
+
+### 명령어 실행 시 확인
+
+```
+IF (명령어 실행) THEN
+  IF (특정 앱/패키지만 작업) THEN
+    → --filter 옵션 사용
+  ELSE
+    → 루트에서 실행
+  END IF
+END IF
+```
+
 ## 프로젝트 구조
 
 ```
@@ -34,17 +59,21 @@ hua-platform/
 
 ## 작업 위치 결정
 
-### 앱 작업
-- **위치**: `apps/{app-name}/`
-- **예시**: `apps/my-app/`
+### 위치 선택 로직
 
-### 패키지 작업
-- **위치**: `packages/{package-name}/`
-- **예시**: `packages/hua-ui/`
+```
+IF (앱 작업) THEN
+  → `apps/{app-name}/`
+ELSE IF (패키지 작업) THEN
+  → `packages/{package-name}/`
+ELSE IF (공통 스크립트) THEN
+  → `scripts/`
+END IF
+```
 
-### 공통 스크립트
-- **위치**: `scripts/`
-- **사용**: 루트에서 `pnpm run {script-name}`
+- **앱 작업**: `apps/{app-name}/`
+- **패키지 작업**: `packages/{package-name}/`
+- **공통 스크립트**: `scripts/`
 
 ## 명령어 실행
 
@@ -64,7 +93,7 @@ pnpm type-check
 pnpm lint
 ```
 
-### 특정 앱/패키지만 실행
+### 특정 앱/패키지만 실행 (⚠️ 권장)
 
 ```bash
 # 특정 앱 개발
@@ -105,7 +134,7 @@ pnpm build
 ### 새 패키지 추가
 
 ```bash
-# 루트에서 실행
+# 루트에서 실행 (권장)
 pnpm add {package-name} --filter=my-app
 
 # 또는 앱 폴더에서
@@ -146,14 +175,14 @@ import { Component } from '@/components'
 - **설정**: `turbo.json` 파일 참조
 - **캐싱**: 자동 빌드 캐싱 지원
 
-## Graphite와 함께 사용하기
+## Graphite와 함께 사용하기 (⚠️ 중요!)
 
 ### 패키지 변경 워크플로우
 
 패키지 간 의존성이 있는 변경 시 Graphite를 사용하여 단계적으로 작업:
 
 ```bash
-# 1. 하위 패키지부터 변경
+# 1. 하위 패키지부터 변경 (⚠️ 순서 중요!)
 gt create -m "feat(packages/hua-ui): update Button component"
 
 # 2. 의존하는 앱들 업데이트
@@ -170,30 +199,75 @@ gt submit
 
 ### 의존성 변경 시 주의사항
 
-1. **순환 의존성 방지**
-   - `motion-core → ui` 같은 금지된 의존성 확인
-   - 스택 분리 시 의존성 방향 확인 필수
+#### 1. 순환 의존성 방지
 
-2. **Turbo 빌드 통합**
-   - `dependsOn: ["^build"]` 설정으로 자동 처리
-   - 각 PR에서 관련 패키지만 빌드
+```
+IF (의존성 변경) THEN
+  → 순환 의존성 확인
+  → `motion-core → ui` 같은 금지된 의존성 확인
+  → 스택 분리 시 의존성 방향 확인 필수
+END IF
+```
 
-3. **workspace 의존성**
-   - `workspace:*` 사용 시 패키지 버전 일치 확인
-   - 패키지 변경 후 의존하는 앱들도 함께 업데이트
+**금지된 의존성**:
+- `motion-core → ui` (순환 의존성)
+- `motion-core → motion-advanced` (역방향 의존성)
 
-## 체크리스트
+#### 2. Turbo 빌드 통합
 
-모노레포 작업 시 다음을 확인하세요:
+- `dependsOn: ["^build"]` 설정으로 자동 처리
+- 각 PR에서 관련 패키지만 빌드
 
+#### 3. workspace 의존성
+
+- `workspace:*` 사용 시 패키지 버전 일치 확인
+- 패키지 변경 후 의존하는 앱들도 함께 업데이트
+
+## AI 어시스턴트 실행 체크리스트
+
+모노레포 작업 시 다음을 자동으로 확인하세요:
+
+### 작업 시작 전
 - [ ] 올바른 위치에서 작업하고 있는가? (apps/ 또는 packages/)
 - [ ] 루트에서 `pnpm install`을 실행했는가?
 - [ ] `--filter` 옵션을 올바르게 사용했는가?
+
+### 의존성 관리
 - [ ] 패키지 간 의존성이 올바르게 설정되었는가?
 - [ ] 경로 별칭을 올바르게 사용했는가?
+- [ ] `workspace:*` 사용 시 버전 일치 확인
 
-### Graphite 사용 시 추가 체크리스트
-
+### Graphite 사용 시 (⚠️ 중요!)
 - [ ] 패키지 변경 시 하위 패키지부터 스택을 생성했는가?
 - [ ] 순환 의존성 규칙을 위반하지 않았는가?
 - [ ] 병합 순서가 올바른가? (하위 → 상위)
+
+## 자동 검증 로직
+
+```
+IF (모노레포 작업 시작) THEN
+  IF (작업 위치가 apps/ 또는 packages/가 아님) THEN
+    → "작업 위치를 확인하세요. apps/ 또는 packages/ 폴더에서 작업해야 합니다."
+  END IF
+  
+  IF (명령어 실행 시 --filter 옵션 누락) THEN
+    → "특정 앱/패키지만 작업할 때는 --filter 옵션을 사용하세요."
+    → 예시: "pnpm dev --filter=my-app"
+  END IF
+  
+  IF (Graphite 사용 시 의존성 순서 오류) THEN
+    → "하위 패키지부터 먼저 스택을 생성해야 합니다."
+    → 올바른 순서 제안
+  END IF
+  
+  IF (순환 의존성 감지) THEN
+    → "순환 의존성이 감지되었습니다. 의존성 방향을 확인하세요."
+  END IF
+END IF
+```
+
+## 참고
+
+- Graphite 워크플로우: `.cursor/skills/graphite-workflow/SKILL.md`
+- 패키지 구조: `pnpm-workspace.yaml`
+- Turbo 설정: `turbo.json`
