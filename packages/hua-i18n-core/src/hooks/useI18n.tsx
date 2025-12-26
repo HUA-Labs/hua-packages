@@ -157,20 +157,10 @@ export function I18nProvider({
       if (translatorLang !== currentLanguage) {
         // translator의 언어를 currentLanguage로 변경
         // 이는 외부에서 setLanguage를 호출했을 때 발생하는 정상적인 동기화
-        if (config.debug) {
-          console.log(`🔄 [USEI18N] Syncing translator language: ${translatorLang} -> ${currentLanguage} (already initialized)`);
-        }
         translator.setLanguage(currentLanguage);
       }
       return;
     }
-    
-    console.log('🔄 [USEI18N] useEffect triggered:', { 
-      hasTranslator: !!translator, 
-      currentLanguage, 
-      debug: config.debug,
-      isInitialized 
-    });
     
     const initializeTranslator = async () => {
       try {
@@ -186,16 +176,9 @@ export function I18nProvider({
         // 모든 번역 데이터 미리 로드
         await translator.initialize();
         setIsInitialized(true);
-        
-        if (config.debug) {
-          console.log('✅ [USEI18N] Translator initialization completed successfully');
-        }
       } catch (err) {
         const initError = err as TranslationError;
         setError(initError);
-        if (config.debug) {
-          console.error('❌ [USEI18N] Failed to initialize translator:', initError);
-        }
         // 에러가 발생해도 초기화 완료로 표시 (기본 번역 사용)
         setIsInitialized(true);
       } finally {
@@ -215,9 +198,6 @@ export function I18nProvider({
     const unsubscribe = translator.onTranslationLoaded(() => {
       // 번역이 로드되면 상태를 업데이트하여 리렌더링 트리거
       setTranslationVersion(prev => prev + 1);
-      if (config.debug) {
-        console.log('🔄 [USEI18N] Translation loaded, triggering re-render');
-      }
     });
 
     return unsubscribe;
@@ -232,9 +212,6 @@ export function I18nProvider({
     // 언어 변경 이벤트 구독
     const unsubscribe = translator.onLanguageChanged((newLanguage: string) => {
       if (newLanguage !== currentLanguage) {
-        if (config.debug) {
-          console.log(`🔄 [USEI18N] Language changed event: ${currentLanguage} -> ${newLanguage}`);
-        }
         setCurrentLanguageState(newLanguage);
         setTranslationVersion(prev => prev + 1); // 리렌더링 트리거
       }
@@ -252,7 +229,6 @@ export function I18nProvider({
     const handleLanguageChange = (event: CustomEvent) => {
       const newLanguage = event.detail;
       if (typeof newLanguage === 'string' && newLanguage !== currentLanguage) {
-        console.log('🌐 Auto language sync:', newLanguage);
         setLanguage(newLanguage);
       }
     };
@@ -278,14 +254,7 @@ export function I18nProvider({
     // 현재 언어와 동일하면 스킵 (무한 루프 방지)
     const currentLang = translator.getCurrentLanguage();
     if (currentLang === language) {
-      if (config.debug) {
-        console.log(`⏭️ [USEI18N] Language unchanged, skipping: ${language}`);
-      }
       return;
-    }
-
-    if (config.debug) {
-      console.log(`🔄 [USEI18N] setLanguage called: ${currentLang} -> ${language}`);
     }
     
     setIsLoading(true);
@@ -299,14 +268,7 @@ export function I18nProvider({
       // 로드되지 않은 네임스페이스는 자동으로 로드됨 (translator 내부에서 처리)
       // 언어 변경 시 리렌더링 트리거 (번역 로드 완료 이벤트가 자동으로 발생)
       await new Promise(resolve => setTimeout(resolve, 0)); // 다음 틱에서 리렌더링
-      
-      if (config.debug) {
-        console.log(`✅ [USEI18N] Language changed to ${language}`);
-      }
     } catch (error) {
-      if (config.debug) {
-        console.error(`❌ [USEI18N] Failed to change language to ${language}:`, error);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -320,14 +282,8 @@ export function I18nProvider({
     const _ = translationVersion;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const __ = currentLanguage;
-    // if (config.debug) {
-    //   console.log(`🎯 [USEI18N] t() called:`, { key, language, hasTranslator: !!translator, isInitialized, isLoading });
-    // }
     
     if (!translator) {
-      // if (config.debug) {
-      //   console.warn('🎯 [USEI18N] No translator available');
-      // }
       return key;
     }
     
@@ -409,9 +365,6 @@ export function I18nProvider({
   // 기존 비동기 번역 함수 (하위 호환성)
   const tAsync = useCallback(async (key: string, params?: TranslationParams) => {
     if (!translator) {
-      if (config.debug) {
-      console.warn('Translator not initialized');
-      }
       return key;
     }
 
@@ -420,26 +373,20 @@ export function I18nProvider({
       const result = await translator.translateAsync(key, params);
       return result;
     } catch (error) {
-      if (config.debug) {
-      console.error('Translation error:', error);
-      }
       return key;
     } finally {
       setIsLoading(false);
     }
-  }, [translator, config.debug]);
+  }, [translator]);
 
   // 기존 동기 번역 함수 (하위 호환성)
   const tSync = useCallback((key: string, namespace?: string, params?: TranslationParams) => {
     if (!translator) {
-      if (config.debug) {
-      console.warn('Translator not initialized');
-      }
       return key;
     }
 
     return translator.translateSync(key, params);
-  }, [translator, config.debug]);
+  }, [translator]);
 
   // 원시 값 가져오기 (배열, 객체 포함)
   const getRawValue = useCallback((key: string, language?: string): unknown => {
