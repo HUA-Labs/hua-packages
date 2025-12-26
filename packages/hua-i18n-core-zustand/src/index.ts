@@ -160,7 +160,6 @@ export function createZustandI18n(
           return; // 이미 실행됨
         }
         hydratedRef.current = true;
-        console.log(`✅ [ZUSTAND-I18N] Hydration complete`);
         
         // 하이드레이션 완료 후 저장된 언어로 동기화
         // 단, 초기 언어(initialLanguage)와 다를 때만 동기화
@@ -169,10 +168,7 @@ export function createZustandI18n(
           const storeLanguage = store.getState().language;
           // initialLanguage와 다르고, 현재 i18n 언어와도 다를 때만 동기화
           if (storeLanguage !== initialLanguage && storeLanguage !== currentLanguageRef.current) {
-            console.log(`🔄 [ZUSTAND-I18N] Hydration complete, syncing language: ${currentLanguageRef.current} -> ${storeLanguage}`);
             setI18nLanguage(storeLanguage);
-          } else {
-            console.log(`⏭️ [ZUSTAND-I18N] Hydration complete, no sync needed (store: ${storeLanguage}, initial: ${initialLanguage}, current: ${currentLanguageRef.current})`);
           }
         }
       };
@@ -194,7 +190,6 @@ export function createZustandI18n(
       
       const storeLanguage = store.getState().language;
       if (storeLanguage !== currentLanguageRef.current && storeLanguage !== initialLanguage) {
-        console.log(`🔄 [ZUSTAND-I18N] Syncing language from store: ${currentLanguageRef.current} -> ${storeLanguage}`);
         setI18nLanguage(storeLanguage);
       }
     }, [isInitialized, setI18nLanguage, initialLanguage]);
@@ -224,14 +219,8 @@ export function createZustandI18n(
           if (hydratedRef.current) {
             // currentLanguageRef를 사용하여 최신 값 확인 (무한 루프 방지)
             if (newLanguage !== currentLanguageRef.current) {
-              console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${currentLanguageRef.current} -> ${newLanguage}`);
               setI18nLanguage(newLanguage);
-            } else {
-              console.log(`⏭️ [ZUSTAND-I18N] Store language changed but i18n already synced: ${newLanguage}`);
             }
-          } else {
-            // 하이드레이션 완료 전에는 나중에 동기화하기 위해 저장
-            console.log(`⏳ [ZUSTAND-I18N] Store language changed but hydration not complete yet: ${newLanguage}`);
           }
         }
       });
@@ -242,10 +231,7 @@ export function createZustandI18n(
         const storeLanguage = store.getState().language;
         // initialLanguage와 다르고, 현재 i18n 언어와도 다를 때만 동기화
         if (storeLanguage !== initialLanguage && storeLanguage !== currentLanguageRef.current) {
-          console.log(`🔄 [ZUSTAND-I18N] Already hydrated, syncing language: ${currentLanguageRef.current} -> ${storeLanguage}`);
           setI18nLanguage(storeLanguage);
-        } else {
-          console.log(`⏭️ [ZUSTAND-I18N] Already hydrated, no sync needed (store: ${storeLanguage}, initial: ${initialLanguage}, current: ${currentLanguageRef.current})`);
         }
       }
 
