@@ -1,0 +1,57 @@
+{
+  "name": "@hua-labs/state",
+  "version": "0.1.0",
+  "description": "HUA State - Unified state management for hua-ux framework with SSR support and integrations",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./integrations/i18n": {
+      "types": "./dist/integrations/i18n.d.ts",
+      "import": "./src/integrations/i18n.ts",
+      "require": "./src/integrations/i18n.ts",
+      "default": "./dist/integrations/i18n.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "node ../../node_modules/typescript/lib/tsc.js",
+    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "clean": "rm -rf dist",
+    "lint": "echo 'Skipping lint for hua-state (ESLint 8, needs separate config)'",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "zustand": ">=5.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "keywords": [
+    "hua-state",
+    "zustand",
+    "state-management",
+    "ssr",
+    "react",
+    "nextjs"
+  ],
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
+}
