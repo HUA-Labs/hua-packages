@@ -1,0 +1,32 @@
+{
+  "title": "HUA UX Showcase",
+  "description": "See UI + Motion + i18n in one place",
+  "nav": {
+    "home": "Home",
+    "ui": "UI",
+    "motion": "Motion",
+    "i18n": "i18n"
+  },
+  "ui": {
+    "title": "UI Components",
+    "description": "HUA UI component library demo",
+    "spacing": "Spacing",
+    "components": "Components",
+    "icons": "Icons"
+  },
+  "motion": {
+    "title": "Motion Hooks",
+    "description": "HUA Motion hooks demo",
+    "scroll": "Scroll Motion",
+    "hover": "Hover Motion",
+    "transition": "Transition Motion"
+  },
+  "i18n": {
+    "title": "Internationalization",
+    "description": "HUA i18n demo",
+    "currentLanguage": "Current Language",
+    "switchLanguage": "Switch Language",
+    "welcome": "Welcome",
+    "descriptionText": "This page demonstrates internationalization support."
+  }
+}
