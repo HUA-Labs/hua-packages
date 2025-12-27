@@ -1,0 +1,32 @@
+{
+  "title": "HUA UX Showcase",
+  "description": "UI + Motion + i18n을 한 곳에서 확인하세요",
+  "nav": {
+    "home": "홈",
+    "ui": "UI",
+    "motion": "모션",
+    "i18n": "다국어"
+  },
+  "ui": {
+    "title": "UI 컴포넌트",
+    "description": "HUA UI 컴포넌트 라이브러리 데모",
+    "spacing": "스페이싱",
+    "components": "컴포넌트",
+    "icons": "아이콘"
+  },
+  "motion": {
+    "title": "Motion 훅",
+    "description": "HUA Motion 훅 데모",
+    "scroll": "스크롤 모션",
+    "hover": "호버 모션",
+    "transition": "전환 모션"
+  },
+  "i18n": {
+    "title": "다국어 지원",
+    "description": "HUA i18n 데모",
+    "currentLanguage": "현재 언어",
+    "switchLanguage": "언어 전환",
+    "welcome": "환영합니다",
+    "descriptionText": "이 페이지는 다국어 지원을 시연합니다."
+  }
+}
