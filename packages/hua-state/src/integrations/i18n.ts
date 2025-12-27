@@ -5,12 +5,12 @@
  */
 
 import { createHuaStore } from '../store/create-store';
-import type { HuaStore } from '../store/types';
+import type { HuaStore, BaseStoreState } from '../store/types';
 
 /**
  * i18n store state interface
  */
-export interface I18nStoreState {
+export interface I18nStoreState extends BaseStoreState {
   language: string;
   setLanguage: (lang: string) => void;
 }
@@ -79,7 +79,7 @@ export function createI18nStore(
       persist,
       persistKey: persistKey || 'hua-i18n-storage',
       ssr,
-      partialize: (state) => ({ language: state.language }),
+      partialize: (state: I18nStoreState) => ({ language: state.language }),
     }
   );
 }
