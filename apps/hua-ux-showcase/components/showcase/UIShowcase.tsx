@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '@hua-labs/i18n-core';
-import { Button, Card, Stack, Badge, Alert, Progress } from '@hua-labs/hua-ux';
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Stack, Badge, Alert, Progress } from '@hua-labs/hua-ux';
 
 export function UIShowcase() {
   const { t } = useTranslation();

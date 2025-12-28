@@ -25,11 +25,11 @@ export function MotionShowcase() {
   });
   const scrollRevealRef = useScrollReveal({ threshold: 0.3 });
   const progressRef = useRef<HTMLDivElement>(null);
-  const progress = useScrollProgress();
+  const { progress } = useScrollProgress();
 
   useEffect(() => {
     if (progressRef.current) {
-      progressRef.current.style.width = `${progress * 100}%`;
+      progressRef.current.style.width = `${progress}%`;
     }
   }, [progress]);
 
@@ -54,7 +54,7 @@ export function MotionShowcase() {
         {/* Fade In */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Fade In</h2>
-          <Card ref={fadeInRef}>
+          <Card ref={fadeInRef.ref} style={fadeInRef.style}>
             <CardHeader>
               <CardTitle>Fade In Animation</CardTitle>
             </CardHeader>
@@ -67,7 +67,7 @@ export function MotionShowcase() {
         {/* Slide Up */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Slide Up</h2>
-          <Card ref={slideUpRef}>
+          <Card ref={slideUpRef.ref} style={slideUpRef.style}>
             <CardHeader>
               <CardTitle>Slide Up Animation</CardTitle>
             </CardHeader>
@@ -80,7 +80,7 @@ export function MotionShowcase() {
         {/* Scale In */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Scale In</h2>
-          <Card ref={scaleInRef}>
+          <Card ref={scaleInRef.ref} style={scaleInRef.style}>
             <CardHeader>
               <CardTitle>Scale In Animation</CardTitle>
             </CardHeader>
@@ -94,7 +94,7 @@ export function MotionShowcase() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">{t('motion:hover')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card ref={hoverRef} className="cursor-pointer">
+            <Card ref={hoverRef.ref} style={hoverRef.style} className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Hover Me</CardTitle>
               </CardHeader>
@@ -102,7 +102,7 @@ export function MotionShowcase() {
                 <p>Hover over this card to see the scale effect</p>
               </CardContent>
             </Card>
-            <Card ref={hoverRef} className="cursor-pointer">
+            <Card ref={hoverRef.ref} style={hoverRef.style} className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Hover Me</CardTitle>
               </CardHeader>
@@ -110,7 +110,7 @@ export function MotionShowcase() {
                 <p>Hover over this card to see the scale effect</p>
               </CardContent>
             </Card>
-            <Card ref={hoverRef} className="cursor-pointer">
+            <Card ref={hoverRef.ref} style={hoverRef.style} className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Hover Me</CardTitle>
               </CardHeader>
@@ -126,7 +126,7 @@ export function MotionShowcase() {
           <h2 className="text-2xl font-semibold mb-4">{t('motion:scroll')}</h2>
           <Stack spacing="lg">
             {[1, 2, 3, 4, 5].map((num) => (
-              <Card key={num} ref={scrollRevealRef}>
+              <Card key={num} ref={scrollRevealRef.ref} style={scrollRevealRef.style}>
                 <CardHeader>
                   <CardTitle>Scroll Reveal Item {num}</CardTitle>
                 </CardHeader>

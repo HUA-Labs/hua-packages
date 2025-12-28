@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@hua-labs/hua-ux": "workspace:*",
+    "@hua-labs/i18n-core": "workspace:*",
+    "@hua-labs/i18n-core-zustand": "workspace:*",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",
