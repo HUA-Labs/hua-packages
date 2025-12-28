@@ -1,3 +1,5 @@
+'use client';
+
 import { createZustandI18n } from '@hua-labs/i18n-core-zustand';
 import { useAppStore } from '../store/useAppStore';
 
