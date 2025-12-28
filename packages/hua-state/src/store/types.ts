@@ -26,7 +26,7 @@ export type StoreCreator<T extends BaseStoreState> = StateCreator<
 /**
  * Store configuration options
  */
-export interface StoreConfig {
+export interface StoreConfig<T extends BaseStoreState = BaseStoreState> {
   /**
    * Enable persistence
    */
@@ -45,7 +45,7 @@ export interface StoreConfig {
   /**
    * Partialize function for persistence (select which state to persist)
    */
-  partialize?: <T>(state: T) => Partial<T>;
+  partialize?: (state: T) => Partial<T>;
 }
 
 /**

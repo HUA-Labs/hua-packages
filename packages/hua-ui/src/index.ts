@@ -16,6 +16,7 @@ export { Grid } from './components/Grid';
 export { Stack } from './components/Stack';
 export { Divider } from './components/Divider';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/Card';
+export type { CardProps, CardHeaderProps, CardTitleProps, CardDescriptionProps, CardContentProps, CardFooterProps } from './components/Card';
 export { Panel } from './components/Panel';
 export { ActionToolbar } from './components/ActionToolbar';
 export type { ActionToolbarProps, ActionButton } from './components/ActionToolbar';
