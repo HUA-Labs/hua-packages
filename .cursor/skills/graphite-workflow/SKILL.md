@@ -421,6 +421,56 @@ gt submit
 gt track --parent main <branch-name>
 ```
 
+### PR이 자동으로 닫혔을 때
+
+**문제**: `gt sync` 또는 스택 처리 중 PR이 자동으로 닫힘
+
+**원인**:
+- 베이스 브랜치가 변경되어 PR이 더 이상 유효하지 않음
+- `gt sync` 실행 시 이미 병합된 것으로 감지됨
+- restack 중 충돌이 해결되지 않아 자동으로 닫힘
+
+**해결 방법 1: PR 다시 제출**
+```bash
+# 1. 해당 브랜치로 이동
+gt checkout <branch-name>
+# 또는
+git checkout <branch-name>
+
+# 2. 베이스 브랜치와 동기화
+gt sync
+
+# 3. 충돌이 있다면 해결
+gt restack  # 또는 수동으로 merge commit 생성
+
+# 4. PR 다시 제출
+gt submit --base main
+```
+
+**해결 방법 2: GitHub에서 수동으로 다시 열기**
+```bash
+# 1. 브랜치 확인
+git branch -a
+
+# 2. 브랜치가 존재한다면 GitHub에서 PR을 다시 열 수 있음
+# Graphite 웹 인터페이스 또는 GitHub에서 "Reopen pull request" 클릭
+
+# 3. 또는 새로 제출
+gt submit --base main
+```
+
+**해결 방법 3: 브랜치가 삭제된 경우**
+```bash
+# 1. 로컬 브랜치 확인
+gt ls
+
+# 2. 브랜치가 있다면 다시 제출
+gt submit --base main
+
+# 3. 브랜치가 없다면 Graphite 웹 인터페이스에서 확인
+# 또는 git log로 커밋 찾아서 새 브랜치 생성
+```
+
 ## 참고
 
 - Graphite 공식 문서: https://docs.graphite.dev/
