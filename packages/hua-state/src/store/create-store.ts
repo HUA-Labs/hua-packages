@@ -25,7 +25,7 @@ import type { StoreCreator, StoreConfig, HuaStore, BaseStoreState } from './type
  */
 export function createHuaStore<T extends BaseStoreState>(
   storeCreator: StoreCreator<T>,
-  config?: StoreConfig
+  config?: StoreConfig<T>
 ): HuaStore<T> {
   const { persist: enablePersist = false, persistKey, ssr = false, partialize } = config || {};
 
@@ -36,7 +36,7 @@ export function createHuaStore<T extends BaseStoreState>(
         storeCreator,
         {
           name: persistKey || 'hua-state-storage',
-          partialize: partialize as any,
+          partialize,
         }
       )
     );
