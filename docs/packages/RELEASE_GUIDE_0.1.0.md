@@ -158,8 +158,14 @@ cat package.json | grep -E '"name"|"version"|"files"|"exports"'
 cd packages/hua-ux
 
 # 배포 (공개 패키지, 첫 배포)
-npm publish --access public
+# --provenance 옵션: 빌드 출처 증명 (GitHub Actions 사용 시 권장)
+npm publish --access public --provenance
 ```
+
+**참고 / Note:**
+- `--provenance` 옵션은 최근 npm에서 보안 강화를 위해 권장하는 옵션입니다
+- GitHub Actions로 배포할 경우 특히 유용합니다
+- 로컬에서 배포할 경우 생략 가능합니다
 
 **예상 출력 / Expected Output:**
 ```
@@ -218,8 +224,14 @@ cat package.json | grep -E '"name"|"version"|"files"|"bin"'
 cd packages/create-hua-ux
 
 # 배포 (공개 패키지, 첫 배포)
-npm publish --access public
+# --provenance 옵션: 빌드 출처 증명 (GitHub Actions 사용 시 권장)
+npm publish --access public --provenance
 ```
+
+**참고 / Note:**
+- `--provenance` 옵션은 최근 npm에서 보안 강화를 위해 권장하는 옵션입니다
+- GitHub Actions로 배포할 경우 특히 유용합니다
+- 로컬에서 배포할 경우 생략 가능합니다
 
 **예상 출력 / Expected Output:**
 ```
@@ -390,6 +402,13 @@ pnpm run build
 - `0.x`: Alpha 단계, API 변경 가능 / Alpha stage, API changes allowed
 - `1.x`: 안정화 후 / After stabilization
 
+**참고: Alpha 태그 활용 / Note: Using Alpha Tag**
+- 첫 배포인 만큼 예상치 못한 이슈가 있을 수 있으니, `latest` 태그 대신 `alpha` 태그로 먼저 배포하는 것도 방법입니다
+- 현재는 `0.1.0`으로 `latest` 태그로 배포하지만, 필요시 `npm publish --tag alpha`로 배포 가능합니다
+- 사용자는 `pnpm add @hua-labs/hua-ux@alpha`로 설치 가능합니다
+- If needed, you can publish with `npm publish --tag alpha` instead of `latest`
+- Users can install with `pnpm add @hua-labs/hua-ux@alpha`
+
 ### 버전 업데이트 방법 / Version Update Methods
 
 #### 패치 버전 (0.1.0 → 0.1.1) / Patch Version (0.1.0 → 0.1.1)
@@ -435,8 +454,17 @@ git push --tags
 - 또는 `create-hua-ux`에서 `@hua-labs/hua-ux`의 최신 버전을 자동으로 참조 / Or automatically reference the latest version of `@hua-labs/hua-ux` from `create-hua-ux`
 
 **현재 구현 / Current Implementation:**
-- `create-hua-ux/src/utils.ts`의 `getHuaUxVersion()` 함수가 `^0.1.0` 반환 / `getHuaUxVersion()` function in `create-hua-ux/src/utils.ts` returns `^0.1.0`
-- 수동으로 버전 업데이트 필요 (향후 자동화 가능) / Manual version updates required (can be automated in the future)
+- `create-hua-ux/src/utils.ts`의 `getHuaUxVersion()` 함수가 자동으로 `hua-ux` 패키지의 `package.json`에서 버전을 읽어옴 / `getHuaUxVersion()` function in `create-hua-ux/src/utils.ts` automatically reads version from `hua-ux` package's `package.json`
+- 모노레포 내부에서는 `workspace:*` 사용, 외부에서는 `^[version]` 형식 사용 / Uses `workspace:*` inside monorepo, `^[version]` format outside
+- 빌드 시 자동으로 버전 동기화됨 (수동 업데이트 불필요) / Version automatically synchronized at build time (no manual update needed)
+
+**자동화 원리 / Automation Principle:**
+- `getHuaUxVersion()` 함수는 런타임에 `hua-ux` 패키지의 `package.json`을 읽어서 버전을 추출합니다
+- 모노레포 내부에서는 `workspace:*`를 반환하고, 외부에서는 `^[version]` 형식으로 반환합니다
+- `hua-ux` 패키지의 버전이 업데이트되면 자동으로 반영되므로 수동 업데이트가 필요 없습니다
+- The `getHuaUxVersion()` function reads the `hua-ux` package's `package.json` at runtime to extract the version
+- Returns `workspace:*` inside monorepo, `^[version]` format outside
+- Automatically reflects version updates from `hua-ux` package, no manual update needed
 
 ---
 
