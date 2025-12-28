@@ -79,7 +79,7 @@ export function createI18nStore(
       persist,
       persistKey: persistKey || 'hua-i18n-storage',
       ssr,
-      partialize: (state: I18nStoreState) => ({ language: state.language }),
+      partialize: (state) => ({ language: state.language }),
     }
   );
 }
