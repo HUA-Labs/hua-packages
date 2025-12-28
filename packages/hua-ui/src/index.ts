@@ -1,5 +1,6 @@
 // UI Components - Core
 export { Button } from './components/Button';
+export type { ButtonProps } from './components/Button';
 export { Action } from './components/Action';
 export { Input } from './components/Input';
 export { Link } from './components/Link';
