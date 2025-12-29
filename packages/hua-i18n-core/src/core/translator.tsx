@@ -218,11 +218,19 @@ export class Translator implements TranslatorInterface {
             const data = await this.safeLoadTranslations(language, namespace);
 
             if (this.config.debug) {
-              console.log('Loaded data for', language, namespace, ':', data);
+              console.log(`✅ [TRANSLATOR] Loaded data for ${language}/${namespace}:`, data);
+              console.log(`✅ [TRANSLATOR] Saving to allTranslations[${language}][${namespace}]`);
             }
 
+            if (!this.allTranslations[language]) {
+              this.allTranslations[language] = {};
+            }
             this.allTranslations[language][namespace] = data;
             this.loadedNamespaces.add(`${language}:${namespace}`);
+            
+            if (this.config.debug) {
+              console.log(`✅ [TRANSLATOR] Saved! allTranslations[${language}][${namespace}] =`, this.allTranslations[language][namespace]);
+            }
 
           } catch (error) {
             const translationError = this.createTranslationError(
@@ -297,18 +305,19 @@ export class Translator implements TranslatorInterface {
     // 하지만 언어 변경 중일 때는 이전 언어의 번역을 찾기 위해 별도 처리
     const targetLang = language || this.currentLang;
 
-    // 디버그 로그는 missing key일 때만 출력 (성공한 번역은 로그 안 찍음)
-    // if (this.config.debug) {
-    //   console.log(`🔍 [TRANSLATOR] translate called:`, {
-    //     key,
-    //     targetLang,
-    //     isInitialized: this.isInitialized,
-    //     currentLang: this.currentLang,
-    //     hasAllTranslations: !!this.allTranslations,
-    //     allTranslationsKeys: Object.keys(this.allTranslations || {}),
-    //     targetLangData: this.allTranslations[targetLang] ? Object.keys(this.allTranslations[targetLang]) : 'no data'
-    //   });
-    // }
+    // 디버그 로그 활성화
+    if (this.config.debug) {
+      console.log(`🔍 [TRANSLATOR] translate called:`, {
+        key,
+        targetLang,
+        isInitialized: this.isInitialized,
+        currentLang: this.currentLang,
+        hasAllTranslations: !!this.allTranslations,
+        allTranslationsKeys: Object.keys(this.allTranslations || {}),
+        targetLangData: this.allTranslations[targetLang] ? Object.keys(this.allTranslations[targetLang]) : 'no data',
+        allTranslations: this.allTranslations
+      });
+    }
 
     if (!this.isInitialized) {
       if (this.config.debug) {
@@ -394,20 +403,21 @@ export class Translator implements TranslatorInterface {
   private findInNamespace(namespace: string, key: string, language: string): string {
     const translations = this.allTranslations[language]?.[namespace];
 
-    // 디버그 로그는 missing key일 때만 출력
-    // if (this.config.debug && !translations) {
-    //   console.log(`🔍 [TRANSLATOR] findInNamespace:`, {
-    //     namespace,
-    //     key,
-    //     language,
-    //     hasTranslations: !!translations,
-    //     translationsKeys: translations ? Object.keys(translations) : [],
-    //     allTranslationsStructure: {
-    //       languages: Object.keys(this.allTranslations),
-    //       namespaces: language in this.allTranslations ? Object.keys(this.allTranslations[language]) : []
-    //     }
-    //   });
-    // }
+    // 디버그 로그 활성화
+    if (this.config.debug) {
+      console.log(`🔍 [TRANSLATOR] findInNamespace:`, {
+        namespace,
+        key,
+        language,
+        hasTranslations: !!translations,
+        translationsKeys: translations ? Object.keys(translations) : [],
+        allTranslationsStructure: {
+          languages: Object.keys(this.allTranslations),
+          namespaces: language in this.allTranslations ? Object.keys(this.allTranslations[language]) : []
+        },
+        loadedNamespaces: Array.from(this.loadedNamespaces)
+      });
+    }
 
     if (!translations) {
       // 네임스페이스가 없으면 자동으로 로드 시도 (비동기, 백그라운드)
