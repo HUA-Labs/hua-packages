@@ -125,6 +125,7 @@ export type {
   // 공통 타입들
   BaseMotionOptions,
   BaseMotionReturn,
+  MotionElement, // MotionElement 추가
   
   // 프리셋 시스템
   MotionPreset,
