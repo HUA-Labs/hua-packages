@@ -279,7 +279,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
 
   // 앵커 모드
   if ("href" in rest && rest.href) {
-    const { onClick, target, rel, href, "aria-label": ariaLabel, ...anchorProps } = rest as AnchorProps;
+    const { onClick, target, rel, href, "aria-label": ariaLabel, className: anchorClassName, ...anchorProps } = rest as AnchorProps;
     const isDisabled = !!disabled || loading;
 
     const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
@@ -291,7 +291,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
       <a
         ref={ref as React.Ref<HTMLAnchorElement>}
         href={href}
-        className={base}
+        className={merge(base, anchorClassName)}
         onClick={handleAnchorClick}
         aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
@@ -306,12 +306,12 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
   }
 
   // 버튼 모드
-  const btnProps = rest as NativeButtonProps;
+  const { className: buttonClassName, ...btnProps } = rest as NativeButtonProps;
   const isDisabled = !!disabled || loading;
   return (
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
-      className={base}
+      className={merge(base, buttonClassName)}
       type="button"                 // 폼 기본 제출 방지
       disabled={isDisabled}
       aria-busy={loading || undefined}
