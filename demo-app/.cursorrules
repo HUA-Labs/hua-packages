@@ -1,0 +1,107 @@
+# hua-ux 프로젝트 Cursor 규칙
+# hua-ux Project Cursor Rules
+
+이 프로젝트는 **hua-ux 프레임워크**를 사용하는 Next.js 애플리케이션입니다.
+This project uses the **hua-ux framework** for Next.js applications.
+
+## 핵심 철학 / Core Philosophy
+
+**"Next.js 몰라도 됨. 그냥 설정하고 AI한테 말하면 됨."**
+**"You don't need to know Next.js. Just configure and tell AI what to do."**
+
+## 프로젝트 구조 / Project Structure
+
+- `app/`: Next.js App Router 페이지 (HuaUxPage 사용)
+- `components/`: 재사용 가능한 컴포넌트
+- `lib/`: 유틸리티 함수
+- `store/`: Zustand 스토어
+- `translations/`: 번역 파일 (ko/, en/)
+- `hua-ux.config.ts`: 프레임워크 설정
+
+## 코드 생성 규칙 / Code Generation Rules
+
+### 페이지 생성 시 / When Creating Pages
+
+1. **항상 `HuaUxPage`로 감싸기 / Always wrap with `HuaUxPage`**:
+   ```tsx
+   import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+   
+   export default function MyPage() {
+     return (
+       <HuaUxPage title="페이지 제목" description="페이지 설명">
+         {/* 내용 */}
+       </HuaUxPage>
+     );
+   }
+   ```
+
+2. **번역 파일도 함께 생성 / Generate translation files too**:
+   - `translations/ko/my-page.json`
+   - `translations/en/my-page.json`
+
+3. **`useTranslation` 훅 사용 / Use `useTranslation` hook**:
+   ```tsx
+   import { useTranslation } from '@hua-labs/i18n-core';
+   
+   const { t } = useTranslation('my-page');
+   ```
+
+### 컴포넌트 생성 시 / When Creating Components
+
+1. **클라이언트 컴포넌트는 `'use client'` 필수 / Client components require `'use client'`**
+2. **프레임워크 컴포넌트 활용 / Use framework components**:
+   - `@hua-labs/ui`: UI 컴포넌트
+   - `@hua-labs/motion-core`: 모션 훅
+3. **Motion 적용 고려 / Consider motion**:
+   ```tsx
+   import { useFadeIn } from '@hua-labs/motion-core';
+   
+   const motion = useFadeIn();
+   ```
+
+### 번역 추가 시 / When Adding Translations
+
+1. **한국어와 영어 모두 추가 / Add both Korean and English**
+2. **네임스페이스 일관성 유지 / Maintain namespace consistency**
+3. **파일명은 페이지/컴포넌트 이름과 동일 / File name matches page/component name**
+
+### 설정 변경 시 / When Changing Configuration
+
+1. **`hua-ux.config.ts`만 수정 / Only modify `hua-ux.config.ts`**
+2. **Preset 활용 우선 / Prefer Preset over manual configuration**:
+   ```typescript
+   // Good: Preset 사용
+   preset: 'product'
+   
+   // Avoid: 직접 설정 (필요할 때만)
+   ```
+
+## 주요 패턴 / Key Patterns
+
+### Preset 시스템 / Preset System
+
+- `'product'`: 제품 페이지용 (전문적, 효율적) / Product pages (professional, efficient)
+- `'marketing'`: 마케팅 페이지용 (화려함, 눈에 띄는) / Marketing pages (dramatic, eye-catching)
+
+### 브랜딩 / Branding
+
+- `hua-ux.config.ts`에서 `branding` 설정으로 색상, 타이포그래피 커스터마이징
+- 모든 컴포넌트가 자동으로 branding 적용
+
+### 모션 / Motion
+
+- `HuaUxPage`로 감싸면 자동으로 모션 적용
+- `enableMotion={false}`로 비활성화 가능
+
+## AI가 코드 생성할 때 / When AI Generates Code
+
+1. **프레임워크 컴포넌트 우선 사용 / Prefer framework components**
+2. **설정 파일 기반 자동 적용 / Auto-apply based on config**
+3. **번역 키는 항상 함께 생성 / Always generate translation keys together**
+4. **타입 안전성 유지 / Maintain type safety**
+
+## 참고 자료 / References
+
+- `ai-context.md`: 상세한 프로젝트 구조 설명
+- `hua-ux.config.ts`: 프레임워크 설정 파일
+- 프레임워크 문서: `node_modules/@hua-labs/hua-ux/README.md`
