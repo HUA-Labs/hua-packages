@@ -112,7 +112,6 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
     duration,
     autoStart: false,
     delay,
-    easing,
     ...restOptions,
   });
 
