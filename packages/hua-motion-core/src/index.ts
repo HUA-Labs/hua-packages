@@ -44,6 +44,10 @@ export { usePageMotions } from './hooks/usePageMotions'
 // 3단계: useSmartMotion (개별 요소) - 기존 호환성 유지
 export { useSmartMotion } from './hooks/useSmartMotion'
 
+// 통합 Motion Hook (단일 타입으로 여러 hook 중 선택)
+export { useUnifiedMotion } from './hooks/useUnifiedMotion'
+export type { UseUnifiedMotionOptions } from './hooks/useUnifiedMotion'
+
 // ========================================
 // 기본 모션 훅들 (Core 패키지 범위)
 // ========================================
