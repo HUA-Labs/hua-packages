@@ -623,7 +623,7 @@ Alias for `ssrTranslate`.
 
 ## Requirements
 
-- React >= 16.8.0
+- React >= 19.0.0
 - TypeScript (recommended)
 
 ## Development

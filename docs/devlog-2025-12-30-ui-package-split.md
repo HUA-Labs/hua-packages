@@ -116,7 +116,7 @@ Pro 컴포넌트들이 Core UI의 상대 경로를 참조하고 있어 패키지
 #### IconProvider 패턴
 - **Provider 패턴**: React Context API 기반
 - **기본 동작**: IconProvider 없이도 사용 가능 (기본값 자동 적용)
-- **지원 세트**: Lucide (기본), Phosphor, Untitled (준비 중)
+- **지원 세트**: Lucide (기본), Phosphor, Iconsax (준비 중)
 
 #### 주요 기능 / Key Features
 1. **전역 아이콘 설정**: IconProvider로 한 번 설정하면 전체 앱에 적용
