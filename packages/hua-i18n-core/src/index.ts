@@ -104,17 +104,6 @@ export function createCoreI18n(options?: {
    */
   translationApiPath?: string;
   /**
-   * 서버사이드에서 사용할 기본 URL (절대 URL 필요)
-   * 예: 'https://example.com' 또는 'http://localhost:3000'
-   * 환경 변수 NEXT_PUBLIC_SITE_URL 또는 VERCEL_URL이 있으면 자동 감지
-   */
-  baseUrl?: string;
-  /**
-   * 로컬 개발 환경에서 사용할 기본 URL (baseUrl이 없을 때만 사용)
-   * 기본값: 'http://localhost:3000'
-   */
-  localFallbackBaseUrl?: string;
-  /**
    * SSR에서 전달된 초기 번역 데이터 (네트워크 요청 없이 사용)
    * 형식: { [language]: { [namespace]: { [key]: value } } }
    */
@@ -133,75 +122,36 @@ export function createCoreI18n(options?: {
     loadTranslations,
     translationLoader = 'api',
     translationApiPath = '/api/translations',
-    baseUrl,
-    localFallbackBaseUrl,
     initialTranslations,
     autoLanguageSync = false // 기본값 false (Zustand 어댑터 등 외부에서 직접 처리)
   } = options || {};
 
-  /**
-   * 서버사이드/클라이언트사이드 URL 빌드 함수
-   * createApiTranslationLoader의 로직을 참고하여 구현
-   */
-  const buildUrl = (language: string, namespace: string): string => {
-    const safeNamespace = namespace.replace(/[^a-zA-Z0-9-_]/g, '');
-    const path = `${translationApiPath}/${language}/${safeNamespace}`;
-    
-    // 클라이언트 사이드: 상대 경로 사용
-    if (typeof window !== 'undefined') {
-      return path;
-    }
-    
-    // 서버사이드: 절대 URL 필요
-    // 1. baseUrl 옵션이 있으면 우선 사용
-    if (baseUrl) {
-      return `${baseUrl}${path}`;
-    }
-    
-    // 2. NEXT_PUBLIC_SITE_URL 환경 변수 확인
-    if (process.env.NEXT_PUBLIC_SITE_URL) {
-      return `${process.env.NEXT_PUBLIC_SITE_URL}${path}`;
-    }
-    
-    // 3. VERCEL_URL 환경 변수 확인
-    if (process.env.VERCEL_URL) {
-      const vercelUrl = process.env.VERCEL_URL.startsWith('http')
-        ? process.env.VERCEL_URL
-        : `https://${process.env.VERCEL_URL}`;
-      return `${vercelUrl}${path}`;
-    }
-    
-    // 4. 로컬 개발 환경 fallback
-    const fallbackBase = localFallbackBaseUrl ?? 'http://localhost:3000';
-    return `${fallbackBase}${path}`;
-  };
-
   // API route 기반 로더 (기본값, 권장)
-  // 서버사이드 지원 추가: buildUrl 함수를 사용하여 절대 URL 생성
   const apiRouteLoader = async (language: string, namespace: string) => {
     try {
-      const apiUrl = buildUrl(language, namespace);
-      const response = await fetch(apiUrl);
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (debug) {
-          const env = typeof window !== 'undefined' ? 'client' : 'server';
-          console.log(`✅ Loaded translation from API (${env}): ${language}/${namespace}`);
-        }
-        return data;
-      } else if (response.status === 404) {
-        if (debug) {
-          console.warn(`⚠️ Translation not found in API: ${language}/${namespace}`);
+      // 클라이언트 사이드에서만 동적 로드
+      if (typeof window !== 'undefined') {
+        const apiUrl = `${translationApiPath}/${language}/${namespace}`;
+        const response = await fetch(apiUrl);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (debug) {
+            console.log(`✅ Loaded translation from API: ${language}/${namespace}`);
+          }
+          return data;
+        } else if (response.status === 404) {
+          if (debug) {
+            console.warn(`⚠️ Translation not found in API: ${language}/${namespace}`);
+          }
         }
       }
       
-      // API 실패 시 기본 번역 반환
+      // SSR 또는 API 실패 시 기본 번역 반환
       return getDefaultTranslations(language, namespace);
     } catch (error) {
       if (debug) {
-        const env = typeof window !== 'undefined' ? 'client' : 'server';
-        console.warn(`Failed to load translation from API (${env}): ${language}/${namespace}`, error);
+        console.warn(`Failed to load translation from API: ${language}/${namespace}`, error);
       }
       return getDefaultTranslations(language, namespace);
     }
@@ -302,75 +252,8 @@ export function createCoreI18n(options?: {
   };
 }
 
-// 기본 번역 데이터
-function getDefaultTranslations(language: string, namespace: string): Record<string, string> {
-  const defaultTranslations: Record<string, Record<string, Record<string, string>>> = {
-    ko: {
-      common: {
-        welcome: "환영합니다",
-        greeting: "안녕하세요",
-        goodbye: "안녕히 가세요",
-        loading: "로딩 중...",
-        error: "오류가 발생했습니다",
-        success: "성공했습니다",
-        cancel: "취소",
-        confirm: "확인",
-        save: "저장",
-        delete: "삭제",
-        edit: "편집",
-        add: "추가",
-        search: "검색",
-        filter: "필터",
-        sort: "정렬",
-        refresh: "새로고침",
-        back: "뒤로",
-        next: "다음",
-        previous: "이전",
-        home: "홈",
-        about: "소개",
-        contact: "연락처",
-        settings: "설정",
-        profile: "프로필",
-        logout: "로그아웃",
-        login: "로그인",
-        register: "회원가입"
-      }
-    },
-    en: {
-      common: {
-        welcome: "Welcome",
-        greeting: "Hello",
-        goodbye: "Goodbye",
-        loading: "Loading...",
-        error: "An error occurred",
-        success: "Success",
-        cancel: "Cancel",
-        confirm: "Confirm",
-        save: "Save",
-        delete: "Delete",
-        edit: "Edit",
-        add: "Add",
-        search: "Search",
-        filter: "Filter",
-        sort: "Sort",
-        refresh: "Refresh",
-        back: "Back",
-        next: "Next",
-        previous: "Previous",
-        home: "Home",
-        about: "About",
-        contact: "Contact",
-        settings: "Settings",
-        profile: "Profile",
-        logout: "Logout",
-        login: "Login",
-        register: "Register"
-      }
-    }
-  };
-
-  return defaultTranslations[language]?.[namespace] || {};
-}
+// 기본 번역 데이터는 공통 유틸리티에서 가져옴
+import { getDefaultTranslations } from './utils/default-translations';
 
 /**
  * 가장 기본적인 Provider (최소한의 설정)

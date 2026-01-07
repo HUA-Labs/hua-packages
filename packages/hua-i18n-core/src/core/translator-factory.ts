@@ -10,6 +10,7 @@ import { I18nConfig } from '../types';
 export class TranslatorFactory {
   private static instances = new Map<string, Translator>();
   private static configCache = new Map<string, I18nConfig>();
+  private static readonly MAX_INSTANCES = 10; // 최대 인스턴스 수 제한
 
   /**
    * Config를 기반으로 고유 키 생성
@@ -49,6 +50,20 @@ export class TranslatorFactory {
     
     // Config가 변경되었거나 인스턴스가 없으면 새로 생성
     if (!this.instances.has(configKey) || this.isConfigChanged(configKey, config)) {
+      // 최대 인스턴스 수 초과 시 오래된 인스턴스 제거 (LRU 방식)
+      if (this.instances.size >= this.MAX_INSTANCES && !this.instances.has(configKey)) {
+        // 가장 오래된 인스턴스 제거 (Map은 삽입 순서 유지)
+        const oldestKey = this.instances.keys().next().value;
+        if (oldestKey) {
+          const oldInstance = this.instances.get(oldestKey);
+          if (oldInstance) {
+            oldInstance.clearCache();
+          }
+          this.instances.delete(oldestKey);
+          this.configCache.delete(oldestKey);
+        }
+      }
+
       // 기존 인스턴스 정리
       if (this.instances.has(configKey)) {
         const oldInstance = this.instances.get(configKey)!;

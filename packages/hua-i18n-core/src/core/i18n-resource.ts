@@ -171,7 +171,6 @@ export class I18nResourceManager {
   optimizeMemory(): void {
     // 사용되지 않는 번역 데이터 정리
     // 실제 구현에서는 사용 통계를 기반으로 정리
-    console.log('Memory optimization completed');
   }
 }
 

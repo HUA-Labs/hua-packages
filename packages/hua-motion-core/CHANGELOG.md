@@ -1,6 +1,6 @@
-# @hua-labs/i18n-core
+# @hua-labs/motion-core
 
-## 1.1.0-alpha.3
+## 2.1.0-alpha.3
 
 ### Patch Changes
 
@@ -40,7 +40,7 @@
   - @hua-labs/state
   - create-hua-ux
 
-## 1.1.0-alpha.2
+## 2.1.0-alpha.2
 
 ### Patch Changes
 
@@ -54,7 +54,7 @@
 
   This ensures consistent behavior across the monorepo and prevents version conflicts.
 
-## 1.1.0-alpha.1
+## 2.1.0-alpha.1
 
 ### Minor Changes
 
@@ -66,28 +66,45 @@
   - Professional documentation tone and structure
   - All packages updated to alpha.0.2
 
+## 1.1.0
+
+### Minor Changes
+
+- 31920d5: Update motion-core with latest hooks and improvements
+
+  - Added `useUnifiedMotion` hook for streamlined animation API
+  - Enhanced type definitions for better TypeScript support
+  - Improved animation performance and stability
+  - Updated documentation and examples
+
 ## 2.0.0
 
 ### Major Changes
 
-- a475818: Initial release of i18n packages:
+- 950a40d: # HUA Motion Core v2.0.0 - React 19 compatibility and essential motion hooks
 
-  - **@hua-labs/i18n-core**: Core i18n library with SSR/CSR support, zero flickering on language changes, and state management integration
-  - **@hua-labs/i18n-core-zustand**: Zustand adapter for seamless state management integration
-  - **@hua-labs/i18n-loaders**: Production-ready translation loaders with caching, preloading, and default translation merging
+  **React 19 Migration:**
+  - Updated peerDependencies to React >=19.0.0
+  - Refactored type definitions for React 19 compatibility
+  - Updated ref handling to work with React 19's stricter element types
+  - Removed HTMLElement from generic types (React 19 uses more specific element types)
+  - Updated style types to support React 19's new CSS properties
 
-  Includes complete Next.js App Router example and CodeSandbox template.
+  **Breaking Changes:**
+  - Minimum React version: 19.0.0 (previously >=16.8.0)
+  - Type definitions updated for React 19's stricter typing
 
-## 1.0.0
+  **Migration Guide:**
+  - If you're using React 18 or earlier, stay on v1.x
+  - For React 19 projects, upgrade to v2.x
+  - No code changes required for most use cases
+  - TypeScript users may need to update type annotations if using custom element types
 
-### Major Changes
-
-- Initial release of @hua-labs/i18n-core
-
-  - Type-safe i18n library with SSR/CSR support
-  - Zero flickering on language changes
-  - Built-in hydration handling
-  - State management integration support
-  - Framework agnostic (Next.js, Remix, Vite, etc.)
-  - Small bundle size (~2.8KB gzipped)
-  - Zero dependencies (React only)
+  **Other Changes:**
+  - 25 essential motion hooks for React applications
+  - Full TypeScript support with comprehensive type definitions
+  - Zero external dependencies, lightweight and performant
+  - SSR ready for Next.js and other frameworks
+  - Extensive test coverage (74%+ functions)
+  - Intuitive API design for easy integration
+  - Covers fade, slide, scale, scroll, and interaction animations
