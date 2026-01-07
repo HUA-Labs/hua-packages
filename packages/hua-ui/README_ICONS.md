@@ -27,10 +27,11 @@ import { Icon } from '@hua-labs/ui'
 <Icon name="user" provider="phosphor" />
 ```
 
-### 3. Untitled Icons
+### 3. Iconsax Icons
+- **상태**: 준비 중
 - **타입**: SVG 기반
 - **사용법**: CSS 클래스 또는 커스텀 렌더링
-- **참고**: Untitled Icons는 SVG 파일로 제공되므로, 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
+- **참고**: Iconsax Icons는 SVG 파일로 제공되므로, 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
 
 ## Icon 컴포넌트 사용법
 
@@ -92,6 +93,6 @@ pnpm add @phosphor-icons/react --filter @hua-labs/ui
 ## 주의사항
 
 1. **Phosphor Icons는 선택적 의존성**입니다. 사용하지 않으면 설치할 필요가 없습니다.
-2. **Untitled Icons**는 현재 SVG 기반이므로, 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
+2. **Iconsax Icons**는 현재 준비 중이며, SVG 기반이므로 구현 시 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
 3. **서버 사이드 렌더링**: 모든 아이콘은 클라이언트 사이드에서만 렌더링됩니다 (hydration 오류 방지).
 

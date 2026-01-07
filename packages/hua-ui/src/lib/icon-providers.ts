@@ -16,13 +16,11 @@ import type { LucideIcon } from 'lucide-react'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
 
-// Icon Provider Type (deprecated: IconSet 사용 권장)
-// @deprecated Use IconSet from './components/Icon/icon-store' instead
+// Icon Provider Type
 export type IconProvider = 'lucide' | 'phosphor' | 'untitled'
 
 // Icon Provider Configuration
 export interface IconProviderConfig {
-  /** @deprecated Use IconSet from './components/Icon/icon-store' instead */
   provider: IconProvider
   prefix?: string
 }
@@ -52,7 +50,7 @@ export const PROJECT_ICONS = {
   'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', untitled: 'arrow-right' },
   'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up' },
   'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down' },
-  
+
   // Actions
   'add': { lucide: 'Plus', phosphor: 'Plus', untitled: 'add' },
   'edit': { lucide: 'Edit', phosphor: 'Pencil', untitled: 'edit' },
@@ -67,7 +65,7 @@ export const PROJECT_ICONS = {
   'share': { lucide: 'Share', phosphor: 'Share', untitled: 'share' },
   'copy': { lucide: 'Copy', phosphor: 'Copy', untitled: 'copy' },
   'save': { lucide: 'Save', phosphor: 'FloppyDisk', untitled: 'save' },
-  
+
   // Status & Feedback
   'loader': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
   'loader2': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
@@ -83,7 +81,7 @@ export const PROJECT_ICONS = {
   'heart': { lucide: 'Heart', phosphor: 'Heart', untitled: 'heart' },
   'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star' },
   'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark', untitled: 'bookmark' },
-  
+
   // User & Auth
   'user': { lucide: 'User', phosphor: 'User', untitled: 'user' },
   'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', untitled: 'user-plus' },
@@ -92,7 +90,7 @@ export const PROJECT_ICONS = {
   'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', untitled: 'chrome' },
   'github': { lucide: 'Github', phosphor: 'GithubLogo', untitled: 'github' },
   'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle', untitled: 'message' },
-  
+
   // Content
   'messageSquare': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
   'message-square': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
@@ -103,18 +101,18 @@ export const PROJECT_ICONS = {
   'clock': { lucide: 'Clock', phosphor: 'Clock', untitled: 'clock' },
   'book': { lucide: 'Book', phosphor: 'Book', untitled: 'book' },
   'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', untitled: 'book-open' },
-  
+
   // Theme & UI
   'monitor': { lucide: 'Monitor', phosphor: 'Monitor', untitled: 'monitor' },
   'sun': { lucide: 'Sun', phosphor: 'Sun', untitled: 'sun' },
   'moon': { lucide: 'Moon', phosphor: 'Moon', untitled: 'moon' },
-  
+
   // AI & Features
   'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle', untitled: 'sparkles' },
   'lightbulb': { lucide: 'Lightbulb', phosphor: 'Lightbulb', untitled: 'lightbulb' },
   'brain': { lucide: 'Brain', phosphor: 'Brain', untitled: 'brain' },
   'zap': { lucide: 'Zap', phosphor: 'Lightning', untitled: 'zap' },
-  
+
   // Data & Analytics
   'chart': { lucide: 'BarChart3', phosphor: 'ChartBar', untitled: 'chart' },
   'barChart': { lucide: 'BarChart', phosphor: 'ChartBar', untitled: 'bar-chart' },
@@ -125,46 +123,46 @@ export const PROJECT_ICONS = {
   'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
   'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
   'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'currency' },
-  
+
   // Security
   'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock' },
   'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', untitled: 'unlock' },
   'shield': { lucide: 'Shield', phosphor: 'Shield', untitled: 'shield' },
   'key': { lucide: 'Key', phosphor: 'Key', untitled: 'key' },
-  
+
   // Media
   'play': { lucide: 'Play', phosphor: 'Play', untitled: 'play' },
   'pause': { lucide: 'Pause', phosphor: 'Pause', untitled: 'pause' },
   'image': { lucide: 'Image', phosphor: 'Image', untitled: 'image' },
   'video': { lucide: 'Video', phosphor: 'Video', untitled: 'video' },
   'camera': { lucide: 'Camera', phosphor: 'Camera', untitled: 'camera' },
-  
+
   // Files
   'fileText': { lucide: 'FileText', phosphor: 'FileText', untitled: 'file-text' },
   'file': { lucide: 'File', phosphor: 'File', untitled: 'file' },
-  
+
   // Navigation
   'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut', untitled: 'external-link' },
   'link': { lucide: 'Link', phosphor: 'Link', untitled: 'link' },
   'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline', untitled: 'more-horizontal' },
   'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical', untitled: 'more-vertical' },
-  
+
   // Priority
   'remove': { lucide: 'Minus', phosphor: 'Minus', untitled: 'remove' },
-  
+
   // Eye (password)
   'eye': { lucide: 'Eye', phosphor: 'Eye', untitled: 'eye' },
   'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', untitled: 'eye-off' },
-  
+
   // Emotions
   'smile': { lucide: 'Smile', phosphor: 'Smiley', untitled: 'smile' },
   'frown': { lucide: 'Frown', phosphor: 'SmileySad', untitled: 'frown' },
   'meh': { lucide: 'Meh', phosphor: 'SmileyMeh', untitled: 'meh' },
-  
+
   // Social
   'mail': { lucide: 'Mail', phosphor: 'Envelope', untitled: 'mail' },
   'phone': { lucide: 'Phone', phosphor: 'Phone', untitled: 'phone' },
-  
+
   // Additional
   'flag': { lucide: 'Flag', phosphor: 'Flag', untitled: 'flag' },
 } as const
@@ -176,7 +174,7 @@ export const PROJECT_ICONS = {
  */
 export async function initPhosphorIcons() {
   if (typeof window === 'undefined') return null
-  
+
   if (!PhosphorIcons) {
     try {
       // Dynamic import with tree-shaking support
@@ -196,7 +194,7 @@ export async function initPhosphorIcons() {
  * Only resolves icons that are in PROJECT_ICONS for optimal bundle size
  * 
  * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 아이콘 컴포넌트 또는 null / Icon component or null
  */
 export function getIconFromProvider(
@@ -205,28 +203,28 @@ export function getIconFromProvider(
 ): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   // Check if icon is in project icon list
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
-  
+
   if (!iconMapping) {
     // Fallback to direct lookup for backward compatibility
     return getIconDirect(iconName, provider)
   }
-  
+
   const mappedName = iconMapping[provider]
-  
+
   switch (provider) {
     case 'lucide':
       return (LucideIcons as unknown as Record<string, LucideIcon>)[mappedName] || null
-    
+
     case 'phosphor':
       if (!PhosphorIcons) {
         return null
       }
       return PhosphorIcons?.[mappedName] || null
-    
+
     case 'untitled':
       // Untitled Icons are SVG-based, handled separately
       return null
-    
+
     default:
       return null
   }
@@ -242,7 +240,7 @@ export function getIconFromProvider(
  * Allows using icons not in icons.ts.
  * 
  * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 아이콘 컴포넌트 또는 null / Icon component or null
  */
 function getIconDirect(
@@ -255,15 +253,15 @@ function getIconDirect(
       // PascalCase 변환 시도
       const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
       // camelCase도 시도
-      const camelCaseName = iconName.replace(/([A-Z])/g, (match, p1) => 
+      const camelCaseName = iconName.replace(/([A-Z])/g, (match, p1) =>
         match === iconName[0] ? match.toLowerCase() : match
       )
-      
-      return (LucideIcons as unknown as Record<string, LucideIcon>)[lucideName] || 
-             (LucideIcons as unknown as Record<string, LucideIcon>)[iconName] || 
-             (LucideIcons as unknown as Record<string, LucideIcon>)[camelCaseName] || 
-             null
-    
+
+      return (LucideIcons as unknown as Record<string, LucideIcon>)[lucideName] ||
+        (LucideIcons as unknown as Record<string, LucideIcon>)[iconName] ||
+        (LucideIcons as unknown as Record<string, LucideIcon>)[camelCaseName] ||
+        null
+
     case 'phosphor':
       if (!PhosphorIcons) {
         return null
@@ -273,14 +271,14 @@ function getIconDirect(
         .split(/(?=[A-Z])/)
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join('')
-      return PhosphorIcons?.[phosphorName1] || 
-             PhosphorIcons?.[phosphorName2] ||
-             PhosphorIcons?.[iconName] ||
-             null
-    
+      return PhosphorIcons?.[phosphorName1] ||
+        PhosphorIcons?.[phosphorName2] ||
+        PhosphorIcons?.[iconName] ||
+        null
+
     case 'untitled':
       return null
-    
+
     default:
       return null
   }
@@ -293,7 +291,7 @@ function getIconDirect(
  * Gets icon name for the specified provider.
  * 
  * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 (deprecated: IconSet 사용 권장) / Icon provider (deprecated: use IconSet instead)
+ * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 프로바이더별 아이콘 이름 / Icon name for provider
  */
 export function getIconNameForProvider(
