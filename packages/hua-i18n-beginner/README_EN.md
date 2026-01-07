@@ -4,7 +4,7 @@
 
 ## This SDK is for Beginners!
 
-> [View Demo](https://i18n-demo.hua-labs.com) | Contributing: [SDK Repo](https://github.com/HUA-Labs/HUA-Labs-public)
+> Contributing: [SDK Repo](https://github.com/HUA-Labs/HUA-Labs-public)
 
 > Need advanced features?  
 > - **Beginner**: `@hua-labs/i18n-beginner` (current package) - Simple and intuitive

@@ -13,6 +13,15 @@ export function withDefaultTranslations(
 
     try {
       const remote = await loader(language, namespace);
+      
+      // API 응답이 빈 객체이거나 null/undefined인 경우 fallback 반환
+      if (!remote || (typeof remote === 'object' && Object.keys(remote).length === 0)) {
+        if (fallback) {
+          return fallback;
+        }
+        return remote || {};
+      }
+      
       if (!fallback) {
         return remote;
       }

@@ -4,6 +4,7 @@ export { withDefaultTranslations } from './defaults';
 
 export type {
   ApiLoaderOptions,
+  CacheInvalidation,
   DefaultTranslations,
   PreloadOptions,
   TranslationLoader,
