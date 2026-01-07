@@ -1,37 +1,46 @@
-# HUA Motion Core
+# @hua-labs/motion-core
 
-The foundation of React motion ✨
+Production-ready React animation hooks. Zero dependencies, SSR-ready.
+프로덕션 레디 React 애니메이션 훅. 의존성 없음, SSR 지원
 
-## Overview
+[![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
+[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
+[![license](https://img.shields.io/npm/l/@hua-labs/motion-core.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 
-HUA Motion Core provides a comprehensive collection of 25 essential motion hooks designed to simplify animation implementation in React applications. Built with TypeScript and extensively tested, it offers intuitive APIs for creating smooth, performant animations.
+> **⚠️ Alpha Release**: This package is currently in alpha. APIs may change before the stable release.
 
-**Every React app needs motion. Start here.**
+---
 
-## Features
+[English](#english) | [한국어](#korean)
 
-- **25 Essential Hooks** Complete collection covering fade, slide, scale, scroll, and interaction animations
-- **TypeScript First** Full type safety with comprehensive type definitions
-- **Battle Tested** 74%+ function coverage with 517 test cases
-- **Zero Dependencies** Lightweight with no external animation dependencies
-- **SSR Ready** Works seamlessly with Next.js and other SSR frameworks
-- **Highly Customizable** Extensive configuration options for each hook
+## English
 
-## Installation
+### Overview
+
+A collection of React animation hooks built on a ref-based engine. Provides smooth animations with zero external dependencies. All hooks are TypeScript-native and SSR-compatible.
+
+### Features
+
+- **25+ Animation Hooks** - Fade, slide, scale, scroll, and interaction animations
+- **Performance Optimized** - Direct ref manipulation for consistent performance
+- **Zero Dependencies** - Pure JavaScript motion engine
+- **TypeScript Native** - Full type safety with inferred types
+- **SSR Compatible** - Works with Next.js, Remix, and SSR frameworks
+- **Tested** - Test coverage with 517 test cases
+
+### Installation
 
 ```bash
 npm install @hua-labs/motion-core
-```
-
-```bash
+# or
 yarn add @hua-labs/motion-core
-```
-
-```bash
+# or
 pnpm add @hua-labs/motion-core
 ```
 
-## Quick Start
+### Quick Start
 
 ```tsx
 import React from 'react';
@@ -47,51 +56,47 @@ function MyComponent() {
         Welcome to HUA Motion Core
       </h1>
       <p ref={slideUp.ref} style={slideUp.style}>
-        Beautiful animations made simple
+        Simple animations
       </p>
     </div>
   );
 }
 ```
 
-## Available Hooks
+### Available Hooks
 
-### Basic Motion Hooks (9)
+#### Basic Motion Hooks
 - `useFadeIn` - Fade in animation
-- `useSlideUp` - Slide up animation  
+- `useSlideUp` - Slide up animation
 - `useSlideLeft` - Slide left animation
 - `useSlideRight` - Slide right animation
-- `useSlideDown` - Advanced slide down with bounce/overshoot
 - `useScaleIn` - Scale in animation
 - `useBounceIn` - Bounce in animation
 - `usePulse` - Pulse animation
-- `useSkeleton` - Skeleton loading animation
+- `useSpringMotion` - Spring physics animations
+- `useGradient` - Gradient animations
 
-### Interaction Hooks (4)
+#### Interaction Hooks
 - `useHoverMotion` - Hover-triggered animations
 - `useClickToggle` - Click-triggered animations
 - `useFocusToggle` - Focus-triggered animations
-- `useVisibilityToggle` - Visibility-controlled animations
+- `useToggleMotion` - Toggle animations
 
-### Scroll Hooks (3)
+#### Scroll Hooks
 - `useScrollReveal` - Scroll-triggered reveal animations
-- `useScrollToggle` - Scroll-based toggle animations
 - `useScrollProgress` - Scroll progress tracking
 
-### Utility Hooks (2)
+#### Utility Hooks
 - `useMotionState` - Motion state management
 - `useRepeat` - Repeating animations
+- `useSmartMotion` - Smart motion with auto-detection
+- `useUnifiedMotion` - Unified motion interface
+- `useSimplePageMotion` - Simple page transitions
+- `usePageMotions` - Multiple page motions
+- `useGesture` - Gesture detection
+- `useGestureMotion` - Gesture-based animations
 
-### Advanced Hooks (7)
-- `useMotion` - Core motion engine
-- `useSpringMotion` - Spring physics animations
-- `useGradient` - Gradient animations
-- `useNavigation` - Navigation animations
-- `useButtonEffect` - Button interaction effects
-- `useCardList` - Card list animations
-- `useLoadingSpinner` - Loading spinner animations
-
-## API Reference
+### API Overview
 
 All hooks return a consistent interface:
 
@@ -110,133 +115,138 @@ interface BaseMotionReturn<T = HTMLElement> {
 }
 ```
 
-### Common Options
+### Documentation
 
-```tsx
-interface BaseMotionOptions {
-  duration?: number;        // Animation duration in ms (default: 1000)
-  delay?: number;          // Animation delay in ms (default: 0)
-  easing?: string;         // CSS easing function (default: 'ease-out')
-  autoStart?: boolean;     // Auto-start animation (default: true)
-  onStart?: () => void;    // Start callback
-  onComplete?: () => void; // Complete callback
-  onStop?: () => void;     // Stop callback
-  onReset?: () => void;    // Reset callback
-}
+- [Detailed Guide](./DETAILED_GUIDE.md) - Complete API reference, examples, and advanced usage
+- [TypeScript Definitions](./dist/index.d.ts) - Type definitions
+
+### Related Packages
+
+- [`@hua-labs/hua-ux`](../hua-ux/README.md) - Integrated framework (UI + Motion + i18n)
+
+### Requirements
+
+- React >= 19.0.0
+- React DOM >= 19.0.0
+
+## Korean
+
+### 개요
+
+ref 기반 엔진으로 구축된 React 애니메이션 훅 컬렉션입니다. 외부 의존성 없이 부드러운 애니메이션을 제공합니다. 모든 훅은 TypeScript 네이티브이며 SSR과 호환됩니다.
+
+### 주요 기능
+
+- **25개 이상의 애니메이션 훅** - 페이드, 슬라이드, 스케일, 스크롤 및 상호작용 애니메이션
+- **성능 최적화** - 일관된 성능을 위한 직접 ref 조작
+- **의존성 없음** - 순수 JavaScript 모션 엔진
+- **TypeScript 네이티브** - 타입 추론을 통한 완전한 타입 안전성
+- **SSR 호환** - Next.js, Remix 및 SSR 프레임워크와 작동
+- **테스트 완료** - 517개 테스트 케이스로 테스트 커버리지
+
+### 설치
+
+```bash
+npm install @hua-labs/motion-core
+# 또는
+yarn add @hua-labs/motion-core
+# 또는
+pnpm add @hua-labs/motion-core
 ```
 
-## Examples
-
-### Fade In Animation
+### 빠른 시작
 
 ```tsx
-import { useFadeIn } from '@hua-labs/motion-core';
+import React from 'react';
+import { useFadeIn, useSlideUp } from '@hua-labs/motion-core';
 
-function FadeInExample() {
-  const { ref, style, start, stop } = useFadeIn({
-    duration: 1000,
-    autoStart: false
-  });
+function MyComponent() {
+  const fadeIn = useFadeIn({ duration: 800 });
+  const slideUp = useSlideUp({ delay: 200 });
 
   return (
     <div>
-      <div ref={ref} style={style}>
-        This will fade in
-      </div>
-      <button onClick={start}>Start</button>
-      <button onClick={stop}>Stop</button>
+      <h1 ref={fadeIn.ref} style={fadeIn.style}>
+        HUA Motion Core에 오신 것을 환영합니다
+      </h1>
+      <p ref={slideUp.ref} style={slideUp.style}>
+        간단한 애니메이션
+      </p>
     </div>
   );
 }
 ```
 
-### Scroll Reveal
+### 사용 가능한 훅
+
+#### 기본 모션 훅
+- `useFadeIn` - 페이드 인 애니메이션
+- `useSlideUp` - 슬라이드 업 애니메이션
+- `useSlideLeft` - 슬라이드 왼쪽 애니메이션
+- `useSlideRight` - 슬라이드 오른쪽 애니메이션
+- `useScaleIn` - 스케일 인 애니메이션
+- `useBounceIn` - 바운스 인 애니메이션
+- `usePulse` - 펄스 애니메이션
+- `useSpringMotion` - 스프링 물리 애니메이션
+- `useGradient` - 그라디언트 애니메이션
+
+#### 상호작용 훅
+- `useHoverMotion` - 호버 트리거 애니메이션
+- `useClickToggle` - 클릭 트리거 애니메이션
+- `useFocusToggle` - 포커스 트리거 애니메이션
+- `useToggleMotion` - 토글 애니메이션
+
+#### 스크롤 훅
+- `useScrollReveal` - 스크롤 트리거 리빌 애니메이션
+- `useScrollProgress` - 스크롤 진행률 추적
+
+#### 유틸리티 훅
+- `useMotionState` - 모션 상태 관리
+- `useRepeat` - 반복 애니메이션
+- `useSmartMotion` - 자동 감지 스마트 모션
+- `useUnifiedMotion` - 통합 모션 인터페이스
+- `useSimplePageMotion` - 간단한 페이지 전환
+- `usePageMotions` - 여러 페이지 모션
+- `useGesture` - 제스처 감지
+- `useGestureMotion` - 제스처 기반 애니메이션
+
+### API 개요
+
+모든 훅은 일관된 인터페이스를 반환합니다:
 
 ```tsx
-import { useScrollReveal } from '@hua-labs/motion-core';
-
-function ScrollRevealExample() {
-  const { ref, style } = useScrollReveal({
-    threshold: 0.3,
-    triggerOnce: true
-  });
-
-  return (
-    <div ref={ref} style={style}>
-      This appears when scrolled into view
-    </div>
-  );
+interface BaseMotionReturn<T = HTMLElement> {
+  ref: RefObject<T>;
+  style: CSSProperties;
+  isVisible: boolean;
+  isAnimating: boolean;
+  progress: number;
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+  pause: () => void;
+  resume: () => void;
 }
 ```
 
-### Hover Interaction
+### 문서
 
-```tsx
-import { useHoverMotion } from '@hua-labs/motion-core';
+- [상세 가이드](./DETAILED_GUIDE.md) - 완전한 API 참조, 예시 및 고급 사용법
+- [TypeScript 정의](./dist/index.d.ts) - 타입 정의
 
-function HoverExample() {
-  const { ref, style, hover, leave } = useHoverMotion({
-    scale: 1.1,
-    duration: 300
-  });
+### 관련 패키지
 
-  return (
-    <div 
-      ref={ref} 
-      style={style}
-      onMouseEnter={hover}
-      onMouseLeave={leave}
-    >
-      Hover me!
-    </div>
-  );
-}
-```
+- [`@hua-labs/hua-ux`](../hua-ux/README.md) - 통합 프레임워크 (UI + Motion + i18n)
 
-## TypeScript Support
+### 요구사항
 
-HUA Motion Core is built with TypeScript and provides comprehensive type definitions:
-
-```tsx
-import { useFadeIn, BaseMotionReturn, FadeInOptions } from '@hua-labs/motion-core';
-
-// Full type safety
-const fadeIn: BaseMotionReturn<HTMLDivElement> = useFadeIn({
-  duration: 1000,
-  opacity: { from: 0, to: 1 }
-} as FadeInOptions);
-```
-
-## Related Packages
-
-- **[@hua-labs/motion-advanced](../../hua-motion-advanced)** - Advanced motion hooks and orchestration
-- **[@hua-labs/motion](../../hua-motion)** - Unified package (Core + Advanced re-export)
-
-## Roadmap
-
-- **Motion Core** - Essential hooks ✅ (Current)
-- **Motion Advanced** - Complex animations ✅ (Available)
-- **Motion Enterprise** - Team solutions (Planned)
-
-## Browser Support
-
-- Chrome 60+
-- Firefox 60+
-- Safari 12+
-- Edge 79+
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+- React >= 19.0.0
+- React DOM >= 19.0.0
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT © HUA Labs
 
-## Changelog
+## Repository
 
-See [CHANGELOG.md](CHANGELOG.md) for release history.
-
----
-
-Built with ❤️ by [HUA Labs](https://github.com/HUA-Labs)
+https://github.com/HUA-Labs/HUA-Labs-public
