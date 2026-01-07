@@ -1,21 +1,21 @@
 {
   "name": "@hua-labs/state",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha.5",
   "description": "HUA State - Unified state management for hua-ux framework with SSR support and integrations",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "require": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./integrations/i18n": {
       "types": "./dist/integrations/i18n.d.ts",
-      "import": "./src/integrations/i18n.ts",
-      "require": "./src/integrations/i18n.ts",
+      "import": "./dist/integrations/i18n.js",
+      "require": "./dist/integrations/i18n.js",
       "default": "./dist/integrations/i18n.js"
     }
   },
@@ -30,19 +30,22 @@
     "lint": "echo 'Skipping lint for hua-state (ESLint 8, needs separate config)'",
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {},
   "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0",
     "zustand": ">=5.0.0",
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "@hua-labs/i18n-core-zustand": ">=1.0.0"
+    "@hua-labs/i18n-core-zustand": ">=2.0.0-alpha.4"
   },
   "keywords": [
-    "hua-state",
-    "zustand",
+    "hua-labs",
     "state-management",
-    "ssr",
+    "zustand",
     "react",
+    "typescript",
+    "ssr",
+    "hydration",
+    "persistence",
+    "i18n",
     "nextjs"
   ],
   "author": "HUA Labs",
@@ -54,5 +57,14 @@
   "bugs": {
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
-  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@hua-labs/i18n-core-zustand": "workspace:*",
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
 }

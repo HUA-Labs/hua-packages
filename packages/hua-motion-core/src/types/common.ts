@@ -80,6 +80,19 @@ export interface BaseMotionReturn<T extends MotionElement = HTMLDivElement> {
 }
 
 // ========================================
+// 인터랙션 모션 반환값 인터페이스
+// ========================================
+
+export interface InteractionReturn<T extends MotionElement = HTMLDivElement> extends BaseMotionReturn<T> {
+  /** 가시성 토글 함수 */
+  toggle?: () => void
+  /** 표시 함수 */
+  show?: () => void
+  /** 숨김 함수 */
+  hide?: () => void
+}
+
+// ========================================
 // 훅별 확장 옵션 인터페이스들
 // ========================================
 

@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/i18n-core-zustand",
-  "version": "1.0.0",
+  "version": "1.1.0-alpha.1",
   "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
-    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "echo \"No tests defined\"",
     "lint": "echo 'Skipping lint for hua-i18n-core-zustand'",
@@ -28,21 +28,25 @@
     "@hua-labs/i18n-core": "workspace:*"
   },
   "peerDependencies": {
-    "zustand": "^5.0.0",
+    "zustand": "^4.0.0 || ^5.0.0",
     "react": ">=16.8.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.7",
     "typescript": "^5.9.3",
-    "zustand": "^5.0.8"
+    "zustand": "^4.0.0"
   },
   "keywords": [
+    "hua-labs",
     "i18n",
     "internationalization",
     "zustand",
     "state-management",
-    "adapter"
+    "adapter",
+    "react",
+    "typescript",
+    "ssr"
   ],
   "author": "HUA Labs",
   "license": "MIT",
@@ -55,4 +59,3 @@
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
 }
-

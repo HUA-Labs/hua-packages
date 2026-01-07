@@ -6,11 +6,13 @@
 
 // Store creation
 export { createHuaStore } from './store/create-store';
-export type { 
-  StoreCreator, 
-  StoreConfig, 
-  HuaStore, 
-  BaseStoreState 
+export type {
+  StoreCreator,
+  StoreConfig,
+  HuaStore,
+  BaseStoreState,
+  UseBoundStore,
+  StoreApi
 } from './store/types';
 
 // i18n integration

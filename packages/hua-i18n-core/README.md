@@ -1,25 +1,37 @@
 # @hua-labs/i18n-core
 
-**Type-safe i18n library with SSR/CSR support and state management integration**
+Type-safe i18n library with SSR/CSR support and state management integration.
+SSR/CSR 지원 및 상태 관리 통합 기능을 갖춘 타입 안전 i18n 라이브러리.
 
-HUA Labs - Core Internationalization Library
+[![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
+[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
+[![license](https://img.shields.io/npm/l/@hua-labs/i18n-core.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 
-Lightweight i18n library for React applications with essential translation features only.
+> **⚠️ Alpha Release**: This package is currently in alpha. APIs may change before the stable release.
 
-## 🎯 Why @hua-labs/i18n-core?
+---
 
-Struggling with flickering on language changes or hydration mismatches? @hua-labs/i18n-core provides a pragmatic, production-ready solution for React i18n.
+[English](#english) | [한국어](#korean)
+
+## English
+
+### Overview
+Lightweight, production-ready i18n library for React applications. Delivers zero-flicker language transitions through intelligent caching and provides seamless SSR/CSR support with built-in state management integration.
+
+### Why i18n-core?
+
+Built to address common challenges in React internationalization: language transition flickers and SSR hydration mismatches. Provides a focused solution for these specific problems.
 
 **Key advantages:**
-- ✅ **Zero flickering**: Automatically shows previous language translation during switch
-- ✅ **SSR-first**: Built-in hydration handling, no mismatch issues
-- ✅ **State management integration**: First-class Zustand support
-- ✅ **Small bundle**: ~2.8KB gzipped, zero dependencies (React only)
-- ✅ **Framework agnostic**: Works with Next.js, Remix, Vite, and more
+- **Zero flickering**: Automatically shows previous language translation during switch
+- **SSR-first**: Built-in hydration handling, no mismatch issues
+- **State management integration**: First-class Zustand support
+- **Small bundle**: ~2.8KB gzipped, zero dependencies (React only)
+- **Framework agnostic**: Works with Next.js, Remix, Vite, and more
 
-[📊 Compare with other libraries](./docs/COMPARISON_I18N_LIBRARIES.md)
-
-## Installation
+### Installation
 
 ```bash
 npm install @hua-labs/i18n-core
@@ -31,19 +43,28 @@ pnpm add @hua-labs/i18n-core
 
 ## Features
 
-- ✅ Lightweight core translation functionality
-- ✅ Multiple translation loader strategies (API, static files, custom)
-- ✅ Lazy loading support for namespaces
-- ✅ SSR/SSG support with initial translations
-- ✅ TypeScript support
-- ✅ Zero external dependencies (except React)
-- ✅ Built-in caching
-- ✅ Error handling and fallback support
-- ✅ Debug mode for development
-- ✅ **Language change flickering prevention**: Automatically shows previous language translation during language switch
-- ✅ **State management integration**: Works seamlessly with Zustand via `@hua-labs/i18n-core-zustand`
+- Lightweight core translation functionality
+- Multiple translation loader strategies (API, static files, custom)
+- Lazy loading support for namespaces
+- SSR/SSG support with initial translations
+- TypeScript support
+- Zero external dependencies (except React)
+- Built-in caching
+- Error handling and fallback support
+- Debug mode for development
+- **Language change flickering prevention**: Automatically shows previous language translation during language switch
+- **State management integration**: Works seamlessly with Zustand via `@hua-labs/i18n-core-zustand`
+- **Raw value access**: Get arrays, objects, or any non-string values from translations via `getRawValue`
+- **Automatic retry**: Network errors are automatically retried with exponential backoff (when using API loader)
+- **Memory leak prevention**: LRU cache for Translator instances to prevent memory accumulation
+- **Production-optimized**: Console logs are automatically suppressed in production mode
 
-## Quick Start
+### Examples
+
+- **[CodeSandbox Template](../../examples/codesandbox-template/)** - Quick start template
+- **[Next.js Example](../../examples/next-app-router-example/)** - Complete Next.js App Router example
+
+### Quick Start
 
 ### Basic Setup
 
@@ -89,24 +110,16 @@ The library supports three translation loading strategies:
 
 ### 1. API Loader (Default, Recommended)
 
-Loads translations through API routes. Best for production environments. **Now supports server-side rendering!**
+Loads translations through API routes. Best for production environments.
 
 ```tsx
 createCoreI18n({
   translationLoader: 'api',
   translationApiPath: '/api/translations', // default
   defaultLanguage: 'ko',
-  namespaces: ['common', 'pages'],
-  // Server-side support (optional)
-  baseUrl: 'https://example.com', // Explicit base URL for server-side
-  localFallbackBaseUrl: 'http://localhost:3000' // Local dev fallback
+  namespaces: ['common', 'pages']
 })
 ```
-
-**Server-Side Support:**
-- Automatically detects `NEXT_PUBLIC_SITE_URL` or `VERCEL_URL` environment variables
-- Falls back to `http://localhost:3000` in development if no base URL is provided
-- Works seamlessly on both server and client without additional configuration
 
 **API Route Example (Next.js):**
 
@@ -262,6 +275,49 @@ Translation file:
 ```json
 {
   "greeting": "Hello, {{name}}!"
+}
+```
+
+### Getting Raw Values (Arrays and Objects)
+
+Use `getRawValue` to access arrays, objects, or any non-string values from translation files:
+
+```tsx
+import { useTranslation } from '@hua-labs/i18n-core';
+
+function MyComponent() {
+  const { getRawValue } = useTranslation();
+  
+  // Get an array
+  const features = getRawValue('common:features') as string[];
+  
+  // Get an object
+  const metadata = getRawValue('common:metadata') as Record<string, string>;
+  
+  return (
+    <div>
+      <ul>
+        {features?.map((feature, index) => (
+          <li key={index}>{feature}</li>
+        ))}
+      </ul>
+      <div>
+        <p>Version: {metadata?.version}</p>
+        <p>Author: {metadata?.author}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+Translation file:
+```json
+{
+  "features": ["Fast", "Lightweight", "Type-safe"],
+  "metadata": {
+    "version": "1.0.0",
+    "author": "HUA Labs"
+  }
 }
 ```
 
@@ -434,10 +490,6 @@ createCoreI18n({
     // Custom loader function
   },
   
-  // Server-side support (for API loader)
-  baseUrl?: string, // Explicit base URL for server-side requests
-  localFallbackBaseUrl?: string, // Local dev fallback (default: 'http://localhost:3000')
-  
   // SSR optimization: Pre-loaded translations (no network requests)
   // Prevents missing key exposure during initial load
   initialTranslations: {
@@ -503,6 +555,8 @@ createCoreI18n({
 })
 ```
 
+**Note**: In production (`debug: false`), console logs are automatically suppressed to improve performance and prevent information leakage.
+
 ### Missing Key Overlay (Development)
 
 Display missing translation keys in development:
@@ -521,136 +575,32 @@ function DebugBar() {
 
 The library includes built-in error handling:
 
-- Automatic fallback to default language
-- Missing key handling
-- Network error recovery
-- Cache invalidation on errors
+- **Automatic fallback**: Falls back to default language when translations are missing
+- **Missing key handling**: Returns key in debug mode, empty string in production
+- **Network error recovery**: Automatic retry with exponential backoff (when using API loader)
+- **Cache invalidation**: Automatically clears cache on errors
+- **Error classification**: Distinguishes between recoverable and non-recoverable errors
+- **Memory leak prevention**: LRU cache for Translator instances (max 10 instances)
 
 ## API Reference
 
-### createCoreI18n
+### Main Exports
 
-Creates an i18n Provider component.
-
-```tsx
-function createCoreI18n(options?: {
-  defaultLanguage?: string;
-  fallbackLanguage?: string;
-  namespaces?: string[];
-  debug?: boolean;
-  loadTranslations?: (language: string, namespace: string) => Promise<Record<string, string>>;
-  translationLoader?: 'api' | 'static' | 'custom';
-  translationApiPath?: string;
-  baseUrl?: string; // Server-side base URL
-  localFallbackBaseUrl?: string; // Local dev fallback URL
-  initialTranslations?: Record<string, Record<string, Record<string, string>>>;
-  autoLanguageSync?: boolean;
-}): React.ComponentType<{ children: React.ReactNode }>
-```
-
-### useTranslation
-
-Hook for accessing translations and language state.
-
-```tsx
-function useTranslation(): {
-  t: (key: string, language?: string) => string;
-  tWithParams: (key: string, params: Record<string, string>) => string;
-  currentLanguage: string;
-  setLanguage: (language: string) => Promise<void>;
-  isLoading: boolean;
-  error: TranslationError | null;
-  supportedLanguages: LanguageConfig[];
-  isInitialized: boolean;
-  debug: {
-    getLoadedNamespaces: () => string[];
-    getCacheStats: () => { hits: number; misses: number };
-  };
-}
-```
-
-### useLanguageChange
-
-Hook for language switching.
-
-```tsx
-function useLanguageChange(): {
-  currentLanguage: string;
-  changeLanguage: (language: string) => void;
-  supportedLanguages: LanguageConfig[];
-}
-```
-
-### Translator
-
-Core translation class (for SSR or advanced use cases).
-
-```tsx
-class Translator {
-  translate(key: string, language?: string): string;
-  setLanguage(lang: string): void;
-  getCurrentLanguage(): string;
-  initialize(): Promise<void>;
-  isReady(): boolean;
-  onTranslationLoaded(callback: () => void): () => void;
-  onLanguageChanged(callback: (language: string) => void): () => void;
-  debug(): unknown;
-}
-```
-
-### ssrTranslate
-
-Server-side translation helper function.
-
-```tsx
-function ssrTranslate(options: {
-  translations: Record<string, string>;
-  key: string;
-  language: string;
-}): string
-```
-
-### serverTranslate
-
-Alias for `ssrTranslate`.
-
-## Bundle Size
-
-- Main entry (index.js): **9.5 KB** (uncompressed)
-- Estimated gzip: **~2.8 KB**
-- Total JS files: ~106 KB (with tree shaking, only used modules are included)
-- Zero dependencies (React only as peer dependency)
+- `createCoreI18n(options?)` - Creates i18n Provider component
+- `useTranslation()` - Hook for translations and language state
+- `useLanguageChange()` - Hook for language switching
+- `Translator` - Core translation class (for SSR)
+- `ssrTranslate()` / `serverTranslate()` - Server-side translation helpers
 
 ## Requirements
 
-- React >= 19.0.0
+- React >= 16.8.0
 - TypeScript (recommended)
 
-## Development
+## Bundle Size
 
-### Build
-
-```bash
-pnpm build
-```
-
-### Development Mode
-
-```bash
-pnpm dev
-```
-
-### Type Check
-
-```bash
-pnpm type-check
-```
-
-### Test
-
-```bash
-pnpm test
-```
+- **~2.8 KB** gzipped
+- Zero dependencies (React only as peer dependency)
 
 ## Troubleshooting
 
@@ -673,8 +623,19 @@ pnpm test
 2. Check API route returns valid JSON
 3. Ensure API route handles 404 errors gracefully
 4. Check CORS settings if loading from different domain
-5. **Server-side**: Ensure `baseUrl` is set or `NEXT_PUBLIC_SITE_URL`/`VERCEL_URL` environment variables are configured
-6. **Server-side**: Check that the API route is accessible from the server (not just client)
+
+## Documentation
+
+- [Architecture Guide](./docs/ARCHITECTURE.md) - Core architecture and design patterns
+
+## Code Quality
+
+This package has been refactored for better maintainability:
+
+- **Modular functions**: Translation logic split into focused helper methods
+- **Type safety**: Improved type guards and error handling
+- **Performance**: Optimized translation lookup with proper memoization
+- **Code clarity**: Removed commented code and improved function organization
 
 ## Related Packages
 
@@ -686,3 +647,89 @@ pnpm test
 ## License
 
 MIT
+
+## Korean
+
+### 개요
+React 애플리케이션을 위한 경량 프로덕션 레디 i18n 라이브러리입니다. 지능형 캐싱을 통해 깜빡임 없는 언어 전환을 제공하고, 내장된 상태 관리 통합과 함께 원활한 SSR/CSR 지원을 제공합니다.
+
+### 왜 i18n-core인가?
+
+React 국제화에서 흔히 발생하는 문제인 언어 전환 시 깜빡임과 SSR hydration 불일치를 해결하기 위해 구축되었습니다.
+
+**주요 장점:**
+- **깜빡임 없음**: 언어 전환 중 이전 언어 번역을 자동으로 표시
+- **SSR 우선**: 내장 hydration 처리, 불일치 문제 없음
+- **상태 관리 통합**: Zustand 일급 지원
+- **작은 번들**: ~2.8KB gzipped, 의존성 없음 (React만)
+- **프레임워크 독립적**: Next.js, Remix, Vite 등과 작동
+
+### 설치
+
+```bash
+npm install @hua-labs/i18n-core
+# 또는
+yarn add @hua-labs/i18n-core
+# 또는
+pnpm add @hua-labs/i18n-core
+```
+
+### 주요 기능
+
+- 경량 핵심 번역 기능
+- 여러 번역 로더 전략 (API, 정적 파일, 커스텀)
+- 네임스페이스 지연 로딩 지원
+- 초기 번역을 통한 SSR/SSG 지원
+- TypeScript 지원
+- 외부 의존성 없음 (React 제외)
+- 내장 캐싱
+- 에러 처리 및 폴백 지원
+- 개발용 디버그 모드
+- **언어 변경 깜빡임 방지**: 언어 전환 중 이전 언어 번역을 자동으로 표시
+- **상태 관리 통합**: `@hua-labs/i18n-core-zustand`를 통해 Zustand와 원활하게 작동
+- **원시 값 접근**: `getRawValue`를 통해 번역에서 배열, 객체 또는 모든 비문자열 값 가져오기
+
+### 빠른 시작
+
+```tsx
+// app/layout.tsx (Next.js App Router)
+import { createCoreI18n } from '@hua-labs/i18n-core';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {createCoreI18n({
+          defaultLanguage: 'ko',
+          fallbackLanguage: 'en',
+          namespaces: ['common', 'pages']
+        })({ children })}
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx
+import { useTranslation } from '@hua-labs/i18n-core';
+
+function MyComponent() {
+  const { t } = useTranslation();
+  
+  return (
+    <div>
+      <h1>{t('common:welcome')}</h1>
+      <p>{t('pages:home.title')}</p>
+    </div>
+  );
+}
+```
+
+### 관련 패키지
+
+- `@hua-labs/i18n-core-zustand`: Zustand 상태 관리 통합 어댑터
+- `@hua-labs/i18n-loaders`: 프로덕션 레디 로더, 캐싱 및 프리로딩 헬퍼
+- `@hua-labs/i18n-advanced`: 복수형, 날짜 포맷팅 등의 고급 기능
+- `@hua-labs/i18n-debug`: 디버그 도구 및 개발 헬퍼
+
+자세한 내용은 [상세 가이드](./DETAILED_GUIDE.md)를 참고하세요.
