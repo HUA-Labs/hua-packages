@@ -115,10 +115,10 @@ interface ToastProviderProps {
  * @todo 접근성 개선: ToastItem에 role="alert" 또는 role="status" 추가 필요 / Accessibility: Add role="alert" or role="status" to ToastItem
  * @todo 접근성 개선: aria-live="polite" 또는 aria-live="assertive" 추가 필요 / Accessibility: Add aria-live="polite" or aria-live="assertive"
  */
-export function ToastProvider({ 
-  children, 
+export function ToastProvider({
+  children,
   maxToasts = 5,
-  position = "top-right" 
+  position = "top-right"
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
@@ -129,12 +129,12 @@ export function ToastProvider({
   const addToast = useCallback((toast: Omit<Toast, "id">) => {
     const id = Math.random().toString(36).substr(2, 9)
     const newToast: Toast = { ...toast, id }
-    
+
     setToasts(prev => {
       const updatedToasts = [...prev, newToast]
       return updatedToasts.slice(-maxToasts) // 최대 개수 제한
     })
-    
+
     // 자동 제거
     if (toast.duration !== 0) {
       setTimeout(() => {
@@ -266,8 +266,8 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       className={merge(
         "flex items-start p-4 rounded-xl border shadow-lg backdrop-blur-sm transition-all duration-300 transform",
         getToastStyles(toast.type),
-        isVisible 
-          ? "translate-x-0 opacity-100 scale-100" 
+        isVisible
+          ? "translate-x-0 opacity-100 scale-100"
           : "translate-x-full opacity-0 scale-95"
       )}
       style={{
@@ -289,7 +289,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         <p className="text-sm leading-relaxed">
           {toast.message}
         </p>
-        
+
         {/* 액션 버튼 */}
         {toast.action && (
           <button
@@ -323,21 +323,21 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
 // 편의 함수들
 export const showToast = (toast: Omit<Toast, "id">) => {
   // 이 함수는 ToastProvider 내부에서만 사용 가능
-  console.warn("showToast is deprecated. Use useToast hook instead.")
+
 }
 
 export const showSuccessToast = (message: string, title?: string, duration?: number) => {
-  console.warn("showSuccessToast is deprecated. Use useToast hook instead.")
+
 }
 
 export const showErrorToast = (message: string, title?: string, duration?: number) => {
-  console.warn("showErrorToast is deprecated. Use useToast hook instead.")
+
 }
 
 export const showWarningToast = (message: string, title?: string, duration?: number) => {
-  console.warn("showWarningToast is deprecated. Use useToast hook instead.")
+
 }
 
 export const showInfoToast = (message: string, title?: string, duration?: number) => {
-  console.warn("showInfoToast is deprecated. Use useToast hook instead.")
+
 } 
