@@ -5,7 +5,7 @@
 ### 아키텍처
 - **Provider 패턴**: React Context API 기반
 - **상태관리**: 서비스 레벨에서 Zustand 등으로 관리 (패키지 의존성 없음)
-- **지원 세트**: Lucide (기본), Phosphor, Untitled (준비 중)
+- **지원 세트**: Lucide (기본), Phosphor, Iconsax (준비 중)
 - **기본 동작**: IconProvider 없이도 사용 가능 (기본값 자동 적용)
 
 ### 파일 구조
@@ -244,7 +244,7 @@ import { LoadingIcon, SuccessIcon, ErrorIcon, EmotionIcon, StatusIcon } from '@h
 - **기본값**: weight "regular"
 - **설치**: `pnpm add @phosphor-icons/react`
 
-### Untitled Icons
+### Iconsax Icons
 - **상태**: 준비 중
 - **특징**: SVG 기반
 - **API 차이점**: 
@@ -258,11 +258,11 @@ import { LoadingIcon, SuccessIcon, ErrorIcon, EmotionIcon, StatusIcon } from '@h
 
 ```tsx
 interface IconProviderProps {
-  set?: 'lucide' | 'phosphor' | 'untitled'  // 기본: 'phosphor'
+  set?: 'lucide' | 'phosphor' | 'iconsax'  // 기본: 'phosphor'
   weight?: 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'  // 기본: 'regular'
   size?: number  // 기본: 20
   color?: string  // 기본: 'currentColor'
-  strokeWidth?: number  // Lucide/Untitled용, 기본: 1.25
+  strokeWidth?: number  // Lucide/Iconsax용, 기본: 1.25
   children: React.ReactNode
 }
 ```
@@ -369,7 +369,7 @@ const aliases2 = getIconAliases('settings')
 **세트별 SSR 지원:**
 - **Lucide**: SSR-safe (하지만 현재는 클라이언트 전용으로 제한)
 - **Phosphor**: Dynamic import 사용 (SSR 시 클라이언트에서만 로드)
-- **Untitled**: SVG 기반이므로 SSR 가능 (구현 시)
+- **Iconsax**: SVG 기반이므로 SSR 가능 (구현 시)
 
 **권장사항:**
 - Next.js App Router 사용 시 `'use client'` 지시어 필요
@@ -411,12 +411,12 @@ const aliases2 = getIconAliases('settings')
 |------|-------------|------|
 | **Lucide** | 완전 지원 | ESM 기반, 사용하지 않는 아이콘 자동 제거 |
 | **Phosphor** | ESM/Dynamic | Dynamic import 사용 시 선택적 로딩 |
-| **Untitled** | 제한적 | SVG 파일 기반이므로 번들러 설정 필요 |
+| **Iconsax** | 제한적 | SVG 파일 기반이므로 번들러 설정 필요 |
 
 **최적화 팁:**
 - Lucide: 자동으로 tree-shaking 됨
 - Phosphor: Dynamic import로 필요한 아이콘만 로드
-- Untitled: SVG 파일을 개별 import하여 번들러가 최적화하도록 설정
+- Iconsax: SVG 파일을 개별 import하여 번들러가 최적화하도록 설정
 
 ## 완료된 개선사항
 
@@ -456,7 +456,7 @@ pnpm generate:icon-types
 ## 향후 개선 계획
 
 ### 1. 기능 개선
-- [ ] Untitled Icons 구현
+- [ ] Iconsax Icons 구현
 - [ ] 테마별 weight 자동 분기 (라이트/다크)
 - [ ] 아이콘 로딩 에러 처리 개선
 - [ ] Phosphor 초기화 캐싱
