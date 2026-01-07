@@ -25,11 +25,28 @@ import { createCoreI18n, useTranslation } from '@hua-labs/i18n-core';
 import type { StoreApi, UseBoundStore } from 'zustand';
 
 /**
- * Zustand 스토어에서 언어 관련 상태를 가져오는 인터페이스
+ * 지원되는 언어 코드 타입
+ * ISO 639-1 표준 언어 코드
  */
-export interface ZustandLanguageStore {
-  language: string | 'ko' | 'en';
-  setLanguage: (lang: string | 'ko' | 'en') => void;
+export type SupportedLanguage = 'ko' | 'en' | 'ja';
+
+/**
+ * Zustand 스토어에서 언어 관련 상태를 가져오는 인터페이스
+ * 
+ * @template L - 언어 코드 타입 (기본값: SupportedLanguage | string)
+ * 
+ * @example
+ * ```typescript
+ * // 기본 사용 (모든 언어 코드 허용)
+ * interface MyStore extends ZustandLanguageStore {}
+ * 
+ * // 특정 언어만 허용
+ * interface MyStore extends ZustandLanguageStore<'ko' | 'en'> {}
+ * ```
+ */
+export interface ZustandLanguageStore<L extends string = SupportedLanguage | string> {
+  language: L;
+  setLanguage: (lang: L) => void;
 }
 
 /**
@@ -43,16 +60,19 @@ export interface ZustandI18nAdapter {
 
 /**
  * Zustand 스토어에서 어댑터 생성
+ * 
+ * @template L - 언어 코드 타입
  */
-function createZustandAdapter(
-  store: UseBoundStore<StoreApi<ZustandLanguageStore>>
+function createZustandAdapter<L extends string = SupportedLanguage | string>(
+  store: UseBoundStore<StoreApi<ZustandLanguageStore<L>>>
 ): ZustandI18nAdapter {
   return {
     getLanguage: () => store.getState().language,
     setLanguage: (lang: string) => {
       const currentLang = store.getState().language;
       if (currentLang !== lang) {
-        store.getState().setLanguage(lang);
+        // 어댑터는 string을 받지만, 스토어는 L 타입을 기대하므로 타입 단언 필요
+        store.getState().setLanguage(lang as L);
       }
     },
     subscribe: (callback: (lang: string) => void) => {
@@ -104,10 +124,24 @@ export interface ZustandI18nConfig {
   translationApiPath?: string;
   initialTranslations?: Record<string, Record<string, Record<string, string>>>;
   autoLanguageSync?: boolean;
+  /**
+   * document.documentElement.lang 자동 업데이트 여부
+   * 기본값: false (사용자가 직접 관리)
+   * true로 설정하면 언어 변경 시 자동으로 html[lang] 속성 업데이트
+   */
+  autoUpdateHtmlLang?: boolean;
 }
 
-export function createZustandI18n(
-  store: UseBoundStore<StoreApi<ZustandLanguageStore>>,
+/**
+ * Zustand 스토어와 i18n-core를 통합하는 Provider 생성
+ * 
+ * @template L - 언어 코드 타입
+ * @param store - Zustand 스토어 (language와 setLanguage 메서드 필요)
+ * @param config - i18n 설정
+ * @returns I18nProvider 컴포넌트
+ */
+export function createZustandI18n<L extends string = SupportedLanguage | string>(
+  store: UseBoundStore<StoreApi<ZustandLanguageStore<L>>>,
   config?: ZustandI18nConfig
 ): React.ComponentType<{ children: React.ReactNode }> {
   const adapter = createZustandAdapter(store);
@@ -129,70 +163,105 @@ export function createZustandI18n(
   // 언어 동기화 래퍼 컴포넌트 (Provider 내부에서만 사용)
   // BaseI18nProvider가 I18nProvider를 렌더링하므로, 그 자식으로 들어가면 useTranslation 사용 가능
   function LanguageSyncWrapper({ children: innerChildren }: { children: React.ReactNode }) {
+    const debug = config?.debug ?? false;
+    const autoUpdateHtmlLang = config?.autoUpdateHtmlLang ?? false;
     // useTranslation은 I18nProvider 내부에서만 사용 가능
     // BaseI18nProvider가 I18nProvider를 렌더링하므로 여기서 사용 가능
     const { setLanguage: setI18nLanguage, currentLanguage, isInitialized } = useTranslation();
-    const prevStoreLanguageRef = React.useRef<string | null>(null);
-    const initializedRef = React.useRef<boolean>(false);
-    const hydratedRef = React.useRef<boolean>(false);
-    const currentLanguageRef = React.useRef<string>(currentLanguage);
     
-    // currentLanguage가 변경되면 ref 업데이트
+    // document.documentElement.lang 자동 업데이트
     React.useEffect(() => {
-      currentLanguageRef.current = currentLanguage;
+      if (autoUpdateHtmlLang && typeof document !== 'undefined') {
+        document.documentElement.lang = currentLanguage;
+        if (debug) {
+          console.log(`[ZUSTAND-I18N] Updated html[lang] to: ${currentLanguage}`);
+        }
+      }
+    }, [currentLanguage, autoUpdateHtmlLang, debug]);
+    
+    // 하이드레이션 상태를 하나의 객체로 관리
+    interface HydrationState {
+      isComplete: boolean;
+      isInitialized: boolean;
+      previousStoreLanguage: string | null;
+      currentI18nLanguage: string;
+    }
+    
+    const hydrationStateRef = React.useRef<HydrationState>({
+      isComplete: false,
+      isInitialized: false,
+      previousStoreLanguage: null,
+      currentI18nLanguage: currentLanguage,
+    });
+    
+    // currentLanguage가 변경되면 상태 업데이트
+    React.useEffect(() => {
+      hydrationStateRef.current.currentI18nLanguage = currentLanguage;
     }, [currentLanguage]);
     
-    // 하이드레이션 완료 감지 (클라이언트에서만, 한 번만 실행)
+    // 하이드레이션 완료 감지 및 언어 동기화
     React.useEffect(() => {
-      if (typeof window === 'undefined') {
+      if (typeof window === 'undefined' || hydrationStateRef.current.isComplete) {
         return;
       }
       
-      // 이미 하이드레이션 완료 체크를 했다면 스킵
-      if (hydratedRef.current) {
-        return;
-      }
-      
-      // 하이드레이션이 완료되면 true로 설정
-      // requestAnimationFrame을 사용하여 하이드레이션 완료 후 실행
       const checkHydration = () => {
-        if (hydratedRef.current) {
-          return; // 이미 실행됨
+        if (hydrationStateRef.current.isComplete) {
+          return;
         }
-        hydratedRef.current = true;
+        
+        hydrationStateRef.current.isComplete = true;
+        hydrationStateRef.current.isInitialized = isInitialized;
+        
+        if (debug) {
+          console.log(`✅ [ZUSTAND-I18N] Hydration complete`);
+        }
         
         // 하이드레이션 완료 후 저장된 언어로 동기화
-        // 단, 초기 언어(initialLanguage)와 다를 때만 동기화
-        // (초기 언어와 같으면 SSR과 일치하므로 동기화 불필요)
         if (isInitialized) {
           const storeLanguage = store.getState().language;
+          const state = hydrationStateRef.current;
+          
           // initialLanguage와 다르고, 현재 i18n 언어와도 다를 때만 동기화
-          if (storeLanguage !== initialLanguage && storeLanguage !== currentLanguageRef.current) {
+          if (storeLanguage !== initialLanguage && storeLanguage !== state.currentI18nLanguage) {
+            if (debug) {
+              console.log(`🔄 [ZUSTAND-I18N] Hydration complete, syncing language: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+            }
             setI18nLanguage(storeLanguage);
+            state.previousStoreLanguage = storeLanguage;
+          } else {
+            if (debug) {
+              console.log(`⏭️ [ZUSTAND-I18N] Hydration complete, no sync needed (store: ${storeLanguage}, initial: ${initialLanguage}, current: ${state.currentI18nLanguage})`);
+            }
+            state.previousStoreLanguage = storeLanguage;
           }
         }
       };
       
       // 브라우저가 준비되면 하이드레이션 완료로 간주
-      // setTimeout을 사용하여 하이드레이션 완료 후 실행
       const timeoutId = setTimeout(() => {
         requestAnimationFrame(checkHydration);
       }, 0);
       
       return () => clearTimeout(timeoutId);
-    }, [isInitialized]); // currentLanguage를 의존성에서 제거하여 무한 루프 방지
+    }, [isInitialized, setI18nLanguage, initialLanguage, debug]);
     
     // 언어 동기화 함수 (재사용)
     const syncLanguageFromStore = React.useCallback(() => {
-      if (!isInitialized || !hydratedRef.current) {
+      const state = hydrationStateRef.current;
+      if (!state.isInitialized || !state.isComplete) {
         return;
       }
       
       const storeLanguage = store.getState().language;
-      if (storeLanguage !== currentLanguageRef.current && storeLanguage !== initialLanguage) {
+      if (storeLanguage !== state.currentI18nLanguage && storeLanguage !== initialLanguage) {
+        if (debug) {
+          console.log(`🔄 [ZUSTAND-I18N] Syncing language from store: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+        }
         setI18nLanguage(storeLanguage);
+        state.previousStoreLanguage = storeLanguage;
       }
-    }, [isInitialized, setI18nLanguage, initialLanguage]);
+    }, [setI18nLanguage, initialLanguage, debug]);
     
     // 언어 변경 구독 설정
     React.useEffect(() => {
@@ -201,42 +270,61 @@ export function createZustandI18n(
         return;
       }
       
-      // 초기 동기화 플래그 설정 (한 번만)
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        const storeLanguage = store.getState().language;
-        prevStoreLanguageRef.current = storeLanguage;
+      const state = hydrationStateRef.current;
+      state.isInitialized = true;
+      
+      // 초기 스토어 언어 설정
+      if (state.previousStoreLanguage === null) {
+        state.previousStoreLanguage = store.getState().language;
       }
       
-      // Zustand 스토어 변경 감지 (subscribe는 한 번만 설정)
+      // Zustand 스토어 변경 감지
       const unsubscribe = adapter.subscribe((newLanguage) => {
-        // Zustand 스토어의 언어가 변경되면 i18n에 직접 동기화
-        // 이벤트를 사용하지 않고 직접 setLanguage 호출 (순환 참조 방지)
-        if (newLanguage !== prevStoreLanguageRef.current) {
-          prevStoreLanguageRef.current = newLanguage;
+        // 이전 언어와 다를 때만 처리
+        if (newLanguage !== state.previousStoreLanguage) {
+          state.previousStoreLanguage = newLanguage;
           
           // 하이드레이션 완료 후에만 동기화
-          if (hydratedRef.current) {
-            // currentLanguageRef를 사용하여 최신 값 확인 (무한 루프 방지)
-            if (newLanguage !== currentLanguageRef.current) {
+          if (state.isComplete) {
+            // 현재 i18n 언어와 다를 때만 동기화 (무한 루프 방지)
+            if (newLanguage !== state.currentI18nLanguage) {
+              if (debug) {
+                console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${state.currentI18nLanguage} -> ${newLanguage}`);
+              }
               setI18nLanguage(newLanguage);
+            } else {
+              if (debug) {
+                console.log(`⏭️ [ZUSTAND-I18N] Store language changed but i18n already synced: ${newLanguage}`);
+              }
+            }
+          } else {
+            // 하이드레이션 완료 전에는 로그만 출력
+            if (debug) {
+              console.log(`⏳ [ZUSTAND-I18N] Store language changed but hydration not complete yet: ${newLanguage}`);
             }
           }
         }
       });
       
       // 하이드레이션이 이미 완료되었다면 즉시 동기화
-      // 단, 초기 언어와 다를 때만 동기화 (초기 언어와 같으면 SSR과 일치하므로 동기화 불필요)
-      if (hydratedRef.current) {
+      if (state.isComplete) {
         const storeLanguage = store.getState().language;
         // initialLanguage와 다르고, 현재 i18n 언어와도 다를 때만 동기화
-        if (storeLanguage !== initialLanguage && storeLanguage !== currentLanguageRef.current) {
+        if (storeLanguage !== initialLanguage && storeLanguage !== state.currentI18nLanguage) {
+          if (debug) {
+            console.log(`🔄 [ZUSTAND-I18N] Already hydrated, syncing language: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+          }
           setI18nLanguage(storeLanguage);
+          state.previousStoreLanguage = storeLanguage;
+        } else {
+          if (debug) {
+            console.log(`⏭️ [ZUSTAND-I18N] Already hydrated, no sync needed (store: ${storeLanguage}, initial: ${initialLanguage}, current: ${state.currentI18nLanguage})`);
+          }
         }
       }
 
       return unsubscribe;
-    }, [isInitialized, setI18nLanguage]); // store와 adapter는 클로저로 캡처되므로 의존성 불필요
+    }, [isInitialized, setI18nLanguage, initialLanguage, debug]);
     
     // 하이드레이션 완료 후 언어 동기화를 위한 별도 useEffect
     // hydratedRef는 ref이므로 의존성으로 사용할 수 없음
@@ -276,8 +364,15 @@ export function createZustandI18n(
  * }
  * ```
  */
-export function useZustandI18n(
-  store: UseBoundStore<StoreApi<ZustandLanguageStore>>
+/**
+ * Zustand 스토어와 i18n-core를 통합하는 Hook
+ * 
+ * @template L - 언어 코드 타입
+ * @param store - Zustand 스토어
+ * @returns { language, setLanguage } - 언어 상태 및 변경 함수
+ */
+export function useZustandI18n<L extends string = SupportedLanguage | string>(
+  store: UseBoundStore<StoreApi<ZustandLanguageStore<L>>>
 ) {
   const adapter = React.useMemo(() => createZustandAdapter(store), [store]);
   

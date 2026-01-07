@@ -6,6 +6,9 @@
 
 import type { StateCreator, StoreApi, UseBoundStore } from 'zustand';
 
+// Re-export zustand types for consumers
+export type { UseBoundStore, StoreApi } from 'zustand';
+
 /**
  * Base store state interface
  */

@@ -1,18 +1,19 @@
 /**
  * @hua-labs/state - i18n Integration
- * 
+ *
  * Pre-configured store for i18n language management
  */
 
 import { createHuaStore } from '../store/create-store';
 import type { HuaStore, BaseStoreState } from '../store/types';
+import type { ZustandLanguageStore } from '@hua-labs/i18n-core-zustand';
 
 /**
  * i18n store state interface
+ * Extends ZustandLanguageStore for compatibility with i18n-core-zustand
  */
-export interface I18nStoreState extends BaseStoreState {
-  language: string;
-  setLanguage: (lang: string) => void;
+export interface I18nStoreState extends ZustandLanguageStore, BaseStoreState {
+  // language and setLanguage are already defined in ZustandLanguageStore
 }
 
 /**
@@ -23,22 +24,22 @@ export interface I18nStoreConfig {
    * Default language
    */
   defaultLanguage: string;
-  
+
   /**
    * Supported languages
    */
   supportedLanguages: string[];
-  
+
   /**
    * Enable persistence
    */
   persist?: boolean;
-  
+
   /**
    * Persistence storage key
    */
   persistKey?: string;
-  
+
   /**
    * Enable SSR support
    */
@@ -81,5 +82,5 @@ export function createI18nStore(
       ssr,
       partialize: (state) => ({ language: state.language }),
     }
-  );
+  ) as HuaStore<I18nStoreState>;
 }

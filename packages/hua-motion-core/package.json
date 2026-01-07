@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/motion-core",
-  "version": "1.0.0",
+  "version": "2.1.0-alpha.3",
   "description": "HUA Motion Core - Essential animation hooks for React developers",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,9 +25,9 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
@@ -36,25 +36,25 @@
     "vitest": "^4.0.14"
   },
   "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "keywords": [
+    "hua-labs",
+    "react",
+    "typescript",
     "motion",
     "animation",
     "hooks",
-    "react",
-    "typescript",
+    "transitions",
+    "gestures",
+    "scroll",
     "fade",
     "slide",
-    "scale",
-    "bounce",
-    "pulse",
-    "scroll",
-    "hover",
-    "click",
-    "korean",
-    "english"
+    "spring",
+    "performance",
+    "ssr",
+    "nextjs"
   ],
   "author": "HUA Labs",
   "license": "MIT",
@@ -65,5 +65,9 @@
   "bugs": {
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
-  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme"
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

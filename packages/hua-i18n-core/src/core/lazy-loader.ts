@@ -63,14 +63,7 @@ export class LazyLoader {
     namespace: string,
     loader: (lang: string, ns: string) => Promise<TranslationNamespace>
   ): Promise<TranslationNamespace> {
-    console.log(`🔄 Loading namespace: ${namespace} for language: ${language}`);
-    
-    const startTime = performance.now();
     const result = await i18nResourceManager.getCachedTranslations(language, namespace, loader);
-    const endTime = performance.now();
-    
-    console.log(`✅ Loaded namespace: ${namespace} in ${(endTime - startTime).toFixed(2)}ms`);
-    
     return result;
   }
 
@@ -95,14 +88,11 @@ export class LazyLoader {
       return; // 이미 사전 로딩됨
     }
 
-    console.log(`📦 Preloading namespace: ${namespace} for language: ${language}`);
-    
     try {
       await this.loadOnDemand(language, namespace, loader);
       this.preloadCache.add(cacheKey);
-      console.log(`✅ Preloaded namespace: ${namespace}`);
     } catch (error) {
-      console.warn(`⚠️ Failed to preload namespace: ${namespace}`, error);
+      // Silent fail for preloading
     }
   }
 
@@ -114,14 +104,11 @@ export class LazyLoader {
     namespaces: string[],
     loader: (lang: string, ns: string) => Promise<TranslationNamespace>
   ): Promise<void> {
-    console.log(`📦 Preloading ${namespaces.length} namespaces for language: ${language}`);
-    
     const promises = namespaces.map(namespace => 
       this.preloadNamespace(language, namespace, loader)
     );
     
     await Promise.allSettled(promises);
-    console.log(`✅ Preloading completed for language: ${language}`);
   }
 
   /**
@@ -161,7 +148,6 @@ export class LazyLoader {
    */
   setLoadPriority(namespaces: string[]): void {
     // 우선순위가 높은 네임스페이스들을 먼저 로딩
-    console.log(`🎯 Set load priority: ${namespaces.join(', ')}`);
   }
 
   /**
@@ -188,8 +174,6 @@ export class LazyLoader {
         this.loadHistory.delete(key);
       }
     }
-
-    console.log('🧹 Memory optimization completed');
   }
 
   /**

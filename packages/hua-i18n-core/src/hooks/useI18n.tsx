@@ -9,108 +9,7 @@ import {
   TranslationError,
   validateI18nConfig
 } from '../types';
-
-// 기본 번역 데이터
-function getDefaultTranslations(language: string, namespace: string): Record<string, string> {
-  const defaultTranslations: Record<string, Record<string, Record<string, string>>> = {
-    ko: {
-      common: {
-        welcome: "환영합니다",
-        greeting: "안녕하세요",
-        goodbye: "안녕히 가세요",
-        loading: "로딩 중...",
-        error: "오류가 발생했습니다",
-        success: "성공했습니다",
-        cancel: "취소",
-        confirm: "확인",
-        save: "저장",
-        delete: "삭제",
-        edit: "편집",
-        add: "추가",
-        search: "검색",
-        filter: "필터",
-        sort: "정렬",
-        refresh: "새로고침",
-        back: "뒤로",
-        next: "다음",
-        previous: "이전",
-        home: "홈",
-        about: "소개",
-        contact: "연락처",
-        settings: "설정",
-        profile: "프로필",
-        logout: "로그아웃",
-        login: "로그인",
-        register: "회원가입"
-      },
-      auth: {
-        login: "로그인",
-        logout: "로그아웃",
-        register: "회원가입",
-        email: "이메일",
-        password: "비밀번호",
-        forgot_password: "비밀번호 찾기",
-        remember_me: "로그인 상태 유지"
-      },
-      errors: {
-        not_found: "페이지를 찾을 수 없습니다",
-        server_error: "서버 오류가 발생했습니다",
-        network_error: "네트워크 오류가 발생했습니다",
-        unauthorized: "인증이 필요합니다",
-        forbidden: "접근이 거부되었습니다"
-      }
-    },
-    en: {
-      common: {
-        welcome: "Welcome",
-        greeting: "Hello",
-        goodbye: "Goodbye",
-        loading: "Loading...",
-        error: "An error occurred",
-        success: "Success",
-        cancel: "Cancel",
-        confirm: "Confirm",
-        save: "Save",
-        delete: "Delete",
-        edit: "Edit",
-        add: "Add",
-        search: "Search",
-        filter: "Filter",
-        sort: "Sort",
-        refresh: "Refresh",
-        back: "Back",
-        next: "Next",
-        previous: "Previous",
-        home: "Home",
-        about: "About",
-        contact: "Contact",
-        settings: "Settings",
-        profile: "Profile",
-        logout: "Logout",
-        login: "Login",
-        register: "Register"
-      },
-      auth: {
-        login: "Login",
-        logout: "Logout",
-        register: "Register",
-        email: "Email",
-        password: "Password",
-        forgot_password: "Forgot Password",
-        remember_me: "Remember Me"
-      },
-      errors: {
-        not_found: "Page not found",
-        server_error: "Server error occurred",
-        network_error: "Network error occurred",
-        unauthorized: "Authentication required",
-        forbidden: "Access denied"
-      }
-    }
-  };
-
-  return defaultTranslations[language]?.[namespace] || {};
-}
+import { getDefaultTranslations } from '../utils/default-translations';
 
 // React Context
 const I18nContext = createContext<I18nContextType | null>(null);
@@ -157,9 +56,21 @@ export function I18nProvider({
       if (translatorLang !== currentLanguage) {
         // translator의 언어를 currentLanguage로 변경
         // 이는 외부에서 setLanguage를 호출했을 때 발생하는 정상적인 동기화
+        if (config.debug) {
+          console.log(`🔄 [USEI18N] Syncing translator language: ${translatorLang} -> ${currentLanguage} (already initialized)`);
+        }
         translator.setLanguage(currentLanguage);
       }
       return;
+    }
+    
+    if (config.debug) {
+      console.log('🔄 [USEI18N] useEffect triggered:', { 
+        hasTranslator: !!translator, 
+        currentLanguage, 
+        debug: config.debug,
+        isInitialized 
+      });
     }
     
     const initializeTranslator = async () => {
@@ -176,9 +87,16 @@ export function I18nProvider({
         // 모든 번역 데이터 미리 로드
         await translator.initialize();
         setIsInitialized(true);
+        
+        if (config.debug) {
+          console.log('✅ [USEI18N] Translator initialization completed successfully');
+        }
       } catch (err) {
         const initError = err as TranslationError;
         setError(initError);
+        if (config.debug) {
+          console.error('❌ [USEI18N] Failed to initialize translator:', initError);
+        }
         // 에러가 발생해도 초기화 완료로 표시 (기본 번역 사용)
         setIsInitialized(true);
       } finally {
@@ -198,6 +116,9 @@ export function I18nProvider({
     const unsubscribe = translator.onTranslationLoaded(() => {
       // 번역이 로드되면 상태를 업데이트하여 리렌더링 트리거
       setTranslationVersion(prev => prev + 1);
+      if (config.debug) {
+        console.log('🔄 [USEI18N] Translation loaded, triggering re-render');
+      }
     });
 
     return unsubscribe;
@@ -212,6 +133,9 @@ export function I18nProvider({
     // 언어 변경 이벤트 구독
     const unsubscribe = translator.onLanguageChanged((newLanguage: string) => {
       if (newLanguage !== currentLanguage) {
+        if (config.debug) {
+          console.log(`🔄 [USEI18N] Language changed event: ${currentLanguage} -> ${newLanguage}`);
+        }
         setCurrentLanguageState(newLanguage);
         setTranslationVersion(prev => prev + 1); // 리렌더링 트리거
       }
@@ -229,6 +153,9 @@ export function I18nProvider({
     const handleLanguageChange = (event: CustomEvent) => {
       const newLanguage = event.detail;
       if (typeof newLanguage === 'string' && newLanguage !== currentLanguage) {
+        if (config.debug) {
+          console.log('🌐 Auto language sync:', newLanguage);
+        }
         setLanguage(newLanguage);
       }
     };
@@ -254,7 +181,16 @@ export function I18nProvider({
     // 현재 언어와 동일하면 스킵 (무한 루프 방지)
     const currentLang = translator.getCurrentLanguage();
     if (currentLang === language) {
+      if (config.debug) {
+        console.log(`⏭️ [USEI18N] Language unchanged, skipping: ${language}`);
+      }
       return;
+    }
+
+    if (config.debug) {
+      if (config.debug) {
+        console.log(`🔄 [USEI18N] setLanguage called: ${currentLang} -> ${language}`);
+      }
     }
     
     setIsLoading(true);
@@ -268,91 +204,111 @@ export function I18nProvider({
       // 로드되지 않은 네임스페이스는 자동으로 로드됨 (translator 내부에서 처리)
       // 언어 변경 시 리렌더링 트리거 (번역 로드 완료 이벤트가 자동으로 발생)
       await new Promise(resolve => setTimeout(resolve, 0)); // 다음 틱에서 리렌더링
+      
+      if (config.debug) {
+        console.log(`✅ [USEI18N] Language changed to ${language}`);
+      }
     } catch (error) {
+      if (config.debug) {
+        console.error(`❌ [USEI18N] Failed to change language to ${language}:`, error);
+      }
     } finally {
       setIsLoading(false);
     }
   }, [translator, config.debug]);
 
+  // parseKey 함수를 메모이제이션하여 성능 최적화
+  const parseKey = useCallback((key: string) => {
+    const parts = key.split(':');
+    if (parts.length >= 2) {
+      return { namespace: parts[0], key: parts.slice(1).join(':') };
+    }
+    return { namespace: 'common', key };
+  }, []);
+
+  // SSR 번역에서 찾기
+  const findInSSRTranslations = useCallback((key: string, targetLang: string): string | null => {
+    if (!config.initialTranslations) {
+      return null;
+    }
+
+    const { namespace, key: actualKey } = parseKey(key);
+    
+    // 현재 언어의 SSR 번역 확인
+    const ssrTranslations = config.initialTranslations[targetLang]?.[namespace];
+    if (ssrTranslations && ssrTranslations[actualKey]) {
+      const value = ssrTranslations[actualKey];
+      if (typeof value === 'string') {
+        return value;
+      }
+    }
+    
+    // 폴백 언어의 SSR 번역 확인
+    const fallbackLang = config.fallbackLanguage || 'en';
+    if (targetLang !== fallbackLang) {
+      const fallbackTranslations = config.initialTranslations[fallbackLang]?.[namespace];
+      if (fallbackTranslations && fallbackTranslations[actualKey]) {
+        const value = fallbackTranslations[actualKey];
+        if (typeof value === 'string') {
+          return value;
+        }
+      }
+    }
+    
+    return null;
+  }, [config.initialTranslations, config.fallbackLanguage, parseKey]);
+
+  // 기본 번역에서 찾기
+  const findInDefaultTranslations = useCallback((key: string, targetLang: string): string | null => {
+    const { namespace, key: actualKey } = parseKey(key);
+    const defaultTranslations = getDefaultTranslations(targetLang, namespace);
+    const fallbackTranslations = getDefaultTranslations(config.fallbackLanguage || 'en', namespace);
+    
+    return defaultTranslations[actualKey] || fallbackTranslations[actualKey] || null;
+  }, [config.fallbackLanguage, parseKey]);
+
   // hua-api 스타일의 간단한 번역 함수 (메모이제이션)
   // translationVersion과 currentLanguage에 의존하여 번역 로드 및 언어 변경 시 리렌더링 트리거
   const t = useCallback((key: string, language?: string) => {
     // translationVersion과 currentLanguage를 참조하여 번역 로드 및 언어 변경 시 리렌더링 트리거
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _ = translationVersion;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const __ = currentLanguage;
+    // 의존성 배열에 포함되어 있어서 값이 변경되면 함수가 재생성됨
+    void translationVersion;
+    void currentLanguage;
     
     if (!translator) {
       return key;
     }
     
-    // 통일된 번역 조회 로직 (초기화 전/후 동일)
-    // 1. translator.translate() 시도 (초기화 완료 후 또는 초기화 중에도 시도)
-    // 2. 결과가 없으면 SSR 번역 확인
-    // 3. 그래도 없으면 기본 번역 확인
-    
-    const parseKey = (key: string) => {
-      const parts = key.split(':');
-      if (parts.length >= 2) {
-        return { namespace: parts[0], key: parts.slice(1).join(':') };
-      }
-      return { namespace: 'common', key };
-    };
-    
     const targetLang = language || currentLanguage;
     
-    // 1단계: translator.translate() 시도 (초기화 완료 여부와 관계없이 시도)
-    let result: string | undefined;
+    // 1단계: translator.translate() 시도
     try {
-      result = translator.translate(key, language);
-      
-      // 번역 결과가 유효한 경우 반환
+      const result = translator.translate(key, language);
       if (result && result !== key && result !== '') {
         return result;
       }
     } catch (error) {
-      // translator.translate() 실패 시 다음 단계로
-      result = undefined;
+      // translator.translate() 실패 시 다음 단계로 진행
     }
     
-    // 2단계: SSR 번역 데이터에서 찾기 (언어 변경 중 깜빡임 방지)
-    if (config.initialTranslations) {
-      const { namespace, key: actualKey } = parseKey(key);
-      
-      // 현재 언어의 SSR 번역 확인
-      const ssrTranslations = config.initialTranslations[targetLang]?.[namespace];
-      if (ssrTranslations && ssrTranslations[actualKey]) {
-        return ssrTranslations[actualKey];
-      }
-      
-      // 폴백 언어의 SSR 번역 확인
-      const fallbackLang = config.fallbackLanguage || 'en';
-      if (targetLang !== fallbackLang) {
-        const fallbackTranslations = config.initialTranslations[fallbackLang]?.[namespace];
-        if (fallbackTranslations && fallbackTranslations[actualKey]) {
-          return fallbackTranslations[actualKey];
-        }
-      }
+    // 2단계: SSR 번역 데이터에서 찾기
+    const ssrResult = findInSSRTranslations(key, targetLang);
+    if (ssrResult) {
+      return ssrResult;
     }
     
     // 3단계: 기본 번역 데이터에서 찾기
-    const { namespace, key: actualKey } = parseKey(key);
-    const defaultTranslations = getDefaultTranslations(targetLang, namespace);
-    const fallbackTranslations = getDefaultTranslations(config.fallbackLanguage || 'en', namespace);
-    
-    const defaultResult = defaultTranslations[actualKey] || fallbackTranslations[actualKey];
+    const defaultResult = findInDefaultTranslations(key, targetLang);
     if (defaultResult) {
       return defaultResult;
     }
     
     // 모든 단계에서 번역을 찾지 못한 경우
-    // 디버그 모드에서는 키를 반환하고, 프로덕션에서는 빈 문자열 반환 (미싱 키 노출 방지)
     if (config.debug) {
       return key; // 개발 환경에서는 키를 표시하여 디버깅 가능
     }
     return ''; // 프로덕션에서는 빈 문자열 반환하여 미싱 키 노출 방지
-  }, [translator, config.debug, isInitialized, isLoading, currentLanguage, config.fallbackLanguage, translationVersion, config.initialTranslations]) as (key: string, language?: string) => string;
+  }, [translator, config.debug, currentLanguage, config.fallbackLanguage, translationVersion, findInSSRTranslations, findInDefaultTranslations]) as (key: string, language?: string) => string;
 
   // 파라미터가 있는 번역 함수 (메모이제이션)
   const tWithParams = useCallback((key: string, params?: TranslationParams, language?: string) => {
@@ -365,6 +321,9 @@ export function I18nProvider({
   // 기존 비동기 번역 함수 (하위 호환성)
   const tAsync = useCallback(async (key: string, params?: TranslationParams) => {
     if (!translator) {
+      if (config.debug) {
+        console.warn('Translator not initialized');
+      }
       return key;
     }
 
@@ -373,20 +332,26 @@ export function I18nProvider({
       const result = await translator.translateAsync(key, params);
       return result;
     } catch (error) {
+      if (config.debug) {
+        console.error('Translation error:', error);
+      }
       return key;
     } finally {
       setIsLoading(false);
     }
-  }, [translator]);
+  }, [translator, config.debug]);
 
   // 기존 동기 번역 함수 (하위 호환성)
   const tSync = useCallback((key: string, namespace?: string, params?: TranslationParams) => {
     if (!translator) {
+      if (config.debug) {
+        console.warn('Translator not initialized');
+      }
       return key;
     }
 
     return translator.translateSync(key, params);
-  }, [translator]);
+  }, [translator, config.debug]);
 
   // 원시 값 가져오기 (배열, 객체 포함)
   const getRawValue = useCallback((key: string, language?: string): unknown => {
@@ -508,6 +473,9 @@ export function I18nProvider({
     isInitialized, // 추가: 초기화 상태 직접 노출
     translationVersion, // 번역 로드 완료 시 리렌더링 트리거
   }), [currentLanguage, setLanguage, t, tWithParams, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
+  
+  // 의존성 배열은 이미 최적화되어 있음
+  // t, tWithParams, tAsync, tSync, getRawValue는 모두 useCallback으로 메모이제이션됨
 
   return (
     <I18nContext.Provider value={value}>
@@ -552,6 +520,23 @@ export function useI18n(): I18nContextType {
     };
   }
   return context;
+}
+
+/**
+ * 간단한 번역 훅 (hua-api 스타일)
+ */
+export function useTranslation() {
+  const { t, tWithParams, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
+  
+  return {
+    t,
+    tWithParams,
+    currentLanguage,
+    setLanguage,
+    isLoading,
+    error,
+    supportedLanguages,
+  };
 }
 
 /**
