@@ -2,6 +2,9 @@
 
 import React from "react";
 import { merge } from "../lib/utils";
+import { createButtonStyles } from "../lib/styles/system/components";
+import { useTheme } from "./ThemeProvider";
+import type { Theme } from "../lib/styles/system/theme";
 
 /**
  * 버튼 스타일 변형 / Button style variant
@@ -176,80 +179,58 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
   ref
 ) {
   const reduced = useReducedMotion();
+  
+  // ThemeProvider에서 테마 가져오기 (없으면 기본값 'light' 사용)
+  let resolvedTheme: Theme = "light";
+  try {
+    const themeContext = useTheme();
+    resolvedTheme = themeContext.resolvedTheme as Theme;
+  } catch {
+    // ThemeProvider가 없으면 기본값 사용
+    resolvedTheme = "light";
+  }
 
-  const variantClasses: Record<Variant, string> = {
-    default:
-      "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
-    destructive:
-      "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
-    outline:
-      "border-2 border-blue-600 bg-transparent text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20",
-    secondary:
-      "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
-    ghost:
-      "bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
-    link:
-      "bg-transparent text-blue-600 underline hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
-    gradient: `bg-gradient-to-r ${customGradient || getGradientClass(gradient)} text-white hover:shadow-lg`,
-    neon:
-      "bg-gray-900 text-cyan-400 border border-cyan-400/30 shadow-lg shadow-cyan-400/20 hover:shadow-cyan-400/40",
-    glass:
-      "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20",
-  };
+  // 통합 스타일 시스템 사용
+  const styles = React.useMemo(() => {
+    // gradient variant의 경우 customGradient 처리
+    let gradientStyle = "";
+    if (variant === "gradient" && customGradient) {
+      gradientStyle = `bg-gradient-to-r ${customGradient}`;
+    } else if (variant === "gradient") {
+      gradientStyle = `bg-gradient-to-r ${getGradientClass(gradient)}`;
+    }
 
-  const sizeClasses: Record<Size, string> = {
-    sm: "h-8 px-3 py-1 text-sm",
-    md: "h-10 px-4 py-2 text-base",
-    lg: "h-12 px-6 py-3 text-lg",
-    xl: "h-14 px-8 py-4 text-xl",
-    icon: "h-10 w-10 p-0",
-  };
+    const buttonStyles = createButtonStyles({
+      variant,
+      size,
+      rounded,
+      shadow,
+      hover,
+      theme: resolvedTheme,
+      reducedMotion: reduced,
+    });
 
-  const roundedClasses: Record<Rounded, string> = {
-    sm: "rounded",
-    md: "rounded-md",
-    lg: "rounded-lg",
-    full: "rounded-full",
-  };
+    // gradient variant는 별도 처리
+    if (variant === "gradient") {
+      return {
+        ...buttonStyles,
+        variant: gradientStyle + " text-white hover:shadow-lg",
+      };
+    }
 
-  const shadowClasses: Record<Shadow, string> = {
-    none: "",
-    sm: "shadow-sm",
-    md: "shadow-md",
-    lg: "shadow-lg",
-    xl: "shadow-xl",
-  };
-
-  const hoverClasses: Record<Hover, string> = {
-    scale: reduced ? "" : "hover:scale-105 transition-transform duration-200",
-    glow: reduced ? "" : "hover:shadow-2xl hover:shadow-blue-500/25 dark:hover:shadow-cyan-400/25 transition-shadow duration-300",
-    slide: reduced ? "" : "hover:-translate-y-1 transition-transform duration-200",
-    none: "",
-  };
-
-  // variant별 포커스 스타일
-  const focusClasses: Record<Variant, string> = {
-    default: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-    destructive: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500 focus-visible:ring-offset-1",
-    outline: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-600 focus-visible:ring-offset-0",
-    secondary: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 focus-visible:ring-offset-1",
-    ghost: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 focus-visible:ring-offset-0",
-    link: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 focus-visible:ring-offset-0",
-    gradient: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-    neon: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 focus-visible:ring-offset-1",
-    glass: "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400/50 focus-visible:ring-offset-0",
-  };
+    return buttonStyles;
+  }, [variant, size, rounded, shadow, hover, resolvedTheme, reduced, gradient, customGradient]);
 
   const base = merge(
-    "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200",
-    focusClasses[variant],
+    styles.base,
+    styles.focus,
     "disabled:pointer-events-none disabled:opacity-50 min-w-fit",
     fullWidth && "w-full",
-    variantClasses[variant],
-    sizeClasses[size],
-    roundedClasses[rounded],
-    shadowClasses[shadow],
-    hoverClasses[hover],
+    styles.variant,
+    styles.size,
+    styles.rounded,
+    styles.shadow,
+    styles.hover,
     className
   );
 
