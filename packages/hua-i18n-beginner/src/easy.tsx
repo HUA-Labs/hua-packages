@@ -12,8 +12,6 @@ const defaultTranslations: Record<string, Record<string, string>> = {
   ko: {
     welcome: "환영합니다",
     hello: "안녕하세요",
-    goodbye: "안녕히 가세요",
-    thank_you: "감사합니다",
     click_me: "클릭하세요",
     loading: "로딩 중...",
     error: "오류가 발생했습니다",
@@ -54,29 +52,11 @@ const defaultTranslations: Record<string, Record<string, string>> = {
     not_found: "찾을 수 없습니다",
     unauthorized: "권한이 없습니다",
     forbidden: "접근이 거부되었습니다",
-    server_error: "서버 오류가 발생했습니다",
-    // 날짜/시간 관련 번역
-    today: "오늘",
-    yesterday: "어제",
-    tomorrow: "내일",
-    morning: "아침",
-    afternoon: "오후",
-    evening: "저녁",
-    night: "밤",
-    week: "주",
-    month: "월",
-    year: "년",
-    date: "날짜",
-    time: "시간",
-    hour: "시간",
-    minute: "분",
-    second: "초"
+    server_error: "서버 오류가 발생했습니다"
   },
   en: {
     welcome: "Welcome",
     hello: "Hello",
-    goodbye: "Goodbye",
-    thank_you: "Thank you",
     click_me: "Click me",
     loading: "Loading...",
     error: "An error occurred",
@@ -117,23 +97,7 @@ const defaultTranslations: Record<string, Record<string, string>> = {
     not_found: "Not found",
     unauthorized: "Unauthorized",
     forbidden: "Forbidden",
-    server_error: "Server error occurred",
-    // 날짜/시간 관련 번역
-    today: "Today",
-    yesterday: "Yesterday",
-    tomorrow: "Tomorrow",
-    morning: "Morning",
-    afternoon: "Afternoon",
-    evening: "Evening",
-    night: "Night",
-    week: "Week",
-    month: "Month",
-    year: "Year",
-    date: "Date",
-    time: "Time",
-    hour: "Hour",
-    minute: "Minute",
-    second: "Second"
+    server_error: "Server error occurred"
   }
 };
 
