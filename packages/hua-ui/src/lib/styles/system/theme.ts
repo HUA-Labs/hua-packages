@@ -104,9 +104,14 @@ export function getThemeColorClassWithDark(
 ): string {
   const lightColor = getColorToken("light", colorKey);
   const darkColor = getColorToken("dark", colorKey);
-  
+
+  // CSS 변수 기반 색상이면 dark: prefix 불필요
+  if (lightColor === darkColor) {
+    return prefix ? `${prefix}${lightColor}` : lightColor;
+  }
+
   const lightClass = prefix ? `${prefix}${lightColor}` : lightColor;
   const darkClass = prefix ? `${prefix}${darkColor}` : darkColor;
-  
+
   return withTheme(lightClass, darkClass);
 }

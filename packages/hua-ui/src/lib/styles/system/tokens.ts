@@ -69,20 +69,20 @@ export interface DesignTokens {
 export const defaultTokens: DesignTokens = {
   colors: {
     primary: {
-      light: "blue-600",
-      dark: "blue-500",
+      light: "primary",
+      dark: "primary",
     },
     secondary: {
-      light: "gray-200",
-      dark: "gray-700",
+      light: "secondary",
+      dark: "secondary",
     },
     accent: {
-      light: "blue-600",
-      dark: "blue-400",
+      light: "accent",
+      dark: "accent",
     },
     destructive: {
-      light: "red-600",
-      dark: "red-500",
+      light: "destructive",
+      dark: "destructive",
     },
     success: {
       light: "green-600",
@@ -97,20 +97,20 @@ export const defaultTokens: DesignTokens = {
       dark: "blue-400",
     },
     muted: {
-      light: "gray-500",
-      dark: "gray-400",
+      light: "muted-foreground",
+      dark: "muted-foreground",
     },
     background: {
-      light: "white",
-      dark: "slate-800",
+      light: "background",
+      dark: "background",
     },
     foreground: {
-      light: "gray-900",
-      dark: "slate-50",
+      light: "foreground",
+      dark: "foreground",
     },
     border: {
-      light: "slate-200",
-      dark: "slate-700",
+      light: "border",
+      dark: "border",
     },
   },
   spacing: {
