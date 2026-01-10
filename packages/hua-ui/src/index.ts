@@ -102,6 +102,8 @@ export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
 
 // Utilities
 export { merge, mergeIf, mergeMap, cn, formatRelativeTime } from './lib/utils';
+export { Slot, composeRefs, mergeProps } from './lib/Slot';
+export type { SlotProps } from './lib/Slot';
 
 // Convenience exports for common use cases (Tree-shaking friendly)
 // These are just re-exports, so they don't increase bundle size if not used
