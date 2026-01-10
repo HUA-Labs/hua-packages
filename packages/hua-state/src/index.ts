@@ -5,7 +5,7 @@
  */
 
 // Store creation
-export { createHuaStore } from './store/create-store';
+export { createHuaStore, isStoreRehydrated, onStoreRehydrated } from './store/create-store';
 export type {
   StoreCreator,
   StoreConfig,

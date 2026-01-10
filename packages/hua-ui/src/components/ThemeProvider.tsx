@@ -147,7 +147,10 @@ export function ThemeProvider({
     },
     resolvedTheme,
     toggleTheme: () => {
-      const newTheme = theme === "light" ? "dark" : "light"
+      const newTheme = resolvedTheme === "light" ? "dark" : "light"
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, newTheme)
+      }
       setTheme(newTheme)
     },
   }

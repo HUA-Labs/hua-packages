@@ -41,10 +41,14 @@ export { Skeleton, SkeletonText, SkeletonCircle, SkeletonRectangle, SkeletonRoun
 
 // UI Components - Feedback
 export { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from './components/Alert';
-export { ToastProvider, useToast } from './components/Toast';
+export { ToastProvider, useToast, useToastSafe } from './components/Toast';
 export type { Toast } from './components/Toast';
 export { LoadingSpinner } from './components/LoadingSpinner';
 export { Tooltip, TooltipLight, TooltipDark } from './components/Tooltip';
+
+// UI Components - Code Display
+export { CodeBlock, InlineCode } from './components/CodeBlock';
+export type { CodeBlockProps } from './components/CodeBlock';
 
 // UI Components - Overlay
 export { Popover, PopoverTrigger, PopoverContent } from './components/Popover';
@@ -104,6 +108,9 @@ export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
 export { merge, mergeIf, mergeMap, cn, formatRelativeTime } from './lib/utils';
 export { Slot, composeRefs, mergeProps } from './lib/Slot';
 export type { SlotProps } from './lib/Slot';
+
+// Common Types
+export type { Color, Size, BaseVariant, ExtendedVariant } from './lib/types/common';
 
 // Convenience exports for common use cases (Tree-shaking friendly)
 // These are just re-exports, so they don't increase bundle size if not used

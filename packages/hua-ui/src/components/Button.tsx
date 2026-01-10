@@ -5,6 +5,7 @@ import { merge } from "../lib/utils";
 import { createButtonStyles } from "../lib/styles/system/components";
 import { useTheme } from "./ThemeProvider";
 import type { Theme } from "../lib/styles/system/theme";
+import { Slot } from "../lib/Slot";
 
 /**
  * 버튼 스타일 변형 / Button style variant
@@ -78,7 +79,8 @@ type CommonProps = {
   iconOnly?: boolean;
   "aria-label"?: string;
   className?: string;
-  disabled?: boolean; // <-- 요놈 추가
+  disabled?: boolean;
+  asChild?: boolean;
 };
 
 type AnchorProps = CommonProps &
@@ -174,6 +176,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     className,
     children,
     disabled,
+    asChild = false,
     ...rest
   },
   ref
@@ -258,6 +261,19 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     console.warn("[Button] iconOnly 사용 시 aria-label을 제공하세요.");
   }
 
+  // asChild 모드: Slot을 사용하여 자식 요소에 props 병합
+  if (asChild) {
+    const slotProps = {
+      className: base,
+      ref,
+      disabled: disabled || loading,
+      "aria-busy": loading || undefined,
+      "aria-disabled": (disabled || loading) || undefined,
+      ...rest,
+    };
+    return <Slot {...slotProps}>{children}</Slot>;
+  }
+
   // 앵커 모드
   if ("href" in rest && rest.href) {
     const { onClick, target, rel, href, "aria-label": ariaLabel, className: anchorClassName, ...anchorProps } = rest as AnchorProps;
@@ -310,7 +326,7 @@ export const Button = ButtonInner;
 
 function getGradientClass(gradient: GradientName): string {
   const g: Record<Exclude<GradientName, "custom">, string> = {
-    blue: "from-blue-500 to-cyan-500",
+    blue: "from-teal-500 to-cyan-500",
     purple: "from-purple-500 to-pink-500",
     green: "from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400",
     orange: "from-orange-500 to-red-500 dark:from-orange-300 dark:to-red-300",
