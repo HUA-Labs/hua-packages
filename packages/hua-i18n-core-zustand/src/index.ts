@@ -123,6 +123,7 @@ export interface ZustandI18nConfig {
   translationLoader?: 'api' | 'static' | 'custom';
   translationApiPath?: string;
   initialTranslations?: Record<string, Record<string, Record<string, string>>>;
+  supportedLanguages?: Array<{ code: string; name: string; nativeName: string }> | string[];
   autoLanguageSync?: boolean;
   /**
    * document.documentElement.lang 자동 업데이트 여부
