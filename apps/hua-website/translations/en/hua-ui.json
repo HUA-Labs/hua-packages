@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "HUA UI",
+    "subtitle": "Beautiful and accessible React component library",
+    "description": "A component library built on Tailwind CSS, providing 60+ components. Supports dark mode and is fully customizable.",
+    "button1": "Get Started on GitHub",
+    "button2": "View Documentation"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Perfect UI components for developers",
+    "components": {
+      "title": "60+ Components",
+      "description": "All commonly used components including Button, Card, Modal, Input, and more."
+    },
+    "darkMode": {
+      "title": "Dark Mode Support",
+      "description": "Automatically detects system settings to support dark mode."
+    },
+    "accessible": {
+      "title": "Accessibility First",
+      "description": "Complies with WCAG 2.1 AA standards to ensure accessibility for all users."
+    },
+    "customizable": {
+      "title": "Fully Customizable",
+      "description": "Easily change styles using Tailwind CSS and CVA."
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "Improve developer productivity with perfect type support."
+    },
+    "treeShakeable": {
+      "title": "Tree-shakeable",
+      "description": "Only used components are included in the bundle, minimizing bundle size."
+    }
+  },
+  "cta": {
+    "title": "Get Started Now",
+    "description": "Install with npm or pnpm and start using immediately.",
+    "install": "Install",
+    "github": "GitHub",
+    "contact": "Support Inquiry"
+  }
+}

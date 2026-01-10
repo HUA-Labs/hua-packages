@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "Motion Core",
+    "subtitle": "宣言的Reactアニメーションフック",
+    "description": "シンプルなAPIで豊富なモーションを実装します。useFadeIn、useSlideUpなどの様々なアニメーションフックを提供し、開発者が簡単に使用できます。",
+    "button1": "GitHubで始める",
+    "button2": "ドキュメントを見る"
+  },
+  "features": {
+    "title": "主な機能",
+    "subtitle": "宣言的で直感的なアニメーション",
+    "hooks": {
+      "title": "アニメーションフック",
+      "description": "useFadeIn、useSlideUp、useScrollRevealなどの様々なアニメーションフックを提供します。"
+    },
+    "scroll": {
+      "title": "スクロールベースアニメーション",
+      "description": "Intersection Observerを活用して、スクロール時に要素を自動的にアニメーションします。"
+    },
+    "presets": {
+      "title": "プリセットシステム",
+      "description": "ドラマティック、ミニマルなどの様々なプリセットでアニメーションスタイルを素早く適用します。"
+    },
+    "performance": {
+      "title": "パフォーマンス最適化",
+      "description": "requestAnimationFrameを活用して、スムーズで効率的なアニメーションを提供します。"
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "完璧な型サポートで開発生産性を向上させます。"
+    },
+    "lightweight": {
+      "title": "軽量",
+      "description": "依存関係が少なく、バンドルサイズを最小化します。"
+    }
+  },
+  "cta": {
+    "title": "今すぐ始めましょう",
+    "description": "npmまたはpnpmでインストールして、すぐに使用できます。",
+    "install": "インストール",
+    "github": "GitHub",
+    "contact": "サポートお問い合わせ"
+  }
+}

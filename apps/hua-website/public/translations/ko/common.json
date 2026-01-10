@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "홈",
+    "about": "소개",
+    "products": "제품",
+    "contact": "문의"
+  },
+  "footer": {
+    "company": "회사",
+    "resources": "리소스",
+    "legal": "법적 고지",
+    "copyright": "© {year} HUA Labs. All rights reserved."
+  },
+  "theme": {
+    "light": "라이트 모드",
+    "dark": "다크 모드",
+    "system": "시스템 설정"
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "cta": {
+    "getStarted": "시작하기",
+    "learnMore": "자세히 보기",
+    "contact": "문의하기"
+  }
+}

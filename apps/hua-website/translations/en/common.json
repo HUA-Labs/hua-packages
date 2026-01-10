@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "products": "Products",
+    "contact": "Contact"
+  },
+  "language": {
+    "toggle": "Change Language"
+  },
+  "theme": {
+    "toggle": "Toggle Theme"
+  },
+  "menu": {
+    "toggle": "Open Menu",
+    "close": "Close Menu"
+  },
+  "footer": {
+    "tagline1": "Creating interfaces",
+    "tagline2": "that understand emotions.",
+    "products": {
+      "title": "Products",
+      "sumDiary": "Sum Diary",
+      "huaUx": "HUA UX Framework",
+      "allProducts": "All Products"
+    },
+    "company": {
+      "title": "Company",
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us"
+    },
+    "resources": {
+      "title": "Resources",
+      "github": "GitHub",
+      "docs": "Documentation"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    },
+    "copyright": "© {{year}} {{name}}. All rights reserved."
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "buttons": {
+    "learnMore": "Learn More",
+    "getStarted": "Get Started",
+    "contact": "Contact Us"
+  }
+}

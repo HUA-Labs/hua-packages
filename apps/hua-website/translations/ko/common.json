@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "home": "홈",
+    "about": "회사 소개",
+    "products": "제품",
+    "contact": "문의하기"
+  },
+  "language": {
+    "toggle": "언어 변경"
+  },
+  "theme": {
+    "toggle": "테마 변경"
+  },
+  "menu": {
+    "toggle": "메뉴 열기",
+    "close": "메뉴 닫기"
+  },
+  "footer": {
+    "tagline1": "감정을 이해하는",
+    "tagline2": "인터페이스를 만듭니다.",
+    "products": {
+      "title": "제품",
+      "sumDiary": "숨다이어리",
+      "huaUx": "HUA UX Framework",
+      "allProducts": "모든 제품"
+    },
+    "company": {
+      "title": "회사",
+      "aboutUs": "회사 소개",
+      "contactUs": "문의하기"
+    },
+    "resources": {
+      "title": "리소스",
+      "github": "GitHub",
+      "docs": "문서"
+    },
+    "legal": {
+      "title": "법적 고지",
+      "privacyPolicy": "개인정보처리방침",
+      "termsOfService": "이용약관"
+    },
+    "copyright": "© {{year}} {{name}}. All rights reserved."
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "buttons": {
+    "learnMore": "자세히 보기",
+    "getStarted": "시작하기",
+    "contact": "문의하기"
+  }
+}

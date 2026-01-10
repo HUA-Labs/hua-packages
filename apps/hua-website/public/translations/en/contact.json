@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "title": "Contact Us",
+    "description": "Have questions or want to collaborate? Feel free to reach out anytime."
+  },
+  "form": {
+    "title": "Send a Message",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "email": "Email",
+    "emailPlaceholder": "example@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "Inquiry subject",
+    "message": "Message",
+    "messagePlaceholder": "Enter your message here",
+    "submit": "Send Message",
+    "submitting": "Sending...",
+    "success": {
+      "title": "Message sent!",
+      "description": "We'll get back to you soon.",
+      "newMessage": "Send another message"
+    }
+  },
+  "info": {
+    "contactTitle": "Contact",
+    "email": "Email",
+    "business": "Business Inquiries",
+    "socialTitle": "Social"
+  },
+  "faq": {
+    "title": "FAQ",
+    "q1": {
+      "question": "Is Sum Diary free?",
+      "answer": "Basic features are free. Advanced AI analysis features are available in the premium plan."
+    },
+    "q2": {
+      "question": "Can I use HUA UX Framework commercially?",
+      "answer": "Yes, it's provided under the MIT license, allowing commercial use."
+    },
+    "q3": {
+      "question": "How can I get technical support?",
+      "answer": "You can reach us through GitHub Issues or email."
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "Motion Core",
+    "subtitle": "Declarative React animation hooks",
+    "description": "Implement rich motion with a simple API. Provides various animation hooks like useFadeIn, useSlideUp, making it easy for developers to use.",
+    "button1": "Get Started on GitHub",
+    "button2": "View Documentation"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Declarative and intuitive animations",
+    "hooks": {
+      "title": "Animation Hooks",
+      "description": "Provides various animation hooks including useFadeIn, useSlideUp, useScrollReveal, and more."
+    },
+    "scroll": {
+      "title": "Scroll-based Animations",
+      "description": "Uses Intersection Observer to automatically animate elements on scroll."
+    },
+    "presets": {
+      "title": "Preset System",
+      "description": "Quickly apply animation styles with various presets like dramatic, minimal."
+    },
+    "performance": {
+      "title": "Performance Optimized",
+      "description": "Uses requestAnimationFrame to provide smooth and efficient animations."
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "Improve developer productivity with perfect type support."
+    },
+    "lightweight": {
+      "title": "Lightweight",
+      "description": "Minimal dependencies to minimize bundle size."
+    }
+  },
+  "cta": {
+    "title": "Get Started Now",
+    "description": "Install with npm or pnpm and start using immediately.",
+    "install": "Install",
+    "github": "GitHub",
+    "contact": "Support Inquiry"
+  }
+}
