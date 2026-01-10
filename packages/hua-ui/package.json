@@ -44,6 +44,11 @@
       "import": "./dist/feedback.mjs",
       "require": "./dist/feedback.js"
     },
+    "./sdui": {
+      "types": "./dist/sdui.d.ts",
+      "import": "./dist/sdui.mjs",
+      "require": "./dist/sdui.js"
+    },
     "./components/*": {
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.mjs",

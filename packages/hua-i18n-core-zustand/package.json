@@ -25,7 +25,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@hua-labs/i18n-core": "workspace:*"
+    "@hua-labs/i18n-core": "workspace:*",
+    "@hua-labs/state": "workspace:*"
   },
   "peerDependencies": {
     "zustand": "^4.0.0 || ^5.0.0",
@@ -35,7 +36,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.7",
     "typescript": "^5.9.3",
-    "zustand": "^4.0.0"
+    "zustand": "^5.0.0"
   },
   "keywords": [
     "hua-labs",

@@ -6,15 +6,19 @@
 
 import { createHuaStore } from '../store/create-store';
 import type { HuaStore, BaseStoreState } from '../store/types';
-import type { ZustandLanguageStore } from '@hua-labs/i18n-core-zustand';
+
+/**
+ * Language store interface (compatible with @hua-labs/i18n-core-zustand)
+ */
+export interface LanguageStoreState {
+  language: string;
+  setLanguage: (lang: string) => void;
+}
 
 /**
  * i18n store state interface
- * Extends ZustandLanguageStore for compatibility with i18n-core-zustand
  */
-export interface I18nStoreState extends ZustandLanguageStore, BaseStoreState {
-  // language and setLanguage are already defined in ZustandLanguageStore
-}
+export interface I18nStoreState extends LanguageStoreState, BaseStoreState {}
 
 /**
  * i18n store configuration

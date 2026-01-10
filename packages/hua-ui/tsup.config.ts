@@ -8,6 +8,7 @@ const entry = {
   form: 'src/form.ts',
   navigation: 'src/navigation.ts',
   feedback: 'src/feedback.ts',
+  sdui: 'src/sdui/index.ts',
 };
 
 const shared = {

@@ -118,6 +118,16 @@ export function createCoreI18n(options?: {
    * 기본값: false (Zustand 어댑터 등 외부에서 직접 처리하는 경우)
    */
   autoLanguageSync?: boolean;
+  /**
+   * 서버사이드 렌더링 시 사용할 기본 URL
+   * 환경 변수보다 우선 적용됨
+   */
+  baseUrl?: string;
+  /**
+   * 로컬 개발 환경 fallback URL
+   * 기본값: 'http://localhost:3010'
+   */
+  localFallbackBaseUrl?: string;
 }) {
   const {
     defaultLanguage = 'ko',
@@ -129,7 +139,9 @@ export function createCoreI18n(options?: {
     translationApiPath = '/api/translations',
     initialTranslations,
     supportedLanguages: providedSupportedLanguages,
-    autoLanguageSync = false // 기본값 false (Zustand 어댑터 등 외부에서 직접 처리)
+    autoLanguageSync = false, // 기본값 false (Zustand 어댑터 등 외부에서 직접 처리)
+    baseUrl,
+    localFallbackBaseUrl,
   } = options || {};
 
   // supportedLanguages 처리: string[] 또는 LanguageConfig[] 모두 지원
@@ -200,7 +212,7 @@ export function createCoreI18n(options?: {
     }
     
     // 4. 로컬 개발 환경 fallback
-    const fallbackBase = localFallbackBaseUrl ?? 'http://localhost:3000';
+    const fallbackBase = localFallbackBaseUrl ?? 'http://localhost:3010';
     return `${fallbackBase}${path}`;
   };
   // API route 기반 로더 (기본값, 권장)

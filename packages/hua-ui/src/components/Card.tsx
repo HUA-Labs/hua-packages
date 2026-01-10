@@ -51,9 +51,9 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variantClasses = {
-      default: "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
-      outline: "bg-transparent border-2 border-slate-300 dark:border-slate-600",
-      elevated: "bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700"
+      default: "bg-card text-card-foreground border border-border",
+      outline: "bg-transparent border-2 border-border",
+      elevated: "bg-card text-card-foreground shadow-lg border border-border"
     }
 
     return (
@@ -154,7 +154,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionPr
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={merge("text-sm text-slate-500 dark:text-slate-400", className)}
+      className={merge("text-sm text-muted-foreground", className)}
       {...props}
     />
   )

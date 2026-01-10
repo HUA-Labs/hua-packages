@@ -80,12 +80,12 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
     }
   }, [])
 
-  // ScrollProgress는 특정 색상만 사용 (스크롤 진행률 표시 특화)
+  // 색상 옵션 (Teal 브랜드 기반)
   const progressColors: Record<string, string> = {
-    default: 'bg-blue-600',
-    primary: 'bg-purple-600',
-    secondary: 'bg-gray-600',
-    gradient: 'bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600'
+    default: 'bg-foreground',
+    primary: 'bg-primary',
+    secondary: 'bg-muted-foreground',
+    gradient: 'bg-gradient-to-r from-teal-600 via-cyan-500 to-teal-600'
   }
 
   const positionClasses = {
@@ -105,7 +105,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
       {...props}
     >
       {/* 배경 바 */}
-      <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
+      <div className="w-full h-full bg-border" />
       
       {/* 진행률 바 */}
       <div
@@ -121,7 +121,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
       
       {/* 퍼센트 표시 (선택사항) */}
       {showPercentage && (
-        <div className="absolute top-2 right-2 text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded">
+        <div className="absolute top-2 right-2 text-xs text-muted-foreground bg-card px-2 py-1 rounded border border-border">
           {Math.round(progress)}%
         </div>
       )}

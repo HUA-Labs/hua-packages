@@ -41,22 +41,22 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
 /**
  * useToast Hook
- * 
+ *
  * Toast를 추가, 제거, 초기화하는 훅입니다.
  * ToastProvider 내부에서만 사용 가능합니다.
- * 
+ *
  * Hook for adding, removing, and clearing toasts.
  * Can only be used within ToastProvider.
- * 
+ *
  * @example
  * const { addToast, removeToast, clearToasts } = useToast()
- * 
+ *
  * addToast({
  *   type: "success",
  *   message: "저장되었습니다",
  *   duration: 3000
  * })
- * 
+ *
  * @returns {ToastContextType} Toast 컨텍스트 값 / Toast context value
  * @throws {Error} ToastProvider 외부에서 사용 시 에러 발생 / Error when used outside ToastProvider
  */
@@ -64,6 +64,41 @@ export function useToast(): ToastContextType {
   const context = useContext(ToastContext)
   if (!context) {
     throw new Error("useToast must be used within a ToastProvider")
+  }
+  return context
+}
+
+// No-op functions for safe toast hook
+const noopAddToast = () => {}
+const noopRemoveToast = () => {}
+const noopClearToasts = () => {}
+
+/**
+ * useToastSafe Hook
+ *
+ * ToastProvider 없이도 안전하게 사용할 수 있는 useToast 훅입니다.
+ * Provider가 없으면 no-op 함수를 반환합니다.
+ *
+ * Safe version of useToast that works without ToastProvider.
+ * Returns no-op functions when used outside ToastProvider.
+ *
+ * @example
+ * const { addToast } = useToastSafe()
+ *
+ * // 안전하게 호출 가능 - Provider 없으면 아무 일도 안 함
+ * addToast({ type: "success", message: "저장됨" })
+ *
+ * @returns {ToastContextType} Toast 컨텍스트 값 또는 no-op 함수들
+ */
+export function useToastSafe(): ToastContextType {
+  const context = useContext(ToastContext)
+  if (!context) {
+    return {
+      toasts: [],
+      addToast: noopAddToast,
+      removeToast: noopRemoveToast,
+      clearToasts: noopClearToasts,
+    }
   }
   return context
 }

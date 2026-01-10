@@ -5,10 +5,7 @@
 
 import { merge } from "../../utils";
 import type { Theme } from "./theme";
-import {
-  getThemeColorClassWithDark,
-  getThemeTokens,
-} from "./theme";
+import { getThemeColorClassWithDark } from "./theme";
 import { createRoundedStyles, createShadowStyles, createHoverStyles } from "../variants";
 
 /**
@@ -91,11 +88,9 @@ export interface ButtonStyles {
  */
 function createButtonVariantStyle(
   variant: ButtonVariant,
-  theme: Theme,
+  _theme: Theme,
   branding?: BrandingColors
 ): string {
-  const tokens = getThemeTokens(theme);
-
   // Branding이 있으면 CSS 변수 사용
   if (branding) {
     switch (variant) {
@@ -117,75 +112,33 @@ function createButtonVariantStyle(
     }
   }
 
-  // 기본 스타일 (토큰 기반)
-  const primaryBg = getThemeColorClassWithDark("primary", "bg-");
-  const primaryHover = primaryBg.replace("bg-", "hover:bg-");
-  const destructiveBg = getThemeColorClassWithDark("destructive", "bg-");
-  const destructiveHover = destructiveBg.replace("bg-", "hover:bg-");
-  const accentBorder = getThemeColorClassWithDark("accent", "border-");
-  const accentText = getThemeColorClassWithDark("accent", "text-");
-  const accentHover = accentBorder.replace("border-", "hover:bg-");
-  const secondaryBg = getThemeColorClassWithDark("secondary", "bg-");
-  const secondaryHover = secondaryBg.replace("bg-", "hover:bg-");
-  const foregroundText = getThemeColorClassWithDark("foreground", "text-");
-  const mutedHover = getThemeColorClassWithDark("muted", "bg-").replace("bg-", "hover:bg-");
-  const primaryText = getThemeColorClassWithDark("primary", "text-");
-  const primaryTextHover = primaryText.replace("text-", "hover:text-");
-
   switch (variant) {
     case "default":
-      return merge(
-        primaryBg,
-        "text-white",
-        primaryHover
-      );
+      return "bg-primary text-primary-foreground hover:bg-primary/90";
 
     case "destructive":
-      return merge(
-        destructiveBg,
-        "text-white",
-        destructiveHover
-      );
+      return "bg-destructive text-destructive-foreground hover:bg-destructive/90";
 
     case "outline":
-      return merge(
-        "border-2",
-        accentBorder,
-        "bg-transparent",
-        accentText,
-        accentHover + "/10"
-      );
+      return "border-2 border-border bg-transparent text-foreground hover:bg-secondary";
 
     case "secondary":
-      return merge(
-        secondaryBg,
-        foregroundText,
-        secondaryHover
-      );
+      return "bg-secondary text-secondary-foreground hover:bg-secondary/80";
 
     case "ghost":
-      return merge(
-        "bg-transparent",
-        foregroundText,
-        mutedHover
-      );
+      return "bg-transparent text-foreground hover:bg-secondary";
 
     case "link":
-      return merge(
-        "bg-transparent",
-        primaryText,
-        "underline",
-        primaryTextHover
-      );
+      return "bg-transparent text-primary underline hover:text-primary/80";
 
     case "gradient":
-      return "bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:shadow-lg";
+      return "bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-lg";
 
     case "neon":
-      return "bg-gray-900 text-cyan-400 border border-cyan-400/30 shadow-lg shadow-cyan-400/20 hover:shadow-cyan-400/40";
+      return "bg-background text-primary border border-primary/30 shadow-lg shadow-primary/20 hover:shadow-primary/40";
 
     case "glass":
-      return "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20";
+      return "bg-card/50 backdrop-blur-md border border-border text-foreground hover:bg-card/70";
 
     default:
       return "";
@@ -212,47 +165,28 @@ function createButtonSizeStyle(size: ButtonSize): string {
 
 /**
  * Button Focus 스타일 생성
- * 
+ *
  * @param variant - Button variant
- * @param theme - 테마
+ * @param _theme - 테마 (CSS 변수 기반으로 미사용)
  * @returns Focus 클래스 문자열
  */
 function createButtonFocusStyle(
   variant: ButtonVariant,
-  theme: Theme
+  _theme: Theme
 ): string {
-  const tokens = getThemeTokens(theme);
+  const baseFocus = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
   switch (variant) {
-    case "default":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1";
-
     case "destructive":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500 focus-visible:ring-offset-1";
+      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
     case "outline":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-600 focus-visible:ring-offset-0";
-
-    case "secondary":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 focus-visible:ring-offset-1";
-
     case "ghost":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-300 dark:focus-visible:ring-gray-600 focus-visible:ring-offset-0";
-
     case "link":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 focus-visible:ring-offset-0";
-
-    case "gradient":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1";
-
-    case "neon":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 focus-visible:ring-offset-1";
-
-    case "glass":
-      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400/50 focus-visible:ring-offset-0";
+      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0";
 
     default:
-      return "";
+      return baseFocus;
   }
 }
 
