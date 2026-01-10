@@ -109,6 +109,11 @@ export function createCoreI18n(options?: {
    */
   initialTranslations?: Record<string, Record<string, Record<string, string>>>;
   /**
+   * 지원 언어 목록 (LanguageConfig 배열 또는 언어 코드 문자열 배열)
+   * 기본값: ['ko', 'en']
+   */
+  supportedLanguages?: Array<{ code: string; name: string; nativeName: string }> | string[];
+  /**
    * 자동 언어 동기화 활성화 여부
    * 기본값: false (Zustand 어댑터 등 외부에서 직접 처리하는 경우)
    */
@@ -123,9 +128,81 @@ export function createCoreI18n(options?: {
     translationLoader = 'api',
     translationApiPath = '/api/translations',
     initialTranslations,
+    supportedLanguages: providedSupportedLanguages,
     autoLanguageSync = false // 기본값 false (Zustand 어댑터 등 외부에서 직접 처리)
   } = options || {};
 
+  // supportedLanguages 처리: string[] 또는 LanguageConfig[] 모두 지원
+  let supportedLanguagesConfig: Array<{ code: string; name: string; nativeName: string }>;
+  if (providedSupportedLanguages) {
+    if (Array.isArray(providedSupportedLanguages) && providedSupportedLanguages.length > 0) {
+      // string[]인지 LanguageConfig[]인지 확인
+      if (typeof providedSupportedLanguages[0] === 'string') {
+        // string[]를 LanguageConfig[]로 변환
+        const languageMap: Record<string, { name: string; nativeName: string }> = {
+          ko: { name: 'Korean', nativeName: '한국어' },
+          en: { name: 'English', nativeName: 'English' },
+          ja: { name: 'Japanese', nativeName: '日本語' },
+          zh: { name: 'Chinese', nativeName: '中文' },
+          es: { name: 'Spanish', nativeName: 'Español' },
+          fr: { name: 'French', nativeName: 'Français' },
+          de: { name: 'German', nativeName: 'Deutsch' },
+          pt: { name: 'Portuguese', nativeName: 'Português' },
+          it: { name: 'Italian', nativeName: 'Italiano' },
+          ru: { name: 'Russian', nativeName: 'Русский' },
+        };
+        supportedLanguagesConfig = (providedSupportedLanguages as string[]).map(code => ({
+          code,
+          name: languageMap[code]?.name || code,
+          nativeName: languageMap[code]?.nativeName || code,
+        }));
+      } else {
+        // LanguageConfig[]인 경우 그대로 사용
+        supportedLanguagesConfig = providedSupportedLanguages as Array<{ code: string; name: string; nativeName: string }>;
+      }
+    } else {
+      supportedLanguagesConfig = defaultLanguages;
+    }
+  } else {
+    supportedLanguagesConfig = defaultLanguages;
+  }
+
+  /**
+   * 서버사이드/클라이언트사이드 URL 빌드 함수
+   * createApiTranslationLoader의 로직을 참고하여 구현
+   */
+  const buildUrl = (language: string, namespace: string): string => {
+    const safeNamespace = namespace.replace(/[^a-zA-Z0-9-_]/g, '');
+    const path = `${translationApiPath}/${language}/${safeNamespace}`;
+    
+    // 클라이언트 사이드: 상대 경로 사용
+    if (typeof window !== 'undefined') {
+      return path;
+    }
+    
+    // 서버사이드: 절대 URL 필요
+    // 1. baseUrl 옵션이 있으면 우선 사용
+    if (baseUrl) {
+      return `${baseUrl}${path}`;
+    }
+    
+    // 2. NEXT_PUBLIC_SITE_URL 환경 변수 확인
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return `${process.env.NEXT_PUBLIC_SITE_URL}${path}`;
+    }
+    
+    // 3. VERCEL_URL 환경 변수 확인
+    if (process.env.VERCEL_URL) {
+      const vercelUrl = process.env.VERCEL_URL.startsWith('http')
+        ? process.env.VERCEL_URL
+        : `https://${process.env.VERCEL_URL}`;
+      return `${vercelUrl}${path}`;
+    }
+    
+    // 4. 로컬 개발 환경 fallback
+    const fallbackBase = localFallbackBaseUrl ?? 'http://localhost:3000';
+    return `${fallbackBase}${path}`;
+  };
   // API route 기반 로더 (기본값, 권장)
   const apiRouteLoader = async (language: string, namespace: string) => {
     try {
@@ -211,7 +288,7 @@ export function createCoreI18n(options?: {
   const config: I18nConfig = {
     defaultLanguage,
     fallbackLanguage,
-    supportedLanguages: defaultLanguages,
+    supportedLanguages: supportedLanguagesConfig,
     namespaces,
     loadTranslations: translationLoader === 'custom' && loadTranslations 
       ? loadTranslations 

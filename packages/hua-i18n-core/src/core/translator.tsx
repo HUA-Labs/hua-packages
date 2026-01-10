@@ -144,8 +144,11 @@ export class Translator implements TranslatorInterface {
           this.loadedNamespaces.add(`${language}:${namespace}`);
         }
       }
+      // initialTranslations가 있으면 초기화 완료로 간주 (SSR에서 이미 로드됨)
+      // 이렇게 하면 초기화 전 상태에서도 번역을 사용할 수 있음
+      this.isInitialized = true;
       if (this.config.debug) {
-        console.log('✅ [TRANSLATOR] Initial translations loaded from SSR:', this.loadedNamespaces);
+        console.log('✅ [TRANSLATOR] Initial translations loaded from SSR, marked as initialized:', this.loadedNamespaces);
       }
     }
   }
@@ -305,28 +308,27 @@ export class Translator implements TranslatorInterface {
       console.warn('Translator not initialized. Call initialize() first.');
     }
     
+    // 초기화되지 않았을 때도 기본 번역 시도 (initialTranslations 사용)
     const { namespace, key: actualKey } = this.parseKey(key);
-    const translations = this.allTranslations[targetLang]?.[namespace];
-
-    if (this.config.debug) {
-      console.log(`🔍 [TRANSLATOR] Not initialized, trying fallback:`, {
-        namespace,
-        actualKey,
-        translations,
-        hasTranslation: translations && translations[actualKey]
-      });
-    }
-
-    if (translations && translations[actualKey]) {
-      const value = translations[actualKey];
-      if (typeof value === 'string') {
-        if (this.config.debug) {
-          console.log(`✅ [TRANSLATOR] Found fallback translation:`, value);
-        }
-        return value;
+    
+    // findInNamespace를 사용하여 중첩 키도 처리
+    const result = this.findInNamespace(namespace, actualKey, targetLang);
+    if (result) {
+      if (this.config.debug) {
+        console.log(`✅ [TRANSLATOR] Found fallback translation from initialTranslations:`, result);
       }
+      return result;
     }
     
+    if (this.config.debug) {
+      const translations = this.allTranslations[targetLang]?.[namespace];
+      console.log(`🔍 [TRANSLATOR] Not initialized, fallback failed:`, {
+        namespace,
+        actualKey,
+        hasTranslations: !!translations,
+        translationsKeys: translations ? Object.keys(translations) : []
+      });
+    }
     return this.config.missingKeyHandler?.(key, targetLang, 'default') || key;
   }
 
@@ -866,23 +868,25 @@ export class Translator implements TranslatorInterface {
   }
 
   /**
-   * 키 파싱 (네임스페이스:키 또는 네임스페이스.키 형식 지원)
-   * 우선순위: : > . (첫 번째 구분자 사용)
+   * 키 파싱 (네임스페이스:키 형식)
+   * 
+   * - 콜론(:)만 네임스페이스 구분자로 사용
+   * - 점(.)은 키 이름의 일부로 취급 (중첩 객체 접근용)
+   * 
+   * @example
+   * parseKey("home:hero.badge") → { namespace: "home", key: "hero.badge" }
+   * parseKey("hero.badge") → { namespace: "common", key: "hero.badge" }
+   * parseKey("save") → { namespace: "common", key: "save" }
    */
   private parseKey(key: string): { namespace: string; key: string } {
-    // : 구분자 우선 확인
+    // 콜론(:)만 네임스페이스 구분자로 사용
     const colonIndex = key.indexOf(':');
     if (colonIndex !== -1) {
       return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
     }
 
-    // . 구분자 확인 (첫 번째 점만 네임스페이스 구분자로 사용)
-    const dotIndex = key.indexOf('.');
-    if (dotIndex !== -1) {
-      return { namespace: key.substring(0, dotIndex), key: key.substring(dotIndex + 1) };
-    }
-
-    // 구분자가 없으면 common 네임스페이스로 간주
+    // 콜론이 없으면 common 네임스페이스로 간주
+    // 점(.)은 키 이름의 일부 (중첩 객체 접근은 getNestedValue에서 처리)
     return { namespace: 'common', key };
   }
 
@@ -1063,20 +1067,20 @@ function isStringValue(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0;
 }
 
+/**
+ * 키 파싱 (네임스페이스:키 형식) - SSR용 standalone 함수
+ * 
+ * - 콜론(:)만 네임스페이스 구분자로 사용
+ * - 점(.)은 키 이름의 일부로 취급 (중첩 객체 접근용)
+ */
 function parseKey(key: string): { namespace: string; key: string } {
-  // : 구분자 우선 확인
+  // 콜론(:)만 네임스페이스 구분자로 사용
   const colonIndex = key.indexOf(':');
   if (colonIndex !== -1) {
     return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
   }
 
-  // . 구분자 확인 (첫 번째 점만 네임스페이스 구분자로 사용)
-  const dotIndex = key.indexOf('.');
-  if (dotIndex !== -1) {
-    return { namespace: key.substring(0, dotIndex), key: key.substring(dotIndex + 1) };
-  }
-
-  // 구분자가 없으면 common 네임스페이스로 간주
+  // 콜론이 없으면 common 네임스페이스로 간주
   return { namespace: 'common', key };
 }
 
