@@ -1,0 +1,42 @@
+{
+  "hero": {
+    "badge": "Service",
+    "title": "スムダイアリー",
+    "subtitle": "AIがあなたの感情を分析し理解するスマート日記サービス。毎日の感情を記録して、あなただけの感情パターンを発見しましょう。",
+    "button1": "今すぐ始める",
+    "button2": "お問い合わせ"
+  },
+  "features": {
+    "title": "主な機能",
+    "subtitle": "感情を記録し理解するために必要なすべて",
+    "analysis": {
+      "title": "AI感情分析",
+      "description": "GPTベースのAIが日記の内容を分析し、感情を理解して共感します。"
+    },
+    "visualization": {
+      "title": "感情パターンの可視化",
+      "description": "時間の経過に伴う感情の流れを可視化してパターンを発見します。"
+    },
+    "interpretation": {
+      "title": "パーソナライズされた解釈",
+      "description": "AIがあなたの感情に合わせた共感のある解釈とアドバイスを提供します。"
+    },
+    "privacy": {
+      "title": "完全なプライバシー",
+      "description": "すべての日記は暗号化されて保存され、あなただけがアクセスできます。"
+    },
+    "multilingual": {
+      "title": "多言語サポート",
+      "description": "日本語、英語、韓国語で日記を書いて分析できます。"
+    },
+    "themes": {
+      "title": "美しいテーマ",
+      "description": "紙の質感のPaperテーマとクリーンなMinimalテーマから選択できます。"
+    }
+  },
+  "cta": {
+    "title": "今日の感情を記録しましょう",
+    "description": "無料で始めて、AIと一緒にあなたの感情を理解しましょう。",
+    "button": "スムダイアリーを始める"
+  }
+}

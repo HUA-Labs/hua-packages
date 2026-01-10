@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "Motion Core",
+    "subtitle": "선언적 React 애니메이션 훅",
+    "description": "간단한 API로 풍부한 모션을 구현합니다. useFadeIn, useSlideUp 등 다양한 애니메이션 훅을 제공하여 개발자가 쉽게 사용할 수 있습니다.",
+    "button1": "GitHub에서 시작하기",
+    "button2": "문서 보기"
+  },
+  "features": {
+    "title": "주요 기능",
+    "subtitle": "선언적이고 직관적인 애니메이션",
+    "hooks": {
+      "title": "애니메이션 훅",
+      "description": "useFadeIn, useSlideUp, useScrollReveal 등 다양한 애니메이션 훅을 제공합니다."
+    },
+    "scroll": {
+      "title": "스크롤 기반 애니메이션",
+      "description": "Intersection Observer를 활용하여 스크롤 시 요소를 자동으로 애니메이션합니다."
+    },
+    "presets": {
+      "title": "프리셋 시스템",
+      "description": "드라마틱, 미니멀 등 다양한 프리셋으로 애니메이션 스타일을 빠르게 적용합니다."
+    },
+    "performance": {
+      "title": "성능 최적화",
+      "description": "requestAnimationFrame을 활용하여 부드럽고 효율적인 애니메이션을 제공합니다."
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "완벽한 타입 지원으로 개발 생산성을 높입니다."
+    },
+    "lightweight": {
+      "title": "경량",
+      "description": "의존성이 적어 번들 크기를 최소화합니다."
+    }
+  },
+  "cta": {
+    "title": "지금 시작하세요",
+    "description": "npm 또는 pnpm으로 설치하고 바로 사용해보세요.",
+    "install": "설치하기",
+    "github": "GitHub",
+    "contact": "지원 문의"
+  }
+}

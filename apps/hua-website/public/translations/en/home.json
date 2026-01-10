@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "badge": "Emotion Interface Platform",
+    "title": "Building interfaces that\nunderstand {emotion}",
+    "titleEmotion": "emotions",
+    "subtitle": "HUA Labs researches and develops next-generation interfaces that understand and respond to user emotions.",
+    "cta": {
+      "products": "Explore Products",
+      "about": "About Us"
+    }
+  },
+  "features": {
+    "title": "Our Values",
+    "subtitle": "Pursuing the balance between technology and emotion",
+    "items": {
+      "emotion": {
+        "title": "Emotion Understanding",
+        "description": "AI-powered emotion analysis creates interfaces that understand and empathize with users."
+      },
+      "dx": {
+        "title": "Developer Experience",
+        "description": "Intuitive APIs and rich documentation help developers start quickly and scale easily."
+      },
+      "global": {
+        "title": "Global Support",
+        "description": "Designed for multilingual environments to provide optimal experiences for users worldwide."
+      }
+    }
+  },
+  "products": {
+    "title": "Products & Services",
+    "subtitle": "Complete solutions for emotion interfaces",
+    "sumDiary": {
+      "title": "Sum Diary",
+      "badge": "Service",
+      "description": "A smart diary service where AI analyzes and understands your emotions. Record your daily emotions and discover patterns."
+    },
+    "huaUx": {
+      "title": "HUA UX Framework",
+      "badge": "Package",
+      "description": "A React framework with UI + Motion + i18n pre-wired. Build beautiful UX quickly."
+    }
+  },
+  "cta": {
+    "title": "Let's Build Together",
+    "description": "Join HUA Labs in building the future of emotion-aware interfaces. Contact us anytime with questions.",
+    "button": "Contact Us"
+  }
+}

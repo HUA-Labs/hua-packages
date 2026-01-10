@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "i18n Core",
+    "subtitle": "Multilingual system supporting both SSR/CSR",
+    "description": "Integrated with Zustand for state management. Supports namespaces and dynamic loading to provide a scalable multilingual system.",
+    "button1": "Get Started on GitHub",
+    "button2": "View Documentation"
+  },
+  "features": {
+    "title": "Key Features",
+    "subtitle": "Flexible and powerful multilingual support",
+    "ssr": {
+      "title": "SSR/CSR Support",
+      "description": "Perfectly compatible with server-side rendering frameworks like Next.js, Remix."
+    },
+    "namespace": {
+      "title": "Namespaces",
+      "description": "Separate translation keys into namespaces for easier management."
+    },
+    "dynamic": {
+      "title": "Dynamic Loading",
+      "description": "Load only necessary translations to minimize initial bundle size."
+    },
+    "zustand": {
+      "title": "Zustand Integration",
+      "description": "State management with Zustand ensures language changes are reflected immediately."
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "Perfect type support prevents typos in translation keys."
+    },
+    "loader": {
+      "title": "Custom Loader",
+      "description": "Load translations in various ways including API, file system, and more."
+    }
+  },
+  "cta": {
+    "title": "Get Started Now",
+    "description": "Install with npm or pnpm and start using immediately.",
+    "install": "Install",
+    "github": "GitHub",
+    "contact": "Support Inquiry"
+  }
+}

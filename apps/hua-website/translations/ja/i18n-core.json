@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "badge": "Package",
+    "title": "i18n Core",
+    "subtitle": "SSR/CSR両方をサポートする多言語システム",
+    "description": "Zustand統合で状態管理まで。ネームスペースと動的ローディングをサポートして、拡張可能な多言語システムを提供します。",
+    "button1": "GitHubで始める",
+    "button2": "ドキュメントを見る"
+  },
+  "features": {
+    "title": "主な機能",
+    "subtitle": "柔軟で強力な多言語サポート",
+    "ssr": {
+      "title": "SSR/CSRサポート",
+      "description": "Next.js、Remixなどのサーバーサイドレンダリングフレームワークと完全に互換性があります。"
+    },
+    "namespace": {
+      "title": "ネームスペース",
+      "description": "翻訳キーをネームスペースで分離して、管理が容易になります。"
+    },
+    "dynamic": {
+      "title": "動的ローディング",
+      "description": "必要な翻訳のみをロードして、初期バンドルサイズを最小化します。"
+    },
+    "zustand": {
+      "title": "Zustand統合",
+      "description": "Zustandを活用した状態管理で、言語変更が即座に反映されます。"
+    },
+    "typescript": {
+      "title": "TypeScript",
+      "description": "完璧な型サポートで翻訳キーの誤字を防止します。"
+    },
+    "loader": {
+      "title": "カスタムローダー",
+      "description": "API、ファイルシステムなど、様々な方法で翻訳をロードできます。"
+    }
+  },
+  "cta": {
+    "title": "今すぐ始めましょう",
+    "description": "npmまたはpnpmでインストールして、すぐに使用できます。",
+    "install": "インストール",
+    "github": "GitHub",
+    "contact": "サポートお問い合わせ"
+  }
+}
