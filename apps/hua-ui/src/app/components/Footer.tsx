@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Icon } from '@hua-labs/ui'
+import { Sparkle, GithubLogo, TwitterLogo } from '@phosphor-icons/react'
 
 export default function Footer() {
   return (
@@ -12,30 +12,21 @@ export default function Footer() {
           {/* 브랜드 */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              {React.createElement(Icon as any, {
-                name: "sparkles",
-                className: "w-6 h-6 text-blue-600"
-              })}
+              <Sparkle className="w-6 h-6 text-blue-600" weight="fill" />
               <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 HUA UI
               </h3>
             </div>
             <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-md">
-              아름다운 디자인 시스템으로 더 나은 웹 경험을 만들어보세요. 
-              Tailwind CSS와 Lucide React 기반의 현대적인 UI 컴포넌트 라이브러리입니다.
+              아름다운 디자인 시스템으로 더 나은 웹 경험을 만들어보세요.
+              Tailwind CSS와 Phosphor Icons 기반의 현대적인 UI 컴포넌트 라이브러리입니다.
             </p>
             <div className="flex gap-4">
               <Link href="https://github.com/hua-labs/hua-ui" target="_blank" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
-                {React.createElement(Icon as any, {
-                  name: "github",
-                  className: "w-5 h-5"
-                })}
+                <GithubLogo className="w-5 h-5" weight="fill" />
               </Link>
               <Link href="https://twitter.com/hua_labs" target="_blank" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
-                {React.createElement(Icon as any, {
-                  name: "twitter",
-                  className: "w-5 h-5"
-                })}
+                <TwitterLogo className="w-5 h-5" weight="fill" />
               </Link>
             </div>
           </div>
@@ -112,4 +103,4 @@ export default function Footer() {
       </div>
     </footer>
   )
-} 
+}

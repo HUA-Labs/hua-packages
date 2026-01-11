@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react'
-import { Icon } from '@hua-labs/ui'
+import { Sparkle, Play, Check, ShareNetwork, Info, Warning } from '@phosphor-icons/react'
 
 export default function PlaygroundPage() {
-  const [code, setCode] = React.useState(`import { Card, CardContent, CardHeader, CardTitle } from '@hua-labs/ui'
+  const [code, setCode] = React.useState(`import { Card, CardContent, CardHeader, CardTitle } from '@hua-labs/hua-ux'
 
 function BasicCard() {
   return (
@@ -32,7 +32,7 @@ function BasicCard() {
       id: 'basic-card',
       name: '기본 카드',
       description: '간단한 카드 컴포넌트 예제',
-      code: `import { Card, CardContent, CardHeader, CardTitle } from '@hua-labs/ui'
+      code: `import { Card, CardContent, CardHeader, CardTitle } from '@hua-labs/hua-ux'
 
 function BasicCard() {
   return (
@@ -51,7 +51,7 @@ function BasicCard() {
       id: 'button-gallery',
       name: '버튼 갤러리',
       description: '다양한 버튼 스타일 예제',
-      code: `import { Button } from '@hua-labs/ui'
+      code: `import { Button } from '@hua-labs/hua-ux'
 
 function ButtonGallery() {
   return (
@@ -69,7 +69,7 @@ function ButtonGallery() {
       id: 'form-example',
       name: '폼 예제',
       description: '간단한 폼 컴포넌트 조합',
-      code: `import { Input, Button, Label, Form, FormField } from '@hua-labs/ui'
+      code: `import { Input, Button, Label, Form, FormField } from '@hua-labs/hua-ux'
 
 function FormExample() {
   return (
@@ -91,7 +91,7 @@ function FormExample() {
       id: 'icon-example',
       name: '아이콘 예제',
       description: '아이콘과 버튼 조합',
-      code: `import { Button, Icon } from '@hua-labs/ui'
+      code: `import { Button, Icon } from '@hua-labs/hua-ux'
 
 function IconExample() {
   return (
@@ -119,7 +119,7 @@ function IconExample() {
       id: 'emotion-selector',
       name: '감정 선택기',
       description: '감정 표현 컴포넌트',
-      code: `import { EmotionSelector } from '@hua-labs/ui/advanced'
+      code: `import { EmotionSelector } from '@hua-labs/hua-ux'
 
 function EmotionExample() {
   const [selectedEmotion, setSelectedEmotion] = React.useState('')
@@ -141,7 +141,7 @@ function EmotionExample() {
       id: 'accordion-example',
       name: '아코디언',
       description: '접을 수 있는 콘텐츠 영역',
-      code: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@hua-labs/ui'
+      code: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@hua-labs/hua-ux'
 
 function AccordionExample() {
   return (
@@ -178,7 +178,7 @@ function AccordionExample() {
         {/* 헤더 */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Icon name="sparkles" className="w-6 h-6 text-blue-600" />
+            <Sparkle className="w-6 h-6 text-blue-600" />
           </div>
           <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">
             플레이그라운드
@@ -198,7 +198,7 @@ function AccordionExample() {
               </h2>
               <div className="flex gap-2">
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                  <Icon name="play" className="w-4 h-4" />
+                  <Play className="w-4 h-4" />
                   실행
                 </button>
                 <button 
@@ -207,12 +207,12 @@ function AccordionExample() {
                 >
                   {copied === 'share' ? (
                     <>
-                      <Icon name="check" className="w-4 h-4" />
+                      <Check className="w-4 h-4" />
                       복사됨
                     </>
                   ) : (
                     <>
-                      <Icon name="share" className="w-4 h-4" />
+                      <ShareNetwork className="w-4 h-4" />
                       공유
                     </>
                   )}
@@ -252,7 +252,7 @@ function AccordionExample() {
           {/* 사용 가능한 컴포넌트 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Icon name="info" className="w-5 h-5" />
+              <Info className="w-5 h-5" />
               사용 가능한 컴포넌트
             </h3>
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
@@ -272,7 +272,7 @@ function AccordionExample() {
           {/* 주의사항 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Icon name="warning" className="w-5 h-5" />
+              <Warning className="w-5 h-5" />
               주의사항
             </h3>
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">

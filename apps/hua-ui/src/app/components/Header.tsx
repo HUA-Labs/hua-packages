@@ -3,13 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LanguageToggle } from '@hua-labs/ui/advanced'
-import { 
-  ThemeToggle, 
-  Icon,
-  Container,
-  Button
-} from '@hua-labs/ui'
+import { ThemeToggle, LanguageToggle } from '@hua-labs/hua-ux'
+import { Sparkle } from '@phosphor-icons/react'
 
 export default function Header() {
   const pathname = usePathname()
@@ -29,17 +24,14 @@ export default function Header() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                {React.createElement(Icon as any, {
-                  name: "sparkles",
-                  className: "w-6 h-6 text-blue-600"
-                })}
+                <Sparkle className="w-6 h-6 text-blue-600" weight="fill" />
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   HUA UI
                 </h1>
               </div>
             </Link>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <nav className="hidden md:flex items-center gap-6">
               {navigation.map((item) => (
@@ -56,15 +48,15 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
-            
-            {/* SDK 컴포넌트들 사용 */}
+
+            {/* HUA UX 컴포넌트들 */}
             <div className="flex items-center gap-2">
-              {React.createElement(LanguageToggle as any)}
-              {React.createElement(ThemeToggle as any)}
+              <LanguageToggle />
+              <ThemeToggle />
             </div>
           </div>
         </div>
       </div>
     </header>
   )
-} 
+}

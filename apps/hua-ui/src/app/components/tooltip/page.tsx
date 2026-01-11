@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { Tooltip, Button, Card, CardContent, Icon } from "@hua-labs/ui"
+import { Tooltip, Button, Card, CardContent } from '@hua-labs/hua-ux'
+import { Gear, Question, Bell, User, MagnifyingGlass, Upload, FloppyDisk, ArrowCounterClockwise } from '@phosphor-icons/react'
 
 export default function TooltipPage() {
   return (
@@ -96,31 +97,31 @@ export default function TooltipPage() {
           <div className="flex flex-wrap gap-6">
             <Tooltip content="설정 메뉴">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name={"settings" as any} className="w-6 h-6" />
+                <Gear className="w-6 h-6" />
               </button>
             </Tooltip>
-            
+
             <Tooltip content="도움말 보기">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name={"helpCircle" as any} className="w-6 h-6" />
+                <Question className="w-6 h-6" />
               </button>
             </Tooltip>
-            
+
             <Tooltip content="알림 확인">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name={"bell" as any} className="w-6 h-6" />
+                <Bell className="w-6 h-6" />
               </button>
             </Tooltip>
-            
+
             <Tooltip content="사용자 프로필">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name={"user" as any} className="w-6 h-6" />
+                <User className="w-6 h-6" />
               </button>
             </Tooltip>
-            
+
             <Tooltip content="검색하기">
               <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                <Icon name={"search" as any} className="w-6 h-6" />
+                <MagnifyingGlass className="w-6 h-6" />
               </button>
             </Tooltip>
           </div>
@@ -142,7 +143,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium">이메일</label>
                   <Tooltip content="회원가입에 사용되는 이메일 주소를 입력해주세요">
-                    <Icon name="helpCircle" className="w-4 h-4 text-slate-400" />
+                    <Question className="w-4 h-4 text-slate-400" />
                   </Tooltip>
                 </div>
                 <input 
@@ -154,7 +155,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium">비밀번호</label>
                   <Tooltip content="8자 이상, 영문/숫자/특수문자 조합">
-                    <Icon name="helpCircle" className="w-4 h-4 text-slate-400" />
+                    <Question className="w-4 h-4 text-slate-400" />
                   </Tooltip>
                 </div>
                 <input 
@@ -175,7 +176,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="파일을 업로드합니다">
                     <Button size="sm">
-                      <Icon name={"upload" as any} className="w-4 h-4 mr-2" />
+                      <Upload className="w-4 h-4 mr-2" />
                       업로드
                     </Button>
                   </Tooltip>
@@ -184,7 +185,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="변경사항을 저장합니다">
                     <Button size="sm" variant="outline">
-                      <Icon name={"save" as any} className="w-4 h-4 mr-2" />
+                      <FloppyDisk className="w-4 h-4 mr-2" />
                       저장
                     </Button>
                   </Tooltip>
@@ -193,7 +194,7 @@ export default function TooltipPage() {
                 <div className="flex items-center gap-2">
                   <Tooltip content="작업을 되돌립니다">
                     <Button size="sm" variant="ghost">
-                      <Icon name={"undo" as any} className="w-4 h-4 mr-2" />
+                      <ArrowCounterClockwise className="w-4 h-4 mr-2" />
                       되돌리기
                     </Button>
                   </Tooltip>
@@ -216,7 +217,7 @@ export default function TooltipPage() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { Tooltip, Button } from '@hua-labs/ui'
+{`import { Tooltip, Button } from '@hua-labs/hua-ux'
 
 // 기본 툴팁
 <Tooltip content="툴팁 내용">

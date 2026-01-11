@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Checkbox, Label, ComponentLayout } from "@hua-labs/ui"
+import { Checkbox, Label, ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function CheckboxPage() {
   return (
@@ -40,7 +40,7 @@ export default function CheckboxPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Checkbox } from "@hua-labs/ui"
+                <code>{`import { Checkbox } from '@hua-labs/hua-ux'
 
 <Checkbox 
   id="basic-checkbox"
@@ -241,7 +241,7 @@ export default function CheckboxPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Checkbox, Label } from "@hua-labs/ui"
+                <code>{`import { Checkbox, Label } from '@hua-labs/hua-ux'
 
 <div>
   <Label className="text-lg font-semibold mb-3 block">약관 동의</Label>
@@ -286,7 +286,7 @@ export default function CheckboxPage() {
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
                 <code>{`import { useState } from "react"
-import { Checkbox } from "@hua-labs/ui"
+import { Checkbox } from '@hua-labs/hua-ux'
 
 const [isChecked, setIsChecked] = useState(false)
 

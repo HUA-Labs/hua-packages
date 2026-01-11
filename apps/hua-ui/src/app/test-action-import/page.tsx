@@ -3,7 +3,7 @@
 import React from "react"
 
 // 직접 import 테스트
-import { Action } from "@hua-labs/ui"
+import { Action } from '@hua-labs/hua-ux'
 
 export default function TestActionImportPage() {
   console.log("Action component:", Action)

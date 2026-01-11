@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Play, Settings, Palette, FileText, Download, Copy, Sparkles } from 'lucide-react'
+import { Play, Gear, Palette, FileText, DownloadSimple, Copy, Sparkle } from '@phosphor-icons/react'
 
 export default function DocsPage() {
   const [activeTab, setActiveTab] = React.useState('getting-started')
@@ -16,7 +16,7 @@ export default function DocsPage() {
 
   const tabs = [
     { id: 'getting-started', name: '시작하기', icon: Play },
-    { id: 'components', name: '컴포넌트', icon: Settings },
+    { id: 'components', name: '컴포넌트', icon: Gear },
     { id: 'styling', name: '스타일링', icon: Palette },
     { id: 'examples', name: '예제', icon: FileText }
   ]
@@ -35,7 +35,7 @@ export default function DocsPage() {
             문서
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            @hua-labs/ui SDK의 완전한 사용법 가이드
+            @hua-labs/hua-ux SDK의 완전한 사용법 가이드
           </p>
         </div>
 
@@ -70,14 +70,14 @@ export default function DocsPage() {
                   빠른 시작
                 </h2>
                 <p className="text-slate-600 dark:text-slate-400 mb-6">
-                  @hua-labs/ui를 프로젝트에 추가하고 첫 번째 컴포넌트를 만들어보세요
+                  @hua-labs/hua-ux를 프로젝트에 추가하고 첫 번째 컴포넌트를 만들어보세요
                 </p>
               </section>
 
               {/* 설치하기 */}
               <section>
                 <h3 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white flex items-center gap-2">
-                  <Download className="w-5 h-5" />
+                  <DownloadSimple className="w-5 h-5" />
                   설치하기
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 mb-4">
@@ -85,10 +85,10 @@ export default function DocsPage() {
                 </p>
                 <div className="relative">
                   <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                    <code>npm install @hua-labs/ui</code>
+                    <code>npm install @hua-labs/hua-ux</code>
                   </pre>
                   <button
-                    onClick={() => copyToClipboard('npm install @hua-labs/ui', 'install')}
+                    onClick={() => copyToClipboard('npm install @hua-labs/hua-ux', 'install')}
                     className="absolute top-2 right-2 p-2 text-slate-400 hover:text-white transition-colors"
                   >
                     {copied === 'install' ? (
@@ -110,7 +110,7 @@ export default function DocsPage() {
                 </p>
                 <div className="relative">
                   <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-                    <code>{`import { Button, Card } from '@hua-labs/ui'
+                    <code>{`import { Button, Card } from '@hua-labs/hua-ux'
 
 function App() {
   return (
@@ -122,7 +122,7 @@ function App() {
 }`}</code>
                   </pre>
                   <button
-                    onClick={() => copyToClipboard(`import { Button, Card } from '@hua-labs/ui'
+                    onClick={() => copyToClipboard(`import { Button, Card } from '@hua-labs/hua-ux'
 
 function App() {
   return (
@@ -146,7 +146,7 @@ function App() {
               {/* 빠른 시작 예제 */}
               <section>
                 <h3 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+                  <Sparkle className="w-5 h-5" />
                   빠른 시작 예제
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,11 +179,11 @@ function App() {
                     <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                       <div className="flex items-center gap-2">
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                          <Download className="w-4 h-4" />
+                          <DownloadSimple className="w-4 h-4" />
                           다운로드
                         </button>
                         <button className="p-2 bg-slate-200 dark:bg-slate-600 rounded-md hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">
-                          <Download className="w-4 h-4" />
+                          <DownloadSimple className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -195,7 +195,7 @@ function App() {
 
           {activeTab === 'components' && (
             <div className="text-center py-12">
-              <Settings className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+              <Gear className="w-16 h-16 text-slate-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">
                 컴포넌트 문서
               </h3>
@@ -232,4 +232,4 @@ function App() {
       </div>
     </div>
   )
-} 
+}

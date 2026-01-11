@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent, Card, CardContent } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent, Card, CardContent } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function AccordionPage() {
   const [singleValue, setSingleValue] = useState<string>("item-1")
@@ -298,7 +298,7 @@ export default function AccordionPage() {
             <div>
               <h3 className="font-medium mb-2">기본 사용법</h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@hua-labs/ui"
+{`import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@hua-labs/hua-ux'
 
 // 기본 아코디언
 <Accordion>

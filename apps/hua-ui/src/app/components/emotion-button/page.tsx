@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { EmotionButton } from "@hua-labs/ui/advanced"
-import { Card, CardContent, ComponentLayout } from "@hua-labs/ui"
+import { EmotionButton } from '@hua-labs/hua-ux'
+import { Card, CardContent, ComponentLayout } from '@hua-labs/hua-ux'
 
 // API 문서용 타입 정의
 const EMOTION_BUTTON_TYPES = {
@@ -205,7 +205,7 @@ export default function EmotionButtonPage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { EmotionButton } from "@hua-labs/ui/advanced"
+{`import { EmotionButton } from '@hua-labs/hua-ux'
 
 // 기본 감정 버튼
 <EmotionButton 

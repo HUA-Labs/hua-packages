@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { useToast, Button, Card, CardContent, Icon, ToastProvider } from "@hua-labs/ui"
+import { useToast, Button, Card, CardContent, ToastProvider } from '@hua-labs/hua-ux'
+import { Check, X, Warning, Info } from '@phosphor-icons/react'
 
 function ToastContent() {
   const { addToast } = useToast()
@@ -65,7 +66,7 @@ function ToastContent() {
           <div className="space-y-4">
             <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
               <div className="flex items-start gap-3">
-                <Icon name="check" className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+                <Check className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-green-900 dark:text-green-100">성공</h3>
                   <p className="text-sm text-green-700 dark:text-green-300">
@@ -73,7 +74,7 @@ function ToastContent() {
                   </p>
                 </div>
                 <button className="text-green-400 hover:text-green-600 dark:hover:text-green-300">
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -88,14 +89,14 @@ function ToastContent() {
                   </p>
                 </div>
                 <button className="text-red-400 hover:text-red-600 dark:hover:text-red-300">
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
             
             <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
               <div className="flex items-start gap-3">
-                <Icon name="warning" className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                <Warning className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">주의</h3>
                   <p className="text-sm text-yellow-700 dark:text-yellow-300">
@@ -103,14 +104,14 @@ function ToastContent() {
                   </p>
                 </div>
                 <button className="text-yellow-400 hover:text-yellow-600 dark:hover:text-yellow-300">
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
             
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-start gap-3">
-                <Icon name="info" className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-blue-900 dark:text-blue-100">정보</h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">
@@ -118,7 +119,7 @@ function ToastContent() {
                   </p>
                 </div>
                 <button className="text-blue-400 hover:text-blue-600 dark:hover:text-blue-300">
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -210,7 +211,7 @@ function ToastContent() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { useToast, ToastProvider } from '@hua-labs/ui'
+{`import { useToast, ToastProvider } from '@hua-labs/hua-ux'
 
 function MyComponent() {
   const { addToast } = useToast()

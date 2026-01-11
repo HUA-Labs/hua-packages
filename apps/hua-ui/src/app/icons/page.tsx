@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react'
-import { Search, Palette, Check } from 'lucide-react'
+import { MagnifyingGlass, Palette, Check } from '@phosphor-icons/react'
 
 // SDK의 Icon 컴포넌트와 아이콘 카테고리 import
-import { Icon, iconCategories } from '@hua-labs/ui'
+import { Icon, iconCategories } from '@hua-labs/hua-ux'
 
 export default function IconsPage() {
   const [searchTerm, setSearchTerm] = React.useState('')
@@ -139,7 +139,7 @@ export default function IconsPage() {
                 검색
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder="아이콘 이름으로 검색..."
@@ -253,7 +253,7 @@ export default function IconsPage() {
         {/* 결과 없음 */}
         {filteredIcons.length === 0 && (
           <div className="text-center py-12">
-            <Search className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+            <MagnifyingGlass className="w-16 h-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">
               검색 결과가 없습니다
             </h3>

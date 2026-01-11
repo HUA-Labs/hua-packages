@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { LoadingSpinner, Card, CardContent } from "@hua-labs/ui"
+import { LoadingSpinner, Card, CardContent } from '@hua-labs/hua-ux'
 
 export default function LoadingSpinnerPage() {
   return (
@@ -213,7 +213,7 @@ export default function LoadingSpinnerPage() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { LoadingSpinner } from '@hua-labs/ui'
+{`import { LoadingSpinner } from '@hua-labs/hua-ux'
 
 // 기본 스피너
 <LoadingSpinner />

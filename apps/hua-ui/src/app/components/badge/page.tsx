@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { Badge } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Badge } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function BadgePage() {
   return (
@@ -31,7 +31,7 @@ export default function BadgePage() {
           </div>
           <div className="mt-4">
             <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-              <code>{`import { Badge } from "@hua-labs/ui"
+              <code>{`import { Badge } from '@hua-labs/hua-ux'
 
 <Badge>기본</Badge>
 <Badge variant="secondary">보조</Badge>

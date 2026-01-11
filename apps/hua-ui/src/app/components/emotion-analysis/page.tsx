@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { EmotionAnalysis } from "@hua-labs/ui/advanced"
-import { Card, CardContent, ComponentLayout } from "@hua-labs/ui"
+import { EmotionAnalysis } from '@hua-labs/hua-ux'
+import { Card, CardContent, ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function EmotionAnalysisPage() {
   const [text, setText] = useState<string>("오늘은 정말 기분이 좋아요! 새로운 프로젝트를 시작하게 되어서 설렙니다.")
@@ -221,7 +221,7 @@ export default function EmotionAnalysisPage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { EmotionAnalysis } from "@hua-labs/ui/advanced"
+{`import { EmotionAnalysis } from '@hua-labs/hua-ux'
 
 // 기본 감정 분석
 const analysis = {

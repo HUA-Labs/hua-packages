@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Input, Label, Icon, ComponentLayout } from "@hua-labs/ui"
+import { Input, Label, ComponentLayout } from '@hua-labs/hua-ux'
+import { MagnifyingGlass, Envelope, Lock, Eye } from '@phosphor-icons/react'
 
 export default function InputPage() {
   const [formData, setFormData] = useState({
@@ -66,7 +67,7 @@ export default function InputPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Input, Label } from "@hua-labs/ui"
+                <code>{`import { Input, Label } from '@hua-labs/hua-ux'
 
 <div>
   <Label htmlFor="name">이름</Label>
@@ -237,7 +238,7 @@ export default function InputPage() {
                 <div>
                   <Label htmlFor="search-input">검색</Label>
                   <div className="relative">
-                    <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <Input 
                       id="search-input"
                       placeholder="검색어를 입력하세요"
@@ -250,7 +251,7 @@ export default function InputPage() {
                 <div>
                   <Label htmlFor="email-input">이메일</Label>
                   <div className="relative">
-                    <Icon name="mail" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <Input 
                       id="email-input"
                       type="email"
@@ -262,8 +263,8 @@ export default function InputPage() {
                 <div>
                   <Label htmlFor="password-input">비밀번호</Label>
                   <div className="relative">
-                    <Icon name="lock" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <Icon name="eye" size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />
+                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Eye size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />
                     <Input 
                       id="password-input"
                       type="password"
@@ -276,21 +277,21 @@ export default function InputPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Icon } from "@hua-labs/ui"
+                <code>{`import { MagnifyingGlass, Envelope, Lock, Eye } from '@phosphor-icons/react'
 
 <div className="relative">
-  <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
+  <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
   <Input placeholder="검색어를 입력하세요" className="pl-10" />
 </div>
 
 <div className="relative">
-  <Icon name="mail" size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
+  <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
   <Input type="email" placeholder="이메일을 입력하세요" className="pl-10" />
 </div>
 
 <div className="relative">
-  <Icon name="lock" size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
-  <Icon name="eye" size={16} className="absolute right-3 top-1/2 -translate-y-1/2" />
+  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2" />
+  <Eye size={16} className="absolute right-3 top-1/2 -translate-y-1/2" />
   <Input type="password" placeholder="비밀번호를 입력하세요" className="pl-10 pr-10" />
 </div>`}</code>
               </pre>

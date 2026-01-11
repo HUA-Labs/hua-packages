@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo, ComponentLayout } from "@hua-labs/ui"
-import { Button } from "@hua-labs/ui"
+import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo, ComponentLayout } from '@hua-labs/hua-ux'
+import { Button } from '@hua-labs/hua-ux'
 
 export default function AlertPage() {
   const [showClosable, setShowClosable] = useState(true)

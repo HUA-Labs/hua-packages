@@ -1,37 +1,74 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import React from 'react'
-import { ThemeProvider, ScrollToTop } from '@hua-labs/ui'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import { HydrationProvider } from './components/HydrationProvider'
+import type { Metadata, Viewport } from 'next';
+import { ThemeProvider, ScrollToTop } from '@hua-labs/hua-ux';
+import { HuaUxLayout, SkipToContent } from '@hua-labs/hua-ux/framework';
+import { setConfig } from '@hua-labs/hua-ux/framework/config';
+import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import huaUxConfig from '../../hua-ux.config';
+import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] })
+// 설정 초기화 (서버 사이드)
+setConfig(huaUxConfig);
 
 export const metadata: Metadata = {
-  title: 'HUA UI - 아름다운 디자인 시스템',
+  title: {
+    default: 'HUA UI - Component Library',
+    template: '%s | HUA UI',
+  },
   description: 'HUA Labs의 가볍고 스마트한 UI 컴포넌트 라이브러리',
-}
+  keywords: ['HUA UI', 'React', 'UI Components', 'Design System', 'Tailwind CSS'],
+  authors: [{ name: 'HUA Labs' }],
+  creator: 'HUA Labs',
+};
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
+};
+
+export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
+  // SSR 번역 데이터 로드
+  const initialTranslations = await getSSRTranslations(huaUxConfig, 'public/translations');
+
+  // config에 initialTranslations 추가
+  const configWithSSR: Partial<typeof huaUxConfig> = {
+    ...huaUxConfig,
+    i18n: huaUxConfig.i18n
+      ? {
+          ...huaUxConfig.i18n,
+          initialTranslations,
+        }
+      : undefined,
+  };
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        {/* 하이드레이션 문제 방지를 위한 메타 태그 */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        {/* Google Sans Flex - 영문 폰트 */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
-        <HydrationProvider>
-          <ThemeProvider 
-            defaultTheme="system" 
-            storageKey="hua-ui-theme"
-            enableTransition={false}
-          >
+      <body className="min-h-screen antialiased" suppressHydrationWarning>
+        <ThemeProvider
+          defaultTheme="system"
+          storageKey="hua-ui-theme"
+          enableSystem
+          enableTransition
+        >
+          <HuaUxLayout config={configWithSSR}>
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-900 dark:via-blue-900/20 dark:to-purple-900/20 relative overflow-hidden">
               {/* 배경 장식 */}
               <div className="absolute inset-0 opacity-50" style={{
@@ -41,21 +78,22 @@ export default function RootLayout({
               <div className="absolute top-0 right-0 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
               <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
               <div className="relative z-10">
+                <SkipToContent targetId="main-content" className="sr-only" />
                 <Header />
-                <main className="flex-1">
+                <main id="main-content" className="flex-1">
                   {children}
                 </main>
                 <Footer />
               </div>
-              {React.createElement(ScrollToTop as any, {
-                variant: "primary",
-                size: "md",
-                threshold: 300
-              })}
+              <ScrollToTop
+                variant="primary"
+                size="md"
+                threshold={300}
+              />
             </div>
-          </ThemeProvider>
-        </HydrationProvider>
+          </HuaUxLayout>
+        </ThemeProvider>
       </body>
     </html>
-  )
-} 
+  );
+}

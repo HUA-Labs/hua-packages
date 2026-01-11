@@ -1,9 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
-import { Switch } from "@hua-labs/ui"
-import { Label } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Switch } from '@hua-labs/hua-ux'
+import { Label } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function SwitchPage() {
   const [isEnabled, setIsEnabled] = useState(false)
@@ -45,7 +45,7 @@ export default function SwitchPage() {
           </div>
           <div className="mt-4">
             <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-              <code>{`import { Switch } from "@hua-labs/ui"
+              <code>{`import { Switch } from '@hua-labs/hua-ux'
 
 <Switch 
   id="basic-switch"
@@ -239,7 +239,7 @@ export default function SwitchPage() {
           <div className="mt-4">
             <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
               <code>{`import { useState } from "react"
-import { Switch, Label } from "@hua-labs/ui"
+import { Switch, Label } from '@hua-labs/hua-ux'
 
 const [isEnabled, setIsEnabled] = useState(false)
 
@@ -298,7 +298,7 @@ const [isEnabled, setIsEnabled] = useState(false)
           <div className="mt-4">
             <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
               <code>{`import { useState } from "react"
-import { Switch, Label } from "@hua-labs/ui"
+import { Switch, Label } from '@hua-labs/hua-ux'
 
 const [notifications, setNotifications] = useState(true)
 const [darkMode, setDarkMode] = useState(false)

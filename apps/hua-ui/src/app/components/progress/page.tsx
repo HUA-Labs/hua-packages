@@ -12,7 +12,7 @@ import {
   CardContent,
   Button,
   ComponentLayout
-} from "@hua-labs/ui"
+} from '@hua-labs/hua-ux'
 
 export default function ProgressPage() {
   const [progress, setProgress] = useState(0)
@@ -240,7 +240,7 @@ export default function ProgressPage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { Progress } from "@hua-labs/ui"
+{`import { Progress } from '@hua-labs/hua-ux'
 
 // 기본 프로그레스 바
 <Progress value={50} />
