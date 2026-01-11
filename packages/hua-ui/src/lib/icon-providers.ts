@@ -5,19 +5,21 @@
  * - Lucide Icons (default)
  * - Phosphor Icons
  * - Untitled Icons (SVG-based)
+ * - Iconsax Icons (SVG-based, dynamically loaded)
  * 
  * Only imports icons that are actually used in the project for optimal bundle size.
  */
 
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { loadIconsaxIcon, normalizeIconsaxIconName, getIconsaxIconSync } from './iconsax-loader'
 
 // Phosphor Icons - lazy loaded, tree-shakeable
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
 
 // Icon Provider Type
-export type IconProvider = 'lucide' | 'phosphor' | 'untitled'
+export type IconProvider = 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
 
 // Icon Provider Configuration
 export interface IconProviderConfig {
@@ -32,36 +34,36 @@ export interface IconProviderConfig {
  */
 export const PROJECT_ICONS = {
   // Navigation & Layout
-  'home': { lucide: 'Home', phosphor: 'House', untitled: 'home' },
+  'home': { lucide: 'Home', phosphor: 'House', untitled: 'home', iconsax: 'Home2' },
   'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour', untitled: 'layout-dashboard' },
-  'folder': { lucide: 'Folder', phosphor: 'Folder', untitled: 'folder' },
+  'folder': { lucide: 'Folder', phosphor: 'Folder', untitled: 'folder', iconsax: 'Folder' },
   'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'alert-circle' },
   'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'alert-circle' },
   'columns': { lucide: 'Columns', phosphor: 'Columns', untitled: 'columns' },
   'users': { lucide: 'Users', phosphor: 'Users', untitled: 'users' },
   'settings': { lucide: 'Settings', phosphor: 'Gear', untitled: 'settings' },
-  'menu': { lucide: 'Menu', phosphor: 'List', untitled: 'menu' },
-  'close': { lucide: 'X', phosphor: 'X', untitled: 'close' },
+  'menu': { lucide: 'Menu', phosphor: 'List', untitled: 'menu', iconsax: 'Menu' },
+  'close': { lucide: 'X', phosphor: 'X', untitled: 'close', iconsax: 'CloseCircle' },
   'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft', untitled: 'chevron-left' },
   'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight', untitled: 'chevron-right' },
   'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown', untitled: 'chevron-down' },
   'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp', untitled: 'chevron-up' },
-  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', untitled: 'arrow-left' },
-  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', untitled: 'arrow-right' },
-  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up' },
-  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down' },
+  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', untitled: 'arrow-left', iconsax: 'ArrowLeft' },
+  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', untitled: 'arrow-right', iconsax: 'ArrowRight' },
+  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up', iconsax: 'ArrowUp' },
+  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down', iconsax: 'ArrowDown' },
 
   // Actions
-  'add': { lucide: 'Plus', phosphor: 'Plus', untitled: 'add' },
+  'add': { lucide: 'Plus', phosphor: 'Plus', untitled: 'add', iconsax: 'Add' },
   'edit': { lucide: 'Edit', phosphor: 'Pencil', untitled: 'edit' },
   'pencil': { lucide: 'Pencil', phosphor: 'Pencil', untitled: 'pencil' },
   'delete': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash' },
-  'trash': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash' },
-  'upload': { lucide: 'Upload', phosphor: 'Upload', untitled: 'upload' },
-  'download': { lucide: 'Download', phosphor: 'Download', untitled: 'download' },
+  'trash': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash', iconsax: 'Trash' },
+  'upload': { lucide: 'Upload', phosphor: 'Upload', untitled: 'upload', iconsax: 'Upload' },
+  'download': { lucide: 'Download', phosphor: 'Download', untitled: 'download', iconsax: 'Download' },
   'x': { lucide: 'X', phosphor: 'X', untitled: 'close' },
-  'check': { lucide: 'Check', phosphor: 'Check', untitled: 'check' },
-  'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', untitled: 'search' },
+  'check': { lucide: 'Check', phosphor: 'Check', untitled: 'check', iconsax: 'Check' },
+  'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', untitled: 'search', iconsax: 'SearchNormal' },
   'share': { lucide: 'Share', phosphor: 'Share', untitled: 'share' },
   'copy': { lucide: 'Copy', phosphor: 'Copy', untitled: 'copy' },
   'save': { lucide: 'Save', phosphor: 'FloppyDisk', untitled: 'save' },
@@ -73,20 +75,20 @@ export const PROJECT_ICONS = {
   'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
   'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
   'error': { lucide: 'XCircle', phosphor: 'XCircle', untitled: 'error' },
-  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'warning' },
-  'info': { lucide: 'Info', phosphor: 'Info', untitled: 'info' },
-  'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh' },
-  'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh' },
-  'bell': { lucide: 'Bell', phosphor: 'Bell', untitled: 'bell' },
-  'heart': { lucide: 'Heart', phosphor: 'Heart', untitled: 'heart' },
-  'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star' },
+  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'warning', iconsax: 'Warning2' },
+  'info': { lucide: 'Info', phosphor: 'Info', untitled: 'info', iconsax: 'InfoCircle' },
+  'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh', iconsax: 'Refresh' },
+  'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh', iconsax: 'Refresh' },
+  'bell': { lucide: 'Bell', phosphor: 'Bell', untitled: 'bell', iconsax: 'Bell' },
+  'heart': { lucide: 'Heart', phosphor: 'Heart', untitled: 'heart', iconsax: 'Heart' },
+  'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star', iconsax: 'Star' },
   'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark', untitled: 'bookmark' },
 
   // User & Auth
-  'user': { lucide: 'User', phosphor: 'User', untitled: 'user' },
+  'user': { lucide: 'User', phosphor: 'User', untitled: 'user', iconsax: 'User' },
   'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', untitled: 'user-plus' },
-  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', untitled: 'log-in' },
-  'logOut': { lucide: 'LogOut', phosphor: 'SignOut', untitled: 'log-out' },
+  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', untitled: 'log-in', iconsax: 'Login' },
+  'logOut': { lucide: 'LogOut', phosphor: 'SignOut', untitled: 'log-out', iconsax: 'Logout' },
   'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', untitled: 'chrome' },
   'github': { lucide: 'Github', phosphor: 'GithubLogo', untitled: 'github' },
   'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle', untitled: 'message' },
@@ -99,13 +101,13 @@ export const PROJECT_ICONS = {
   'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus', untitled: 'calendar-plus' },
   'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare', untitled: 'check-square' },
   'clock': { lucide: 'Clock', phosphor: 'Clock', untitled: 'clock' },
-  'book': { lucide: 'Book', phosphor: 'Book', untitled: 'book' },
+  'book': { lucide: 'Book', phosphor: 'Book', untitled: 'book', iconsax: 'Book' },
   'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', untitled: 'book-open' },
 
   // Theme & UI
-  'monitor': { lucide: 'Monitor', phosphor: 'Monitor', untitled: 'monitor' },
-  'sun': { lucide: 'Sun', phosphor: 'Sun', untitled: 'sun' },
-  'moon': { lucide: 'Moon', phosphor: 'Moon', untitled: 'moon' },
+  'monitor': { lucide: 'Monitor', phosphor: 'Monitor', untitled: 'monitor', iconsax: 'Monitor' },
+  'sun': { lucide: 'Sun', phosphor: 'Sun', untitled: 'sun', iconsax: 'Sun' },
+  'moon': { lucide: 'Moon', phosphor: 'Moon', untitled: 'moon', iconsax: 'Moon' },
 
   // AI & Features
   'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle', untitled: 'sparkles' },
@@ -125,9 +127,9 @@ export const PROJECT_ICONS = {
   'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'currency' },
 
   // Security
-  'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock' },
+  'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock', iconsax: 'Lock' },
   'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', untitled: 'unlock' },
-  'shield': { lucide: 'Shield', phosphor: 'Shield', untitled: 'shield' },
+  'shield': { lucide: 'Shield', phosphor: 'Shield', untitled: 'shield', iconsax: 'Shield' },
   'key': { lucide: 'Key', phosphor: 'Key', untitled: 'key' },
 
   // Media
@@ -143,7 +145,7 @@ export const PROJECT_ICONS = {
 
   // Navigation
   'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut', untitled: 'external-link' },
-  'link': { lucide: 'Link', phosphor: 'Link', untitled: 'link' },
+  'link': { lucide: 'Link', phosphor: 'Link', untitled: 'link', iconsax: 'Link' },
   'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline', untitled: 'more-horizontal' },
   'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical', untitled: 'more-vertical' },
 
@@ -151,8 +153,8 @@ export const PROJECT_ICONS = {
   'remove': { lucide: 'Minus', phosphor: 'Minus', untitled: 'remove' },
 
   // Eye (password)
-  'eye': { lucide: 'Eye', phosphor: 'Eye', untitled: 'eye' },
-  'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', untitled: 'eye-off' },
+  'eye': { lucide: 'Eye', phosphor: 'Eye', untitled: 'eye', iconsax: 'Eye' },
+  'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', untitled: 'eye-off', iconsax: 'EyeSlash' },
 
   // Emotions
   'smile': { lucide: 'Smile', phosphor: 'Smiley', untitled: 'smile' },
@@ -164,7 +166,7 @@ export const PROJECT_ICONS = {
   'phone': { lucide: 'Phone', phosphor: 'Phone', untitled: 'phone' },
 
   // Additional
-  'flag': { lucide: 'Flag', phosphor: 'Flag', untitled: 'flag' },
+  'flag': { lucide: 'Flag', phosphor: 'Flag', untitled: 'flag', iconsax: 'Flag' },
 } as const
 
 /**
@@ -181,7 +183,7 @@ export async function initPhosphorIcons() {
       // Only icons actually used will be included in bundle
       const phosphorModule = await import('@phosphor-icons/react')
       PhosphorIcons = phosphorModule
-    } catch (error) {
+    } catch {
       console.warn('Phosphor Icons not available. Install @phosphor-icons/react to use.')
       return null
     }
@@ -199,7 +201,7 @@ export async function initPhosphorIcons() {
  */
 export function getIconFromProvider(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' = 'lucide'
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax' = 'lucide'
 ): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   // Check if icon is in project icon list
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
@@ -209,14 +211,15 @@ export function getIconFromProvider(
     return getIconDirect(iconName, provider)
   }
 
-  const mappedName = iconMapping[provider]
+  const mappedName = (iconMapping as Record<string, string | undefined>)[provider]
 
   switch (provider) {
     case 'lucide':
+      if (!mappedName) return null
       return (LucideIcons as unknown as Record<string, LucideIcon>)[mappedName] || null
 
     case 'phosphor':
-      if (!PhosphorIcons) {
+      if (!mappedName || !PhosphorIcons) {
         return null
       }
       return PhosphorIcons?.[mappedName] || null
@@ -224,6 +227,12 @@ export function getIconFromProvider(
     case 'untitled':
       // Untitled Icons are SVG-based, handled separately
       return null
+
+    case 'iconsax':
+      // Iconsax icons are dynamically loaded
+      // Try sync cache first, then async load
+      const iconsaxName = mappedName ? normalizeIconsaxIconName(mappedName) : normalizeIconsaxIconName(iconName)
+      return getIconsaxIconSync(iconsaxName) || null
 
     default:
       return null
@@ -245,15 +254,15 @@ export function getIconFromProvider(
  */
 function getIconDirect(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled'
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
 ): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   switch (provider) {
-    case 'lucide':
+    case 'lucide': {
       // icons.ts에 없는 아이콘을 동적으로 찾기
       // PascalCase 변환 시도
       const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
       // camelCase도 시도
-      const camelCaseName = iconName.replace(/([A-Z])/g, (match, p1) =>
+      const camelCaseName = iconName.replace(/([A-Z])/g, (match) =>
         match === iconName[0] ? match.toLowerCase() : match
       )
 
@@ -261,8 +270,9 @@ function getIconDirect(
         (LucideIcons as unknown as Record<string, LucideIcon>)[iconName] ||
         (LucideIcons as unknown as Record<string, LucideIcon>)[camelCaseName] ||
         null
+    }
 
-    case 'phosphor':
+    case 'phosphor': {
       if (!PhosphorIcons) {
         return null
       }
@@ -275,9 +285,17 @@ function getIconDirect(
         PhosphorIcons?.[phosphorName2] ||
         PhosphorIcons?.[iconName] ||
         null
+    }
 
     case 'untitled':
       return null
+
+    case 'iconsax': {
+      // Iconsax icons are dynamically loaded
+      // Try sync cache first
+      const iconsaxName = normalizeIconsaxIconName(iconName)
+      return getIconsaxIconSync(iconsaxName) || null
+    }
 
     default:
       return null
@@ -296,11 +314,14 @@ function getIconDirect(
  */
 export function getIconNameForProvider(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled'
+  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
 ): string {
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
-  if (iconMapping && iconMapping[provider]) {
-    return iconMapping[provider]
+  if (iconMapping) {
+    const mappedName = (iconMapping as Record<string, string | undefined>)[provider]
+    if (mappedName) {
+      return mappedName
+    }
   }
   return iconName
 }

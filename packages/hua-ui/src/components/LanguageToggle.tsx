@@ -71,8 +71,8 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
     ],
     currentLanguage = "ko",
     onLanguageChange,
-    ...props 
-  }, ref) => {
+    ...props
+  }, _ref) => {
     const [isOpen, setIsOpen] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
 
@@ -84,7 +84,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
       lg: "h-14 w-14" // 56px - 더 넉넉한 크기
     }
 
-    const iconSizes = {
+    const _iconSizes = {
       sm: 16,
       md: 20,
       lg: 24

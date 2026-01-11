@@ -201,6 +201,14 @@ function NodeRenderer({ node, registry }: NodeRendererProps) {
     }
   }
 
+  // void 엘리먼트는 children을 받지 않음
+  const voidElements = ['Divider', 'Input', 'Textarea', 'Checkbox', 'Switch', 'Progress', 'Skeleton', 'Image', 'ScrollProgress'];
+  const isVoidElement = voidElements.includes(node.type);
+
+  if (isVoidElement || children === null) {
+    return <Component {...resolvedProps} {...eventProps} />;
+  }
+
   return (
     <Component {...resolvedProps} {...eventProps}>
       {children}

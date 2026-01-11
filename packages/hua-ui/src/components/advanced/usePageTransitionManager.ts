@@ -51,7 +51,7 @@ export const usePageTransitionManager = (
     defaultDuration = 500,
     defaultEasing = 'smooth',
     enableHistory = true,
-    enableProgress = true,
+    enableProgress: _enableProgress = true,
     enableDebug = false
   } = config
 
@@ -68,6 +68,7 @@ export const usePageTransitionManager = (
 
   const logDebug = useCallback((message: string, data?: unknown) => {
     if (enableDebug) {
+      // eslint-disable-next-line no-console
       console.log(`[PageTransitionManager] ${message}`, data)
     }
   }, [enableDebug])
@@ -173,7 +174,7 @@ export const usePageTransitionManager = (
   }, [logDebug])
 
   const resumeAll = useCallback(() => {
-    activeTransitionsRef.current.forEach(({ config }, id) => {
+    activeTransitionsRef.current.forEach(({ config }, _id) => {
       startTransition(config)
     })
   }, [startTransition])
@@ -209,12 +210,13 @@ export const usePageTransitionManager = (
   }, [state])
 
   useEffect(() => {
+    const activeTransitions = activeTransitionsRef.current
     return () => {
       // 컴포넌트 언마운트 시 모든 타이머 정리
-      activeTransitionsRef.current.forEach(({ timer }) => {
+      activeTransitions.forEach(({ timer }) => {
         clearTimeout(timer)
       })
-      activeTransitionsRef.current.clear()
+      activeTransitions.clear()
     }
   }, [])
 

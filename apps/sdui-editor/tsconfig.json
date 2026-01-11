@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@hua-labs/ui": ["../../packages/hua-ui/src"],
+      "@hua-labs/ui/sdui": ["../../packages/hua-ui/src/sdui"],
+      "@hua-labs/motion-core": ["../../packages/hua-motion-core/dist"],
+      "@hua-labs/i18n-core": ["../../packages/hua-i18n-core/dist"],
+      "@hua-labs/i18n-core-zustand": ["../../packages/hua-i18n-core-zustand/dist"],
+      "@hua-labs/hua-ux": ["../../packages/hua-ux/src"],
+      "@hua-labs/hua-ux/framework": ["../../packages/hua-ux/src/framework"],
+      "@hua-labs/hua-ux/framework/server": ["../../packages/hua-ux/src/framework/server"],
+      "@hua-labs/hua-ux/framework/config": ["../../packages/hua-ux/src/framework/config"],
+      "@hua-labs/hua-ux/presets": ["../../packages/hua-ux/src/presets"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

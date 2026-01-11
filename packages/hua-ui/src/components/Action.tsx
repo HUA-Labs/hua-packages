@@ -115,7 +115,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
 
     const runEffects = React.useCallback((event: React.MouseEvent) => {
       if (hapticFeedback && isBrowser && "vibrate" in navigator && !reduced) {
-        try { navigator.vibrate?.(30); } catch {}
+        try { navigator.vibrate?.(30); } catch { /* ignore */ }
       }
       
       if (soundEffect && !reduced && isBrowser) {
@@ -137,7 +137,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
           
           oscillator.start(audioContext.currentTime);
           oscillator.stop(audioContext.currentTime + 0.1);
-        } catch (e) {
+        } catch {
           // 오디오 컨텍스트를 지원하지 않는 환경에서는 무시
         }
       }

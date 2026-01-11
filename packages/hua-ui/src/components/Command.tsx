@@ -88,14 +88,14 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
     const isOpen = isControlled ? controlledOpen : internalOpen
     const searchValue = controlledSearchValue !== undefined ? controlledSearchValue : internalSearchValue
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = React.useCallback((newOpen: boolean) => {
       if (disabled) return
-      
+
       if (!isControlled) {
         setInternalOpen(newOpen)
       }
       onOpenChange?.(newOpen)
-    }
+    }, [disabled, isControlled, onOpenChange])
 
     const handleSearchChange = (value: string) => {
       if (!isControlled) {
@@ -120,11 +120,12 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
           event.preventDefault()
           setSelectedIndex((prev) => (prev - 1 + itemCount) % itemCount)
           break
-        case 'Enter':
+        case 'Enter': {
           event.preventDefault()
           const selectedItem = items?.[selectedIndex] as HTMLElement
           selectedItem?.click()
           break
+        }
         case 'Escape':
           event.preventDefault()
           handleOpenChange(false)
@@ -151,7 +152,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
       return () => {
         document.removeEventListener('keydown', handleKeyDown)
       }
-    }, [isOpen])
+    }, [isOpen, handleOpenChange])
 
     React.useEffect(() => {
       const selectedItem = listRef.current?.querySelector(`[data-command-item]:nth-child(${selectedIndex + 1})`) as HTMLElement

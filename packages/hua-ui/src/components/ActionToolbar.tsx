@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import type { IconName } from '../lib/icons';

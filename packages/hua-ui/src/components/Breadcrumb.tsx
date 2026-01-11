@@ -3,6 +3,7 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
+import type { IconName } from "../lib/icons"
 
 /**
  * Breadcrumb 항목 타입 / Breadcrumb item type
@@ -10,7 +11,7 @@ import { Icon } from "./Icon"
 export interface BreadcrumbItemData {
   label: string
   href?: string
-  icon?: string
+  icon?: IconName
 }
 
 /**
@@ -122,7 +123,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               isCurrent={isCurrent}
             >
               {item.icon && (
-                <Icon name={item.icon as any} className="w-4 h-4 mr-1" />
+                <Icon name={item.icon} className="w-4 h-4 mr-1" />
               )}
               {item.label}
             </BreadcrumbItem>

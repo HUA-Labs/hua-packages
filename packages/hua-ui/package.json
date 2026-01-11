@@ -13,9 +13,10 @@
       "default": "./dist/index.js"
     },
     "./advanced": {
-      "types": "./dist/advanced.d.ts",
-      "import": "./dist/advanced.mjs",
-      "require": "./dist/advanced.js"
+      "types": "./src/advanced.ts",
+      "import": "./src/advanced.ts",
+      "require": "./src/advanced.ts",
+      "default": "./dist/advanced.mjs"
     },
     "./advanced/dashboard": {
       "types": "./src/advanced/dashboard.ts",
@@ -75,7 +76,8 @@
     "test:coverage": "vitest --coverage",
     "analyze": "node scripts/analyze-bundle.js",
     "build:analyze": "pnpm build && pnpm analyze",
-    "lint": "echo 'Skipping lint for hua-ui (ESLint 8, needs separate config)'",
+    "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit",
     "generate:icon-types": "tsx scripts/generate-icon-types.ts",
     "generate:icon-snippets": "tsx scripts/generate-icon-snippets.ts"
@@ -86,6 +88,7 @@
     "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@phosphor-icons/react": "^2.1.10",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -94,6 +97,8 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.3.0",
     "jsdom": "^27.2.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
@@ -101,6 +106,7 @@
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.35.1",
     "vitest": "^4.0.14"
   },
   "peerDependencies": {

@@ -128,7 +128,7 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
     const average = data.length > 0 ? Math.round(total / data.length) : 0;
     const max = Math.max(...data);
 
-    const chartId = React.useId();
+    const _chartId = React.useId();
     const chartLabel = labels && labels.length > 0
       ? `미니 막대 그래프 - ${labels.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`
       : `미니 막대 그래프 - ${data.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`;

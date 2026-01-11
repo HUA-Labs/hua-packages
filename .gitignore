@@ -227,3 +227,6 @@ workspace/
 *storybook.log
 storybook-static
 .storybook-cache/
+
+# Iconsax source SVG files (converted to React components)
+packages/hua-ui/src/assets/svgs/*.svg
