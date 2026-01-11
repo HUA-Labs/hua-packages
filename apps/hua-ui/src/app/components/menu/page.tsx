@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Menu, MenuItem, MenuSeparator, MenuLabel, Button, Card, CardContent, Icon } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Menu, MenuItem, MenuSeparator, MenuLabel, Button, Card, CardContent, ComponentLayout } from '@hua-labs/hua-ux'
+import { User, Gear, Question, Plus, Trash, X, House, Star, Envelope, Users, ChartBar, DownloadSimple, Heart, Lock, Bell, Upload } from '@phosphor-icons/react'
 
 export default function MenuPage() {
   const [activeItem, setActiveItem] = useState<string>("")
@@ -59,24 +59,24 @@ export default function MenuPage() {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">세로 메뉴</h3>
               <Menu>
-                <MenuItem icon={<Icon name="user" className="w-4 h-4" />}>
+                <MenuItem icon={<User className="w-4 h-4" />}>
                   프로필 보기
                 </MenuItem>
-                <MenuItem icon={<Icon name="settings" className="w-4 h-4" />}>
+                <MenuItem icon={<Gear className="w-4 h-4" />}>
                   설정
                 </MenuItem>
-                <MenuItem icon={<Icon name="helpCircle" className="w-4 h-4" />}>
+                <MenuItem icon={<Question className="w-4 h-4" />}>
                   도움말
                 </MenuItem>
                 <MenuSeparator />
-                <MenuItem icon={<Icon name="add" className="w-4 h-4" />}>
+                <MenuItem icon={<Plus className="w-4 h-4" />}>
                   새 파일
                 </MenuItem>
-                <MenuItem icon={<Icon name="delete" className="w-4 h-4" />}>
+                <MenuItem icon={<Trash className="w-4 h-4" />}>
                   휴지통
                 </MenuItem>
                 <MenuSeparator />
-                <MenuItem icon={<Icon name="close" className="w-4 h-4" />}>
+                <MenuItem icon={<X className="w-4 h-4" />}>
                   로그아웃
                 </MenuItem>
               </Menu>
@@ -85,16 +85,16 @@ export default function MenuPage() {
             <div>
               <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">가로 메뉴</h3>
               <Menu variant="horizontal">
-                <MenuItem icon={<Icon name="home" className="w-4 h-4" />}>
+                <MenuItem icon={<House className="w-4 h-4" />}>
                   홈
                 </MenuItem>
-                <MenuItem icon={<Icon name="star" className="w-4 h-4" />}>
+                <MenuItem icon={<Star className="w-4 h-4" />}>
                   상품
                 </MenuItem>
-                <MenuItem icon={<Icon name="settings" className="w-4 h-4" />}>
+                <MenuItem icon={<Gear className="w-4 h-4" />}>
                   서비스
                 </MenuItem>
-                <MenuItem icon={<Icon name="mail" className="w-4 h-4" />}>
+                <MenuItem icon={<Envelope className="w-4 h-4" />}>
                   문의
                 </MenuItem>
               </Menu>
@@ -154,21 +154,21 @@ export default function MenuPage() {
               <div className="space-y-4">
                 <Menu>
                   <MenuLabel>메인 메뉴</MenuLabel>
-                  <MenuItem icon={<Icon name="home" className="w-4 h-4" />}>
+                  <MenuItem icon={<House className="w-4 h-4" />}>
                     대시보드
                   </MenuItem>
-                  <MenuItem icon={<Icon name="users" className="w-4 h-4" />}>
+                  <MenuItem icon={<Users className="w-4 h-4" />}>
                     사용자 관리
                   </MenuItem>
-                  <MenuItem icon={<Icon name="settings" className="w-4 h-4" />}>
+                  <MenuItem icon={<Gear className="w-4 h-4" />}>
                     시스템 설정
                   </MenuItem>
                   <MenuSeparator />
                   <MenuLabel>도구</MenuLabel>
-                  <MenuItem icon={<Icon name="barChart" className="w-4 h-4" />}>
+                  <MenuItem icon={<ChartBar className="w-4 h-4" />}>
                     분석
                   </MenuItem>
-                  <MenuItem icon={<Icon name="download" className="w-4 h-4" />}>
+                  <MenuItem icon={<DownloadSimple className="w-4 h-4" />}>
                     내보내기
                   </MenuItem>
                 </Menu>
@@ -183,16 +183,16 @@ export default function MenuPage() {
               </h3>
               <div className="space-y-4">
                 <Menu variant="horizontal">
-                  <MenuItem icon={<Icon name="home" className="w-4 h-4" />}>
+                  <MenuItem icon={<House className="w-4 h-4" />}>
                     홈
                   </MenuItem>
-                  <MenuItem icon={<Icon name="star" className="w-4 h-4" />}>
+                  <MenuItem icon={<Star className="w-4 h-4" />}>
                     상품
                   </MenuItem>
-                  <MenuItem icon={<Icon name="heart" className="w-4 h-4" />}>
+                  <MenuItem icon={<Heart className="w-4 h-4" />}>
                     찜
                   </MenuItem>
-                  <MenuItem icon={<Icon name="user" className="w-4 h-4" />}>
+                  <MenuItem icon={<User className="w-4 h-4" />}>
                     마이페이지
                   </MenuItem>
                 </Menu>
@@ -208,21 +208,21 @@ export default function MenuPage() {
               <div className="space-y-4">
                 <Menu>
                   <MenuLabel>계정 설정</MenuLabel>
-                  <MenuItem icon={<Icon name="user" className="w-4 h-4" />}>
+                  <MenuItem icon={<User className="w-4 h-4" />}>
                     프로필 편집
                   </MenuItem>
-                  <MenuItem icon={<Icon name="lock" className="w-4 h-4" />}>
+                  <MenuItem icon={<Lock className="w-4 h-4" />}>
                     비밀번호 변경
                   </MenuItem>
-                  <MenuItem icon={<Icon name="mail" className="w-4 h-4" />}>
+                  <MenuItem icon={<Envelope className="w-4 h-4" />}>
                     이메일 설정
                   </MenuItem>
                   <MenuSeparator />
                   <MenuLabel>알림 설정</MenuLabel>
-                  <MenuItem icon={<Icon name="bell" className="w-4 h-4" />}>
+                  <MenuItem icon={<Bell className="w-4 h-4" />}>
                     푸시 알림
                   </MenuItem>
-                  <MenuItem icon={<Icon name="mail" className="w-4 h-4" />}>
+                  <MenuItem icon={<Envelope className="w-4 h-4" />}>
                     이메일 알림
                   </MenuItem>
                 </Menu>
@@ -237,17 +237,17 @@ export default function MenuPage() {
               </h3>
               <div className="space-y-4">
                 <Menu>
-                  <MenuItem icon={<Icon name="add" className="w-4 h-4" />}>
+                  <MenuItem icon={<Plus className="w-4 h-4" />}>
                     새 파일
                   </MenuItem>
-                  <MenuItem icon={<Icon name="upload" className="w-4 h-4" />}>
+                  <MenuItem icon={<Upload className="w-4 h-4" />}>
                     파일 업로드
                   </MenuItem>
-                  <MenuItem icon={<Icon name="download" className="w-4 h-4" />}>
+                  <MenuItem icon={<DownloadSimple className="w-4 h-4" />}>
                     파일 다운로드
                   </MenuItem>
                   <MenuSeparator />
-                  <MenuItem icon={<Icon name="delete" className="w-4 h-4" />}>
+                  <MenuItem icon={<Trash className="w-4 h-4" />}>
                     휴지통
                   </MenuItem>
                 </Menu>
@@ -269,7 +269,7 @@ export default function MenuPage() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { Menu, MenuItem, MenuSeparator, MenuLabel, Icon } from '@hua-labs/ui'
+{`import { Menu, MenuItem, MenuSeparator, MenuLabel, Icon } from '@hua-labs/hua-ux'
 
 // 기본 세로 메뉴
 <Menu>

@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Navigation, NavigationList, NavigationItem, NavigationContent, Icon, Panel } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Navigation, NavigationList, NavigationItem, NavigationContent, Panel, ComponentLayout } from '@hua-labs/hua-ux'
+import { User, Gear, Bell } from '@phosphor-icons/react'
 
 // API 문서용 타입 정의
 const NAVIGATION_TYPES = {
@@ -59,7 +59,7 @@ export default function NavigationPage() {
           </Panel>
           <Panel padding="lg">
             <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-              <code>{`import { Navigation, NavigationList, NavigationItem, NavigationContent } from '@hua-labs/ui'
+              <code>{`import { Navigation, NavigationList, NavigationItem, NavigationContent } from '@hua-labs/hua-ux'
 
 <Navigation value={value} onValueChange={setValue}>
   <NavigationList>
@@ -91,15 +91,15 @@ export default function NavigationPage() {
           <Navigation defaultValue="profile">
             <NavigationList>
               <NavigationItem value="profile" className="flex items-center gap-2">
-                <Icon name="user" className="w-4 h-4" />
+                <User className="w-4 h-4" />
                 프로필
               </NavigationItem>
               <NavigationItem value="settings" className="flex items-center gap-2">
-                <Icon name="settings" className="w-4 h-4" />
+                <Gear className="w-4 h-4" />
                 설정
               </NavigationItem>
               <NavigationItem value="notifications" className="flex items-center gap-2">
-                <Icon name="bell" className="w-4 h-4" />
+                <Bell className="w-4 h-4" />
                 알림
               </NavigationItem>
             </NavigationList>

@@ -1,9 +1,9 @@
 "use client"
 
 import React from "react"
-import { Label } from "@hua-labs/ui"
-import { Input } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { Label } from '@hua-labs/hua-ux'
+import { Input } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function LabelPage() {
   return (
@@ -35,7 +35,7 @@ export default function LabelPage() {
           </div>
           <div className="mt-4">
             <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-              <code>{`import { Label, Input } from "@hua-labs/ui"
+              <code>{`import { Label, Input } from '@hua-labs/hua-ux'
 
 <div>
   <Label htmlFor="email">이메일</Label>

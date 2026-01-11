@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Skeleton, ComponentLayout } from "@hua-labs/ui"
+import { Skeleton, ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function SkeletonPage() {
   return (
@@ -149,7 +149,7 @@ export default function SkeletonPage() {
             <div>
               <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
               <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { Skeleton } from "@hua-labs/ui"
+{`import { Skeleton } from '@hua-labs/hua-ux'
 
 // 기본 스켈레톤
 <Skeleton className="h-4 w-[250px]" />

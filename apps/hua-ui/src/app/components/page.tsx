@@ -1,14 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { 
-  Panel, 
-  Icon,
-  Badge,
-  Action,
-  Input
-} from '@hua-labs/ui'
+import { Panel, Badge, Button, Input } from '@hua-labs/hua-ux'
+import { Stack, Star } from '@phosphor-icons/react'
 
 export default function ComponentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -42,7 +36,7 @@ export default function ComponentsPage() {
       name: '기본 컴포넌트',
       description: '가장 기본이 되는 UI 컴포넌트들',
       components: [
-        { name: 'Action', description: '액션 컴포넌트', href: '/components/action', status: 'stable' },
+        { name: 'Button', description: '버튼 컴포넌트', href: '/components/button', status: 'stable' },
         { name: 'Input', description: '입력 필드 컴포넌트', href: '/components/input', status: 'stable' },
         { name: 'Label', description: '라벨 컴포넌트', href: '/components/label', status: 'stable' },
         { name: 'Textarea', description: '텍스트 영역 컴포넌트', href: '/components/textarea', status: 'stable' },
@@ -50,7 +44,7 @@ export default function ComponentsPage() {
         { name: 'Checkbox', description: '체크박스 컴포넌트', href: '/components/checkbox', status: 'stable' },
         { name: 'Radio', description: '라디오 버튼 컴포넌트', href: '/components/radio', status: 'stable' },
         { name: 'Switch', description: '스위치 컴포넌트', href: '/components/switch', status: 'stable' },
-        { name: 'Panel', description: '패널 레이아웃 컴포넌트', href: '/components/panel', status: 'stable' },
+        { name: 'Card', description: '카드 레이아웃 컴포넌트', href: '/components/card', status: 'stable' },
         { name: 'Badge', description: '배지 컴포넌트', href: '/components/badge', status: 'stable' },
         { name: 'Avatar', description: '아바타 컴포넌트', href: '/components/avatar', status: 'stable' },
         { name: 'Form', description: '폼 컴포넌트', href: '/components/form', status: 'stable' },
@@ -64,7 +58,7 @@ export default function ComponentsPage() {
         { name: 'Menu', description: '메뉴 컴포넌트', href: '/components/menu', status: 'stable' },
         { name: 'Breadcrumb', description: '브레드크럼 컴포넌트', href: '/components/breadcrumb', status: 'stable' },
         { name: 'Pagination', description: '페이지네이션 컴포넌트', href: '/components/pagination', status: 'stable' },
-        { name: 'Navigation', description: '네비게이션 컴포넌트', href: '/components/navigation', status: 'stable' },
+        { name: 'Tabs', description: '탭 컴포넌트', href: '/components/tabs', status: 'stable' },
       ]
     },
     {
@@ -98,16 +92,6 @@ export default function ComponentsPage() {
       ]
     },
     {
-      name: '감정 표현',
-      description: '감정 분석 및 표현을 위한 컴포넌트들',
-      components: [
-        { name: 'EmotionButton', description: '감정 버튼 컴포넌트', href: '/components/emotion-button', status: 'stable' },
-        { name: 'EmotionSelector', description: '감정 선택 컴포넌트', href: '/components/emotion-selector', status: 'stable' },
-        { name: 'EmotionMeter', description: '감정 측정 컴포넌트', href: '/components/emotion-meter', status: 'stable' },
-        { name: 'EmotionAnalysis', description: '감정 분석 컴포넌트', href: '/components/emotion-analysis', status: 'beta' },
-      ]
-    },
-    {
       name: '유틸리티',
       description: '편의를 위한 유틸리티 컴포넌트들',
       components: [
@@ -121,7 +105,7 @@ export default function ComponentsPage() {
   ]
 
   // 모든 컴포넌트를 평면화
-  const allComponents = componentCategories.flatMap(category => 
+  const allComponents = componentCategories.flatMap(category =>
     category.components.map(component => ({
       ...component,
       category: category.name
@@ -167,16 +151,13 @@ export default function ComponentsPage() {
         {/* 헤더 */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            {React.createElement(Icon as any, {
-              name: "layers",
-              className: "w-8 h-8 text-blue-600"
-            })}
+            <Stack className="w-8 h-8 text-blue-600" weight="fill" />
           </div>
           <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">
             컴포넌트 라이브러리
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            HUA UI SDK에서 제공하는 모든 컴포넌트들을 확인하고 사용해보세요
+            HUA UX에서 제공하는 모든 컴포넌트들을 확인하고 사용해보세요
           </p>
         </div>
 
@@ -188,18 +169,18 @@ export default function ComponentsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-auto"
           />
-          <Action
+          <Button
             onClick={() => setShowBookmarks(!showBookmarks)}
             variant={showBookmarks ? 'secondary' : 'outline'}
             className="w-full sm:w-auto"
           >
             {showBookmarks ? '북마크 숨기기' : '북마크 보기'}
-          </Action>
+          </Button>
         </div>
 
         {/* 컴포넌트 카테고리 */}
         {showBookmarks ? (
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+          <Panel className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">
               북마크된 컴포넌트 ({bookmarkedComponents.length})
             </h2>
@@ -217,7 +198,7 @@ export default function ComponentsPage() {
                           onClick={() => toggleBookmark(component.name)}
                           className="text-yellow-500 hover:text-yellow-600 transition-colors"
                         >
-                          <Icon name="star" className="w-4 h-4 fill-current" />
+                          <Star className="w-4 h-4" weight="fill" />
                         </button>
                       </div>
                     </div>
@@ -230,26 +211,26 @@ export default function ComponentsPage() {
                   </div>
                   <div>
                     <a href={component.href}>
-                      <button className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                      <Button variant="outline" className="w-full">
                         자세히 보기
-                      </button>
+                      </Button>
                     </a>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Panel>
         ) : (
           <div className="space-y-12">
             {componentCategories.map((category) => {
               const categoryComponents = displayComponents.filter(
                 component => component.category === category.name
               )
-              
+
               if (categoryComponents.length === 0) return null
-              
+
               return (
-                <div key={category.name} className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+                <Panel key={category.name} className="p-6">
                   <div className="mb-6">
                     <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">
                       {category.name}
@@ -258,7 +239,7 @@ export default function ComponentsPage() {
                       {category.description}
                     </p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {category.components.map((component) => (
                       <div key={component.name} className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 hover:shadow-lg transition-shadow">
@@ -277,7 +258,10 @@ export default function ComponentsPage() {
                                     : 'text-slate-400 hover:text-yellow-500'
                                 }`}
                               >
-                                <Icon name="star" className={`w-4 h-4 ${bookmarks.includes(component.name) ? 'fill-current' : ''}`} />
+                                <Star
+                                  className="w-4 h-4"
+                                  weight={bookmarks.includes(component.name) ? 'fill' : 'regular'}
+                                />
                               </button>
                             </div>
                           </div>
@@ -285,18 +269,18 @@ export default function ComponentsPage() {
                             {component.description}
                           </p>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <a href={component.href} className="flex-1">
-                            <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            <Button className="w-full">
                               자세히 보기
-                            </button>
+                            </Button>
                           </a>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </Panel>
               )
             })}
           </div>
@@ -304,7 +288,7 @@ export default function ComponentsPage() {
 
         {/* 통계 */}
         <div className="mt-12 text-center">
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+          <Panel className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">
               컴포넌트 통계
             </h3>
@@ -317,7 +301,7 @@ export default function ComponentsPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {componentCategories.reduce((acc, cat) => 
+                  {componentCategories.reduce((acc, cat) =>
                     acc + cat.components.filter(c => c.status === 'stable').length, 0
                   )}
                 </div>
@@ -325,16 +309,16 @@ export default function ComponentsPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-yellow-600">
-                  {componentCategories.reduce((acc, cat) => 
+                  {componentCategories.reduce((acc, cat) =>
                     acc + cat.components.filter(c => c.status === 'beta').length, 0
                   )}
                 </div>
                 <div className="text-sm text-slate-600 dark:text-slate-400">베타 버전</div>
               </div>
             </div>
-          </div>
+          </Panel>
         </div>
       </div>
     </div>
   )
-} 
+}

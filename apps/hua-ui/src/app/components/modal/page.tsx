@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { Modal, Button, Card, CardContent, Icon } from "@hua-labs/ui"
+import { Modal, Button, Card, CardContent } from '@hua-labs/hua-ux'
+import { Check } from '@phosphor-icons/react'
 
 export default function ModalPage() {
   const [isOpen, setIsOpen] = useState(false)
@@ -188,7 +189,7 @@ export default function ModalPage() {
             <div className="p-6">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="check" className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">작업 완료!</h3>
                 <p className="text-slate-600 dark:text-slate-400">
@@ -299,7 +300,7 @@ export default function ModalPage() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { Modal, Button } from '@hua-labs/ui'
+{`import { Modal, Button } from '@hua-labs/hua-ux'
 import { useState } from 'react'
 
 function MyComponent() {

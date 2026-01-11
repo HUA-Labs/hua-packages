@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react"
-import { BottomSheet, Button, Card, CardContent, Icon } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { BottomSheet, Button, Card, CardContent, ComponentLayout } from '@hua-labs/hua-ux'
+import { X, Gear } from '@phosphor-icons/react'
 
 export default function BottomSheetPage() {
   const [open, setOpen] = useState(false)
@@ -51,7 +51,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpen(false)}
                 >
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
@@ -119,7 +119,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenSmall(false)}
                 >
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4">
@@ -139,7 +139,7 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenLarge(false)}
                 >
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
@@ -203,13 +203,13 @@ export default function BottomSheetPage() {
                   size="sm"
                   onClick={() => setOpenCustom(false)}
                 >
-                  <Icon name="close" className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
               <div className="flex-1 p-4 overflow-y-auto">
                 <div className="text-center mb-6">
                   <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="settings" className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    <Gear className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">설정</h3>
                   <p className="text-slate-600 dark:text-slate-400">
@@ -354,7 +354,7 @@ export default function BottomSheetPage() {
                 기본 사용법
               </h3>
               <pre className="bg-slate-800 dark:bg-slate-900 text-slate-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`import { BottomSheet, Button } from '@hua-labs/ui'
+{`import { BottomSheet, Button } from '@hua-labs/hua-ux'
 import { useState } from 'react'
 
 function MyComponent() {

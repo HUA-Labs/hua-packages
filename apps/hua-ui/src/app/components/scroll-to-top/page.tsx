@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { ScrollToTop, Card, CardContent } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
+import { ScrollToTop, Card, CardContent } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function ScrollToTopPage() {
   return (
@@ -91,7 +91,7 @@ export default function ScrollToTopPage() {
             <div>
               <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
               <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { ScrollToTop } from "@hua-labs/ui"
+{`import { ScrollToTop } from '@hua-labs/hua-ux'
 
 // 기본 스크롤 버튼
 <ScrollToTop />`}

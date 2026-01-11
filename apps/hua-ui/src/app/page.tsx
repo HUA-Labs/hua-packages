@@ -1,38 +1,63 @@
 'use client'
 
 import React from 'react'
-import { useState } from 'react'
-
-import { Action, Icon, Panel } from '@hua-labs/ui'
-import { useHydrationContext } from './components/HydrationProvider'
+import { useState, useEffect } from 'react'
+import { Button, Panel, CodeBlock } from '@hua-labs/hua-ux'
+import {
+  Lightning,
+  Palette,
+  Heart,
+  DownloadSimple,
+  GithubLogo,
+  Stack,
+  BookOpen,
+  Cursor,
+  Warning,
+  CreditCard,
+  Square,
+  TextT,
+  FolderOpen,
+  ChartBar,
+  ChatCircle
+} from '@phosphor-icons/react'
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false)
-  const { isHydrated, isClient } = useHydrationContext()
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsLoaded(true)
   }, [])
 
   const features = [
     {
-      icon: "zap" as const,
+      icon: Lightning,
       title: "빠르고 가벼움",
       description: "최적화된 번들 크기로 빠른 로딩과 부드러운 성능을 제공합니다.",
       color: "blue"
     },
     {
-      icon: "palette" as const,
+      icon: Palette,
       title: "완벽한 커스터마이징",
       description: "Tailwind CSS 기반으로 모든 스타일을 쉽게 커스터마이징할 수 있습니다.",
       color: "green"
     },
     {
-      icon: "heart" as const,
+      icon: Heart,
       title: "개발자 친화적",
       description: "TypeScript 지원과 직관적인 API로 개발 경험을 향상시킵니다.",
       color: "purple"
     }
+  ]
+
+  const componentPreviews = [
+    { name: "Button", icon: Cursor, description: "다양한 스타일의 버튼" },
+    { name: "Alert", icon: Warning, description: "알림 메시지" },
+    { name: "Panel", icon: CreditCard, description: "카드 레이아웃" },
+    { name: "Modal", icon: Square, description: "모달 다이얼로그" },
+    { name: "Input", icon: TextT, description: "입력 필드" },
+    { name: "Navigation", icon: FolderOpen, description: "탭 네비게이션" },
+    { name: "Progress", icon: ChartBar, description: "진행률 표시" },
+    { name: "Toast", icon: ChatCircle, description: "토스트 메시지" }
   ]
 
   const getColorClasses = (color: string) => {
@@ -44,35 +69,17 @@ export default function HomePage() {
     }
   }
 
-  // 하이드레이션 중에는 기본 스타일로 렌더링
-  if (!isClient) {
-    return (
-      <div className="min-h-screen py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-20">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              아름다운 디자인 시스템
-            </h1>
-            <p className="text-lg sm:text-xl lg:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed">
-              HUA Labs의 가볍고 스마트한 UI 컴포넌트 라이브러리
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 히어로 섹션 */}
-        <div 
+        <div
           className={`text-center py-16 sm:py-20 lg:py-24 relative overflow-hidden rounded-3xl mb-16 sm:mb-20 lg:mb-24 transition-all duration-1000 ${
             isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
           style={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-            animation: isHydrated ? 'gradientShift 8s ease-in-out infinite' : 'none'
+            animation: 'gradientShift 8s ease-in-out infinite'
           }}
         >
           {/* 배경 장식 */}
@@ -81,55 +88,76 @@ export default function HomePage() {
             <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-white/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
           </div>
-          
+
           <div className="relative z-10 bg-white/10 backdrop-blur-sm rounded-3xl p-8 sm:p-12 lg:p-16 mx-4">
-            <h1 
+            <h1
               className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-white hover:scale-105 transition-transform duration-300"
             >
               아름다운 디자인 시스템
             </h1>
             <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-10 max-w-4xl mx-auto leading-relaxed">
-              HUA Labs의 가볍고 스마트한 UI 컴포넌트 라이브러리. 
-              Tailwind CSS와 Lucide React만으로 구축된 완벽한 디자인 시스템입니다.
+              HUA Labs의 가볍고 스마트한 UI 컴포넌트 라이브러리.
+              Tailwind CSS와 Phosphor Icons만으로 구축된 완벽한 디자인 시스템입니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
-              <Action 
+              <Button
                 variant="glass"
                 size="lg"
                 className="w-full sm:w-auto hover:scale-105 transition-all duration-300 shadow-lg"
                 onClick={() => window.location.href = '/components'}
+                icon={<DownloadSimple className="w-5 h-5" />}
               >
-                <Icon name={"download" as any} className="w-5 h-5 mr-2" />
                 시작하기
-              </Action>
-              <Action 
+              </Button>
+              <Button
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 hover:scale-105 transition-all duration-300 shadow-lg"
                 onClick={() => window.open('https://github.com/hua-labs/hua-ui', '_blank')}
+                icon={<GithubLogo className="w-5 h-5" />}
               >
-                <Icon name={"github" as any} className="w-5 h-5 mr-2" />
                 GitHub
-              </Action>
+              </Button>
             </div>
+          </div>
+        </div>
+
+        {/* 설치 섹션 */}
+        <div className="mb-16 sm:mb-20 lg:mb-24">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900 dark:text-white">
+              빠른 설치
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400">
+              한 줄의 명령어로 시작하세요
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <CodeBlock
+              code="pnpm add @hua-labs/hua-ux"
+              language="bash"
+            />
           </div>
         </div>
 
         {/* 특징 섹션 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 sm:mb-20 lg:mb-24">
-          {features.map((feature, index) => (
-            <Panel key={index} style="elevated" padding="large" className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <div className={`w-16 h-16 ${getColorClasses(feature.color)} rounded-full flex items-center justify-center mx-auto mb-6`}>
-                <Icon name={feature.icon as any} className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-slate-900 dark:text-white">
-                {feature.title}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </Panel>
-          ))}
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon
+            return (
+              <Panel key={index} style="elevated" className="text-center p-6 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <div className={`w-16 h-16 ${getColorClasses(feature.color)} rounded-full flex items-center justify-center mx-auto mb-6`}>
+                  <IconComponent className="w-8 h-8" weight="fill" />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-slate-900 dark:text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {feature.description}
+                </p>
+              </Panel>
+            )
+          })}
         </div>
 
         {/* 컴포넌트 미리보기 */}
@@ -142,58 +170,52 @@ export default function HomePage() {
               30개 이상의 컴포넌트로 모든 UI 요구사항을 충족하세요
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "Action", icon: "mousePointer" as const, description: "다양한 스타일의 버튼" },
-              { name: "Alert", icon: "alertCircle" as const, description: "알림 메시지" },
-              { name: "Panel", icon: "creditCard" as const, description: "카드 레이아웃" },
-              { name: "Modal", icon: "square" as const, description: "모달 다이얼로그" },
-              { name: "Input", icon: "type" as const, description: "입력 필드" },
-              { name: "Navigation", icon: "folder" as const, description: "탭 네비게이션" },
-              { name: "Progress", icon: "barChart" as const, description: "진행률 표시" },
-              { name: "Toast", icon: "messageSquare" as const, description: "토스트 메시지" }
-            ].map((component, index) => (
-              <Panel key={index} style="solid" padding="medium" className="hover:shadow-lg transition-all duration-300 hover:scale-105">
-                <div className="flex items-center gap-3 mb-3">
-                  <Icon name={component.icon as any} className="w-6 h-6 text-blue-600" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">{component.name}</h3>
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{component.description}</p>
-              </Panel>
-            ))}
+            {componentPreviews.map((component, index) => {
+              const IconComponent = component.icon
+              return (
+                <Panel key={index} className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  <div className="flex items-center gap-3 mb-3">
+                    <IconComponent className="w-6 h-6 text-blue-600" />
+                    <h3 className="font-semibold text-slate-900 dark:text-white">{component.name}</h3>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{component.description}</p>
+                </Panel>
+              )
+            })}
           </div>
         </div>
 
         {/* CTA 섹션 */}
-        <Panel style="glass" padding="large" className="text-center py-16 sm:py-20 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700">
+        <Panel style="glass" className="text-center py-16 sm:py-20 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-700">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
             지금 시작해보세요
           </h2>
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-3xl mx-auto">
-            HUA UI와 함께 아름다운 웹 애플리케이션을 만들어보세요.
+            HUA UX와 함께 아름다운 웹 애플리케이션을 만들어보세요.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Action 
-              size="lg" 
+            <Button
+              size="lg"
               className="w-full sm:w-auto"
               onClick={() => window.location.href = '/components'}
+              icon={<Stack className="w-5 h-5" />}
             >
-              <Icon name={"layers" as any} className="w-5 h-5 mr-2" />
               컴포넌트 보기
-            </Action>
-            <Action 
-              variant="outline" 
-              size="lg" 
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
               className="w-full sm:w-auto"
               onClick={() => window.location.href = '/docs'}
+              icon={<BookOpen className="w-5 h-5" />}
             >
-              <Icon name={"bookOpen" as any} className="w-5 h-5 mr-2" />
               문서 읽기
-            </Action>
+            </Button>
           </div>
         </Panel>
       </div>
     </div>
   )
-} 
+}

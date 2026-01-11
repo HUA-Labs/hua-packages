@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { Select, SelectOption, Label, Icon, ComponentLayout } from "@hua-labs/ui"
+import { Select, SelectOption, Label, ComponentLayout } from '@hua-labs/hua-ux'
+import { Globe, User } from '@phosphor-icons/react'
 
 export default function SelectPage() {
   return (
@@ -44,7 +45,7 @@ export default function SelectPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Select, SelectOption, Label } from "@hua-labs/ui"
+                <code>{`import { Select, SelectOption, Label } from '@hua-labs/hua-ux'
 
 <div>
   <Label htmlFor="basic-select">국가 선택</Label>
@@ -219,9 +220,9 @@ export default function SelectPage() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="icon-select">아이콘이 있는 선택</Label>
-                  <Select 
-                    id="icon-select" 
-                    leftIcon={<Icon name={"globe" as any} size={16} />}
+                  <Select
+                    id="icon-select"
+                    leftIcon={<Globe size={16} />}
                     placeholder="국가를 선택하세요"
                   >
                     <SelectOption value="kr">대한민국</SelectOption>
@@ -231,9 +232,9 @@ export default function SelectPage() {
                 </div>
                 <div>
                   <Label htmlFor="user-select">사용자 아이콘</Label>
-                  <Select 
-                    id="user-select" 
-                    leftIcon={<Icon name={"user" as any} size={16} />}
+                  <Select
+                    id="user-select"
+                    leftIcon={<User size={16} />}
                     placeholder="사용자를 선택하세요"
                   >
                     <SelectOption value="user1">김철수</SelectOption>
@@ -245,10 +246,10 @@ export default function SelectPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Icon } from "@hua-labs/ui"
+                <code>{`import { Globe, User } from '@phosphor-icons/react'
 
-<Select 
-  leftIcon={<Icon name={"globe" as any} size={16} />}
+<Select
+  leftIcon={<Globe size={16} />}
   placeholder="국가를 선택하세요"
 >
   <SelectOption value="kr">대한민국</SelectOption>
@@ -256,8 +257,8 @@ export default function SelectPage() {
   <SelectOption value="jp">일본</SelectOption>
 </Select>
 
-<Select 
-  leftIcon={<Icon name={"user" as any} size={16} />}
+<Select
+  leftIcon={<User size={16} />}
   placeholder="사용자를 선택하세요"
 >
   <SelectOption value="user1">김철수</SelectOption>

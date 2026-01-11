@@ -10,10 +10,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@hua-labs/i18n-sdk": "workspace:*",
-    "@hua-labs/ui": "workspace:*",
+    "@hua-labs/hua-ux": "workspace:*",
+    "@phosphor-icons/react": "^2.1.7",
     "clsx": "^2.1.0",
-    "lucide-react": "^0.263.1",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",

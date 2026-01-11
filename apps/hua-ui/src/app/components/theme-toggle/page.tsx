@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { ThemeToggle, Card, CardContent, ComponentLayout } from "@hua-labs/ui"
+import { ThemeToggle, Card, CardContent, ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function ThemeTogglePage() {
   return (
@@ -99,7 +99,7 @@ export default function ThemeTogglePage() {
               <div>
                 <h3 className="font-medium mb-2 text-slate-900 dark:text-white">기본 사용법</h3>
                 <pre className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-200 dark:border-slate-700">
-{`import { ThemeToggle } from "@hua-labs/ui"
+{`import { ThemeToggle } from '@hua-labs/hua-ux'
 
 // 기본 테마 토글
 <ThemeToggle />`}

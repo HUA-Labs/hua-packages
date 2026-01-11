@@ -1,12 +1,8 @@
 "use client"
 
 import React from "react"
-import { Action, Icon, ComponentLayout } from "@hua-labs/ui"
-
-// 디버깅을 위한 로그
-console.log("Action component:", Action)
-console.log("Icon component:", Icon)
-console.log("ComponentLayout component:", ComponentLayout)
+import { Action, ComponentLayout } from '@hua-labs/hua-ux'
+import { DownloadSimple, Heart, ShareNetwork } from '@phosphor-icons/react'
 
 // API 문서용 타입 정의
 const ACTION_TYPES = {
@@ -47,7 +43,7 @@ export default function ActionPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Action } from "@hua-labs/ui"
+                <code>{`import { Action } from '@hua-labs/hua-ux'
 
 <Action>기본 액션</Action>
 <Action variant="outline">아웃라인</Action>
@@ -123,31 +119,33 @@ export default function ActionPage() {
             <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-lg">
               <div className="flex flex-wrap gap-4">
                 <Action>
-                  <Icon name="download" className="w-4 h-4 mr-2" />
+                  <DownloadSimple className="w-4 h-4 mr-2" />
                   다운로드
                 </Action>
                 <Action variant="outline">
-                  <Icon name="heart" className="w-4 h-4 mr-2" />
+                  <Heart className="w-4 h-4 mr-2" />
                   좋아요
                 </Action>
                 <Action variant="ghost">
-                  <Icon name="share" className="w-4 h-4 mr-2" />
+                  <ShareNetwork className="w-4 h-4 mr-2" />
                   공유
                 </Action>
               </div>
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`<Action>
-  <Icon name="download" className="w-4 h-4 mr-2" />
+                <code>{`import { DownloadSimple, Heart, ShareNetwork } from '@phosphor-icons/react'
+
+<Action>
+  <DownloadSimple className="w-4 h-4 mr-2" />
   다운로드
 </Action>
 <Action variant="outline">
-  <Icon name="heart" className="w-4 h-4 mr-2" />
+  <Heart className="w-4 h-4 mr-2" />
   좋아요
 </Action>
 <Action variant="ghost">
-  <Icon name="share" className="w-4 h-4 mr-2" />
+  <ShareNetwork className="w-4 h-4 mr-2" />
   공유
 </Action>`}</code>
               </pre>
@@ -203,7 +201,7 @@ export default function ActionPage() {
                     HUA UI의 스마트 클래스 병합 유틸리티로 중복 클래스를 자동으로 해결합니다.
                   </p>
                   <pre className="bg-slate-800 text-slate-100 p-3 rounded text-sm">
-                    <code>{`import { merge } from "@hua-labs/ui"
+                    <code>{`import { merge } from '@hua-labs/hua-ux'
 
 // 중복 클래스 자동 해결
 merge("px-2 py-1", "px-4") // "py-1 px-4"
@@ -217,7 +215,7 @@ merge("text-red-500", "text-blue-500") // "text-blue-500"`}</code>
                     조건부 클래스 병합으로 더 깔끔한 코드를 작성할 수 있습니다.
                   </p>
                   <pre className="bg-slate-800 text-slate-100 p-3 rounded text-sm">
-                    <code>{`import { mergeIf } from "@hua-labs/ui"
+                    <code>{`import { mergeIf } from '@hua-labs/hua-ux'
 
 // 조건부 클래스 적용
 mergeIf(isActive, "bg-blue-500", "bg-gray-200")
@@ -231,7 +229,7 @@ mergeIf(isLoading, "opacity-50 cursor-not-allowed")`}</code>
                     객체 기반 클래스 병합으로 복잡한 조건을 쉽게 관리할 수 있습니다.
                   </p>
                   <pre className="bg-slate-800 text-slate-100 p-3 rounded text-sm">
-                    <code>{`import { mergeMap } from "@hua-labs/ui"
+                    <code>{`import { mergeMap } from '@hua-labs/hua-ux'
 
 // 객체 기반 조건부 클래스
 mergeMap({

@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Textarea, Label, ComponentLayout } from "@hua-labs/ui"
+import { Textarea, Label, ComponentLayout } from '@hua-labs/hua-ux'
 
 export default function TextareaPage() {
   return (
@@ -41,7 +41,7 @@ export default function TextareaPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Textarea, Label } from "@hua-labs/ui"
+                <code>{`import { Textarea, Label } from '@hua-labs/hua-ux'
 
 <div>
   <Label htmlFor="basic-textarea">메모</Label>

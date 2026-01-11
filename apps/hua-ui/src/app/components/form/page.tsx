@@ -1,14 +1,14 @@
 "use client"
 
 import React, { useState } from "react"
-import { Form, FormField, FormGroup } from "@hua-labs/ui"
-import { ComponentLayout } from "@hua-labs/ui"
-import { Button } from "@hua-labs/ui"
-import { Input } from "@hua-labs/ui"
-import { Textarea } from "@hua-labs/ui"
-import { Select, SelectOption } from "@hua-labs/ui"
-import { Checkbox } from "@hua-labs/ui"
-import { Radio } from "@hua-labs/ui"
+import { Form, FormField, FormGroup } from '@hua-labs/hua-ux'
+import { ComponentLayout } from '@hua-labs/hua-ux'
+import { Button } from '@hua-labs/hua-ux'
+import { Input } from '@hua-labs/hua-ux'
+import { Textarea } from '@hua-labs/hua-ux'
+import { Select, SelectOption } from '@hua-labs/hua-ux'
+import { Checkbox } from '@hua-labs/hua-ux'
+import { Radio } from '@hua-labs/hua-ux'
 
 export default function FormPage() {
   const [formData, setFormData] = useState({

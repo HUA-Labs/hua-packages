@@ -6,7 +6,7 @@ import {
   Action,
   Badge,
   ComponentLayout
-} from "@hua-labs/ui"
+} from '@hua-labs/hua-ux'
 
 // API 문서용 타입 정의
 const PANEL_TYPES = {
@@ -52,7 +52,7 @@ export default function PanelPage() {
             </div>
             <div className="mt-4">
               <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto">
-                <code>{`import { Panel, Action } from "@hua-labs/ui"
+                <code>{`import { Panel, Action } from '@hua-labs/hua-ux'
 
 <Panel style="solid" padding="large">
   <h3 className="text-xl font-semibold mb-2">패널 제목</h3>
