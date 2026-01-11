@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { createPortal } from "react-dom"
 import { merge } from "../lib/utils"
 
 /**
@@ -160,20 +161,20 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   const titleId = title ? `modal-title-${generatedTitleId}` : undefined;
   const descriptionId = description ? `modal-description-${generatedDescId}` : undefined;
 
+  // SSR에서는 document가 없으므로 체크
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <div
       className={merge(
-        "fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center p-4 overflow-hidden", // PWA 호환성 개선
-        centered ? "items-center" : "items-start pt-16", // 64px 상단 여백
+        "fixed inset-0 z-50 overflow-y-auto",
         className
       )}
-      style={{
-        width: '100vw',
-        height: '100vh',
-        minHeight: '100vh'
-      }}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
@@ -183,29 +184,29 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       {/* 배경 오버레이 */}
       {showBackdrop && (
         <div className={merge(
-          "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
+          "fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
           backdropClassName
         )} />
       )}
-      
-      {/* 모달 컨테이너 */}
-      <div
-        ref={combinedRef}
-        className={merge(
-          "relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out overflow-hidden",
-          // 반응형: 모바일 전체, 데스크톱 고정
-          "w-[calc(100vw-2rem)]", // 모바일: 화면 너비 - 패딩
-          sizeClasses[size],       // 데스크톱: md:w-[72rem]
-          "max-w-[calc(100vw-2rem)] md:max-w-none", // 모바일: 최대 너비 제한, 데스크톱: 제한 없음
-          "flex-none" // flex 컨테이너에서 크기 유지
-        )}
-        style={{
-          animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-          maxHeight: "90vh",
-          marginTop: centered ? 'auto' : '0',
-          marginBottom: centered ? 'auto' : '0'
-        }}
-      >
+
+      {/* 센터링 컨테이너 */}
+      <div className={merge(
+        "flex min-h-full justify-center p-4",
+        centered ? "items-center" : "items-start pt-16"
+      )}>
+        {/* 모달 컨테이너 */}
+        <div
+          ref={combinedRef}
+          className={merge(
+            "relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out",
+            "w-full",
+            sizeClasses[size],
+            "max-w-[calc(100vw-2rem)]"
+          )}
+          style={{
+            animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+          }}
+        >
         
         {/* 헤더 */}
         {title && (
@@ -251,8 +252,17 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
           {children}
         </div>
       </div>
+      </div>
     </div>
   )
+
+  // 브라우저에서만 createPortal 사용 (SSR 호환)
+  if (mounted && typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+
+  // SSR fallback - 그냥 렌더링 (첫 렌더링에는 보이지 않음)
+  return null
 })
 
 Modal.displayName = "Modal" 
