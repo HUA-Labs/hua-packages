@@ -71,9 +71,9 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     open: controlledOpen,
     onOpenChange,
     trigger,
-    placement = "bottom",
-    align = "start",
-    offset = 8,
+    placement: _placement = "bottom",
+    align: _align = "start",
+    offset: _offset = 8,
     disabled = false,
     ...props 
   }, ref) => {
@@ -84,20 +84,20 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = React.useCallback((newOpen: boolean) => {
       if (disabled) return
-      
+
       if (!isControlled) {
         setInternalOpen(newOpen)
       }
       onOpenChange?.(newOpen)
-    }
+    }, [disabled, isControlled, onOpenChange])
 
     const handleContextMenu = (event: React.MouseEvent) => {
       event.preventDefault()
       if (disabled) return
 
-      const rect = event.currentTarget.getBoundingClientRect()
+      const _rect = event.currentTarget.getBoundingClientRect()
       const x = event.clientX
       const y = event.clientY
 
@@ -144,8 +144,8 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (
-          triggerRef.current && 
-          menuRef.current && 
+          triggerRef.current &&
+          menuRef.current &&
           !triggerRef.current.contains(event.target as Node) &&
           !menuRef.current.contains(event.target as Node)
         ) {
@@ -159,7 +159,7 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
           document.removeEventListener('mousedown', handleClickOutside)
         }
       }
-    }, [isOpen])
+    }, [isOpen, handleOpenChange])
 
     return (
       <div ref={ref} className={merge("relative", className)} {...props}>

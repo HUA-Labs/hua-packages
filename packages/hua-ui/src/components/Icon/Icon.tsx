@@ -3,6 +3,7 @@ import type { LucideProps } from 'lucide-react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
 import { getIconFromProvider, initPhosphorIcons } from '../../lib/icon-providers'
+import { loadIconsaxIcon, normalizeIconsaxIconName } from '../../lib/iconsax-loader'
 import { resolveIconAlias } from '../../lib/icon-aliases'
 import { useIconContext, type IconSet } from './IconProvider'
 import { type PhosphorWeight } from './icon-store'
@@ -114,6 +115,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
   const [isClient, setIsClient] = React.useState(false)
   const [phosphorReady, setPhosphorReady] = React.useState(false)
+  const [iconsaxIcon, setIconsaxIcon] = React.useState<React.ComponentType<React.SVGProps<SVGSVGElement>> | null>(null)
   
   React.useEffect(() => {
     setIsClient(true)
@@ -135,6 +137,28 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   
   // Alias 해결 (back, prev → arrowLeft 등)
   iconName = resolveIconAlias(iconName) as AllIconName
+
+  // Iconsax 아이콘 동적 로딩
+  React.useEffect(() => {
+    if (iconSet === 'iconsax' && isClient) {
+      const resolvedIconName = emotion ? emotionIcons[emotion] : 
+                                status ? statusIcons[status] : 
+                                resolveIconAlias(name) as AllIconName
+      const iconsaxName = normalizeIconsaxIconName(resolvedIconName)
+      
+      // 캐시에 없으면 비동기 로드
+      loadIconsaxIcon(iconsaxName).then((loadedIcon) => {
+        if (loadedIcon) {
+          setIconsaxIcon(loadedIcon)
+        }
+      }).catch(() => {
+        // 아이콘 로드 실패 시 무시
+        setIconsaxIcon(null)
+      })
+    } else {
+      setIconsaxIcon(null)
+    }
+  }, [iconSet, name, emotion, status, isClient])
   
   // 색상 변형 클래스 (먼저 선언 - fallback에서 사용)
   const variantClasses = mergeMap({
@@ -149,7 +173,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   
   // 서버사이드에서는 빈 span 반환 (hydration 오류 방지)
   // Return empty span on server-side (prevent hydration errors)
-  if (!isClient || (iconSet === 'phosphor' && !phosphorReady)) {
+  if (!isClient || (iconSet === 'phosphor' && !phosphorReady) || (iconSet === 'iconsax' && !iconsaxIcon)) {
     return (
       <span
         style={{ width: iconSize, height: iconSize }}
@@ -170,6 +194,13 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     IconComponent = (icons[iconName as IconName] || null) as IconComponentType | null
     
     // 2. 없으면 동적으로 Lucide에서 가져오기 (fallback)
+    if (!IconComponent) {
+      IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
+    }
+  } else if (iconSet === 'iconsax') {
+    // Iconsax 아이콘은 state에서 가져오기 (비동기 로딩)
+    IconComponent = iconsaxIcon as IconComponentType | null
+    // 캐시에서도 확인 (이미 로드된 경우)
     if (!IconComponent) {
       IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
@@ -223,7 +254,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   if (iconSet === 'phosphor') {
     iconProps.weight = iconWeight
   } else {
-    // Lucide/Untitled는 strokeWidth 사용
+    // Lucide/Iconsax/Untitled는 strokeWidth 사용
     iconProps.strokeWidth = iconStrokeWidth
   }
 

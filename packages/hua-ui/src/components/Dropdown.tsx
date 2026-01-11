@@ -86,14 +86,14 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = React.useCallback((newOpen: boolean) => {
       if (disabled) return
-      
+
       if (!isControlled) {
         setInternalOpen(newOpen)
       }
       onOpenChange?.(newOpen)
-    }
+    }, [disabled, isControlled, onOpenChange])
 
     const handleTriggerClick = () => {
       handleOpenChange(!isOpen)
@@ -181,8 +181,8 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (
-          triggerRef.current && 
-          dropdownRef.current && 
+          triggerRef.current &&
+          dropdownRef.current &&
           !triggerRef.current.contains(event.target as Node) &&
           !dropdownRef.current.contains(event.target as Node)
         ) {
@@ -196,7 +196,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
           document.removeEventListener('mousedown', handleClickOutside)
         }
       }
-    }, [isOpen])
+    }, [isOpen, handleOpenChange])
 
     const getPlacementClasses = () => {
       switch (placement) {

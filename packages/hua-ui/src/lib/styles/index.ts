@@ -18,6 +18,7 @@ export {
   createRoundedStyles,
   createShadowStyles,
   createHoverStyles,
+  HUA_SPRING_EASING,
   type SizeStyles,
   type Rounded,
   type Shadow,

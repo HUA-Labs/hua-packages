@@ -375,15 +375,15 @@ export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonE
  */
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ 
-    className, 
+    className,
     value,
     onValueChange,
-    orientation = "horizontal",
+    orientation: _orientation = "horizontal",
     variant = "default",
     size = "md",
     active = false,
     children,
-    ...props 
+    ...props
   }, ref) => {
     const getVariantClasses = () => {
       switch (variant) {
@@ -430,7 +430,6 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
     }
 
     const handleClick = () => {
-      console.log('TabsTrigger clicked:', value, 'onValueChange:', !!onValueChange)
       if (onValueChange) {
         onValueChange(value)
       }

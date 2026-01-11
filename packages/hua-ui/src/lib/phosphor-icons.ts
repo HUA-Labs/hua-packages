@@ -49,7 +49,7 @@ export async function getPhosphorIcon(iconName: string) {
     const mappedName = iconMap[iconName] || iconName
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (phosphor as any)[mappedName] || null
-  } catch (error) {
+  } catch {
     console.warn('Phosphor Icons not available')
     return null
   }

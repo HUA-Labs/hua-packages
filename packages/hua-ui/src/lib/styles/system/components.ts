@@ -39,8 +39,9 @@ export type ButtonShadow = "none" | "sm" | "md" | "lg" | "xl";
 
 /**
  * Button Hover 타입
+ * "springy"가 HUA-UI 시그니처 (공 튕기듯 미세한 반동)
  */
-export type ButtonHover = "scale" | "glow" | "slide" | "none";
+export type ButtonHover = "springy" | "scale" | "glow" | "slide" | "none";
 
 /**
  * Branding 색상 인터페이스
@@ -218,7 +219,7 @@ export function createButtonStyles(
     size,
     rounded = "md",
     shadow = "md",
-    hover = "scale",
+    hover = "springy",  // HUA-UI 시그니처: 미세한 스프링 반동
     theme,
     branding,
     reducedMotion = false,

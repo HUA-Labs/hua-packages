@@ -122,7 +122,7 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
     glowIntensity = 0,
     glowColor = "blue",
     particleEffect = false,
-    hoverEffect = false,
+    hoverEffect: _hoverEffect = false,
     animationEffect = false,
     padding = "md",
     customPadding,

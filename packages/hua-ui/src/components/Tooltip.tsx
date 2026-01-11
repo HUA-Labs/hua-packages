@@ -79,7 +79,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       if (disabled) return
       
       const rect = e.currentTarget.getBoundingClientRect()
-      const tooltipRect = tooltipRef.current?.getBoundingClientRect()
+      const _tooltipRect = tooltipRef.current?.getBoundingClientRect()
       
       let x = 0
       let y = 0
@@ -136,7 +136,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       }
     }
 
-    const getPositionClasses = () => {
+    const _getPositionClasses = () => {
       switch (position) {
         case "top":
           return "bottom-full left-1/2 -translate-x-1/2 mb-2" // 8px 간격

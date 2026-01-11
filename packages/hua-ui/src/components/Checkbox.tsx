@@ -71,7 +71,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     id,
     ...props 
   }, ref) => {
-    const checkboxId = id || React.useId()
+    const generatedId = React.useId()
+    const checkboxId = id || generatedId
     const labelId = label ? `${checkboxId}-label` : undefined
     const descriptionId = description ? `${checkboxId}-description` : undefined
     const sizeClasses = {

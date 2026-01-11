@@ -66,7 +66,8 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     id,
     ...props 
   }, ref) => {
-    const radioId = id || React.useId()
+    const generatedId = React.useId()
+    const radioId = id || generatedId
     const labelId = label ? `${radioId}-label` : undefined
     const descriptionId = description ? `${radioId}-description` : undefined
     const sizeClasses = {

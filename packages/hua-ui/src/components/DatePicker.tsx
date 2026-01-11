@@ -42,7 +42,7 @@ const sizeClasses = {
   lg: "h-12 text-base px-5",
 }
 
-const formatDate = (date: Date | null, format: string = "YYYY-MM-DD", locale: string = "ko-KR"): string => {
+const formatDate = (date: Date | null, format: string = "YYYY-MM-DD", _locale: string = "ko-KR"): string => {
   if (!date) return ""
   
   const year = date.getFullYear()
