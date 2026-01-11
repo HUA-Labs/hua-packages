@@ -54,7 +54,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   height = 2,
   color = 'gradient',
   position = 'top',
-  animated = true,
+  animated: _animated = true,
   showPercentage = false,
   ...props
 }, ref) => {

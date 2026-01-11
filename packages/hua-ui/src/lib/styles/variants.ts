@@ -151,28 +151,47 @@ export function createShadowStyles(shadow: Shadow = "md"): string {
 /**
  * Hover 효과 타입
  */
-export type HoverEffect = "scale" | "glow" | "slide" | "none";
+export type HoverEffect = "scale" | "glow" | "slide" | "springy" | "none";
+
+/**
+ * HUA-UI 스프링 이징
+ * 공 튕기듯 아주 미세한 반동 - cubic-bezier(0.34, 1.56, 0.64, 1)
+ */
+export const HUA_SPRING_EASING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 /**
  * Hover 효과 스타일 생성 함수
- * 
+ *
  * @param hover - Hover 효과 타입
  * @param reducedMotion - 애니메이션 축소 설정 여부
  * @returns 생성된 hover 클래스 문자열
+ *
+ * @description
+ * HUA-UI 시그니처: "스륵 부드럽고 아주 미세하게 쫀득"
+ * - 스프링 이징으로 미세한 반동 효과
+ * - 1.5% 스케일 변화로 자연스러운 피드백
  */
 export function createHoverStyles(
-  hover: HoverEffect = "scale",
+  hover: HoverEffect = "springy",
   reducedMotion: boolean = false
 ): string {
   if (reducedMotion || hover === "none") return "";
-  
+
+  // 스프링 이징 스타일 (Tailwind arbitrary value)
+  const springTransition = "[transition:transform_180ms_cubic-bezier(0.34,1.56,0.64,1)]";
+
   const hoverMap: Record<HoverEffect, string> = {
-    scale: "hover:scale-105 transition-transform duration-200",
-    glow: "hover:shadow-2xl hover:shadow-blue-500/25 dark:hover:shadow-cyan-400/25 transition-shadow duration-300",
-    slide: "hover:-translate-y-1 transition-transform duration-200",
+    // HUA-UI 시그니처 스프링 효과 (기본값) - 아주아주 미세하게
+    springy: `hover:scale-[1.008] active:scale-[0.992] ${springTransition} transform-gpu`,
+    // 기존 scale (스프링 없음)
+    scale: "hover:scale-[1.008] active:scale-[0.992] transition-transform duration-200 transform-gpu",
+    // 글로우 효과
+    glow: "hover:shadow-lg hover:shadow-primary/15 transition-shadow duration-300",
+    // 슬라이드 효과 (미세하게)
+    slide: `hover:-translate-y-[0.5px] ${springTransition} transform-gpu`,
     none: "",
   };
-  
+
   return hoverMap[hover];
 }
 

@@ -65,7 +65,7 @@ const ScrollToTop = ({
   ...props 
 }: ScrollToTopProps) => {
     // HUA Motion의 useScrollToggle 훅 사용
-    const { isVisible, scrollToTop, mounted } = useScrollToggle({
+    const { isVisible, scrollToTop, mounted: _mounted } = useScrollToggle({
       threshold,
       showOnMount,
       smooth

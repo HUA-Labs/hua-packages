@@ -60,7 +60,7 @@ const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
     const isControlled = value !== undefined
     const currentValue = isControlled ? value : activeTab
 
-    const handleTabChange = (newValue: string) => {
+    const _handleTabChange = (newValue: string) => {
       if (!isControlled) {
         setActiveTab(newValue)
       }
@@ -115,14 +115,14 @@ export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivEl
 }
 
 const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
-  ({ 
-    className, 
+  ({
+    className,
     value,
-    onValueChange,
+    onValueChange: _onValueChange,
     variant = "pills",
     scale = "medium",
     children,
-    ...props 
+    ...props
   }, ref) => {
     const getStyleClasses = () => {
       switch (variant) {

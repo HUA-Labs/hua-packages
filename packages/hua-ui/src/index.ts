@@ -72,6 +72,8 @@ export { Upload } from './components/Upload';
 export type { UploadProps, UploadedFile } from './components/Upload';
 export { Autocomplete } from './components/Autocomplete';
 export type { AutocompleteProps, AutocompleteOption } from './components/Autocomplete';
+export { ColorPicker } from './components/ColorPicker';
+export type { ColorPickerProps } from './components/ColorPicker';
 
 // UI Components - Interactive
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './components/Accordion';
@@ -84,6 +86,7 @@ export { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandS
 export { ScrollArea } from './components/ScrollArea';
 export { ScrollToTop } from './components/ScrollToTop';
 export { ThemeProvider } from './components/ThemeProvider';
+export type { ThemeProviderProps, ThemeProviderState } from './components/ThemeProvider';
 export { ThemeToggle } from './components/ThemeToggle';
 export { useTheme } from './components/ThemeProvider';
 
@@ -108,6 +111,41 @@ export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
 export { merge, mergeIf, mergeMap, cn, formatRelativeTime } from './lib/utils';
 export { Slot, composeRefs, mergeProps } from './lib/Slot';
 export type { SlotProps } from './lib/Slot';
+
+// Style System
+export {
+  // Colors
+  createColorStyles,
+  useColorStyles,
+  // Variants
+  createVariantStyles,
+  createSizeStyles,
+  createRoundedStyles,
+  createShadowStyles,
+  createHoverStyles,
+  HUA_SPRING_EASING,
+  // Utils
+  withDarkMode,
+  createGradient,
+  withOpacity,
+  isTextWhite,
+  isGradientVariant,
+  responsive,
+  conditionalClass,
+} from './lib/styles';
+export type {
+  ColorStyleConfig,
+  ColorStyles,
+  SizeStyles,
+  Rounded,
+  Shadow,
+  HoverEffect,
+} from './lib/styles';
+
+// Micro Motion System - "스륵 부드럽고 쫀득"
+export { useMicroMotion, getMicroMotionClasses } from './lib/motion';
+export type { MicroMotionConfig, MicroMotionPreset, MicroMotionState } from './lib/motion';
+export { EASING_FUNCTIONS, DURATIONS, COMPONENT_MOTION_DEFAULTS, CSS_MOTION_VARS } from './lib/motion';
 
 // Common Types
 export type { Color, Size, BaseVariant, ExtendedVariant } from './lib/types/common';

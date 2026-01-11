@@ -60,7 +60,7 @@ export function CodeBlock({
   showLineNumbers = false,
   showCopyButton = true,
   onCopy,
-  copySuccessMessage = "Copied!",
+  copySuccessMessage: _copySuccessMessage = "Copied!",
   className,
   maxHeight,
 }: CodeBlockProps) {

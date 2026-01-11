@@ -101,7 +101,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({
 
   const maxValue = Math.max(...series.flatMap((s) => s.data), 10);
 
-  const chartId = React.useId();
+  const _chartId = React.useId();
   const chartLabel = series.length > 0
     ? `트렌드 차트 - ${series.length}개 시리즈, ${safeCategories.length}개 카테고리, 최대값 ${maxValue.toLocaleString()}`
     : `트렌드 차트 - ${safeCategories.length}개 카테고리`;
@@ -181,7 +181,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({
           );
         })}
         <div className="absolute inset-x-0 bottom-0 flex text-[10px] text-slate-400">
-          {safeCategories.map((label, idx) => (
+          {safeCategories.map((label, _idx) => (
             <div key={label} className="flex-1 text-center">
               {label}
             </div>

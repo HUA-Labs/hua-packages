@@ -155,8 +155,10 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   }
 
   // 접근성을 위한 ID 생성
-  const titleId = title ? `modal-title-${React.useId()}` : undefined;
-  const descriptionId = description ? `modal-description-${React.useId()}` : undefined;
+  const generatedTitleId = React.useId()
+  const generatedDescId = React.useId()
+  const titleId = title ? `modal-title-${generatedTitleId}` : undefined;
+  const descriptionId = description ? `modal-description-${generatedDescId}` : undefined;
 
   if (!isOpen) return null
 

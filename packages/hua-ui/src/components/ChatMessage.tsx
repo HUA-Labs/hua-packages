@@ -123,8 +123,8 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     ...props 
   }, ref) => {
     const isUser = message.role === "user"
-    const isAssistant = message.role === "assistant"
-    const isSystem = message.role === "system"
+    const _isAssistant = message.role === "assistant"
+    const _isSystem = message.role === "system"
 
     const getEmotionColor = (emotion?: string) => {
       if (!emotion) return "bg-gray-100"

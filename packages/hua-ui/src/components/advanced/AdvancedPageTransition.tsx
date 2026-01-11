@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { merge } from '../../lib/utils'
 
 export type TransitionType = 
@@ -54,7 +54,7 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
 }, ref) => {
   const [isVisible, setIsVisible] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [_isTransitioning, setIsTransitioning] = useState(false)
   const animationRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
 
@@ -80,14 +80,14 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
     return easingFunctions[easingType]
   }
 
-  const animate = (timestamp: number) => {
+  const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) {
       startTimeRef.current = timestamp
     }
 
     const elapsed = timestamp - startTimeRef.current
     const easingFunction = getEasingFunction(easing)
-    
+
     let currentProgress = Math.min(elapsed / duration, 1)
     currentProgress = easingFunction(currentProgress)
 
@@ -95,32 +95,32 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
     setIsVisible(currentProgress > 0.1)
 
     if (currentProgress < 1) {
-      animationRef.current = requestAnimationFrame(animate)
+      animationRef.current = requestAnimationFrame((t) => animate(t))
     } else {
       setIsTransitioning(false)
       setProgress(1)
       onComplete?.()
     }
-  }
+  }, [duration, easing, onComplete])
 
-  const startTransition = () => {
+  const startTransition = useCallback(() => {
     setIsTransitioning(true)
     setProgress(0)
     onStart?.()
-    
+
     startTimeRef.current = null
     animationRef.current = requestAnimationFrame(animate)
-  }
+  }, [animate, onStart])
 
   useEffect(() => {
     if (autoStart) {
       const timer = setTimeout(() => {
         startTransition()
       }, delay)
-      
+
       return () => clearTimeout(timer)
     }
-  }, [autoStart, delay])
+  }, [autoStart, delay, startTransition])
 
   useEffect(() => {
     return () => {

@@ -3,7 +3,6 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
-import { Button } from "./Button"
 import type { IconName } from "../lib/icons"
 
 /**

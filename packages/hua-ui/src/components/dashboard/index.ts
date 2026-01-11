@@ -57,6 +57,9 @@ export type {
 export { TrendChart } from "./TrendChart";
 export type { TrendChartProps, TrendSeries } from "./TrendChart";
 
+export { BarChart } from "./BarChart";
+export type { BarChartProps } from "./BarChart";
+
 export { TransactionDetailDrawer } from "./TransactionDetailDrawer";
 export type {
   TransactionDetailDrawerProps,

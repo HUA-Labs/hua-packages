@@ -35,9 +35,10 @@ type Shadow = "none" | "sm" | "md" | "lg" | "xl";
 
 /**
  * 버튼 호버 효과 / Button hover effect
- * @typedef {"scale" | "glow" | "slide" | "none"} Hover
+ * "springy"가 HUA-UI 시그니처 - 공 튕기듯 미세한 반동
+ * @typedef {"springy" | "scale" | "glow" | "slide" | "none"} Hover
  */
-type Hover = "scale" | "glow" | "slide" | "none";
+type Hover = "springy" | "scale" | "glow" | "slide" | "none";
 
 /**
  * 그라디언트 색상 이름 / Gradient color name
@@ -57,7 +58,7 @@ type GradientName = "blue" | "purple" | "green" | "orange" | "pink" | "custom";
  * @property {string} [customGradient] - 커스텀 그라디언트 클래스 (variant="gradient"일 때) / Custom gradient class (when variant="gradient")
  * @property {Rounded} [rounded="md"] - 모서리 둥글기 / Border radius
  * @property {Shadow} [shadow="md"] - 그림자 크기 / Shadow size
- * @property {Hover} [hover="scale"] - 호버 효과 / Hover effect
+ * @property {Hover} [hover="springy"] - 호버 효과 (HUA-UI 시그니처) / Hover effect (HUA-UI signature)
  * @property {boolean} [fullWidth=false] - 전체 너비 사용 / Use full width
  * @property {boolean} [iconOnly=false] - 아이콘만 표시 (aria-label 필수) / Icon only (aria-label required)
  * @property {string} [aria-label] - 접근성을 위한 레이블 (iconOnly일 때 필수) / Accessibility label (required when iconOnly)
@@ -170,7 +171,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     customGradient,
     rounded = "md",
     shadow = "md",
-    hover = "scale",
+    hover = "springy",
     fullWidth,
     iconOnly,
     className,
@@ -257,7 +258,6 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
   );
 
   if (iconOnly && !("aria-label" in rest) && process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.warn("[Button] iconOnly 사용 시 aria-label을 제공하세요.");
   }
 
@@ -276,7 +276,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
 
   // 앵커 모드
   if ("href" in rest && rest.href) {
-    const { onClick, target, rel, href, "aria-label": ariaLabel, className: anchorClassName, ...anchorProps } = rest as AnchorProps;
+    const { onClick, target, rel, href, "aria-label": _ariaLabel, className: anchorClassName, ...anchorProps } = rest as AnchorProps;
     const isDisabled = !!disabled || loading;
 
     const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {

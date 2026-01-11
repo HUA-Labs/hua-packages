@@ -70,7 +70,8 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     id,
     ...props 
   }, ref) => {
-    const switchId = id || React.useId()
+    const generatedId = React.useId()
+    const switchId = id || generatedId
     const labelId = label ? `${switchId}-label` : undefined
     const descriptionId = description ? `${switchId}-description` : undefined
     const sizeClasses = {

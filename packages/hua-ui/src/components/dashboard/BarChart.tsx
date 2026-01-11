@@ -162,7 +162,7 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
     }, [title, data.length, max]);
     
     const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
-    const chartId = React.useId();
+    const _chartId = React.useId();
 
     return (
       <div

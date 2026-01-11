@@ -115,7 +115,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
     requiredInputValue,
     showCancel = true,
     size = "md"
-  }, ref) => {
+  }, _ref) => {
     // 타입별 아이콘과 색상
     const typeConfig = {
       danger: {

@@ -355,24 +355,23 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
   )
 }
 
-// 편의 함수들
-export const showToast = (toast: Omit<Toast, "id">) => {
-  // 이 함수는 ToastProvider 내부에서만 사용 가능
-
+// 편의 함수들 (ToastProvider 내부에서만 사용 가능 - 스텁 함수)
+export const showToast = (_toast: Omit<Toast, "id">) => {
+  // ToastProvider 컨텍스트 필요
 }
 
-export const showSuccessToast = (message: string, title?: string, duration?: number) => {
-
+export const showSuccessToast = (_message: string, _title?: string, _duration?: number) => {
+  // ToastProvider 컨텍스트 필요
 }
 
-export const showErrorToast = (message: string, title?: string, duration?: number) => {
-
+export const showErrorToast = (_message: string, _title?: string, _duration?: number) => {
+  // ToastProvider 컨텍스트 필요
 }
 
-export const showWarningToast = (message: string, title?: string, duration?: number) => {
-
+export const showWarningToast = (_message: string, _title?: string, _duration?: number) => {
+  // ToastProvider 컨텍스트 필요
 }
 
-export const showInfoToast = (message: string, title?: string, duration?: number) => {
-
+export const showInfoToast = (_message: string, _title?: string, _duration?: number) => {
+  // ToastProvider 컨텍스트 필요
 } 

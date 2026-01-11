@@ -594,7 +594,8 @@ The library includes built-in error handling:
 
 ## Requirements
 
-- React >= 16.8.0
+- React >= 19.0.0
+- React DOM >= 19.0.0
 - TypeScript (recommended)
 
 ## Bundle Size
@@ -640,9 +641,9 @@ This package has been refactored for better maintainability:
 ## Related Packages
 
 - `@hua-labs/i18n-core-zustand`: Zustand state management integration adapter
-- `@hua-labs/i18n-loaders`: Production-ready loaders, caching, and preloading helpers
-- `@hua-labs/i18n-advanced`: Advanced features like pluralization, date formatting, etc.
-- `@hua-labs/i18n-debug`: Debug tools and development helpers
+- `@hua-labs/i18n-loaders` (Coming Soon): Production-ready loaders, caching, and preloading helpers
+- `@hua-labs/i18n-advanced` (Coming Soon): Advanced features like pluralization, date formatting, etc.
+- `@hua-labs/i18n-debug` (Coming Soon): Debug tools and development helpers
 
 ## License
 
@@ -728,8 +729,8 @@ function MyComponent() {
 ### 관련 패키지
 
 - `@hua-labs/i18n-core-zustand`: Zustand 상태 관리 통합 어댑터
-- `@hua-labs/i18n-loaders`: 프로덕션 레디 로더, 캐싱 및 프리로딩 헬퍼
-- `@hua-labs/i18n-advanced`: 복수형, 날짜 포맷팅 등의 고급 기능
-- `@hua-labs/i18n-debug`: 디버그 도구 및 개발 헬퍼
+- `@hua-labs/i18n-loaders` (Coming Soon): 프로덕션 레디 로더, 캐싱 및 프리로딩 헬퍼
+- `@hua-labs/i18n-advanced` (Coming Soon): 복수형, 날짜 포맷팅 등의 고급 기능
+- `@hua-labs/i18n-debug` (Coming Soon): 디버그 도구 및 개발 헬퍼
 
 자세한 내용은 [상세 가이드](./DETAILED_GUIDE.md)를 참고하세요.

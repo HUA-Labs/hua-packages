@@ -5,7 +5,6 @@ import { merge } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { useColorStyles } from "../../lib/styles/colors";
-import { createVariantStyles } from "../../lib/styles/variants";
 import type { Color } from "../../lib/types/common";
 
 /**

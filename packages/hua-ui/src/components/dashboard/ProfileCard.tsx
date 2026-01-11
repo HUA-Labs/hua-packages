@@ -3,7 +3,6 @@
 import React from "react";
 import { merge } from "../../lib/utils";
 import { Icon } from "../Icon";
-import type { IconName } from "../../lib/icons";
 
 /**
  * 멤버십 등급 인터페이스

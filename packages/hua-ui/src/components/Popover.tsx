@@ -78,14 +78,14 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = React.useCallback((newOpen: boolean) => {
       if (disabled) return
-      
+
       if (!isControlled) {
         setInternalOpen(newOpen)
       }
       onOpenChange?.(newOpen)
-    }
+    }, [disabled, isControlled, onOpenChange])
 
     const handleTriggerClick = () => {
       handleOpenChange(!isOpen)
@@ -109,7 +109,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
           document.removeEventListener('mousedown', handleClickOutside)
         }
       }
-    }, [isOpen])
+    }, [isOpen, handleOpenChange])
 
     const getPositionClasses = () => {
       const baseClasses = "absolute z-50"

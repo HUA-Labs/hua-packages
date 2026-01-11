@@ -13,7 +13,7 @@ type Theme = "light" | "dark" | "system"
  * @property {boolean} [enableSystem=true] - 시스템 테마 감지 활성화 / Enable system theme detection
  * @property {boolean} [enableTransition=true] - 테마 전환 애니메이션 활성화 / Enable theme transition animation
  */
-interface ThemeProviderProps {
+export interface ThemeProviderProps {
   children: React.ReactNode
   defaultTheme?: Theme
   storageKey?: string
@@ -29,7 +29,7 @@ interface ThemeProviderProps {
  * @property {"light" | "dark"} resolvedTheme - 실제 적용된 테마 (system일 경우 시스템 테마) / Actually applied theme (system theme when system is selected)
  * @property {() => void} toggleTheme - 테마 토글 함수 / Theme toggle function
  */
-interface ThemeProviderState {
+export interface ThemeProviderState {
   theme: Theme
   setTheme: (theme: Theme) => void
   resolvedTheme: "light" | "dark"

@@ -5,7 +5,7 @@
  * 상태관리는 서비스 레벨에서 관리 (Zustand 등)
  */
 
-export type IconSet = 'lucide' | 'phosphor' | 'untitled'
+export type IconSet = 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
 
 export type PhosphorWeight = 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
 
@@ -36,6 +36,8 @@ export const getDefaultStrokeWidth = (set: IconSet): number => {
       return 1.25 // Phosphor는 weight 사용
     case 'untitled':
       return 1.5
+    case 'iconsax':
+      return 1.5 // Iconsax는 stroke-width 1.5가 기본
     default:
       return 1.25
   }

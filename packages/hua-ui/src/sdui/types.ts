@@ -74,8 +74,9 @@ export interface SDUIPageSchema {
 
 /**
  * 컴포넌트 레지스트리 타입
+ * Record<string, unknown>으로 처리하고 렌더링 시 타입 가드 사용
  */
-export type SDUIComponentRegistry = Record<string, React.ComponentType<any>>;
+export type SDUIComponentRegistry = Record<string, React.ComponentType<Record<string, unknown>>>;
 
 /**
  * 렌더러 컨텍스트
