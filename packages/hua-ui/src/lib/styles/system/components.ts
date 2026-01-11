@@ -113,33 +113,39 @@ function createButtonVariantStyle(
     }
   }
 
+  // HUA UI 기본 색상: CSS 변수 arbitrary value 사용
+  // @theme 없이도 동작 - HuaUxLayout에서 CSS 변수 자동 주입
   switch (variant) {
     case "default":
-      return "bg-primary text-primary-foreground hover:bg-primary/90";
+      // 프라이머리 (CSS 변수 - arbitrary value)
+      return "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:opacity-90";
 
     case "destructive":
-      return "bg-destructive text-destructive-foreground hover:bg-destructive/90";
+      return "bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)] hover:opacity-90";
 
     case "outline":
-      return "border-2 border-border bg-transparent text-foreground hover:bg-secondary";
+      return "border-2 border-[var(--color-input)] bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-foreground)]";
 
     case "secondary":
-      return "bg-secondary text-secondary-foreground hover:bg-secondary/80";
+      return "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:opacity-80";
 
     case "ghost":
-      return "bg-transparent text-foreground hover:bg-secondary";
+      return "bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-foreground)]";
 
     case "link":
-      return "bg-transparent text-primary underline hover:text-primary/80";
+      return "bg-transparent text-[var(--color-primary)] underline hover:opacity-80";
 
     case "gradient":
-      return "bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-lg";
+      // 그라데이션은 직접 색상 유지 (CSS 변수 그라데이션 지원 어려움)
+      return "bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-lg hover:from-teal-600 hover:to-cyan-600";
 
     case "neon":
-      return "bg-background text-primary border border-primary/30 shadow-lg shadow-primary/20 hover:shadow-primary/40";
+      // 네온은 직접 색상 유지 (특수 효과)
+      return "bg-slate-900 dark:bg-slate-950 text-teal-400 border border-teal-500/50 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 hover:border-teal-400";
 
     case "glass":
-      return "bg-card/50 backdrop-blur-md border border-border text-foreground hover:bg-card/70";
+      // glass는 직접 색상 사용 (opacity modifier가 arbitrary value에서 안 됨)
+      return "bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 hover:bg-white/70 dark:hover:bg-slate-900/70";
 
     default:
       return "";
@@ -175,16 +181,16 @@ function createButtonFocusStyle(
   variant: ButtonVariant,
   _theme: Theme
 ): string {
-  const baseFocus = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  const baseFocus = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
 
   switch (variant) {
     case "destructive":
-      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-destructive)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
 
     case "outline":
     case "ghost":
     case "link":
-      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0";
+      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-0";
 
     default:
       return baseFocus;
