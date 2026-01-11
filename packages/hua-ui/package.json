@@ -85,6 +85,7 @@
   "dependencies": {
     "clsx": "^2.0.0",
     "lucide-react": "^0.562.0",
+    "sugar-high": "^0.9.5",
     "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
