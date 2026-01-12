@@ -60,7 +60,8 @@
       "import": "./dist/components/advanced/*.mjs",
       "require": "./dist/components/advanced/*.js"
     },
-    "./styles/toast.css": "./src/styles/toast.css"
+    "./styles/toast.css": "./src/styles/toast.css",
+    "./styles/recommended-theme.css": "./src/styles/recommended-theme.css"
   },
   "files": [
     "dist",
