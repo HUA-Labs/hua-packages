@@ -182,6 +182,7 @@ function MyComponent() {
 #### 기본 모션 훅
 - `useFadeIn` - 페이드 인 애니메이션
 - `useSlideUp` - 슬라이드 업 애니메이션
+- `useSlideDown` - 슬라이드 다운 애니메이션
 - `useSlideLeft` - 슬라이드 왼쪽 애니메이션
 - `useSlideRight` - 슬라이드 오른쪽 애니메이션
 - `useScaleIn` - 스케일 인 애니메이션
@@ -189,6 +190,11 @@ function MyComponent() {
 - `usePulse` - 펄스 애니메이션
 - `useSpringMotion` - 스프링 물리 애니메이션
 - `useGradient` - 그라디언트 애니메이션
+
+#### 스태거 및 리스트 훅
+- `useStaggerMotion` - 여러 항목에 대한 스태거 애니메이션
+- `useCardList` - 카드 리스트 애니메이션
+- `useSkeleton` - 스켈레톤 로딩 애니메이션
 
 #### 상호작용 훅
 - `useHoverMotion` - 호버 트리거 애니메이션
