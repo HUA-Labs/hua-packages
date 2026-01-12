@@ -56,10 +56,18 @@ declare global {
   }
 }
 
-// 기본 언어 설정
+// 기본 언어 설정 (10개 언어 지원)
 const defaultLanguages = [
   { code: 'ko', name: 'Korean', nativeName: '한국어' },
   { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'en-IN', name: 'English (India)', nativeName: 'English (India)' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+  { code: 'zh', name: 'Chinese (Simplified)', nativeName: '简体中文' },
+  { code: 'zh-TW', name: 'Chinese (Traditional)', nativeName: '繁體中文' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch' },
+  { code: 'fr', name: 'French', nativeName: 'Français' },
 ];
 
 /**
