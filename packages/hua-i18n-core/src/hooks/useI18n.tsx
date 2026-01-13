@@ -526,11 +526,12 @@ export function useI18n(): I18nContextType {
  * 간단한 번역 훅 (hua-api 스타일)
  */
 export function useTranslation() {
-  const { t, tWithParams, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
-  
+  const { t, tWithParams, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
+
   return {
     t,
     tWithParams,
+    getRawValue,
     currentLanguage,
     setLanguage,
     isLoading,

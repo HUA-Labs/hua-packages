@@ -146,27 +146,27 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
     }
 
     const titleSizeClasses = {
-      sm: "text-3xl md:text-4xl",
-      md: "text-4xl md:text-5xl",
-      lg: "text-5xl md:text-6xl",
-      xl: "text-6xl md:text-7xl",
-      full: "text-6xl md:text-7xl lg:text-8xl"
+      sm: "text-2xl sm:text-3xl md:text-4xl leading-tight",
+      md: "text-3xl sm:text-4xl md:text-5xl leading-tight",
+      lg: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight",
+      xl: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight",
+      full: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight"
     }
 
     const subtitleSizeClasses = {
-      sm: "text-lg md:text-xl",
-      md: "text-xl md:text-2xl",
-      lg: "text-2xl md:text-3xl",
-      xl: "text-3xl md:text-4xl",
-      full: "text-3xl md:text-4xl lg:text-5xl"
+      sm: "text-base sm:text-lg md:text-xl leading-snug",
+      md: "text-lg sm:text-xl md:text-2xl leading-snug",
+      lg: "text-lg sm:text-xl md:text-2xl lg:text-3xl leading-snug",
+      xl: "text-xl sm:text-2xl md:text-3xl leading-snug",
+      full: "text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-snug"
     }
 
     const descriptionSizeClasses = {
-      sm: "text-base md:text-lg",
-      md: "text-lg md:text-xl",
-      lg: "text-lg md:text-xl",
-      xl: "text-xl md:text-2xl",
-      full: "text-xl md:text-2xl"
+      sm: "text-sm sm:text-base md:text-lg leading-relaxed",
+      md: "text-base sm:text-lg md:text-xl leading-relaxed",
+      lg: "text-base sm:text-lg md:text-xl leading-relaxed",
+      xl: "text-base sm:text-lg md:text-xl leading-relaxed",
+      full: "text-lg sm:text-xl md:text-2xl leading-relaxed"
     }
 
     const currentBg = isSlideMode ? (currentContent.background || background) : background
@@ -290,7 +290,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
             className="animate-in fade-in slide-in-from-bottom-4 duration-500"
           >
             <h1 className={merge(
-              "font-extrabold mb-6 text-foreground",
+              "font-extrabold mb-4 sm:mb-6 text-foreground",
               titleSizeClasses[size]
             )}>
               <span className="block gradient-text">
@@ -298,7 +298,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
               </span>
               {currentContent.subtitle && (
                 <span className={merge(
-                  "block font-semibold mt-4 text-muted-foreground",
+                  "block font-semibold mt-2 sm:mt-4 text-muted-foreground",
                   subtitleSizeClasses[size]
                 )}>
                   {currentContent.subtitle}
@@ -307,7 +307,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
             </h1>
 
             <p className={merge(
-              "text-muted-foreground mb-10 max-w-2xl mx-auto",
+              "text-muted-foreground mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto",
               descriptionSizeClasses[size]
             )}>
               {currentContent.description}
