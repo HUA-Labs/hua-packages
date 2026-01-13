@@ -2,7 +2,6 @@
 
 import React from "react"
 import { merge } from "../lib/utils"
-import { Icon } from "./Icon"
 
 /**
  * Select 컴포넌트의 props / Select component props
@@ -97,10 +96,12 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:border-blue-400/50 focus:ring-blue-400/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:focus:border-blue-400/50 dark:focus:ring-blue-400/20 dark:focus:bg-slate-700/20"
     }
 
+    // Spacing system: 4px grid - matching Input component
+    // pr-10 is added separately for arrow icon space
     const sizeClasses = {
-      sm: "h-8 px-3 text-sm",
-      md: "h-10 px-4 text-base",
-      lg: "h-12 px-4 text-lg"
+      sm: "h-8 pl-2 text-sm",
+      md: "h-10 pl-3 text-sm",
+      lg: "h-12 pl-4 text-base"
     }
 
     const stateClasses = error 
@@ -162,10 +163,23 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           {children}
         </select>
         <div className={merge(
-          "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none transition-transform duration-200",
+          "absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none",
+          "transition-transform duration-200 ease-out",
           isFocused && "rotate-180"
         )}>
-          <Icon name="chevronDown" size={16} />
+          <svg
+            className="w-4 h-4 text-gray-500 dark:text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </div>
       </div>
     )
