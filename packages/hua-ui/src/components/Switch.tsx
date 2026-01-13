@@ -74,16 +74,25 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     const switchId = id || generatedId
     const labelId = label ? `${switchId}-label` : undefined
     const descriptionId = description ? `${switchId}-description` : undefined
+    // Track sizes - proper proportions for smooth toggle
     const sizeClasses = {
-      sm: "w-8 h-4",
+      sm: "w-9 h-5",
       md: "w-11 h-6",
-      lg: "w-14 h-7"
+      lg: "w-14 h-8"
     }
 
+    // Thumb sizes - slightly smaller than track height for padding
     const thumbSizes = {
-      sm: "w-3 h-3",
+      sm: "w-4 h-4",
       md: "w-5 h-5",
-      lg: "w-6 h-6"
+      lg: "w-7 h-7"
+    }
+
+    // Thumb position when checked - calculated for proper alignment
+    const thumbTranslate = {
+      sm: "peer-checked:translate-x-4",
+      md: "peer-checked:translate-x-5",
+      lg: "peer-checked:translate-x-6"
     }
 
     const variantClasses = {
@@ -130,12 +139,11 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           >
             <div
               className={merge(
-                "pointer-events-none block rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out",
-                "peer-checked:translate-x-full",
+                "pointer-events-none absolute rounded-full bg-white shadow-md ring-0",
+                "transition-all duration-200 ease-out",
+                "top-1/2 -translate-y-1/2 left-0.5",
                 thumbSizes[size],
-                size === "sm" ? "translate-x-0.5 peer-checked:translate-x-4.5" : "",
-                size === "md" ? "translate-x-0.5 peer-checked:translate-x-5.5" : "",
-                size === "lg" ? "translate-x-0.5 peer-checked:translate-x-7" : ""
+                thumbTranslate[size]
               )}
             />
           </div>
