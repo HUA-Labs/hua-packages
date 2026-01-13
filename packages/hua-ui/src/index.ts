@@ -154,6 +154,25 @@ export { EASING_FUNCTIONS, DURATIONS, COMPONENT_MOTION_DEFAULTS, CSS_MOTION_VARS
 // Common Types
 export type { Color, Size, BaseVariant, ExtendedVariant } from './lib/types/common';
 
+// Motion & Interaction Hooks
+export {
+  useInView,
+  useScrollProgress,
+  useMouse,
+  useReducedMotion,
+  useWindowSize,
+} from './hooks';
+export type {
+  UseInViewOptions,
+  UseInViewReturn,
+  UseScrollProgressOptions,
+  UseScrollProgressReturn,
+  UseMouseOptions,
+  UseMouseReturn,
+  UseWindowSizeOptions,
+  UseWindowSizeReturn,
+} from './hooks';
+
 // Convenience exports for common use cases (Tree-shaking friendly)
 // These are just re-exports, so they don't increase bundle size if not used
 export { Button as Btn } from './components/Button';
