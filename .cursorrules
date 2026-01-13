@@ -3,7 +3,7 @@
 ## 프로젝트 개요
 - **이름**: HUA Platform (HUA Labs - 감정 인터페이스 플랫폼)
 - **구조**: Monorepo (pnpm workspaces)
-- **주요 기술**: TypeScript, Next.js 15, React 19, Tailwind CSS
+- **주요 기술**: TypeScript, Next.js 16, React 19, Tailwind CSS v4
 - **패키지 매니저**: pnpm 10.24.0+
 
 ## 스킬 사용
