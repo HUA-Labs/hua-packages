@@ -7,6 +7,10 @@ export * from './advanced/dashboard';
 // Motion components
 export * from './advanced/motion';
 
+// Logo component (HUA Labs official branding)
+export { Logo } from './advanced/Logo';
+export type { LogoProps, LogoVariant, LogoSize } from './advanced/Logo';
+
 // Advanced Specialized components
 export { Bookmark } from './components/Bookmark';
 export { ChatMessage } from './components/ChatMessage';
