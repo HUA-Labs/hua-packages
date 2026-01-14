@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { merge, type Color } from '@hua-labs/ui';
+import { merge } from '../../../lib/utils';
+import type { Color } from '../../../lib/types/common';
 
 /**
  * EmotionMeter 컴포넌트의 props / EmotionMeter component props
@@ -21,26 +22,26 @@ export interface EmotionMeterProps extends React.HTMLAttributes<HTMLDivElement> 
 
 /**
  * EmotionMeter 컴포넌트 / EmotionMeter component
- * 
+ *
  * 감정 강도를 표시하는 미터 컴포넌트입니다.
  * Progress 컴포넌트와 유사하지만 감정 분석에 특화되어 있습니다.
- * 
+ *
  * Meter component that displays emotion intensity.
  * Similar to Progress component but specialized for emotion analysis.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <EmotionMeter value={75} />
- * 
+ *
  * @example
  * // 다양한 색상 / Various colors
- * <EmotionMeter 
+ * <EmotionMeter
  *   value={80}
  *   color="green"
  *   size="lg"
  * />
- * 
+ *
  * @param {EmotionMeterProps} props - EmotionMeter 컴포넌트의 props / EmotionMeter component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} EmotionMeter 컴포넌트 / EmotionMeter component
@@ -49,7 +50,7 @@ const EmotionMeter = React.forwardRef<HTMLDivElement, EmotionMeterProps>(
   ({ className, value, max = 100, size = "md", color = "blue", ...props }, ref) => {
     const sizeClasses = {
       sm: "h-2",
-      md: "h-3", 
+      md: "h-3",
       lg: "h-4"
     }
 
@@ -92,4 +93,4 @@ const EmotionMeter = React.forwardRef<HTMLDivElement, EmotionMeterProps>(
 )
 EmotionMeter.displayName = "EmotionMeter"
 
-export { EmotionMeter } 
+export { EmotionMeter }

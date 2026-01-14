@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { merge } from '@hua-labs/ui';
+import { merge } from '../../../lib/utils';
 
 /**
  * EmotionButton 컴포넌트의 props / EmotionButton component props
@@ -19,26 +19,26 @@ export interface EmotionButtonProps extends React.ButtonHTMLAttributes<HTMLButto
 
 /**
  * EmotionButton 컴포넌트 / EmotionButton component
- * 
+ *
  * 감정을 선택하는 버튼 컴포넌트입니다.
  * 이모지나 텍스트로 감정을 표시하며, 선택 상태를 지원합니다.
- * 
+ *
  * Button component for selecting emotions.
  * Displays emotion as emoji or text and supports selected state.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <EmotionButton emotion="😊" />
- * 
+ *
  * @example
  * // 선택 상태 / Selected state
- * <EmotionButton 
+ * <EmotionButton
  *   emotion="😊"
  *   isSelected
  *   size="lg"
  * />
- * 
+ *
  * @param {EmotionButtonProps} props - EmotionButton 컴포넌트의 props / EmotionButton component props
  * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
  * @returns {JSX.Element} EmotionButton 컴포넌트 / EmotionButton component
@@ -57,8 +57,8 @@ const EmotionButton = React.forwardRef<HTMLButtonElement, EmotionButtonProps>(
         className={merge(
           "rounded-full border-2 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500",
           sizeClasses[size],
-          isSelected 
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
+          isSelected
+            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
             : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800",
           className
         )}
@@ -71,4 +71,4 @@ const EmotionButton = React.forwardRef<HTMLButtonElement, EmotionButtonProps>(
 )
 EmotionButton.displayName = "EmotionButton"
 
-export { EmotionButton } 
+export { EmotionButton }

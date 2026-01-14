@@ -1,7 +1,9 @@
 'use client'
 
 import React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, merge } from '@hua-labs/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../Card';
+import { Badge } from '../../Badge';
+import { merge } from '../../../lib/utils';
 import { EmotionMeter } from "./EmotionMeter"
 
 /**
@@ -50,13 +52,13 @@ interface EmotionAnalysisProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * EmotionAnalysis 컴포넌트 / EmotionAnalysis component
- * 
+ *
  * 감정 분석 결과를 표시하는 컴포넌트입니다.
  * 주요 감정, 감정 분포, 키워드, 메트릭(강도, 긍정성, 에너지)을 표시할 수 있습니다.
- * 
+ *
  * Component that displays emotion analysis results.
  * Can display primary emotion, emotion distribution, keywords, and metrics (intensity, positivity, energy).
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -64,7 +66,7 @@ interface EmotionAnalysisProps extends React.HTMLAttributes<HTMLDivElement> {
  *   primaryEmotion={{ name: "기쁨", intensity: 80 }}
  *   keywords={["행복", "만족"]}
  * />
- * 
+ *
  * @example
  * // 상세 레이아웃 / Detailed layout
  * <EmotionAnalysis
@@ -79,14 +81,14 @@ interface EmotionAnalysisProps extends React.HTMLAttributes<HTMLDivElement> {
  *   energy={50}
  *   layout="detailed"
  * />
- * 
+ *
  * @param {EmotionAnalysisProps} props - EmotionAnalysis 컴포넌트의 props / EmotionAnalysis component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} EmotionAnalysis 컴포넌트 / EmotionAnalysis component
  */
 const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
-  ({ 
-    className, 
+  ({
+    className,
     primaryEmotion,
     emotionDistribution = [],
     keywords = [],
@@ -98,7 +100,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
     showKeywords = true,
     showMetrics = true,
     layout = "detailed",
-    ...props 
+    ...props
   }, ref) => {
     const getIntensityLabel = (value: number) => {
       if (value < 30) return "약함"
@@ -279,11 +281,11 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                 </div>
               </div>
               {showMeter && (
-                                  <EmotionMeter
-                    value={primaryEmotion.intensity}
-                    size="lg"
-                    color="blue"
-                  />
+                <EmotionMeter
+                  value={primaryEmotion.intensity}
+                  size="lg"
+                  color="blue"
+                />
               )}
             </div>
           </div>
@@ -302,8 +304,8 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className={`${item.color} h-2 rounded-full transition-all duration-300`} 
+                    <div
+                      className={`${item.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
@@ -323,8 +325,8 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                   {getIntensityLabel(intensity)}
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${intensity}%` }}
                   />
                 </div>
@@ -335,8 +337,8 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                   {getPositivityLabel(positivity)}
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${positivity}%` }}
                   />
                 </div>
@@ -347,8 +349,8 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                   {getEnergyLabel(energy)}
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                  <div
+                    className="bg-orange-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${energy}%` }}
                   />
                 </div>
@@ -376,4 +378,5 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
 
 EmotionAnalysis.displayName = "EmotionAnalysis"
 
-export { EmotionAnalysis } 
+export { EmotionAnalysis }
+export type { EmotionAnalysisProps }

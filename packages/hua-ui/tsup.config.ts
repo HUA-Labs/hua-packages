@@ -5,6 +5,7 @@ const entry = {
   advanced: 'src/advanced.ts',
   'advanced-dashboard': 'src/advanced/dashboard.ts',
   'advanced-motion': 'src/advanced/motion.ts',
+  'advanced-emotion': 'src/components/advanced/emotion/index.ts',
   form: 'src/form.ts',
   navigation: 'src/navigation.ts',
   feedback: 'src/feedback.ts',
