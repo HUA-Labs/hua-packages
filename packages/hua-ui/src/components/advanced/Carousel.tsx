@@ -70,9 +70,16 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
     },
     ref
   ) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+    // For slide transition with loop: start at 1 (account for cloned first slide)
+    // For fade/scale: always start at 0 (no cloned slides)
+    const getInitialIndex = () => {
+      if (transition === "slide" && loop) return 1;
+      return 0;
+    };
+    const [currentIndex, setCurrentIndex] = useState(getInitialIndex);
     const [isPaused, setIsPaused] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [noTransition, setNoTransition] = useState(false);
     const [touchStart, setTouchStart] = useState<number | null>(null);
     const [touchEnd, setTouchEnd] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -81,27 +88,69 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
     // Check for reduced motion preference
     const prefersReducedMotion = useReducedMotion();
 
+    // Get actual slide index for display (accounting for cloned slides in loop mode for slide transition)
+    const getActualIndex = useCallback((index: number) => {
+      // For fade/scale transitions, currentIndex is the actual index
+      if (transition !== "slide") return index;
+      // For slide transition without loop, index is actual
+      if (!loop) return index;
+      // For slide transition with loop, account for cloned slides
+      if (index === 0) return slideCount - 1;
+      if (index === slideCount + 1) return 0;
+      return index - 1;
+    }, [loop, slideCount, transition]);
+
     // Go to specific slide
     const goToSlide = useCallback(
       (index: number) => {
         if (isTransitioning) return;
 
         let newIndex = index;
-        if (loop) {
-          newIndex = ((index % slideCount) + slideCount) % slideCount;
-        } else {
+        if (!loop) {
           newIndex = Math.max(0, Math.min(index, slideCount - 1));
+        } else if (transition !== "slide") {
+          // For fade/scale with loop, wrap around without cloned slides
+          if (index < 0) {
+            newIndex = slideCount - 1;
+          } else if (index >= slideCount) {
+            newIndex = 0;
+          }
         }
 
         if (newIndex !== currentIndex) {
           setIsTransitioning(true);
           setCurrentIndex(newIndex);
-          onSlideChange?.(newIndex);
+          const actualIndex = loop && transition === "slide"
+            ? (newIndex === 0 ? slideCount - 1 : newIndex === slideCount + 1 ? 0 : newIndex - 1)
+            : newIndex;
+          onSlideChange?.(actualIndex);
           setTimeout(() => setIsTransitioning(false), transitionDuration);
         }
       },
-      [currentIndex, slideCount, loop, isTransitioning, transitionDuration, onSlideChange]
+      [currentIndex, slideCount, loop, isTransitioning, transitionDuration, transition, onSlideChange]
     );
+
+    // Handle infinite loop jump (when reaching cloned slides)
+    useEffect(() => {
+      if (!loop || isTransitioning || transition !== "slide") return;
+
+      // Jump to real slide without animation when on cloned slides
+      if (currentIndex === 0) {
+        // At cloned last slide -> jump to real last slide
+        setTimeout(() => {
+          setNoTransition(true);
+          setCurrentIndex(slideCount);
+          setTimeout(() => setNoTransition(false), 50);
+        }, transitionDuration);
+      } else if (currentIndex === slideCount + 1) {
+        // At cloned first slide -> jump to real first slide
+        setTimeout(() => {
+          setNoTransition(true);
+          setCurrentIndex(1);
+          setTimeout(() => setNoTransition(false), 50);
+        }, transitionDuration);
+      }
+    }, [currentIndex, slideCount, loop, isTransitioning, transitionDuration, transition]);
 
     // Next slide
     const nextSlide = useCallback(() => {
@@ -165,7 +214,8 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
     // Render slides with transition
     const renderSlides = () => {
-      const duration = prefersReducedMotion ? 0 : transitionDuration;
+      const duration = prefersReducedMotion || noTransition ? 0 : transitionDuration;
+      const actualIndex = getActualIndex(currentIndex);
 
       switch (transition) {
         case "fade":
@@ -173,11 +223,11 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             <div
               key={index}
               className={merge(
-                "absolute inset-0",
-                index === currentIndex ? "z-10" : "z-0"
+                "absolute inset-0 w-full h-full",
+                index === actualIndex ? "z-10" : "z-0"
               )}
               style={{
-                opacity: index === currentIndex ? 1 : 0,
+                opacity: index === actualIndex ? 1 : 0,
                 transition: `opacity ${duration}ms ease-in-out`,
               }}
             >
@@ -190,12 +240,12 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             <div
               key={index}
               className={merge(
-                "absolute inset-0",
-                index === currentIndex ? "z-10" : "z-0"
+                "absolute inset-0 w-full h-full",
+                index === actualIndex ? "z-10" : "z-0"
               )}
               style={{
-                opacity: index === currentIndex ? 1 : 0,
-                transform: `scale(${index === currentIndex ? 1 : 0.9})`,
+                opacity: index === actualIndex ? 1 : 0,
+                transform: `scale(${index === actualIndex ? 1 : 0.9})`,
                 transition: `opacity ${duration}ms ease-in-out, transform ${duration}ms ease-in-out`,
               }}
             >
@@ -204,22 +254,27 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           ));
 
         case "slide":
-        default:
-          return (
+        default: {
+          const childArray = React.Children.toArray(children);
+          // For infinite loop: clone last slide at beginning and first slide at end
+          const slides = loop
+            ? [childArray[childArray.length - 1], ...childArray, childArray[0]]
+            : childArray;
+
+          // 각 슬라이드를 fade/scale처럼 absolute로 배치하고 translateX로 위치 조정
+          return slides.map((child, index) => (
             <div
-              className="flex h-full"
+              key={index}
+              className="absolute inset-0 w-full h-full"
               style={{
-                transform: `translateX(-${currentIndex * 100}%)`,
-                transition: `transform ${duration}ms ease-in-out`,
+                transform: `translateX(${(index - currentIndex) * 100}%)`,
+                transition: noTransition ? 'none' : `transform ${duration}ms ease-in-out`,
               }}
             >
-              {React.Children.map(children, (child, index) => (
-                <div key={index} className="w-full h-full flex-shrink-0">
-                  {child}
-                </div>
-              ))}
+              {child}
             </div>
-          );
+          ));
+        }
       }
     };
 
@@ -229,6 +284,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
       const isInside = indicatorPosition.includes("inside");
       const isTop = indicatorPosition.includes("top");
+      const actualIndex = getActualIndex(currentIndex);
 
       const indicatorContainerClass = merge(
         "flex items-center justify-center gap-2",
@@ -243,17 +299,26 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             )
       );
 
+      // Handle indicator click - go to the correct index accounting for loop mode
+      const handleIndicatorClick = (index: number) => {
+        if (loop && transition === "slide") {
+          goToSlide(index + 1); // +1 because of cloned first slide (only for slide transition)
+        } else {
+          goToSlide(index);
+        }
+      };
+
       return (
         <div className={indicatorContainerClass} role="tablist">
           {Array.from({ length: slideCount }, (_, index) => {
-            const isActive = index === currentIndex;
+            const isActive = index === actualIndex;
 
             switch (indicators) {
               case "bars":
                 return (
                   <button
                     key={index}
-                    onClick={() => goToSlide(index)}
+                    onClick={() => handleIndicatorClick(index)}
                     className={merge(
                       "h-1 rounded-full transition-all duration-300",
                       isActive
@@ -270,7 +335,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                 return (
                   <button
                     key={index}
-                    onClick={() => goToSlide(index)}
+                    onClick={() => handleIndicatorClick(index)}
                     className={merge(
                       "w-8 h-8 rounded-full text-sm font-medium transition-all duration-300",
                       isActive
@@ -290,7 +355,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                 return (
                   <button
                     key={index}
-                    onClick={() => goToSlide(index)}
+                    onClick={() => handleIndicatorClick(index)}
                     className={merge(
                       "w-2.5 h-2.5 rounded-full transition-all duration-300",
                       isActive
@@ -353,7 +418,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       <div
         ref={ref}
         className={merge(
-          "flex flex-col",
+          "flex flex-col w-full h-full",
           arrowPosition === "outside" && "px-16",
           className
         )}
@@ -362,10 +427,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       >
         <div
           ref={containerRef}
-          className={merge(
-            "relative overflow-hidden",
-            transition !== "slide" && "h-full"
-          )}
+          className="relative overflow-hidden w-full flex-1"
           onMouseEnter={() => pauseOnHover && setIsPaused(true)}
           onMouseLeave={() => pauseOnHover && setIsPaused(false)}
           onTouchStart={handleTouchStart}

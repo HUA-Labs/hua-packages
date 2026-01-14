@@ -45,3 +45,10 @@ export type { VideoBackgroundProps } from "./VideoBackground";
 // Carousel - 슬라이드 캐러셀
 export { Carousel } from "./Carousel";
 export type { CarouselProps } from "./Carousel";
+
+// ============================================
+// Emotion Analysis Components (Premium)
+// 감정 분석 컴포넌트 (프리미엄)
+// ============================================
+
+export * from "./emotion";
