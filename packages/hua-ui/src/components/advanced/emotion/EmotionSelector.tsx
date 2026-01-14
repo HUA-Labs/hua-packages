@@ -3,7 +3,7 @@
 import React from "react"
 import { EmotionButton } from "./EmotionButton"
 import { EmotionMeter } from "./EmotionMeter"
-import { merge } from '@hua-labs/ui';
+import { merge } from '../../../lib/utils';
 
 /**
  * EmotionSelector 컴포넌트의 props / EmotionSelector component props
@@ -53,13 +53,13 @@ const defaultEmotions = [
 
 /**
  * EmotionSelector 컴포넌트 / EmotionSelector component
- * 
+ *
  * 감정을 선택하는 컴포넌트입니다.
  * 여러 감정 옵션을 제공하며, 강도 조절 기능을 포함할 수 있습니다.
- * 
+ *
  * Component for selecting emotions.
  * Provides multiple emotion options and can include intensity control.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -67,7 +67,7 @@ const defaultEmotions = [
  *   selectedEmotion="joy"
  *   onEmotionSelect={(emotion) => console.log(emotion)}
  * />
- * 
+ *
  * @example
  * // 강도 조절 포함 / With intensity control
  * <EmotionSelector
@@ -78,14 +78,14 @@ const defaultEmotions = [
  *   onIntensityChange={setIntensity}
  *   variant="card"
  * />
- * 
+ *
  * @param {EmotionSelectorProps} props - EmotionSelector 컴포넌트의 props / EmotionSelector component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} EmotionSelector 컴포넌트 / EmotionSelector component
  */
 const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
-  ({ 
-    className, 
+  ({
+    className,
     selectedEmotion,
     onEmotionSelect,
     layout = "grid",
@@ -95,7 +95,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
     emotions = defaultEmotions,
     size = "md",
     variant = "button",
-    ...props 
+    ...props
   }, ref) => {
     const handleEmotionClick = (emotionKey: string) => {
       onEmotionSelect?.(emotionKey)
@@ -103,7 +103,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
 
     const renderEmotionItem = (emotion: typeof emotions[0]) => {
       const isSelected = selectedEmotion === emotion.key
-      
+
       if (variant === "button") {
         return (
           <EmotionButton
@@ -128,8 +128,8 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             key={emotion.key}
             className={merge(
               "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
-              isSelected 
-                ? "border-primary bg-primary/5" 
+              isSelected
+                ? "border-primary bg-primary/5"
                 : "border-border hover:border-primary/50"
             )}
             onClick={() => handleEmotionClick(emotion.key)}
@@ -163,8 +163,8 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             key={emotion.key}
             className={merge(
               "px-3 py-1 rounded-full cursor-pointer transition-all duration-200 text-sm font-medium",
-              isSelected 
-                ? "bg-primary text-primary-foreground" 
+              isSelected
+                ? "bg-primary text-primary-foreground"
                 : "bg-muted hover:bg-muted/80"
             )}
             onClick={() => handleEmotionClick(emotion.key)}
@@ -231,4 +231,5 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
 
 EmotionSelector.displayName = "EmotionSelector"
 
-export { EmotionSelector } 
+export { EmotionSelector }
+export type { EmotionSelectorProps }

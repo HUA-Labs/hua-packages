@@ -26,6 +26,11 @@
       "import": "./dist/advanced-motion.mjs",
       "require": "./dist/advanced-motion.js"
     },
+    "./advanced/emotion": {
+      "types": "./dist/advanced-emotion.d.ts",
+      "import": "./dist/advanced-emotion.mjs",
+      "require": "./dist/advanced-emotion.js"
+    },
     "./form": {
       "types": "./dist/form.d.ts",
       "import": "./dist/form.mjs",
