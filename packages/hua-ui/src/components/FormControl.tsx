@@ -129,8 +129,40 @@ function FormControl({
  *   if (isValid) { ... }
  * };
  */
+/**
+ * Validation preset types for common field formats
+ */
+type ValidationPreset = "email" | "phone" | "url" | "alphanumeric" | "password";
+
+/**
+ * Preset validation patterns and error messages
+ */
+const VALIDATION_PRESETS: Record<ValidationPreset, { pattern: RegExp; message: string }> = {
+  email: {
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: "Invalid email format",
+  },
+  phone: {
+    pattern: /^[\d\s\-+()]{10,}$/,
+    message: "Invalid phone number format",
+  },
+  url: {
+    pattern: /^https?:\/\/.+\..+/,
+    message: "Invalid URL format (must start with http:// or https://)",
+  },
+  alphanumeric: {
+    pattern: /^[a-zA-Z0-9]+$/,
+    message: "Only letters and numbers are allowed",
+  },
+  password: {
+    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+    message: "Must contain at least 8 characters with uppercase, lowercase, and number",
+  },
+};
+
 interface ValidationRule {
   value: string | number | boolean;
+  type?: ValidationPreset;
   required?: boolean;
   minLength?: number;
   maxLength?: number;
@@ -140,6 +172,7 @@ interface ValidationRule {
   custom?: (value: string | number | boolean) => string | undefined;
   messages?: {
     required?: string;
+    type?: string;
     minLength?: string;
     maxLength?: string;
     min?: string;
@@ -158,7 +191,7 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
     const newErrors: ValidationErrors = {};
 
     for (const [field, rule] of Object.entries(rules)) {
-      const { value, required, minLength, maxLength, min, max, pattern, custom, messages = {} } = rule;
+      const { value, type, required, minLength, maxLength, min, max, pattern, custom, messages = {} } = rule;
       const stringValue = String(value);
 
       // Required check
@@ -169,6 +202,15 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
 
       // Skip other validations if empty and not required
       if (!value || stringValue.trim() === "") continue;
+
+      // Type preset check (email, phone, url, alphanumeric, password)
+      if (type) {
+        const preset = VALIDATION_PRESETS[type];
+        if (preset && !preset.pattern.test(stringValue)) {
+          newErrors[field] = messages.type || preset.message;
+          continue;
+        }
+      }
 
       // MinLength check
       if (minLength !== undefined && stringValue.length < minLength) {
@@ -194,7 +236,7 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
         continue;
       }
 
-      // Pattern check
+      // Pattern check (for custom patterns, overrides type preset)
       if (pattern && !pattern.test(stringValue)) {
         newErrors[field] = messages.pattern || "Invalid format";
         continue;
@@ -247,5 +289,5 @@ function ErrorIcon({ className }: { className?: string }) {
   );
 }
 
-export { FormControl, useFormValidation };
-export type { ValidationRule, ValidationRules, ValidationErrors };
+export { FormControl, useFormValidation, VALIDATION_PRESETS };
+export type { ValidationRule, ValidationRules, ValidationErrors, ValidationPreset };
