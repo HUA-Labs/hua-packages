@@ -97,6 +97,7 @@ export function useMotion<T extends MotionElement = HTMLDivElement>(
   const [isReversed, setIsReversed] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const animationRef = useRef<number | null>(null)
+  const startRef = useRef<() => void>(() => {})
 
   // 값 정규화 함수
   const normalizeValue = (value: any): { from: any; to: any } => {
@@ -188,6 +189,9 @@ export function useMotion<T extends MotionElement = HTMLDivElement>(
       runAnimation(Date.now(), isReversed)
     }
   }, [isVisible, onStart, runAnimation, isReversed])
+
+  // startRef 업데이트 (IntersectionObserver에서 안정적인 참조 사용)
+  startRef.current = start
 
   // 재생 함수
   const play = useCallback(() => {
@@ -303,7 +307,7 @@ export function useMotion<T extends MotionElement = HTMLDivElement>(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            start()
+            startRef.current()
             if (triggerOnce) {
               observerRef.current?.disconnect()
             }
@@ -320,7 +324,7 @@ export function useMotion<T extends MotionElement = HTMLDivElement>(
         observerRef.current.disconnect()
       }
     }
-  }, [autoStart, threshold, triggerOnce, start])
+  }, [autoStart, threshold, triggerOnce])
 
   // 마운트 시 자동 시작
   useEffect(() => {
