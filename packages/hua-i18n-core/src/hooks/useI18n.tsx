@@ -160,7 +160,7 @@ export function I18nProvider({
       }
     };
 
-    // hua-i18n-sdk 언어 전환 이벤트 감지
+    // HUA i18n 언어 전환 이벤트 감지
     window.addEventListener('huaI18nLanguageChange', handleLanguageChange as EventListener);
     
     // 일반적인 언어 변경 이벤트도 감지
