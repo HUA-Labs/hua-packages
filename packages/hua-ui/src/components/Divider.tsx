@@ -64,20 +64,33 @@ const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
   }, ref) => {
     const orientationClasses = React.useMemo(() => ({
       horizontal: "w-full",
-      vertical: "h-full w-px"
+      vertical: "h-full"
     }), [])
 
-    const sizeClasses = React.useMemo(() => ({
-      sm: orientation === "horizontal" ? "h-px" : "w-px",
-      md: orientation === "horizontal" ? "h-0.5" : "w-0.5", // 2px
-      lg: orientation === "horizontal" ? "h-1" : "w-1" // 4px
-    }), [orientation])
+    // dashed/dotted는 border 스타일 사용, solid/gradient/glass는 height/width 사용
+    const sizeClasses = React.useMemo(() => {
+      const useBorder = variant === "dashed" || variant === "dotted"
+      if (useBorder) {
+        // border 스타일일 때는 border-width 사용
+        return {
+          sm: orientation === "horizontal" ? "border-t" : "border-l",
+          md: orientation === "horizontal" ? "border-t-2" : "border-l-2",
+          lg: orientation === "horizontal" ? "border-t-4" : "border-l-4"
+        }
+      }
+      // 배경색 스타일일 때는 height/width 사용
+      return {
+        sm: orientation === "horizontal" ? "h-px" : "w-px",
+        md: orientation === "horizontal" ? "h-0.5" : "w-0.5",
+        lg: orientation === "horizontal" ? "h-1" : "w-1"
+      }
+    }, [orientation, variant])
 
     const variantClasses = React.useMemo(() => ({
       solid: "",
       dashed: "border-dashed",
       dotted: "border-dotted",
-      gradient: orientation === "horizontal" 
+      gradient: orientation === "horizontal"
         ? "bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600"
         : "bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600",
       glass: orientation === "horizontal"
@@ -85,12 +98,24 @@ const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
         : "bg-gradient-to-b from-transparent via-white/30 to-transparent"
     }), [orientation])
 
-    const colorClasses = React.useMemo(() => ({
-      default: "bg-gray-200 dark:bg-gray-700",
-      muted: "bg-gray-100 dark:bg-gray-800",
-      primary: "bg-blue-200 dark:bg-blue-700",
-      secondary: "bg-gray-300 dark:bg-gray-600"
-    }), [])
+    // dashed/dotted는 border-color 사용, solid는 bg-color 사용
+    const colorClasses = React.useMemo(() => {
+      const useBorder = variant === "dashed" || variant === "dotted"
+      if (useBorder) {
+        return {
+          default: "border-gray-200 dark:border-gray-700",
+          muted: "border-gray-100 dark:border-gray-800",
+          primary: "border-blue-200 dark:border-blue-700",
+          secondary: "border-gray-300 dark:border-gray-600"
+        }
+      }
+      return {
+        default: "bg-gray-200 dark:bg-gray-700",
+        muted: "bg-gray-100 dark:bg-gray-800",
+        primary: "bg-blue-200 dark:bg-blue-700",
+        secondary: "bg-gray-300 dark:bg-gray-600"
+      }
+    }, [variant])
 
     const spacingClasses = React.useMemo(() => ({
       none: "",
