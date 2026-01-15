@@ -101,10 +101,31 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = parseFloat(e.target.value);
-      if (!isNaN(newValue)) {
-        updateValue(newValue);
+      const inputValue = e.target.value;
+      // Allow empty string, minus sign alone (for typing negative numbers), or valid numbers
+      if (inputValue === "" || inputValue === "-") {
+        return;
       }
+      const newValue = parseFloat(inputValue);
+      if (!isNaN(newValue)) {
+        // If min is set, enforce it on direct input
+        if (min !== undefined && newValue < min) {
+          updateValue(min);
+        } else {
+          updateValue(newValue);
+        }
+      }
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      // On blur, ensure value is within bounds
+      if (min !== undefined && currentValue < min) {
+        updateValue(min);
+      }
+      if (max !== undefined && currentValue > max) {
+        updateValue(max);
+      }
+      props.onBlur?.(e);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -180,10 +201,11 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             ref={ref}
             type="text"
             inputMode="numeric"
-            pattern="[0-9]*"
+            pattern={min !== undefined && min >= 0 ? "[0-9]*" : "-?[0-9]*"}
             value={currentValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
             disabled={disabled}
             className={merge(
               "w-16 text-center rounded-md border border-input bg-background",
@@ -215,10 +237,11 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           ref={ref}
           type="text"
           inputMode="numeric"
-          pattern="[0-9]*"
+          pattern={min !== undefined && min >= 0 ? "[0-9]*" : "-?[0-9]*"}
           value={currentValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
           disabled={disabled}
           className={merge(
             "w-16 text-center rounded-md border border-input bg-background",

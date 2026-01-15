@@ -11,7 +11,7 @@ import { merge } from "../../lib/utils";
  * @property {boolean} [pauseOnClick=false] - 클릭시 일시정지 / Pause on click
  * @property {number} [gap=16] - 아이템 간격 (px) / Gap between items in pixels
  * @property {boolean} [gradient=true] - 양쪽 페이드 그라디언트 / Fade gradient on edges
- * @property {string} [gradientColor="white"] - 그라디언트 색상 / Gradient color
+ * @property {string} [gradientColor="hsl(var(--background))"] - 그라디언트 색상 / Gradient color
  * @property {number} [gradientWidth=100] - 그라디언트 너비 (px) / Gradient width in pixels
  */
 export interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -60,7 +60,7 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       pauseOnClick = false,
       gap = 16,
       gradient = true,
-      gradientColor = "white",
+      gradientColor = "hsl(var(--background))",
       gradientWidth = 100,
       style,
       ...props
