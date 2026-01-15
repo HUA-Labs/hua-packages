@@ -26,6 +26,7 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
   const observerRef = useRef<IntersectionObserver | null>(null)
   const motionRef = useRef<number | null>(null)
   const timeoutRef = useRef<number | null>(null)
+  const startRef = useRef<() => void>(() => {})
 
   // 모션 시작 함수
   const start = useCallback(() => {
@@ -50,6 +51,9 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
       onComplete?.()
     }
   }, [delay, isAnimating, onStart, onComplete])
+
+  // startRef 업데이트 (IntersectionObserver에서 안정적인 참조 사용)
+  startRef.current = start
 
   // 모션 중단 함수
   const stop = useCallback(() => {
@@ -81,7 +85,7 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            start()
+            startRef.current()
             if (triggerOnce) {
               observerRef.current?.disconnect()
             }
@@ -98,7 +102,7 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
         observerRef.current.disconnect()
       }
     }
-  }, [autoStart, threshold, triggerOnce, start])
+  }, [autoStart, threshold, triggerOnce])
 
   // 자동 시작이 비활성화된 경우 수동 시작
   useEffect(() => {

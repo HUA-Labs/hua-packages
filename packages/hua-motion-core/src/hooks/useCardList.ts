@@ -50,6 +50,7 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
   const [progress, setProgress] = useState(0)
   const [cardCount, setCardCount] = useState(0)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const startRef = useRef<() => void>(() => {})
 
   // 카드 개수 계산
   useEffect(() => {
@@ -101,6 +102,9 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
     }, totalDuration / 10)
   }, [isAnimating, cardCount, staggerDelay, duration, onStart, onComplete])
 
+  // startRef 업데이트 (IntersectionObserver에서 안정적인 참조 사용)
+  startRef.current = start
+
   // 모션 중단 함수
   const stop = useCallback(() => {
     setIsAnimating(false)
@@ -135,7 +139,7 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            start()
+            startRef.current()
           }
         })
       },
@@ -149,7 +153,7 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
         observerRef.current.disconnect()
       }
     }
-  }, [start])
+  }, [])
 
   // 그리드 스타일
   const gridStyle: React.CSSProperties = {
