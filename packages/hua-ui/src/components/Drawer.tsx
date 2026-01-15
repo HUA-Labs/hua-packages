@@ -133,17 +133,18 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
     }
 
     const sideClasses = {
-      left: "left-0 top-0 h-full translate-x-0",
-      right: "right-0 top-0 h-full translate-x-0",
-      top: "top-0 left-0 w-full translate-y-0",
-      bottom: "bottom-0 left-0 w-full translate-y-0"
+      left: "left-0 top-0 h-full",
+      right: "right-0 top-0 h-full",
+      top: "top-0 left-0 w-full",
+      bottom: "bottom-0 left-0 w-full"
     }
 
+    // Transform: open=true -> visible position, open=false -> hidden position
     const transformClasses = {
-      left: isAnimating ? (open ? "translate-x-0" : "-translate-x-full") : "",
-      right: isAnimating ? (open ? "translate-x-0" : "translate-x-full") : "",
-      top: isAnimating ? (open ? "translate-y-0" : "-translate-y-full") : "",
-      bottom: isAnimating ? (open ? "translate-y-0" : "translate-y-full") : ""
+      left: open ? "translate-x-0" : "-translate-x-full",
+      right: open ? "translate-x-0" : "translate-x-full",
+      top: open ? "translate-y-0" : "-translate-y-full",
+      bottom: open ? "translate-y-0" : "translate-y-full"
     }
 
     return (

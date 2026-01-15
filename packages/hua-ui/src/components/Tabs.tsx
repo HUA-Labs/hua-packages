@@ -154,26 +154,34 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            // TabsContent인 경우 active prop을 자동으로 설정
+            // TabsContent인 경우 active prop만 설정 (value는 원래 값 유지)
             if (child.type === TabsContent) {
               const childProps = child.props as TabsContentProps
+              return React.cloneElement(child, {
+                active: childProps.value === currentValue
+              } as Partial<TabsContentProps>)
+            }
+            // TabsList인 경우에만 onValueChange 전달
+            if (child.type === TabsList) {
               return React.cloneElement(child, {
                 value: currentValue,
                 onValueChange: handleTabChange,
                 orientation,
                 variant,
-                size,
-                active: childProps.value === currentValue
-              } as Partial<TabsContentProps>)
+                size
+              } as Partial<TabsListProps>)
             }
-            // 다른 컴포넌트들
-            return React.cloneElement(child, {
-              value: currentValue,
-              onValueChange: handleTabChange,
-              orientation,
-              variant,
-              size
-            } as Partial<TabsTriggerProps | TabsListProps>)
+            // 다른 React 컴포넌트들 (다른 custom wrapper 등)
+            // HTML 요소가 아닌 경우에만 props 전달
+            if (typeof child.type !== 'string') {
+              return React.cloneElement(child, {
+                value: currentValue,
+                onValueChange: handleTabChange,
+                orientation,
+                variant,
+                size
+              } as Record<string, unknown>)
+            }
           }
           return child
         })}
@@ -327,12 +335,17 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
+            // Only pass tab props to non-HTML elements (React components)
+            if (typeof child.type === 'string') {
+              return child
+            }
+            const childProps = child.props as { value?: string }
             return React.cloneElement(child, {
-              value,
               onValueChange,
               orientation,
               variant,
-              size
+              size,
+              active: childProps.value === value
             } as Partial<TabsTriggerProps>)
           }
           return child

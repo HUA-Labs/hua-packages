@@ -166,7 +166,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
             {...props}
           >
             <span className="text-lg">{currentLang.flag}</span>
-            {showLabel && <span>{currentLang.name}</span>}
+            {showLabel && <span className="text-gray-700 dark:text-gray-300">{currentLang.name}</span>}
             <svg
               className={merge(
                 "w-4 h-4 transition-transform duration-200",
@@ -216,7 +216,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
         {...props}
       >
         <span className="text-lg">{currentLang.flag}</span>
-        {showLabel && <span>{currentLang.name}</span>}
+        {showLabel && <span className="text-gray-700 dark:text-gray-300">{currentLang.name}</span>}
       </button>
     )
   }

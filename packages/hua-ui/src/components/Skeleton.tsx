@@ -53,13 +53,13 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} Skeleton 컴포넌트 / Skeleton component
  */
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ 
-    className, 
+  ({
+    className,
     variant = "text",
     width,
     height,
     animation = "pulse",
-    ...props 
+    ...props
   }, ref) => {
     const getVariantClasses = () => {
       switch (variant) {
@@ -78,13 +78,23 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     const getAnimationClasses = () => {
       switch (animation) {
         case "wave":
-          return "animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-shimmer"
         case "shimmer":
-          return "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-shimmer"
+          return "skeleton-shimmer"
         case "pulse":
         default:
           return "animate-pulse bg-gray-200 dark:bg-gray-700"
       }
+    }
+
+    const getAnimationStyle = (): React.CSSProperties => {
+      if (animation === "wave" || animation === "shimmer") {
+        return {
+          background: "linear-gradient(90deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%)",
+          backgroundSize: "200% 100%",
+          animation: "shimmer 1.5s ease-in-out infinite",
+        }
+      }
+      return {}
     }
 
     const getDefaultDimensions = () => {
@@ -107,20 +117,34 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     const finalHeight = height || defaultDims.height
 
     return (
-      <div
-        ref={ref}
-        className={merge(
-          "block",
-          getVariantClasses(),
-          getAnimationClasses(),
-          className
+      <>
+        {(animation === "wave" || animation === "shimmer") && (
+          <style>{`
+            @keyframes shimmer {
+              0% { background-position: 200% 0; }
+              100% { background-position: -200% 0; }
+            }
+            .dark .skeleton-shimmer {
+              background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%) !important;
+            }
+          `}</style>
         )}
-        style={{
-          width: typeof finalWidth === "number" ? `${finalWidth}px` : finalWidth,
-          height: typeof finalHeight === "number" ? `${finalHeight}px` : finalHeight,
-        }}
-        {...props}
-      />
+        <div
+          ref={ref}
+          className={merge(
+            "block",
+            getVariantClasses(),
+            getAnimationClasses(),
+            className
+          )}
+          style={{
+            width: typeof finalWidth === "number" ? `${finalWidth}px` : finalWidth,
+            height: typeof finalHeight === "number" ? `${finalHeight}px` : finalHeight,
+            ...getAnimationStyle(),
+          }}
+          {...props}
+        />
+      </>
     )
   }
 )

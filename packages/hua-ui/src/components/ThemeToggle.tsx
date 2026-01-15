@@ -179,7 +179,7 @@ export function ThemeToggle({
     >
       {renderIcon()}
       {showLabel && (
-        <span>
+        <span className="text-gray-700 dark:text-gray-300">
           {theme === "system" ? label.system : theme === "dark" ? label.dark : label.light}
         </span>
       )}

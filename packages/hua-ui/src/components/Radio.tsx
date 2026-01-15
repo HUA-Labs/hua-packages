@@ -89,11 +89,17 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
       glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-blue-400/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-blue-400/50 dark:focus:bg-slate-700/20"
     }
 
-    const stateClasses = error 
+    const stateClasses = error
       ? "border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:ring-red-400"
       : success
       ? "border-green-500 focus:ring-green-500 dark:border-green-400 dark:focus:ring-green-400"
       : ""
+
+    // Support both controlled and uncontrolled modes
+    const isControlled = props.checked !== undefined;
+    const isChecked = props.checked ?? props.defaultChecked ?? false;
+    // Add readOnly if controlled without onChange to suppress React warning
+    const needsReadOnly = isControlled && !props.onChange && !props.readOnly;
 
     return (
       <div className="flex items-start space-x-3">
@@ -106,12 +112,13 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
               className
             )}
             ref={ref}
-            aria-checked={props.checked ?? false}
+            aria-checked={isChecked}
             aria-invalid={error}
             aria-label={!label ? props['aria-label'] : undefined}
             aria-labelledby={label ? labelId : undefined}
             aria-describedby={descriptionId}
             role="radio"
+            readOnly={needsReadOnly || props.readOnly}
             {...props}
           />
           <div
@@ -122,13 +129,14 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
               sizeClasses[size],
               variantClasses[variant],
               stateClasses,
-              "peer-checked:border-blue-600 dark:peer-checked:border-blue-500"
+              isChecked && "border-blue-600 dark:border-blue-500"
             )}
           >
             <div
               className={merge(
-                "rounded-full bg-blue-600 dark:bg-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity duration-200",
-                dotSizes[size]
+                "rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-200",
+                dotSizes[size],
+                isChecked ? "opacity-100 scale-100" : "opacity-0 scale-0"
               )}
             />
           </div>

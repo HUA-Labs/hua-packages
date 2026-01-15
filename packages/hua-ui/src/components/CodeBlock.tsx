@@ -36,6 +36,12 @@ export interface CodeBlockProps {
  * 코드를 표시하고 복사 기능을 제공하는 컴포넌트입니다.
  * Sugar-high를 사용한 신택스 하이라이팅을 지원합니다.
  *
+ * @remarks
+ * 신택스 하이라이팅을 위해 CSS 파일을 import하세요:
+ * ```tsx
+ * import '@hua-labs/ui/styles/codeblock.css';
+ * ```
+ *
  * @example
  * ```tsx
  * // 기본 사용

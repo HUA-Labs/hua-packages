@@ -100,7 +100,11 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       ? "border-green-500 focus:ring-green-500 dark:border-green-400 dark:focus:ring-green-400"
       : ""
 
-    const isChecked = props.checked ?? false;
+    // Support both controlled and uncontrolled modes
+    const isControlled = props.checked !== undefined;
+    const isChecked = props.checked ?? props.defaultChecked ?? false;
+    // Add readOnly if controlled without onChange to suppress React warning
+    const needsReadOnly = isControlled && !props.onChange && !props.readOnly;
 
     return (
       <div className="flex items-start space-x-3">
@@ -119,6 +123,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             aria-labelledby={label ? labelId : undefined}
             aria-describedby={descriptionId}
             role="checkbox"
+            readOnly={needsReadOnly || props.readOnly}
             {...props}
           />
           <div
