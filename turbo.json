@@ -99,15 +99,7 @@
       "dependsOn": ["@hua-labs/i18n-core#build"],
       "outputs": ["dist/**"]
     },
-    "@hua-labs/i18n-date#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/i18n-number#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/i18n-currency#build": {
+    "@hua-labs/i18n-formatters#build": {
       "dependsOn": ["@hua-labs/i18n-core#build"],
       "outputs": ["dist/**"]
     }
