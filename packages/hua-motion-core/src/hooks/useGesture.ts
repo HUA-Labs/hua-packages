@@ -312,20 +312,29 @@ export function useGesture(options: GestureOptions = {}): GestureReturn {
   }, [enabled, getDistance, getSwipeDirection, swipeThreshold, swipeVelocity, swipeDirections, threshold, timeout, onSwipe, onTap, onDoubleTap, onEnd])
 
   // 터치 이벤트 핸들러
+  // Note: e.preventDefault()는 passive event listener에서 경고 유발 가능
+  // 실제 사용 시 onTouchStart 등에 { passive: false } 옵션 필요
   const onTouchStart = useCallback((e: React.TouchEvent | TouchEvent) => {
-    e.preventDefault()
+    // cancelable 체크 후 preventDefault 호출 (passive listener 경고 방지)
+    if (e.cancelable) {
+      e.preventDefault()
+    }
     const touch = e.touches[0]
     startGesture(touch.clientX, touch.clientY, e.touches.length)
   }, [startGesture])
 
   const onTouchMove = useCallback((e: React.TouchEvent | TouchEvent) => {
-    e.preventDefault()
+    if (e.cancelable) {
+      e.preventDefault()
+    }
     const touch = e.touches[0]
     updateGesture(touch.clientX, touch.clientY, Array.from(e.touches) as Touch[])
   }, [updateGesture])
 
   const onTouchEnd = useCallback((e: React.TouchEvent | TouchEvent) => {
-    e.preventDefault()
+    if (e.cancelable) {
+      e.preventDefault()
+    }
     const touch = e.changedTouches[0]
     endGesture(touch.clientX, touch.clientY)
   }, [endGesture])
