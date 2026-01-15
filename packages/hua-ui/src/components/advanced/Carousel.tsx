@@ -16,6 +16,8 @@ import { merge } from "../../lib/utils";
  * @property {"slide" | "fade" | "scale"} [transition="slide"] - 전환 효과 / Transition effect
  * @property {number} [transitionDuration=500] - 전환 시간 (ms) / Transition duration
  * @property {(index: number) => void} [onSlideChange] - 슬라이드 변경 콜백 / Slide change callback
+ * @property {boolean} [showPlayPause=false] - 재생/일시정지 버튼 표시 / Show play/pause button
+ * @property {"left" | "right" | "center"} [playPausePosition="right"] - 재생/일시정지 버튼 위치 / Play/pause button position
  */
 export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   children: React.ReactNode[];
@@ -30,6 +32,8 @@ export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   transition?: "slide" | "fade" | "scale";
   transitionDuration?: number;
   onSlideChange?: (index: number) => void;
+  showPlayPause?: boolean;
+  playPausePosition?: "left" | "right" | "center";
 }
 
 /**
@@ -64,6 +68,8 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       transition = "slide",
       transitionDuration = 500,
       onSlideChange,
+      showPlayPause = false,
+      playPausePosition = "right",
       className,
       style,
       ...props
@@ -77,7 +83,8 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       return 0;
     };
     const [currentIndex, setCurrentIndex] = useState(getInitialIndex);
-    const [isPaused, setIsPaused] = useState(false);
+    const [isPaused, setIsPaused] = useState(!autoPlay);
+    const [isManuallyPaused, setIsManuallyPaused] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [noTransition, setNoTransition] = useState(false);
     const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -162,13 +169,28 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       goToSlide(currentIndex - 1);
     }, [currentIndex, goToSlide]);
 
+    // Toggle play/pause manually
+    const togglePlayPause = useCallback(() => {
+      setIsManuallyPaused(prev => !prev);
+    }, []);
+
+    // Play function
+    const play = useCallback(() => {
+      setIsManuallyPaused(false);
+    }, []);
+
+    // Pause function
+    const pause = useCallback(() => {
+      setIsManuallyPaused(true);
+    }, []);
+
     // Auto play
     useEffect(() => {
-      if (!autoPlay || isPaused || prefersReducedMotion) return;
+      if (!autoPlay || isPaused || isManuallyPaused || prefersReducedMotion) return;
 
       const timer = setInterval(nextSlide, interval);
       return () => clearInterval(timer);
-    }, [autoPlay, interval, isPaused, nextSlide, prefersReducedMotion]);
+    }, [autoPlay, interval, isPaused, isManuallyPaused, nextSlide, prefersReducedMotion]);
 
     // Touch handlers for swipe
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -373,6 +395,35 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       );
     };
 
+    // Render play/pause button
+    const renderPlayPause = () => {
+      if (!showPlayPause || !autoPlay) return null;
+
+      const isPlaying = !isManuallyPaused;
+      const positionClasses = {
+        left: "left-4",
+        center: "left-1/2 -translate-x-1/2",
+        right: "right-4"
+      };
+
+      return (
+        <button
+          onClick={togglePlayPause}
+          className={merge(
+            "absolute bottom-4 z-20",
+            "w-8 h-8 rounded-full flex items-center justify-center",
+            "bg-white/80 hover:bg-white text-gray-800",
+            "transition-all duration-200",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+            positionClasses[playPausePosition]
+          )}
+          aria-label={isPlaying ? "일시정지" : "재생"}
+        >
+          {isPlaying ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
+        </button>
+      );
+    };
+
     // Render arrows
     const renderArrows = () => {
       if (!showArrows || arrowPosition === "hidden") return null;
@@ -440,6 +491,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
         >
           {renderSlides()}
           {renderArrows()}
+          {renderPlayPause()}
           {indicatorPosition.includes("inside") && renderIndicators()}
         </div>
         {!indicatorPosition.includes("inside") && renderIndicators()}
@@ -482,6 +534,22 @@ function ChevronRight({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function PlayIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+}
+
+function PauseIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
     </svg>
   );
 }
