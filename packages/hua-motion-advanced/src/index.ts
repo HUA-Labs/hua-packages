@@ -112,7 +112,9 @@ export type {
 } from './hooks/useGameLoop'
 export type {
   // Auto 모션 타입들
-  AutoMotionConfig
+  AutoMotionConfig,
+  MotionConfig,
+  MotionState
 } from './hooks/useMotion'
 export type {
   AutoSlideConfig

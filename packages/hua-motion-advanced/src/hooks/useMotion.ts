@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 
 export interface AutoMotionConfig {
   duration?: number
@@ -95,6 +95,10 @@ export function useMotion(
   } = config
 
   const ref = useRef<HTMLDivElement>(null)
+  const fromValuesRef = useRef(fromValues)
+  const toValuesRef = useRef(toValues)
+  const initialBgColor = useRef(fromValues.backgroundColor)
+
   const [state, setState] = useState<MotionState>({
     transform: '',
     opacity: fromValues.opacity ?? 1,
@@ -103,14 +107,14 @@ export function useMotion(
   })
 
   // 간단한 이징 함수
-  const easingFunction = (t: number) => {
+  const easingFunction = useCallback((t: number) => {
     switch (easing) {
       case 'ease-in': return t * t
       case 'ease-out': return 1 - (1 - t) * (1 - t)
       case 'ease-in-out': return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t)
       default: return t
     }
-  }
+  }, [easing])
 
   // 값 보간
   const interpolate = useCallback((from: number, to: number, progress: number): number => {
@@ -120,39 +124,41 @@ export function useMotion(
   // 모션 업데이트
   const updateMotion = useCallback((progress: number) => {
     const easedProgress = easingFunction(progress)
-    
+    const from = fromValuesRef.current
+    const to = toValuesRef.current
+
     const newState: MotionState = {
       transform: '',
       opacity: 1,
-      backgroundColor: state.backgroundColor,
+      backgroundColor: initialBgColor.current,
       isAnimating: true
     }
 
     // opacity 보간
-    if (fromValues.opacity !== undefined && toValues.opacity !== undefined) {
-      newState.opacity = interpolate(fromValues.opacity, toValues.opacity, easedProgress)
+    if (from.opacity !== undefined && to.opacity !== undefined) {
+      newState.opacity = interpolate(from.opacity, to.opacity, easedProgress)
     }
 
     // transform 보간
     const transforms: string[] = []
-    
-    if (fromValues.translateX !== undefined && toValues.translateX !== undefined) {
-      const translateX = interpolate(fromValues.translateX, toValues.translateX, easedProgress)
+
+    if (from.translateX !== undefined && to.translateX !== undefined) {
+      const translateX = interpolate(from.translateX, to.translateX, easedProgress)
       transforms.push(`translateX(${translateX}px)`)
     }
-    
-    if (fromValues.translateY !== undefined && toValues.translateY !== undefined) {
-      const translateY = interpolate(fromValues.translateY, toValues.translateY, easedProgress)
+
+    if (from.translateY !== undefined && to.translateY !== undefined) {
+      const translateY = interpolate(from.translateY, to.translateY, easedProgress)
       transforms.push(`translateY(${translateY}px)`)
     }
-    
-    if (fromValues.scale !== undefined && toValues.scale !== undefined) {
-      const scale = interpolate(fromValues.scale, toValues.scale, easedProgress)
-      transforms.push(`scale(${scale})`)
+
+    if (from.scale !== undefined && to.scale !== undefined) {
+      const scaleVal = interpolate(from.scale, to.scale, easedProgress)
+      transforms.push(`scale(${scaleVal})`)
     }
-    
-    if (fromValues.rotate !== undefined && toValues.rotate !== undefined) {
-      const rotate = interpolate(fromValues.rotate, toValues.rotate, easedProgress)
+
+    if (from.rotate !== undefined && to.rotate !== undefined) {
+      const rotate = interpolate(from.rotate, to.rotate, easedProgress)
       transforms.push(`rotate(${rotate}deg)`)
     }
 
@@ -161,12 +167,12 @@ export function useMotion(
     }
 
     // backgroundColor 보간
-    if (fromValues.backgroundColor && toValues.backgroundColor) {
-      newState.backgroundColor = easedProgress > 0.5 ? toValues.backgroundColor : fromValues.backgroundColor
+    if (from.backgroundColor && to.backgroundColor) {
+      newState.backgroundColor = easedProgress > 0.5 ? to.backgroundColor : from.backgroundColor
     }
 
     setState(newState)
-  }, [fromValues, toValues, easingFunction, interpolate, state.backgroundColor])
+  }, [easingFunction, interpolate])
 
   const start = useCallback(() => {
     setState(prev => ({ ...prev, isAnimating: true }))
@@ -191,23 +197,26 @@ export function useMotion(
   }, [duration, delay, updateMotion])
 
   const reset = useCallback(() => {
+    const from = fromValuesRef.current
     setState({
       transform: '',
-      opacity: fromValues.opacity ?? 1,
-      backgroundColor: fromValues.backgroundColor,
+      opacity: from.opacity ?? 1,
+      backgroundColor: from.backgroundColor,
       isAnimating: false
     })
-  }, [fromValues])
+  }, [])
 
   const stop = useCallback(() => {
     setState(prev => ({ ...prev, isAnimating: false }))
   }, [])
 
+  // autoStart는 마운트 시 한 번만 실행 (start 의존성 제거로 무한 루프 방지)
   useEffect(() => {
     if (autoStart) {
       start()
     }
-  }, [autoStart, start])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const setRef = (element: HTMLDivElement | null) => {
     if (ref.current !== element) {
@@ -215,8 +224,16 @@ export function useMotion(
     }
   }
 
+  // style 객체 생성 (편의용)
+  const style: React.CSSProperties = {
+    opacity: state.opacity,
+    ...(state.transform && { transform: state.transform }),
+    ...(state.backgroundColor && { backgroundColor: state.backgroundColor }),
+  }
+
   return {
     ref: setRef,
+    style,
     transform: state.transform,
     opacity: state.opacity,
     backgroundColor: state.backgroundColor,
