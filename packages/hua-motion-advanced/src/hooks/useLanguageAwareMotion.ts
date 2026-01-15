@@ -26,6 +26,14 @@ export function useLanguageAwareMotion(options: LanguageConfig) {
   const [isPaused, setIsPaused] = useState(false)
   const [internalLanguage, setInternalLanguage] = useState<string>('')
 
+  // ref로 상태 추적 (observer callback에서 안정적인 참조 사용)
+  const isVisibleRef = useRef(false)
+  const isPausedRef = useRef(false)
+
+  // state 변경 시 ref 동기화
+  isVisibleRef.current = isVisible
+  isPausedRef.current = isPaused
+
   // 언어 변경 감지
   useEffect(() => {
     if (externalLanguage && internalLanguage !== externalLanguage) {
@@ -58,7 +66,7 @@ export function useLanguageAwareMotion(options: LanguageConfig) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !isVisible && !isPaused) {
+          if (entry.isIntersecting && !isVisibleRef.current && !isPausedRef.current) {
             setTimeout(() => {
               setIsVisible(true)
             }, delay)
@@ -73,7 +81,7 @@ export function useLanguageAwareMotion(options: LanguageConfig) {
     return () => {
       observer.disconnect()
     }
-  }, [isVisible, isPaused, delay, threshold])
+  }, [delay, threshold])
 
   // 모션 스타일 생성
   const getMotionStyle = useCallback(() => {
