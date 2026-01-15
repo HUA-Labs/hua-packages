@@ -58,7 +58,7 @@ export type { CodeBlockProps } from './components/CodeBlock';
 export { Popover, PopoverTrigger, PopoverContent } from './components/Popover';
 export { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel, DropdownMenu, DropdownGroup } from './components/Dropdown';
 export { Drawer, DrawerHeader, DrawerContent, DrawerFooter } from './components/Drawer';
-export { BottomSheet } from './components/BottomSheet';
+export { BottomSheet, BottomSheetHeader, BottomSheetContent } from './components/BottomSheet';
 export { ConfirmModal } from './components/ConfirmModal';
 
 // UI Components - Form
@@ -92,6 +92,8 @@ export { ScrollToTop } from './components/ScrollToTop';
 export { ThemeProvider } from './components/ThemeProvider';
 export type { ThemeProviderProps, ThemeProviderState } from './components/ThemeProvider';
 export { ThemeToggle } from './components/ThemeToggle';
+export { Toggle } from './components/Toggle';
+export type { ToggleProps } from './components/Toggle';
 export { useTheme } from './components/ThemeProvider';
 
 // ❌ Advanced Specialized components moved to @hua-labs/ui/advanced
