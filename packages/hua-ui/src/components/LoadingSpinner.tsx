@@ -73,28 +73,36 @@ export function LoadingSpinner({
     success: "border-green-300 border-t-green-600 dark:border-green-600 dark:border-t-green-300",
     warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-600 dark:border-t-yellow-300",
     error: "border-red-300 border-t-red-600 dark:border-red-600 dark:border-t-red-300",
-    glass: "border-white/30 border-t-white/50 dark:border-slate-600/50 dark:border-t-slate-400/50"
+    glass: "border-white/50 border-t-white/90 dark:border-slate-400/50 dark:border-t-slate-200/80"
   }
 
   const renderSpinner = () => {
     switch (variant) {
       case "dots":
         return (
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-100" />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-200" />
+          <div className="flex space-x-1.5 items-center">
+            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         )
       case "bars":
         return (
-          <div className="flex space-x-1 h-full items-end">
-            <div className="w-1 bg-current animate-pulse" style={{ height: '60%' }} />
-            <div className="w-1 bg-current animate-pulse delay-100" style={{ height: '80%' }} />
-            <div className="w-1 bg-current animate-pulse delay-200" style={{ height: '40%' }} />
-            <div className="w-1 bg-current animate-pulse delay-300" style={{ height: '100%' }} />
-            <div className="w-1 bg-current animate-pulse delay-500" style={{ height: '70%' }} />
-          </div>
+          <>
+            <style>{`
+              @keyframes barWave {
+                0%, 40%, 100% { transform: scaleY(0.4); }
+                20% { transform: scaleY(1); }
+              }
+            `}</style>
+            <div className="flex space-x-0.5 h-full items-center">
+              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '0ms' }} />
+              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '100ms' }} />
+              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '200ms' }} />
+              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '300ms' }} />
+              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '400ms' }} />
+            </div>
+          </>
         )
       case "ring":
         return (

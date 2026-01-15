@@ -202,13 +202,13 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         )}
         
         <div className="flex-1 relative">
-          <div className={merge("relative", orientation === "vertical" ? "h-full" : "w-full")}>
+          <div className={merge("relative", orientation === "vertical" ? "h-full" : "w-full h-4 flex items-center")}>
             {/* 배경 트랙 */}
             <div className={merge(
               "absolute rounded-full",
               sizeClasses[size],
               variantClasses[variant],
-              orientation === "vertical" ? "w-full bottom-0" : "h-full left-0"
+              orientation === "vertical" ? "h-full left-1/2 -translate-x-1/2" : "w-full"
             )} />
             
             {/* 활성 트랙 (값에 따른 채워진 부분) */}
@@ -217,11 +217,11 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               <div className={merge(
                 "absolute rounded-full bg-blue-500 dark:bg-blue-400",
                 sizeClasses[size],
-                orientation === "vertical" 
-                  ? "w-full bottom-0" 
-                  : "h-full left-0"
+                orientation === "vertical"
+                  ? "left-1/2 -translate-x-1/2"
+                  : ""
               )} style={{
-                ...(orientation === "vertical" 
+                ...(orientation === "vertical"
                   ? {
                       bottom: `${(currentValue[0] - min) / (max - min) * 100}%`,
                       height: `${(currentValue[1] - currentValue[0]) / (max - min) * 100}%`
@@ -237,9 +237,9 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
               <div className={merge(
                 "absolute rounded-full bg-blue-500 dark:bg-blue-400",
                 sizeClasses[size],
-                orientation === "vertical" 
-                  ? "w-full bottom-0" 
-                  : "h-full left-0"
+                orientation === "vertical"
+                  ? "left-1/2 -translate-x-1/2 bottom-0"
+                  : "left-0"
               )} style={{
                 ...(orientation === "vertical"
                   ? { height: `${(currentValue[0] - min) / (max - min) * 100}%` }

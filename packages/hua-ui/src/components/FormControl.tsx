@@ -12,6 +12,7 @@ import { merge } from "../lib/utils";
  * @property {boolean} [required=false] - 필수 필드 표시 / Required field indicator
  * @property {string} [htmlFor] - 레이블의 for 속성 / Label's for attribute
  * @property {boolean} [showErrorIcon=true] - 에러 아이콘 표시 / Show error icon
+ * @property {boolean} [suppressBrowserValidation=true] - 브라우저 유효성 검사 UI 숨기기 / Hide browser validation UI
  * @property {React.ReactNode} children - 폼 입력 요소 / Form input element
  */
 export interface FormControlProps {
@@ -21,6 +22,7 @@ export interface FormControlProps {
   required?: boolean;
   htmlFor?: string;
   showErrorIcon?: boolean;
+  suppressBrowserValidation?: boolean;
   className?: string;
   children: React.ReactNode;
 }
@@ -58,10 +60,36 @@ function FormControl({
   required = false,
   htmlFor,
   showErrorIcon = true,
+  suppressBrowserValidation = true,
   className,
   children,
 }: FormControlProps) {
   const hasError = !!error;
+
+  // Clone children to add aria-invalid and suppress browser validation
+  const enhancedChildren = React.Children.map(children, (child) => {
+    if (React.isValidElement(child)) {
+      const childProps: Record<string, unknown> = {
+        "aria-invalid": hasError || undefined,
+        "aria-describedby": hasError ? `${htmlFor}-error` : undefined,
+      };
+
+      // Suppress browser validation tooltip by handling onInvalid
+      if (suppressBrowserValidation) {
+        childProps.onInvalid = (e: React.FormEvent) => {
+          e.preventDefault();
+          // Call original onInvalid if exists
+          const originalOnInvalid = (child.props as Record<string, unknown>).onInvalid;
+          if (typeof originalOnInvalid === "function") {
+            originalOnInvalid(e);
+          }
+        };
+      }
+
+      return React.cloneElement(child, childProps);
+    }
+    return child;
+  });
 
   return (
     <div className={merge("space-y-2", className)}>
@@ -88,14 +116,15 @@ function FormControl({
         <p className="text-sm text-muted-foreground">{description}</p>
       )}
 
-      {/* Input */}
-      <div className="relative">
-        {children}
+      {/* Input - with :invalid styling support */}
+      <div className="relative [&_input:invalid]:border-red-300 [&_input:invalid]:dark:border-red-500/50 [&_select:invalid]:border-red-300 [&_select:invalid]:dark:border-red-500/50 [&_textarea:invalid]:border-red-300 [&_textarea:invalid]:dark:border-red-500/50">
+        {enhancedChildren}
       </div>
 
       {/* Error Message */}
       {hasError && (
         <div
+          id={htmlFor ? `${htmlFor}-error` : undefined}
           className="flex items-start gap-2 text-sm text-red-500 dark:text-red-400"
           role="alert"
           aria-live="polite"
