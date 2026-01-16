@@ -191,12 +191,15 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           ref={ref}
           className={merge(
             "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
-            heightClasses[height],
+            height !== "full" ? heightClasses[height] : "",
             isAnimating ? (open ? "translate-y-0" : "translate-y-full") : "",
             className
           )}
           style={{
-            height: `${currentHeight}%`,
+            // height prop이 "full"일 때만 퍼센트 높이 사용 (스냅 포인트)
+            // 그 외에는 heightClasses의 고정 높이 사용
+            height: height === "full" ? `${currentHeight}%` : undefined,
+            maxHeight: height !== "full" ? undefined : "100%",
             transform: isDragging ? `translateY(${currentY - startY}px)` : undefined
           }}
           onTouchStart={handleTouchStart}
