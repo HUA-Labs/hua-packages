@@ -1,7 +1,7 @@
 # @hua-labs/ui
 
-Modern React UI component library with 70+ production-ready components.
-70개 이상의 프로덕션 레디 React UI 컴포넌트 라이브러리
+Modern React UI component library with production-ready components.
+프로덕션 레디 React UI 컴포넌트 라이브러리
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/ui.svg)](https://www.npmjs.com/package/@hua-labs/ui)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/ui.svg)](https://www.npmjs.com/package/@hua-labs/ui)
@@ -19,18 +19,17 @@ Modern React UI component library with 70+ production-ready components.
 
 ### Overview
 
-Accessible, TypeScript-native component library for React applications. Provides modular entry points for optimal bundle size and comprehensive dark mode support.
+Accessible, TypeScript component library for React applications. Provides modular entry points for optimal bundle size and dark mode support.
 
 ### Features
 
-- 70+ production-ready components
+- Production-ready components
 - Modular entry points for bundle optimization
-- Full TypeScript support
+- TypeScript support
 - Dark mode support
 - Accessible (ARIA attributes, keyboard navigation)
 - Responsive design
 - Tree-shaking friendly
-- Zero external dependencies (except React)
 - Tailwind CSS based styling
 
 ### Installation
@@ -80,7 +79,7 @@ function App() {
 
 ### Entry Points
 
-HUA UI is organized into **Core**, **Form**, **Navigation**, **Feedback**, and **Advanced** entry points. Import only the components you need from specific entry points to optimize bundle size.
+HUA UI is organized into **Core**, **Form**, **Navigation**, and **Feedback** entry points. Import only the components you need from specific entry points to optimize bundle size.
 
 | Entry | Path | Description |
 |-------|------|-------------|
@@ -88,9 +87,6 @@ HUA UI is organized into **Core**, **Form**, **Navigation**, **Feedback**, and *
 | Form | `@hua-labs/ui/form` | All form components (Input, Select, DatePicker, Upload, Autocomplete, etc.) |
 | Navigation | `@hua-labs/ui/navigation` | Navigation components for page transitions (PageNavigation, PageTransition) |
 | Feedback | `@hua-labs/ui/feedback` | Toast notifications for user feedback (ToastProvider, useToast) |
-| Advanced (all) | `@hua-labs/ui/advanced` | Advanced components + experimental features |
-| Dashboard widgets | `@hua-labs/ui/advanced/dashboard` | Dashboard-specific components (StatCard, TransactionsTable, TrendChart, etc.) |
-| Motion/Experimental | `@hua-labs/ui/advanced/motion` | AdvancedPageTransition and experimental features |
 
 ```tsx
 // Core components (most commonly used components)
@@ -105,13 +101,6 @@ import { PageNavigation, PageTransition } from '@hua-labs/ui/navigation';
 // Feedback components (Toast - user feedback)
 import { ToastProvider, useToast } from '@hua-labs/ui/feedback';
 import '@hua-labs/ui/styles/toast.css';
-
-// Advanced components
-import { StatCard, DashboardSidebar } from '@hua-labs/ui/advanced';
-
-// Import from specific sub-paths
-import { TransactionsTable } from '@hua-labs/ui/advanced/dashboard';
-import { AdvancedPageTransition } from '@hua-labs/ui/advanced/motion';
 ```
 
 **Note**: See [package structure documentation](./docs/PACKAGE_STRUCTURE.md) for detailed entry point information.
@@ -123,9 +112,9 @@ HUA UI supports modular entry points and tree-shaking. Import only the component
 **Optimization Tips**:
 - Import only needed components
 - Use specific entry points (Form, Navigation, Feedback)
-- Import Advanced components only when actually used
+- Tree-shaking automatically removes unused code
 
-**Note**: You can import all components from Core, but it's not recommended. Using specific entry points provides better bundle size optimization. Next.js + Turbopack supports tree-shaking automatically.
+**Note**: Using specific entry points provides better bundle size optimization. Tree-shaking automatically removes unused code.
 
 ### CSS Import (Toast Component Usage)
 
@@ -147,20 +136,25 @@ import '@hua-labs/ui/styles/toast.css';
 
 #### Core Components
 
-- **Basic UI**: Button, Action, Input, Icon, Avatar
-- **Layout**: Container, Grid, Stack, Card, Panel
+- **Basic UI**: Button, Input, Icon, Avatar, Link
+- **Layout**: Container, Grid, Stack, Card, Panel, Divider, ActionToolbar, ComponentLayout
 - **Navigation**: Navigation, Breadcrumb, Pagination, PageNavigation, PageTransition
 - **Data Display**: Table, Badge, Progress, Skeleton
 - **Feedback**: Alert, Toast, LoadingSpinner, Tooltip
-- **Overlay**: Modal, Drawer, Popover, Dropdown, BottomSheet
-- **Form**: Form, Input, Select, Checkbox, Radio, Switch, Slider, Textarea, DatePicker, Upload, Autocomplete
-- **Interactive**: Accordion, Tabs, Menu, Command
+- **Overlay**: Modal, Drawer, Popover, Dropdown, BottomSheet, ConfirmModal
+- **Form**: Form, FormControl, Input, NumberInput, Select, Checkbox, Radio, Switch, Slider, Textarea, DatePicker, Upload, Autocomplete, ColorPicker, Label
+- **Interactive**: Accordion, Tabs, Menu, ContextMenu, Command
+- **Code Display**: CodeBlock, InlineCode
+- **Specialized**: ScrollArea, ScrollToTop, Toggle
 - **Theme**: ThemeProvider, ThemeToggle
 
 #### Utilities
 
-- `merge`, `mergeIf`, `mergeMap`, `cn` - Class merging utilities
-- `formatRelativeTime` - Date formatting utility
+- **Class Utilities**: `merge`, `mergeIf`, `mergeMap`, `cn` - Smart class merging utilities
+- **Date Utilities**: `formatRelativeTime` - Relative time formatting
+- **Style System**: Color styles, variant styles, size styles, responsive utilities
+- **Motion Hooks**: `useInView`, `useScrollProgress`, `useMouse`, `useReducedMotion`, `useWindowSize`
+- **Icon System**: `Icon`, `IconProvider`, `useIconContext` - Flexible icon system with multiple providers
 
 ### Documentation
 
@@ -186,18 +180,17 @@ import '@hua-labs/ui/styles/toast.css';
 
 ### 개요
 
-접근 가능하고 TypeScript 네이티브인 React 컴포넌트 라이브러리입니다. 최적의 번들 크기를 위한 모듈식 진입점과 포괄적인 다크 모드 지원을 제공합니다.
+접근 가능한 TypeScript React 컴포넌트 라이브러리입니다. 번들 크기 최적화를 위한 모듈식 진입점과 다크 모드 지원을 제공합니다.
 
 ### 주요 기능
 
-- 70개 이상의 프로덕션 레디 컴포넌트
+- 프로덕션 레디 컴포넌트
 - 번들 최적화를 위한 모듈식 진입점
-- 완전한 TypeScript 지원
+- TypeScript 지원
 - 다크 모드 지원
 - 접근성 (ARIA 속성, 키보드 네비게이션)
 - 반응형 디자인
 - Tree-shaking 친화적
-- React 외부 의존성 없음
 - Tailwind CSS 기반 스타일링
 
 ### 설치
@@ -247,7 +240,7 @@ function App() {
 
 ### 진입점
 
-HUA UI는 **Core**, **Form**, **Navigation**, **Feedback**, **Advanced** 진입점으로 구성됩니다. 번들 크기를 최적화하려면 필요한 컴포넌트만 특정 진입점에서 import하세요.
+HUA UI는 **Core**, **Form**, **Navigation**, **Feedback** 진입점으로 구성됩니다. 번들 크기를 최적화하려면 필요한 컴포넌트만 특정 진입점에서 import하세요.
 
 | 진입점 | 경로 | 설명 |
 |--------|------|------|
@@ -255,9 +248,6 @@ HUA UI는 **Core**, **Form**, **Navigation**, **Feedback**, **Advanced** 진입�
 | Form | `@hua-labs/ui/form` | 모든 폼 컴포넌트 (Input, Select, DatePicker, Upload, Autocomplete 등) |
 | Navigation | `@hua-labs/ui/navigation` | 페이지 전환용 네비게이션 컴포넌트 (PageNavigation, PageTransition) |
 | Feedback | `@hua-labs/ui/feedback` | 사용자 피드백용 Toast 알림 (ToastProvider, useToast) |
-| Advanced (전체) | `@hua-labs/ui/advanced` | 고급 컴포넌트 + 실험적 기능 |
-| Dashboard 위젯 | `@hua-labs/ui/advanced/dashboard` | 대시보드 전용 컴포넌트 (StatCard, TransactionsTable, TrendChart 등) |
-| Motion/실험적 | `@hua-labs/ui/advanced/motion` | AdvancedPageTransition 및 실험적 기능 |
 
 ```tsx
 // Core 컴포넌트 (가장 많이 사용되는 컴포넌트)
@@ -272,13 +262,6 @@ import { PageNavigation, PageTransition } from '@hua-labs/ui/navigation';
 // Feedback 컴포넌트 (Toast - 사용자 피드백)
 import { ToastProvider, useToast } from '@hua-labs/ui/feedback';
 import '@hua-labs/ui/styles/toast.css';
-
-// Advanced 컴포넌트
-import { StatCard, DashboardSidebar } from '@hua-labs/ui/advanced';
-
-// 특정 하위 경로에서 import
-import { TransactionsTable } from '@hua-labs/ui/advanced/dashboard';
-import { AdvancedPageTransition } from '@hua-labs/ui/advanced/motion';
 ```
 
 **참고**: 자세한 진입점 정보는 [패키지 구조 문서](./docs/PACKAGE_STRUCTURE.md)를 참고하세요.
@@ -290,9 +273,9 @@ HUA UI는 모듈식 진입점과 tree-shaking을 지원합니다. 번들 크기�
 **최적화 팁**:
 - 필요한 컴포넌트만 import
 - 특정 진입점 사용 (Form, Navigation, Feedback)
-- Advanced 컴포넌트는 실제로 사용할 때만 import
+- Tree-shaking이 자동으로 사용하지 않는 코드를 제거합니다
 
-**참고**: Core에서 모든 컴포넌트를 import할 수 있지만 권장하지 않습니다. 특정 진입점을 사용하면 더 나은 번들 크기 최적화를 제공합니다. Next.js + Turbopack은 자동으로 tree-shaking을 지원합니다.
+**참고**: 특정 진입점을 사용하면 번들 크기 최적화에 도움이 됩니다. Tree-shaking이 자동으로 사용하지 않는 코드를 제거합니다.
 
 ### CSS Import (Toast 컴포넌트 사용 시)
 
@@ -314,14 +297,16 @@ import '@hua-labs/ui/styles/toast.css';
 
 #### Core 컴포넌트
 
-- **기본 UI**: Button, Action, Input, Icon, Avatar
-- **레이아웃**: Container, Grid, Stack, Card, Panel
+- **기본 UI**: Button, Input, Icon, Avatar, Link
+- **레이아웃**: Container, Grid, Stack, Card, Panel, Divider, ActionToolbar, ComponentLayout
 - **네비게이션**: Navigation, Breadcrumb, Pagination, PageNavigation, PageTransition
 - **데이터 표시**: Table, Badge, Progress, Skeleton
 - **피드백**: Alert, Toast, LoadingSpinner, Tooltip
-- **오버레이**: Modal, Drawer, Popover, Dropdown, BottomSheet
-- **폼**: Form, Input, Select, Checkbox, Radio, Switch, Slider, Textarea, DatePicker, Upload, Autocomplete
-- **인터랙티브**: Accordion, Tabs, Menu, Command
+- **오버레이**: Modal, Drawer, Popover, Dropdown, BottomSheet, ConfirmModal
+- **폼**: Form, FormControl, Input, NumberInput, Select, Checkbox, Radio, Switch, Slider, Textarea, DatePicker, Upload, Autocomplete, ColorPicker, Label
+- **인터랙티브**: Accordion, Tabs, Menu, ContextMenu, Command
+- **코드 표시**: CodeBlock, InlineCode
+- **특수 컴포넌트**: ScrollArea, ScrollToTop, Toggle
 - **테마**: ThemeProvider, ThemeToggle
 
 #### 유틸리티
