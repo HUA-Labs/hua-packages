@@ -870,6 +870,8 @@ importers:
         specifier: ^4.0.14
         version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@22.19.3)(@vitest/browser-playwright@4.0.14)(jiti@2.6.1)(jsdom@27.2.0)(lightningcss@1.30.1)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)
 
+  packages/create-hua: {}
+
   packages/create-hua-ux:
     dependencies:
       chalk:
@@ -1385,9 +1387,6 @@ importers:
       '@hua-labs/i18n-core-zustand':
         specifier: workspace:*
         version: link:../hua-i18n-core-zustand
-      '@hua-labs/motion-advanced':
-        specifier: workspace:*
-        version: link:../hua-motion-advanced
       '@hua-labs/motion-core':
         specifier: workspace:*
         version: link:../hua-motion-core
