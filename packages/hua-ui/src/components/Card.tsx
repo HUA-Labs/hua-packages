@@ -7,10 +7,14 @@ import { merge } from "../lib/utils"
  * Card 컴포넌트의 props / Card component props
  * @typedef {Object} CardProps
  * @property {"default" | "outline" | "elevated"} [variant="default"] - 카드 스타일 변형 / Card style variant
+ * @property {"none" | "sm" | "md" | "lg"} [shadow] - 그림자 크기 (none으로 끄기) / Shadow size (use none to disable)
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "outline" | "elevated"
+  shadow?: "none" | "sm" | "md" | "lg"
+  /** 호버 시 효과 활성화 */
+  hoverable?: boolean
 }
 
 /**
@@ -49,11 +53,18 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} Card 컴포넌트 / Card component
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", ...props }, ref) => {
+  ({ className, variant = "default", shadow, ...props }, ref) => {
     const variantClasses = {
       default: "bg-card text-card-foreground border border-border",
       outline: "bg-transparent border-2 border-border",
       elevated: "bg-card text-card-foreground shadow-lg border border-border"
+    }
+
+    const shadowClasses = {
+      none: "shadow-none",
+      sm: "shadow-sm",
+      md: "shadow-md",
+      lg: "shadow-lg"
     }
 
     return (
@@ -62,6 +73,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         className={merge(
           "rounded-lg p-6",
           variantClasses[variant],
+          shadow && shadowClasses[shadow],
           className
         )}
         {...props}

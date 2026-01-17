@@ -182,7 +182,7 @@ export function Logo({
 
   return (
     <div
-      className={merge("inline-flex items-center gap-1", className)}
+      className={merge("inline-flex items-center gap-1 flex-shrink-0 min-w-max", className)}
       {...(props as React.HTMLAttributes<HTMLDivElement>)}
     >
       {/* 엠블럼 */}
