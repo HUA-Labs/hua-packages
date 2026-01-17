@@ -8,11 +8,14 @@ import { merge } from "../lib/utils"
  * @typedef {Object} CardProps
  * @property {"default" | "outline" | "elevated"} [variant="default"] - 카드 스타일 변형 / Card style variant
  * @property {"none" | "sm" | "md" | "lg"} [shadow] - 그림자 크기 (none으로 끄기) / Shadow size (use none to disable)
+ * @property {"none" | "sm" | "md" | "lg"} [padding="none"] - 패딩 크기 (기본: none) / Padding size (default: none)
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "outline" | "elevated"
   shadow?: "none" | "sm" | "md" | "lg"
+  /** 패딩 크기 (기본: none - 슬림 기본값, 필요시 늘리기) */
+  padding?: "none" | "sm" | "md" | "lg"
   /** 호버 시 효과 활성화 */
   hoverable?: boolean
 }
@@ -53,7 +56,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} Card 컴포넌트 / Card component
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", shadow, ...props }, ref) => {
+  ({ className, variant = "default", shadow, padding = "none", ...props }, ref) => {
     const variantClasses = {
       default: "bg-card text-card-foreground border border-border",
       outline: "bg-transparent border-2 border-border",
@@ -67,13 +70,22 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       lg: "shadow-lg"
     }
 
+    // 슬림 기본값: none, 필요시 옵션으로 늘리기
+    const paddingClasses = {
+      none: "",
+      sm: "p-3",
+      md: "p-4",
+      lg: "p-6"
+    }
+
     return (
       <div
         ref={ref}
         className={merge(
-          "rounded-lg p-6",
+          "rounded-lg",
           variantClasses[variant],
           shadow && shadowClasses[shadow],
+          paddingClasses[padding],
           className
         )}
         {...props}
@@ -105,7 +117,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("flex flex-col space-y-1.5 p-6", className)}
+      className={merge("flex flex-col space-y-1 p-3", className)}
       {...props}
     />
   )
@@ -135,7 +147,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, CardTitleProps>(
     <h3
       ref={ref}
       className={merge(
-        "text-2xl font-semibold leading-none tracking-tight",
+        "text-base md:text-lg font-semibold leading-tight tracking-tight",
         className
       )}
       {...props}
@@ -193,7 +205,7 @@ export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={merge("p-6 pt-0", className)} {...props} />
+    <div ref={ref} className={merge("px-3 pb-3", className)} {...props} />
   )
 )
 
@@ -220,7 +232,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("flex items-center p-6 pt-0", className)}
+      className={merge("flex items-center px-3 pb-3", className)}
       {...props}
     />
   )
