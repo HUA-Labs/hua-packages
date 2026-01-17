@@ -124,7 +124,7 @@ function createButtonVariantStyle(
       return "bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)] hover:opacity-90";
 
     case "outline":
-      return "border-2 border-[var(--color-input)] bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-foreground)]";
+      return "border-2 border-[var(--color-border)] bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-foreground)]";
 
     case "secondary":
       return "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:opacity-80";

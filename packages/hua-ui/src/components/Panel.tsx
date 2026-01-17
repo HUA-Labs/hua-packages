@@ -33,7 +33,7 @@ import { Card, CardProps } from "./Card"
  * @property {boolean} [hoverGlow=false] - 호버 시 글로우 효과 / Glow effect on hover
  * @extends {Omit<CardProps, 'variant' | 'style'>}
  */
-export interface PanelProps extends Omit<CardProps, 'variant' | 'style'> {
+export interface PanelProps extends Omit<CardProps, 'variant' | 'style' | 'padding'> {
   // 🆕 Panel 전용 고급 속성들
   style?: "default" | "solid" | "glass" | "outline" | "elevated" | "neon" | "holographic" | "cyberpunk" | "minimal" | "luxury"
   effect?: "none" | "glow" | "shadow" | "gradient" | "animated"
