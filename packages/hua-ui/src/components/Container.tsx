@@ -66,12 +66,13 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
       full: "max-w-full"
     }
 
+    // 반응형 패딩: 모바일에서 더 좁게
     const paddingClasses = {
       none: "",
-      sm: "px-4 py-8", // 16px 좌우, 32px 상하
-      md: "px-6 py-12", // 24px 좌우, 48px 상하
-      lg: "px-8 py-16", // 32px 좌우, 64px 상하
-      xl: "px-12 py-20" // 48px 좌우, 80px 상하
+      sm: "px-3 sm:px-4 py-6 sm:py-8", // 12px → 16px 좌우, 24px → 32px 상하
+      md: "px-4 sm:px-6 py-8 sm:py-12", // 16px → 24px 좌우, 32px → 48px 상하
+      lg: "px-4 sm:px-6 lg:px-8 py-10 sm:py-16", // 16px → 24px → 32px 좌우
+      xl: "px-6 sm:px-8 lg:px-12 py-12 sm:py-20" // 24px → 32px → 48px 좌우
     }
 
     return (

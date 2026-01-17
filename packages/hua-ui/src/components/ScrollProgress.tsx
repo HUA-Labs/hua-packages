@@ -105,12 +105,12 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
       {...props}
     >
       {/* 배경 바 */}
-      <div className="w-full h-full bg-border" />
+      <div className="absolute inset-0 w-full h-full bg-border/30" />
       
-      {/* 진행률 바 */}
+      {/* 진행률 바 - absolute로 배경 위에 표시 */}
       <div
         className={merge(
-          'h-full origin-left transition-all duration-100 ease-out',
+          'absolute top-0 left-0 h-full origin-left transition-all duration-100 ease-out',
           progressColors[color] || progressColors.gradient
         )}
         style={{

@@ -175,8 +175,12 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
       none: null,
       gradient: (
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-teal-400 via-cyan-500 to-teal-600 opacity-30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tr from-cyan-400 via-teal-500 to-emerald-600 opacity-20 rounded-full blur-2xl" />
+          {/* 왼쪽 위 - 메인 그라데이션 */}
+          <div className="absolute top-0 left-0 w-80 h-80 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] -translate-x-1/3 -translate-y-1/3 rounded-full bg-gradient-to-br from-teal-400 via-cyan-500 to-teal-600 opacity-40 blur-3xl" />
+          {/* 오른쪽 아래 - 보조 그라데이션 */}
+          <div className="absolute bottom-0 right-0 w-72 h-72 sm:w-80 sm:h-80 md:w-[400px] md:h-[400px] translate-x-1/4 translate-y-1/4 rounded-full bg-gradient-to-tr from-cyan-400 via-teal-500 to-emerald-500 opacity-35 blur-3xl" />
+          {/* 중앙 액센트 */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full bg-teal-500/20 blur-2xl" />
         </div>
       ),
       particles: (
@@ -324,6 +328,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
                   <Button
                     href={currentContent.primaryAction.href}
                     size={size === "xl" || size === "full" ? "lg" : "md"}
+                    hover="scale"
                     className="inline-flex items-center gap-2"
                   >
                     {currentContent.primaryAction.icon}
@@ -336,6 +341,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
                     href={currentContent.secondaryAction.href}
                     variant="outline"
                     size={size === "xl" || size === "full" ? "lg" : "md"}
+                    hover="scale"
                     className="inline-flex items-center gap-2"
                   >
                     {currentContent.secondaryAction.icon}
