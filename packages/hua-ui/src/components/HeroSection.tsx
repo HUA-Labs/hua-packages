@@ -306,12 +306,17 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
               )}
             </h1>
 
-            <p className={merge(
+            <div className={merge(
               "text-muted-foreground mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto",
               descriptionSizeClasses[size]
             )}>
-              {currentContent.description}
-            </p>
+              {currentContent.description.split('\n').map((line, i, arr) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </div>
 
             {(currentContent.primaryAction || currentContent.secondaryAction) && (
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
