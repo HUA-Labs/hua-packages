@@ -61,7 +61,10 @@ export const iconNames = [
   'clock', 'timer', 'calendar', 'calendarDays',
   
   // UI & Theme
-  'monitor', 'sun', 'moon', 'sparkles', 'lightbulb', 'brain',
+  'monitor', 'sun', 'moon', 'sparkle', 'sparkles', 'lightbulb', 'brain',
+
+  // Device & Platform
+  'globe', 'deviceMobile', 'smartphone', 'floppyDisk',
   
   // Navigation Extended
   'externalLink', 'link', 'moreHorizontal', 'moreVertical',
@@ -83,7 +86,7 @@ export const iconNames = [
 export const iconProviderMapping: Record<string, {
   lucide: string
   phosphor: string
-  untitled: string
+  iconsax?: string
 }> = PROJECT_ICONS
 
 /**
@@ -98,12 +101,12 @@ export function isValidIconName(name: string): name is AllIconName {
  */
 export function getIconNameForProvider(
   iconName: string,
-  provider: 'lucide' | 'phosphor' | 'untitled'
+  provider: 'lucide' | 'phosphor' | 'iconsax'
 ): string | null {
   const mapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
   if (!mapping) return null
-  
-  return mapping[provider] || null
+
+  return (mapping as Record<string, string>)[provider] || null
 }
 
 

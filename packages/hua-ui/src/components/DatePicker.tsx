@@ -143,9 +143,57 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const daysInMonth = getDaysInMonth(year, month)
     const firstDay = getFirstDayOfMonth(year, month)
 
-    const weekDays = locale === "ko-KR" 
-      ? ["일", "월", "화", "수", "목", "금", "토"]
-      : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    // 로케일별 요일 텍스트
+    const weekDaysMap: Record<string, string[]> = {
+      "ko-KR": ["일", "월", "화", "수", "목", "금", "토"],
+      "ko": ["일", "월", "화", "수", "목", "금", "토"],
+      "ja-JP": ["日", "月", "火", "水", "木", "金", "土"],
+      "ja": ["日", "月", "火", "水", "木", "金", "土"],
+      "en-US": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "en": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    }
+    const weekDays = weekDaysMap[locale] || weekDaysMap["en"]
+
+    // 로케일별 월 포맷
+    const formatMonth = (year: number, month: number, loc: string): string => {
+      if (loc === "ko-KR" || loc === "ko") {
+        return `${year}년 ${month + 1}월`
+      } else if (loc === "ja-JP" || loc === "ja") {
+        return `${year}年 ${month + 1}月`
+      } else {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"]
+        return `${monthNames[month]} ${year}`
+      }
+    }
+
+    // 로케일별 "오늘" 텍스트
+    const todayTextMap: Record<string, string> = {
+      "ko-KR": "오늘",
+      "ko": "오늘",
+      "ja-JP": "今日",
+      "ja": "今日",
+      "en-US": "Today",
+      "en": "Today",
+    }
+    const todayText = todayTextMap[locale] || "Today"
+
+    // 로케일별 aria-label 텍스트
+    const ariaLabels = {
+      prevMonth: locale.startsWith("ko") ? "이전 달" : locale.startsWith("ja") ? "前月" : "Previous month",
+      nextMonth: locale.startsWith("ko") ? "다음 달" : locale.startsWith("ja") ? "翌月" : "Next month",
+    }
+
+    // 날짜 aria-label 포맷
+    const formatDateAriaLabel = (date: Date, loc: string): string => {
+      if (loc.startsWith("ko")) {
+        return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+      } else if (loc.startsWith("ja")) {
+        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+      } else {
+        return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+      }
+    }
 
     const isDateDisabled = (date: Date): boolean => {
       if (minDate && date < minDate) return true
@@ -234,18 +282,18 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   type="button"
                   onClick={handlePrevMonth}
                   className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="이전 달"
+                  aria-label={ariaLabels.prevMonth}
                 >
                   <Icon name="chevronLeft" className="h-4 w-4" />
                 </button>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {year}년 {month + 1}월
+                  {formatMonth(year, month, locale)}
                 </div>
                 <button
                   type="button"
                   onClick={handleNextMonth}
                   className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="다음 달"
+                  aria-label={ariaLabels.nextMonth}
                 >
                   <Icon name="chevronRight" className="h-4 w-4" />
                 </button>
@@ -299,7 +347,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                         isTodayDate && !isSelected && "ring-2 ring-blue-500",
                         isHovered && !isSelected && "bg-blue-100 dark:bg-blue-900/30"
                       )}
-                      aria-label={`${year}년 ${month + 1}월 ${date.getDate()}일`}
+                      aria-label={formatDateAriaLabel(date, locale)}
                     >
                       {date.getDate()}
                     </button>
@@ -315,7 +363,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   onClick={handleToday}
                   className="w-full"
                 >
-                  오늘
+                  {todayText}
                 </Button>
               </div>
             </div>
