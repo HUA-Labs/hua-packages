@@ -117,6 +117,10 @@ import {
   Brain,
   Flag,
   Square,
+  Sparkle,
+  Sparkles,
+  Globe,
+  Smartphone,
 } from 'lucide-react'
 
 // 핵심 아이콘 객체
@@ -227,6 +231,12 @@ export const icons = {
   brain: Brain,
   flag: Flag,
   square: Square,
+  sparkle: Sparkle,
+  sparkles: Sparkles,
+  globe: Globe,
+  smartphone: Smartphone,
+  deviceMobile: Smartphone,
+  floppyDisk: Save,
 } as const
 
 // 아이콘 이름 타입
