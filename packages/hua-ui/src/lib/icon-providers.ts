@@ -1,25 +1,42 @@
 /**
  * Icon Provider System
- * 
- * Supports multiple icon libraries:
- * - Lucide Icons (default)
- * - Phosphor Icons
- * - Untitled Icons (SVG-based)
- * - Iconsax Icons (SVG-based, dynamically loaded)
- * 
- * Only imports icons that are actually used in the project for optimal bundle size.
+ *
+ * 각 프로바이더별 로딩 전략 / Loading strategies per provider:
+ *
+ * 1. Lucide Icons (https://lucide.dev) - default
+ *    - Official package: lucide-react (ISC License)
+ *    - 정적 import로 번들에 포함 / Statically imported, included in bundle
+ *    - PROJECT_ICONS에 매핑된 아이콘만 사용 권장 / Use mapped icons for tree-shaking
+ *    - 폴백: 직접 이름으로 동적 조회 가능 / Fallback: direct name lookup available
+ *
+ * 2. Phosphor Icons (https://phosphoricons.com)
+ *    - Official package: @phosphor-icons/react (MIT License)
+ *    - 지연 로딩 (lazy load) / Lazy loaded on demand
+ *    - initPhosphorIcons() 호출 시에만 로드 / Only loaded when initPhosphorIcons() called
+ *    - tree-shaking 지원 / Supports tree-shaking
+ *
+ * 3. Iconsax Icons (https://iconsax.io)
+ *    - SVG 기반 동적 로딩 / SVG-based dynamic loading
+ *    - 캐시 시스템으로 성능 최적화 / Cached for performance
+ *    - getIconsaxIconSync로 동기 캐시 조회 / Sync cache lookup via getIconsaxIconSync
+ *    - Free for personal and commercial use - thanks Iconsax team!
+ *
+ * 아이콘 조회 방식 / Icon Resolution:
+ * - PROJECT_ICONS 매핑: 통일된 이름으로 프로바이더별 아이콘 조회 / Unified name mapping
+ * - 폴백 동적 조회: PROJECT_ICONS에 없는 아이콘도 직접 이름으로 사용 가능
+ *   Fallback: Icons not in PROJECT_ICONS can be used by direct name
  */
 
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { loadIconsaxIcon, normalizeIconsaxIconName, getIconsaxIconSync } from './iconsax-loader'
+import { normalizeIconsaxIconName, getIconsaxIconSync } from './iconsax-loader'
 
 // Phosphor Icons - lazy loaded, tree-shakeable
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
 
 // Icon Provider Type
-export type IconProvider = 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
+export type IconProvider = 'lucide' | 'phosphor' | 'iconsax' | 'untitled'
 
 // Icon Provider Configuration
 export interface IconProviderConfig {
@@ -34,139 +51,146 @@ export interface IconProviderConfig {
  */
 export const PROJECT_ICONS = {
   // Navigation & Layout
-  'home': { lucide: 'Home', phosphor: 'House', untitled: 'home', iconsax: 'Home2' },
-  'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour', untitled: 'layout-dashboard' },
-  'folder': { lucide: 'Folder', phosphor: 'Folder', untitled: 'folder', iconsax: 'Folder' },
-  'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'alert-circle' },
-  'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'alert-circle' },
-  'columns': { lucide: 'Columns', phosphor: 'Columns', untitled: 'columns' },
-  'users': { lucide: 'Users', phosphor: 'Users', untitled: 'users' },
-  'settings': { lucide: 'Settings', phosphor: 'Gear', untitled: 'settings' },
-  'menu': { lucide: 'Menu', phosphor: 'List', untitled: 'menu', iconsax: 'Menu' },
-  'close': { lucide: 'X', phosphor: 'X', untitled: 'close', iconsax: 'CloseCircle' },
-  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft', untitled: 'chevron-left' },
-  'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight', untitled: 'chevron-right' },
-  'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown', untitled: 'chevron-down' },
-  'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp', untitled: 'chevron-up' },
-  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', untitled: 'arrow-left', iconsax: 'ArrowLeft' },
-  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', untitled: 'arrow-right', iconsax: 'ArrowRight' },
-  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', untitled: 'arrow-up', iconsax: 'ArrowUp' },
-  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', untitled: 'arrow-down', iconsax: 'ArrowDown' },
+  'home': { lucide: 'Home', phosphor: 'House', iconsax: 'Home2' },
+  'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour' },
+  'folder': { lucide: 'Folder', phosphor: 'Folder', iconsax: 'Folder' },
+  'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle' },
+  'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle' },
+  'columns': { lucide: 'Columns', phosphor: 'Columns' },
+  'users': { lucide: 'Users', phosphor: 'Users' },
+  'settings': { lucide: 'Settings', phosphor: 'Gear' },
+  'menu': { lucide: 'Menu', phosphor: 'List', iconsax: 'Menu' },
+  'close': { lucide: 'X', phosphor: 'X', iconsax: 'CloseCircle' },
+  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft' },
+  'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight' },
+  'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown' },
+  'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp' },
+  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', iconsax: 'ArrowLeft' },
+  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', iconsax: 'ArrowRight' },
+  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', iconsax: 'ArrowUp' },
+  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', iconsax: 'ArrowDown' },
 
   // Actions
-  'add': { lucide: 'Plus', phosphor: 'Plus', untitled: 'add', iconsax: 'Add' },
-  'edit': { lucide: 'Edit', phosphor: 'Pencil', untitled: 'edit' },
-  'pencil': { lucide: 'Pencil', phosphor: 'Pencil', untitled: 'pencil' },
-  'delete': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash' },
-  'trash': { lucide: 'Trash2', phosphor: 'Trash', untitled: 'trash', iconsax: 'Trash' },
-  'upload': { lucide: 'Upload', phosphor: 'Upload', untitled: 'upload', iconsax: 'Upload' },
-  'download': { lucide: 'Download', phosphor: 'Download', untitled: 'download', iconsax: 'Download' },
-  'x': { lucide: 'X', phosphor: 'X', untitled: 'close' },
-  'check': { lucide: 'Check', phosphor: 'Check', untitled: 'check', iconsax: 'Check' },
-  'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', untitled: 'search', iconsax: 'SearchNormal' },
-  'share': { lucide: 'Share', phosphor: 'Share', untitled: 'share' },
-  'copy': { lucide: 'Copy', phosphor: 'Copy', untitled: 'copy' },
-  'save': { lucide: 'Save', phosphor: 'FloppyDisk', untitled: 'save' },
+  'add': { lucide: 'Plus', phosphor: 'Plus', iconsax: 'Add' },
+  'edit': { lucide: 'Edit', phosphor: 'Pencil' },
+  'pencil': { lucide: 'Pencil', phosphor: 'Pencil' },
+  'delete': { lucide: 'Trash2', phosphor: 'Trash' },
+  'trash': { lucide: 'Trash2', phosphor: 'Trash', iconsax: 'Trash' },
+  'upload': { lucide: 'Upload', phosphor: 'Upload', iconsax: 'Upload' },
+  'download': { lucide: 'Download', phosphor: 'Download', iconsax: 'Download' },
+  'x': { lucide: 'X', phosphor: 'X' },
+  'check': { lucide: 'Check', phosphor: 'Check', iconsax: 'Check' },
+  'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', iconsax: 'SearchNormal' },
+  'share': { lucide: 'Share', phosphor: 'Share' },
+  'copy': { lucide: 'Copy', phosphor: 'Copy' },
+  'save': { lucide: 'Save', phosphor: 'FloppyDisk' },
 
   // Status & Feedback
-  'loader': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
-  'loader2': { lucide: 'Loader2', phosphor: 'Spinner', untitled: 'loader' },
-  'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
-  'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
-  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle', untitled: 'check-circle' },
-  'error': { lucide: 'XCircle', phosphor: 'XCircle', untitled: 'error' },
-  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', untitled: 'warning', iconsax: 'Warning2' },
-  'info': { lucide: 'Info', phosphor: 'Info', untitled: 'info', iconsax: 'InfoCircle' },
-  'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh', iconsax: 'Refresh' },
-  'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', untitled: 'refresh', iconsax: 'Refresh' },
-  'bell': { lucide: 'Bell', phosphor: 'Bell', untitled: 'bell', iconsax: 'Bell' },
-  'heart': { lucide: 'Heart', phosphor: 'Heart', untitled: 'heart', iconsax: 'Heart' },
-  'star': { lucide: 'Star', phosphor: 'Star', untitled: 'star', iconsax: 'Star' },
-  'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark', untitled: 'bookmark' },
+  'loader': { lucide: 'Loader2', phosphor: 'Spinner' },
+  'loader2': { lucide: 'Loader2', phosphor: 'Spinner' },
+  'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
+  'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
+  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
+  'error': { lucide: 'XCircle', phosphor: 'XCircle' },
+  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Warning2' },
+  'info': { lucide: 'Info', phosphor: 'Info', iconsax: 'InfoCircle' },
+  'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', iconsax: 'Refresh' },
+  'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', iconsax: 'Refresh' },
+  'bell': { lucide: 'Bell', phosphor: 'Bell', iconsax: 'Bell' },
+  'heart': { lucide: 'Heart', phosphor: 'Heart', iconsax: 'Heart' },
+  'star': { lucide: 'Star', phosphor: 'Star', iconsax: 'Star' },
+  'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark' },
 
   // User & Auth
-  'user': { lucide: 'User', phosphor: 'User', untitled: 'user', iconsax: 'User' },
-  'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', untitled: 'user-plus' },
-  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', untitled: 'log-in', iconsax: 'Login' },
-  'logOut': { lucide: 'LogOut', phosphor: 'SignOut', untitled: 'log-out', iconsax: 'Logout' },
-  'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', untitled: 'chrome' },
-  'github': { lucide: 'Github', phosphor: 'GithubLogo', untitled: 'github' },
-  'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle', untitled: 'message' },
+  'user': { lucide: 'User', phosphor: 'User', iconsax: 'User' },
+  'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus' },
+  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', iconsax: 'Login' },
+  'logOut': { lucide: 'LogOut', phosphor: 'SignOut', iconsax: 'Logout' },
+  'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo' },
+  'github': { lucide: 'Github', phosphor: 'GithubLogo' },
+  'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle' },
 
   // Content
-  'messageSquare': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
-  'message-square': { lucide: 'MessageSquare', phosphor: 'ChatSquare', untitled: 'message-square' },
-  'inbox': { lucide: 'Inbox', phosphor: 'Inbox', untitled: 'inbox' },
-  'calendar': { lucide: 'Calendar', phosphor: 'Calendar', untitled: 'calendar' },
-  'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus', untitled: 'calendar-plus' },
-  'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare', untitled: 'check-square' },
-  'clock': { lucide: 'Clock', phosphor: 'Clock', untitled: 'clock' },
-  'book': { lucide: 'Book', phosphor: 'Book', untitled: 'book', iconsax: 'Book' },
-  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', untitled: 'book-open' },
+  'messageSquare': { lucide: 'MessageSquare', phosphor: 'ChatSquare' },
+  'message-square': { lucide: 'MessageSquare', phosphor: 'ChatSquare' },
+  'inbox': { lucide: 'Inbox', phosphor: 'Inbox' },
+  'calendar': { lucide: 'Calendar', phosphor: 'Calendar' },
+  'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus' },
+  'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare' },
+  'clock': { lucide: 'Clock', phosphor: 'Clock' },
+  'book': { lucide: 'Book', phosphor: 'Book', iconsax: 'Book' },
+  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen' },
 
   // Theme & UI
-  'monitor': { lucide: 'Monitor', phosphor: 'Monitor', untitled: 'monitor', iconsax: 'Monitor' },
-  'sun': { lucide: 'Sun', phosphor: 'Sun', untitled: 'sun', iconsax: 'Sun' },
-  'moon': { lucide: 'Moon', phosphor: 'Moon', untitled: 'moon', iconsax: 'Moon' },
+  'monitor': { lucide: 'Monitor', phosphor: 'Monitor', iconsax: 'Monitor' },
+  'sun': { lucide: 'Sun', phosphor: 'Sun', iconsax: 'Sun' },
+  'moon': { lucide: 'Moon', phosphor: 'Moon', iconsax: 'Moon' },
 
   // AI & Features
-  'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle', untitled: 'sparkles' },
-  'lightbulb': { lucide: 'Lightbulb', phosphor: 'Lightbulb', untitled: 'lightbulb' },
-  'brain': { lucide: 'Brain', phosphor: 'Brain', untitled: 'brain' },
-  'zap': { lucide: 'Zap', phosphor: 'Lightning', untitled: 'zap' },
+  'sparkle': { lucide: 'Sparkle', phosphor: 'Sparkle' },
+  'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle' },
+  'lightbulb': { lucide: 'Lightbulb', phosphor: 'Lightbulb' },
+  'brain': { lucide: 'Brain', phosphor: 'Brain' },
+  'zap': { lucide: 'Zap', phosphor: 'Lightning' },
+
+  // Device & Platform
+  'globe': { lucide: 'Globe', phosphor: 'Globe' },
+  'deviceMobile': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
+  'smartphone': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
+  'floppyDisk': { lucide: 'Save', phosphor: 'FloppyDisk' },
 
   // Data & Analytics
-  'chart': { lucide: 'BarChart3', phosphor: 'ChartBar', untitled: 'chart' },
-  'barChart': { lucide: 'BarChart', phosphor: 'ChartBar', untitled: 'bar-chart' },
-  'trendingUp': { lucide: 'TrendingUp', phosphor: 'TrendUp', untitled: 'trending-up' },
-  'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown', untitled: 'trending-down' },
-  'activity': { lucide: 'Activity', phosphor: 'Activity', untitled: 'activity' },
-  'database': { lucide: 'Database', phosphor: 'Database', untitled: 'database' },
-  'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
-  'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'dollar-sign' },
-  'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar', untitled: 'currency' },
+  'chart': { lucide: 'BarChart3', phosphor: 'ChartBar' },
+  'barChart': { lucide: 'BarChart', phosphor: 'ChartBar' },
+  'trendingUp': { lucide: 'TrendingUp', phosphor: 'TrendUp' },
+  'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown' },
+  'activity': { lucide: 'Activity', phosphor: 'Activity' },
+  'database': { lucide: 'Database', phosphor: 'Database' },
+  'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
+  'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
+  'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
 
   // Security
-  'lock': { lucide: 'Lock', phosphor: 'Lock', untitled: 'lock', iconsax: 'Lock' },
-  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', untitled: 'unlock' },
-  'shield': { lucide: 'Shield', phosphor: 'Shield', untitled: 'shield', iconsax: 'Shield' },
-  'key': { lucide: 'Key', phosphor: 'Key', untitled: 'key' },
+  'lock': { lucide: 'Lock', phosphor: 'Lock', iconsax: 'Lock' },
+  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen' },
+  'shield': { lucide: 'Shield', phosphor: 'Shield', iconsax: 'Shield' },
+  'key': { lucide: 'Key', phosphor: 'Key' },
 
   // Media
-  'play': { lucide: 'Play', phosphor: 'Play', untitled: 'play' },
-  'pause': { lucide: 'Pause', phosphor: 'Pause', untitled: 'pause' },
-  'image': { lucide: 'Image', phosphor: 'Image', untitled: 'image' },
-  'video': { lucide: 'Video', phosphor: 'Video', untitled: 'video' },
-  'camera': { lucide: 'Camera', phosphor: 'Camera', untitled: 'camera' },
+  'play': { lucide: 'Play', phosphor: 'Play' },
+  'pause': { lucide: 'Pause', phosphor: 'Pause' },
+  'image': { lucide: 'Image', phosphor: 'Image' },
+  'video': { lucide: 'Video', phosphor: 'Video' },
+  'camera': { lucide: 'Camera', phosphor: 'Camera' },
 
   // Files
-  'fileText': { lucide: 'FileText', phosphor: 'FileText', untitled: 'file-text' },
-  'file': { lucide: 'File', phosphor: 'File', untitled: 'file' },
+  'fileText': { lucide: 'FileText', phosphor: 'FileText' },
+  'file': { lucide: 'File', phosphor: 'File' },
 
   // Navigation
-  'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut', untitled: 'external-link' },
-  'link': { lucide: 'Link', phosphor: 'Link', untitled: 'link', iconsax: 'Link' },
-  'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline', untitled: 'more-horizontal' },
-  'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical', untitled: 'more-vertical' },
+  'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut' },
+  'link': { lucide: 'Link', phosphor: 'Link', iconsax: 'Link' },
+  'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline' },
+  'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical' },
 
   // Priority
-  'remove': { lucide: 'Minus', phosphor: 'Minus', untitled: 'remove' },
+  'remove': { lucide: 'Minus', phosphor: 'Minus' },
 
   // Eye (password)
-  'eye': { lucide: 'Eye', phosphor: 'Eye', untitled: 'eye', iconsax: 'Eye' },
-  'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', untitled: 'eye-off', iconsax: 'EyeSlash' },
+  'eye': { lucide: 'Eye', phosphor: 'Eye', iconsax: 'Eye' },
+  'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', iconsax: 'EyeSlash' },
 
   // Emotions
-  'smile': { lucide: 'Smile', phosphor: 'Smiley', untitled: 'smile' },
-  'frown': { lucide: 'Frown', phosphor: 'SmileySad', untitled: 'frown' },
-  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh', untitled: 'meh' },
+  'smile': { lucide: 'Smile', phosphor: 'Smiley' },
+  'frown': { lucide: 'Frown', phosphor: 'SmileySad' },
+  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh' },
 
   // Social
-  'mail': { lucide: 'Mail', phosphor: 'Envelope', untitled: 'mail' },
-  'phone': { lucide: 'Phone', phosphor: 'Phone', untitled: 'phone' },
+  'mail': { lucide: 'Mail', phosphor: 'Envelope' },
+  'phone': { lucide: 'Phone', phosphor: 'Phone' },
 
   // Additional
-  'flag': { lucide: 'Flag', phosphor: 'Flag', untitled: 'flag', iconsax: 'Flag' },
+  'flag': { lucide: 'Flag', phosphor: 'Flag', iconsax: 'Flag' },
 } as const
 
 /**
@@ -201,7 +225,7 @@ export async function initPhosphorIcons() {
  */
 export function getIconFromProvider(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax' = 'lucide'
+  provider: IconProvider = 'lucide'
 ): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   // Check if icon is in project icon list
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
@@ -223,10 +247,6 @@ export function getIconFromProvider(
         return null
       }
       return PhosphorIcons?.[mappedName] || null
-
-    case 'untitled':
-      // Untitled Icons are SVG-based, handled separately
-      return null
 
     case 'iconsax':
       // Iconsax icons are dynamically loaded
@@ -254,7 +274,7 @@ export function getIconFromProvider(
  */
 function getIconDirect(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
+  provider: IconProvider
 ): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
   switch (provider) {
     case 'lucide': {
@@ -287,9 +307,6 @@ function getIconDirect(
         null
     }
 
-    case 'untitled':
-      return null
-
     case 'iconsax': {
       // Iconsax icons are dynamically loaded
       // Try sync cache first
@@ -314,7 +331,7 @@ function getIconDirect(
  */
 export function getIconNameForProvider(
   iconName: string,
-  provider: IconProvider | 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
+  provider: IconProvider
 ): string {
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
   if (iconMapping) {
