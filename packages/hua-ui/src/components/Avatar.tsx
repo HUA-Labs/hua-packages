@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { merge } from "../lib/utils"
 
 /**
@@ -10,6 +10,7 @@ import { merge } from "../lib/utils"
  * @property {"default" | "glass"} [variant="default"] - 아바타 스타일 변형 / Avatar style variant
  * @property {string} [src] - 이미지 URL / Image URL
  * @property {string} [alt] - 이미지 대체 텍스트 / Image alt text
+ * @property {string} [fallbackText] - Fallback 표시 텍스트 (기본: alt의 첫 글자) / Fallback display text (default: first char of alt)
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -17,6 +18,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "glass"
   src?: string
   alt?: string
+  fallbackText?: string
 }
 
 /**
@@ -60,17 +62,29 @@ export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement
  * @returns {JSX.Element} Avatar 컴포넌트 / Avatar component
  */
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, size = "md", variant = "default", src, alt, children, ...props }, ref) => {
+  ({ className, size = "md", variant = "default", src, alt, fallbackText, children, ...props }, ref) => {
+    const [imgError, setImgError] = useState(false)
+
     const sizeClasses = {
-      sm: "w-8 h-8",
-      md: "w-10 h-10", 
-      lg: "w-12 h-12"
+      sm: "w-8 h-8 text-xs",
+      md: "w-10 h-10 text-sm",
+      lg: "w-12 h-12 text-base"
     }
 
     const variantClasses = {
       default: "",
       glass: "ring-2 ring-white/30 backdrop-blur-sm"
     }
+
+    // Fallback 텍스트 결정: fallbackText > children > alt 첫글자 > "U"
+    const getFallbackContent = () => {
+      if (fallbackText) return fallbackText
+      if (children) return children
+      if (alt) return alt.charAt(0).toUpperCase()
+      return "U"
+    }
+
+    const showImage = src && !imgError
 
     return (
       <div
@@ -83,11 +97,15 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         )}
         {...props}
       >
-        {src ? (
-          <AvatarImage src={src} alt={alt || "avatar"} />
+        {showImage ? (
+          <AvatarImage
+            src={src}
+            alt={alt || "avatar"}
+            onError={() => setImgError(true)}
+          />
         ) : (
           <AvatarFallback>
-            {children || (alt ? alt.charAt(0).toUpperCase() : "U")}
+            {getFallbackContent()}
           </AvatarFallback>
         )}
       </div>
@@ -134,7 +152,7 @@ const AvatarFallback = React.forwardRef<HTMLDivElement, AvatarFallbackProps>(
     <div
       ref={ref}
       className={merge(
-        "flex h-full w-full items-center justify-center rounded-full bg-secondary text-secondary-foreground font-medium",
+        "flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 text-white font-semibold",
         className
       )}
       {...props}
