@@ -1,6 +1,10 @@
 /**
  * Iconsax Icons Dynamic Loader
  *
+ * Iconsax icon assets from https://iconsax.io
+ * Special thanks to Iconsax team for providing high-quality icons
+ * with a permissive license (free for personal and commercial use).
+ *
  * Iconsax 아이콘을 동적으로 로드하는 시스템입니다.
  * 성능 최적화를 위해 필요한 아이콘만 동적으로 import합니다.
  *

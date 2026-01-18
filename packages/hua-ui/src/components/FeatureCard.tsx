@@ -3,12 +3,19 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
-import type { IconName } from "../lib/icons"
+import type { AllIconName } from "../lib/icon-names"
+
+/**
+ * FeatureCard 아이콘 타입 / FeatureCard icon type
+ * - AllIconName: icons.ts + PROJECT_ICONS의 모든 아이콘 / All icons from icons.ts + PROJECT_ICONS
+ * - `http${string}`: 이미지 URL / Image URL
+ */
+type FeatureCardIconType = AllIconName | `http${string}`
 
 /**
  * FeatureCard 컴포넌트의 props / FeatureCard component props
  * @typedef {Object} FeatureCardProps
- * @property {IconName | string} [icon] - 아이콘 (IconName 또는 이미지 URL) / Icon (IconName or image URL)
+ * @property {FeatureCardIconType} [icon] - 아이콘 (IconName, ProjectIconName 또는 이미지 URL) / Icon (IconName, ProjectIconName or image URL)
  * @property {string} title - 카드 제목 / Card title
  * @property {string} description - 카드 설명 / Card description
  * @property {"default" | "gradient" | "glass" | "neon"} [variant="default"] - FeatureCard 스타일 변형 / FeatureCard style variant
@@ -19,7 +26,7 @@ import type { IconName } from "../lib/icons"
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: IconName | string
+  icon?: FeatureCardIconType
   title: string
   description: string
   variant?: "default" | "gradient" | "glass" | "neon"
@@ -113,10 +120,8 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
           <div className={`mb-4 ${iconSize} ${variant === "neon" ? "text-cyan-400" : ""}`}>
             {typeof icon === "string" && icon.startsWith("http") ? (
               <img src={icon} alt={title} className="w-full h-full object-contain" />
-            ) : typeof icon === "string" ? (
-              <span>{icon}</span>
             ) : (
-              <Icon name={icon} className="w-full h-full" />
+              <Icon name={icon as AllIconName} className="w-full h-full" />
             )}
           </div>
         )}
