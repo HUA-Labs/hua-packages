@@ -132,6 +132,21 @@ export interface ZustandI18nConfig {
    * true로 설정하면 언어 변경 시 자동으로 html[lang] 속성 업데이트
    */
   autoUpdateHtmlLang?: boolean;
+  /**
+   * Zustand persist 스토리지 키
+   * 하이드레이션 완료 감지에 사용됨
+   * 기본값: 'hua-i18n-storage'
+   *
+   * @example
+   * ```ts
+   * // useAppStore가 'my-app-app-storage' 키를 사용하는 경우
+   * const I18nProvider = createZustandI18n(useAppStore, {
+   *   storageKey: 'my-app-app-storage',
+   *   // ...
+   * });
+   * ```
+   */
+  storageKey?: string;
 }
 
 /**
@@ -167,6 +182,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
   function LanguageSyncWrapper({ children: innerChildren }: { children: React.ReactNode }) {
     const debug = config?.debug ?? false;
     const autoUpdateHtmlLang = config?.autoUpdateHtmlLang ?? false;
+    const storageKey = config?.storageKey ?? 'hua-i18n-storage';
     // useTranslation은 I18nProvider 내부에서만 사용 가능
     // BaseI18nProvider가 I18nProvider를 렌더링하므로 여기서 사용 가능
     const { setLanguage: setI18nLanguage, currentLanguage, isInitialized } = useTranslation();
@@ -225,7 +241,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
       }
 
       // Zustand persist rehydration 완료를 기다림
-      const unsubscribe = onStoreRehydrated('hua-i18n-storage', () => {
+      const unsubscribe = onStoreRehydrated(storageKey, () => {
         if (hydrationStateRef.current.isComplete) {
           return;
         }
