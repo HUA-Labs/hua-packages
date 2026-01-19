@@ -147,9 +147,6 @@ export class Translator implements TranslatorInterface {
       // initialTranslations가 있으면 초기화 완료로 간주 (SSR에서 이미 로드됨)
       // 이렇게 하면 초기화 전 상태에서도 번역을 사용할 수 있음
       this.isInitialized = true;
-      if (this.config.debug) {
-        console.log('✅ [TRANSLATOR] Initial translations loaded from SSR, marked as initialized:', this.loadedNamespaces);
-      }
     }
   }
 
