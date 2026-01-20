@@ -250,11 +250,15 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
       return <>{gradients}</>;
     };
 
+    // Check if className contains position class (fixed, absolute, sticky)
+    const hasPositionClass = className && /\b(fixed|absolute|sticky)\b/.test(className);
+
     return (
       <div
         ref={ref}
         className={merge(
-          "relative overflow-hidden",
+          "overflow-hidden",
+          !hasPositionClass && "relative",
           className
         )}
         style={style}
