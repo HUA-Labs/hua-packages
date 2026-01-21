@@ -210,3 +210,82 @@ export interface MotionConfig {
   /** 로그 레벨 */
   logLevel?: 'none' | 'error' | 'warn' | 'info' | 'debug'
 }
+
+// ========================================
+// useInView 타입
+// ========================================
+
+export interface InViewOptions {
+  /** Intersection Observer 임계값 */
+  threshold?: number | number[]
+  /** 루트 마진 */
+  rootMargin?: string
+  /** 한 번만 트리거할지 여부 */
+  triggerOnce?: boolean
+  /** 초기 가시성 상태 */
+  initialInView?: boolean
+}
+
+export interface InViewReturn<T extends HTMLElement = HTMLDivElement> {
+  /** DOM 요소 참조 */
+  ref: RefObject<T | null>
+  /** 요소가 화면에 보이는지 여부 */
+  inView: boolean
+  /** IntersectionObserver 엔트리 */
+  entry: IntersectionObserverEntry | null
+}
+
+// ========================================
+// useMouse 타입
+// ========================================
+
+export interface MouseOptions {
+  /** 타겟 요소 참조 */
+  targetRef?: RefObject<HTMLElement | null>
+  /** 스로틀 시간 (ms) */
+  throttle?: number
+}
+
+export interface MouseReturn {
+  /** 마우스 X 좌표 (viewport 기준) */
+  x: number
+  /** 마우스 Y 좌표 (viewport 기준) */
+  y: number
+  /** 요소 내 상대 X 좌표 (0-1) */
+  elementX: number
+  /** 요소 내 상대 Y 좌표 (0-1) */
+  elementY: number
+  /** 마우스가 타겟 위에 있는지 여부 */
+  isOver: boolean
+}
+
+// ========================================
+// useReducedMotion 타입
+// ========================================
+
+export interface ReducedMotionReturn {
+  /** 사용자가 모션 감소를 선호하는지 여부 */
+  prefersReducedMotion: boolean
+}
+
+// ========================================
+// useWindowSize 타입
+// ========================================
+
+export interface WindowSizeOptions {
+  /** 디바운스 시간 (ms) */
+  debounce?: number
+  /** 초기 너비 */
+  initialWidth?: number
+  /** 초기 높이 */
+  initialHeight?: number
+}
+
+export interface WindowSizeReturn {
+  /** 윈도우 너비 */
+  width: number
+  /** 윈도우 높이 */
+  height: number
+  /** 마운트 여부 (SSR 대응) */
+  isMounted: boolean
+}

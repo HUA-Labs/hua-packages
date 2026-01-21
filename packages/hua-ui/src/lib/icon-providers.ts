@@ -191,6 +191,7 @@ export const PROJECT_ICONS = {
 
   // Additional
   'flag': { lucide: 'Flag', phosphor: 'Flag', iconsax: 'Flag' },
+  'rocket': { lucide: 'Rocket', phosphor: 'Rocket', iconsax: 'Rocket' },
 } as const
 
 /**

@@ -68,6 +68,9 @@ export const iconNames = [
   
   // Navigation Extended
   'externalLink', 'link', 'moreHorizontal', 'moreVertical',
+
+  // Additional
+  'rocket',
 ] as const
 
 /**
