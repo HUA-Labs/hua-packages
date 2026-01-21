@@ -26,3 +26,5 @@ export { Scrollbar } from './components/scrollbar/scrollbar';
 export { FeatureCard } from './components/FeatureCard';
 export { HeroSection } from './components/HeroSection';
 export { InfoCard } from './components/InfoCard';
+export { Timeline } from './components/Timeline';
+export type { TimelineProps, TimelineItem, TimelineStatus } from './components/Timeline';
