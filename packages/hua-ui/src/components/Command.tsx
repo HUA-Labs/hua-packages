@@ -146,6 +146,11 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
           event.preventDefault()
           handleOpenChange(!isOpen)
         }
+        // 전역 ESC 키 처리
+        if (event.key === 'Escape' && isOpen) {
+          event.preventDefault()
+          handleOpenChange(false)
+        }
       }
 
       document.addEventListener('keydown', handleKeyDown)
@@ -202,6 +207,10 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
               >
                 {React.Children.map(children, (child, index) => {
                   if (React.isValidElement<CommandItemProps>(child)) {
+                    // Fragment나 다른 컴포넌트에 selected prop 전달 방지
+                    if (child.type === React.Fragment || typeof child.type === 'symbol') {
+                      return child
+                    }
                     return React.cloneElement(child, {
                       selected: index === selectedIndex,
                       onSelect: () => {
