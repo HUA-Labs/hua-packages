@@ -89,3 +89,34 @@ export type {
   MerchantListItem,
   MerchantHealth,
 } from "./MerchantList";
+
+// Kanban Board
+export {
+  KanbanBoard,
+  KanbanColumn,
+  KanbanColumnHeader,
+  KanbanCard,
+  KanbanAddCard,
+  KanbanAddColumn,
+  KanbanDropIndicator,
+  KanbanProvider,
+  useKanban,
+  KanbanContext,
+} from "./kanban";
+export type {
+  KanbanColumnType,
+  KanbanCardType,
+  KanbanPriority,
+  KanbanAssignee,
+  KanbanDragType,
+  KanbanDragData,
+  KanbanCardMoveEvent,
+  KanbanColumnMoveEvent,
+  KanbanBoardProps,
+  KanbanColumnProps,
+  KanbanColumnHeaderProps,
+  KanbanCardProps,
+  KanbanAddCardProps,
+  KanbanAddColumnProps,
+  KanbanDropIndicatorProps,
+} from "./kanban";
