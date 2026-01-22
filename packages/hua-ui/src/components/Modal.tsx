@@ -21,17 +21,31 @@ import { merge } from "../lib/utils"
  * @property {string} [className] - 모달 컨테이너 추가 CSS 클래스 / Additional CSS class for modal container
  */
 export interface ModalProps {
+  /** 모달 열림/닫힘 상태 / Modal open/close state */
   isOpen: boolean
+  /** 모달 닫기 콜백 함수 / Modal close callback function */
   onClose: () => void
+  /** 모달 내용 / Modal content */
   children: React.ReactNode
+  /** 모달 크기 / Modal size */
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
+  /** 닫기 버튼 표시 여부 / Show close button */
+  closable?: boolean
+  /** @deprecated use closable instead */
   showCloseButton?: boolean
+  /** 오버레이 클릭 시 닫기 여부 / Close on overlay click */
   closeOnOverlayClick?: boolean
+  /** 모달 제목 / Modal title */
   title?: string
+  /** 모달 설명 / Modal description */
   description?: string
+  /** 배경 오버레이 표시 여부 / Show backdrop overlay */
   showBackdrop?: boolean
+  /** 배경 오버레이 추가 CSS 클래스 / Additional CSS class for backdrop */
   backdropClassName?: string
+  /** 모달을 화면 중앙에 배치할지 여부 / Center modal on screen */
   centered?: boolean
+  /** 모달 컨테이너 추가 CSS 클래스 / Additional CSS class for modal container */
   className?: string
 }
 
@@ -98,13 +112,14 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
  * @returns {JSX.Element} Modal 컴포넌트 / Modal component
  */
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
-  ({ 
+  ({
   className,
   isOpen,
   onClose,
   children,
   size = "md",
-  showCloseButton = true,
+  closable,
+  showCloseButton,
   closeOnOverlayClick = true,
   title,
   description,
@@ -112,6 +127,8 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   backdropClassName,
   centered = true
   }, ref) => {
+  // closable과 showCloseButton 둘 다 지원 (closable 우선)
+  const _closable = closable ?? showCloseButton ?? true
   const modalRef = React.useRef<HTMLDivElement>(null)
     const combinedRef = useCombinedRefs(ref, modalRef)
 
@@ -215,7 +232,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
             <div className="flex items-center justify-between gap-4 mb-2">
               <h2 id={titleId} className="text-xl font-semibold text-gray-900 dark:text-white flex-1 min-w-0">{title}</h2>
               {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
-              {showCloseButton && (
+              {_closable && (
                 <button
                   onClick={onClose}
                   className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110 z-20"
