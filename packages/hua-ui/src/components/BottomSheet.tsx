@@ -21,17 +21,35 @@ import { Icon } from "./Icon"
  * @property {number} [defaultSnap=50] - 기본 스냅 포인트 (퍼센트) / Default snap point (percentage)
  */
 interface BottomSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  /** BottomSheet 열림/닫힘 상태 / BottomSheet open/close state */
+  isOpen?: boolean
+  /** @deprecated use isOpen instead */
+  open?: boolean
+  /** BottomSheet 닫기 콜백 / BottomSheet close callback */
+  onClose?: () => void
+  /** @deprecated use onClose instead */
+  onOpenChange?: (open: boolean) => void
+  /** BottomSheet 내용 / BottomSheet content */
   children: React.ReactNode
+  /** 추가 CSS 클래스 / Additional CSS class */
   className?: string
+  /** BottomSheet 높이 / BottomSheet height */
   height?: "sm" | "md" | "lg" | "xl" | "full"
+  /** 배경 오버레이 표시 여부 / Show backdrop overlay */
   showBackdrop?: boolean
+  /** 배경 오버레이 추가 CSS 클래스 / Backdrop overlay additional CSS class */
   backdropClassName?: string
+  /** 배경 클릭 시 닫기 여부 / Close on backdrop click */
   closeOnBackdropClick?: boolean
+  /** ESC 키로 닫기 여부 / Close on ESC key */
   closeOnEscape?: boolean
+  /** 드래그 핸들 표시 여부 / Show drag handle */
   showDragHandle?: boolean
+  /** 닫기 버튼 표시 여부 / Show close button */
+  closable?: boolean
+  /** 스냅 포인트 (퍼센트) / Snap points (percentage) */
   snapPoints?: number[]
+  /** 기본 스냅 포인트 (퍼센트) / Default snap point (percentage) */
   defaultSnap?: number
 }
 
@@ -75,10 +93,12 @@ interface BottomSheetProps {
  * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
  */
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
-  ({ 
-    open, 
-    onOpenChange, 
-    children, 
+  ({
+    isOpen,
+    open,
+    onClose,
+    onOpenChange,
+    children,
     className,
     height = "md",
     showBackdrop = true,
@@ -86,10 +106,19 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     closeOnBackdropClick = true,
     closeOnEscape = true,
     showDragHandle = true,
+    closable = true,
     snapPoints = [25, 50, 75, 100],
     defaultSnap = 50,
-    ...props 
+    ...props
   }, ref) => {
+    // isOpen과 open 둘 다 지원 (isOpen 우선)
+    const _isOpen = isOpen ?? open ?? false
+    // onClose와 onOpenChange 둘 다 지원
+    const handleClose = () => {
+      onClose?.()
+      onOpenChange?.(false)
+    }
+
     const [isVisible, setIsVisible] = React.useState(false)
     const [isAnimating, setIsAnimating] = React.useState(false)
     const [currentHeight, setCurrentHeight] = React.useState(defaultSnap)
@@ -106,7 +135,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     }
 
     React.useEffect(() => {
-      if (open) {
+      if (_isOpen) {
         setIsVisible(true)
         setIsAnimating(true)
         const timer = setTimeout(() => setIsAnimating(false), 50)
@@ -119,27 +148,27 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         }, 300)
         return () => clearTimeout(timer)
       }
-    }, [open])
+    }, [_isOpen])
 
     React.useEffect(() => {
       if (!closeOnEscape) return
 
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && open) {
-          onOpenChange(false)
+      const handleEscapeKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && _isOpen) {
+          handleClose()
         }
       }
 
-      if (open) {
-        document.addEventListener("keydown", handleEscape)
+      if (_isOpen) {
+        document.addEventListener("keydown", handleEscapeKey)
         document.body.style.overflow = "hidden"
       }
 
       return () => {
-        document.removeEventListener("keydown", handleEscape)
+        document.removeEventListener("keydown", handleEscapeKey)
         document.body.style.overflow = ""
       }
-    }, [open, closeOnEscape, onOpenChange])
+    }, [_isOpen, closeOnEscape])
 
     const handleTouchStart = (e: React.TouchEvent) => {
       setIsDragging(true)
@@ -161,7 +190,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
 
       if (deltaY > threshold) {
         // 아래로 드래그 - 닫기
-        onOpenChange(false)
+        handleClose()
       } else if (deltaY < -threshold) {
         // 위로 드래그 - 다음 스냅 포인트
         const currentIndex = snapPoints.indexOf(currentHeight)
@@ -179,10 +208,10 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           <div
             className={merge(
               "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
-              isAnimating ? (open ? "opacity-100" : "opacity-0") : "",
+              isAnimating ? (_isOpen ? "opacity-100" : "opacity-0") : "",
               backdropClassName
             )}
-            onClick={closeOnBackdropClick ? () => onOpenChange(false) : undefined}
+            onClick={closeOnBackdropClick ? handleClose : undefined}
           />
         )}
 
@@ -192,7 +221,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           className={merge(
             "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
             height !== "full" ? heightClasses[height] : "",
-            isAnimating ? (open ? "translate-y-0" : "translate-y-full") : "",
+            isAnimating ? (_isOpen ? "translate-y-0" : "translate-y-full") : "",
             className
           )}
           style={{

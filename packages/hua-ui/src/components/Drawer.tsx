@@ -19,16 +19,32 @@ import { Icon } from "./Icon"
  * @property {boolean} [closeOnEscape=true] - ESC 키로 닫기 여부 / Close on ESC key
  */
 interface DrawerProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  /** Drawer 열림/닫힘 상태 / Drawer open/close state */
+  isOpen?: boolean
+  /** @deprecated use isOpen instead */
+  open?: boolean
+  /** Drawer 닫기 콜백 / Drawer close callback */
+  onClose?: () => void
+  /** @deprecated use onClose instead */
+  onOpenChange?: (open: boolean) => void
+  /** Drawer 내용 / Drawer content */
   children: React.ReactNode
+  /** 추가 CSS 클래스 / Additional CSS class */
   className?: string
+  /** Drawer 표시 위치 / Drawer display position */
   side?: "left" | "right" | "top" | "bottom"
+  /** Drawer 크기 / Drawer size */
   size?: "sm" | "md" | "lg" | "xl" | "full"
+  /** 배경 오버레이 표시 여부 / Show backdrop overlay */
   showBackdrop?: boolean
+  /** 배경 오버레이 추가 CSS 클래스 / Backdrop overlay additional CSS class */
   backdropClassName?: string
+  /** 배경 클릭 시 닫기 여부 / Close on backdrop click */
   closeOnBackdropClick?: boolean
+  /** ESC 키로 닫기 여부 / Close on ESC key */
   closeOnEscape?: boolean
+  /** 닫기 버튼 표시 여부 / Show close button */
+  closable?: boolean
 }
 
 /**
@@ -69,10 +85,12 @@ interface DrawerProps {
  * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
  */
 const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
-  ({ 
-    open, 
-    onOpenChange, 
-    children, 
+  ({
+    isOpen,
+    open,
+    onClose,
+    onOpenChange,
+    children,
     className,
     side = "right",
     size = "md",
@@ -80,13 +98,22 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
     backdropClassName,
     closeOnBackdropClick = true,
     closeOnEscape = true,
-    ...props 
+    closable = true,
+    ...props
   }, ref) => {
+    // isOpen과 open 둘 다 지원 (isOpen 우선)
+    const _isOpen = isOpen ?? open ?? false
+    // onClose와 onOpenChange 둘 다 지원
+    const handleClose = () => {
+      onClose?.()
+      onOpenChange?.(false)
+    }
+
     const [isVisible, setIsVisible] = React.useState(false)
     const [isAnimating, setIsAnimating] = React.useState(false)
 
     React.useEffect(() => {
-      if (open) {
+      if (_isOpen) {
         setIsVisible(true)
         setIsAnimating(true)
         // 애니메이션 시작을 위한 지연
@@ -100,27 +127,27 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
         }, 300) // 애니메이션 완료 후 숨김
         return () => clearTimeout(timer)
       }
-    }, [open])
+    }, [_isOpen])
 
     React.useEffect(() => {
       if (!closeOnEscape) return
 
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && open) {
-          onOpenChange(false)
+      const handleEscapeKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && _isOpen) {
+          handleClose()
         }
       }
 
-      if (open) {
-        document.addEventListener("keydown", handleEscape)
+      if (_isOpen) {
+        document.addEventListener("keydown", handleEscapeKey)
         document.body.style.overflow = "hidden"
       }
 
       return () => {
-        document.removeEventListener("keydown", handleEscape)
+        document.removeEventListener("keydown", handleEscapeKey)
         document.body.style.overflow = ""
       }
-    }, [open, closeOnEscape, onOpenChange])
+    }, [_isOpen, closeOnEscape])
 
     if (!isVisible) return null
 
@@ -139,12 +166,12 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
       bottom: "bottom-0 left-0 w-full"
     }
 
-    // Transform: open=true -> visible position, open=false -> hidden position
+    // Transform: _isOpen=true -> visible position, _isOpen=false -> hidden position
     const transformClasses = {
-      left: open ? "translate-x-0" : "-translate-x-full",
-      right: open ? "translate-x-0" : "translate-x-full",
-      top: open ? "translate-y-0" : "-translate-y-full",
-      bottom: open ? "translate-y-0" : "translate-y-full"
+      left: _isOpen ? "translate-x-0" : "-translate-x-full",
+      right: _isOpen ? "translate-x-0" : "translate-x-full",
+      top: _isOpen ? "translate-y-0" : "-translate-y-full",
+      bottom: _isOpen ? "translate-y-0" : "translate-y-full"
     }
 
     return (
@@ -154,10 +181,10 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
           <div
             className={merge(
               "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
-              isAnimating ? (open ? "opacity-100" : "opacity-0") : "",
+              isAnimating ? (_isOpen ? "opacity-100" : "opacity-0") : "",
               backdropClassName
             )}
-            onClick={closeOnBackdropClick ? () => onOpenChange(false) : undefined}
+            onClick={closeOnBackdropClick ? handleClose : undefined}
           />
         )}
 
