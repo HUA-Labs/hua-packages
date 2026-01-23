@@ -136,6 +136,7 @@ export async function GET(
   const { language, namespace } = await params;
   const translationPath = join(
     process.cwd(),
+    'lib',
     'translations',
     language,
     `${namespace}.json`
@@ -167,11 +168,10 @@ createCoreI18n({
 ```
 
 The loader will try these paths:
-- `/translations/{language}/{namespace}.json`
-- `../translations/{language}/{namespace}.json`
-- `./translations/{language}/${namespace}.json`
-- `translations/{language}/${namespace}.json`
-- `../../translations/{language}/${namespace}.json`
+- `/public/translations/{language}/{namespace}.json`
+- `../public/translations/{language}/{namespace}.json`
+- `./public/translations/{language}/${namespace}.json`
+- `public/translations/{language}/${namespace}.json`
 
 ### 3. Custom Loader
 
@@ -194,18 +194,44 @@ createCoreI18n({
 
 Recommended file structure for translations:
 
+### Option 1: Public Directory (Static Loader)
+
+For static file loader, place translations in `public/`:
+
 ```
 your-app/
-├── translations/
-│   ├── ko/
-│   │   ├── common.json
-│   │   ├── pages.json
-│   │   └── footer.json
-│   └── en/
-│       ├── common.json
-│       ├── pages.json
-│       └── footer.json
+├── public/
+│   └── translations/
+│       ├── ko/
+│       │   ├── common.json
+│       │   └── pages.json
+│       └── en/
+│           ├── common.json
+│           └── pages.json
 └── app/
+    └── layout.tsx
+```
+
+### Option 2: Lib Directory (API Loader)
+
+For API loader, you can place translations in `lib/` (not publicly accessible):
+
+```
+your-app/
+├── lib/
+│   └── translations/
+│       ├── ko/
+│       │   ├── common.json
+│       │   └── pages.json
+│       └── en/
+│           ├── common.json
+│           └── pages.json
+└── app/
+    ├── api/
+    │   └── translations/
+    │       └── [language]/
+    │           └── [namespace]/
+    │               └── route.ts
     └── layout.tsx
 ```
 
@@ -394,7 +420,7 @@ export async function getServerTranslations(language: string) {
     defaultLanguage: language,
     namespaces: ['common', 'pages'],
     loadTranslations: async (lang, namespace) => {
-      const path = `./translations/${lang}/${namespace}.json`;
+      const path = `./lib/translations/${lang}/${namespace}.json`;
       return (await import(path)).default;
     }
   });
@@ -407,7 +433,7 @@ export async function getServerTranslations(language: string) {
 
 // Using helper functions
 export function getStaticTranslations(language: string) {
-  const translations = require(`./translations/${language}/common.json`);
+  const translations = require(`./lib/translations/${language}/common.json`);
   
   return {
     welcome: ssrTranslate({
