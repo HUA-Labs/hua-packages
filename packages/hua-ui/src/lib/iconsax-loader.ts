@@ -20,22 +20,24 @@
 
 import React from 'react'
 import type { SVGProps } from 'react'
+import { toPascalCase } from './case-utils'
+import { getIconsaxIcon } from '../components/icons'
 
 // Iconsax 아이콘 컴포넌트 타입
 export type IconsaxIconComponent = React.ComponentType<SVGProps<SVGSVGElement>>
 
-// Iconsax 아이콘 캐시 (성능 최적화)
+// Iconsax 아이콘 캐시 (성능 최적화) - 이제 ICONSAX_ICONS 맵 사용
 const iconsaxIconCache = new Map<string, IconsaxIconComponent>()
 
-// 로딩 중인 아이콘 Promise 캐시 (중복 요청 방지)
+// 로딩 중인 아이콘 Promise 캐시 (중복 요청 방지) - deprecated, 이제 동기적으로 사용
 const loadingPromises = new Map<string, Promise<IconsaxIconComponent | null>>()
 
 /**
- * Iconsax 아이콘을 동적으로 로드합니다.
- * 캐시를 사용하여 같은 아이콘을 여러 번 로드하지 않도록 최적화합니다.
+ * Iconsax 아이콘을 로드합니다.
+ * ICONSAX_ICONS 맵에서 직접 조회합니다 (동적 import 대신).
  *
- * Dynamically loads Iconsax icons.
- * Uses cache to avoid loading the same icon multiple times.
+ * Loads Iconsax icons from the static ICONSAX_ICONS map.
+ * No longer uses dynamic import for better bundler compatibility.
  *
  * @param iconName - Iconsax 아이콘 이름 (PascalCase, 예: "Add", "Home2")
  * @returns 아이콘 컴포넌트 또는 null
@@ -45,50 +47,30 @@ export async function loadIconsaxIcon(
 ): Promise<IconsaxIconComponent | null> {
   const normalizedName = normalizeIconsaxIconName(iconName)
 
-  // 캐시 확인
-  if (iconsaxIconCache.has(normalizedName)) {
-    return iconsaxIconCache.get(normalizedName)!
-  }
+  // getIconsaxIcon 함수를 통해 아이콘 조회
+  const IconComponent = getIconsaxIcon(normalizedName)
 
-  // 이미 로딩 중인 경우 기존 Promise 반환
-  if (loadingPromises.has(normalizedName)) {
-    return loadingPromises.get(normalizedName)!
-  }
-
-  // 새로운 로딩 시작
-  const loadPromise = (async () => {
-    try {
-      // 동적 import (tree-shaking 지원)
-      const iconModule = await import(`../components/icons/${normalizedName}`)
-      const IconComponent = iconModule.default as IconsaxIconComponent
-
-      if (IconComponent) {
-        // 캐시에 저장
-        iconsaxIconCache.set(normalizedName, IconComponent)
-        return IconComponent
-      }
-    } catch (error) {
-      // 개발 환경에서만 경고 출력
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`Iconsax icon "${normalizedName}" not found`, error)
-      }
-    } finally {
-      // 로딩 완료 후 Promise 캐시에서 제거
-      loadingPromises.delete(normalizedName)
+  if (IconComponent) {
+    // 캐시에도 저장 (getIconsaxIconSync 호환)
+    if (!iconsaxIconCache.has(normalizedName)) {
+      iconsaxIconCache.set(normalizedName, IconComponent)
     }
-    return null
-  })()
+    return IconComponent
+  }
 
-  loadingPromises.set(normalizedName, loadPromise)
-  return loadPromise
+  // 개발 환경에서만 경고 출력
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`Iconsax icon "${normalizedName}" not found`)
+  }
+
+  return null
 }
 
 /**
- * Iconsax 아이콘을 동기적으로 가져옵니다 (캐시에서만).
- * 캐시에 없는 경우 null을 반환합니다.
+ * Iconsax 아이콘을 동기적으로 가져옵니다.
+ * ICONSAX_ICONS 맵에서 직접 조회합니다.
  *
- * Synchronously gets Iconsax icon from cache only.
- * Returns null if not in cache.
+ * Synchronously gets Iconsax icon from ICONSAX_ICONS map.
  *
  * @param iconName - Iconsax 아이콘 이름
  * @returns 아이콘 컴포넌트 또는 null
@@ -97,7 +79,8 @@ export function getIconsaxIconSync(
   iconName: string
 ): IconsaxIconComponent | null {
   const normalizedName = normalizeIconsaxIconName(iconName)
-  return iconsaxIconCache.get(normalizedName) || null
+  // getIconsaxIcon 함수로 조회 (캐시보다 우선)
+  return getIconsaxIcon(normalizedName) || iconsaxIconCache.get(normalizedName) || null
 }
 
 /**
@@ -163,18 +146,11 @@ export function getCachedIconsaxIcons(): string[] {
  *
  * @param name - 아이콘 이름
  * @returns PascalCase 아이콘 이름
+ * @deprecated Use toPascalCase from normalize-icon-name.ts instead
  */
 export function normalizeIconsaxIconName(name: string): string {
-  // 이미 PascalCase인 경우
-  if (/^[A-Z]/.test(name)) {
-    return name
-  }
-
-  // kebab-case 또는 snake_case를 PascalCase로 변환
-  return name
-    .split(/[-_]/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join('')
+  // toPascalCase를 재사용하여 일관성 유지
+  return toPascalCase(name)
 }
 
 /**

@@ -29,7 +29,8 @@
 
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { normalizeIconsaxIconName, getIconsaxIconSync } from './iconsax-loader'
+import { getIconsaxIconSync } from './iconsax-loader'
+import { toPascalCase } from './case-utils'
 
 // Phosphor Icons - lazy loaded, tree-shakeable
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -252,7 +253,7 @@ export function getIconFromProvider(
     case 'iconsax':
       // Iconsax icons are dynamically loaded
       // Try sync cache first, then async load
-      const iconsaxName = mappedName ? normalizeIconsaxIconName(mappedName) : normalizeIconsaxIconName(iconName)
+      const iconsaxName = mappedName || toPascalCase(iconName)
       return getIconsaxIconSync(iconsaxName) || null
 
     default:
@@ -311,7 +312,7 @@ function getIconDirect(
     case 'iconsax': {
       // Iconsax icons are dynamically loaded
       // Try sync cache first
-      const iconsaxName = normalizeIconsaxIconName(iconName)
+      const iconsaxName = toPascalCase(iconName)
       return getIconsaxIconSync(iconsaxName) || null
     }
 

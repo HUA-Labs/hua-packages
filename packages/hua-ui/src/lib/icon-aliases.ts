@@ -6,6 +6,38 @@
  */
 
 export const ICON_ALIASES: Record<string, string> = {
+  // kebab-case → camelCase mappings (자동 변환 지원)
+  'arrow-left': 'arrowLeft',
+  'arrow-right': 'arrowRight',
+  'arrow-up': 'arrowUp',
+  'arrow-down': 'arrowDown',
+  'chevron-left': 'chevronLeft',
+  'chevron-right': 'chevronRight',
+  'chevron-up': 'chevronUp',
+  'chevron-down': 'chevronDown',
+  'external-link': 'externalLink',
+  'more-horizontal': 'moreHorizontal',
+  'more-vertical': 'moreVertical',
+  'user-plus': 'userPlus',
+  'log-in': 'logIn',
+  'log-out': 'logOut',
+  'check-circle': 'checkCircle',
+  'check-square': 'checkSquare',
+  'alert-circle': 'alertCircle',
+  'eye-off': 'eyeOff',
+  'file-text': 'fileText',
+  'book-open': 'bookOpen',
+  'bar-chart': 'barChart',
+  'trending-up': 'trendingUp',
+  'trending-down': 'trendingDown',
+  'message-square': 'messageSquare',
+  'calendar-plus': 'calendarPlus',
+  'refresh-cw': 'refreshCw',
+  'dollar-sign': 'dollarSign',
+  'layout-dashboard': 'layoutDashboard',
+  'device-mobile': 'deviceMobile',
+  'floppy-disk': 'floppyDisk',
+
   // Navigation aliases
   'back': 'arrowLeft',
   'prev': 'arrowLeft',

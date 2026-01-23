@@ -2,9 +2,9 @@ import React from 'react'
 import type { LucideProps } from 'lucide-react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
-import { getIconFromProvider, initPhosphorIcons } from '../../lib/icon-providers'
-import { loadIconsaxIcon, normalizeIconsaxIconName } from '../../lib/iconsax-loader'
-import { resolveIconAlias } from '../../lib/icon-aliases'
+import { getIconFromProvider, initPhosphorIcons, getIconNameForProvider } from '../../lib/icon-providers'
+import { getIconsaxIconSync } from '../../lib/iconsax-loader'
+import { normalizeIconName } from '../../lib/normalize-icon-name'
 import { useIconContext, type IconSet } from './IconProvider'
 import { type PhosphorWeight } from './icon-store'
 import type { AllIconName } from '../../lib/icon-names'
@@ -115,11 +115,10 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
   const [isClient, setIsClient] = React.useState(false)
   const [phosphorReady, setPhosphorReady] = React.useState(false)
-  const [iconsaxIcon, setIconsaxIcon] = React.useState<React.ComponentType<React.SVGProps<SVGSVGElement>> | null>(null)
-  
+
   React.useEffect(() => {
     setIsClient(true)
-    
+
     // Phosphor Icons 초기화 (provider가 phosphor일 때만)
     if (iconSet === 'phosphor') {
       initPhosphorIcons().then(() => {
@@ -130,35 +129,28 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     }
   }, [iconSet])
 
-  // 감정이나 상태가 지정되면 해당 아이콘으로 오버라이드
-  let iconName = emotion ? emotionIcons[emotion] : 
-                 status ? statusIcons[status] : 
-                 name
-  
-  // Alias 해결 (back, prev → arrowLeft 등)
-  iconName = resolveIconAlias(iconName) as AllIconName
+  // 통합 정규화: 감정/상태 → 기본 이름 → alias 해결 → provider별 이름 변환
+  // Unified normalization: emotion/status → base name → alias resolution → provider name
+  const resolvedIcon = React.useMemo(() => {
+    const baseName = emotion ? emotionIcons[emotion] :
+                     status ? statusIcons[status] : name
+    const { normalized } = normalizeIconName(baseName)
+    // PROJECT_ICONS 매핑을 통해 provider별 아이콘 이름 가져오기
+    const providerName = getIconNameForProvider(normalized, iconSet)
+    return { normalized, providerName }
+  }, [name, emotion, status, iconSet])
 
-  // Iconsax 아이콘 동적 로딩
-  React.useEffect(() => {
+  // 기존 iconName 변수는 하위 호환성을 위해 유지
+  const iconName = resolvedIcon.normalized as AllIconName
+
+  // Iconsax 아이콘은 동기적으로 가져오기 (getIconsaxIconSync 사용)
+  // Iconsax icons are fetched synchronously using getIconsaxIconSync
+  const iconsaxIcon = React.useMemo(() => {
     if (iconSet === 'iconsax' && isClient) {
-      const resolvedIconName = emotion ? emotionIcons[emotion] : 
-                                status ? statusIcons[status] : 
-                                resolveIconAlias(name) as AllIconName
-      const iconsaxName = normalizeIconsaxIconName(resolvedIconName)
-      
-      // 캐시에 없으면 비동기 로드
-      loadIconsaxIcon(iconsaxName).then((loadedIcon) => {
-        if (loadedIcon) {
-          setIconsaxIcon(loadedIcon)
-        }
-      }).catch(() => {
-        // 아이콘 로드 실패 시 무시
-        setIconsaxIcon(null)
-      })
-    } else {
-      setIconsaxIcon(null)
+      return getIconsaxIconSync(resolvedIcon.providerName)
     }
-  }, [iconSet, name, emotion, status, isClient])
+    return null
+  }, [iconSet, resolvedIcon.providerName, isClient])
   
   // 색상 변형 클래스 (먼저 선언 - fallback에서 사용)
   const variantClasses = mergeMap({
@@ -173,7 +165,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   
   // 서버사이드에서는 빈 span 반환 (hydration 오류 방지)
   // Return empty span on server-side (prevent hydration errors)
-  if (!isClient || (iconSet === 'phosphor' && !phosphorReady) || (iconSet === 'iconsax' && !iconsaxIcon)) {
+  if (!isClient || (iconSet === 'phosphor' && !phosphorReady)) {
     return (
       <span
         style={{ width: iconSize, height: iconSize }}
