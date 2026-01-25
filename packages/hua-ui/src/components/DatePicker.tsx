@@ -34,6 +34,8 @@ export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   locale?: string
   size?: "sm" | "md" | "lg"
   className?: string
+  /** 표시할 날짜 배열 (점으로 표시) / Dates to mark with a dot */
+  markedDates?: Date[]
 }
 
 const sizeClasses = {
@@ -107,6 +109,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       locale = "ko-KR",
       size = "md",
       className,
+      markedDates,
       ...props
     },
     ref
@@ -219,6 +222,16 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       )
     }
 
+    const isMarkedDate = (date: Date): boolean => {
+      if (!markedDates) return false
+      return markedDates.some(
+        (marked) =>
+          marked.getFullYear() === date.getFullYear() &&
+          marked.getMonth() === date.getMonth() &&
+          marked.getDate() === date.getDate()
+      )
+    }
+
     const calendarDays: (Date | null)[] = []
     
     // 이전 달의 마지막 날들
@@ -324,7 +337,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   const isDisabled = isDateDisabled(date)
                   const isSelected = isDateSelected(date)
                   const isTodayDate = isToday(date)
-                  const isHovered = hoveredDate && 
+                  const isMarked = isMarkedDate(date)
+                  const isHovered = hoveredDate &&
                     date.getFullYear() === hoveredDate.getFullYear() &&
                     date.getMonth() === hoveredDate.getMonth() &&
                     date.getDate() === hoveredDate.getDate()
@@ -349,7 +363,15 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       )}
                       aria-label={formatDateAriaLabel(date, locale)}
                     >
-                      {date.getDate()}
+                      <span className={merge(
+                        "relative z-10",
+                        isMarked && !isSelected && "text-blue-600 dark:text-blue-400 font-semibold"
+                      )}>
+                        {date.getDate()}
+                      </span>
+                      {isMarked && !isSelected && (
+                        <span className="absolute inset-1 rounded-lg bg-blue-100 dark:bg-blue-900/40" />
+                      )}
                     </button>
                   )
                 })}
