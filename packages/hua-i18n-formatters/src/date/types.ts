@@ -15,11 +15,35 @@ export interface DateFormatterOptions {
    * - 'DD/MM/YYYY': 유럽 형식
    */
   format?: string;
-  
+
   /**
    * 타임존 설정
    */
   timezone?: TimezoneConfig;
+}
+
+/**
+ * 로케일 기반 날짜 포맷 옵션
+ */
+export interface LocaleDateFormatterOptions {
+  /**
+   * 날짜 스타일
+   * - 'full': 2025년 1월 25일 토요일 (ko) / Saturday, January 25, 2025 (en)
+   * - 'long': 2025년 1월 25일 (ko) / January 25, 2025 (en)
+   * - 'medium': 2025. 1. 25. (ko) / Jan 25, 2025 (en)
+   * - 'short': 25. 1. 25. (ko) / 1/25/25 (en)
+   */
+  dateStyle?: 'full' | 'long' | 'medium' | 'short';
+
+  /**
+   * 시간 스타일
+   */
+  timeStyle?: 'full' | 'long' | 'medium' | 'short';
+
+  /**
+   * 타임존 이름
+   */
+  timeZone?: string;
 }
 
 /**
@@ -68,30 +92,49 @@ export interface DateFormatterReturn {
    * 월 이름 배열 (현재 언어 기준)
    */
   monthNames: string[];
-  
+
   /**
    * 요일 이름 배열 (현재 언어 기준)
    */
   dayNames: string[];
-  
+
   /**
-   * 날짜 포맷팅 함수
+   * 날짜 포맷팅 함수 (포맷 문자열 기반)
    */
   formatDate: (date: Date, options?: DateFormatterOptions) => string;
-  
+
   /**
-   * 날짜+시간 포맷팅 함수
+   * 날짜+시간 포맷팅 함수 (포맷 문자열 기반)
    */
   formatDateTime: (date: Date, options?: DateFormatterOptions) => string;
-  
+
+  /**
+   * 로케일 기반 날짜 포맷팅 함수
+   * 현재 언어에 맞는 네이티브 날짜 형식으로 포맷팅
+   * - ko: 2025년 1월 25일
+   * - en: January 25, 2025
+   * - ja: 2025年1月25日
+   */
+  formatDateLocalized: (date: Date, options?: LocaleDateFormatterOptions) => string;
+
+  /**
+   * 로케일 기반 날짜+시간 포맷팅 함수
+   */
+  formatDateTimeLocalized: (date: Date, options?: LocaleDateFormatterOptions) => string;
+
   /**
    * 상대 시간 포맷팅 함수 ("3분 전", "2시간 전" 등)
    */
   formatRelativeTime: (date: Date, options?: RelativeTimeOptions) => string;
-  
+
   /**
    * 현재 언어 코드
    */
   currentLanguage: string;
+
+  /**
+   * 현재 로케일 코드 (ko-KR, en-US, ja-JP)
+   */
+  locale: string;
 }
 

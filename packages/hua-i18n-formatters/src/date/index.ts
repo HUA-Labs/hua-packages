@@ -12,6 +12,9 @@ export {
   formatDate,
   formatDateTime,
   formatDateReadable,
+  formatDateLocalized,
+  formatDateTimeLocalized,
+  getLocaleFromLanguage,
 } from './utils/date-formatter';
 
 export {
@@ -30,6 +33,7 @@ export {
 // 타입
 export type {
   DateFormatterOptions,
+  LocaleDateFormatterOptions,
   TimezoneConfig,
   RelativeTimeOptions,
   DateFormatterReturn,
