@@ -34,9 +34,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.9",
     "typescript": "^5.9.3",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.10"
   },
   "keywords": [
     "hua-labs",
