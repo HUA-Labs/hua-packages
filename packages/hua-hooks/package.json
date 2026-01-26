@@ -21,10 +21,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "19.2.1"
+    "react": "19.2.3"
   },
   "devDependencies": {
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.9",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
