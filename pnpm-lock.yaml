@@ -672,6 +672,9 @@ importers:
       '@hua-labs/i18n-loaders':
         specifier: workspace:*
         version: link:../../packages/hua-i18n-loaders
+      '@hua-labs/state':
+        specifier: workspace:*
+        version: link:../../packages/hua-state
       '@hua-labs/ui':
         specifier: workspace:*
         version: link:../../packages/hua-ui
