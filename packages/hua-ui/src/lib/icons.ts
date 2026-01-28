@@ -28,7 +28,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  
+
   // Actions
   Edit,
   Trash2,
@@ -39,6 +39,18 @@ import {
   RefreshCw,
   Save,
   Copy,
+
+  // Text Formatting (Markdown Toolbar)
+  Bold,
+  Italic,
+  Strikethrough,
+  Heading,
+  Link,
+  Code,
+  FileCode,
+  Quote,
+  List,
+  ListOrdered,
   
   // Status & Feedback
   Loader2,
@@ -237,6 +249,19 @@ export const icons = {
   smartphone: Smartphone,
   deviceMobile: Smartphone,
   floppyDisk: Save,
+
+  // Text Formatting (Markdown Toolbar)
+  bold: Bold,
+  italic: Italic,
+  strikethrough: Strikethrough,
+  heading: Heading,
+  link: Link,
+  code: Code,
+  fileCode: FileCode,
+  quote: Quote,
+  list: List,
+  listOrdered: ListOrdered,
+  minus: Minus,
 } as const
 
 // 아이콘 이름 타입

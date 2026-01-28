@@ -193,6 +193,18 @@ export const PROJECT_ICONS = {
   // Additional
   'flag': { lucide: 'Flag', phosphor: 'Flag', iconsax: 'Flag' },
   'rocket': { lucide: 'Rocket', phosphor: 'Rocket', iconsax: 'Rocket' },
+
+  // Text Formatting (Markdown Toolbar)
+  'bold': { lucide: 'Bold', phosphor: 'TextBolder' },
+  'italic': { lucide: 'Italic', phosphor: 'TextItalic' },
+  'strikethrough': { lucide: 'Strikethrough', phosphor: 'TextStrikethrough' },
+  'heading': { lucide: 'Heading', phosphor: 'TextHOne' },
+  'code': { lucide: 'Code', phosphor: 'Code' },
+  'fileCode': { lucide: 'FileCode', phosphor: 'FileCode' },
+  'quote': { lucide: 'Quote', phosphor: 'Quotes' },
+  'list': { lucide: 'List', phosphor: 'List' },
+  'listOrdered': { lucide: 'ListOrdered', phosphor: 'ListNumbers' },
+  'minus': { lucide: 'Minus', phosphor: 'Minus' },
 } as const
 
 /**

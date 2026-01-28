@@ -44,6 +44,41 @@ export function onStoreRehydrated(persistKey: string, callback: () => void): () 
 }
 
 /**
+ * Manually mark a store as rehydrated
+ *
+ * Use this when you have a Zustand store created outside of createHuaStore
+ * but still want to integrate with the rehydration system.
+ *
+ * @example
+ * ```ts
+ * // In your store's onRehydrateStorage callback:
+ * import { markStoreRehydrated } from '@hua-labs/state';
+ *
+ * const useAppStore = create(persist(
+ *   (set) => ({ ... }),
+ *   {
+ *     name: 'my-app-storage',
+ *     onRehydrateStorage: () => (state) => {
+ *       markStoreRehydrated('my-app-storage');
+ *     },
+ *   }
+ * ));
+ * ```
+ */
+export function markStoreRehydrated(persistKey: string): void {
+  if (rehydrationStatus.get(persistKey)) {
+    return; // Already rehydrated
+  }
+
+  rehydrationStatus.set(persistKey, true);
+  const listeners = rehydrationListeners.get(persistKey);
+  if (listeners) {
+    listeners.forEach(cb => cb());
+    listeners.clear();
+  }
+}
+
+/**
  * Create a hua-ux optimized Zustand store
  *
  * @example
