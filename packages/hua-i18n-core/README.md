@@ -108,16 +108,28 @@ function MyComponent() {
 
 The library supports three translation loading strategies:
 
-### 1. API Loader (Default, Recommended)
+| Loader | File Location | SSR Support | Best For |
+|--------|--------------|-------------|----------|
+| `api` | `lib/translations/` | ✅ Yes (with `initialTranslations`) | Production apps with SSR |
+| `static` | `public/translations/` | ❌ No | Simple SPAs, prototypes |
+| `custom` | Any | ✅ Yes (manual implementation) | CMS, database, external API |
 
-Loads translations through API routes. Best for production environments.
+> **💡 Recommendation**: Use `api` loader with `initialTranslations` for SSR apps to prevent language flickering.
+
+### 1. API Loader (Recommended for SSR)
+
+Loads translations through API routes. **Supports SSR** when combined with `initialTranslations`.
+
+**File Location**: `lib/translations/{language}/{namespace}.json`
 
 ```tsx
 createCoreI18n({
   translationLoader: 'api',
   translationApiPath: '/api/translations', // default
   defaultLanguage: 'ko',
-  namespaces: ['common', 'pages']
+  namespaces: ['common', 'pages'],
+  // SSR: Pre-load translations to prevent flickering
+  initialTranslations: ssrTranslations,
 })
 ```
 
@@ -141,7 +153,7 @@ export async function GET(
     language,
     `${namespace}.json`
   );
-  
+
   try {
     const fileContent = await readFile(translationPath, 'utf-8');
     return NextResponse.json(JSON.parse(fileContent), {
@@ -157,7 +169,11 @@ export async function GET(
 
 ### 2. Static File Loader
 
-Loads translations from static JSON files in the public directory.
+Loads translations from static JSON files in the public directory. **Does not support SSR** (files in `public/` cannot be read server-side).
+
+**File Location**: `public/translations/{language}/{namespace}.json`
+
+> **⚠️ Warning**: Static loader may cause language flickering on page load because translations are fetched client-side after hydration.
 
 ```tsx
 createCoreI18n({
@@ -168,14 +184,14 @@ createCoreI18n({
 ```
 
 The loader will try these paths:
-- `/public/translations/{language}/{namespace}.json`
+- `/translations/{language}/{namespace}.json`
 - `../public/translations/{language}/{namespace}.json`
 - `./public/translations/{language}/${namespace}.json`
 - `public/translations/{language}/${namespace}.json`
 
 ### 3. Custom Loader
 
-Use your own translation loading function.
+Use your own translation loading function. **Supports SSR** if you implement `initialTranslations` manually.
 
 ```tsx
 createCoreI18n({
@@ -186,40 +202,25 @@ createCoreI18n({
     return response.json();
   },
   defaultLanguage: 'ko',
-  namespaces: ['common', 'pages']
+  namespaces: ['common', 'pages'],
+  // SSR: You can still use initialTranslations with custom loader
+  initialTranslations: ssrTranslations,
 })
-```
 
 ## File Structure
 
-Recommended file structure for translations:
+Choose your file structure based on SSR requirements:
 
-### Option 1: Public Directory (Static Loader)
+### Option 1: Lib Directory (API Loader) - Recommended for SSR
 
-For static file loader, place translations in `public/`:
+**Best for**: Production apps with SSR, Next.js App Router
 
-```
-your-app/
-├── public/
-│   └── translations/
-│       ├── ko/
-│       │   ├── common.json
-│       │   └── pages.json
-│       └── en/
-│           ├── common.json
-│           └── pages.json
-└── app/
-    └── layout.tsx
-```
-
-### Option 2: Lib Directory (API Loader)
-
-For API loader, you can place translations in `lib/` (not publicly accessible):
+Place translations in `lib/translations/` (server-only, not publicly accessible). This enables SSR with `initialTranslations`.
 
 ```
 your-app/
 ├── lib/
-│   └── translations/
+│   └── translations/           ← Server reads directly for SSR
 │       ├── ko/
 │       │   ├── common.json
 │       │   └── pages.json
@@ -228,11 +229,73 @@ your-app/
 │           └── pages.json
 └── app/
     ├── api/
-    │   └── translations/
+    │   └── translations/       ← API route for client-side loading
     │       └── [language]/
     │           └── [namespace]/
     │               └── route.ts
+    └── layout.tsx              ← Load initialTranslations here
+```
+
+**SSR Setup (Next.js App Router)**:
+
+```tsx
+// app/layout.tsx
+import { loadSSRTranslations } from '@/lib/ssr-translations';
+
+export default async function RootLayout({ children }) {
+  // Load translations server-side
+  const initialTranslations = await loadSSRTranslations('ko');
+
+  return (
+    <html lang="ko">
+      <body>
+        <I18nProvider initialTranslations={initialTranslations}>
+          {children}
+        </I18nProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Option 2: Public Directory (Static Loader) - SPA Only
+
+**Best for**: Simple SPAs, prototypes, no SSR needed
+
+Place translations in `public/translations/`. Client fetches directly via HTTP.
+
+> **⚠️ Warning**: Cannot read `public/` files server-side. Language may flicker on page load.
+
+```
+your-app/
+├── public/
+│   └── translations/           ← Client fetches via HTTP
+│       ├── ko/
+│       │   ├── common.json
+│       │   └── pages.json
+│       └── en/
+│           ├── common.json
+│           └── pages.json
+└── app/
     └── layout.tsx
+```
+
+### Option 3: Custom Location (Custom Loader)
+
+**Best for**: CMS integration, database storage, external APIs
+
+Use `loadTranslations` function to load from any source. Combine with `initialTranslations` for SSR support.
+
+```tsx
+createCoreI18n({
+  translationLoader: 'custom',
+  loadTranslations: async (lang, ns) => {
+    // Load from CMS, database, or external API
+    return await cms.getTranslations(lang, ns);
+  },
+  // SSR: Pre-load translations server-side
+  initialTranslations: await preloadTranslations(),
+})
 ```
 
 ## Translation File Format
