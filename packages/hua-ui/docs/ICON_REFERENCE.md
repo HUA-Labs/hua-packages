@@ -171,6 +171,17 @@ hua-ui 프레임워크의 공식 아이콘 레퍼런스.
 | `listOrdered` | ListOrdered | 순서 목록 |
 | `minus` | Minus | 마이너스 |
 
+### Connectivity & Misc (6개)
+
+| Name | Lucide Component | 설명 |
+|------|------------------|------|
+| `ticket` | Ticket | 티켓/초대코드 |
+| `clipboard` | ClipboardList | 클립보드 |
+| `wifi` | Wifi | 와이파이 (온라인) |
+| `wifiOff` | WifiOff | 와이파이 끊김 (오프라인) |
+| `cpu` | Cpu | CPU/연산 |
+| `mask` | Drama | 마스크/연극 |
+
 ### Additional (8개)
 
 | Name | Lucide Component | 설명 |
@@ -713,6 +724,12 @@ hua-ui 프레임워크의 공식 아이콘 레퍼런스.
 | `phone` | Phone | Phone | - |
 | `flag` | Flag | Flag | Flag |
 | `rocket` | Rocket | Rocket | Rocket |
+| `ticket` | Ticket | Ticket | Ticket |
+| `clipboard` | ClipboardList | Clipboard | Sticker |
+| `wifi` | Wifi | WifiHigh | Wifi |
+| `wifiOff` | WifiOff | WifiSlash | - |
+| `cpu` | Cpu | Cpu | Computing |
+| `mask` | Drama | MaskHappy | EmojiHappy |
 | `bold` | Bold | TextBolder | - |
 | `italic` | Italic | TextItalic | - |
 | `strikethrough` | Strikethrough | TextStrikethrough | - |

@@ -194,6 +194,14 @@ export const PROJECT_ICONS = {
   'flag': { lucide: 'Flag', phosphor: 'Flag', iconsax: 'Flag' },
   'rocket': { lucide: 'Rocket', phosphor: 'Rocket', iconsax: 'Rocket' },
 
+  // Connectivity & Misc
+  'ticket': { lucide: 'Ticket', phosphor: 'Ticket', iconsax: 'Ticket' },
+  'clipboard': { lucide: 'ClipboardList', phosphor: 'Clipboard', iconsax: 'Sticker' },
+  'wifi': { lucide: 'Wifi', phosphor: 'WifiHigh', iconsax: 'Wifi' },
+  'wifiOff': { lucide: 'WifiOff', phosphor: 'WifiSlash' },
+  'cpu': { lucide: 'Cpu', phosphor: 'Cpu', iconsax: 'Computing' },
+  'mask': { lucide: 'Drama', phosphor: 'MaskHappy', iconsax: 'EmojiHappy' },
+
   // Text Formatting (Markdown Toolbar)
   'bold': { lucide: 'Bold', phosphor: 'TextBolder' },
   'italic': { lucide: 'Italic', phosphor: 'TextItalic' },
