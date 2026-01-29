@@ -244,13 +244,13 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
   const getToastStyles = (type: Toast["type"]) => {
     switch (type) {
       case "success":
-        return "bg-green-100/90 dark:bg-green-900/40 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200"
+        return "bg-white dark:bg-green-900/40 border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 shadow-lg shadow-green-100/50 dark:shadow-none"
       case "error":
-        return "bg-red-100/90 dark:bg-red-900/40 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200"
+        return "bg-white dark:bg-red-900/40 border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 shadow-lg shadow-red-100/50 dark:shadow-none"
       case "warning":
-        return "bg-yellow-100/90 dark:bg-yellow-900/40 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200"
+        return "bg-white dark:bg-yellow-900/40 border-yellow-300 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 shadow-lg shadow-yellow-100/50 dark:shadow-none"
       case "info":
-        return "bg-blue-100/90 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200"
+        return "bg-white dark:bg-blue-900/40 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-200 shadow-lg shadow-blue-100/50 dark:shadow-none"
     }
   }
 
@@ -341,7 +341,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         <button
           onClick={handleRemove}
           className={merge(
-            "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-1 focus:ring-offset-2 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5",
+            "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-white/10",
             getIconStyles(toast.type)
           )}
           aria-label="닫기"
