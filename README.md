@@ -1,8 +1,16 @@
 # HUA Platform
 
-> Ship UX faster. UI + Motion + i18n, pre-wired.
+> Engineering Emotion — UI, Motion, i18n을 하나로.
 
-HUA Labs의 메인 모노레포입니다. 오픈소스 React 프레임워크와 프로덕트를 함께 개발합니다.
+HUA Labs의 메인 모노레포입니다. 감정을 엔지니어링하는 오픈소스 React 프레임워크와 프로덕트를 함께 개발합니다.
+
+## Products
+
+| Product | Description | URL |
+|---------|-------------|-----|
+| [SUM Diary](./apps/my-app) | AI 기반 감정 분석 일기 서비스 | [sumdiary.com](https://sumdiary.com) |
+| [HUA Docs](./apps/hua-docs) | HUA UX 프레임워크 문서 | [docs.hua-labs.com](https://docs.hua-labs.com) |
+| [HUA Official](./apps/hua-official) | HUA Labs 공식 사이트 | [hua-labs.com](https://hua-labs.com) |
 
 ## Quick Start
 
@@ -52,40 +60,46 @@ pnpm add @hua-labs/hua-ux
 
 | Package | Description |
 |---------|-------------|
-| [`hua-state`](./packages/hua-state) | 상태 관리 유틸리티 |
+| [`hua-state`](./packages/hua-state) | 상태 관리 유틸리티 (Zustand 기반) |
 | [`hua-hooks`](./packages/hua-hooks) | 공용 React 훅 |
 | [`hua-utils`](./packages/hua-utils) | 공용 유틸리티 함수 |
 
-### SDUI (Server-Driven UI)
+## Tech Stack
 
-| Package | Description |
-|---------|-------------|
-| [`sdui-core`](./packages/sdui-core) | SDUI 코어 엔진 |
-| [`sdui-renderers`](./packages/sdui-renderers) | 컴포넌트 렌더러 |
-| [`sdui-inspector`](./packages/sdui-inspector) | 개발용 인스펙터 |
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5.9 |
+| Runtime | React 19 |
+| Styling | Tailwind CSS |
+| State | Zustand |
+| Database | PostgreSQL + Prisma |
+| Auth | NextAuth v5 |
+| Build | Turborepo, tsup |
+| Testing | Vitest, Playwright |
+| Deploy | Vercel |
 
-## Apps
+## Monorepo Structure
 
-### Products
-
-| App | Description | URL |
-|-----|-------------|-----|
-| [`my-app`](./apps/my-app) | AI 감정 다이어리 | [sumdiary.com](https://sumdiary.com) |
-| [`my-api`](./apps/my-api) | SUM API 서버 | - |
-
-### Framework & Docs
-
-| App | Description | URL |
-|-----|-------------|-----|
-| [`hua-docs`](./apps/hua-docs) | HUA UX 문서 사이트 | [docs.hua-labs.com](https://docs.hua-labs.com) |
-| [`hua-official`](./apps/hua-official) | HUA Labs 공식 사이트 | [hua-labs.com](https://hua-labs.com) |
-
-### Tools (WIP)
-
-| App | Description |
-|-----|-------------|
-| [`sdui-studio`](./apps/sdui-studio) | SDUI 비주얼 에디터 |
-| [`hue`](./apps/hue) | HUA UI 비주얼 에디터 |
+```
+hua-platform/
+├── apps/
+│   ├── my-app/          # AI 감정 분석 일기 (메인 프로덕트)
+│   ├── my-api/            # SUM API 서버
+│   ├── hua-docs/           # 프레임워크 문서 사이트
+│   └── hua-official/       # HUA Labs 공식 사이트
+├── packages/
+│   ├── hua-ux/             # 통합 프레임워크 (@hua-labs/hua-ux)
+│   ├── hua-ui/             # UI 컴포넌트 (@hua-labs/ui)
+│   ├── hua-i18n-*/         # i18n 패키지 (core, loaders, formatters, ...)
+│   ├── hua-motion-*/       # Motion 패키지 (core, presets, advanced)
+│   ├── hua-state/          # 상태 관리
+│   └── hua-utils/          # 유틸리티
+├── docs/
+│   ├── collab/             # 아키텍처, 로드맵, 태스크
+│   └── devlogs/            # 개발 일지
+└── scripts/                # 빌드/배포 스크립트
+```
 
 ## Development
 
@@ -97,69 +111,37 @@ pnpm add @hua-labs/hua-ux
 ### 설치 및 실행
 
 ```bash
-# 의존성 설치
-pnpm install
+pnpm install          # 의존성 설치
+pnpm dev              # 전체 개발 서버
+pnpm build            # 전체 빌드
+pnpm type-check       # 타입 체크
+pnpm lint             # 린트
+pnpm test             # 테스트
+```
 
-# 전체 개발 서버
-pnpm dev
+특정 앱만 실행:
 
-# 특정 앱만 실행
+```bash
+pnpm dev --filter=my-app
 pnpm dev --filter=hua-docs
-pnpm dev --filter=hua-official
-
-# 빌드
-pnpm build
-
-# 타입 체크
-pnpm type-check
-
-# 린트
-pnpm lint
-
-# 테스트
-pnpm test
+pnpm build --filter=my-app
 ```
 
-### 프로젝트 구조
+### 배포
+
+커밋 메시지에 태그로 배포 제어:
 
 ```
-hua-platform/
-├── apps/                    # 애플리케이션
-│   ├── hua-docs/           # 문서 사이트
-│   ├── hua-official/       # 공식 사이트
-│   ├── sdui-studio/        # SDUI 에디터
-│   └── ...
-├── packages/               # npm 패키지
-│   ├── hua-ux/            # 통합 프레임워크
-│   ├── hua-ui/            # UI 컴포넌트
-│   ├── hua-i18n-*/        # i18n 패키지들
-│   ├── hua-motion-*/      # Motion 패키지들
-│   └── ...
-├── docs/                   # 문서 및 devlogs
-└── scripts/               # 빌드/배포 스크립트
+feat: new feature [deploy my-app]
+fix: bug fix [deploy docs]
 ```
-
-## Tech Stack
-
-- **Framework**: Next.js 15, React 19
-- **Language**: TypeScript 5.9
-- **Build**: Turbo, tsup
-- **Styling**: Tailwind CSS
-- **Testing**: Vitest, Playwright
-- **Docs**: Storybook
 
 ## Links
 
-**Products**
-- [SUM Diary](https://sumdiary.com) - AI 감정 다이어리
-
-**Framework**
-- [Documentation](https://docs.hua-labs.com)
+- [SUM Diary](https://sumdiary.com) — AI 감정 분석 일기
+- [HUA Docs](https://docs.hua-labs.com) — 프레임워크 문서
+- [HUA Labs](https://hua-labs.com) — 공식 사이트
 - [npm: @hua-labs/hua-ux](https://www.npmjs.com/package/@hua-labs/hua-ux)
-- [npm: @hua-labs/ui](https://www.npmjs.com/package/@hua-labs/ui)
-
-**Community**
-- [HUA Labs](https://hua-labs.com)
 - [GitHub Issues](https://github.com/HUA-Labs/HUA-platform/issues)
 
 ## License
@@ -168,4 +150,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ---
 
-Built with HUA by [HUA Labs](https://hua-labs.com)
+Built with care by [HUA Labs](https://hua-labs.com)
