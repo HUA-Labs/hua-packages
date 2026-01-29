@@ -112,7 +112,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
 
     const variantClasses = {
       default: "bg-gray-200 dark:bg-gray-700",
-      primary: "bg-blue-200 dark:bg-blue-700",
+      primary: "bg-indigo-200 dark:bg-indigo-700",
       success: "bg-green-200 dark:bg-green-700",
       warning: "bg-yellow-200 dark:bg-yellow-700",
       danger: "bg-red-200 dark:bg-red-700"
@@ -120,7 +120,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
 
     const thumbVariantClasses = {
       default: "bg-gray-400 hover:bg-gray-500 dark:bg-gray-500 dark:hover:bg-gray-400",
-      primary: "bg-blue-500 hover:bg-blue-600 dark:bg-blue-400 dark:hover:bg-blue-500",
+      primary: "bg-primary hover:bg-primary/90 dark:bg-indigo-400 dark:hover:bg-indigo-500",
       success: "bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500",
       warning: "bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500",
       danger: "bg-red-500 hover:bg-red-600 dark:bg-red-400 dark:hover:bg-red-500"
@@ -215,7 +215,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             {isRange ? (
               // 범위 슬라이더
               <div className={merge(
-                "absolute rounded-full bg-blue-500 dark:bg-blue-400",
+                "absolute rounded-full bg-primary dark:bg-indigo-400",
                 sizeClasses[size],
                 orientation === "vertical"
                   ? "left-1/2 -translate-x-1/2"
@@ -235,7 +235,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             ) : (
               // 단일 슬라이더
               <div className={merge(
-                "absolute rounded-full bg-blue-500 dark:bg-blue-400",
+                "absolute rounded-full bg-primary dark:bg-indigo-400",
                 sizeClasses[size],
                 orientation === "vertical"
                   ? "left-1/2 -translate-x-1/2 bottom-0"

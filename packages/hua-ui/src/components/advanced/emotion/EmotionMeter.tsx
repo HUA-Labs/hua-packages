@@ -56,7 +56,7 @@ const EmotionMeter = React.forwardRef<HTMLDivElement, EmotionMeterProps>(
 
     // EmotionMeter는 특정 색상만 사용 (감정 분석 특화)
     const emotionColors: Record<string, string> = {
-      blue: "bg-blue-500",
+      blue: "bg-indigo-500",
       green: "bg-green-500",
       yellow: "bg-yellow-500",
       red: "bg-red-500",

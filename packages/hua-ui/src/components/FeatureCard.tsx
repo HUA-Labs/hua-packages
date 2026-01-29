@@ -97,7 +97,7 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
 
     const hoverClasses = {
       scale: "hover:scale-105 transition-transform duration-300",
-      glow: "hover:shadow-2xl hover:shadow-blue-500/25 dark:hover:shadow-cyan-400/25 transition-shadow duration-300",
+      glow: "hover:shadow-2xl hover:shadow-cyan-500/25 dark:hover:shadow-cyan-400/25 transition-shadow duration-300",
       slide: "hover:-translate-y-2 transition-transform duration-300",
       none: ""
     }
@@ -149,7 +149,7 @@ FeatureCard.displayName = "FeatureCard"
 
 function getGradientClass(gradient: string): string {
   const gradients = {
-    blue: "from-blue-500 via-cyan-500 to-blue-600",
+    blue: "from-indigo-500 via-cyan-500 to-cyan-600",
     purple: "from-purple-500 via-pink-500 to-purple-600",
     green: "from-green-500 via-emerald-500 to-green-600",
     orange: "from-orange-500 via-red-500 to-orange-600",

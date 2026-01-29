@@ -98,7 +98,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
                   title={`이전: ${prevPage.title}`}
                 >
                   <svg 
-                    className="w-5 h-5 text-slate-600 group-hover:text-blue-600 group-active:text-blue-800 transition-colors" 
+                    className="w-5 h-5 text-slate-600 group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -120,7 +120,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
                   title={`다음: ${nextPage.title}`}
                 >
                   <svg 
-                    className="w-5 h-5 text-slate-600 group-hover:text-blue-600 group-active:text-blue-800 transition-colors" 
+                    className="w-5 h-5 text-slate-600 group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"

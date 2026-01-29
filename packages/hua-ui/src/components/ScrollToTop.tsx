@@ -81,7 +81,7 @@ const ScrollToTop = ({
 
     const variantClasses = {
       default: "bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 dark:bg-slate-800/20 dark:border-slate-700/50 dark:text-slate-100 dark:hover:bg-slate-700/30",
-      primary: "bg-blue-600/70 backdrop-blur-md border border-blue-500/40 text-white hover:bg-blue-500/80 transition-all duration-300 dark:bg-blue-500/70 dark:border-blue-400/40 dark:hover:bg-blue-400/80",
+      primary: "bg-primary/70 backdrop-blur-md border border-indigo-500/40 text-white hover:bg-primary/80 transition-all duration-300 dark:bg-primary/70 dark:border-indigo-400/40 dark:hover:bg-indigo-400/80",
       secondary: "bg-slate-100/80 backdrop-blur-md border border-slate-200 text-slate-700 hover:bg-slate-200/90 dark:bg-slate-700/50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-600/60",
       outline: "border border-white/40 bg-white/15 backdrop-blur-md text-white hover:bg-white/25 dark:border-slate-600/50 dark:bg-slate-800/15 dark:text-slate-200 dark:hover:bg-slate-700/25",
       ghost: "bg-transparent hover:bg-white/15 backdrop-blur-md text-white dark:text-slate-200 dark:hover:bg-slate-700/25"
@@ -93,7 +93,7 @@ const ScrollToTop = ({
         className={merge(
           "fixed z-[9999] rounded-full transition-all duration-500 ease-in-out",
           "flex items-center justify-center",
-          "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-blue-500/50",
+          "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-ring/50",
           "transform hover:scale-105 active:scale-95",
           // 페이드 애니메이션
           isVisible 

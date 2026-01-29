@@ -124,7 +124,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={merge(
-              "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2",
+              "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
               sizeClasses[size],
               className
             )}
@@ -141,7 +141,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
                   onClick={() => handleLanguageChange(language.code)}
                   className={merge(
                     "w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
-                    currentLanguage === language.code && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                    currentLanguage === language.code && "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                   )}
                 >
                   <span className="text-lg">{language.flag}</span>
@@ -160,7 +160,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={merge(
-              "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+              "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
               className
             )}
             {...props}
@@ -188,7 +188,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
                   onClick={() => handleLanguageChange(language.code)}
                   className={merge(
                     "w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
-                    currentLanguage === language.code && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                    currentLanguage === language.code && "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                   )}
                 >
                   <span className="text-lg">{language.flag}</span>
@@ -210,7 +210,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           onLanguageChange?.(languages[nextIndex].code)
         }}
         className={merge(
-          "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+          "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
           className
         )}
         {...props}

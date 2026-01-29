@@ -64,10 +64,10 @@ export function Link({
 }: LinkProps) {
   const variantClasses = {
     default: "text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300",
-    primary: "text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300",
+    primary: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300",
     secondary: "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200",
     ghost: "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:bg-gray-800",
-    underline: "text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline hover:no-underline"
+    underline: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline hover:no-underline"
   }
 
   const sizeClasses = {

@@ -46,7 +46,7 @@ const BlogEditorLanguageTabs = React.forwardRef<HTMLDivElement, BlogEditorLangua
               className={merge(
                 'flex-1 px-4 py-3 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+                  ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600'
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               )}
             >

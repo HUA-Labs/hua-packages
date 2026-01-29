@@ -145,21 +145,21 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           return merge(
             "border border-gray-300 dark:border-gray-600",
             isActive 
-              ? "bg-blue-500 border-blue-500 text-white" 
+              ? "bg-primary border-primary text-white" 
               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           )
         case "minimal":
           return merge(
             "border-0",
             isActive 
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
               : "bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           )
         default:
           return merge(
             "border-0",
             isActive 
-              ? "bg-blue-500 text-white" 
+              ? "bg-primary text-white" 
               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           )
       }

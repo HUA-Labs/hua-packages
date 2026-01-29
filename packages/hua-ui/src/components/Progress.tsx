@@ -95,7 +95,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         case "error":
           return "bg-red-500 dark:bg-red-400"
         case "info":
-          return "bg-blue-500 dark:bg-blue-400"
+          return "bg-primary dark:bg-indigo-400"
         case "glass":
           return "bg-white/50 backdrop-blur-sm"
         default:

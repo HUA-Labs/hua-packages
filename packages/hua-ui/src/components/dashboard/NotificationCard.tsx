@@ -56,9 +56,9 @@ export interface NotificationCardProps extends React.HTMLAttributes<HTMLDivEleme
 
 const typeStyles = {
   info: {
-    container: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20",
-    border: "border-blue-200/50 dark:border-blue-700/30",
-    dot: "bg-blue-500",
+    container: "bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20",
+    border: "border-indigo-200/50 dark:border-indigo-700/30",
+    dot: "bg-primary",
   },
   warning: {
     container: "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20",

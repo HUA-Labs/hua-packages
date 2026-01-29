@@ -140,13 +140,13 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
       },
       info: {
         icon: (
-          <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
-        bgColor: "bg-blue-100 dark:bg-blue-900/20",
-        buttonColor: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
-        textColor: "text-blue-600 dark:text-blue-400"
+        bgColor: "bg-indigo-100 dark:bg-indigo-900/20",
+        buttonColor: "bg-primary hover:bg-primary/80 focus:ring-ring",
+        textColor: "text-indigo-600 dark:text-indigo-400"
       },
       success: {
         icon: (

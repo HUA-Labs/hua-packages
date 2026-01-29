@@ -156,7 +156,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   // 색상 변형 클래스 (먼저 선언 - fallback에서 사용)
   const variantClasses = mergeMap({
     'text-gray-900 dark:text-white': variant === 'default',
-    'text-blue-600 dark:text-blue-400': variant === 'primary',
+    'text-indigo-600 dark:text-indigo-400': variant === 'primary',
     'text-gray-600 dark:text-gray-400': variant === 'secondary',
     'text-green-600 dark:text-green-400': variant === 'success',
     'text-yellow-600 dark:text-yellow-400': variant === 'warning',

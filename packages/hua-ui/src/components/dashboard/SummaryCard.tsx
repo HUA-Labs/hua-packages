@@ -43,23 +43,23 @@ export interface SummaryCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 // SummaryCard는 default variant가 특별한 그라데이션을 사용하므로 별도 처리
 const defaultVariantGradients: Record<Color, string> = {
-  blue: "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20",
+  blue: "bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-900/20",
   purple: "bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20",
   green: "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20",
   orange: "bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20",
   red: "bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/20 dark:to-rose-900/20",
-  indigo: "bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-indigo-900/20 dark:to-blue-900/20",
+  indigo: "bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-900/20",
   pink: "bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-900/20 dark:to-rose-900/20",
   gray: "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20",
 };
 
 const buttonGradients: Record<Color, string> = {
-  blue: "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700",
+  blue: "bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700",
   purple: "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700",
   green: "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700",
   orange: "bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700",
   red: "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700",
-  indigo: "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700",
+  indigo: "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700",
   pink: "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700",
   gray: "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800",
 };
@@ -157,7 +157,7 @@ export const SummaryCard = React.forwardRef<HTMLDivElement, SummaryCardProps>(
         {/* 배경 장식 - 정적 클래스 사용 */}
         <div className={merge(
           "absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl to-transparent rounded-full -translate-y-16 translate-x-16",
-          color === "blue" ? "from-blue-400/10" :
+          color === "blue" ? "from-cyan-400/10" :
           color === "purple" ? "from-purple-400/10" :
           color === "green" ? "from-green-400/10" :
           color === "orange" ? "from-orange-400/10" :
@@ -168,7 +168,7 @@ export const SummaryCard = React.forwardRef<HTMLDivElement, SummaryCardProps>(
         )}></div>
         <div className={merge(
           "absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr to-transparent rounded-full translate-y-12 -translate-x-12",
-          color === "blue" ? "from-blue-400/10" :
+          color === "blue" ? "from-cyan-400/10" :
           color === "purple" ? "from-purple-400/10" :
           color === "green" ? "from-green-400/10" :
           color === "orange" ? "from-orange-400/10" :
