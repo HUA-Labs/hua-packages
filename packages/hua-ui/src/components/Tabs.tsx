@@ -411,7 +411,7 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
             active 
-              ? "border-blue-500 text-blue-600 dark:text-blue-400" 
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400" 
               : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           )
         case "cards":

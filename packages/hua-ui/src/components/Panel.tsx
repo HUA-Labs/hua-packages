@@ -173,11 +173,11 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
     const effectClasses = React.useMemo(() => {
       switch (effect) {
         case "glow":
-          return "shadow-2xl shadow-blue-500/20 dark:shadow-cyan-400/20"
+          return "shadow-2xl shadow-indigo-500/20 dark:shadow-cyan-400/20"
         case "shadow":
           return "shadow-xl"
         case "gradient":
-          return "bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10"
+          return "bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-cyan-500/10"
         case "animated":
           return "animate-pulse"
         default:
@@ -292,7 +292,7 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
       }
       
       if (hoverGlow) {
-        classes.push("hover:shadow-2xl hover:shadow-blue-500/30")
+        classes.push("hover:shadow-2xl hover:shadow-cyan-500/30")
       }
       
       return classes.join(" ")

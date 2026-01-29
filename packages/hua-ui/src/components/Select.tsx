@@ -89,11 +89,11 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     ...props 
   }, ref) => {
     const variantClasses = {
-      default: "border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400",
-      outline: "border-2 border-gray-300 bg-transparent text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400",
-      filled: "border-transparent bg-gray-50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:focus:bg-gray-800 dark:focus:border-blue-400 dark:focus:ring-blue-400",
+      default: "border-gray-300 bg-white text-gray-900 focus:border-ring focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-ring dark:focus:ring-ring",
+      outline: "border-2 border-gray-300 bg-transparent text-gray-900 focus:border-ring focus:ring-ring dark:border-gray-500 dark:text-white dark:focus:border-ring dark:focus:ring-ring",
+      filled: "border-transparent bg-gray-50 text-gray-900 focus:bg-white focus:border-ring focus:ring-ring dark:bg-gray-700 dark:text-white dark:focus:bg-gray-800 dark:focus:border-ring dark:focus:ring-ring",
       ghost: "border-transparent bg-transparent text-gray-900 focus:bg-gray-50 focus:border-gray-300 focus:ring-gray-500 dark:text-white dark:focus:bg-gray-800 dark:focus:border-gray-600 dark:focus:ring-gray-400",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:border-blue-400/50 focus:ring-blue-400/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:focus:border-blue-400/50 dark:focus:ring-blue-400/20 dark:focus:bg-slate-700/20"
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:border-ring/50 focus:ring-ring/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:focus:border-ring/50 dark:focus:ring-ring/20 dark:focus:bg-slate-700/20"
     }
 
     // Spacing system: 4px grid - matching Input component
@@ -134,7 +134,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           className={merge(
             "flex w-full appearance-none rounded-md border transition-all duration-200",
             "focus:outline-none focus:ring-1 focus:ring-offset-2",
-            "hover:border-blue-400 hover:shadow-sm",
+            "hover:border-indigo-400 hover:shadow-sm",
             "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-300",
             variantClasses[variant],
             sizeClasses[size],

@@ -402,9 +402,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                       aria-label={rowLabel}
                       aria-describedby={clickable && rowActionHintId ? rowActionHintId : undefined}
                       className={merge(
-                        "text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/70",
+                        "text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/70",
                         clickable && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60",
-                        highlightRow?.(row) && "bg-blue-50/60 dark:bg-blue-900/20"
+                        highlightRow?.(row) && "bg-indigo-50/60 dark:bg-indigo-900/20"
                       )}
                     >
                       {columnList.map((column) => (

@@ -53,8 +53,8 @@ export interface ProfileCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const tierStyles = {
   basic: {
-    badge: "bg-gradient-to-r from-blue-500 to-cyan-500 text-white",
-    icon: "text-blue-600 dark:text-blue-400",
+    badge: "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white",
+    icon: "text-indigo-600 dark:text-indigo-400",
   },
   pro: {
     badge: "bg-gradient-to-r from-purple-500 to-pink-500 text-white",
@@ -148,7 +148,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
 
     const variantClasses = {
       default: "bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700",
-      gradient: "bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20",
+      gradient: "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20",
       minimal: "bg-transparent",
     };
 
@@ -165,8 +165,8 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
         {/* 그라데이션 배경 장식 (gradient variant일 때) */}
         {variant === "gradient" && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 opacity-10 dark:opacity-20"></div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 opacity-5 dark:opacity-15"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-10 dark:opacity-20"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-purple-600 opacity-5 dark:opacity-15"></div>
           </>
         )}
 
@@ -177,7 +177,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
               {settingsHref ? (
                 <a
                   href={settingsHref}
-                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   title="설정"
                 >
                   <Icon name="settings" className="w-6 h-6" />
@@ -185,7 +185,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
               ) : (
                 <button
                   onClick={onSettingsClick}
-                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                   title="설정"
                 >
                   <Icon name="settings" className="w-6 h-6" />
@@ -204,7 +204,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                   className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-700 shadow-lg object-cover"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-lg">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-lg">
                   <span className="text-2xl font-bold text-white">
                     {name.charAt(0).toUpperCase()}
                   </span>
@@ -225,7 +225,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                       {isEmoji ? (
                         <span className="text-gray-900 dark:text-white">{part}</span>
                       ) : (
-                        <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                        <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
                           {part}
                         </span>
                       )}

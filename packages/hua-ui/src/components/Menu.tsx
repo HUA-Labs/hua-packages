@@ -149,28 +149,28 @@ const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(
           return merge(
             "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors", // 12px, 8px 패딩
             active 
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
               : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           )
         case "vertical":
           return merge(
             "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors", // 16px, 12px 패딩
             active 
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
               : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           )
         case "compact":
           return merge(
             "flex items-center gap-2 px-2 py-1.5 rounded text-sm font-medium transition-colors", // 8px, 6px 패딩
             active 
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
               : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           )
         default:
           return merge(
             "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors", // 16px, 12px 패딩
             active 
-              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
               : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
           )
       }

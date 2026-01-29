@@ -302,7 +302,7 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
         onClick={onToggle}
         disabled={disabled}
         className={merge(
-          "flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-gray-50/80 dark:hover:bg-gray-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          "flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-gray-50/80 dark:hover:bg-gray-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           className
         )}
         {...props}

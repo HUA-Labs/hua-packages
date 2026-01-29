@@ -220,7 +220,7 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
           </div>
           <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2">
             <div 
-              className="h-full bg-blue-500 rounded-full transition-all duration-100"
+              className="h-full bg-primary rounded-full transition-all duration-100"
               style={{ width: `${progress * 100}%` }}
             />
           </div>

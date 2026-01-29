@@ -27,7 +27,7 @@ const Scrollbar = React.forwardRef<HTMLDivElement, ScrollbarProps>(
         case "glass":
           return "scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30 backdrop-blur-sm"
         case "colorful":
-          return "scrollbar-thumb-gradient-to-b scrollbar-thumb-from-blue-500 scrollbar-thumb-to-purple-500 hover:scrollbar-thumb-from-blue-600 hover:scrollbar-thumb-to-purple-600"
+          return "scrollbar-thumb-gradient-to-b scrollbar-thumb-from-indigo-500 scrollbar-thumb-to-purple-500 hover:scrollbar-thumb-from-cyan-600 hover:scrollbar-thumb-to-purple-600"
         case "minimal":
           return "scrollbar-thumb-slate-200/50 hover:scrollbar-thumb-slate-300/70 dark:scrollbar-thumb-slate-700/50 dark:hover:scrollbar-thumb-slate-600/70"
         case "neon":

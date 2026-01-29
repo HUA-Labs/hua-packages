@@ -25,8 +25,8 @@
   --color-destructive-foreground: hsl(0 0% 98%);
   --color-muted: hsl(210 15% 94%);
   --color-muted-foreground: hsl(210 10% 40%);
-  --color-accent: hsl(166 60% 92%);
-  --color-accent-foreground: hsl(166 78% 25%);
+  --color-accent: hsl(226 100% 97%); /* indigo-50 */
+  --color-accent-foreground: hsl(234 89% 74%); /* indigo-400 */
   --color-card: hsl(0 0% 100%);
   --color-card-foreground: hsl(210 10% 10%);
   --color-popover: hsl(0 0% 100%);
@@ -52,9 +52,9 @@
     --secondary: 210 15% 94%;
     --secondary-foreground: 210 10% 20%;
 
-    /* 악센트 - 밝은 틸 */
-    --accent: 166 60% 92%;
-    --accent-foreground: 166 78% 25%;
+    /* 악센트 - 인디고 */
+    --accent: 226 100% 97%; /* indigo-50 */
+    --accent-foreground: 234 89% 74%; /* indigo-400 */
 
     /* 배경/전경 */
     --background: 210 20% 98%;
@@ -130,9 +130,9 @@
     --secondary: 210 15% 15%;
     --secondary-foreground: 210 10% 90%;
 
-    /* 악센트 */
-    --accent: 166 50% 20%;
-    --accent-foreground: 166 70% 60%;
+    /* 악센트 - 인디고 (다크) */
+    --accent: 234 89% 11%; /* indigo-900 */
+    --accent-foreground: 226 100% 94%; /* indigo-100 */
 
     /* 배경/전경 */
     --background: 210 15% 6%;

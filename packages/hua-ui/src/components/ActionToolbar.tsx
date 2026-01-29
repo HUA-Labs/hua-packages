@@ -143,7 +143,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         case 'red':
           return 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
         case 'blue':
-          return 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300';
+          return 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300';
         case 'green':
           return 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300';
         case 'gray':

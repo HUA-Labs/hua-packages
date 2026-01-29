@@ -21,9 +21,9 @@ export interface InfoCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const toneClasses: Record<NonNullable<InfoCardProps["tone"]>, { container: string; icon: string; title: string; body: string }> = {
   blue: {
-    container: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700",
-    icon: "h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0",
-    title: "text-sm font-medium text-blue-900 dark:text-blue-100 mb-2 block",
+    container: "bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-indigo-200 dark:border-indigo-700",
+    icon: "h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-3 mt-0.5 flex-shrink-0",
+    title: "text-sm font-medium text-indigo-900 dark:text-indigo-100 mb-2 block",
     body: "text-gray-800 dark:text-gray-200 text-sm leading-relaxed",
   },
   purple: {

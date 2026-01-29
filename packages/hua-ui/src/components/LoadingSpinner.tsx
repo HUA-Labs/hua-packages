@@ -68,7 +68,7 @@ export function LoadingSpinner({
   // LoadingSpinner는 border 색상을 사용하므로 특화 색상 시스템 사용
   const spinnerColors: Record<string, string> = {
     default: "border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300",
-    primary: "border-blue-300 border-t-blue-600 dark:border-blue-600 dark:border-t-blue-300",
+    primary: "border-indigo-300 border-t-indigo-600 dark:border-indigo-600 dark:border-t-indigo-300",
     secondary: "border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300",
     success: "border-green-300 border-t-green-600 dark:border-green-600 dark:border-t-green-300",
     warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-600 dark:border-t-yellow-300",

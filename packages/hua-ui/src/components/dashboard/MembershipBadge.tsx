@@ -21,7 +21,7 @@ export interface MembershipBadgeProps extends React.HTMLAttributes<HTMLSpanEleme
 
 const tierConfig = {
   basic: {
-    gradient: "bg-gradient-to-r from-blue-500 to-cyan-500",
+    gradient: "bg-gradient-to-r from-indigo-500 to-cyan-500",
     label: "Basic",
   },
   pro: {

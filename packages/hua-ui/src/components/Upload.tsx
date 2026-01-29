@@ -203,7 +203,7 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
             "relative border-2 border-dashed rounded-xl transition-all cursor-pointer",
             "bg-gray-50 dark:bg-gray-900/50",
             "border-gray-300 dark:border-gray-700",
-            isDragging && "border-blue-500 bg-blue-50 dark:bg-blue-900/20",
+            isDragging && "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20",
             disabled && "cursor-not-allowed opacity-50",
             sizeClasses[size]
           )}
@@ -221,13 +221,13 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
           
           <div className="flex flex-col items-center justify-center text-center">
             <div className={merge(
-              "rounded-full bg-blue-100 dark:bg-blue-900/30 p-4 mb-4",
-              isDragging && "bg-blue-200 dark:bg-blue-900/50"
+              "rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-4 mb-4",
+              isDragging && "bg-indigo-200 dark:bg-indigo-900/50"
             )}>
               <Icon 
                 name="upload" 
                 className={merge(
-                  "h-8 w-8 text-blue-600 dark:text-blue-400",
+                  "h-8 w-8 text-indigo-600 dark:text-indigo-400",
                   isDragging && "scale-110"
                 )} 
               />
@@ -277,7 +277,7 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
                       <>
                         <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-blue-600 transition-all duration-300"
+                            className="h-full bg-primary transition-all duration-300"
                             style={{ width: `${file.progress}%` }}
                           />
                         </div>

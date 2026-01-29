@@ -102,7 +102,7 @@ export const QuickActionCard = React.forwardRef<
       } else {
         // solid는 별도 처리 (정적 클래스 사용)
         const solidClasses: Record<Color, string> = {
-          blue: "text-white bg-blue-600 hover:bg-blue-700",
+          blue: "text-white bg-primary hover:bg-primary/90",
           purple: "text-white bg-purple-600 hover:bg-purple-700",
           green: "text-white bg-green-600 hover:bg-green-700",
           orange: "text-white bg-orange-600 hover:bg-orange-700",

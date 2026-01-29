@@ -88,10 +88,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     }
 
     const variantClasses = {
-      default: "border-gray-300 bg-white text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-blue-400",
-      outline: "border-2 border-gray-200 bg-transparent text-blue-600 focus:ring-blue-500 dark:border-gray-700 dark:focus:ring-blue-400",
-      filled: "border-transparent bg-gray-50 text-blue-600 focus:bg-white focus:ring-blue-500 dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-blue-400",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-blue-400/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-blue-400/50 dark:focus:bg-slate-700/20"
+      default: "border-gray-300 bg-white text-indigo-600 focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-ring",
+      outline: "border-2 border-gray-200 bg-transparent text-indigo-600 focus:ring-ring dark:border-gray-700 dark:focus:ring-ring",
+      filled: "border-transparent bg-gray-50 text-indigo-600 focus:bg-white focus:ring-ring dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-ring",
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-ring/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-ring/50 dark:focus:bg-slate-700/20"
     }
 
     const stateClasses = error 
@@ -130,12 +130,12 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className={merge(
               "flex items-center justify-center rounded border transition-all duration-200 cursor-pointer relative",
               "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-offset-2",
-              "peer-hover:border-blue-400 peer-hover:shadow-sm",
+              "peer-hover:border-indigo-400 peer-hover:shadow-sm",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-disabled:hover:border-gray-300",
               sizeClasses[size],
               variantClasses[variant],
               stateClasses,
-              isChecked && "bg-blue-600 border-blue-600 dark:bg-blue-500 dark:border-blue-500 shadow-md shadow-blue-500/20",
+              isChecked && "bg-primary border-primary dark:bg-primary dark:border-primary shadow-md shadow-indigo-500/20",
               !isChecked && "bg-white dark:bg-gray-800"
             )}
           >
