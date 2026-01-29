@@ -155,7 +155,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         data-index={index}
         disabled={disabled}
         className={merge(
-          "appearance-none cursor-pointer rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          "appearance-none cursor-pointer rounded-full transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           sizeClasses[size],
           variantClasses[variant],
           orientation === "vertical" ? "writing-mode: bt-lr; -webkit-appearance: slider-vertical" : "",

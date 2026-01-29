@@ -224,7 +224,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
                 value={inputValue}
                 onChange={(e) => onInputChange?.(e.target.value)}
                 placeholder={inputPlaceholder}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" // 16px, 12px 패딩
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors" // 16px, 12px 패딩
               />
             </div>
           )}

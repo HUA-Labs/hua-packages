@@ -222,7 +222,7 @@ function App() {
                 </button>
                 <button
                   onClick={() => setShowConfig(!showConfig)}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-white/50"
                   aria-expanded={showConfig}
                   aria-controls="config-panel"
                   aria-label={showConfig ? getTranslation('hideConfig') : getTranslation('showConfig')}
@@ -231,7 +231,7 @@ function App() {
                 </button>
                 <button
                   onClick={clearMessages}
-                  className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 rounded-lg transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-red-300/50"
+                  className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 rounded-lg transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-red-300/50"
                   aria-label={getTranslation('clearChat')}
                 >
                   {getTranslation('clearChat')}
@@ -273,7 +273,7 @@ function App() {
                         type="password"
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
-                        className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
+                        className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
                         placeholder={getTranslation('apiKeyPlaceholder')}
                         aria-label={getTranslation('apiKeyLabel')}
                       />
@@ -299,7 +299,7 @@ function App() {
                       type="text"
                       value={baseURL}
                       onChange={(e) => setBaseURL(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
                       placeholder={getTranslation('serverUrlPlaceholder')}
                       aria-label={getTranslation('serverUrlLabel')}
                     />
@@ -315,7 +315,7 @@ function App() {
                     type="password"
                     value={llmKey}
                     onChange={(e) => setLlmKey(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
                     placeholder={getTranslation('llmKeyPlaceholder')}
                     aria-label={getTranslation('llmKeyLabel')}
                   />
@@ -354,7 +354,7 @@ function App() {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value as 'ko' | 'en')}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
                       aria-label={getTranslation('languageLabel')}
                     >
                       <option value="en" className="bg-gray-800">{getTranslation('english')}</option>
@@ -369,7 +369,7 @@ function App() {
                     <select
                       value={tier}
                       onChange={(e) => setTier(e.target.value as '1' | '2' | '3')}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
                       aria-label={getTranslation('tierLabel')}
                     >
                       <option value="1" className="bg-gray-800">{getTranslation('tier1')}</option>
@@ -388,7 +388,7 @@ function App() {
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value as 'gentle' | 'warm' | 'cheerful' | 'quirky' | 'delicate')}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
                       aria-label={getTranslation('toneLabel')}
                     >
                       <option value="gentle" className="bg-gray-800">{getTranslation('gentle')}</option>
@@ -406,7 +406,7 @@ function App() {
                     <select
                       value={mode}
                       onChange={(e) => setMode(e.target.value as 'empathy' | 'analysis' | 'suggestion' | 'praise' | 'playful')}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-300 text-white backdrop-blur-sm transition-all duration-200"
                       aria-label={getTranslation('modeLabel')}
                     >
                       <option value="empathy" className="bg-gray-800">{getTranslation('empathy')}</option>
@@ -497,7 +497,7 @@ function App() {
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={getTranslation('inputPlaceholder')}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 text-white placeholder-blue-200 resize-none backdrop-blur-sm transition-all duration-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-300 text-white placeholder-blue-200 resize-none backdrop-blur-sm transition-all duration-200"
                     rows={2}
                     disabled={isLoading || !apiKey.trim()}
                     aria-label={getTranslation('inputPlaceholder')}
@@ -513,7 +513,7 @@ function App() {
                 <button
                   onClick={sendMessage}
                   disabled={isLoading || !inputMessage.trim() || !apiKey.trim()}
-                  className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-glow hover:shadow-glow-purple flex items-center justify-center space-x-2 min-h-[44px]"
+                  className="px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-1 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-glow hover:shadow-glow-purple flex items-center justify-center space-x-2 min-h-[44px]"
                   aria-label={getTranslation('send')}
                 >
                   <svg className="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

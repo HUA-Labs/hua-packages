@@ -414,7 +414,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             "w-8 h-8 rounded-full flex items-center justify-center",
             "bg-white/80 hover:bg-white text-gray-800",
             "transition-all duration-200",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white",
             positionClasses[playPausePosition]
           )}
           aria-label={isPlaying ? "일시정지" : "재생"}
@@ -437,7 +437,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
         "bg-white/80 hover:bg-white text-gray-800",
         "transition-all duration-200",
         "disabled:opacity-30 disabled:cursor-not-allowed",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
       );
 
       const prevPosition = arrowPosition === "outside" ? "-left-14" : "left-4";

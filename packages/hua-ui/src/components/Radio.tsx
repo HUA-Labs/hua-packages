@@ -124,7 +124,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
           <div
             className={merge(
               "flex items-center justify-center rounded-full border transition-all duration-200 cursor-pointer",
-              "peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2",
+              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-offset-2",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
               sizeClasses[size],
               variantClasses[variant],

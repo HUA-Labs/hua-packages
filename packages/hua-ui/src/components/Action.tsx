@@ -249,7 +249,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
       () =>
         merge(
           "hua-action relative inline-flex items-center rounded-xl px-4 py-2 font-medium",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/60",
           loading && "cursor-wait opacity-80",
           iconOnly && "justify-center",
           className

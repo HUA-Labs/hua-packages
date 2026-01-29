@@ -257,7 +257,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         disabled={disabled}
         className={merge(
           "flex w-full items-center justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm transition-colors",
-          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+          "hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-2",
           "dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700",
           error && "border-red-500 focus:ring-red-500",
           disabled && "cursor-not-allowed opacity-50",
@@ -354,11 +354,11 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       className={merge(
                         "relative h-9 w-9 rounded-lg text-sm font-medium transition-all",
                         "hover:bg-blue-50 dark:hover:bg-blue-900/20",
-                        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1",
+                        "focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1",
                         !isCurrentMonth && "text-gray-400 dark:text-gray-500",
                         isDisabled && "cursor-not-allowed opacity-30",
                         isSelected && "bg-blue-600 text-white hover:bg-blue-700 shadow-md",
-                        isTodayDate && !isSelected && "ring-2 ring-blue-500",
+                        isTodayDate && !isSelected && "ring-1 ring-blue-500",
                         isHovered && !isSelected && "bg-blue-100 dark:bg-blue-900/30"
                       )}
                       aria-label={formatDateAriaLabel(date, locale)}

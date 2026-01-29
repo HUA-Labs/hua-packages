@@ -251,7 +251,7 @@ function TailwindTab({
                 className={cn(
                   "flex-1 aspect-square rounded-[2px] transition-transform",
                   !disabled && "hover:scale-110 hover:z-10",
-                  currentColor.toLowerCase() === color.toLowerCase() && "ring-2 ring-ring ring-offset-1",
+                  currentColor.toLowerCase() === color.toLowerCase() && "ring-1 ring-ring ring-offset-1",
                   disabled && "opacity-50 cursor-not-allowed"
                 )}
                 style={{ background: color }}
@@ -273,7 +273,7 @@ function TailwindTab({
             className={cn(
               "w-6 h-6 rounded-sm border border-border/50 transition-transform",
               !disabled && "hover:scale-110",
-              currentColor === color && "ring-2 ring-ring ring-offset-1",
+              currentColor === color && "ring-1 ring-ring ring-offset-1",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             style={{
@@ -342,7 +342,7 @@ function CustomTab({
           disabled={disabled}
           className={cn(
             "flex-1 px-3 py-2 text-sm rounded-md border bg-background font-mono",
-            "focus:outline-none focus:ring-2 focus:ring-ring",
+            "focus:outline-none focus:ring-1 focus:ring-ring",
             !isValidColor(hexInput) && "border-destructive",
             disabled && "opacity-50 cursor-not-allowed"
           )}

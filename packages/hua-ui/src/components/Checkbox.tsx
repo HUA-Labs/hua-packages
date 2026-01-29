@@ -129,7 +129,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           <div
             className={merge(
               "flex items-center justify-center rounded border transition-all duration-200 cursor-pointer relative",
-              "peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-offset-2",
+              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-offset-2",
               "peer-hover:border-blue-400 peer-hover:shadow-sm",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-disabled:hover:border-gray-300",
               sizeClasses[size],

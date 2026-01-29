@@ -167,7 +167,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       "hover:bg-secondary hover:border-primary/50 active:scale-95",
       "transition-all duration-150",
       "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
       sizes.button
     );
 
@@ -209,7 +209,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             disabled={disabled}
             className={merge(
               "w-16 text-center rounded-md border border-input bg-background",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
               "disabled:cursor-not-allowed disabled:opacity-50",
               "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
               sizes.input
@@ -245,7 +245,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           disabled={disabled}
           className={merge(
             "w-16 text-center rounded-md border border-input bg-background",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
             sizes.input

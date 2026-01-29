@@ -93,7 +93,7 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white placeholder-gray-400"
+            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 text-gray-800 dark:text-white placeholder-gray-400"
           />
           <div className="flex items-center justify-end gap-2 mt-3">
             <button
