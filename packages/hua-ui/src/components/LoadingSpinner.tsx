@@ -107,19 +107,19 @@ export function LoadingSpinner({
       case "ring":
         return (
           <div className={merge(
-            "animate-spin rounded-full border-2",
+            "w-full h-full animate-spin rounded-full border-2",
             spinnerColors[color] || spinnerColors.default
           )} />
         )
       case "ripple":
         return (
-          <div className="relative">
+          <div className="relative w-full h-full">
             <div className={merge(
               "absolute inset-0 rounded-full border-2 animate-ping",
               spinnerColors[color] || spinnerColors.default
             )} />
             <div className={merge(
-              "rounded-full border-2",
+              "w-full h-full rounded-full border-2",
               spinnerColors[color] || spinnerColors.default
             )} />
           </div>
@@ -127,7 +127,7 @@ export function LoadingSpinner({
       default:
         return (
           <div className={merge(
-            "animate-spin rounded-full border-2",
+            "w-full h-full animate-spin rounded-full border-2",
             spinnerColors[color] || spinnerColors.default
           )} />
         )
