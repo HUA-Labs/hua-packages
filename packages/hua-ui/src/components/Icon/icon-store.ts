@@ -9,12 +9,15 @@ export type IconSet = 'lucide' | 'phosphor' | 'untitled' | 'iconsax'
 
 export type PhosphorWeight = 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
 
+export type IconsaxVariant = 'line' | 'bold'
+
 export interface IconConfig {
   set: IconSet
   weight: PhosphorWeight
   size: number
   color: string
   strokeWidth?: number // Lucide/Untitled용
+  iconsaxVariant?: IconsaxVariant // Iconsax용 (line | bold)
 }
 
 export const defaultIconConfig: IconConfig = {
@@ -23,6 +26,7 @@ export const defaultIconConfig: IconConfig = {
   size: 20,
   color: 'currentColor',
   strokeWidth: 1.25,
+  iconsaxVariant: 'line',
 }
 
 /**

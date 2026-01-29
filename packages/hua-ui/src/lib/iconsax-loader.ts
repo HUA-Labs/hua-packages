@@ -22,6 +22,8 @@ import React from 'react'
 import type { SVGProps } from 'react'
 import { toPascalCase } from './case-utils'
 import { getIconsaxIcon } from '../components/icons'
+import { getIconsaxBoldIcon } from '../components/icons-bold'
+import type { IconsaxVariant } from '../components/Icon/icon-store'
 
 // Iconsax 아이콘 컴포넌트 타입
 export type IconsaxIconComponent = React.ComponentType<SVGProps<SVGSVGElement>>
@@ -68,17 +70,23 @@ export async function loadIconsaxIcon(
 
 /**
  * Iconsax 아이콘을 동기적으로 가져옵니다.
- * ICONSAX_ICONS 맵에서 직접 조회합니다.
+ * ICONSAX_ICONS 또는 ICONSAX_BOLD_ICONS 맵에서 직접 조회합니다.
  *
- * Synchronously gets Iconsax icon from ICONSAX_ICONS map.
+ * Synchronously gets Iconsax icon from ICONSAX_ICONS or ICONSAX_BOLD_ICONS map.
  *
  * @param iconName - Iconsax 아이콘 이름
+ * @param variant - Iconsax 아이콘 변형 (line | bold), 기본값 'line'
  * @returns 아이콘 컴포넌트 또는 null
  */
 export function getIconsaxIconSync(
-  iconName: string
+  iconName: string,
+  variant: IconsaxVariant = 'line'
 ): IconsaxIconComponent | null {
   const normalizedName = normalizeIconsaxIconName(iconName)
+  // variant에 따라 다른 맵에서 조회
+  if (variant === 'bold') {
+    return getIconsaxBoldIcon(normalizedName) || null
+  }
   // getIconsaxIcon 함수로 조회 (캐시보다 우선)
   return getIconsaxIcon(normalizedName) || iconsaxIconCache.get(normalizedName) || null
 }
