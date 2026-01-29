@@ -202,11 +202,17 @@ t("dashboard.title")
 
 **사용**:
 ```typescript
-const { t, tWithParams } = useTranslation();
+const { t } = useTranslation();
 
-tWithParams("common:time.minutesAgo", { minutes: 5 });
+// 통합 t() API - 두 번째 인자가 object이면 params로 인식
+t("common:time.minutesAgo", { minutes: 5 });
 // 결과: "5분 전"
+
+// 특정 언어로 파라미터 보간
+t("common:time.minutesAgo", { minutes: 5 }, "en");
 ```
+
+> **참고**: `tWithParams()`는 deprecated되었습니다. `t(key, params, language?)`를 사용하세요.
 
 ### 중첩 키
 

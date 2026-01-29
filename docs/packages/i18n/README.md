@@ -111,9 +111,13 @@ t('common:welcome');
 
 #### 파라미터 보간
 ```typescript
-const { tWithParams } = useTranslation();
-tWithParams('common:time.minutesAgo', { minutes: 5 });
+const { t } = useTranslation();
+t('common:time.minutesAgo', { minutes: 5 });
+// t()는 두 번째 인자가 object이면 params, string이면 language로 인식
+// t(key, params, language?) 형태로도 사용 가능
 ```
+
+> `tWithParams()`는 deprecated. `t(key, params)`를 사용하세요.
 
 #### 언어 변경
 ```typescript
