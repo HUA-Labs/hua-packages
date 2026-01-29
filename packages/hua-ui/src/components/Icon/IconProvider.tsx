@@ -13,7 +13,7 @@
  */
 
 import React, { createContext, useContext } from 'react'
-import { type IconConfig, type IconSet, type PhosphorWeight, defaultIconConfig } from './icon-store'
+import { type IconConfig, type IconSet, type PhosphorWeight, type IconsaxVariant, defaultIconConfig } from './icon-store'
 
 /**
  * IconProvider 컴포넌트 Props
@@ -23,10 +23,12 @@ import { type IconConfig, type IconSet, type PhosphorWeight, defaultIconConfig }
  * @interface IconProviderProps
  */
 export interface IconProviderProps {
-  /** 아이콘 세트 (lucide, phosphor, untitled) / Icon set (lucide, phosphor, untitled) */
+  /** 아이콘 세트 (lucide, phosphor, untitled, iconsax) / Icon set (lucide, phosphor, untitled, iconsax) */
   set?: IconSet
   /** Phosphor 아이콘 weight (thin, light, regular, bold, duotone, fill) / Phosphor icon weight */
   weight?: PhosphorWeight
+  /** Iconsax 아이콘 변형 (line, bold) / Iconsax icon variant (line, bold) */
+  iconsaxVariant?: IconsaxVariant
   /** 기본 아이콘 크기 / Default icon size */
   size?: number
   /** 기본 아이콘 색상 / Default icon color */
@@ -78,6 +80,7 @@ const IconContext = createContext<IconContextValue>(defaultIconConfig)
 export function IconProvider({
   set = defaultIconConfig.set,
   weight = defaultIconConfig.weight,
+  iconsaxVariant = defaultIconConfig.iconsaxVariant,
   size = defaultIconConfig.size,
   color = defaultIconConfig.color,
   strokeWidth = defaultIconConfig.strokeWidth,
@@ -86,6 +89,7 @@ export function IconProvider({
   const value: IconContextValue = {
     set,
     weight,
+    iconsaxVariant,
     size,
     color,
     strokeWidth,
@@ -122,6 +126,6 @@ export function useIconContext(): IconContextValue {
 }
 
 // Re-export types for convenience
-export type { IconSet, PhosphorWeight, IconConfig } from './icon-store'
+export type { IconSet, PhosphorWeight, IconsaxVariant, IconConfig } from './icon-store'
 export { defaultIconConfig, getDefaultStrokeWidth } from './icon-store'
 

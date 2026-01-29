@@ -55,17 +55,17 @@ export const PROJECT_ICONS = {
   'home': { lucide: 'Home', phosphor: 'House', iconsax: 'Home2' },
   'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour' },
   'folder': { lucide: 'Folder', phosphor: 'Folder', iconsax: 'Folder' },
-  'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle' },
-  'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle' },
+  'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Danger' },
+  'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Danger' },
   'columns': { lucide: 'Columns', phosphor: 'Columns' },
-  'users': { lucide: 'Users', phosphor: 'Users' },
+  'users': { lucide: 'Users', phosphor: 'Users', iconsax: 'People' },
   'settings': { lucide: 'Settings', phosphor: 'Gear' },
   'menu': { lucide: 'Menu', phosphor: 'List', iconsax: 'Menu' },
   'close': { lucide: 'X', phosphor: 'X', iconsax: 'CloseCircle' },
-  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft' },
-  'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight' },
-  'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown' },
-  'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp' },
+  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft', iconsax: 'ArrowLeft2' },
+  'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight', iconsax: 'ArrowRight2' },
+  'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown', iconsax: 'ArrowDown2' },
+  'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp', iconsax: 'ArrowUp2' },
   'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', iconsax: 'ArrowLeft' },
   'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', iconsax: 'ArrowRight' },
   'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', iconsax: 'ArrowUp' },
@@ -75,7 +75,7 @@ export const PROJECT_ICONS = {
   'add': { lucide: 'Plus', phosphor: 'Plus', iconsax: 'Add' },
   'edit': { lucide: 'Edit', phosphor: 'Pencil' },
   'pencil': { lucide: 'Pencil', phosphor: 'Pencil' },
-  'delete': { lucide: 'Trash2', phosphor: 'Trash' },
+  'delete': { lucide: 'Trash2', phosphor: 'Trash', iconsax: 'Trash' },
   'trash': { lucide: 'Trash2', phosphor: 'Trash', iconsax: 'Trash' },
   'upload': { lucide: 'Upload', phosphor: 'Upload', iconsax: 'Upload' },
   'download': { lucide: 'Download', phosphor: 'Download', iconsax: 'Download' },
@@ -89,10 +89,10 @@ export const PROJECT_ICONS = {
   // Status & Feedback
   'loader': { lucide: 'Loader2', phosphor: 'Spinner' },
   'loader2': { lucide: 'Loader2', phosphor: 'Spinner' },
-  'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
-  'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
-  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle' },
-  'error': { lucide: 'XCircle', phosphor: 'XCircle' },
+  'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
+  'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
+  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
+  'error': { lucide: 'XCircle', phosphor: 'XCircle', iconsax: 'CloseCircle' },
   'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Warning2' },
   'info': { lucide: 'Info', phosphor: 'Info', iconsax: 'InfoCircle' },
   'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', iconsax: 'Refresh' },
@@ -104,10 +104,10 @@ export const PROJECT_ICONS = {
 
   // User & Auth
   'user': { lucide: 'User', phosphor: 'User', iconsax: 'User' },
-  'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus' },
+  'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', iconsax: 'UserAdd' },
   'logIn': { lucide: 'LogIn', phosphor: 'SignIn', iconsax: 'Login' },
   'logOut': { lucide: 'LogOut', phosphor: 'SignOut', iconsax: 'Logout' },
-  'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo' },
+  'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', iconsax: 'Chrome' },
   'github': { lucide: 'Github', phosphor: 'GithubLogo' },
   'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle' },
 
@@ -117,10 +117,10 @@ export const PROJECT_ICONS = {
   'inbox': { lucide: 'Inbox', phosphor: 'Inbox' },
   'calendar': { lucide: 'Calendar', phosphor: 'Calendar' },
   'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus' },
-  'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare' },
+  'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare', iconsax: 'TickSquare' },
   'clock': { lucide: 'Clock', phosphor: 'Clock' },
   'book': { lucide: 'Book', phosphor: 'Book', iconsax: 'Book' },
-  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen' },
+  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', iconsax: 'Book' },
 
   // Theme & UI
   'monitor': { lucide: 'Monitor', phosphor: 'Monitor', iconsax: 'Monitor' },
@@ -135,7 +135,7 @@ export const PROJECT_ICONS = {
   'zap': { lucide: 'Zap', phosphor: 'Lightning' },
 
   // Device & Platform
-  'globe': { lucide: 'Globe', phosphor: 'Globe' },
+  'globe': { lucide: 'Globe', phosphor: 'Globe', iconsax: 'Global' },
   'deviceMobile': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
   'smartphone': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
   'floppyDisk': { lucide: 'Save', phosphor: 'FloppyDisk' },
@@ -153,16 +153,16 @@ export const PROJECT_ICONS = {
 
   // Security
   'lock': { lucide: 'Lock', phosphor: 'Lock', iconsax: 'Lock' },
-  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen' },
+  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', iconsax: 'Unlock' },
   'shield': { lucide: 'Shield', phosphor: 'Shield', iconsax: 'Shield' },
   'key': { lucide: 'Key', phosphor: 'Key' },
 
   // Media
-  'play': { lucide: 'Play', phosphor: 'Play' },
-  'pause': { lucide: 'Pause', phosphor: 'Pause' },
-  'image': { lucide: 'Image', phosphor: 'Image' },
-  'video': { lucide: 'Video', phosphor: 'Video' },
-  'camera': { lucide: 'Camera', phosphor: 'Camera' },
+  'play': { lucide: 'Play', phosphor: 'Play', iconsax: 'Play' },
+  'pause': { lucide: 'Pause', phosphor: 'Pause', iconsax: 'Pause' },
+  'image': { lucide: 'Image', phosphor: 'Image', iconsax: 'Image' },
+  'video': { lucide: 'Video', phosphor: 'Video', iconsax: 'Video' },
+  'camera': { lucide: 'Camera', phosphor: 'Camera', iconsax: 'Camera' },
 
   // Files
   'fileText': { lucide: 'FileText', phosphor: 'FileText' },
@@ -175,16 +175,16 @@ export const PROJECT_ICONS = {
   'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical' },
 
   // Priority
-  'remove': { lucide: 'Minus', phosphor: 'Minus' },
+  'remove': { lucide: 'Minus', phosphor: 'Minus', iconsax: 'Minus' },
 
   // Eye (password)
   'eye': { lucide: 'Eye', phosphor: 'Eye', iconsax: 'Eye' },
   'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', iconsax: 'EyeSlash' },
 
   // Emotions
-  'smile': { lucide: 'Smile', phosphor: 'Smiley' },
-  'frown': { lucide: 'Frown', phosphor: 'SmileySad' },
-  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh' },
+  'smile': { lucide: 'Smile', phosphor: 'Smiley', iconsax: 'EmojiHappy' },
+  'frown': { lucide: 'Frown', phosphor: 'SmileySad', iconsax: 'EmojiSad' },
+  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh', iconsax: 'EmojiNormal' },
 
   // Social
   'mail': { lucide: 'Mail', phosphor: 'Envelope' },
@@ -199,12 +199,12 @@ export const PROJECT_ICONS = {
   'italic': { lucide: 'Italic', phosphor: 'TextItalic' },
   'strikethrough': { lucide: 'Strikethrough', phosphor: 'TextStrikethrough' },
   'heading': { lucide: 'Heading', phosphor: 'TextHOne' },
-  'code': { lucide: 'Code', phosphor: 'Code' },
+  'code': { lucide: 'Code', phosphor: 'Code', iconsax: 'Code' },
   'fileCode': { lucide: 'FileCode', phosphor: 'FileCode' },
-  'quote': { lucide: 'Quote', phosphor: 'Quotes' },
+  'quote': { lucide: 'Quote', phosphor: 'Quotes', iconsax: 'QuoteUp' },
   'list': { lucide: 'List', phosphor: 'List' },
   'listOrdered': { lucide: 'ListOrdered', phosphor: 'ListNumbers' },
-  'minus': { lucide: 'Minus', phosphor: 'Minus' },
+  'minus': { lucide: 'Minus', phosphor: 'Minus', iconsax: 'Minus' },
 } as const
 
 /**

@@ -112,6 +112,8 @@ export { IconProvider, useIconContext } from './components/Icon';
 export type { IconProviderProps } from './components/Icon';
 export type { IconSet, PhosphorWeight, IconConfig } from './components/Icon';
 export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
+export { IconsaxGallery, ICONSAX_ICON_NAMES } from './components/IconsaxGallery';
+export type { IconsaxGalleryProps, IconsaxIconName } from './components/IconsaxGallery';
 
 // Utilities
 export { merge, mergeIf, mergeMap, cn, formatRelativeTime } from './lib/utils';
