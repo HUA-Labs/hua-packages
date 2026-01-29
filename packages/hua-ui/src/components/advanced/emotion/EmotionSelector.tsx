@@ -114,7 +114,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             onClick={() => handleEmotionClick(emotion.key)}
             className={merge(
               "transition-all duration-200",
-              isSelected && "ring-2 ring-offset-2 ring-primary"
+              isSelected && "ring-1 ring-offset-2 ring-primary"
             )}
           >
             {emotion.label}

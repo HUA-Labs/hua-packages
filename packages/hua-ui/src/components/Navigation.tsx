@@ -258,7 +258,7 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
         className={merge(
           getStyleClasses(),
           getScaleClasses(),
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
           className
         )}
         onClick={handleClick}

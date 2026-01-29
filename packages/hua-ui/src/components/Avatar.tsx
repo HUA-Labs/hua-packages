@@ -73,7 +73,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 
     const variantClasses = {
       default: "",
-      glass: "ring-2 ring-white/30 backdrop-blur-sm"
+      glass: "ring-1 ring-white/30 backdrop-blur-sm"
     }
 
     // Fallback 텍스트 결정: fallbackText > children > alt 첫글자 > "U"

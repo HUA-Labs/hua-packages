@@ -130,7 +130,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           <div
             className={merge(
               "relative inline-flex cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out",
-              "peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2",
+              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 peer-focus:ring-offset-2",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
               sizeClasses[size],
               variantClasses[variant],

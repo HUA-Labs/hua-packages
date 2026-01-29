@@ -192,7 +192,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               <nav className="space-y-1" aria-label={section.label || "네비게이션"}>
                 {section.items.map((item) => {
                   const baseClasses = merge(
-                    "group flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70",
+                    "group flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/70",
                     item.active
                       ? "bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-200"
                       : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
