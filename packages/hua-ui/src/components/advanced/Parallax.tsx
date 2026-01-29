@@ -43,7 +43,7 @@ export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
  * @example
  * // 다양한 효과 / With effects
  * <Parallax speed={0.5} scale opacity direction="up">
- *   <div className="h-screen bg-gradient-to-b from-blue-500 to-purple-600" />
+ *   <div className="h-screen bg-gradient-to-b from-indigo-500 to-purple-600" />
  * </Parallax>
  */
 const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(

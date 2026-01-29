@@ -48,9 +48,9 @@ export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const colorSchemes = {
   blue: {
-    default: "bg-blue-500",
-    gradient: "from-blue-500 to-blue-600",
-    highlight: "from-blue-600 to-blue-700",
+    default: "bg-indigo-500",
+    gradient: "from-indigo-500 to-cyan-600",
+    highlight: "from-cyan-600 to-cyan-700",
   },
   purple: {
     default: "bg-purple-500",

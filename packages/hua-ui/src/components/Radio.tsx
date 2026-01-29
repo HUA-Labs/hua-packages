@@ -83,10 +83,10 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     }
 
     const variantClasses = {
-      default: "border-gray-300 bg-white text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-blue-400",
-      outline: "border-2 border-gray-200 bg-transparent text-blue-600 focus:ring-blue-500 dark:border-gray-700 dark:focus:ring-blue-400",
-      filled: "border-transparent bg-gray-50 text-blue-600 focus:bg-white focus:ring-blue-500 dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-blue-400",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-blue-400/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-blue-400/50 dark:focus:bg-slate-700/20"
+      default: "border-gray-300 bg-white text-indigo-600 focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-ring",
+      outline: "border-2 border-gray-200 bg-transparent text-indigo-600 focus:ring-ring dark:border-gray-700 dark:focus:ring-ring",
+      filled: "border-transparent bg-gray-50 text-indigo-600 focus:bg-white focus:ring-ring dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-ring",
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-ring/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-ring/50 dark:focus:bg-slate-700/20"
     }
 
     const stateClasses = error
@@ -129,12 +129,12 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
               sizeClasses[size],
               variantClasses[variant],
               stateClasses,
-              isChecked && "border-blue-600 dark:border-blue-500"
+              isChecked && "border-primary dark:border-primary"
             )}
           >
             <div
               className={merge(
-                "rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-200",
+                "rounded-full bg-primary dark:bg-primary transition-all duration-200",
                 dotSizes[size],
                 isChecked ? "opacity-100 scale-100" : "opacity-0 scale-0"
               )}

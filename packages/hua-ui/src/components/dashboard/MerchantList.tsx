@@ -187,7 +187,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                   disabled={!onMerchantSelect}
                   aria-label={onMerchantSelect ? `${merchantLabel} - 클릭하여 상세 정보 보기` : merchantLabel}
                   className={merge(
-                    "w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/90 dark:bg-slate-900/60 p-4 text-left shadow-sm transition hover:border-slate-200 dark:hover:border-slate-700 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/70",
+                    "w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/90 dark:bg-slate-900/60 p-4 text-left shadow-sm transition hover:border-slate-200 dark:hover:border-slate-700 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/70",
                     onMerchantSelect ? "cursor-pointer" : "cursor-default opacity-60"
                   )}
                 >

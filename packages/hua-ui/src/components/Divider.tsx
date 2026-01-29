@@ -105,14 +105,14 @@ const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
         return {
           default: "border-gray-200 dark:border-gray-700",
           muted: "border-gray-100 dark:border-gray-800",
-          primary: "border-blue-200 dark:border-blue-700",
+          primary: "border-indigo-200 dark:border-indigo-700",
           secondary: "border-gray-300 dark:border-gray-600"
         }
       }
       return {
         default: "bg-gray-200 dark:bg-gray-700",
         muted: "bg-gray-100 dark:bg-gray-800",
-        primary: "bg-blue-200 dark:bg-blue-700",
+        primary: "bg-indigo-200 dark:bg-indigo-700",
         secondary: "bg-gray-300 dark:bg-gray-600"
       }
     }, [variant])

@@ -96,10 +96,10 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     }
 
     const variantClasses = {
-      default: "bg-gray-200 peer-checked:bg-blue-600 dark:bg-gray-700 dark:peer-checked:bg-blue-500",
-      outline: "bg-transparent border-2 border-gray-300 peer-checked:border-blue-600 peer-checked:bg-blue-600 dark:border-gray-600 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500",
-      filled: "bg-gray-100 peer-checked:bg-blue-600 dark:bg-gray-800 dark:peer-checked:bg-blue-500",
-      glass: "bg-white/20 backdrop-blur-sm border border-white/30 peer-checked:bg-blue-400/50 peer-checked:border-blue-300/50 dark:bg-slate-800/20 dark:border-slate-700/50 dark:peer-checked:bg-blue-400/50 dark:peer-checked:border-blue-300/50"
+      default: "bg-gray-200 peer-checked:bg-primary dark:bg-gray-700 dark:peer-checked:bg-primary",
+      outline: "bg-transparent border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary dark:border-gray-600 dark:peer-checked:border-primary dark:peer-checked:bg-primary",
+      filled: "bg-gray-100 peer-checked:bg-primary dark:bg-gray-800 dark:peer-checked:bg-primary",
+      glass: "bg-white/20 backdrop-blur-sm border border-white/30 peer-checked:bg-primary/50 peer-checked:border-indigo-300/50 dark:bg-slate-800/20 dark:border-slate-700/50 dark:peer-checked:bg-primary/50 dark:peer-checked:border-indigo-300/50"
     }
 
     const stateClasses = error 
@@ -130,7 +130,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           <div
             className={merge(
               "relative inline-flex cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out",
-              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 peer-focus:ring-offset-2",
+              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-ring peer-focus:ring-offset-2",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
               sizeClasses[size],
               variantClasses[variant],

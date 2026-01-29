@@ -72,7 +72,7 @@ export function parseMarkdown(text: string): string {
   // 링크
   html = html.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">$1</a>'
+    '<a href="$2" class="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 underline" target="_blank" rel="noopener noreferrer">$1</a>'
   )
 
   // 리스트 (연속된 리스트 아이템을 ul로 감싸기)

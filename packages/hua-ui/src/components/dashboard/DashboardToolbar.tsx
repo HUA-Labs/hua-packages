@@ -84,7 +84,7 @@ export interface DashboardToolbarProps
 }
 
 const actionAppearance = {
-  primary: "bg-blue-600 text-white hover:bg-blue-700",
+  primary: "bg-primary text-white hover:bg-primary/90",
   secondary:
     "border border-slate-200 text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800",
   ghost: "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",

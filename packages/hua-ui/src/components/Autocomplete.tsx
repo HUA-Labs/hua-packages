@@ -320,8 +320,8 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                       className={merge(
                         "px-4 py-3 cursor-pointer transition-colors",
                         "hover:bg-gray-100 dark:hover:bg-gray-700",
-                        isSelected && "bg-blue-50 dark:bg-blue-900/20",
-                        isValueSelected && "bg-blue-100 dark:bg-blue-900/30"
+                        isSelected && "bg-indigo-50 dark:bg-indigo-900/20",
+                        isValueSelected && "bg-indigo-100 dark:bg-indigo-900/30"
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -338,7 +338,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                             {isValueSelected && (
                               <Icon 
                                 name="check" 
-                                className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" 
+                                className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" 
                               />
                             )}
                           </div>

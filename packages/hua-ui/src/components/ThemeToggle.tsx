@@ -113,7 +113,7 @@ export function ThemeToggle({
       <button
         onClick={handleClick}
         className={merge(
-          "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2",
+          "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
           sizeClasses[size],
           className
         )}
@@ -126,7 +126,7 @@ export function ThemeToggle({
               resolvedTheme === "dark" ? "rotate-0 opacity-100" : "rotate-90 opacity-0"
             )}
           >
-            <Icon name="moon" size={iconSizes[size]} className="text-blue-500" />
+            <Icon name="moon" size={iconSizes[size]} className="text-indigo-500" />
           </div>
           <div
             className={merge(
@@ -146,9 +146,9 @@ export function ThemeToggle({
       <button
         onClick={handleClick}
         className={merge(
-          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2",
+          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
           resolvedTheme === "dark" 
-            ? "bg-blue-600" 
+            ? "bg-primary" 
             : "bg-gray-200 dark:bg-gray-700",
           className
         )}
@@ -162,7 +162,7 @@ export function ThemeToggle({
         />
         <div className="absolute inset-0 flex items-center justify-between px-1.5">
           <Icon name="sun" size={12} className="text-amber-600 dark:text-yellow-500 opacity-0" />
-          <Icon name="moon" size={12} className="text-blue-500 opacity-0" />
+          <Icon name="moon" size={12} className="text-indigo-500 opacity-0" />
         </div>
       </button>
     )
@@ -172,7 +172,7 @@ export function ThemeToggle({
     <button
       onClick={handleClick}
       className={merge(
-        "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+        "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
         className
       )}
       {...props}

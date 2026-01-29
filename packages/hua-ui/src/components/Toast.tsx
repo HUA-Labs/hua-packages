@@ -250,7 +250,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       case "warning":
         return "bg-white dark:bg-yellow-900/40 border-yellow-300 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 shadow-lg shadow-yellow-100/50 dark:shadow-none"
       case "info":
-        return "bg-white dark:bg-blue-900/40 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-200 shadow-lg shadow-blue-100/50 dark:shadow-none"
+        return "bg-white dark:bg-indigo-900/40 border-indigo-300 dark:border-indigo-800 text-cyan-800 dark:text-cyan-200 shadow-lg shadow-indigo-100/50 dark:shadow-none"
     }
   }
 
@@ -263,7 +263,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       case "warning":
         return "text-yellow-500 dark:text-yellow-400"
       case "info":
-        return "text-blue-500 dark:text-blue-400"
+        return "text-cyan-500 dark:text-cyan-400"
     }
   }
 

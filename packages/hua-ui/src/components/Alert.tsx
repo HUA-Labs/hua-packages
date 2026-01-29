@@ -84,7 +84,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         case "error":
           return "bg-red-500/10 backdrop-blur-sm border-red-400/30 text-red-200 dark:bg-red-500/10 dark:border-red-400/30 dark:text-red-200"
         case "info":
-          return "bg-blue-500/10 backdrop-blur-sm border-blue-400/30 text-blue-200 dark:bg-blue-500/10 dark:border-blue-400/30 dark:text-blue-200"
+          return "bg-indigo-500/10 backdrop-blur-sm border-cyan-400/30 text-cyan-200 dark:bg-indigo-500/10 dark:border-cyan-400/30 dark:text-cyan-200"
         default:
           return "bg-white/10 backdrop-blur-sm border-white/30 text-white dark:bg-slate-800/20 dark:border-slate-700/50 dark:text-slate-200"
       }
@@ -99,7 +99,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         case "error":
           return "text-red-500 dark:text-red-400"
         case "info":
-          return "text-blue-500 dark:text-blue-400"
+          return "text-cyan-500 dark:text-cyan-400"
         default:
           return "text-gray-500 dark:text-gray-400"
       }

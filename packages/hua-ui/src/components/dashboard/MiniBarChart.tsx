@@ -33,8 +33,8 @@ export interface MiniBarChartProps extends React.HTMLAttributes<HTMLDivElement> 
 // 차트 전용 색상 (막대 그래프용 그라데이션)
 const chartColors: Record<Color, { default: string; highlight: string }> = {
   blue: {
-    default: "bg-gradient-to-t from-blue-500 to-blue-400",
-    highlight: "bg-gradient-to-t from-blue-600 to-blue-500 shadow-lg",
+    default: "bg-gradient-to-t from-indigo-500 to-cyan-400",
+    highlight: "bg-gradient-to-t from-cyan-600 to-cyan-500 shadow-lg",
   },
   purple: {
     default: "bg-gradient-to-t from-purple-500 to-purple-400",

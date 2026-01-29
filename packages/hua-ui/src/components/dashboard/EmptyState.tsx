@@ -41,7 +41,7 @@ const variantStyles = {
     description: "text-gray-600 dark:text-gray-400",
   },
   info: {
-    icon: "text-blue-500 dark:text-blue-400",
+    icon: "text-indigo-500 dark:text-indigo-400",
     title: "text-gray-900 dark:text-white",
     description: "text-gray-600 dark:text-gray-400",
   },

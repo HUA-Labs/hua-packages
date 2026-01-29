@@ -35,7 +35,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
     )
 
     const inputClasses =
-      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-colors'
+      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
 
     const labelClasses = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
 
@@ -115,19 +115,19 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
             <div>
               <label className={labelClasses}>{labels.tags}</label>
               <div className={merge(
-                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-transparent transition-colors'
+                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus-within:ring-1 focus-within:ring-ring focus-within:border-transparent transition-colors'
               )}>
                 {/* 태그 칩들 */}
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm rounded-md"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm rounded-md"
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="hover:text-blue-900 dark:hover:text-blue-100 transition-colors"
+                      className="hover:text-indigo-900 dark:hover:text-indigo-100 transition-colors"
                       aria-label={`${tag} 태그 삭제`}
                     >
                       <Icon name="x" size={14} />

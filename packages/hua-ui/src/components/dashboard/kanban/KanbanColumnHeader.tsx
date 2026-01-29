@@ -10,7 +10,7 @@ import type { Color } from "../../../lib/types/common";
  * Color to dot class mapping
  */
 const colorDotClasses: Record<Color, string> = {
-  blue: "bg-blue-500",
+  blue: "bg-indigo-500",
   purple: "bg-purple-500",
   green: "bg-green-500",
   orange: "bg-orange-500",

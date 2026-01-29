@@ -131,7 +131,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
       
       const emotionColors = {
         joy: "bg-yellow-100 text-yellow-800",
-        sadness: "bg-blue-100 text-blue-800",
+        sadness: "bg-indigo-100 text-cyan-800",
         anger: "bg-red-100 text-red-800",
         calm: "bg-green-100 text-green-800",
         excitement: "bg-pink-100 text-pink-800",

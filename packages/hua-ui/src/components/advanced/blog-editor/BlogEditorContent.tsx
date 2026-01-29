@@ -36,7 +36,7 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
     const currentLang = languages.find((l) => l.key === activeLanguage)
 
     const inputClasses =
-      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-colors'
+      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
 
     const labelClasses = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
 

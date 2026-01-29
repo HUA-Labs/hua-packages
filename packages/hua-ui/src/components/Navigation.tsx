@@ -217,7 +217,7 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
           return merge(
             "border-b-2 px-3 py-2 text-sm font-medium transition-all",
             active 
-              ? "border-blue-500 text-blue-600 dark:text-blue-400" 
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400" 
               : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           )
         case "cards":
@@ -258,7 +258,7 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
         className={merge(
           getStyleClasses(),
           getScaleClasses(),
-          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
           className
         )}
         onClick={handleClick}

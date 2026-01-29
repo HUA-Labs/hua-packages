@@ -41,7 +41,7 @@ export interface ProgressCardProps extends React.HTMLAttributes<HTMLDivElement> 
 
 // Progress bar 색상은 별도 처리
 const progressColors: Record<Color, string> = {
-  blue: "bg-blue-500",
+  blue: "bg-indigo-500",
   purple: "bg-purple-500",
   green: "bg-green-500",
   orange: "bg-orange-500",

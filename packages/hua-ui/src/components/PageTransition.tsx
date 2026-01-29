@@ -106,7 +106,7 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
 
   if (isLoading && showLoading) {
     return (
-      <div className={merge('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800', className)}>
+      <div className={merge('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800', className)}>
         <LoadingSpinner
           size="lg"
           variant={loadingVariant}
