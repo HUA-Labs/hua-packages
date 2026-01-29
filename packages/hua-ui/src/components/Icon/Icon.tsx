@@ -104,13 +104,14 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
 }, ref) => {
   // Context에서 전역 설정 가져오기
   const config = useIconContext()
-  
+
   // prop으로 오버라이드 가능, 없으면 Context에서 가져옴
   const iconSet = provider || config.set
   const iconSize = size ?? config.size
   const iconWeight = weight || config.weight
   const iconColor = config.color
   const iconStrokeWidth = config.strokeWidth ?? 1.25
+  const iconsaxVariant = config.iconsaxVariant ?? 'line'
   
   // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
   const [isClient, setIsClient] = React.useState(false)
@@ -147,10 +148,10 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   // Iconsax icons are fetched synchronously using getIconsaxIconSync
   const iconsaxIcon = React.useMemo(() => {
     if (iconSet === 'iconsax' && isClient) {
-      return getIconsaxIconSync(resolvedIcon.providerName)
+      return getIconsaxIconSync(resolvedIcon.providerName, iconsaxVariant)
     }
     return null
-  }, [iconSet, resolvedIcon.providerName, isClient])
+  }, [iconSet, resolvedIcon.providerName, isClient, iconsaxVariant])
   
   // 색상 변형 클래스 (먼저 선언 - fallback에서 사용)
   const variantClasses = mergeMap({

@@ -63,11 +63,23 @@
     },
     "./styles/toast.css": "./src/styles/toast.css",
     "./styles/codeblock.css": "./src/styles/codeblock.css",
-    "./styles/recommended-theme.css": "./src/styles/recommended-theme.css"
+    "./styles/recommended-theme.css": "./src/styles/recommended-theme.css",
+    "./icons": {
+      "types": "./src/components/icons/index.ts",
+      "import": "./src/components/icons/index.ts",
+      "require": "./src/components/icons/index.ts"
+    },
+    "./icons-bold": {
+      "types": "./src/components/icons-bold/index.ts",
+      "import": "./src/components/icons-bold/index.ts",
+      "require": "./src/components/icons-bold/index.ts"
+    }
   },
   "files": [
     "dist",
-    "src/styles"
+    "src/styles",
+    "src/components/icons",
+    "src/components/icons-bold"
   ],
   "scripts": {
     "build": "pnpm exec tsup && pnpm exec tsc --emitDeclarationOnly && node scripts/add-use-client.js",
