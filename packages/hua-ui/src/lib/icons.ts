@@ -133,6 +133,12 @@ import {
   Sparkles,
   Globe,
   Smartphone,
+  Ticket,
+  ClipboardList,
+  Wifi,
+  WifiOff,
+  Cpu,
+  Drama,
 } from 'lucide-react'
 
 // 핵심 아이콘 객체
@@ -249,6 +255,14 @@ export const icons = {
   smartphone: Smartphone,
   deviceMobile: Smartphone,
   floppyDisk: Save,
+
+  // Connectivity
+  ticket: Ticket,
+  clipboard: ClipboardList,
+  wifi: Wifi,
+  wifiOff: WifiOff,
+  cpu: Cpu,
+  mask: Drama,
 
   // Text Formatting (Markdown Toolbar)
   bold: Bold,

@@ -71,6 +71,9 @@ export const iconNames = [
 
   // Additional
   'rocket',
+
+  // Connectivity & Misc
+  'ticket', 'clipboard', 'wifi', 'wifiOff', 'cpu', 'mask',
 ] as const
 
 /**
