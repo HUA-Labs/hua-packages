@@ -133,7 +133,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ref={combinedRef}
           className={merge(
             "flex w-full appearance-none rounded-md border transition-all duration-200",
-            "focus:outline-none focus:ring-2 focus:ring-offset-2",
+            "focus:outline-none focus:ring-1 focus:ring-offset-2",
             "hover:border-blue-400 hover:shadow-sm",
             "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-300",
             variantClasses[variant],

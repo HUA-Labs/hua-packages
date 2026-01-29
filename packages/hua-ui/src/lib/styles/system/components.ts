@@ -181,16 +181,16 @@ function createButtonFocusStyle(
   variant: ButtonVariant,
   _theme: Theme
 ): string {
-  const baseFocus = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
+  const baseFocus = "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
 
   switch (variant) {
     case "destructive":
-      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-destructive)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
+      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-destructive)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]";
 
     case "outline":
     case "ghost":
     case "link":
-      return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-0";
+      return "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-0";
 
     default:
       return baseFocus;

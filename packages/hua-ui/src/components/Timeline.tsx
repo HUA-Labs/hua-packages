@@ -212,7 +212,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                       "rounded-full border-2 shrink-0",
                       sizeConfig.dot,
                       statusConfig.dot,
-                      isHighlighted && "scale-125 ring-2 ring-offset-2 ring-slate-200 dark:ring-slate-700"
+                      isHighlighted && "scale-125 ring-1 ring-offset-2 ring-slate-200 dark:ring-slate-700"
                     )}
                     aria-label={statusConfig.label}
                   />

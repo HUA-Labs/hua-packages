@@ -35,7 +35,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
     )
 
     const inputClasses =
-      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors'
+      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-colors'
 
     const labelClasses = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
 
@@ -115,7 +115,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
             <div>
               <label className={labelClasses}>{labels.tags}</label>
               <div className={merge(
-                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-colors'
+                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-transparent transition-colors'
               )}>
                 {/* 태그 칩들 */}
                 {formData.tags.map((tag) => (

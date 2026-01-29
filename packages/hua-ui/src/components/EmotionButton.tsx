@@ -55,7 +55,7 @@ const EmotionButton = React.forwardRef<HTMLButtonElement, EmotionButtonProps>(
       <button
         ref={ref}
         className={merge(
-          "rounded-full border-2 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500",
+          "rounded-full border-2 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-1 focus:ring-blue-500",
           sizeClasses[size],
           isSelected 
             ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 

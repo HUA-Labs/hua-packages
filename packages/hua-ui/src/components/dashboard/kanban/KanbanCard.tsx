@@ -170,7 +170,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
           "group relative rounded-lg p-3 mb-2 cursor-grab active:cursor-grabbing transition-all duration-200",
           cardStyles[variant],
           isDragging && "opacity-50 scale-95 shadow-2xl z-50",
-          isOver && "ring-2 ring-indigo-500",
+          isOver && "ring-1 ring-indigo-500",
           !allowCardDrag && "cursor-default",
           isDeleting && "pointer-events-none",
           "hover:shadow-md hover:-translate-y-0.5 touch-none",
