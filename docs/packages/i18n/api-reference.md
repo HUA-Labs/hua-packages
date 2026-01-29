@@ -245,10 +245,10 @@ function useTranslation(): TranslationHookResult
 
 ```typescript
 interface TranslationHookResult {
-  /** 기본 번역 함수 */
-  t: (key: string, language?: string) => string;
-  
-  /** 파라미터가 있는 번역 함수 */
+  /** 통합 번역 함수 - t(key), t(key, language), t(key, params), t(key, params, language) */
+  t: (key: string, paramsOrLanguage?: TranslationParams | string, language?: string) => string;
+
+  /** @deprecated t(key, params, language?)를 사용하세요. 내부적으로 t()를 호출합니다. */
   tWithParams: (key: string, params?: TranslationParams, language?: string) => string;
   
   /** 현재 언어 */
@@ -280,18 +280,23 @@ interface TranslationHookResult {
 import { useTranslation } from '@hua-labs/i18n-core';
 
 function MyComponent() {
-  const { t, tWithParams, currentLanguage, setLanguage } = useTranslation();
-  
+  const { t, currentLanguage, setLanguage } = useTranslation();
+
   return (
     <div>
       <h1>{t('common:welcome')}</h1>
-      <p>{tWithParams('common:time.minutesAgo', { minutes: 5 })}</p>
+      <p>{t('common:time.minutesAgo', { minutes: 5 })}</p>
+      <p>{t('common:welcome', 'en')}</p> {/* 특정 언어로 번역 */}
       <p>Current language: {currentLanguage}</p>
       <button onClick={() => setLanguage('en')}>Switch to English</button>
     </div>
   );
 }
 ```
+
+> **통합 API**: `t()` 함수는 두 번째 인자의 타입으로 동작을 결정합니다:
+> - `string` → 언어 코드로 인식
+> - `object` → 파라미터로 인식
 
 ---
 
@@ -784,9 +789,13 @@ t('dashboard:sections.summary.title')
   }
 }
 
-// 사용
-tWithParams('common:time.minutesAgo', { minutes: 5 })
+// 사용 (통합 t() API)
+t('common:time.minutesAgo', { minutes: 5 })
 // 결과: "5분 전"
+
+// 특정 언어로 파라미터 보간
+t('common:time.minutesAgo', { minutes: 5 }, 'en')
+// 결과: "5 minutes ago"
 ```
 
 ### 여러 파라미터
@@ -802,9 +811,11 @@ tWithParams('common:time.minutesAgo', { minutes: 5 })
 }
 
 // 사용
-tWithParams('common:alerts.healthDown.message', { count: 3 })
+t('common:alerts.healthDown.message', { count: 3 })
 // 결과: "3개 서비스가 응답하지 않습니다"
 ```
+
+> **참고**: `tWithParams(key, params, language?)`는 deprecated되었습니다. `t(key, params, language?)`를 사용하세요.
 
 ---
 
