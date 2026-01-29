@@ -269,54 +269,69 @@ export function I18nProvider({
 
   // hua-api 스타일의 간단한 번역 함수 (메모이제이션)
   // translationVersion과 currentLanguage에 의존하여 번역 로드 및 언어 변경 시 리렌더링 트리거
-  const t = useCallback((key: string, language?: string) => {
+  const t = useCallback((key: string, paramsOrLang?: TranslationParams | string, language?: string) => {
     // translationVersion과 currentLanguage를 참조하여 번역 로드 및 언어 변경 시 리렌더링 트리거
-    // 의존성 배열에 포함되어 있어서 값이 변경되면 함수가 재생성됨
     void translationVersion;
     void currentLanguage;
-    
+
     if (!translator) {
       return key;
     }
-    
-    const targetLang = language || currentLanguage;
-    
-    // 1단계: translator.translate() 시도
+
+    // 두 번째 인자 타입으로 분기
+    let params: TranslationParams | undefined;
+    let lang: string | undefined;
+    if (typeof paramsOrLang === 'string') {
+      lang = paramsOrLang;
+    } else if (typeof paramsOrLang === 'object' && paramsOrLang !== null) {
+      params = paramsOrLang;
+      lang = language;
+    }
+
+    const targetLang = lang || currentLanguage;
+
+    // 1단계: translator.translate() 시도 (params가 있으면 translate에 위임)
     try {
-      const result = translator.translate(key, language);
+      const result = translator.translate(key, params || lang, params ? lang : undefined);
       if (result && result !== key && result !== '') {
         return result;
       }
     } catch (error) {
       // translator.translate() 실패 시 다음 단계로 진행
     }
-    
+
+    // interpolate 헬퍼
+    const interpolate = (text: string) => {
+      if (!params) return text;
+      return text.replace(/\{\{(\w+)\}\}/g, (match, k) => {
+        const value = params![k];
+        return value !== undefined ? String(value) : match;
+      });
+    };
+
     // 2단계: SSR 번역 데이터에서 찾기
     const ssrResult = findInSSRTranslations(key, targetLang);
     if (ssrResult) {
-      return ssrResult;
+      return interpolate(ssrResult);
     }
-    
+
     // 3단계: 기본 번역 데이터에서 찾기
     const defaultResult = findInDefaultTranslations(key, targetLang);
     if (defaultResult) {
-      return defaultResult;
+      return interpolate(defaultResult);
     }
-    
+
     // 모든 단계에서 번역을 찾지 못한 경우
     if (config.debug) {
-      return key; // 개발 환경에서는 키를 표시하여 디버깅 가능
+      return interpolate(key); // 개발 환경에서는 키를 표시하여 디버깅 가능
     }
     return ''; // 프로덕션에서는 빈 문자열 반환하여 미싱 키 노출 방지
-  }, [translator, config.debug, currentLanguage, config.fallbackLanguage, translationVersion, findInSSRTranslations, findInDefaultTranslations]) as (key: string, language?: string) => string;
+  }, [translator, config.debug, currentLanguage, config.fallbackLanguage, translationVersion, findInSSRTranslations, findInDefaultTranslations]) as (key: string, paramsOrLang?: TranslationParams | string, language?: string) => string;
 
-  // 파라미터가 있는 번역 함수 (메모이제이션)
+  // 파라미터가 있는 번역 함수 (deprecated: t()에 통합됨)
   const tWithParams = useCallback((key: string, params?: TranslationParams, language?: string) => {
-    if (!translator || !isInitialized) {
-      return key;
-    }
-    return translator.translateWithParams(key, params, language);
-  }, [translator, isInitialized]);
+    return t(key, params, language);
+  }, [t]);
 
   // 기존 비동기 번역 함수 (하위 호환성)
   const tAsync = useCallback(async (key: string, params?: TranslationParams) => {
@@ -495,7 +510,7 @@ export function useI18n(): I18nContextType {
       currentLanguage: 'ko',
       setLanguage: () => {},
       t: (key: string) => key,
-      tWithParams: (key: string) => key,
+      tWithParams: (key: string) => key, // deprecated
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
       getRawValue: () => undefined,

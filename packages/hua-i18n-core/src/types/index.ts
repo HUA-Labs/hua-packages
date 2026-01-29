@@ -121,9 +121,9 @@ export interface TranslationResult {
 export interface I18nContextType {
   currentLanguage: string;
   setLanguage: (language: string) => void;
-  // hua-api 스타일의 간단한 번역 함수
-  t: (key: string, language?: string) => string;
-  // 파라미터가 있는 번역 함수
+  // 통합 번역 함수: t(key), t(key, language), t(key, params), t(key, params, language)
+  t: (key: string, paramsOrLang?: TranslationParams | string, language?: string) => string;
+  /** @deprecated Use t(key, params, language) instead */
   tWithParams: (key: string, params?: TranslationParams, language?: string) => string;
   // 기존 비동기 번역 함수 (하위 호환성)
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
@@ -172,7 +172,8 @@ export type TranslationKey<T> = T extends Record<string, unknown>
 // 타입 안전한 번역 함수들
 export interface TypedI18nContextType<T extends TranslationData> extends Omit<I18nContextType, 't' | 'tWithParams' | 'tSync'> {
   // 타입 안전한 번역 함수
-  t: <K extends TranslationKey<T>>(key: K, language?: string) => string;
+  t: <K extends TranslationKey<T>>(key: K, paramsOrLang?: TranslationParams | string, language?: string) => string;
+  /** @deprecated Use t(key, params, language) instead */
   tWithParams: <K extends TranslationKey<T>>(key: K, params?: TranslationParams, language?: string) => string;
   tSync: <K extends TranslationKey<T>>(key: K, namespace?: string, params?: TranslationParams) => string;
 }

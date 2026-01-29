@@ -14,7 +14,7 @@ import {
 } from '../types';
 
 export interface TranslatorInterface {
-  translate(key: string, language?: string): string;
+  translate(key: string, paramsOrLang?: Record<string, unknown> | string, language?: string): string;
   setLanguage(lang: string): void;
   getCurrentLanguage(): string;
   initialize(): Promise<void>;
@@ -371,12 +371,23 @@ export class Translator implements TranslatorInterface {
   /**
    * 번역 키를 번역된 텍스트로 변환
    */
-  translate(key: string, language?: string): string {
-    const targetLang = language || this.currentLang;
+  translate(key: string, paramsOrLang?: Record<string, unknown> | string, language?: string): string {
+    // 두 번째 인자 타입으로 분기
+    let params: Record<string, unknown> | undefined;
+    let targetLang: string;
+    if (typeof paramsOrLang === 'string') {
+      targetLang = paramsOrLang;
+    } else if (typeof paramsOrLang === 'object' && paramsOrLang !== null) {
+      params = paramsOrLang;
+      targetLang = language || this.currentLang;
+    } else {
+      targetLang = this.currentLang;
+    }
 
     // 초기화되지 않은 경우 처리
     if (!this.isInitialized) {
-      return this.translateBeforeInitialized(key, targetLang);
+      const raw = this.translateBeforeInitialized(key, targetLang);
+      return params ? this.interpolate(raw, params) : raw;
     }
 
     const { namespace, key: actualKey } = this.parseKey(key);
@@ -385,28 +396,29 @@ export class Translator implements TranslatorInterface {
     let result: string | null = this.findInNamespace(namespace, actualKey, targetLang);
     if (result) {
       this.cacheStats.hits++;
-      return result;
+      return params ? this.interpolate(result, params) : result;
     }
-    
+
     // 2단계: 다른 로드된 언어에서 찾기 (언어 변경 중 깜빡임 방지)
     result = this.findInOtherLanguages(namespace, actualKey, targetLang);
     if (result) {
-      return result;
+      return params ? this.interpolate(result, params) : result;
     }
 
     // 3단계: 폴백 언어에서 찾기
     result = this.findInFallbackLanguage(namespace, actualKey, targetLang);
     if (result) {
-      return result;
+      return params ? this.interpolate(result, params) : result;
     }
 
     // 모든 단계에서 찾지 못한 경우
     this.cacheStats.misses++;
-    
+
     if (this.config.debug) {
-      return this.config.missingKeyHandler?.(key, targetLang, namespace) || key;
+      const missing = this.config.missingKeyHandler?.(key, targetLang, namespace) || key;
+      return params ? this.interpolate(missing, params) : missing;
     }
-    
+
     // 프로덕션에서는 빈 문자열 반환 (미싱 키 노출 방지)
     return '';
   }
@@ -537,15 +549,10 @@ export class Translator implements TranslatorInterface {
 
   /**
    * 매개변수가 있는 번역
+   * @deprecated Use translate(key, params, language) instead
    */
   translateWithParams(key: string, params?: Record<string, unknown>, language?: string): string {
-    const translated = this.translate(key, language);
-
-    if (!params) {
-      return translated;
-    }
-
-    return this.interpolate(translated, params);
+    return this.translate(key, params, language);
   }
 
   /**

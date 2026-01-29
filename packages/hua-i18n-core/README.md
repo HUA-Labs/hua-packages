@@ -350,15 +350,23 @@ function MyComponent() {
 import { useTranslation } from '@hua-labs/i18n-core';
 
 function MyComponent() {
-  const { tWithParams } = useTranslation();
-  
+  const { t } = useTranslation();
+
   return (
     <div>
-      <p>{tWithParams('common:greeting', { name: 'John' })}</p>
+      <p>{t('common:greeting', { name: 'John' })}</p>
     </div>
   );
 }
 ```
+
+> **Note**: `t()` now supports all use cases with a unified API:
+> - `t(key)` - basic translation
+> - `t(key, language)` - translate in a specific language (second arg is a string)
+> - `t(key, params)` - translate with parameters (second arg is an object)
+> - `t(key, params, language)` - translate with parameters in a specific language
+>
+> The previous `tWithParams(key, params, language?)` function is **deprecated** but still works internally by calling `t()`.
 
 Translation file:
 ```json
@@ -442,7 +450,7 @@ import { useTranslation } from '@hua-labs/i18n-core';
 function MyComponent() {
   const {
     t,
-    tWithParams,
+    tWithParams, // deprecated - use t(key, params) instead
     currentLanguage,
     setLanguage,
     isLoading,
