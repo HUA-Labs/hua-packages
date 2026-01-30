@@ -9,15 +9,16 @@ import type { ReactNode, HTMLAttributes } from "react";
  * 공통 색상 타입
  * 모든 컴포넌트에서 사용하는 표준 색상 팔레트
  */
-export type Color = 
-  | "blue" 
-  | "purple" 
-  | "green" 
-  | "orange" 
-  | "red" 
-  | "indigo" 
-  | "pink" 
-  | "gray";
+export type Color =
+  | "blue"
+  | "purple"
+  | "green"
+  | "orange"
+  | "red"
+  | "indigo"
+  | "pink"
+  | "gray"
+  | "cyan";
 
 /**
  * 공통 크기 타입
