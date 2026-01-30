@@ -453,11 +453,17 @@ export class Translator implements TranslatorInterface {
     if (this.isStringValue(directValue)) {
       return directValue;
     }
+    if (this.isStringArray(directValue)) {
+      return directValue[Math.floor(Math.random() * directValue.length)];
+    }
 
     // 중첩 키 매칭 (예: "user.profile.name")
     const nestedValue = this.getNestedValue(translations, key);
     if (this.isStringValue(nestedValue)) {
       return nestedValue;
+    }
+    if (this.isStringArray(nestedValue)) {
+      return nestedValue[Math.floor(Math.random() * nestedValue.length)];
     }
 
     if (this.config.debug) {
@@ -468,6 +474,7 @@ export class Translator implements TranslatorInterface {
 
   /**
    * 중첩된 객체에서 값을 가져오기
+   * 배열도 지원: 최종 값이 string[]이면 그대로 반환
    */
   private getNestedValue(obj: unknown, path: string): unknown {
     if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
@@ -475,7 +482,12 @@ export class Translator implements TranslatorInterface {
     }
 
     return path.split('.').reduce((current: unknown, key: string) => {
-      if (current && typeof current === 'object' && !Array.isArray(current) && key in current) {
+      if (current == null) return undefined;
+      if (Array.isArray(current)) {
+        const idx = Number(key);
+        return Number.isInteger(idx) ? current[idx] : undefined;
+      }
+      if (typeof current === 'object' && key in (current as Record<string, unknown>)) {
         return (current as Record<string, unknown>)[key];
       }
       return undefined;
@@ -487,6 +499,14 @@ export class Translator implements TranslatorInterface {
    */
   private isStringValue(value: unknown): value is string {
     return typeof value === 'string' && value.length > 0;
+  }
+
+  /**
+   * string[] 배열인지 확인하는 타입 가드
+   * 배열 값이 t()에 전달되면 랜덤으로 하나를 선택하여 반환
+   */
+  private isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.length > 0 && value.every(v => typeof v === 'string');
   }
 
   /**
