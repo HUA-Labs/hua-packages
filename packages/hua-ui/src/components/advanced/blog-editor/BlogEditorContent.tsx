@@ -30,6 +30,7 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
       languages,
       generateSlug,
       isEditMode,
+      slugManuallyEdited,
     } = useBlogEditor()
 
     const isPrimaryLanguage = languages.find((l) => l.isPrimary)?.key === activeLanguage
@@ -43,8 +44,9 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
     const handleTitleChange = (value: string) => {
       updateMultilingualField('title', activeLanguage, value)
 
-      // 기본 언어이고 새 글이면 슬러그 자동 생성
-      if (isPrimaryLanguage && !isEditMode && !formData.slug) {
+      // 영어 탭에서 타이틀 입력 시 슬러그 자동 생성
+      // (한국어/일본어보다 영어 슬러그가 URL에 적합)
+      if (activeLanguage === 'en' && !isEditMode && !slugManuallyEdited) {
         updateField('slug', generateSlug(value))
       }
     }
