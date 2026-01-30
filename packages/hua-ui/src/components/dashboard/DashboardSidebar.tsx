@@ -76,6 +76,12 @@ export interface DashboardSidebarProps extends React.HTMLAttributes<HTMLElement>
   itemClassName?: string;
   /** 활성 아이템 클래스 오버라이드 / Active item class override */
   activeClassName?: string;
+  /** 모바일 열림 상태 (제어) / Mobile open state (controlled) */
+  isMobileOpen?: boolean;
+  /** 모바일 열림 상태 변경 핸들러 / Mobile open state change handler */
+  onMobileOpenChange?: (open: boolean) => void;
+  /** 모바일 토글 버튼 숨기기 (외부에서 제어할 때) / Hide mobile toggle button (when controlled externally) */
+  hideMobileToggle?: boolean;
 }
 
 const DEFAULT_COLLAPSED = 72;
@@ -139,15 +145,24 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       hideToggle = false,
       itemClassName,
       activeClassName,
+      isMobileOpen: externalMobileOpen,
+      onMobileOpenChange,
+      hideMobileToggle = false,
       className,
       ...props
     },
     ref
   ) => {
     const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed);
-    const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+    const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
     const [isMobile, setIsMobile] = React.useState(false);
     const collapsed = typeof isCollapsed === "boolean" ? isCollapsed : internalCollapsed;
+
+    const isMobileOpen = typeof externalMobileOpen === "boolean" ? externalMobileOpen : internalMobileOpen;
+    const setIsMobileOpen = (open: boolean) => {
+      onMobileOpenChange?.(open);
+      if (typeof externalMobileOpen !== "boolean") setInternalMobileOpen(open);
+    };
 
     React.useEffect(() => {
       const checkMobile = () => setIsMobile(window.innerWidth <= mobileBreakpoint);
@@ -285,12 +300,14 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       <>
         {isMobile ? (
           <>
-            <button
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:text-slate-200"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Icon name="menu" className="h-4 w-4" />
-            </button>
+            {!hideMobileToggle && (
+              <button
+                className="fixed top-3 left-3 z-30 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                onClick={() => setIsMobileOpen(true)}
+              >
+                <Icon name="menu" className="h-5 w-5" />
+              </button>
+            )}
             {isMobileOpen && (
               <div className="fixed inset-0 z-40 flex">
                 <div
@@ -298,13 +315,13 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                   style={{ backgroundColor: overlayBackground }}
                   onClick={() => setIsMobileOpen(false)}
                 />
-                <div className="relative z-50 h-full">
+                <div className="relative z-50 h-full bg-white dark:bg-slate-950">
                   {sidebarContent}
                   <button
-                    className="absolute top-4 right-4 rounded-full border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                    className="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
                     onClick={() => setIsMobileOpen(false)}
                   >
-                    <Icon name="close" className="h-4 w-4" />
+                    <Icon name="close" className="h-5 w-5" />
                   </button>
                 </div>
               </div>

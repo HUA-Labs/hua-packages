@@ -113,18 +113,18 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
 
     const getPositionClasses = () => {
       const baseClasses = "absolute z-50"
-      
+
       switch (position) {
         case "top":
-          return merge(baseClasses, "bottom-full left-0", `mb-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "bottom-full", `mb-${Math.max(1, Math.floor(offset / 4))}`)
         case "bottom":
-          return merge(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "top-full", `mt-${Math.max(1, Math.floor(offset / 4))}`)
         case "left":
-          return merge(baseClasses, "right-full top-0", `mr-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "right-full", `mr-${Math.max(1, Math.floor(offset / 4))}`)
         case "right":
-          return merge(baseClasses, "left-full top-0", `ml-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "left-full", `ml-${Math.max(1, Math.floor(offset / 4))}`)
         default:
-          return merge(baseClasses, "top-full left-0", `mt-${Math.max(1, Math.floor(offset / 4))}`)
+          return merge(baseClasses, "top-full", `mt-${Math.max(1, Math.floor(offset / 4))}`)
       }
     }
 
