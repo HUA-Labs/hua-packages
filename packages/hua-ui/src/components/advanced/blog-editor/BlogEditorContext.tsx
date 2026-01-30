@@ -196,6 +196,8 @@ export function BlogEditorProvider({
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [translateSuccess, setTranslateSuccess] = useState(false)
+  // 슬러그가 사용자에 의해 수동 편집되었는지 추적
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEditMode || !!initialData?.slug)
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
   const isInitialMount = useRef(true)
@@ -443,6 +445,8 @@ export function BlogEditorProvider({
       handleCancel,
       setError,
       generateSlug,
+      slugManuallyEdited,
+      setSlugManuallyEdited,
     }),
     [
       formData,
@@ -466,6 +470,8 @@ export function BlogEditorProvider({
       handleUploadImage,
       handleCancel,
       generateSlug,
+      slugManuallyEdited,
+      setSlugManuallyEdited,
     ]
   )
 
