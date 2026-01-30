@@ -64,6 +64,10 @@ const chartColors: Record<Color, { default: string; highlight: string }> = {
     default: "bg-gradient-to-t from-gray-500 to-gray-400",
     highlight: "bg-gradient-to-t from-gray-600 to-gray-500 shadow-lg",
   },
+  cyan: {
+    default: "bg-gradient-to-t from-cyan-500 to-cyan-400",
+    highlight: "bg-gradient-to-t from-cyan-600 to-cyan-500 shadow-lg",
+  },
 };
 
 /**

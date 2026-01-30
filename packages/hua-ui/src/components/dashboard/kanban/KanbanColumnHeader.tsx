@@ -18,6 +18,7 @@ const colorDotClasses: Record<Color, string> = {
   indigo: "bg-indigo-500",
   pink: "bg-pink-500",
   gray: "bg-gray-500",
+  cyan: "bg-cyan-500",
 };
 import type { KanbanColumnHeaderProps } from "./types";
 

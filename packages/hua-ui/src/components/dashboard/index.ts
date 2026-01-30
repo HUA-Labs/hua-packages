@@ -90,6 +90,9 @@ export type {
   MerchantHealth,
 } from "./MerchantList";
 
+export { YearlyHeatmap } from "./YearlyHeatmap";
+export type { YearlyHeatmapProps, YearlyHeatmapLabels } from "./YearlyHeatmap";
+
 // Kanban Board
 export {
   KanbanBoard,
