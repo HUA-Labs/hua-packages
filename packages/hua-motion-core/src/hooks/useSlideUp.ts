@@ -23,9 +23,26 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [nodeReady, setNodeReady] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const timeoutRef = useRef<number | null>(null)
   const startRef = useRef<() => void>(() => {})
+
+  // ref가 DOM에 연결되었는지 polling으로 감지
+  useEffect(() => {
+    if (nodeReady) return
+    if (ref.current) {
+      setNodeReady(true)
+      return
+    }
+    const id = setInterval(() => {
+      if (ref.current) {
+        setNodeReady(true)
+        clearInterval(id)
+      }
+    }, 50)
+    return () => clearInterval(id)
+  }, [nodeReady])
 
   // 방향에 따른 초기 위치 계산
   const getInitialTransform = useCallback(() => {
@@ -113,7 +130,7 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
         observerRef.current.disconnect()
       }
     }
-  }, [autoStart, threshold, triggerOnce])
+  }, [autoStart, threshold, triggerOnce, nodeReady])
 
   // 자동 시작이 비활성화된 경우 수동 시작
   useEffect(() => {

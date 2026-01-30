@@ -38,7 +38,7 @@ export interface IconProps {
   /** 바운스 애니메이션 / Bounce animation */
   bounce?: boolean
   /** 색상 변형 / Color variant */
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'muted'
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'muted' | 'inherit'
   /** Phosphor 아이콘 weight 오버라이드 / Phosphor icon weight override */
   weight?: PhosphorWeight
   /** 스크린 리더용 라벨 (의미 있는 아이콘인 경우) / Screen reader label (for meaningful icons) */

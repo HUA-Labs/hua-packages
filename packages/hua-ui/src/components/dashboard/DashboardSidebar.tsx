@@ -68,6 +68,14 @@ export interface DashboardSidebarProps extends React.HTMLAttributes<HTMLElement>
   expandedWidth?: number;
   mobileBreakpoint?: number;
   overlayBackground?: string;
+  /** 사이드바 스타일 변형 / Sidebar style variant */
+  variant?: "default" | "transparent";
+  /** 토글 버튼 숨기기 / Hide collapse toggle button */
+  hideToggle?: boolean;
+  /** 아이템 기본 클래스 오버라이드 / Item base class override */
+  itemClassName?: string;
+  /** 활성 아이템 클래스 오버라이드 / Active item class override */
+  activeClassName?: string;
 }
 
 const DEFAULT_COLLAPSED = 72;
@@ -127,6 +135,10 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       expandedWidth = DEFAULT_EXPANDED,
       mobileBreakpoint = 1024,
       overlayBackground = "rgba(15, 23, 42, 0.45)",
+      variant = "default",
+      hideToggle = false,
+      itemClassName,
+      activeClassName,
       className,
       ...props
     },
@@ -158,7 +170,10 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
         role="navigation"
         aria-label="대시보드 네비게이션"
         className={merge(
-          "flex h-full flex-col border-r border-slate-200/60 bg-white/95 px-3 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/80 backdrop-blur transition-[width] duration-200",
+          "flex h-full flex-col overflow-hidden px-3 py-4 transition-[width] duration-200",
+          variant === "transparent"
+            ? "border-r border-slate-200/40 dark:border-slate-800/60"
+            : "border-r border-slate-200/60 bg-white/95 shadow-sm dark:border-slate-800 dark:bg-slate-950/80 backdrop-blur",
           className
         )}
         style={{ width: widthStyle, minWidth: widthStyle }}
@@ -169,7 +184,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
             {logo}
             {!collapsed && productSwitcher}
           </div>
-          <button
+          {!hideToggle && <button
             type="button"
             onClick={toggleCollapsed}
             aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
@@ -178,7 +193,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
           >
             <Icon name={collapsed ? "chevronRight" : "chevronLeft"} className="h-4 w-4" />
             <span className="sr-only">사이드바 토글</span>
-          </button>
+          </button>}
         </div>
 
         <div className="flex-1 space-y-6 overflow-y-auto">
@@ -191,11 +206,13 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               )}
               <nav className="space-y-1" aria-label={section.label || "네비게이션"}>
                 {section.items.map((item) => {
+                  const defaultActive = "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100";
+                  const defaultItem = "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800";
                   const baseClasses = merge(
-                    "group flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
+                    "group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
                     item.active
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-200"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                      ? (activeClassName || defaultActive)
+                      : (itemClassName || defaultItem)
                   );
 
                   const content = (
@@ -203,7 +220,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                       {item.icon && (
                         <span className="mr-3">
                           {typeof item.icon === "string" ? (
-                            <Icon name={item.icon as IconName} className="h-5 w-5" />
+                            <Icon name={item.icon as IconName} className="h-5 w-5" variant="inherit" />
                           ) : (
                             item.icon
                           )}
@@ -273,7 +290,6 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               onClick={() => setIsMobileOpen(true)}
             >
               <Icon name="menu" className="h-4 w-4" />
-              메뉴
             </button>
             {isMobileOpen && (
               <div className="fixed inset-0 z-40 flex">
