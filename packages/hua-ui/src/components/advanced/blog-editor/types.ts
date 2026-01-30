@@ -239,6 +239,8 @@ export interface BlogEditorContextValue {
   handleCancel: () => void
   setError: (error: string | null) => void
   generateSlug: (title: string) => string
+  slugManuallyEdited: boolean
+  setSlugManuallyEdited: (edited: boolean) => void
   uploading: boolean
 }
 

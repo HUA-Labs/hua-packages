@@ -20,7 +20,7 @@ export interface BlogEditorMetadataProps {
  */
 const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataProps>(
   ({ className }, ref) => {
-    const { formData, updateField, features, labels, variant, handleUploadImage, uploading } = useBlogEditor()
+    const { formData, updateField, features, labels, variant, handleUploadImage, uploading, setSlugManuallyEdited } = useBlogEditor()
     const [tagInput, setTagInput] = useState('')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -102,7 +102,10 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                 <input
                   type="text"
                   value={formData.slug}
-                  onChange={(e) => updateField('slug', normalizeSlug(e.target.value))}
+                  onChange={(e) => {
+                    updateField('slug', normalizeSlug(e.target.value))
+                    setSlugManuallyEdited(true)
+                  }}
                   className={merge(inputClasses, 'flex-1')}
                   placeholder="my-post-slug"
                 />
