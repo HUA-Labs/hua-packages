@@ -25,6 +25,8 @@ export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: "start" | "center" | "end"
   offset?: number
   disabled?: boolean
+  /** Popover 콘텐츠 영역 추가 클래스 / Additional class for popover content area */
+  contentClassName?: string
 }
 
 /**
@@ -70,7 +72,8 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
     align = "center",
     offset = 8,
     disabled = false,
-    ...props 
+    contentClassName,
+    ...props
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
     const triggerRef = React.useRef<HTMLDivElement>(null)
@@ -187,7 +190,8 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
             className={merge(
               "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 min-w-[200px]",
               getPositionClasses(),
-              getAlignmentClasses()
+              getAlignmentClasses(),
+              contentClassName
             )}
           >
             {/* 화살표 */}
