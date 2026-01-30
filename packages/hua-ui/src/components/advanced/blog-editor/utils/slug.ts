@@ -20,7 +20,7 @@
 export function generateSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯\s_.~-]/g, '')
+    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯_.~\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
