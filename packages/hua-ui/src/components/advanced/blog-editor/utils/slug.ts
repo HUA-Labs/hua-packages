@@ -20,7 +20,7 @@
 export function generateSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯\s-]/g, '')
+    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯\s_.~-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
@@ -39,7 +39,7 @@ export function isValidSlug(slug: string): boolean {
   if (slug.length > 200) return false
 
   // 슬러그 형식 검사: 영문, 숫자, 한글, 일본어, 하이픈만 허용
-  const slugPattern = /^[a-z0-9가-힣ぁ-んァ-ン一-龯-]+$/
+  const slugPattern = /^[a-z0-9가-힣ぁ-んァ-ン一-龯_.~-]+$/
   return slugPattern.test(slug)
 }
 
@@ -53,7 +53,7 @@ export function isValidSlug(slug: string): boolean {
 export function normalizeSlug(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯-]/g, '')
+    .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯_.~-]/g, '')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
