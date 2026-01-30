@@ -53,6 +53,7 @@ export function isValidSlug(slug: string): boolean {
 export function normalizeSlug(input: string): string {
   return input
     .toLowerCase()
+    .replace(/\s+/g, '-')
     .replace(/[^a-z0-9가-힣ぁ-んァ-ン一-龯_.~-]/g, '')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
