@@ -244,13 +244,13 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
   const getToastStyles = (type: Toast["type"]) => {
     switch (type) {
       case "success":
-        return "bg-white dark:bg-green-900/40 border-green-300 dark:border-green-800 text-green-800 dark:text-green-200 shadow-lg shadow-green-100/50 dark:shadow-none"
+        return "bg-white dark:bg-green-950/80 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 shadow-lg shadow-green-100/50 dark:shadow-none"
       case "error":
-        return "bg-white dark:bg-red-900/40 border-red-300 dark:border-red-800 text-red-800 dark:text-red-200 shadow-lg shadow-red-100/50 dark:shadow-none"
+        return "bg-white dark:bg-red-950/80 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 shadow-lg shadow-red-100/50 dark:shadow-none"
       case "warning":
-        return "bg-white dark:bg-yellow-900/40 border-yellow-300 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 shadow-lg shadow-yellow-100/50 dark:shadow-none"
+        return "bg-white dark:bg-yellow-950/80 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 shadow-lg shadow-yellow-100/50 dark:shadow-none"
       case "info":
-        return "bg-white dark:bg-indigo-900/40 border-indigo-300 dark:border-indigo-800 text-cyan-800 dark:text-cyan-200 shadow-lg shadow-indigo-100/50 dark:shadow-none"
+        return "bg-white dark:bg-indigo-950/80 border-indigo-300 dark:border-indigo-700 text-cyan-800 dark:text-cyan-200 shadow-lg shadow-indigo-100/50 dark:shadow-none"
     }
   }
 
