@@ -126,7 +126,28 @@
      * 다크 모드 컬러
      * ======================================== */
 
-    /* 프라이머리 - 틸 (다크 모드) */
+    /* Tailwind v4 유틸리티 오버라이드 (bg-primary 등) */
+    --color-primary: hsl(166 70% 45%);
+    --color-primary-foreground: hsl(0 0% 100%);
+    --color-secondary: hsl(210 15% 15%);
+    --color-secondary-foreground: hsl(210 10% 90%);
+    --color-destructive: hsl(0 62% 50%);
+    --color-destructive-foreground: hsl(0 0% 98%);
+    --color-muted: hsl(210 15% 15%);
+    --color-muted-foreground: hsl(210 10% 60%);
+    --color-accent: hsl(234 89% 11%);
+    --color-accent-foreground: hsl(226 100% 94%);
+    --color-card: hsl(210 15% 9%);
+    --color-card-foreground: hsl(210 10% 95%);
+    --color-popover: hsl(210 15% 9%);
+    --color-popover-foreground: hsl(210 10% 95%);
+    --color-background: hsl(210 15% 6%);
+    --color-foreground: hsl(210 10% 95%);
+    --color-border: hsl(210 15% 18%);
+    --color-input: hsl(210 15% 18%);
+    --color-ring: hsl(166 70% 45%);
+
+    /* 레거시 CSS vars (hsl(var(--*)) 패턴) */
     --primary: 166 70% 45%;
     --primary-foreground: 0 0% 100%;
 
