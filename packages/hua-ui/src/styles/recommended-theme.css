@@ -11,8 +11,12 @@
  * @example
  * // globals.css
  * @import "tailwindcss";
- * @import "@hua-labs/hua-ui/styles/recommended-theme.css";
+ * @import "@hua-labs/ui/styles/recommended-theme.css";
+ * // @custom-variant dark 자동 포함됨
  */
+
+/* 프레임워크 필수 설정 (다크모드 등) */
+@import "./base.css";
 
 /* Tailwind v4: @theme으로 색상 유틸리티 활성화 */
 @theme {
