@@ -250,12 +250,17 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                     </>
                   );
 
+                  const handleItemClick = () => {
+                    if (isMobile) setIsMobileOpen(false);
+                  };
+
                   const itemNode = item.href ? (
                     <a
                       key={item.id}
                       href={item.href}
                       className={baseClasses}
                       aria-current={item.active ? "page" : undefined}
+                      onClick={handleItemClick}
                     >
                       {content}
                     </a>
@@ -263,7 +268,10 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                     <button
                       key={item.id}
                       type="button"
-                      onClick={item.onClick}
+                      onClick={() => {
+                        item.onClick?.();
+                        handleItemClick();
+                      }}
                       className={baseClasses}
                       aria-pressed={item.active}
                     >
