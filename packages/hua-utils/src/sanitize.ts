@@ -17,13 +17,13 @@ export function sanitizeInput(input: string): string {
   let sanitized = input.replace(/<[^>]*>/g, '');
   
   // 특수 문자 이스케이프 (기본적인 XSS 방지)
+  // 주의: /는 이스케이프하지 않음 (XSS 위험도 낮고, 일반 텍스트에서 자주 사용됨)
   sanitized = sanitized
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
+    .replace(/'/g, '&#x27;');
 
   return sanitized.trim();
 }
