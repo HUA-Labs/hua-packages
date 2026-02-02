@@ -67,10 +67,6 @@
       "dependsOn": [],
       "outputs": ["dist/**"]
     },
-    "@hua-labs/motion#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
-    },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
@@ -80,14 +76,6 @@
       "outputs": ["dist/**"]
     },
     "@hua-labs/utils#build": {
-      "dependsOn": [],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/i18n-ai#build": {
-      "dependsOn": [],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/i18n-plugins#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
     },
