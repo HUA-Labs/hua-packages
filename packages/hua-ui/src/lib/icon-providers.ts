@@ -145,11 +145,14 @@ export const PROJECT_ICONS = {
   'barChart': { lucide: 'BarChart', phosphor: 'ChartBar' },
   'trendingUp': { lucide: 'TrendingUp', phosphor: 'TrendUp' },
   'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown' },
-  'activity': { lucide: 'Activity', phosphor: 'Activity' },
+  'activity': { lucide: 'Activity', phosphor: 'Pulse' },
   'database': { lucide: 'Database', phosphor: 'Database' },
   'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
   'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
   'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
+
+  'layers': { lucide: 'Layers', phosphor: 'Stack' },
+  'ban': { lucide: 'Ban', phosphor: 'Prohibit' },
 
   // Security
   'lock': { lucide: 'Lock', phosphor: 'Lock', iconsax: 'Lock' },
