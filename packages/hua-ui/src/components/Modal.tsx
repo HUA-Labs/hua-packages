@@ -162,14 +162,14 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
     }
   }
 
-  // 모달 크기 클래스 (반응형 포함)
+  // 모달 크기 클래스 (max-w 기반, 콘텐츠에 맞게 자연스럽게 축소)
   const sizeClasses = {
-    sm: "md:w-80", // 20rem = 320px
-    md: "md:w-96", // 24rem = 384px
-    lg: "md:w-[32rem]", // 32rem = 512px
-    xl: "md:w-[38rem]", // 38rem = 608px
-    "2xl": "md:w-[50rem]", // 50rem = 800px
-    "3xl": "md:w-[72rem]" // 72rem = 1152px (더 넓게)
+    sm: "max-w-xs", // 320px
+    md: "max-w-sm", // 384px
+    lg: "max-w-md", // 448px
+    xl: "max-w-lg", // 512px
+    "2xl": "max-w-xl", // 576px
+    "3xl": "max-w-2xl" // 672px
   }
 
   // 접근성을 위한 ID 생성
@@ -217,8 +217,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
           className={merge(
             "relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out",
             "w-full",
-            sizeClasses[size],
-            "max-w-[calc(100vw-2rem)]"
+            sizeClasses[size]
           )}
           style={{
             animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
