@@ -23,7 +23,7 @@ export interface BlogEditorHeaderProps {
  */
 const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
   ({ onBack, backLink, className }, ref) => {
-    const { labels, showPreview, setShowPreview, features, isEditMode, formData } = useBlogEditor()
+    const { labels, isEditMode, formData } = useBlogEditor()
 
     return (
       <header
@@ -54,17 +54,6 @@ const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
             )}
           </div>
         </div>
-
-        {features.enablePreview && (
-          <button
-            type="button"
-            onClick={() => setShowPreview(!showPreview)}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Icon name={showPreview ? 'pencil' : 'eye'} size={16} />
-            {showPreview ? labels.editMode : labels.preview}
-          </button>
-        )}
       </header>
     )
   }
