@@ -56,7 +56,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} Card 컴포넌트 / Card component
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", shadow, padding = "none", ...props }, ref) => {
+  ({ className, variant = "default", shadow, padding = "none", hoverable, ...props }, ref) => {
     const variantClasses = {
       default: "bg-card text-card-foreground border border-border",
       outline: "bg-transparent border-2 border-border",
@@ -86,6 +86,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           variantClasses[variant],
           shadow && shadowClasses[shadow],
           paddingClasses[padding],
+          hoverable && "transition-shadow hover:shadow-lg cursor-pointer",
           className
         )}
         {...props}
