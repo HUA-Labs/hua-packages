@@ -66,14 +66,15 @@ export function LoadingSpinner({
   }
 
   // LoadingSpinner는 border 색상을 사용하므로 특화 색상 시스템 사용
+  // 다크모드: track(배경)은 밝게, spinner(회전부)는 더 밝게 → 대비 확보
   const spinnerColors: Record<string, string> = {
-    default: "border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300",
-    primary: "border-indigo-300 border-t-indigo-600 dark:border-indigo-500/40 dark:border-t-indigo-300",
-    secondary: "border-gray-300 border-t-gray-600 dark:border-gray-600 dark:border-t-gray-300",
-    success: "border-green-300 border-t-green-600 dark:border-green-600 dark:border-t-green-300",
-    warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-600 dark:border-t-yellow-300",
-    error: "border-red-300 border-t-red-600 dark:border-red-600 dark:border-t-red-300",
-    glass: "border-white/50 border-t-white/90 dark:border-slate-400/50 dark:border-t-slate-200/80"
+    default: "border-gray-300 border-t-gray-600 dark:border-gray-500/50 dark:border-t-gray-200",
+    primary: "border-indigo-300 border-t-indigo-600 dark:border-indigo-400/50 dark:border-t-indigo-300",
+    secondary: "border-gray-300 border-t-gray-600 dark:border-gray-500/50 dark:border-t-gray-200",
+    success: "border-green-300 border-t-green-600 dark:border-green-500/50 dark:border-t-green-300",
+    warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-500/50 dark:border-t-yellow-300",
+    error: "border-red-300 border-t-red-600 dark:border-red-500/50 dark:border-t-red-300",
+    glass: "border-white/50 border-t-white/90 dark:border-slate-400/60 dark:border-t-slate-100"
   }
 
   const renderSpinner = () => {

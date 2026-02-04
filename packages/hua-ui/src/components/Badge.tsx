@@ -39,13 +39,14 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Badge = React.memo(React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ className, variant = "default", ...props }, ref) => {
+    // CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회)
     const variantClasses = React.useMemo(() => ({
-      default: "bg-slate-900 text-slate-50 hover:bg-slate-900/80 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/80",
-      secondary: "bg-slate-100 text-slate-900 hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
-      destructive: "bg-red-500 text-slate-50 hover:bg-red-500/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/80",
-      error: "bg-red-500 text-slate-50 hover:bg-red-500/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/80", // error는 destructive와 동일
-      outline: "text-slate-950 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-50",
-      glass: "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 dark:bg-slate-800/20 dark:border-slate-700/50 dark:text-slate-200 dark:hover:bg-slate-700/30"
+      default: "bg-[var(--badge-default-bg)] text-[var(--badge-default-text)] hover:opacity-80",
+      secondary: "bg-[var(--badge-secondary-bg)] text-[var(--badge-secondary-text)] hover:opacity-80",
+      destructive: "bg-[var(--badge-destructive-bg)] text-slate-50 hover:opacity-80",
+      error: "bg-[var(--badge-destructive-bg)] text-slate-50 hover:opacity-80",
+      outline: "bg-transparent text-[var(--badge-outline-text)] border border-[var(--badge-outline-border)] hover:bg-[var(--badge-outline-hover-bg)]",
+      glass: "bg-[var(--badge-glass-bg)] backdrop-blur-sm border border-[var(--badge-glass-border)] text-[var(--badge-glass-text)] hover:opacity-80"
     }), [])
 
     return (
