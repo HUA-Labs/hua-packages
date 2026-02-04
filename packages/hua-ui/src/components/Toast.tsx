@@ -341,7 +341,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         <button
           onClick={handleRemove}
           className={merge(
-            "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-white/10",
+            "inline-flex rounded-md p-1.5 transition-colors duration-200 ease-in-out hover:bg-gray-100 dark:hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-2",
             getIconStyles(toast.type)
           )}
           aria-label="닫기"
