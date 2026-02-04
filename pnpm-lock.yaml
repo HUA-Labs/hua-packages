@@ -75,6 +75,9 @@ importers:
 
   apps/hua-docs:
     dependencies:
+      '@hua-labs/docs-engine':
+        specifier: workspace:*
+        version: link:../../packages/hua-docs-engine
       '@hua-labs/hua-ux':
         specifier: workspace:*
         version: link:../../packages/hua-ux
@@ -850,6 +853,28 @@ importers:
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/hua-docs-engine:
+    dependencies:
+      '@hua-labs/hua-ux':
+        specifier: workspace:*
+        version: link:../hua-ux
+      '@phosphor-icons/react':
+        specifier: ^2.0.0
+        version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.10
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(@swc/core@1.15.11)(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
