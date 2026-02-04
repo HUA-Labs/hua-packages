@@ -181,7 +181,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
                 <button
                   onClick={onClose}
                   className={merge(
-                    "inline-flex rounded-md p-1.5 focus:outline-none focus:ring-1 focus:ring-offset-2 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5",
+                    "inline-flex rounded-md p-1.5 transition-colors duration-200 ease-in-out hover:bg-black/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-2",
                     getIconClasses()
                   )}
                   aria-label="닫기"

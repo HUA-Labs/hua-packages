@@ -93,7 +93,7 @@ const ScrollToTop = ({
         className={merge(
           "fixed z-[9999] rounded-full transition-all duration-500 ease-in-out",
           "flex items-center justify-center",
-          "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-ring/50",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-ring/50",
           "transform hover:scale-105 active:scale-95",
           // 페이드 애니메이션
           isVisible 

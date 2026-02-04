@@ -113,7 +113,7 @@ const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
         ref={ref}
         onClick={toggleBookmark}
         className={merge(
-          "flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:ring-offset-2",
+          "flex items-center justify-center transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-yellow-500 focus-visible:ring-offset-2",
           sizeClasses[size],
           variantClasses[variant],
           className
