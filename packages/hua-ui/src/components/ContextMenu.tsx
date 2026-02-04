@@ -227,7 +227,7 @@ const ContextMenuItem = React.forwardRef<HTMLButtonElement, ContextMenuItemProps
       <button
         ref={ref}
         className={merge(
-          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700", // 16px, 12px 패딩
+          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700", // 16px, 12px 패딩
           getVariantClasses(),
           className
         )}

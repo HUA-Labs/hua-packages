@@ -79,12 +79,21 @@ export function LoadingSpinner({
   const renderSpinner = () => {
     switch (variant) {
       case "dots":
+        // 순차 점멸 애니메이션 (... 형태)
         return (
-          <div className="flex space-x-1.5 items-center">
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
+          <>
+            <style>{`
+              @keyframes dotPulse {
+                0%, 80%, 100% { opacity: 0.3; }
+                40% { opacity: 1; }
+              }
+            `}</style>
+            <div className="flex space-x-1 items-center">
+              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0ms' }} />
+              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '200ms' }} />
+              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '400ms' }} />
+            </div>
+          </>
         )
       case "bars":
         return (

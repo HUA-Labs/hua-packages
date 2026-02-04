@@ -559,9 +559,14 @@ export class Translator implements TranslatorInterface {
 
   /**
    * 매개변수 보간
+   *
+   * 지원 형식:
+   * - {key} - 단일 중괄호 (일반적인 i18n 형식)
+   * - {{key}} - 이중 중괄호 (하위 호환성)
    */
   private interpolate(text: string, params: Record<string, unknown>): string {
-    return text.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    // 단일 중괄호 {key} 또는 이중 중괄호 {{key}} 모두 지원
+    return text.replace(/\{\{?(\w+)\}?\}/g, (match, key) => {
       const value = params[key];
       return value !== undefined ? String(value) : match;
     });
