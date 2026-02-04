@@ -240,12 +240,13 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
         </div>
 
         {/* 드롭다운 */}
+        {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
         {isOpen && (
           <div
             ref={dropdownRef}
             className={merge(
-              "absolute z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl backdrop-blur-sm", // 보더 대신 섀도우 사용
-              "min-w-[200px] py-2", // 16px 패딩
+              "absolute z-50 bg-[var(--dropdown-bg)] rounded-lg shadow-xl backdrop-blur-sm",
+              "min-w-[200px] py-2",
               getPlacementClasses()
             )}
             style={{

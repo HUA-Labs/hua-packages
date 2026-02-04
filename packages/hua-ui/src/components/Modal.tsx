@@ -208,15 +208,15 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
       {/* 센터링 컨테이너 */}
       <div className={merge(
-        "flex min-h-full justify-center p-4",
+        "flex h-full justify-center p-4",
         centered ? "items-center" : "items-start pt-16"
       )}>
         {/* 모달 컨테이너 */}
+        {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
         <div
           ref={combinedRef}
           className={merge(
-            "relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-out",
-            "w-full",
+            "relative bg-[var(--modal-bg)] rounded-lg shadow-2xl border border-[var(--modal-border)] transform transition-all duration-300 ease-out",
             sizeClasses[size]
           )}
           style={{
