@@ -2,7 +2,6 @@
  * Icon Name Normalization System
  *
  * 아이콘 이름 정규화를 위한 통합 시스템입니다.
- * Unified system for normalizing icon names.
  *
  * Features:
  * - kebab-case → camelCase conversion
@@ -19,27 +18,22 @@ import { toCamelCase, toPascalCase } from './case-utils'
 export { toCamelCase, toPascalCase } from './case-utils'
 
 // IconProvider type (avoid circular dependency with icon-providers.ts)
-export type IconProviderType = 'lucide' | 'phosphor' | 'iconsax' | 'untitled'
+export type IconProviderType = 'lucide' | 'phosphor' | 'iconsax'
 
 /**
  * 정규화 결과 인터페이스
- * Normalization result interface
  */
 export interface NormalizeResult {
-  /** 정규화된 아이콘 이름 (camelCase) / Normalized icon name (camelCase) */
+  /** 정규화된 아이콘 이름 (camelCase) */
   normalized: string
-  /** 원본 이름이 alias였는지 여부 / Whether the original name was an alias */
+  /** 원본 이름이 alias였는지 여부 */
   wasAlias: boolean
-  /** 원본 alias 이름 (alias였던 경우) / Original alias name (if it was an alias) */
+  /** 원본 alias 이름 (alias였던 경우) */
   originalAlias?: string
 }
 
 /**
  * 아이콘 이름을 정규화합니다.
- * Normalizes icon name with case conversion and alias resolution.
- *
- * @param iconName - 아이콘 이름 / Icon name
- * @returns 정규화 결과 / Normalization result
  *
  * @example
  * normalizeIconName('arrow-left')  // { normalized: 'arrowLeft', wasAlias: false }
@@ -51,14 +45,10 @@ export function normalizeIconName(iconName: string): NormalizeResult {
     return { normalized: iconName || '', wasAlias: false }
   }
 
-  // Step 1: kebab-case/snake_case를 camelCase로 변환
   const camelCased = toCamelCase(iconName)
-
-  // Step 2: Alias 확인 (원본과 camelCase 버전 모두 확인)
   const aliasTarget = ICON_ALIASES[iconName] || ICON_ALIASES[camelCased]
 
   if (aliasTarget) {
-    // alias가 있으면 해당 타겟 반환
     return {
       normalized: aliasTarget,
       wasAlias: true,
@@ -73,15 +63,7 @@ export function normalizeIconName(iconName: string): NormalizeResult {
 }
 
 /**
- * 프로바이더별 아이콘 이름을 반환합니다 (기본 케이스 변환만).
- * Returns the provider-specific icon name (basic case conversion only).
- *
- * PROJECT_ICONS 매핑은 icon-providers.ts에서 처리됩니다.
- * PROJECT_ICONS mapping is handled in icon-providers.ts.
- *
- * @param normalizedName - 정규화된 아이콘 이름 (camelCase) / Normalized icon name (camelCase)
- * @param provider - 아이콘 프로바이더 / Icon provider
- * @returns 프로바이더별 아이콘 이름 / Provider-specific icon name
+ * 프로바이더별 아이콘 이름을 반환합니다.
  *
  * @example
  * getProviderIconName('arrowLeft', 'lucide') // 'ArrowLeft'
@@ -91,12 +73,10 @@ export function getProviderIconName(
   normalizedName: string,
   provider: IconProviderType
 ): string {
-  // provider에 맞게 케이스 변환
   switch (provider) {
     case 'lucide':
     case 'phosphor':
     case 'iconsax':
-      // 모두 PascalCase 사용
       return toPascalCase(normalizedName)
     default:
       return normalizedName

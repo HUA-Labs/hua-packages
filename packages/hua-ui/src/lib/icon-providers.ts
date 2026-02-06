@@ -5,41 +5,52 @@
  *
  * 1. Phosphor Icons (https://phosphoricons.com) - default
  *    - Official package: @phosphor-icons/react (MIT License)
- *    - 정적 import로 번들에 포함 / Statically imported, included in bundle
- *    - PROJECT_ICONS에 매핑된 아이콘만 사용 권장 / Use mapped icons for tree-shaking
- *    - 폴백: 직접 이름으로 동적 조회 가능 / Fallback: direct name lookup available
+ *    - icons.ts에서 정적 import (SSR-safe /dist/ssr)
+ *    - PROJECT_ICONS 매핑으로 통합 이름 지원
+ *    - 폴백: initPhosphorIcons()로 동적 namespace 조회
  *
- * 2. Lucide Icons (https://lucide.dev)
- *    - Official package: lucide-react (ISC License)
- *    - 지연 로딩 (lazy load) / Lazy loaded on demand
- *    - initLucideIcons() 호출 시에만 로드 / Only loaded when initLucideIcons() called
- *    - 하위호환 유지 / Backward compatibility maintained
+ * 2. Lucide Icons (https://lucide.dev) - deprecated, backward compat
+ *    - initLucideIcons() 호출 시에만 로드 / Lazy loaded on demand
+ *    - 향후 제거 예정 / Will be removed in future
  *
- * 3. Iconsax Icons (https://iconsax.io)
- *    - SVG 기반 동적 로딩 / SVG-based dynamic loading
- *    - 캐시 시스템으로 성능 최적화 / Cached for performance
- *    - getIconsaxIconSync로 동기 캐시 조회 / Sync cache lookup via getIconsaxIconSync
- *    - Free for personal and commercial use - thanks Iconsax team!
- *
- * 아이콘 조회 방식 / Icon Resolution:
- * - PROJECT_ICONS 매핑: 통일된 이름으로 프로바이더별 아이콘 조회 / Unified name mapping
- * - 폴백 동적 조회: PROJECT_ICONS에 없는 아이콘도 직접 이름으로 사용 가능
- *   Fallback: Icons not in PROJECT_ICONS can be used by direct name
+ * 3. Iconsax Icons (https://iconsax.io) - separate entry
+ *    - '@hua-labs/ui/iconsax'에서 import 시 자동 등록
+ *    - 코어 번들에 포함되지 않음 / Not in core bundle
+ *    - registerIconsaxResolver()로 lazy 연결
  */
 
-import { getIconsaxIconSync } from './iconsax-loader'
 import { toPascalCase } from './case-utils'
 
 // Phosphor Icons - lazy loaded (전체 namespace import 방지, createContext SSR 이슈)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
 
-// Lucide Icons - lazy loaded (하위호환)
+// Lucide Icons - lazy loaded (하위호환, deprecated)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let LucideIcons: any = null
 
+// Iconsax resolver - registered lazily when iconsax entry is loaded
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let iconsaxResolver: ((name: string, variant?: string) => any) | null = null
+
+/**
+ * Register iconsax resolver (called from iconsax entry point).
+ * Allows the core Icon component to resolve iconsax icons
+ * without statically importing the iconsax bundle.
+ */
+export function registerIconsaxResolver(resolver: typeof iconsaxResolver) {
+  iconsaxResolver = resolver
+}
+
+/**
+ * Get registered iconsax resolver
+ */
+export function getIconsaxResolver() {
+  return iconsaxResolver
+}
+
 // Icon Provider Type
-export type IconProvider = 'lucide' | 'phosphor' | 'iconsax' | 'untitled'
+export type IconProvider = 'lucide' | 'phosphor' | 'iconsax'
 
 // Icon Provider Configuration
 export interface IconProviderConfig {
@@ -240,8 +251,8 @@ export async function initPhosphorIcons() {
 }
 
 /**
- * Initialize Lucide Icons (lazy load - 하위호환)
- * Only loads when Lucide provider is used
+ * Initialize Lucide Icons (lazy load - deprecated, backward compat)
+ * @deprecated Use phosphor provider instead
  */
 export async function initLucideIcons() {
   if (typeof window === 'undefined') return null
@@ -292,10 +303,9 @@ export function getIconFromProvider(
       return LucideIcons?.[mappedName] || null
 
     case 'iconsax': {
-      // Iconsax icons are dynamically loaded
-      // Try sync cache first, then async load
+      if (!iconsaxResolver) return null
       const iconsaxName = mappedName || toPascalCase(iconName)
-      return getIconsaxIconSync(iconsaxName) || null
+      return iconsaxResolver(iconsaxName) || null
     }
 
     default:
@@ -332,7 +342,6 @@ function getIconDirect(
       if (!LucideIcons) {
         return null
       }
-      // icons.ts에 없는 아이콘을 동적으로 찾기
       const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
       const camelCaseName = iconName.replace(/([A-Z])/g, (match) =>
         match === iconName[0] ? match.toLowerCase() : match
@@ -344,10 +353,9 @@ function getIconDirect(
     }
 
     case 'iconsax': {
-      // Iconsax icons are dynamically loaded
-      // Try sync cache first
+      if (!iconsaxResolver) return null
       const iconsaxName = toPascalCase(iconName)
-      return getIconsaxIconSync(iconsaxName) || null
+      return iconsaxResolver(iconsaxName) || null
     }
 
     default:
@@ -357,9 +365,6 @@ function getIconDirect(
 
 /**
  * Get icon name for provider
- *
- * 프로바이더별 아이콘 이름을 가져옵니다.
- * Gets icon name for the specified provider.
  *
  * @param iconName - 아이콘 이름 / Icon name
  * @param provider - 아이콘 프로바이더 / Icon provider
