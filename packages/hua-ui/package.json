@@ -74,6 +74,11 @@
       "types": "./src/components/icons-bold/index.ts",
       "import": "./src/components/icons-bold/index.ts",
       "require": "./src/components/icons-bold/index.ts"
+    },
+    "./iconsax": {
+      "types": "./dist/iconsax.d.ts",
+      "import": "./dist/iconsax.mjs",
+      "require": "./dist/iconsax.js"
     }
   },
   "files": [
@@ -83,7 +88,7 @@
     "src/components/icons-bold"
   ],
   "scripts": {
-    "build": "pnpm exec tsup && pnpm exec tsc --emitDeclarationOnly && node scripts/add-use-client.js",
+    "build": "pnpm exec tsup && pnpm exec tsc --emitDeclarationOnly",
     "build:watch": "pnpm exec tsup --watch",
     "dev": "pnpm exec tsup --watch",
     "clean": "rm -rf dist",
@@ -159,6 +164,8 @@
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./dist/iconsax.mjs",
+    "./dist/iconsax.js"
   ]
 }

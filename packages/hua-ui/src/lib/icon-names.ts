@@ -86,8 +86,8 @@ export const iconNames = [
  * // Phosphor 아이콘 사용
  * <Icon name="home" provider="phosphor" />  // Phosphor: House
  * 
- * // Untitled 아이콘 사용
- * <Icon name="home" provider="untitled" />  // Untitled: home
+ * // Iconsax 아이콘 사용 (requires '@hua-labs/ui/iconsax' import)
+ * <Icon name="home" provider="iconsax" />  // Iconsax: Home2
  */
 export const iconProviderMapping: Record<string, {
   lucide: string

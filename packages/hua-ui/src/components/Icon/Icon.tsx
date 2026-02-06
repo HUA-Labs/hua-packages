@@ -2,8 +2,7 @@ import React from 'react'
 import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
-import { getIconFromProvider, initPhosphorIcons, initLucideIcons, getIconNameForProvider } from '../../lib/icon-providers'
-import { getIconsaxIconSync } from '../../lib/iconsax-loader'
+import { getIconFromProvider, getIconsaxResolver, initPhosphorIcons, initLucideIcons, getIconNameForProvider } from '../../lib/icon-providers'
 import { normalizeIconName } from '../../lib/normalize-icon-name'
 import { useIconContext, type IconSet } from './IconProvider'
 import { type PhosphorWeight } from './icon-store'
@@ -11,10 +10,6 @@ import type { AllIconName } from '../../lib/icon-names'
 
 /**
  * Icon 컴포넌트 Props
- * 
- * Icon component props interface.
- * 
- * @interface IconProps
  */
 export interface IconProps {
   /** 아이콘 이름 / Icon name */
@@ -27,7 +22,7 @@ export interface IconProps {
   emotion?: keyof typeof emotionIcons
   /** 상태 아이콘 타입 / Status icon type */
   status?: keyof typeof statusIcons
-  /** 아이콘 프로바이더 오버라이드 (전역 설정 무시) / Icon provider override (ignores global config) */
+  /** 아이콘 프로바이더 오버라이드 / Icon provider override */
   provider?: IconSet
   /** 부드러운 애니메이션 효과 / Smooth animation effect */
   animated?: boolean
@@ -41,50 +36,27 @@ export interface IconProps {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'muted' | 'inherit'
   /** Phosphor 아이콘 weight 오버라이드 / Phosphor icon weight override */
   weight?: PhosphorWeight
-  /** 스크린 리더용 라벨 (의미 있는 아이콘인 경우) / Screen reader label (for meaningful icons) */
+  /** 스크린 리더용 라벨 / Screen reader label */
   'aria-label'?: string
-  /** 장식용 아이콘인 경우 true (스크린 리더에서 숨김) / Set to true for decorative icons (hidden from screen readers) */
+  /** 장식용 아이콘 / Decorative icon (hidden from screen readers) */
   'aria-hidden'?: boolean
 }
 
 /**
  * Icon 컴포넌트
- * 
- * 다중 아이콘 라이브러리(Lucide, Phosphor, Untitled)를 지원하는 통합 아이콘 컴포넌트입니다.
- * IconProvider를 통해 전역 설정을 관리할 수 있으며, 개별 아이콘에서도 설정을 오버라이드할 수 있습니다.
- * 
- * Icon component that supports multiple icon libraries (Lucide, Phosphor, Untitled).
- * Global settings can be managed through IconProvider, and individual icons can override settings.
- * 
- * @component
+ *
+ * 다중 아이콘 라이브러리(Phosphor, Lucide, Iconsax)를 지원하는 통합 아이콘 컴포넌트.
+ * IconProvider를 통해 전역 설정을 관리하며, 개별 아이콘에서도 오버라이드 가능.
+ *
+ * Iconsax는 별도 entry('@hua-labs/ui/iconsax')를 import해야 동작합니다.
+ *
  * @example
  * ```tsx
- * // 기본 사용 / Basic usage
  * <Icon name="heart" />
- * 
- * // 크기 지정 / Specify size
  * <Icon name="user" size={24} />
- * 
- * // 색상 변형 / Color variant
  * <Icon name="check" variant="success" />
- * 
- * // 애니메이션 / Animation
  * <Icon name="loader" spin />
- * <Icon name="heart" pulse />
- * 
- * // 접근성 / Accessibility
- * <Icon name="search" aria-label="검색" />
- * <Icon name="decorative-icon" aria-hidden />
- * 
- * // 감정 아이콘 / Emotion icon
- * <Icon emotion="happy" />
- * 
- * // 상태 아이콘 / Status icon
- * <Icon status="loading" spin />
  * ```
- * 
- * @param props - Icon 컴포넌트 props / Icon component props
- * @returns Icon 컴포넌트 / Icon component
  */
 const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   name,
@@ -102,59 +74,54 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   'aria-label': ariaLabel,
   'aria-hidden': ariaHidden
 }, ref) => {
-  // Context에서 전역 설정 가져오기
   const config = useIconContext()
 
-  // prop으로 오버라이드 가능, 없으면 Context에서 가져옴
   const iconSet = provider || config.set
   const iconSize = size ?? config.size
   const iconWeight = weight || config.weight
   const iconColor = config.color
   const iconStrokeWidth = config.strokeWidth ?? 1.25
   const iconsaxVariant = config.iconsaxVariant ?? 'line'
-  
-  // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
+
   const [isClient, setIsClient] = React.useState(false)
   const [providerReady, setProviderReady] = React.useState(false)
 
   React.useEffect(() => {
     setIsClient(true)
 
-    // Provider별 lazy load 초기화 (fallback용)
+    // Provider별 lazy load 초기화
     if (iconSet === 'lucide') {
       initLucideIcons().then(() => setProviderReady(true))
     } else if (iconSet === 'phosphor') {
-      // icons.ts의 정적 import로 대부분 커버, fallback용으로 namespace도 초기화
       initPhosphorIcons().then(() => setProviderReady(true))
     } else {
       setProviderReady(true)
     }
   }, [iconSet])
 
-  // 통합 정규화: 감정/상태 → 기본 이름 → alias 해결 → provider별 이름 변환
-  // Unified normalization: emotion/status → base name → alias resolution → provider name
+  // 통합 정규화
   const resolvedIcon = React.useMemo(() => {
     const baseName = emotion ? emotionIcons[emotion] :
                      status ? statusIcons[status] : name
     const { normalized } = normalizeIconName(baseName)
-    // PROJECT_ICONS 매핑을 통해 provider별 아이콘 이름 가져오기
     const providerName = getIconNameForProvider(normalized, iconSet)
     return { normalized, providerName }
   }, [name, emotion, status, iconSet])
 
-  // 기존 iconName 변수는 하위 호환성을 위해 유지
   const iconName = resolvedIcon.normalized as AllIconName
 
-  // Iconsax 아이콘은 동기적으로 가져오기 (getIconsaxIconSync 사용)
-  // Iconsax icons are fetched synchronously using getIconsaxIconSync
+  // Iconsax: resolver를 통해 가져오기 (iconsax entry import 시 자동 등록됨)
   const iconsaxIcon = React.useMemo(() => {
     if (iconSet === 'iconsax' && isClient) {
-      return getIconsaxIconSync(resolvedIcon.providerName, iconsaxVariant)
+      const resolver = getIconsaxResolver()
+      if (resolver) {
+        return resolver(resolvedIcon.providerName, iconsaxVariant)
+      }
     }
     return null
   }, [iconSet, resolvedIcon.providerName, isClient, iconsaxVariant])
-  
-  // 색상 변형 클래스 (먼저 선언 - fallback에서 사용)
+
+  // 색상 변형 클래스
   const variantClasses = mergeMap({
     'text-current': variant === 'default',
     'text-indigo-600 dark:text-indigo-400': variant === 'primary',
@@ -164,9 +131,8 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     'text-red-600 dark:text-red-400': variant === 'error',
     'text-gray-500 dark:text-gray-500': variant === 'muted',
   })
-  
-  // 서버사이드에서는 빈 span 반환 (hydration 오류 방지)
-  // Return empty span on server-side (prevent hydration errors)
+
+  // 서버사이드에서는 빈 span 반환
   if (!isClient) {
     return (
       <span
@@ -180,33 +146,30 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
 
   // Provider에 따라 아이콘 가져오기
   type IconComponentType = React.ComponentType<PhosphorIconProps | React.SVGProps<SVGSVGElement> | Record<string, unknown>>
-  let IconComponent: IconComponentType | null = null
+  let ResolvedIcon: IconComponentType | null = null
 
   if (iconSet === 'phosphor') {
     // 1. icons.ts에서 먼저 찾기 (Phosphor 아이콘이 기본, 정적 import)
-    IconComponent = (icons[iconName as IconName] || null) as IconComponentType | null
-
+    ResolvedIcon = (icons[iconName as IconName] || null) as IconComponentType | null
     // 2. 없으면 동적으로 Phosphor namespace에서 가져오기 (fallback, providerReady 필요)
-    if (!IconComponent && providerReady) {
-      IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
+    if (!ResolvedIcon && providerReady) {
+      ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
   } else if (iconSet === 'iconsax') {
-    // Iconsax 아이콘은 state에서 가져오기 (비동기 로딩)
-    IconComponent = iconsaxIcon as IconComponentType | null
-    // 캐시에서도 확인 (이미 로드된 경우)
-    if (!IconComponent) {
-      IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
+    ResolvedIcon = iconsaxIcon as IconComponentType | null
+    if (!ResolvedIcon) {
+      ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
   } else {
-    // Lucide나 다른 provider는 getIconFromProvider 사용 (lazy load)
-    // lucideReady가 true일 때만 호출됨 (위에서 체크)
-    IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
+    // Lucide나 다른 provider
+    ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
   }
-  
-  if (!IconComponent) {
-    console.warn(`Icon "${iconName}" not found for provider "${iconSet}"`)
-    // Fallback: 빈 원형 아이콘 표시 (에러 표시)
-    // Fallback: display empty circle icon (error indicator)
+
+  if (!ResolvedIcon) {
+    // iconsax resolver 미등록 시 조용히 처리
+    if (iconSet !== 'iconsax' || getIconsaxResolver()) {
+      console.warn(`Icon "${iconName}" not found for provider "${iconSet}"`)
+    }
     return (
       <span
         ref={ref}
@@ -225,7 +188,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
       </span>
     )
   }
-  
+
   // 세트별 props 준비
   type IconPropsType = PhosphorIconProps & {
     size?: number
@@ -235,23 +198,20 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     weight?: PhosphorWeight
     strokeWidth?: number
   }
-  
+
   const iconProps: IconPropsType = {
     size: typeof iconSize === 'number' ? iconSize : undefined,
     width: typeof iconSize === 'string' ? iconSize : iconSize,
     height: typeof iconSize === 'string' ? iconSize : iconSize,
     color: iconColor,
   } as IconPropsType
-  
-  // Phosphor는 weight 사용
+
   if (iconSet === 'phosphor') {
     iconProps.weight = iconWeight
   } else {
-    // Lucide/Iconsax/Untitled는 strokeWidth 사용
     iconProps.strokeWidth = iconStrokeWidth
   }
 
-  // 애니메이션 클래스 생성
   const animationClasses = mergeMap({
     'animate-pulse': pulse,
     'animate-spin': spin,
@@ -259,19 +219,14 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     'transition-all duration-200 ease-in-out': animated,
   })
 
-  // 접근성 속성 결정 / Determine accessibility attributes
-  // aria-label이 제공되면 사용, 없으면 aria-hidden이 true인지 확인
-  // If aria-label is provided, use it; otherwise check if aria-hidden is true
   const accessibilityProps: React.AriaAttributes = {}
-  
+
   if (ariaLabel) {
     accessibilityProps['aria-label'] = ariaLabel
     accessibilityProps['aria-hidden'] = false
   } else if (ariaHidden !== undefined) {
     accessibilityProps['aria-hidden'] = ariaHidden
   } else {
-    // 기본값: 장식용으로 간주 (의미 있는 아이콘은 명시적으로 aria-label 제공 필요)
-    // Default: considered decorative (meaningful icons should explicitly provide aria-label)
     accessibilityProps['aria-hidden'] = true
   }
 
@@ -287,24 +242,18 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
       style={{ width: iconSize, height: iconSize }}
       {...accessibilityProps}
     >
-      {IconComponent && React.createElement(IconComponent, { 
+      {ResolvedIcon && React.createElement(ResolvedIcon, {
         ...iconProps,
         className: variantClasses,
-        'aria-hidden': true // SVG 내부 요소는 항상 숨김 (외부 span이 접근성 담당)
-      } as React.ComponentProps<typeof IconComponent>)}
+        'aria-hidden': true
+      } as React.ComponentProps<typeof ResolvedIcon>)}
     </span>
   )
 })
 
 IconComponent.displayName = 'Icon'
 
-// 성능 최적화: React.memo 적용
-// Performance optimization: Apply React.memo
-// forwardRef와 함께 사용할 때는 React.memo로 감싸기
-// When using with forwardRef, wrap with React.memo
 const MemoizedIcon = React.memo(IconComponent, (prevProps, nextProps) => {
-  // props 비교 함수: 변경된 props만 체크
-  // Props comparison function: only check changed props
   return (
     prevProps.name === nextProps.name &&
     prevProps.size === nextProps.size &&
@@ -323,110 +272,36 @@ const MemoizedIcon = React.memo(IconComponent, (prevProps, nextProps) => {
   )
 })
 
-// 타입 안전성을 위해 export
-// Export for type safety
 export const Icon = MemoizedIcon as typeof IconComponent
-
 Icon.displayName = 'Icon'
 
-/**
- * EmotionIcon 컴포넌트
- * 
- * 감정을 표현하는 아이콘 컴포넌트입니다.
- * Icon component for expressing emotions.
- * 
- * @component
- * @example
- * ```tsx
- * <EmotionIcon emotion="happy" />
- * <EmotionIcon emotion="sad" size={24} />
- * ```
- */
 export const EmotionIcon = React.forwardRef<HTMLSpanElement, Omit<IconProps, 'name'> & { emotion: keyof typeof emotionIcons }>(
   (props, ref) => <Icon ref={ref} name="smile" {...props} />
 )
-
 EmotionIcon.displayName = 'EmotionIcon'
 
-/**
- * StatusIcon 컴포넌트
- * 
- * 상태를 표현하는 아이콘 컴포넌트입니다.
- * Icon component for expressing status.
- * 
- * @component
- * @example
- * ```tsx
- * <StatusIcon status="loading" spin />
- * <StatusIcon status="success" variant="success" />
- * ```
- */
 export const StatusIcon = React.forwardRef<HTMLSpanElement, Omit<IconProps, 'name'> & { status: keyof typeof statusIcons }>(
   (props, ref) => <Icon ref={ref} name="info" {...props} />
 )
-
 StatusIcon.displayName = 'StatusIcon'
 
-/**
- * LoadingIcon 컴포넌트
- * 
- * 로딩 상태를 표시하는 전용 아이콘 컴포넌트입니다.
- * Dedicated icon component for displaying loading status.
- * 
- * @component
- * @example
- * ```tsx
- * <LoadingIcon />
- * <LoadingIcon size={32} />
- * ```
- */
 export const LoadingIcon = React.forwardRef<HTMLDivElement, Omit<IconProps, 'name' | 'status'>>(
   (props, ref) => (
     <Icon ref={ref} name="loader" status="loading" spin aria-label="로딩 중" {...props} />
   )
 )
-
 LoadingIcon.displayName = 'LoadingIcon'
 
-/**
- * SuccessIcon 컴포넌트
- * 
- * 성공 상태를 표시하는 전용 아이콘 컴포넌트입니다.
- * Dedicated icon component for displaying success status.
- * 
- * @component
- * @example
- * ```tsx
- * <SuccessIcon />
- * <SuccessIcon size={24} />
- * ```
- */
 export const SuccessIcon = React.forwardRef<HTMLDivElement, Omit<IconProps, 'name' | 'status'>>(
   (props, ref) => (
     <Icon ref={ref} name="check" status="success" variant="success" aria-label="성공" {...props} />
   )
 )
-
 SuccessIcon.displayName = 'SuccessIcon'
 
-/**
- * ErrorIcon 컴포넌트
- * 
- * 에러 상태를 표시하는 전용 아이콘 컴포넌트입니다.
- * Dedicated icon component for displaying error status.
- * 
- * @component
- * @example
- * ```tsx
- * <ErrorIcon />
- * <ErrorIcon size={24} />
- * ```
- */
 export const ErrorIcon = React.forwardRef<HTMLDivElement, Omit<IconProps, 'name' | 'status'>>(
   (props, ref) => (
     <Icon ref={ref} name="alertCircle" status="error" variant="error" aria-label="오류" {...props} />
   )
 )
-
 ErrorIcon.displayName = 'ErrorIcon'
-
