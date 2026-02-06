@@ -42,18 +42,18 @@
    - `month_names`, `day_names` 등 배열 데이터 사용
    - 현재 해결 방법 및 향후 개선 계획
 
-7. **[i18n-date 패키지](../i18n-date/README.md)**
+7. **[i18n-date 패키지](./formatters/date/README.md)**
    - 날짜 포맷팅 및 현지화 유틸리티
    - `useDateFormatter` 훅 사용법
    - 월/요일 이름 자동 추출
    - 타임존 처리 및 상대 시간 포맷팅
 
-8. **[i18n-number 패키지](../i18n-number/README.md)**
+8. **[i18n-number 패키지](./formatters/number/README.md)**
    - 숫자 포맷팅 및 현지화 유틸리티
    - `useNumberFormatter` 훅 사용법
    - 천 단위 구분자, 소수점, 퍼센트, 컴팩트 표기
 
-9. **[i18n-currency 패키지](../i18n-currency/README.md)**
+9. **[i18n-currency 패키지](./formatters/currency/README.md)**
    - 화폐 포맷팅 및 현지화 유틸리티
    - `useCurrencyFormatter` 훅 사용법
    - 언어별 통화 자동 감지 및 포맷팅
