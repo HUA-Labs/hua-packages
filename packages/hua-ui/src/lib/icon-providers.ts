@@ -3,17 +3,17 @@
  *
  * 각 프로바이더별 로딩 전략 / Loading strategies per provider:
  *
- * 1. Lucide Icons (https://lucide.dev) - default
- *    - Official package: lucide-react (ISC License)
+ * 1. Phosphor Icons (https://phosphoricons.com) - default
+ *    - Official package: @phosphor-icons/react (MIT License)
  *    - 정적 import로 번들에 포함 / Statically imported, included in bundle
  *    - PROJECT_ICONS에 매핑된 아이콘만 사용 권장 / Use mapped icons for tree-shaking
  *    - 폴백: 직접 이름으로 동적 조회 가능 / Fallback: direct name lookup available
  *
- * 2. Phosphor Icons (https://phosphoricons.com)
- *    - Official package: @phosphor-icons/react (MIT License)
+ * 2. Lucide Icons (https://lucide.dev)
+ *    - Official package: lucide-react (ISC License)
  *    - 지연 로딩 (lazy load) / Lazy loaded on demand
- *    - initPhosphorIcons() 호출 시에만 로드 / Only loaded when initPhosphorIcons() called
- *    - tree-shaking 지원 / Supports tree-shaking
+ *    - initLucideIcons() 호출 시에만 로드 / Only loaded when initLucideIcons() called
+ *    - 하위호환 유지 / Backward compatibility maintained
  *
  * 3. Iconsax Icons (https://iconsax.io)
  *    - SVG 기반 동적 로딩 / SVG-based dynamic loading
@@ -27,14 +27,16 @@
  *   Fallback: Icons not in PROJECT_ICONS can be used by direct name
  */
 
-import * as LucideIcons from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { getIconsaxIconSync } from './iconsax-loader'
 import { toPascalCase } from './case-utils'
 
-// Phosphor Icons - lazy loaded, tree-shakeable
+// Phosphor Icons - lazy loaded (전체 namespace import 방지, createContext SSR 이슈)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let PhosphorIcons: any = null
+
+// Lucide Icons - lazy loaded (하위호환)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let LucideIcons: any = null
 
 // Icon Provider Type
 export type IconProvider = 'lucide' | 'phosphor' | 'iconsax' | 'untitled'
@@ -206,7 +208,7 @@ export const PROJECT_ICONS = {
   'mask': { lucide: 'Drama', phosphor: 'MaskHappy', iconsax: 'EmojiHappy' },
 
   // Text Formatting (Markdown Toolbar)
-  'bold': { lucide: 'Bold', phosphor: 'TextBolder' },
+  'bold': { lucide: 'Bold', phosphor: 'TextB' },
   'italic': { lucide: 'Italic', phosphor: 'TextItalic' },
   'strikethrough': { lucide: 'Strikethrough', phosphor: 'TextStrikethrough' },
   'heading': { lucide: 'Heading', phosphor: 'TextHOne' },
@@ -219,17 +221,14 @@ export const PROJECT_ICONS = {
 } as const
 
 /**
- * Initialize Phosphor Icons (lazy load)
- * Only loads when Phosphor provider is used
- * Uses tree-shaking to only include used icons
+ * Initialize Phosphor Icons (lazy load for fallback/dynamic lookup)
+ * icons.ts의 개별 import와 별개로, PROJECT_ICONS fallback용
  */
 export async function initPhosphorIcons() {
   if (typeof window === 'undefined') return null
 
   if (!PhosphorIcons) {
     try {
-      // Dynamic import with tree-shaking support
-      // Only icons actually used will be included in bundle
       const phosphorModule = await import('@phosphor-icons/react')
       PhosphorIcons = phosphorModule
     } catch {
@@ -241,17 +240,36 @@ export async function initPhosphorIcons() {
 }
 
 /**
+ * Initialize Lucide Icons (lazy load - 하위호환)
+ * Only loads when Lucide provider is used
+ */
+export async function initLucideIcons() {
+  if (typeof window === 'undefined') return null
+
+  if (!LucideIcons) {
+    try {
+      const lucideModule = await import('lucide-react')
+      LucideIcons = lucideModule
+    } catch {
+      console.warn('Lucide Icons not available. Install lucide-react to use lucide provider.')
+      return null
+    }
+  }
+  return LucideIcons
+}
+
+/**
  * Get icon from provider
  * Only resolves icons that are in PROJECT_ICONS for optimal bundle size
- * 
+ *
  * @param iconName - 아이콘 이름 / Icon name
  * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 아이콘 컴포넌트 또는 null / Icon component or null
  */
 export function getIconFromProvider(
   iconName: string,
-  provider: IconProvider = 'lucide'
-): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
+  provider: IconProvider = 'phosphor'
+): React.ComponentType<Record<string, unknown>> | null {
   // Check if icon is in project icon list
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
 
@@ -263,21 +281,22 @@ export function getIconFromProvider(
   const mappedName = (iconMapping as Record<string, string | undefined>)[provider]
 
   switch (provider) {
-    case 'lucide':
-      if (!mappedName) return null
-      return (LucideIcons as unknown as Record<string, LucideIcon>)[mappedName] || null
-
     case 'phosphor':
-      if (!mappedName || !PhosphorIcons) {
-        return null
-      }
+      if (!mappedName || !PhosphorIcons) return null
       return PhosphorIcons?.[mappedName] || null
 
-    case 'iconsax':
+    case 'lucide':
+      if (!mappedName || !LucideIcons) {
+        return null
+      }
+      return LucideIcons?.[mappedName] || null
+
+    case 'iconsax': {
       // Iconsax icons are dynamically loaded
       // Try sync cache first, then async load
       const iconsaxName = mappedName || toPascalCase(iconName)
       return getIconsaxIconSync(iconsaxName) || null
+    }
 
     default:
       return null
@@ -286,13 +305,7 @@ export function getIconFromProvider(
 
 /**
  * Direct icon lookup (fallback for icons not in PROJECT_ICONS)
- * 
- * 동적으로 Lucide 아이콘을 가져옵니다.
- * icons.ts에 없는 아이콘도 사용 가능하도록 합니다.
- * 
- * Dynamically loads Lucide icons.
- * Allows using icons not in icons.ts.
- * 
+ *
  * @param iconName - 아이콘 이름 / Icon name
  * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 아이콘 컴포넌트 또는 null / Icon component or null
@@ -300,27 +313,10 @@ export function getIconFromProvider(
 function getIconDirect(
   iconName: string,
   provider: IconProvider
-): LucideIcon | React.ComponentType<Record<string, unknown>> | null {
+): React.ComponentType<Record<string, unknown>> | null {
   switch (provider) {
-    case 'lucide': {
-      // icons.ts에 없는 아이콘을 동적으로 찾기
-      // PascalCase 변환 시도
-      const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
-      // camelCase도 시도
-      const camelCaseName = iconName.replace(/([A-Z])/g, (match) =>
-        match === iconName[0] ? match.toLowerCase() : match
-      )
-
-      return (LucideIcons as unknown as Record<string, LucideIcon>)[lucideName] ||
-        (LucideIcons as unknown as Record<string, LucideIcon>)[iconName] ||
-        (LucideIcons as unknown as Record<string, LucideIcon>)[camelCaseName] ||
-        null
-    }
-
     case 'phosphor': {
-      if (!PhosphorIcons) {
-        return null
-      }
+      if (!PhosphorIcons) return null
       const phosphorName1 = iconName.charAt(0).toUpperCase() + iconName.slice(1)
       const phosphorName2 = iconName
         .split(/(?=[A-Z])/)
@@ -329,6 +325,21 @@ function getIconDirect(
       return PhosphorIcons?.[phosphorName1] ||
         PhosphorIcons?.[phosphorName2] ||
         PhosphorIcons?.[iconName] ||
+        null
+    }
+
+    case 'lucide': {
+      if (!LucideIcons) {
+        return null
+      }
+      // icons.ts에 없는 아이콘을 동적으로 찾기
+      const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
+      const camelCaseName = iconName.replace(/([A-Z])/g, (match) =>
+        match === iconName[0] ? match.toLowerCase() : match
+      )
+      return LucideIcons?.[lucideName] ||
+        LucideIcons?.[iconName] ||
+        LucideIcons?.[camelCaseName] ||
         null
     }
 
@@ -346,10 +357,10 @@ function getIconDirect(
 
 /**
  * Get icon name for provider
- * 
+ *
  * 프로바이더별 아이콘 이름을 가져옵니다.
  * Gets icon name for the specified provider.
- * 
+ *
  * @param iconName - 아이콘 이름 / Icon name
  * @param provider - 아이콘 프로바이더 / Icon provider
  * @returns 프로바이더별 아이콘 이름 / Icon name for provider

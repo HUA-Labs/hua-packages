@@ -1,8 +1,8 @@
 import React from 'react'
-import type { LucideProps } from 'lucide-react'
+import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
-import { getIconFromProvider, initPhosphorIcons, getIconNameForProvider } from '../../lib/icon-providers'
+import { getIconFromProvider, initPhosphorIcons, initLucideIcons, getIconNameForProvider } from '../../lib/icon-providers'
 import { getIconsaxIconSync } from '../../lib/iconsax-loader'
 import { normalizeIconName } from '../../lib/normalize-icon-name'
 import { useIconContext, type IconSet } from './IconProvider'
@@ -115,18 +115,19 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   
   // 클라이언트 사이드에서만 아이콘 렌더링 (hydration 오류 방지)
   const [isClient, setIsClient] = React.useState(false)
-  const [phosphorReady, setPhosphorReady] = React.useState(false)
+  const [providerReady, setProviderReady] = React.useState(false)
 
   React.useEffect(() => {
     setIsClient(true)
 
-    // Phosphor Icons 초기화 (provider가 phosphor일 때만)
-    if (iconSet === 'phosphor') {
-      initPhosphorIcons().then(() => {
-        setPhosphorReady(true)
-      })
+    // Provider별 lazy load 초기화 (fallback용)
+    if (iconSet === 'lucide') {
+      initLucideIcons().then(() => setProviderReady(true))
+    } else if (iconSet === 'phosphor') {
+      // icons.ts의 정적 import로 대부분 커버, fallback용으로 namespace도 초기화
+      initPhosphorIcons().then(() => setProviderReady(true))
     } else {
-      setPhosphorReady(true)
+      setProviderReady(true)
     }
   }, [iconSet])
 
@@ -166,7 +167,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   
   // 서버사이드에서는 빈 span 반환 (hydration 오류 방지)
   // Return empty span on server-side (prevent hydration errors)
-  if (!isClient || (iconSet === 'phosphor' && !phosphorReady)) {
+  if (!isClient) {
     return (
       <span
         style={{ width: iconSize, height: iconSize }}
@@ -178,16 +179,15 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   }
 
   // Provider에 따라 아이콘 가져오기
-  type IconComponentType = React.ComponentType<LucideProps | React.SVGProps<SVGSVGElement> | Record<string, unknown>>
+  type IconComponentType = React.ComponentType<PhosphorIconProps | React.SVGProps<SVGSVGElement> | Record<string, unknown>>
   let IconComponent: IconComponentType | null = null
-  
-  if (iconSet === 'lucide') {
-    // 1. icons.ts에서 먼저 찾기 (실제 사용되는 아이콘만 포함)
-    // 타입 단언: AllIconName에는 있지만 icons 객체에 없는 경우를 위해
+
+  if (iconSet === 'phosphor') {
+    // 1. icons.ts에서 먼저 찾기 (Phosphor 아이콘이 기본, 정적 import)
     IconComponent = (icons[iconName as IconName] || null) as IconComponentType | null
-    
-    // 2. 없으면 동적으로 Lucide에서 가져오기 (fallback)
-    if (!IconComponent) {
+
+    // 2. 없으면 동적으로 Phosphor namespace에서 가져오기 (fallback, providerReady 필요)
+    if (!IconComponent && providerReady) {
       IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
   } else if (iconSet === 'iconsax') {
@@ -198,8 +198,8 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
       IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
   } else {
-    // Phosphor나 다른 provider는 getIconFromProvider 사용
-    // phosphorReady가 true일 때만 호출됨 (위에서 체크)
+    // Lucide나 다른 provider는 getIconFromProvider 사용 (lazy load)
+    // lucideReady가 true일 때만 호출됨 (위에서 체크)
     IconComponent = getIconFromProvider(iconName, iconSet) as IconComponentType | null
   }
   
@@ -227,7 +227,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   }
   
   // 세트별 props 준비
-  type IconPropsType = LucideProps & {
+  type IconPropsType = PhosphorIconProps & {
     size?: number
     width?: number | string
     height?: number | string
