@@ -1,0 +1,77 @@
+/**
+ * HUA UI Component CSS Variables
+ * 컴포넌트 배경색/테두리 등 CSS 변수 정의
+ *
+ * 사용법: 앱의 globals.css에서 import
+ * @import "@hua-labs/ui/styles/component-vars.css";
+ *
+ * 커스터마이징: import 후 동일 변수 재정의
+ */
+
+:root {
+  /* Toast */
+  --toast-success-bg: rgba(255, 255, 255, 0.95);
+  --toast-error-bg: rgba(255, 255, 255, 0.95);
+  --toast-warning-bg: rgba(255, 255, 255, 0.95);
+  --toast-info-bg: rgba(255, 255, 255, 0.95);
+
+  /* Modal */
+  --modal-bg: rgb(255, 255, 255);
+  --modal-border: rgba(229, 231, 235, 0.5);
+
+  /* Drawer */
+  --drawer-bg: rgba(255, 255, 255, 0.95);
+
+  /* Sidebar */
+  --sidebar-bg: rgb(255, 255, 255);
+
+  /* Dropdown */
+  --dropdown-bg: rgb(255, 255, 255);
+
+  /* Badge */
+  --badge-default-bg: rgb(15, 23, 42);
+  --badge-default-text: rgb(248, 250, 252);
+  --badge-secondary-bg: rgb(241, 245, 249);
+  --badge-secondary-text: rgb(15, 23, 42);
+  --badge-destructive-bg: rgb(239, 68, 68);
+  --badge-outline-text: rgb(2, 6, 23);
+  --badge-outline-border: rgb(226, 232, 240);
+  --badge-outline-hover-bg: rgb(241, 245, 249);
+  --badge-glass-bg: rgba(255, 255, 255, 0.2);
+  --badge-glass-border: rgba(255, 255, 255, 0.3);
+  --badge-glass-text: white;
+}
+
+.dark {
+  /* Toast */
+  --toast-success-bg: rgba(5, 46, 22, 0.9);
+  --toast-error-bg: rgba(69, 10, 10, 0.9);
+  --toast-warning-bg: rgba(66, 32, 6, 0.9);
+  --toast-info-bg: rgba(30, 27, 75, 0.9);
+
+  /* Modal */
+  --modal-bg: rgb(31, 41, 55);
+  --modal-border: rgba(55, 65, 81, 0.5);
+
+  /* Drawer */
+  --drawer-bg: rgba(31, 41, 55, 0.95);
+
+  /* Sidebar */
+  --sidebar-bg: rgb(2, 6, 23);
+
+  /* Dropdown */
+  --dropdown-bg: rgb(31, 41, 55);
+
+  /* Badge */
+  --badge-default-bg: rgb(248, 250, 252);
+  --badge-default-text: rgb(15, 23, 42);
+  --badge-secondary-bg: rgb(30, 41, 59);
+  --badge-secondary-text: rgb(248, 250, 252);
+  --badge-destructive-bg: rgb(127, 29, 29);
+  --badge-outline-text: rgb(248, 250, 252);
+  --badge-outline-border: rgb(30, 41, 59);
+  --badge-outline-hover-bg: rgb(30, 41, 59);
+  --badge-glass-bg: rgba(30, 41, 59, 0.2);
+  --badge-glass-border: rgba(51, 65, 85, 0.5);
+  --badge-glass-text: rgb(226, 232, 240);
+}
