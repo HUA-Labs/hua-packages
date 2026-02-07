@@ -103,9 +103,9 @@ const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
     }
 
     const variantClasses = {
-      default: "text-slate-400 hover:text-yellow-500 transition-colors",
+      default: "text-muted-foreground hover:text-yellow-500 transition-colors",
       filled: "text-yellow-500 hover:text-yellow-600 transition-colors",
-      outline: "border border-slate-300 dark:border-slate-600 text-slate-400 hover:text-yellow-500 hover:border-yellow-500 transition-colors rounded"
+      outline: "border border-border text-muted-foreground hover:text-yellow-500 hover:border-yellow-500 transition-colors rounded"
     }
 
     return (

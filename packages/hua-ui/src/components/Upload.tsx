@@ -201,9 +201,9 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
           onDrop={handleDrop}
           className={merge(
             "relative border-2 border-dashed rounded-xl transition-all cursor-pointer",
-            "bg-gray-50 dark:bg-gray-900/50",
-            "border-gray-300 dark:border-gray-700",
-            isDragging && "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20",
+            "bg-muted/50",
+            "border-border",
+            isDragging && "border-primary bg-primary/10",
             disabled && "cursor-not-allowed opacity-50",
             sizeClasses[size]
           )}
@@ -221,21 +221,21 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
           
           <div className="flex flex-col items-center justify-center text-center">
             <div className={merge(
-              "rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-4 mb-4",
-              isDragging && "bg-indigo-200 dark:bg-indigo-900/50"
+              "rounded-full bg-primary/10 p-4 mb-4",
+              isDragging && "bg-primary/20"
             )}>
-              <Icon 
-                name="upload" 
+              <Icon
+                name="upload"
                 className={merge(
-                  "h-8 w-8 text-indigo-600 dark:text-indigo-400",
+                  "h-8 w-8 text-primary",
                   isDragging && "scale-110"
                 )} 
               />
             </div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <p className="text-sm font-medium text-foreground mb-1">
               {placeholder}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {accept && `지원 형식: ${accept}`}
               {maxSize && ` • 최대 크기: ${formatFileSize(maxSize)}`}
               {maxFiles && ` • 최대 ${maxFiles}개`}
@@ -251,49 +251,49 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
                 key={file.id}
                 className={merge(
                   "flex items-center gap-3 p-3 rounded-lg border",
-                  "bg-white dark:bg-gray-800",
-                  "border-gray-200 dark:border-gray-700",
-                  file.status === "error" && "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                  "bg-card",
+                  "border-border",
+                  file.status === "error" && "border-destructive/50 bg-destructive/5"
                 )}
               >
                 <div className="flex-shrink-0">
-                  <div className="rounded-lg bg-gray-100 dark:bg-gray-700 p-2">
-                    <Icon 
-                      name={getFileIcon(file.type)} 
-                      className="h-5 w-5 text-gray-600 dark:text-gray-400" 
+                  <div className="rounded-lg bg-muted p-2">
+                    <Icon
+                      name={getFileIcon(file.type)}
+                      className="h-5 w-5 text-muted-foreground"
                     />
                   </div>
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {file.name}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       {formatFileSize(file.size)}
                     </p>
                     {file.status === "uploading" && file.progress !== undefined && (
                       <>
-                        <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary transition-all duration-300"
                             style={{ width: `${file.progress}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {file.progress}%
                         </span>
                       </>
                     )}
                     {file.status === "success" && (
-                      <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                      <span className="text-xs text-[var(--progress-success)] flex items-center gap-1">
                         <Icon name="check" className="h-3 w-3" />
                         완료
                       </span>
                     )}
                     {file.status === "error" && (
-                      <span className="text-xs text-red-600 dark:text-red-400">
+                      <span className="text-xs text-destructive">
                         {file.error || "업로드 실패"}
                       </span>
                     )}
@@ -304,10 +304,10 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
                   <button
                     type="button"
                     onClick={() => handleRemove(file)}
-                    className="flex-shrink-0 rounded-lg p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="flex-shrink-0 rounded-lg p-1.5 hover:bg-muted transition-colors"
                     aria-label="파일 제거"
                   >
-                    <Icon name="close" className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                    <Icon name="close" className="h-4 w-4 text-muted-foreground" />
                   </button>
                 )}
               </div>

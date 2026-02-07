@@ -80,11 +80,11 @@ const ScrollToTop = ({
 
 
     const variantClasses = {
-      default: "bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 dark:bg-slate-800/20 dark:border-slate-700/50 dark:text-slate-100 dark:hover:bg-slate-700/30",
-      primary: "bg-primary/70 backdrop-blur-md border border-indigo-500/40 text-white hover:bg-primary/80 transition-all duration-300 dark:bg-primary/70 dark:border-indigo-400/40 dark:hover:bg-indigo-400/80",
-      secondary: "bg-slate-100/80 backdrop-blur-md border border-slate-200 text-slate-700 hover:bg-slate-200/90 dark:bg-slate-700/50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-600/60",
-      outline: "border border-white/40 bg-white/15 backdrop-blur-md text-white hover:bg-white/25 dark:border-slate-600/50 dark:bg-slate-800/15 dark:text-slate-200 dark:hover:bg-slate-700/25",
-      ghost: "bg-transparent hover:bg-white/15 backdrop-blur-md text-white dark:text-slate-200 dark:hover:bg-slate-700/25"
+      default: "bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 dark:bg-muted/20 dark:border-border/50 dark:text-foreground dark:hover:bg-muted/30",
+      primary: "bg-primary/70 backdrop-blur-md border border-primary/40 text-white hover:bg-primary/80 transition-all duration-300 dark:bg-primary/70 dark:border-primary/40 dark:hover:bg-primary/80",
+      secondary: "bg-muted/80 backdrop-blur-md border border-border text-foreground hover:bg-muted/90 dark:bg-muted/50 dark:border-border dark:text-foreground dark:hover:bg-muted/60",
+      outline: "border border-white/40 bg-white/15 backdrop-blur-md text-white hover:bg-white/25 dark:border-border/50 dark:bg-muted/15 dark:text-foreground dark:hover:bg-muted/25",
+      ghost: "bg-transparent hover:bg-white/15 backdrop-blur-md text-white dark:text-foreground dark:hover:bg-muted/25"
     }
 
     return (

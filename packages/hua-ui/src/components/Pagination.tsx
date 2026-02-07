@@ -143,24 +143,24 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
       switch (variant) {
         case "outlined":
           return merge(
-            "border border-gray-300 dark:border-gray-600",
-            isActive 
-              ? "bg-primary border-primary text-white" 
-              : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            "border border-border",
+            isActive
+              ? "bg-primary border-primary text-primary-foreground"
+              : "bg-background text-foreground hover:bg-muted"
           )
         case "minimal":
           return merge(
             "border-0",
-            isActive 
-              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
-              : "bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            isActive
+              ? "bg-primary/10 text-primary"
+              : "bg-transparent text-foreground hover:bg-muted"
           )
         default:
           return merge(
             "border-0",
-            isActive 
-              ? "bg-primary text-white" 
-              : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            isActive
+              ? "bg-primary text-primary-foreground"
+              : "bg-background text-foreground hover:bg-muted"
           )
       }
     }
@@ -223,7 +223,7 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <React.Fragment key={index}>
             {page === "..." ? (
               <span className={merge(
-                "inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400",
+                "inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-muted-foreground",
                 getSizeClasses()
               )}>
                 ...
@@ -321,7 +321,7 @@ export const PaginationWithInfo = React.forwardRef<HTMLDivElement, PaginationPro
     return (
       <div className={merge("flex flex-col sm:flex-row items-center justify-between gap-4", className)}>
         {showInfo && (
-          <div className="text-sm text-gray-700 dark:text-gray-300">
+          <div className="text-sm text-foreground">
             {totalItems > 0 ? (
               <>
                 <span className="font-medium">{startItem}</span>

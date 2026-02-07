@@ -40,6 +40,14 @@
   --color-border: hsl(210 15% 88%);
   --color-input: hsl(210 15% 88%);
   --color-ring: hsl(166 78% 30%);
+
+  /* Semantic status colors */
+  --color-success: hsl(142 71% 45%);
+  --color-success-foreground: hsl(0 0% 100%);
+  --color-warning: hsl(48 96% 53%);
+  --color-warning-foreground: hsl(28 80% 20%);
+  --color-info: hsl(239 84% 67%);
+  --color-info-foreground: hsl(0 0% 100%);
 }
 
 @layer base {
@@ -146,6 +154,14 @@
     --color-border: hsl(210 15% 18%);
     --color-input: hsl(210 15% 18%);
     --color-ring: hsl(166 70% 45%);
+
+    /* Semantic status colors (dark) */
+    --color-success: hsl(142 71% 55%);
+    --color-success-foreground: hsl(0 0% 100%);
+    --color-warning: hsl(48 96% 60%);
+    --color-warning-foreground: hsl(28 80% 10%);
+    --color-info: hsl(239 84% 74%);
+    --color-info-foreground: hsl(0 0% 100%);
 
     /* 레거시 CSS vars (hsl(var(--*)) 패턴) */
     --primary: 166 70% 45%;

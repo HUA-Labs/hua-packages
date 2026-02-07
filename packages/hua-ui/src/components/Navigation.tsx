@@ -127,13 +127,13 @@ const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
     const getStyleClasses = () => {
       switch (variant) {
         case "pills":
-          return "bg-slate-100 dark:bg-slate-800 p-1 rounded-xl"
+          return "bg-muted p-1 rounded-xl"
         case "underline":
-          return "border-b border-slate-200 dark:border-slate-700"
+          return "border-b border-border"
         case "cards":
-          return "bg-slate-50 dark:bg-slate-900 p-1 rounded-xl"
+          return "bg-muted/50 p-1 rounded-xl"
         default:
-          return "bg-slate-100 dark:bg-slate-800 p-1 rounded-xl"
+          return "bg-muted p-1 rounded-xl"
       }
     }
 
@@ -209,30 +209,30 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
         case "pills":
           return merge(
             "rounded-lg px-3 py-2 text-sm font-medium transition-all",
-            active 
-              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" 
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            active
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )
         case "underline":
           return merge(
             "border-b-2 px-3 py-2 text-sm font-medium transition-all",
-            active 
-              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400" 
-              : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            active
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )
         case "cards":
           return merge(
             "rounded-lg px-3 py-2 text-sm font-medium transition-all",
-            active 
-              ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-700" 
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            active
+              ? "bg-background text-foreground shadow-sm border border-border"
+              : "text-muted-foreground hover:text-foreground"
           )
         default:
           return merge(
             "rounded-lg px-3 py-2 text-sm font-medium transition-all",
-            active 
-              ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" 
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            active
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )
       }
     }

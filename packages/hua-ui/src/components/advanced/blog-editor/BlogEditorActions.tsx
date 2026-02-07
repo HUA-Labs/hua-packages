@@ -30,7 +30,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
       >
         {/* 자동저장 상태 */}
         {features.enableAutoSave && autoSaveStatus !== 'idle' && (
-          <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1">
+          <span className="text-sm text-muted-foreground flex items-center gap-1">
             {autoSaveStatus === 'saving' && (
               <>
                 <Icon name="loader" size={14} spin />
@@ -51,7 +51,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="px-4 py-2 text-foreground hover:text-foreground transition-colors"
           >
             {labels.cancel}
           </button>
@@ -62,7 +62,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
           type="button"
           onClick={() => handleSave(false)}
           disabled={submitting}
-          className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {labels.saveDraft}
         </button>

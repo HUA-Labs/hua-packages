@@ -57,7 +57,7 @@ function BlogEditorRoot({
       ? 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800'
       : variant === 'minimal'
         ? ''
-        : 'bg-gray-50 dark:bg-gray-900'
+        : 'bg-muted'
   )
 
   const contentContainerClasses = merge(
@@ -65,8 +65,8 @@ function BlogEditorRoot({
     variant === 'glass'
       ? 'bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/20 dark:border-slate-700/50'
       : variant === 'minimal'
-        ? 'bg-transparent border border-gray-200 dark:border-gray-700'
-        : 'bg-white dark:bg-gray-800'
+        ? 'bg-transparent border border-border'
+        : 'bg-background'
   )
 
   // 커스텀 자식 요소가 있으면 그걸 렌더링

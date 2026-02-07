@@ -77,9 +77,9 @@ const STATUS_CONFIG: Record<
     labelEn: "Active",
   },
   pending: {
-    dot: "bg-slate-300 dark:bg-slate-600 border-slate-300 dark:border-slate-600",
-    border: "border-slate-200 dark:border-slate-700",
-    text: "text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/50",
+    dot: "bg-muted-foreground/40 border-muted-foreground/40",
+    border: "border-border",
+    text: "text-muted-foreground bg-muted",
     label: "대기",
     labelEn: "Pending",
   },
@@ -182,9 +182,9 @@ export const Timeline: React.FC<TimelineProps> = ({
       <div className={merge("", className)} {...props}>
         {emptyState ?? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Icon name="clock" className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-3" />
-            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">타임라인이 비어 있습니다</p>
-            <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">이벤트가 추가되면 여기에 표시됩니다.</p>
+            <Icon name="clock" className="h-10 w-10 text-muted-foreground/50 mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">타임라인이 비어 있습니다</p>
+            <p className="text-xs text-muted-foreground mt-1">이벤트가 추가되면 여기에 표시됩니다.</p>
           </div>
         )}
       </div>
@@ -212,18 +212,18 @@ export const Timeline: React.FC<TimelineProps> = ({
                       "rounded-full border-2 shrink-0",
                       sizeConfig.dot,
                       statusConfig.dot,
-                      isHighlighted && "scale-125 ring-1 ring-offset-2 ring-slate-200 dark:ring-slate-700"
+                      isHighlighted && "scale-125 ring-1 ring-offset-2 ring-border"
                     )}
                     aria-label={statusConfig.label}
                   />
                   {/* Content below dot */}
                   <div className={merge("mt-3 text-center max-w-[160px]", sizeConfig.text)}>
-                    <p className="font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
+                    <p className="font-semibold text-foreground truncate">{item.title}</p>
                     {item.description && (
-                      <p className="text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{item.description}</p>
+                      <p className="text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
                     )}
                     {date && (
-                      <time className="text-xs text-slate-400 dark:text-slate-500 mt-1 block" dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
+                      <time className="text-xs text-muted-foreground mt-1 block" dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
                         {date}
                       </time>
                     )}
@@ -231,7 +231,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                 </div>
                 {/* Connector */}
                 {showLine && (
-                  <span className="h-0.5 w-16 bg-slate-200 dark:bg-slate-700 mt-[0.4375rem] mx-2" aria-hidden="true" />
+                  <span className="h-0.5 w-16 bg-border mt-[0.4375rem] mx-2" aria-hidden="true" />
                 )}
               </li>
             );
@@ -268,26 +268,26 @@ export const Timeline: React.FC<TimelineProps> = ({
                 "flex-1 rounded-xl border transition-all",
                 sizeConfig.padding,
                 statusConfig.border,
-                isHighlighted && "border-2 shadow-md ring-1 ring-slate-100 dark:ring-slate-800"
+                isHighlighted && "border-2 shadow-md ring-1 ring-border"
               )}
             >
               <div className="flex flex-wrap items-center gap-2">
                 {renderIcon() && (
-                  <span className="text-slate-500 dark:text-slate-400">{renderIcon()}</span>
+                  <span className="text-muted-foreground">{renderIcon()}</span>
                 )}
-                <span className={merge("font-semibold text-slate-900 dark:text-white", sizeConfig.text)}>
+                <span className={merge("font-semibold text-foreground", sizeConfig.text)}>
                   {item.title}
                 </span>
                 <span className={merge("text-xs font-medium rounded-full px-2 py-0.5", statusConfig.text)}>
                   {statusConfig.label}
                 </span>
                 {item.meta && (
-                  <span className="text-xs text-slate-500 dark:text-slate-400">{item.meta}</span>
+                  <span className="text-xs text-muted-foreground">{item.meta}</span>
                 )}
               </div>
 
               {item.description && (
-                <p className={merge("mt-1 text-slate-600 dark:text-slate-300", sizeConfig.text)}>
+                <p className={merge("mt-1 text-muted-foreground", sizeConfig.text)}>
                   {item.description}
                 </p>
               )}
@@ -295,7 +295,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               {item.content && <div className="mt-3">{item.content}</div>}
 
               {date && (
-                <div className="mt-3 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
                   <Icon name="clock" className="h-3 w-3" aria-hidden={true} />
                   <time dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
                     {date}
@@ -327,7 +327,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                   aria-label={statusConfig.label}
                 />
                 {showLine && (
-                  <span className="mt-1 flex-1 w-px bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
+                  <span className="mt-1 flex-1 w-px bg-border" aria-hidden="true" />
                 )}
               </div>
 

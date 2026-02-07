@@ -188,7 +188,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
           <div
             ref={popoverRef}
             className={merge(
-              "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 min-w-[200px]",
+              "bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-4 min-w-[200px]",
               getPositionClasses(),
               getAlignmentClasses(),
               contentClassName
@@ -227,7 +227,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, React.HTMLAttribu
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4", className)}
+      className={merge("bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-4", className)}
       {...props}
     >
       {children}

@@ -149,29 +149,29 @@ const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(
           return merge(
             "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors", // 12px, 8px 패딩
             active 
-              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
-              : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+              ? "bg-primary/10 text-primary"
+              : "text-foreground hover:text-foreground hover:bg-muted"
           )
         case "vertical":
           return merge(
             "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors", // 16px, 12px 패딩
-            active 
-              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
-              : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+            active
+              ? "bg-primary/10 text-primary"
+              : "text-foreground hover:text-foreground hover:bg-muted"
           )
         case "compact":
           return merge(
             "flex items-center gap-2 px-2 py-1.5 rounded text-sm font-medium transition-colors", // 8px, 6px 패딩
-            active 
-              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
-              : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+            active
+              ? "bg-primary/10 text-primary"
+              : "text-foreground hover:text-foreground hover:bg-muted"
           )
         default:
           return merge(
             "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors", // 16px, 12px 패딩
-            active 
-              ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300" 
-              : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+            active
+              ? "bg-primary/10 text-primary"
+              : "text-foreground hover:text-foreground hover:bg-muted"
           )
       }
     }
@@ -236,11 +236,11 @@ const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "horizontal":
-          return "w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" // 4px 여백
+          return "w-px h-4 bg-border mx-1" // 4px 여백
         case "vertical":
         case "compact":
         default:
-          return "h-px bg-gray-200 dark:bg-gray-700 my-2" // 8px 여백
+          return "h-px bg-border my-2" // 8px 여백
       }
     }
 
@@ -282,11 +282,11 @@ const MenuLabel = React.forwardRef<HTMLDivElement, MenuLabelProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "horizontal":
-          return "px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide" // 12px, 4px 패딩
+          return "px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide" // 12px, 4px 패딩
         case "vertical":
         case "compact":
         default:
-          return "px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide" // 16px, 8px 패딩
+          return "px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide" // 16px, 8px 패딩
       }
     }
 

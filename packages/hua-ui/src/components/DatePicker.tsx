@@ -256,16 +256,15 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         type="button"
         disabled={disabled}
         className={merge(
-          "flex w-full items-center justify-between rounded-lg border bg-white px-4 py-2 text-left text-sm transition-colors",
-          "hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2",
-          "dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700",
-          error && "border-red-500 focus:ring-red-500",
+          "flex w-full items-center justify-between rounded-lg border border-input bg-background px-4 py-2 text-left text-sm transition-colors",
+          "hover:bg-muted focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2",
+          error && "border-destructive focus:ring-destructive",
           disabled && "cursor-not-allowed opacity-50",
           sizeClasses[size]
         )}
         aria-label={displayDate || placeholder}
       >
-        <span className={merge("flex-1", !displayDate && "text-gray-400 dark:text-gray-500")}>
+        <span className={merge("flex-1", !displayDate && "text-muted-foreground")}>
           {displayDate || placeholder}
         </span>
         <Icon 
@@ -294,18 +293,18 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="rounded-lg p-2 hover:bg-muted transition-colors"
                   aria-label={ariaLabels.prevMonth}
                 >
                   <Icon name="chevronLeft" className="h-4 w-4" />
                 </button>
-                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                <div className="text-lg font-semibold text-foreground">
                   {formatMonth(year, month, locale)}
                 </div>
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="rounded-lg p-2 hover:bg-muted transition-colors"
                   aria-label={ariaLabels.nextMonth}
                 >
                   <Icon name="chevronRight" className="h-4 w-4" />
@@ -319,8 +318,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                     key={index}
                     className={merge(
                       "text-center text-xs font-medium py-2",
-                      index === 0 && "text-red-500 dark:text-red-400",
-                      index === 6 && "text-indigo-500 dark:text-indigo-400"
+                      index === 0 && "text-destructive",
+                      index === 6 && "text-primary"
                     )}
                   >
                     {day}
@@ -353,24 +352,24 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       onMouseLeave={() => setHoveredDate(null)}
                       className={merge(
                         "relative h-9 w-9 rounded-lg text-sm font-medium transition-all",
-                        "hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
+                        "hover:bg-primary/10",
                         "focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1",
-                        !isCurrentMonth && "text-gray-400 dark:text-gray-500",
+                        !isCurrentMonth && "text-muted-foreground",
                         isDisabled && "cursor-not-allowed opacity-30",
                         isSelected && "bg-primary text-white hover:bg-primary/80 shadow-md",
                         isTodayDate && !isSelected && "ring-1 ring-ring",
-                        isHovered && !isSelected && "bg-indigo-100 dark:bg-indigo-900/30"
+                        isHovered && !isSelected && "bg-primary/15"
                       )}
                       aria-label={formatDateAriaLabel(date, locale)}
                     >
                       <span className={merge(
                         "relative z-10",
-                        isMarked && !isSelected && "text-indigo-600 dark:text-indigo-400 font-semibold"
+                        isMarked && !isSelected && "text-primary font-semibold"
                       )}>
                         {date.getDate()}
                       </span>
                       {isMarked && !isSelected && (
-                        <span className="absolute inset-1 rounded-lg bg-indigo-100 dark:bg-indigo-900/40" />
+                        <span className="absolute inset-1 rounded-lg bg-primary/15" />
                       )}
                     </button>
                   )
@@ -378,7 +377,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               </div>
 
               {/* 오늘 버튼 */}
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="mt-4 pt-4 border-t border-border">
                 <Button
                   variant="outline"
                   size="sm"

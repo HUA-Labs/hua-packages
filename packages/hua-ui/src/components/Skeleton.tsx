@@ -1,17 +1,34 @@
 "use client"
 
 import React from "react"
+import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+
+export const skeletonVariants = cva(
+  "block",
+  {
+    variants: {
+      variant: {
+        text: "rounded",
+        circular: "rounded-full",
+        rounded: "rounded-lg",
+        rectangular: "rounded-none",
+      },
+      animation: {
+        pulse: "animate-pulse bg-muted",
+        wave: "skeleton-shimmer",
+        shimmer: "skeleton-shimmer",
+      },
+    },
+    defaultVariants: {
+      variant: "text",
+      animation: "pulse",
+    },
+  }
+)
 
 /**
  * Skeleton 컴포넌트의 props
- * @typedef {Object} SkeletonProps
- * @property {"text" | "circular" | "rectangular" | "rounded"} [variant="text"] - Skeleton 모양
- * @property {string | number} [width] - 너비 (기본값: variant에 따라 다름)
- * @property {string | number} [height] - 높이 (기본값: variant에 따라 다름)
- * @property {"pulse" | "wave" | "shimmer"} [animation="pulse"] - 애니메이션 타입
- * @property {string} [className] - 추가 CSS 클래스
- * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "text" | "circular" | "rectangular" | "rounded"
@@ -23,34 +40,13 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Skeleton 컴포넌트 / Skeleton component
- * 
+ *
  * 로딩 중 콘텐츠의 플레이스홀더를 표시하는 스켈레톤 컴포넌트입니다.
- * 다양한 모양과 애니메이션을 지원합니다.
- * 
- * Skeleton component that displays placeholders for content while loading.
- * Supports various shapes and animations.
- * 
- * @component
+ *
  * @example
- * // 기본 사용 (텍스트) / Basic usage (text)
  * <Skeleton />
- * 
- * @example
- * // 원형 아바타 / Circular avatar
  * <Skeleton variant="circular" width={40} height={40} />
- * 
- * @example
- * // Wave 애니메이션 / Wave animation
- * <Skeleton 
- *   variant="rounded" 
- *   width="100%" 
- *   height={200}
- *   animation="wave"
- * />
- * 
- * @param {SkeletonProps} props - Skeleton 컴포넌트의 props / Skeleton component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} Skeleton 컴포넌트 / Skeleton component
+ * <Skeleton variant="rounded" width="100%" height={200} animation="wave" />
  */
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({
@@ -61,35 +57,10 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     animation = "pulse",
     ...props
   }, ref) => {
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "circular":
-          return "rounded-full"
-        case "rounded":
-          return "rounded-lg"
-        case "rectangular":
-          return "rounded-none"
-        case "text":
-        default:
-          return "rounded"
-      }
-    }
-
-    const getAnimationClasses = () => {
-      switch (animation) {
-        case "wave":
-        case "shimmer":
-          return "skeleton-shimmer"
-        case "pulse":
-        default:
-          return "animate-pulse bg-gray-200 dark:bg-gray-700"
-      }
-    }
-
     const getAnimationStyle = (): React.CSSProperties => {
       if (animation === "wave" || animation === "shimmer") {
         return {
-          background: "linear-gradient(90deg, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%)",
+          background: "linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.2) 50%, hsl(var(--muted)) 100%)",
           backgroundSize: "200% 100%",
           animation: "shimmer 1.5s ease-in-out infinite",
         }
@@ -101,12 +72,10 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       switch (variant) {
         case "circular":
           return { width: "40px", height: "40px" }
-        case "text":
-          return { width: "100%", height: "1em" }
         case "rounded":
-          return { width: "100%", height: "200px" }
         case "rectangular":
           return { width: "100%", height: "200px" }
+        case "text":
         default:
           return { width: "100%", height: "1em" }
       }
@@ -124,17 +93,12 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
               0% { background-position: 200% 0; }
               100% { background-position: -200% 0; }
             }
-            .dark .skeleton-shimmer {
-              background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%) !important;
-            }
           `}</style>
         )}
         <div
           ref={ref}
           className={merge(
-            "block",
-            getVariantClasses(),
-            getAnimationClasses(),
+            skeletonVariants({ variant, animation }),
             className
           )}
           style={{

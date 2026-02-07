@@ -24,25 +24,25 @@ const toneClasses: Record<NonNullable<InfoCardProps["tone"]>, { container: strin
     container: "bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-indigo-200 dark:border-indigo-700",
     icon: "h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-3 mt-0.5 flex-shrink-0",
     title: "text-sm font-medium text-indigo-900 dark:text-indigo-100 mb-2 block",
-    body: "text-gray-800 dark:text-gray-200 text-sm leading-relaxed",
+    body: "text-foreground text-sm leading-relaxed",
   },
   purple: {
     container: "bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700",
     icon: "h-5 w-5 text-purple-600 dark:text-purple-400 mr-3 mt-0.5 flex-shrink-0",
     title: "text-sm font-medium text-purple-900 dark:text-purple-100 mb-2 block",
-    body: "text-gray-800 dark:text-gray-200 text-sm leading-relaxed",
+    body: "text-foreground text-sm leading-relaxed",
   },
   green: {
     container: "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700",
     icon: "h-5 w-5 text-green-600 dark:text-green-400 mr-3 mt-0.5 flex-shrink-0",
     title: "text-sm font-medium text-green-900 dark:text-green-100 mb-2 block",
-    body: "text-gray-800 dark:text-gray-200 text-sm leading-relaxed",
+    body: "text-foreground text-sm leading-relaxed",
   },
   orange: {
     container: "bg-gradient-to-r from-orange-50 to-rose-50 dark:from-orange-900/20 dark:to-rose-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-700",
     icon: "h-5 w-5 text-orange-600 dark:text-orange-400 mr-3 mt-0.5 flex-shrink-0",
     title: "text-sm font-medium text-orange-900 dark:text-orange-100 mb-2 block",
-    body: "text-gray-800 dark:text-gray-200 text-sm leading-relaxed",
+    body: "text-foreground text-sm leading-relaxed",
   },
 }
 

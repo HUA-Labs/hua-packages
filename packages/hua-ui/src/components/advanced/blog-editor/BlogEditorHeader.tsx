@@ -36,7 +36,7 @@ const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
               <button
                 type="button"
                 onClick={onBack}
-                className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="뒤로가기"
               >
                 <Icon name="chevronLeft" size={24} />
@@ -44,11 +44,11 @@ const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
             )
           )}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-foreground">
               {isEditMode ? labels.editTitle : labels.pageTitle}
             </h1>
             {isEditMode && formData.slug && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {labels.slugPrefix}{formData.slug}
               </p>
             )}

@@ -230,7 +230,7 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
         ref={ref}
         data-accordion-item
         className={merge(
-          "border border-gray-200/50 dark:border-gray-700/50 rounded-lg overflow-hidden",
+          "border border-border/50 rounded-lg overflow-hidden",
           disabled && "opacity-50 pointer-events-none",
           className
         )}
@@ -282,7 +282,7 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
         name="chevronDown" 
         size={20} 
         className={merge(
-          "transition-transform duration-300 ease-out text-gray-500 dark:text-gray-400",
+          "transition-transform duration-300 ease-out text-muted-foreground",
           isOpen && "rotate-180"
         )} 
       />
@@ -302,7 +302,7 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
         onClick={onToggle}
         disabled={disabled}
         className={merge(
-          "flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-gray-50/80 dark:hover:bg-gray-800/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          "flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           className
         )}
         {...props}

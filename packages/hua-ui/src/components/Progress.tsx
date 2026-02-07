@@ -1,21 +1,55 @@
 "use client"
 
 import React from "react"
+import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+
+export const progressBarVariants = cva(
+  "h-full rounded-full transition-all duration-300 ease-out",
+  {
+    variants: {
+      variant: {
+        default: "bg-foreground",
+        success: "bg-[var(--progress-success)]",
+        warning: "bg-[var(--progress-warning)]",
+        error: "bg-[var(--progress-error)]",
+        info: "bg-[var(--progress-info)]",
+        glass: "bg-white/50 backdrop-blur-sm",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export const progressTrackVariants = cva(
+  "relative w-full overflow-hidden rounded-full",
+  {
+    variants: {
+      variant: {
+        default: "bg-[var(--progress-track)] dark:bg-[var(--progress-track)]",
+        success: "bg-[var(--progress-track)] dark:bg-[var(--progress-track)]",
+        warning: "bg-[var(--progress-track)] dark:bg-[var(--progress-track)]",
+        error: "bg-[var(--progress-track)] dark:bg-[var(--progress-track)]",
+        info: "bg-[var(--progress-track)] dark:bg-[var(--progress-track)]",
+        glass: "bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/10 dark:border-slate-700/50",
+      },
+      size: {
+        sm: "h-2",
+        md: "h-3",
+        lg: "h-4",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+)
 
 /**
  * Progress 컴포넌트의 props
- * @typedef {Object} ProgressProps
- * @property {number} [value=0] - 진행률 값
- * @property {number} [max=100] - 최대값
- * @property {"sm" | "md" | "lg"} [size="md"] - Progress 바 크기
- * @property {"default" | "success" | "warning" | "error" | "info" | "glass"} [variant="default"] - Progress 스타일 변형
- * @property {boolean} [showValue=false] - 진행률 퍼센트 표시 여부
- * @property {boolean} [animated=true] - 애니메이션 활성화 여부
- * @property {boolean} [striped=false] - 줄무늬 패턴 표시 여부
- * @property {string} [label] - Progress 라벨 텍스트
- * @property {string} [description] - Progress 설명 텍스트
- * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: number
@@ -31,42 +65,17 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Progress 컴포넌트 / Progress component
- * 
+ *
  * 진행률을 표시하는 프로그레스 바 컴포넌트입니다.
- * 다양한 스타일과 애니메이션을 지원합니다.
- * 
- * Progress bar component that displays progress.
- * Supports various styles and animations.
- * 
- * @component
+ *
  * @example
- * // 기본 사용 / Basic usage
  * <Progress value={50} />
- * 
- * @example
- * // 라벨과 값 표시 / Show label and value
- * <Progress 
- *   value={75} 
- *   label="업로드 진행률"
- *   showValue
- * />
- * 
- * @example
- * // Success 스타일, 줄무늬 패턴 / Success style, striped pattern
- * <Progress 
- *   value={90}
- *   variant="success"
- *   striped
- *   animated
- * />
- * 
- * @param {ProgressProps} props - Progress 컴포넌트의 props / Progress component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} Progress 컴포넌트 / Progress component
+ * <Progress value={75} variant="success" label="업로드" showValue />
+ * <Progress value={90} variant="warning" striped animated />
  */
 const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
-  ({ 
-    className, 
+  ({
+    className,
     value = 0,
     max = 100,
     size = "md",
@@ -76,72 +85,35 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     striped = false,
     label,
     description,
-    ...props 
+    ...props
   }, ref) => {
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
 
-    const sizeClasses = {
-      sm: "h-2", // 8px 높이
-      md: "h-3", // 12px 높이
-      lg: "h-4" // 16px 높이
-    }
-
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "success":
-          return "bg-green-500 dark:bg-green-400"
-        case "warning":
-          return "bg-yellow-500 dark:bg-yellow-400"
-        case "error":
-          return "bg-red-500 dark:bg-red-400"
-        case "info":
-          return "bg-primary dark:bg-indigo-400"
-        case "glass":
-          return "bg-white/50 backdrop-blur-sm"
-        default:
-          return "bg-gray-900 dark:bg-gray-100"
-      }
-    }
-
-    const getStripedClasses = () => {
-      if (!striped) return ""
-      return "bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:20px_100%] animate-pulse"
-    }
-
     return (
       <div className={merge("w-full", className)} {...props}>
-        {/* 라벨과 값 */}
         {(label || showValue) && (
-          <div className="flex items-center justify-between mb-2"> {/* 8px 여백 */}
+          <div className="flex items-center justify-between mb-2">
             {label && (
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-foreground">
                 {label}
               </span>
             )}
             {showValue && (
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-muted-foreground">
                 {Math.round(percentage)}%
               </span>
             )}
           </div>
         )}
 
-        {/* 프로그레스 바 */}
         <div
           ref={ref}
-          className={merge(
-            "relative w-full overflow-hidden rounded-full",
-            variant === "glass" 
-              ? "bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/10 dark:border-slate-700/50"
-              : "bg-gray-200 dark:bg-gray-700",
-            sizeClasses[size]
-          )}
+          className={progressTrackVariants({ variant, size })}
         >
           <div
             className={merge(
-              "h-full rounded-full transition-all duration-300 ease-out",
-              getVariantClasses(),
-              getStripedClasses(),
+              progressBarVariants({ variant }),
+              striped && "bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:20px_100%] animate-pulse",
               animated && "animate-pulse"
             )}
             style={{
@@ -151,9 +123,8 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           />
         </div>
 
-        {/* 설명 */}
         {description && (
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400"> {/* 8px 여백 */}
+          <p className="mt-2 text-xs text-muted-foreground">
             {description}
           </p>
         )}
@@ -195,9 +166,9 @@ ProgressInfo.displayName = "ProgressInfo"
 // 복합 Progress 컴포넌트들
 export const ProgressWrapper = React.forwardRef<HTMLDivElement, ProgressProps & { title?: string }>(
   ({ title, className, ...props }, ref) => (
-    <div className={merge("p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700", className)}>
+    <div className={merge("p-4 bg-card rounded-lg border border-border", className)}>
       {title && (
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3"> {/* 12px 여백 */}
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           {title}
         </h3>
       )}
@@ -211,7 +182,7 @@ export const ProgressGroup = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("space-y-4", className)} // 16px 간격
+      className={merge("space-y-4", className)}
       {...props}
     >
       {children}
@@ -220,4 +191,4 @@ export const ProgressGroup = React.forwardRef<HTMLDivElement, React.HTMLAttribut
 )
 ProgressGroup.displayName = "ProgressGroup"
 
-export { Progress } 
+export { Progress }

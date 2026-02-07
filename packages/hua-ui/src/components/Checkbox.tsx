@@ -88,16 +88,16 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     }
 
     const variantClasses = {
-      default: "border-gray-300 bg-white text-indigo-600 focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-ring",
-      outline: "border-2 border-gray-200 bg-transparent text-indigo-600 focus:ring-ring dark:border-gray-700 dark:focus:ring-ring",
-      filled: "border-transparent bg-gray-50 text-indigo-600 focus:bg-white focus:ring-ring dark:bg-gray-700 dark:focus:bg-gray-800 dark:focus:ring-ring",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-ring/50 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:focus:ring-ring/50 dark:focus:bg-slate-700/20"
+      default: "border-input bg-background text-primary focus:ring-ring",
+      outline: "border-2 border-input bg-transparent text-primary focus:ring-ring",
+      filled: "border-transparent bg-muted text-primary focus:bg-background focus:ring-ring",
+      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-ring/50 focus:bg-white/20",
     }
 
-    const stateClasses = error 
-      ? "border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:ring-red-400"
+    const stateClasses = error
+      ? "border-destructive focus:ring-destructive"
       : success
-      ? "border-green-500 focus:ring-green-500 dark:border-green-400 dark:focus:ring-green-400"
+      ? "border-green-500 focus:ring-green-500"
       : ""
 
     // Support both controlled and uncontrolled modes
@@ -130,13 +130,13 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className={merge(
               "flex items-center justify-center rounded border transition-all duration-200 cursor-pointer relative",
               "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-offset-2",
-              "peer-hover:border-indigo-400 peer-hover:shadow-sm",
-              "peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-disabled:hover:border-gray-300",
+              "peer-hover:border-accent-foreground peer-hover:shadow-sm",
+              "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
               sizeClasses[size],
               variantClasses[variant],
               stateClasses,
-              isChecked && "bg-primary border-primary dark:bg-primary dark:border-primary shadow-md shadow-indigo-500/20",
-              !isChecked && "bg-white dark:bg-gray-800"
+              isChecked && "bg-primary border-primary shadow-md shadow-primary/20",
+              !isChecked && "bg-background"
             )}
           >
             {/* 체크 아이콘으로 개선 */}
@@ -153,12 +153,12 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         {(label || description) && (
           <div className="flex flex-col">
             {label && (
-              <label htmlFor={checkboxId} id={labelId} className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+              <label htmlFor={checkboxId} id={labelId} className="text-sm font-medium text-foreground cursor-pointer">
                 {label}
               </label>
             )}
             {description && (
-              <p id={descriptionId} className="text-sm text-gray-500 dark:text-gray-400">
+              <p id={descriptionId} className="text-sm text-muted-foreground">
                 {description}
               </p>
             )}

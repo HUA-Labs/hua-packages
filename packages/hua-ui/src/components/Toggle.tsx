@@ -96,20 +96,20 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
 
     const variantClasses = {
       default: pressed
-        ? "bg-primary text-white hover:bg-primary/80 dark:bg-primary dark:hover:bg-primary/90"
-        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
+        ? "bg-primary text-primary-foreground hover:bg-primary/80"
+        : "bg-muted text-foreground hover:bg-muted/80",
       outline: pressed
-        ? "border-2 border-primary bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-primary dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
-        : "border-2 border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800",
+        ? "border-2 border-primary bg-primary/10 text-primary hover:bg-primary/15"
+        : "border-2 border-border bg-transparent text-foreground hover:bg-muted",
       filled: pressed
-        ? "bg-primary text-white hover:bg-primary/80 dark:bg-primary dark:hover:bg-primary/90"
-        : "bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
+        ? "bg-primary text-primary-foreground hover:bg-primary/80"
+        : "bg-muted/50 text-foreground hover:bg-muted",
       ghost: pressed
-        ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
-        : "bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
+        ? "bg-primary/10 text-primary hover:bg-primary/15"
+        : "bg-transparent text-foreground hover:bg-muted",
       glass: pressed
-        ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 dark:bg-indigo-400/20 dark:border-indigo-300/50 dark:hover:bg-indigo-400/30"
-        : "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 dark:bg-slate-800/10 dark:border-slate-600/50 dark:text-slate-200 dark:hover:bg-slate-700/20"
+        ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 dark:bg-primary/20 dark:border-primary/50 dark:hover:bg-primary/30"
+        : "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 dark:bg-muted/10 dark:border-border/50 dark:text-foreground dark:hover:bg-muted/20"
     }
 
     return (
@@ -139,7 +139,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         </button>
         {description && (
           <div className="flex flex-col">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {description}
             </p>
           </div>

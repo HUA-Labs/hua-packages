@@ -128,7 +128,7 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "light":
-          return "bg-white text-gray-900 border border-gray-200 shadow-lg"
+          return "bg-popover text-popover-foreground border border-border shadow-lg"
         case "dark":
           return "bg-gray-900 text-white shadow-lg"
         default:

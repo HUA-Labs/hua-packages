@@ -44,11 +44,11 @@ const BlogEditorTranslate = React.forwardRef<HTMLDivElement, BlogEditorTranslate
       <div
         ref={ref}
         className={merge(
-          'px-6 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between',
+          'px-6 py-3 bg-muted border-b border-border flex items-center justify-between',
           className
         )}
       >
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Icon name="sparkles" size={16} />
           <span>{hint || labels.translateHint}</span>
         </div>

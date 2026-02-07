@@ -76,7 +76,7 @@ const PageNavigation = React.forwardRef<HTMLDivElement, PageNavigationProps>(
           {prevPage && (
             <a
               href={prevPage.href}
-              className="group inline-flex items-center text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+              className="group inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <Icon 
                 name="chevronLeft" 
@@ -92,7 +92,7 @@ const PageNavigation = React.forwardRef<HTMLDivElement, PageNavigationProps>(
           {nextPage && (
             <a
               href={nextPage.href}
-              className="group inline-flex items-center text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+              className="group inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <span className="hidden sm:inline mr-2">{nextPage.title}</span>
               <Icon 

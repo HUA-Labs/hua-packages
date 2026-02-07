@@ -297,13 +297,13 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "pills":
-          return "bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
+          return "bg-muted p-3 rounded-xl border border-border/50"
         case "underline":
-          return "border-b border-gray-200 dark:border-gray-700"
+          return "border-b border-border"
         case "cards":
-          return "bg-gray-50/80 dark:bg-gray-900/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
+          return "bg-muted/80 p-3 rounded-xl border border-border/50"
         default:
-          return "bg-gray-50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50"
+          return "bg-muted p-3 rounded-xl border border-border/50"
       }
     }
 
@@ -403,30 +403,30 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         case "pills":
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active 
-              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            active
+              ? "bg-background text-foreground shadow-md"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )
         case "underline":
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active 
-              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400" 
-              : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            active
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )
         case "cards":
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active 
-              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            active
+              ? "bg-background text-foreground shadow-md"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )
         default:
           return merge(
             "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active 
-              ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-md" 
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            active
+              ? "bg-background text-foreground shadow-md"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted"
           )
       }
     }

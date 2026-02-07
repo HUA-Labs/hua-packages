@@ -58,7 +58,7 @@ export const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps
       <div
         ref={ref}
         className={merge(
-          "flex items-center justify-between border-b border-gray-100 bg-transparent px-6 py-4 text-gray-900 dark:border-slate-800 dark:text-slate-50",
+          "flex items-center justify-between border-b border-border bg-transparent px-6 py-4 text-foreground",
           className
         )}
         {...props}
@@ -68,7 +68,7 @@ export const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps
             {title}
           </h3>
           {description && (
-            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {description}
             </p>
           )}

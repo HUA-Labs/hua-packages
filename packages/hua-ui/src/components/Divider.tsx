@@ -5,13 +5,6 @@ import { merge } from "../lib/utils"
 
 /**
  * Divider 컴포넌트의 props / Divider component props
- * @typedef {Object} DividerProps
- * @property {"horizontal" | "vertical"} [orientation="horizontal"] - Divider 방향 / Divider orientation
- * @property {"solid" | "dashed" | "dotted" | "gradient" | "glass"} [variant="solid"] - Divider 스타일 변형 / Divider style variant
- * @property {"sm" | "md" | "lg"} [size="md"] - Divider 크기 / Divider size
- * @property {"none" | "sm" | "md" | "lg" | "xl"} [spacing="md"] - Divider 주변 여백 / Divider spacing
- * @property {"default" | "muted" | "primary" | "secondary"} [color="default"] - Divider 색상 / Divider color
- * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "horizontal" | "vertical"
@@ -21,120 +14,100 @@ export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   color?: "default" | "muted" | "primary" | "secondary"
 }
 
+// Divider는 orientation × variant × color 의 조합이 동적이라 CVA compound variants보다
+// 런타임 조합이 더 명확함. 색상만 시맨틱 토큰으로 교체.
+
+const ORIENTATION = {
+  horizontal: "w-full",
+  vertical: "h-full",
+} as const
+
+const SPACING = {
+  horizontal: { none: "", sm: "my-4", md: "my-6", lg: "my-8", xl: "my-12" },
+  vertical: { none: "", sm: "mx-4", md: "mx-6", lg: "mx-8", xl: "mx-12" },
+} as const
+
+function getSizeClass(orientation: "horizontal" | "vertical", variant: string, size: "sm" | "md" | "lg") {
+  const useBorder = variant === "dashed" || variant === "dotted"
+  if (useBorder) {
+    const map = {
+      horizontal: { sm: "border-t", md: "border-t-2", lg: "border-t-4" },
+      vertical: { sm: "border-l", md: "border-l-2", lg: "border-l-4" },
+    } as const
+    return map[orientation][size]
+  }
+  const map = {
+    horizontal: { sm: "h-px", md: "h-0.5", lg: "h-1" },
+    vertical: { sm: "w-px", md: "w-0.5", lg: "w-1" },
+  } as const
+  return map[orientation][size]
+}
+
+function getVariantClass(orientation: "horizontal" | "vertical", variant: string) {
+  switch (variant) {
+    case "dashed": return "border-dashed"
+    case "dotted": return "border-dotted"
+    case "gradient":
+      return orientation === "horizontal"
+        ? "bg-gradient-to-r from-transparent via-border to-transparent"
+        : "bg-gradient-to-b from-transparent via-border to-transparent"
+    case "glass":
+      return orientation === "horizontal"
+        ? "bg-gradient-to-r from-transparent via-white/30 to-transparent"
+        : "bg-gradient-to-b from-transparent via-white/30 to-transparent"
+    default: return ""
+  }
+}
+
+function getColorClass(variant: string, color: "default" | "muted" | "primary" | "secondary") {
+  const useBorder = variant === "dashed" || variant === "dotted"
+  if (useBorder) {
+    return {
+      default: "border-border",
+      muted: "border-muted",
+      primary: "border-primary/30",
+      secondary: "border-secondary",
+    }[color]
+  }
+  return {
+    default: "bg-border",
+    muted: "bg-muted",
+    primary: "bg-primary/30",
+    secondary: "bg-secondary",
+  }[color]
+}
+
 /**
  * Divider 컴포넌트 / Divider component
- * 
+ *
  * 콘텐츠를 구분하는 구분선 컴포넌트입니다.
- * 가로/세로 방향, 다양한 스타일과 색상을 지원합니다.
- * 
- * Divider component for separating content.
- * Supports horizontal/vertical orientation, various styles and colors.
- * 
- * @component
+ *
  * @example
- * // 기본 사용 (가로) / Basic usage (horizontal)
  * <Divider />
- * 
- * @example
- * // 세로 구분선 / Vertical divider
- * <div className="flex">
- *   <div>왼쪽</div>
- *   <Divider orientation="vertical" />
- *   <div>오른쪽</div>
- * </div>
- * 
- * @example
- * // 다양한 스타일 / Various styles
+ * <Divider orientation="vertical" />
  * <Divider variant="dashed" spacing="lg" />
  * <Divider variant="gradient" color="primary" />
- * 
- * @param {DividerProps} props - Divider 컴포넌트의 props / Divider component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} Divider 컴포넌트 / Divider component
  */
 const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
-  ({ 
-    className, 
+  ({
+    className,
     orientation = "horizontal",
     variant = "solid",
     size = "md",
     spacing = "md",
     color = "default",
-    ...props 
+    ...props
   }, ref) => {
-    const orientationClasses = React.useMemo(() => ({
-      horizontal: "w-full",
-      vertical: "h-full"
-    }), [])
-
-    // dashed/dotted는 border 스타일 사용, solid/gradient/glass는 height/width 사용
-    const sizeClasses = React.useMemo(() => {
-      const useBorder = variant === "dashed" || variant === "dotted"
-      if (useBorder) {
-        // border 스타일일 때는 border-width 사용
-        return {
-          sm: orientation === "horizontal" ? "border-t" : "border-l",
-          md: orientation === "horizontal" ? "border-t-2" : "border-l-2",
-          lg: orientation === "horizontal" ? "border-t-4" : "border-l-4"
-        }
-      }
-      // 배경색 스타일일 때는 height/width 사용
-      return {
-        sm: orientation === "horizontal" ? "h-px" : "w-px",
-        md: orientation === "horizontal" ? "h-0.5" : "w-0.5",
-        lg: orientation === "horizontal" ? "h-1" : "w-1"
-      }
-    }, [orientation, variant])
-
-    const variantClasses = React.useMemo(() => ({
-      solid: "",
-      dashed: "border-dashed",
-      dotted: "border-dotted",
-      gradient: orientation === "horizontal"
-        ? "bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600"
-        : "bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600",
-      glass: orientation === "horizontal"
-        ? "bg-gradient-to-r from-transparent via-white/30 to-transparent"
-        : "bg-gradient-to-b from-transparent via-white/30 to-transparent"
-    }), [orientation])
-
-    // dashed/dotted는 border-color 사용, solid는 bg-color 사용
-    const colorClasses = React.useMemo(() => {
-      const useBorder = variant === "dashed" || variant === "dotted"
-      if (useBorder) {
-        return {
-          default: "border-gray-200 dark:border-gray-700",
-          muted: "border-gray-100 dark:border-gray-800",
-          primary: "border-indigo-200 dark:border-indigo-700",
-          secondary: "border-gray-300 dark:border-gray-600"
-        }
-      }
-      return {
-        default: "bg-gray-200 dark:bg-gray-700",
-        muted: "bg-gray-100 dark:bg-gray-800",
-        primary: "bg-indigo-200 dark:bg-indigo-700",
-        secondary: "bg-gray-300 dark:bg-gray-600"
-      }
-    }, [variant])
-
-    const spacingClasses = React.useMemo(() => ({
-      none: "",
-      sm: orientation === "horizontal" ? "my-4" : "mx-4", // 16px
-      md: orientation === "horizontal" ? "my-6" : "mx-6", // 24px
-      lg: orientation === "horizontal" ? "my-8" : "mx-8", // 32px
-      xl: orientation === "horizontal" ? "my-12" : "mx-12" // 48px
-    }), [orientation])
-
     return (
       <div
         ref={ref}
         className={merge(
           "flex-shrink-0",
-          orientationClasses[orientation],
-          sizeClasses[size],
-          variant === "gradient" ? variantClasses[variant] : colorClasses[color],
-          variant !== "gradient" && variantClasses[variant],
-          spacingClasses[spacing],
+          ORIENTATION[orientation],
+          getSizeClass(orientation, variant, size),
+          variant === "gradient" ? getVariantClass(orientation, variant) : getColorClass(variant, color),
+          variant !== "gradient" && getVariantClass(orientation, variant),
+          SPACING[orientation][spacing],
           className
         )}
         {...props}

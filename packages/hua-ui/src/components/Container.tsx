@@ -1,16 +1,37 @@
 "use client"
 
 import React from "react"
+import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+
+export const containerVariants = cva(
+  "w-full",
+  {
+    variants: {
+      size: {
+        sm: "max-w-2xl",
+        md: "max-w-4xl",
+        lg: "max-w-6xl",
+        xl: "max-w-7xl",
+        full: "max-w-full",
+      },
+      padding: {
+        none: "",
+        sm: "px-3 sm:px-4 py-6 sm:py-8",
+        md: "px-4 sm:px-6 py-8 sm:py-12",
+        lg: "px-4 sm:px-6 lg:px-8 py-10 sm:py-16",
+        xl: "px-6 sm:px-8 lg:px-12 py-12 sm:py-20",
+      },
+    },
+    defaultVariants: {
+      size: "lg",
+      padding: "md",
+    },
+  }
+)
 
 /**
  * Container 컴포넌트의 props
- * @typedef {Object} ContainerProps
- * @property {"sm" | "md" | "lg" | "xl" | "full"} [size="lg"] - 컨테이너 최대 너비
- * @property {"none" | "sm" | "md" | "lg" | "xl"} [padding="md"] - 내부 패딩 크기
- * @property {boolean} [centered=true] - 컨테이너를 중앙 정렬할지 여부
- * @property {boolean} [fluid=false] - 최대 너비 제한 없이 전체 너비 사용
- * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg" | "xl" | "full"
@@ -21,67 +42,30 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * Container 컴포넌트
- * 
+ *
  * 콘텐츠를 감싸는 컨테이너 컴포넌트입니다.
  * 반응형 최대 너비와 패딩을 제공하여 일관된 레이아웃을 구성합니다.
- * 
- * @component
+ *
  * @example
- * // 기본 사용
- * <Container>
- *   <h1>제목</h1>
- *   <p>내용</p>
- * </Container>
- * 
- * @example
- * // 작은 크기, 패딩 없음
- * <Container size="sm" padding="none">
- *   <div>콘텐츠</div>
- * </Container>
- * 
- * @example
- * // 전체 너비 사용
- * <Container fluid padding="xl">
- *   <div>전체 너비 콘텐츠</div>
- * </Container>
- * 
- * @param {ContainerProps} props - Container 컴포넌트의 props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref
- * @returns {JSX.Element} Container 컴포넌트
+ * <Container><h1>제목</h1></Container>
+ * <Container size="sm" padding="none"><div>콘텐츠</div></Container>
+ * <Container fluid padding="xl"><div>전체 너비</div></Container>
  */
 const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
-  ({ 
-    className, 
+  ({
+    className,
     size = "lg",
     padding = "md",
     centered = true,
     fluid = false,
-    ...props 
+    ...props
   }, ref) => {
-    const sizeClasses = {
-      sm: "max-w-2xl", // 672px
-      md: "max-w-4xl", // 896px
-      lg: "max-w-6xl", // 1152px
-      xl: "max-w-7xl", // 1280px
-      full: "max-w-full"
-    }
-
-    // 반응형 패딩: 모바일에서 더 좁게
-    const paddingClasses = {
-      none: "",
-      sm: "px-3 sm:px-4 py-6 sm:py-8", // 12px → 16px 좌우, 24px → 32px 상하
-      md: "px-4 sm:px-6 py-8 sm:py-12", // 16px → 24px 좌우, 32px → 48px 상하
-      lg: "px-4 sm:px-6 lg:px-8 py-10 sm:py-16", // 16px → 24px → 32px 좌우
-      xl: "px-6 sm:px-8 lg:px-12 py-12 sm:py-20" // 24px → 32px → 48px 좌우
-    }
-
     return (
       <div
         ref={ref}
         className={merge(
-          "w-full",
-          !fluid && sizeClasses[size],
-          paddingClasses[padding],
+          containerVariants({ size: fluid ? undefined : size, padding }),
+          fluid && "max-w-full",
           centered && "mx-auto",
           className
         )}

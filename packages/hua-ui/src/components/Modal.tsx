@@ -226,15 +226,15 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         
         {/* 헤더 */}
         {title && (
-          <div className="relative z-10 px-6 pt-6 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="relative z-10 px-6 pt-6 pb-4 border-b border-border/50">
             {/* 타이틀과 닫기 버튼 - 같은 줄, 양쪽 끝 */}
             <div className="flex items-center justify-between gap-4 mb-2">
-              <h2 id={titleId} className="text-xl font-semibold text-gray-900 dark:text-white flex-1 min-w-0">{title}</h2>
+              <h2 id={titleId} className="text-xl font-semibold text-foreground flex-1 min-w-0">{title}</h2>
               {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
               {_closable && (
                 <button
                   onClick={onClose}
-                  className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 focus-visible:ring-offset-2 z-20"
+                  className="flex-shrink-0 p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20"
                   aria-label="닫기"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +245,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
             </div>
             {/* 설명 - 아래 줄 */}
             {description && (
-              <p id={descriptionId} className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+              <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
             )}
           </div>
         )}
@@ -254,7 +254,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         {!title && showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 focus-visible:ring-offset-2 z-20"
+            className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20"
             aria-label="닫기"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

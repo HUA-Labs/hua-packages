@@ -143,7 +143,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
         {...props}
       >
         {title && (
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-slate-50">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">
             {title}
           </h2>
         )}
@@ -200,7 +200,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
                   {item.value}
                 </div>
                 {item.description && (
-                  <div className="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                  <div className="mt-1 text-xs text-muted-foreground">
                     {item.description}
                   </div>
                 )}
@@ -212,7 +212,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
                         ? "text-green-600 dark:text-green-400"
                         : item.trend === "down"
                         ? "text-red-600 dark:text-red-400"
-                        : "text-gray-500 dark:text-slate-400"
+                        : "text-muted-foreground"
                     )}
                   >
                     {item.trend === "up" && "↑"}

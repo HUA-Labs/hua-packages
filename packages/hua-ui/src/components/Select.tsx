@@ -1,18 +1,36 @@
 "use client"
 
 import React from "react"
+import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+import { FORM_STATE } from "../lib/styles/cva-base"
+
+export const selectVariants = cva(
+  "flex w-full appearance-none rounded-md border transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 hover:border-accent-foreground hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "border-input bg-background text-foreground focus:border-ring focus:ring-ring",
+        outline: "border-2 border-input bg-transparent text-foreground focus:border-ring focus:ring-ring",
+        filled: "border-transparent bg-secondary/50 text-foreground focus:bg-background focus:border-ring focus:ring-ring",
+        ghost: "border-transparent bg-transparent text-foreground focus:bg-muted focus:border-border focus:ring-muted-foreground",
+        glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:border-ring/50 focus:ring-ring/20 focus:bg-white/20",
+      },
+      size: {
+        sm: "h-8 pl-2 text-sm",
+        md: "h-10 pl-3 text-sm",
+        lg: "h-12 pl-4 text-base",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+)
 
 /**
  * Select 컴포넌트의 props / Select component props
- * @typedef {Object} SelectProps
- * @property {"default" | "outline" | "filled" | "ghost" | "glass"} [variant="default"] - Select 스타일 변형 / Select style variant
- * @property {"sm" | "md" | "lg"} [size="md"] - Select 크기 / Select size
- * @property {boolean} [error=false] - 에러 상태 표시 / Error state
- * @property {boolean} [success=false] - 성공 상태 표시 / Success state
- * @property {React.ReactNode} [leftIcon] - 왼쪽 아이콘 / Left icon
- * @property {string} [placeholder] - 플레이스홀더 텍스트 / Placeholder text
- * @extends {Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'>}
  */
 export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
   variant?: "default" | "outline" | "filled" | "ghost" | "glass"
@@ -88,28 +106,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     "aria-invalid": ariaInvalid,
     ...props 
   }, ref) => {
-    const variantClasses = {
-      default: "border-gray-300 bg-white text-gray-900 focus:border-ring focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-ring dark:focus:ring-ring",
-      outline: "border-2 border-gray-300 bg-transparent text-gray-900 focus:border-ring focus:ring-ring dark:border-gray-500 dark:text-white dark:focus:border-ring dark:focus:ring-ring",
-      filled: "border-transparent bg-gray-50 text-gray-900 focus:bg-white focus:border-ring focus:ring-ring dark:bg-gray-700 dark:text-white dark:focus:bg-gray-800 dark:focus:border-ring dark:focus:ring-ring",
-      ghost: "border-transparent bg-transparent text-gray-900 focus:bg-gray-50 focus:border-gray-300 focus:ring-gray-500 dark:text-white dark:focus:bg-gray-800 dark:focus:border-gray-600 dark:focus:ring-gray-400",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:border-ring/50 focus:ring-ring/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:focus:border-ring/50 dark:focus:ring-ring/20 dark:focus:bg-slate-700/20"
-    }
-
-    // Spacing system: 4px grid - matching Input component
-    // pr-10 is added separately for arrow icon space
-    const sizeClasses = {
-      sm: "h-8 pl-2 text-sm",
-      md: "h-10 pl-3 text-sm",
-      lg: "h-12 pl-4 text-base"
-    }
-
-    const stateClasses = error 
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400"
-      : success
-      ? "border-green-500 focus:border-green-500 focus:ring-green-500 dark:border-green-400 dark:focus:border-green-400 dark:focus:ring-green-400"
-      : ""
-
     const selectRef = React.useRef<HTMLSelectElement>(null)
     const combinedRef = React.useCallback((node: HTMLSelectElement | null) => {
       selectRef.current = node
@@ -125,22 +121,18 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="relative">
         {leftIcon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none z-10">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none z-10">
             {leftIcon}
           </div>
         )}
         <select
           ref={combinedRef}
           className={merge(
-            "flex w-full appearance-none rounded-md border transition-all duration-200",
-            "focus:outline-none focus:ring-1 focus:ring-offset-2",
-            "hover:border-indigo-400 hover:shadow-sm",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-300",
-            variantClasses[variant],
-            sizeClasses[size],
-            stateClasses,
+            selectVariants({ variant, size }),
+            error && FORM_STATE.error,
+            success && FORM_STATE.success,
             leftIcon ? "pl-10" : "",
-            "pr-10", // 화살표 아이콘을 위한 공간
+            "pr-10",
             className
           )}
           aria-label={ariaLabel || (placeholder ? undefined : "선택")}
@@ -168,7 +160,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           isFocused && "rotate-180"
         )}>
           <svg
-            className="w-4 h-4 text-gray-500 dark:text-gray-400"
+            className="w-4 h-4 text-muted-foreground"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
