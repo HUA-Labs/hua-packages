@@ -1,37 +1,43 @@
 # Icon System
 
-HUA UI 패키지는 여러 아이콘 라이브러리를 지원합니다.
+HUA UI 아이콘 시스템. 여러 프로바이더를 지원하며 Phosphor가 기본값입니다.
 
 ## 지원하는 아이콘 프로바이더
 
-### 1. Lucide Icons (기본값)
-- **패키지**: `lucide-react` (이미 포함됨)
-- **사용법**: 기본값으로 사용됩니다.
+### 1. Phosphor Icons (기본값)
+- **패키지**: `@phosphor-icons/react` (이미 포함됨, 별도 설치 불필요)
+- **사용법**: 기본 프로바이더로 동작
 
 ```tsx
 import { Icon } from '@hua-labs/ui'
 
-<Icon name="home" />
-<Icon name="user" />
+<Icon name="house" />
+<Icon name="user" size={32} />
+<Icon name="gear" variant="primary" />
 ```
 
-### 2. Phosphor Icons
-- **패키지**: `@phosphor-icons/react` (선택적 설치)
-- **설치**: `pnpm add @phosphor-icons/react`
-- **사용법**: `provider` prop 사용
+### 2. Lucide Icons (deprecated)
+- **상태**: deprecated - 하위 호환성 유지 중, 향후 제거 예정
+- **설치**: `pnpm add lucide-react` (레거시 lucide provider가 필요한 경우만)
+- **사용법**: `provider="lucide"` 명시 필요
 
 ```tsx
 import { Icon } from '@hua-labs/ui'
 
-<Icon name="house" provider="phosphor" />
-<Icon name="user" provider="phosphor" />
+// lucide를 쓰려면 provider를 명시해야 함
+<Icon name="home" provider="lucide" />
 ```
 
 ### 3. Iconsax Icons
-- **상태**: 준비 중
-- **타입**: SVG 기반
-- **사용법**: CSS 클래스 또는 커스텀 렌더링
-- **참고**: Iconsax Icons는 SVG 파일로 제공되므로, 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
+- **상태**: 구현 완료
+- **진입점**: `@hua-labs/ui/iconsax` (별도 entry, 코어 번들에 미포함)
+- **용도**: hua-docs 아이콘 갤러리 등에서 사용
+
+```tsx
+import { IconsaxIcon } from '@hua-labs/ui/iconsax'
+
+<IconsaxIcon name="Home2" />
+```
 
 ## Icon 컴포넌트 사용법
 
@@ -39,19 +45,13 @@ import { Icon } from '@hua-labs/ui'
 ```tsx
 import { Icon } from '@hua-labs/ui'
 
-<Icon name="home" size={24} />
+<Icon name="house" size={24} />
 <Icon name="user" size={32} variant="primary" />
-```
-
-### Phosphor Icons 사용
-```tsx
-<Icon name="house" provider="phosphor" size={24} />
-<Icon name="gear" provider="phosphor" variant="primary" />
 ```
 
 ### 애니메이션
 ```tsx
-<Icon name="loader" spin />
+<Icon name="spinner" spin />
 <Icon name="heart" pulse />
 <Icon name="bell" bounce />
 ```
@@ -65,34 +65,28 @@ import { Icon } from '@hua-labs/ui'
 
 ## 아이콘 이름 매핑
 
-일부 아이콘은 프로바이더별로 이름이 다를 수 있습니다:
+프로바이더별로 아이콘 이름이 다를 수 있습니다:
 
-| 일반 이름 | Lucide | Phosphor |
-|---------|--------|----------|
-| home | `home` | `house` |
-| settings | `settings` | `gear` |
-| user | `user` | `user` |
+| 일반 이름 | Phosphor (기본) | Lucide (deprecated) | Iconsax |
+|---------|----------------|---------------------|---------|
+| home | `House` | `Home` | `Home2` |
+| settings | `Gear` | `Settings` | - |
+| user | `User` | `User` | `User` |
 
 자동 매핑이 지원되지만, 필요시 `getIconNameForProvider` 함수를 사용할 수 있습니다.
 
-## Phosphor Icons 설치
+## 설치 안내
 
-Phosphor Icons를 사용하려면 패키지를 설치해야 합니다:
-
-```bash
-cd packages/hua-ui
-pnpm add @phosphor-icons/react
-```
-
-또는 루트에서:
+- **Phosphor**: 이미 `@hua-labs/ui` 의존성에 포함. 별도 설치 불필요.
+- **Lucide**: 레거시 lucide provider가 필요한 경우만 설치
 
 ```bash
-pnpm add @phosphor-icons/react --filter @hua-labs/ui
+pnpm add lucide-react --filter <your-app>
 ```
 
 ## 주의사항
 
-1. **Phosphor Icons는 선택적 의존성**입니다. 사용하지 않으면 설치할 필요가 없습니다.
-2. **Iconsax Icons**는 현재 준비 중이며, SVG 기반이므로 구현 시 직접 SVG를 사용하거나 별도 컴포넌트로 구현해야 합니다.
-3. **서버 사이드 렌더링**: 모든 아이콘은 클라이언트 사이드에서만 렌더링됩니다 (hydration 오류 방지).
-
+1. **Phosphor가 기본 프로바이더**입니다. `provider` prop 없이 사용하면 Phosphor로 렌더링됩니다.
+2. **Lucide는 deprecated**입니다. 기존 코드는 동작하지만 신규 코드에서는 Phosphor를 사용하세요.
+3. **Iconsax는 별도 entry**(`@hua-labs/ui/iconsax`)로 제공되며 코어 번들 사이즈에 영향을 주지 않습니다.
+4. **SSR**: 모든 아이콘은 클라이언트에서만 렌더링됩니다 (`isClient` guard로 hydration 안전성 확보).

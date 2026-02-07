@@ -1,7 +1,7 @@
 # HUA UI 아키텍처 문서
 
-**작성일**: 2026-01-11
-**버전**: 1.1.0
+**작성일**: 2026-02-06
+**버전**: 1.2.0
 
 ---
 
@@ -56,6 +56,7 @@ HUA UI는 다음 원칙에 따라 설계되었습니다:
 packages/hua-ui/
 ├── src/
 │   ├── index.ts              # Core 엔트리 포인트
+│   ├── iconsax.ts            # Iconsax 전용 엔트리 포인트
 │   ├── form.ts                # Form 서브패키지
 │   ├── navigation.ts          # Navigation 서브패키지
 │   ├── feedback.ts            # Feedback 서브패키지
@@ -335,19 +336,20 @@ className="bg-white dark:bg-gray-800"
 
 ### 지원 라이브러리
 
-1. **Lucide React** (기본, 포함됨)
-2. **Phosphor Icons** (선택사항, `@phosphor-icons/react` 필요)
+1. **Phosphor Icons** (기본, `@phosphor-icons/react` 포함)
+2. **Lucide Icons** (deprecated, 하위호환 유지)
+3. **Iconsax Icons** (별도 entry `@hua-labs/ui/iconsax`, docs 전용)
 
 ### Icon 컴포넌트
 
 ```tsx
 import { Icon } from '@hua-labs/ui';
 
-// Lucide 아이콘 (기본)
+// Phosphor 아이콘 (기본)
 <Icon name="heart" />
 
-// Phosphor 아이콘
-<Icon name="heart" provider="phosphor" />
+// Lucide 아이콘 (deprecated, 하위호환)
+<Icon name="heart" set="lucide" />
 ```
 
 ### IconProvider
@@ -355,10 +357,26 @@ import { Icon } from '@hua-labs/ui';
 글로벌 아이콘 설정:
 
 ```tsx
-<IconProvider defaultProvider="lucide">
+// Phosphor가 기본이므로 별도 설정 불필요
+<IconProvider>
+  <App />
+</IconProvider>
+
+// Lucide를 기본으로 사용해야 하는 경우 (deprecated)
+<IconProvider set="lucide">
   <App />
 </IconProvider>
 ```
+
+### Iconsax 엔트리
+
+docs 전용 아이콘 세트. 별도 엔트리 포인트로 분리되어 일반 앱 번들에 영향 없음:
+
+```tsx
+import { SomeIcon } from '@hua-labs/ui/iconsax';
+```
+
+> Iconsax는 lazy resolver 패턴을 사용하여 필요한 아이콘만 로드됨
 
 ### 아이콘 타입
 
@@ -388,6 +406,7 @@ import { Icon } from '@hua-labs/ui';
 // tsup.config.ts
 const entry = {
   index: 'src/index.ts',
+  iconsax: 'src/iconsax.ts',
   form: 'src/form.ts',
   navigation: 'src/navigation.ts',
   feedback: 'src/feedback.ts',
@@ -396,6 +415,8 @@ const entry = {
   'advanced-motion': 'src/advanced/motion.ts',
 };
 ```
+
+> `"use client"` directive는 tsup의 `banner` 옵션으로 자동 추가됨 (별도 post-build 스크립트 불필요)
 
 ### 빌드 명령어
 
@@ -419,16 +440,18 @@ pnpm build:analyze
 - `react` (>=19.0.0)
 - `react-dom` (>=19.0.0)
 
-### 선택적 의존성
-
-- `@phosphor-icons/react` - Phosphor 아이콘 지원
-
 ### 내부 의존성
 
+- `@phosphor-icons/react` - 기본 아이콘 라이브러리
 - `@hua-labs/motion` - 모션 애니메이션 (Advanced 컴포넌트)
 - `clsx` - 클래스 병합
 - `tailwind-merge` - Tailwind 클래스 병합
-- `lucide-react` - 기본 아이콘 라이브러리
+
+### 선택적 의존성 (deprecated)
+
+- `lucide-react` - 레거시 아이콘 라이브러리 (하위호환 유지, 신규 사용 비권장)
+
+> Iconsax 아이콘은 lazy resolver 패턴을 사용하여 별도의 의존성 설치 없이 동작
 
 ### 의존성 규칙
 
@@ -486,5 +509,5 @@ pnpm test:coverage
 ---
 
 **작성자**: Auto (AI Assistant)  
-**최종 업데이트**: 2026-01-11
+**최종 업데이트**: 2026-02-06
 

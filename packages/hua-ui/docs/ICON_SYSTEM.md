@@ -5,27 +5,48 @@
 ### 아키텍처
 - **Provider 패턴**: React Context API 기반
 - **상태관리**: 서비스 레벨에서 Zustand 등으로 관리 (패키지 의존성 없음)
-- **지원 세트**: Lucide (기본), Phosphor, Iconsax (준비 중)
+- **기본 Provider**: Phosphor (`@phosphor-icons/react`)
+- **지원 세트**: Phosphor (기본), Lucide (deprecated, 하위호환), Iconsax (별도 entry)
 - **기본 동작**: IconProvider 없이도 사용 가능 (기본값 자동 적용)
+
+### Provider 요약
+
+| Provider | 상태 | 패키지 | 위치 |
+|----------|------|--------|------|
+| **Phosphor** | 기본 (default) | `@phosphor-icons/react` (dependencies) | icons.ts SSR import |
+| **Lucide** | deprecated (하위호환) | `lucide-react` (devDependencies) | lazy load on demand |
+| **Iconsax** | 구현 완료 (별도 entry) | `@hua-labs/ui/iconsax` | iconsax.ts entry point |
 
 ### 파일 구조
 ```
-hua-ui/src/components/Icon/
-├── Icon.tsx           # Icon 컴포넌트
-├── IconProvider.tsx   # Context Provider
-├── icon-store.ts      # 타입 정의 및 기본값
-└── index.ts           # 통합 export
+hua-ui/src/
+├── components/Icon/
+│   ├── Icon.tsx             # Main Icon 컴포넌트 (React.memo, forwardRef)
+│   ├── IconProvider.tsx     # Context Provider (phosphor/lucide/iconsax)
+│   ├── icon-store.ts        # 타입 정의 및 기본값
+│   └── index.ts             # 통합 export
+├── lib/
+│   ├── icons.ts             # Phosphor 아이콘 정적 import (SSR-safe, /dist/ssr)
+│   ├── icon-providers.ts    # Provider 시스템 (phosphor/lucide/iconsax)
+│   ├── icon-aliases.ts      # 아이콘 이름 alias 매핑
+│   ├── icon-names.ts        # 아이콘 이름 타입 (AllIconName = IconName | ProjectIconName)
+│   ├── normalize-icon-name.ts # 이름 정규화 (kebab/snake/PascalCase → camelCase + alias 해결)
+│   ├── case-utils.ts        # 케이스 변환 유틸리티 (toCamelCase, toPascalCase)
+│   └── iconsax-loader.ts    # Iconsax SVG 로딩 (별도 entry에서만 사용)
+└── iconsax.ts               # Iconsax entry point (@hua-labs/ui/iconsax)
 ```
 
 ### 주요 기능
-- 전역 아이콘 설정 (Provider)
-- 다중 아이콘 세트 지원 (Lucide, Phosphor)
+- 전역 아이콘 설정 (IconProvider Context)
+- 다중 아이콘 세트 지원 (Phosphor, Lucide, Iconsax)
 - 세트별 자동 매핑 (PROJECT_ICONS)
-- Tree-shaking 지원
-- SSR 안전 (hydration 방지)
+- 아이콘 이름 alias 시스템 (300+ alias)
+- 이름 정규화 (kebab-case, snake_case, PascalCase 자동 변환)
+- SSR 안전 (서버: 빈 span, 클라이언트: 아이콘 교체)
 - 애니메이션 지원 (spin, pulse, bounce)
 - Variant 지원 (primary, success, error 등)
 - 감정/상태 아이콘 매핑
+- React.memo 기반 최적화
 
 ## 사용법
 
@@ -135,9 +156,8 @@ const useAppStore = create((set) => ({
     weight: 'regular' as const,
     size: 20,
     color: 'currentColor',
-    strokeWidth: 1.25,
   },
-  updateIconConfig: (config: Partial<IconConfig>) => 
+  updateIconConfig: (config: Partial<IconConfig>) =>
     set((state) => ({
       iconConfig: { ...state.iconConfig, ...config }
     }))
@@ -146,7 +166,7 @@ const useAppStore = create((set) => ({
 // App에서 사용
 function App() {
   const iconConfig = useAppStore(state => state.iconConfig)
-  
+
   return (
     <IconProvider {...iconConfig}>
       <YourApp />
@@ -159,9 +179,9 @@ function App() {
 
 ```tsx
 // Provider 설정을 오버라이드
-<Icon 
-  name="heart" 
-  provider="lucide"  // 전역 설정 무시
+<Icon
+  name="heart"
+  provider="iconsax"  // 전역 설정 무시
   size={32}           // 전역 size 무시
   weight="bold"       // Phosphor weight 오버라이드
 />
@@ -196,28 +216,28 @@ function App() {
 
 | emotion | 매핑된 아이콘 | 설명 |
 |---------|--------------|------|
-| `happy` | `smile` | 행복한 표정 |
-| `sad` | `frown` | 슬픈 표정 |
-| `neutral` | `meh` | 무표정 |
-| `excited` | `laugh` | 신나는 표정 |
-| `angry` | `angry` | 화난 표정 |
-| `love` | `heart` | 하트 아이콘 |
-| `like` | `thumbsUp` | 좋아요 |
-| `dislike` | `thumbsDown` | 싫어요 |
+| `happy` | `smile` (Smiley) | 행복한 표정 |
+| `sad` | `frown` (SmileySad) | 슬픈 표정 |
+| `neutral` | `meh` (SmileyMeh) | 무표정 |
+| `excited` | `smile` (Smiley) | 신나는 표정 |
+| `angry` | `frown` (SmileySad) | 화난 표정 |
+| `love` | `heart` (Heart) | 하트 아이콘 |
+| `like` | `heart` (Heart) | 좋아요 |
+| `dislike` | `frown` (SmileySad) | 싫어요 |
 
 #### 상태 아이콘 매핑표
 
 | status | 매핑된 아이콘 | 설명 |
 |--------|--------------|------|
-| `loading` | `loader` | 로딩 중 |
-| `success` | `success` (checkCircle) | 성공 |
-| `error` | `error` (xCircle) | 에러 |
-| `warning` | `warning` (alertCircle) | 경고 |
-| `info` | `info` | 정보 |
-| `locked` | `lock` | 잠금 |
-| `unlocked` | `unlock` | 잠금 해제 |
-| `visible` | `eye` | 보임 |
-| `hidden` | `eyeOff` | 숨김 |
+| `loading` | `loader` (SpinnerGap) | 로딩 중 |
+| `success` | `success` (CheckCircle) | 성공 |
+| `error` | `error` (XCircle) | 에러 |
+| `warning` | `warning` (WarningCircle) | 경고 |
+| `info` | `info` (Info) | 정보 |
+| `locked` | `lock` (Lock) | 잠금 |
+| `unlocked` | `unlock` (LockOpen) | 잠금 해제 |
+| `visible` | `eye` (Eye) | 보임 |
+| `hidden` | `eyeOff` (EyeSlash) | 숨김 |
 
 ### 8. 특화된 아이콘 컴포넌트
 
@@ -233,24 +253,42 @@ import { LoadingIcon, SuccessIcon, ErrorIcon, EmotionIcon, StatusIcon } from '@h
 
 ## 지원하는 아이콘 세트
 
-### Lucide Icons (기본)
-- **패키지**: `lucide-react` (의존성 포함)
-- **특징**: strokeWidth 기반
-- **기본값**: strokeWidth 1.25
-
-### Phosphor Icons
-- **패키지**: `@phosphor-icons/react` (peerDependency)
+### Phosphor Icons (기본)
+- **패키지**: `@phosphor-icons/react` (dependencies)
+- **import**: `@phosphor-icons/react/dist/ssr` (SSR-safe)
 - **특징**: weight 기반 (thin, light, regular, bold, duotone, fill)
-- **기본값**: weight "regular"
-- **설치**: `pnpm add @phosphor-icons/react`
+- **기본값**: weight `"regular"`, size `20`
+- **해결 순서**:
+  1. `icons.ts` 정적 import에서 찾기 (Phosphor SSR 컴포넌트)
+  2. `PROJECT_ICONS` 매핑에서 fallback
+  3. `initPhosphorIcons()` 동적 namespace lookup (클라이언트 전용)
 
-### Iconsax Icons
-- **상태**: 준비 중
-- **특징**: SVG 기반
-- **API 차이점**: 
-  - `weight` prop 지원 안 함 (Phosphor 전용)
-  - `strokeWidth` 사용 (Lucide와 동일)
-  - Provider에서 `weight` 설정 시 무시되고 `strokeWidth` 사용
+### Lucide Icons (deprecated)
+- **패키지**: `lucide-react` (devDependencies로 이동됨)
+- **상태**: deprecated, 하위호환용으로만 유지
+- **로딩**: `initLucideIcons()` 호출 시에만 lazy load (@deprecated 표시됨)
+- **향후**: 제거 예정
+
+### Iconsax Icons (별도 entry)
+- **entry**: `@hua-labs/ui/iconsax`
+- **상태**: 구현 완료 (별도 entry point로 분리)
+- **패턴**: lazy resolver (`registerIconsaxResolver()` / `getIconsaxResolver()`)
+- **코어 번들**: 포함되지 않음 (iconsax entry import 시에만 로드)
+- **변형**: `line` (기본) | `bold` 지원
+- **주 사용처**: hua-docs 아이콘 갤러리
+
+**Iconsax 사용법:**
+```tsx
+// 1. iconsax entry import (resolver 자동 등록)
+import '@hua-labs/ui/iconsax'
+
+// 2. Icon 컴포넌트에서 iconsax 사용
+<Icon name="home" provider="iconsax" />
+
+// 3. 갤러리 컴포넌트 사용
+import { IconsaxGallery } from '@hua-labs/ui/iconsax'
+<IconsaxGallery />
+```
 
 ## API Reference
 
@@ -258,8 +296,9 @@ import { LoadingIcon, SuccessIcon, ErrorIcon, EmotionIcon, StatusIcon } from '@h
 
 ```tsx
 interface IconProviderProps {
-  set?: 'lucide' | 'phosphor' | 'iconsax'  // 기본: 'phosphor'
+  set?: 'phosphor' | 'lucide' | 'iconsax'  // 기본: 'phosphor'
   weight?: 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'  // 기본: 'regular'
+  iconsaxVariant?: 'line' | 'bold'  // Iconsax 변형, 기본: 'line'
   size?: number  // 기본: 20
   color?: string  // 기본: 'currentColor'
   strokeWidth?: number  // Lucide/Iconsax용, 기본: 1.25
@@ -271,18 +310,20 @@ interface IconProviderProps {
 
 ```tsx
 interface IconProps {
-  name: IconName  // 필수
+  name: AllIconName  // 필수 (IconName | ProjectIconName)
   size?: number | string  // Provider 설정 오버라이드
   className?: string
   emotion?: 'happy' | 'sad' | 'neutral' | 'excited' | 'angry' | 'love' | 'like' | 'dislike'
   status?: 'loading' | 'success' | 'error' | 'warning' | 'info' | 'locked' | 'unlocked' | 'visible' | 'hidden'
-  provider?: IconSet  // Provider 설정 오버라이드
+  provider?: 'phosphor' | 'lucide' | 'iconsax'  // Provider 설정 오버라이드
   weight?: PhosphorWeight  // Phosphor weight 오버라이드
   animated?: boolean
   pulse?: boolean
   spin?: boolean
   bounce?: boolean
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'muted'
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'muted' | 'inherit'
+  'aria-label'?: string  // 스크린 리더용 라벨
+  'aria-hidden'?: boolean  // 장식용 아이콘
 }
 ```
 
@@ -290,12 +331,13 @@ interface IconProps {
 
 ### PROJECT_ICONS 매핑
 
-아이콘 이름은 `PROJECT_ICONS`에서 자동 매핑됩니다:
+아이콘 이름은 `PROJECT_ICONS`에서 프로바이더별로 자동 매핑됩니다:
 
 ```tsx
-// 예시
-'home' → Lucide: 'Home', Phosphor: 'House'
-'settings' → Lucide: 'Settings', Phosphor: 'Gear'
+// 예시 (icon-providers.ts)
+'home' → { lucide: 'Home', phosphor: 'House', iconsax: 'Home2' }
+'settings' → { lucide: 'Settings', phosphor: 'Gear' }
+'search' → { lucide: 'Search', phosphor: 'MagnifyingGlass', iconsax: 'SearchNormal' }
 ```
 
 ### Icon Alias 시스템
@@ -312,80 +354,107 @@ interface IconProps {
 ```
 
 **주요 Alias:**
-- Navigation: `back`, `prev`, `previous` → `arrowLeft`
-- Actions: `plus`, `new` → `add` / `remove`, `trash` → `delete`
-- Status: `spinner`, `loading` → `loader` / `checkmark` → `success`
-- User: `person`, `account`, `profile` → `user`
-- Settings: `gear`, `config`, `preferences` → `settings`
+- Navigation: `back`, `prev`, `previous` -> `arrowLeft`
+- Actions: `plus`, `new` -> `add` / `remove`, `trash` -> `delete`
+- Status: `spinner`, `loading` -> `loader` / `checkmark` -> `success`
+- User: `person`, `account`, `profile` -> `user`
+- Settings: `gear`, `config`, `preferences`, `prefs` -> `settings`
+- kebab-case: `arrow-left` -> `arrowLeft`, `check-circle` -> `checkCircle` (자동 변환)
 
 **Alias 확인:**
 ```tsx
 import { resolveIconAlias, getIconAliases } from '@hua-labs/ui'
 
 // Alias 해결 (역방향 매핑)
-const actualName1 = resolveIconAlias('back')         // 'arrowLeft'
-const actualName2 = resolveIconAlias('gear')        // 'settings'
-const actualName3 = resolveIconAlias('preferences') // 'settings'
-const actualName4 = resolveIconAlias('spinner')     // 'loader'
-const actualName5 = resolveIconAlias('email')      // 'mail'
+resolveIconAlias('back')         // 'arrowLeft'
+resolveIconAlias('gear')         // 'settings'
+resolveIconAlias('spinner')      // 'loader'
+resolveIconAlias('email')        // 'mail'
 
 // 특정 아이콘의 모든 alias 가져오기
-const aliases1 = getIconAliases('arrowLeft')
-// ['back', 'prev', 'previous']
-
-const aliases2 = getIconAliases('settings')
-// ['gear', 'config', 'preferences', 'prefs']
+getIconAliases('arrowLeft')      // ['back', 'prev', 'previous']
+getIconAliases('settings')       // ['gear', 'config', 'preferences', 'prefs']
 ```
 
 자세한 내용은 [Icon Autocomplete Guide](./ICON_AUTOCOMPLETE.md#icon-alias-시스템)를 참고하세요.
 
-### 매핑되지 않은 아이콘 사용
+### 아이콘 해결 순서 (Phosphor provider)
 
-**매핑되지 않은 아이콘도 사용 가능합니다!**
+Icon 컴포넌트가 아이콘을 찾는 순서:
+
+1. **이름 정규화**: `normalizeIconName()` -- kebab/snake/PascalCase -> camelCase, alias 해결
+2. **`icons.ts` 정적 import**: Phosphor SSR 컴포넌트에서 먼저 검색 (가장 빠름)
+3. **`PROJECT_ICONS` 매핑**: 프로바이더별 매핑 테이블에서 fallback 조회
+4. **동적 namespace lookup**: `initPhosphorIcons()` 로 로드된 전체 Phosphor 모듈에서 검색
 
 ```tsx
-// icons.ts에 없는 아이콘도 동적으로 로드됨
-<Icon name="someNewIcon" />  // 동적 로딩
+// icons.ts에 없는 아이콘도 사용 가능 (동적 fallback)
+<Icon name="someNewIcon" />  // 3단계/4단계에서 동적으로 해결
 ```
 
-**동작 방식:**
-1. 먼저 `icons.ts`에서 찾기 (실제 사용되는 아이콘만 포함)
-2. 없으면 `PROJECT_ICONS`에서 매핑 확인
-3. 없으면 동적으로 Lucide에서 가져오기 (fallback)
+## SSR (Server-Side Rendering)
 
-**장점:**
-- 번들 크기 최적화 (실제 사용되는 아이콘만 포함)
-- 새로운 아이콘도 즉시 사용 가능
-- 점진적 마이그레이션 가능
+### 현재 구현
+- 모든 아이콘은 **hydration mismatch 방지**를 위해 `isClient` 가드 사용
+- SSR 시 빈 `<span>` 요소가 렌더링되고, 클라이언트에서 실제 아이콘으로 교체
+- Phosphor icons: `@phosphor-icons/react/dist/ssr`에서 정적 import하지만, hydration 안전을 위해 클라이언트 가드 유지
+
+### 세트별 SSR 지원
+
+| 세트 | SSR import | 실제 렌더링 |
+|------|-----------|------------|
+| **Phosphor** | `/dist/ssr` 정적 import | 클라이언트 전용 (isClient 가드) |
+| **Lucide** | lazy load (deprecated) | 클라이언트 전용 |
+| **Iconsax** | resolver 패턴 | 클라이언트 전용 |
+
+### 권장사항
+- Next.js App Router 사용 시 `'use client'` 지시어 필요
+- SSR이 중요한 경우, 아이콘 영역에 스켈레톤 UI 추가 고려
+- tsup 빌드 시 `"use client"` 배너가 모든 JS 파일에 자동 추가됨
+
+## 빌드 시스템
+
+### tsup 설정
+- **`"use client"` 배너**: `addUseClientDirective()` 함수로 모든 JS 파일에 자동 추가 (post-build script 불필요)
+- **코어 번들**: ESM + CJS, splitting 지원
+- **Iconsax 번들**: 별도 entry (`iconsax.ts`), splitting 없음 (600+ chunks 방지)
+- **코어 dist**: ~106 files (기존 3,135에서 대폭 감소)
+- **external**: `react`, `react-dom`, `lucide-react`, `@phosphor-icons/react` 등
+
+### entry points
+
+| Entry | 경로 | 설명 |
+|-------|------|------|
+| `@hua-labs/ui` | `src/index.ts` | 코어 (Icon, IconProvider 포함) |
+| `@hua-labs/ui/iconsax` | `src/iconsax.ts` | Iconsax (resolver 자동 등록) |
+| `@hua-labs/ui/advanced` | `src/advanced.ts` | 고급 컴포넌트 |
+| `@hua-labs/ui/form` | `src/form.ts` | 폼 컴포넌트 |
+| `@hua-labs/ui/navigation` | `src/navigation.ts` | 네비게이션 컴포넌트 |
+| `@hua-labs/ui/feedback` | `src/feedback.ts` | 피드백 컴포넌트 |
+
+### sideEffects
+
+```json
+{
+  "sideEffects": [
+    "**/*.css",
+    "./dist/iconsax.mjs",
+    "./dist/iconsax.js"
+  ]
+}
+```
+
+Iconsax entry는 import 시 `registerIconsaxResolver()`를 실행하므로 side effect로 표시됨.
 
 ## 주의사항
 
-### SSR (Server-Side Rendering)
-
-**현재 구현:**
-- 모든 아이콘은 **hydration mismatch 방지**를 위해 클라이언트에서만 렌더링됩니다
-- SSR 시 빈 `<span>` 요소가 렌더링되고, 클라이언트에서 실제 아이콘으로 교체됩니다
-
-**세트별 SSR 지원:**
-- **Lucide**: SSR-safe (하지만 현재는 클라이언트 전용으로 제한)
-- **Phosphor**: Dynamic import 사용 (SSR 시 클라이언트에서만 로드)
-- **Iconsax**: SVG 기반이므로 SSR 가능 (구현 시)
-
-**권장사항:**
-- Next.js App Router 사용 시 `'use client'` 지시어 필요
-- SSR이 중요한 경우, 아이콘 영역에 스켈레톤 UI 추가 고려
-
-### Phosphor 초기화
-- Phosphor Icons는 동적 로딩으로 약간의 지연 가능
-- 첫 사용 시에만 로드되며, 이후 캐시됨
-
-### Provider 필수
+### Provider 필수 여부
 - IconProvider 없이 사용하면 기본값 사용 (`phosphor`, `regular`, `size: 20`)
 - 서비스 레벨에서 Zustand 등으로 관리 권장
 
 ### 타입 안전성
-- `IconName` 타입으로 아이콘 이름 제한
-- 존재하지 않는 아이콘 사용 시 콘솔 경고
+- `AllIconName` 타입으로 아이콘 이름 제한 (`IconName | ProjectIconName`)
+- 존재하지 않는 아이콘 사용 시 콘솔 경고 + `?` placeholder 렌더링
 
 ### Variant/Animated와 Tailwind CSS 충돌
 
@@ -403,29 +472,19 @@ const aliases2 = getIconAliases('settings')
 <Icon name="loader" spin className="animate-pulse" />
 ```
 
-### Tree-shaking 지원
-
-**세트별 Tree-shaking 상태:**
+### Tree-shaking
 
 | 세트 | Tree-shaking | 설명 |
 |------|-------------|------|
-| **Lucide** | 완전 지원 | ESM 기반, 사용하지 않는 아이콘 자동 제거 |
-| **Phosphor** | ESM/Dynamic | Dynamic import 사용 시 선택적 로딩 |
-| **Iconsax** | 제한적 | SVG 파일 기반이므로 번들러 설정 필요 |
+| **Phosphor** | 정적 import 최적화 | `icons.ts`에서 필요한 아이콘만 import, 나머지는 동적 fallback |
+| **Lucide** | lazy load | `initLucideIcons()` 호출 시에만 전체 모듈 로드 (deprecated) |
+| **Iconsax** | 별도 entry 분리 | 코어 번들에 포함되지 않음, import 시에만 로드 |
 
-**최적화 팁:**
-- Lucide: 자동으로 tree-shaking 됨
-- Phosphor: Dynamic import로 필요한 아이콘만 로드
-- Iconsax: SVG 파일을 개별 import하여 번들러가 최적화하도록 설정
-
-## 완료된 개선사항
-
-1. 파일 구조 정리 (Icon 폴더로 통합)
-2. Context API 기반 Provider 구현
-3. 서비스 레벨 상태관리 지원 (Zustand 등)
-4. 타입 정의 정리
-5. strokeWidth 기본값 함수 추가
-6. 통합 export (index.ts)
+### Lucide 마이그레이션 참고
+- `lucide-react`는 `devDependencies`로 이동됨 (런타임 의존성 아님)
+- `initLucideIcons()`는 `@deprecated` 표시
+- 기존 `provider="lucide"` 코드는 아직 동작하지만 향후 제거 예정
+- 새 코드에서는 반드시 Phosphor 사용
 
 ## 타입 자동 생성
 
@@ -441,38 +500,45 @@ pnpm generate:icon-types
 **동작 방식:**
 1. `src/lib/icons.ts` 파일을 스캔
 2. `icons` 객체의 모든 키를 추출
-3. `src/lib/icon-names.generated.ts` 파일 생성
-
-**장점:**
-- 이름 충돌 방지
-- 업데이트 누락 방지
-- 오타 방지
-- 타입 안전성 향상
+3. 타입 파일 생성
 
 **주의사항:**
 - 생성된 파일은 자동 생성 파일이므로 수동 수정 금지
 - 아이콘 추가/삭제 후 스크립트 재실행 필요
 
+## 완료된 개선사항
+
+1. 파일 구조 정리 (Icon 폴더로 통합)
+2. Context API 기반 Provider 구현
+3. 서비스 레벨 상태관리 지원 (Zustand 등)
+4. 타입 정의 정리 (AllIconName, ProjectIconName)
+5. Phosphor Icons를 기본 provider로 전환
+6. Phosphor SSR-safe import (`/dist/ssr`)
+7. Iconsax Icons 구현 (별도 entry point)
+8. Iconsax lazy resolver 패턴 (`registerIconsaxResolver` / `getIconsaxResolver`)
+9. Lucide를 devDependencies로 이동, deprecated 처리
+10. Untitled provider 제거
+11. tsup 빌드 최적화 (`"use client"` 배너, 코어/iconsax 분리)
+12. 코어 번들 크기 대폭 감소 (~106 files, 기존 3,135)
+13. 아이콘 이름 정규화 시스템 (normalize-icon-name.ts)
+14. 아이콘 alias 시스템 (icon-aliases.ts)
+15. React.memo 기반 Icon 컴포넌트 최적화
+16. 접근성 개선 (aria-label, aria-hidden)
+
 ## 향후 개선 계획
 
 ### 1. 기능 개선
-- [ ] Iconsax Icons 구현
 - [ ] 테마별 weight 자동 분기 (라이트/다크)
-- [ ] 아이콘 로딩 에러 처리 개선
-- [ ] Phosphor 초기화 캐싱
+- [ ] 아이콘 로딩 에러 처리 개선 (Suspense boundary)
+- [ ] Lucide provider 완전 제거 (breaking change)
 
 ### 2. 성능 최적화
-- [ ] 아이콘 컴포넌트 메모이제이션
-- [ ] 불필요한 리렌더링 방지
-- [ ] 아이콘 프리로딩 옵션
+- [ ] 아이콘 프리로딩 옵션 (Phosphor)
+- [ ] 불필요한 리렌더링 추가 방지
 
 ### 3. 문서화
-- [x] 감정/상태 아이콘 매핑표 추가
-- [x] SSR 주의사항 명확화
-- [x] Tree-shaking 체크리스트 추가
-- [x] Variant/Tailwind 충돌 설명 추가
-- [ ] 아이콘 목록 문서화
-- [ ] 마이그레이션 가이드
+- [ ] 아이콘 전체 목록 문서화
+- [ ] Lucide -> Phosphor 마이그레이션 가이드
 - [ ] Storybook 스토리 추가
 
 ### 4. 테스트
@@ -483,7 +549,16 @@ pnpm generate:icon-types
 
 ## 변경 이력
 
-### v1.0.0 (현재)
+### v1.1.0-alpha (현재)
+- Phosphor Icons를 기본 provider로 전환
+- `@phosphor-icons/react/dist/ssr` SSR-safe import
+- Iconsax Icons 구현 (별도 entry `@hua-labs/ui/iconsax`)
+- Lucide deprecated (devDependencies로 이동)
+- Untitled provider 제거
+- tsup 번들 최적화 (코어 ~106 files)
+- 아이콘 이름 정규화/alias 시스템 추가
+
+### v1.0.0
 - IconProvider 패턴 도입
 - Context API 기반 전역 설정
 - Phosphor Icons 지원

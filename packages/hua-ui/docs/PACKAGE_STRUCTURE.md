@@ -1,7 +1,7 @@
 # 패키지 구조 가이드
 
-**작성일**: 2026-01-11
-**버전**: 1.1.0
+**작성일**: 2026-02-06
+**버전**: 1.2.0
 
 ---
 
@@ -11,6 +11,7 @@
 packages/hua-ui/
 ├── src/                          # 소스 코드
 │   ├── index.ts                  # Core 엔트리 포인트
+│   ├── iconsax.ts                # Iconsax 엔트리 포인트 (docs only)
 │   ├── form.ts                   # Form 서브패키지
 │   ├── navigation.ts             # Navigation 서브패키지
 │   ├── feedback.ts               # Feedback 서브패키지
@@ -26,10 +27,13 @@ packages/hua-ui/
 │   ├── lib/                      # 유틸리티 및 헬퍼
 │   │   ├── utils.ts             # 공용 유틸리티
 │   │   ├── icons.ts             # 아이콘 정의
-│   │   ├── icon-providers.ts    # 아이콘 프로바이더
+│   │   ├── icon-providers.ts    # Phosphor (default) + Lucide (deprecated) + Iconsax (lazy resolver)
 │   │   ├── icon-aliases.ts      # 아이콘 별칭
 │   │   ├── icon-names.ts        # 아이콘 이름 관리
 │   │   ├── phosphor-icons.ts    # Phosphor 아이콘 매핑
+│   │   ├── normalize-icon-name.ts # 아이콘 이름 정규화
+│   │   ├── case-utils.ts        # 케이스 변환 유틸리티
+│   │   ├── iconsax-loader.ts    # Iconsax SVG 로딩
 │   │   ├── styles/              # 스타일 유틸리티
 │   │   │   ├── colors.ts        # 색상 정의
 │   │   │   ├── variants.ts      # 변형 정의
@@ -94,6 +98,15 @@ export { merge, mergeIf, mergeMap, cn, formatRelativeTime } from './lib/utils';
 export { Icon, IconProvider, useIconContext } from './components/Icon';
 export type { IconName, IconSet } from './lib/icons';
 ```
+
+---
+
+### Iconsax (`@hua-labs/ui/iconsax`)
+
+**역할**: Iconsax 아이콘 갤러리 전용 entry point (docs only)
+- 코어 번들에 포함되지 않음
+- hua-docs 아이콘 갤러리에서만 사용
+- `registerIconsaxResolver()`로 코어 Icon 컴포넌트에 lazy 연결
 
 ---
 
@@ -212,9 +225,23 @@ export { Bookmark, ChatMessage, EmotionAnalysis, ... } from './components/...';
 
 ### `src/lib/icon-providers.ts`
 아이콘 프로바이더 관리:
-- Lucide React 프로바이더
-- Phosphor Icons 프로바이더
+- Phosphor Icons 프로바이더 (default)
+- Lucide React 프로바이더 (deprecated)
+- Iconsax lazy resolver
 - 프로바이더 간 전환 로직
+
+### `src/lib/normalize-icon-name.ts`
+아이콘 이름 정규화:
+- 다양한 포맷의 아이콘 이름을 표준 형식으로 변환
+
+### `src/lib/case-utils.ts`
+케이스 변환 유틸리티:
+- PascalCase, camelCase, kebab-case 간 변환
+
+### `src/lib/iconsax-loader.ts`
+Iconsax SVG 로딩:
+- Iconsax 아이콘 SVG를 동적으로 로드
+- docs 갤러리 전용
 
 ### `src/lib/styles/`
 스타일 유틸리티:
@@ -245,6 +272,8 @@ export { Bookmark, ChatMessage, EmotionAnalysis, ... } from './components/...';
 ### Core
 - 다른 패키지에 의존하지 않음
 - React, React DOM만 필요
+- `@phosphor-icons/react` — 기본 아이콘 라이브러리
+- `lucide-react` — deprecated (devDependencies only)
 
 ### 서브패키지
 - Core에서 컴포넌트 import 가능
@@ -253,6 +282,14 @@ export { Bookmark, ChatMessage, EmotionAnalysis, ... } from './components/...';
 ### Advanced
 - `@hua-labs/motion` 의존
 - Core 컴포넌트 사용 가능
+
+---
+
+## 빌드 시스템
+
+- tsup 기반 빌드
+- `"use client"` directive는 tsup `banner` 옵션으로 빌드 시 자동 추가
+- 별도의 post-build 스크립트 불필요 (`scripts/add-use-client.js` 삭제됨)
 
 ---
 
@@ -273,6 +310,7 @@ export { Bookmark, ChatMessage, EmotionAnalysis, ... } from './components/...';
 ```
 dist/
 ├── index.js / index.mjs          # Core (ESM + CJS)
+├── iconsax.js / iconsax.mjs      # Iconsax entry (별도)
 ├── form.js / form.mjs            # Form 서브패키지
 ├── navigation.js / navigation.mjs # Navigation 서브패키지
 ├── feedback.js / feedback.mjs    # Feedback 서브패키지
@@ -293,6 +331,5 @@ dist/
 
 ---
 
-**작성자**: Auto (AI Assistant)  
-**최종 업데이트**: 2026-01-11
-
+**작성자**: Auto (AI Assistant)
+**최종 업데이트**: 2026-02-06
