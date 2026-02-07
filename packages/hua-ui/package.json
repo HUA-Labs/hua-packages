@@ -51,16 +51,6 @@
       "import": "./dist/sdui.mjs",
       "require": "./dist/sdui.js"
     },
-    "./components/*": {
-      "types": "./dist/components/*.d.ts",
-      "import": "./dist/components/*.mjs",
-      "require": "./dist/components/*.js"
-    },
-    "./components/advanced/*": {
-      "types": "./dist/components/advanced/*.d.ts",
-      "import": "./dist/components/advanced/*.mjs",
-      "require": "./dist/components/advanced/*.js"
-    },
     "./styles/base.css": "./src/styles/base.css",
     "./styles/toast.css": "./src/styles/toast.css",
     "./styles/codeblock.css": "./src/styles/codeblock.css",
