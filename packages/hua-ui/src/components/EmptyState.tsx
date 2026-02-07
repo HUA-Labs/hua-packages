@@ -37,34 +37,34 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantStyles = {
   default: {
-    container: "bg-gray-50/50 dark:bg-gray-900/50",
-    icon: "text-gray-400 dark:text-gray-500",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
+    container: "bg-muted/50",
+    icon: "text-muted-foreground",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   },
   warning: {
     container: "bg-yellow-50/50 dark:bg-yellow-900/10",
     icon: "text-yellow-500 dark:text-yellow-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   },
   info: {
-    container: "bg-indigo-50/50 dark:bg-indigo-900/10",
-    icon: "text-indigo-500 dark:text-indigo-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
+    container: "bg-primary/5",
+    icon: "text-primary",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   },
   error: {
-    container: "bg-red-50/50 dark:bg-red-900/10",
-    icon: "text-red-500 dark:text-red-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
+    container: "bg-destructive/5",
+    icon: "text-destructive",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   },
   success: {
     container: "bg-green-50/50 dark:bg-green-900/10",
     icon: "text-green-500 dark:text-green-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   },
 };
 
@@ -148,7 +148,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           "text-center rounded-lg",
           styles.container,
           sizes.container,
-          bordered && "border border-gray-200 dark:border-gray-700",
+          bordered && "border border-border",
           className
         )}
         {...props}

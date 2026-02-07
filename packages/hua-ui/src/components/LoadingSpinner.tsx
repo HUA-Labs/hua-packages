@@ -68,9 +68,9 @@ export function LoadingSpinner({
   // LoadingSpinner는 border 색상을 사용하므로 특화 색상 시스템 사용
   // 다크모드: track(배경)은 밝게, spinner(회전부)는 더 밝게 → 대비 확보
   const spinnerColors: Record<string, string> = {
-    default: "border-gray-300 border-t-gray-600 dark:border-gray-500/50 dark:border-t-gray-200",
-    primary: "border-indigo-300 border-t-indigo-600 dark:border-indigo-400/50 dark:border-t-indigo-300",
-    secondary: "border-gray-300 border-t-gray-600 dark:border-gray-500/50 dark:border-t-gray-200",
+    default: "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
+    primary: "border-primary/30 border-t-primary dark:border-primary/20 dark:border-t-primary/80",
+    secondary: "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
     success: "border-green-300 border-t-green-600 dark:border-green-500/50 dark:border-t-green-300",
     warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-500/50 dark:border-t-yellow-300",
     error: "border-red-300 border-t-red-600 dark:border-red-500/50 dark:border-t-red-300",
@@ -148,11 +148,11 @@ export function LoadingSpinner({
 
   return (
     <div className={merge("flex flex-col items-center justify-center", className)}>
-      <div className={merge(sizeClasses[size], "text-gray-600 dark:text-gray-400")}>
+      <div className={merge(sizeClasses[size], "text-muted-foreground")}>
         {renderSpinner()}
       </div>
       {text && (
-        <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 text-center">
+        <p className="mt-3 text-sm text-muted-foreground text-center">
           {text}
         </p>
       )}

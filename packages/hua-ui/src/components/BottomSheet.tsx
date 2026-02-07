@@ -219,7 +219,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         <div
           ref={ref}
           className={merge(
-            "absolute bottom-0 left-0 right-0 bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border-t border-gray-200/50 dark:!border-gray-600/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
+            "absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
             height !== "full" ? heightClasses[height] : "",
             isAnimating ? (_isOpen ? "translate-y-0" : "translate-y-full") : "",
             className
@@ -239,7 +239,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           {/* Drag Handle */}
           {showDragHandle && (
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
+              <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
             </div>
           )}
 
@@ -288,7 +288,7 @@ const BottomSheetHeader = React.forwardRef<HTMLDivElement, BottomSheetHeaderProp
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted transition-colors"
           >
             <Icon name="close" size={20} />
           </button>

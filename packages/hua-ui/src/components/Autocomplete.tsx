@@ -269,19 +269,19 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             {loading || isSearching ? (
               <Icon 
                       name="loader"
-                className="h-4 w-4 animate-spin text-gray-400" 
+                className="h-4 w-4 animate-spin text-muted-foreground"
               />
             ) : clearable && inputValue ? (
               <button
                 type="button"
                 onClick={handleClear}
-                className="rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="rounded p-1 hover:bg-muted transition-colors"
                 aria-label="지우기"
               >
-                <Icon name="close" className="h-4 w-4 text-gray-400" />
+                <Icon name="close" className="h-4 w-4 text-muted-foreground" />
               </button>
             ) : (
-              <Icon name="chevronDown" className="h-4 w-4 text-gray-400" />
+              <Icon name="chevronDown" className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
         </div>
@@ -294,15 +294,15 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             role="listbox"
             className={merge(
               "absolute z-50 w-full mt-1 rounded-lg border shadow-lg",
-              "bg-white dark:bg-gray-800",
-              "border-gray-200 dark:border-gray-700",
+              "bg-popover text-popover-foreground",
+              "border-border",
               "overflow-hidden"
             )}
             style={{ maxHeight: `${maxHeight}px` }}
           >
             <div className="overflow-y-auto" style={{ maxHeight: `${maxHeight}px` }}>
               {filteredOptions.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                   {emptyText}
                 </div>
               ) : (
@@ -319,31 +319,31 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                       onMouseEnter={() => setSelectedIndex(index)}
                       className={merge(
                         "px-4 py-3 cursor-pointer transition-colors",
-                        "hover:bg-gray-100 dark:hover:bg-gray-700",
-                        isSelected && "bg-indigo-50 dark:bg-indigo-900/20",
-                        isValueSelected && "bg-indigo-100 dark:bg-indigo-900/30"
+                        "hover:bg-muted",
+                        isSelected && "bg-primary/10",
+                        isValueSelected && "bg-primary/15"
                       )}
                     >
                       <div className="flex items-center gap-3">
                         {option.icon && (
-                          <div className="flex-shrink-0 text-gray-400">
+                          <div className="flex-shrink-0 text-muted-foreground">
                             {option.icon}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            <p className="text-sm font-medium text-foreground">
                               {option.label}
                             </p>
                             {isValueSelected && (
                               <Icon 
                                 name="check" 
-                                className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" 
+                                className="h-4 w-4 text-primary flex-shrink-0"
                               />
                             )}
                           </div>
                           {option.description && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               {option.description}
                             </p>
                           )}

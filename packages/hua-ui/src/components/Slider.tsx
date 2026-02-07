@@ -111,19 +111,19 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     }
 
     const variantClasses = {
-      default: "bg-gray-200 dark:bg-gray-700",
-      primary: "bg-indigo-200 dark:bg-indigo-700",
-      success: "bg-green-200 dark:bg-green-700",
-      warning: "bg-yellow-200 dark:bg-yellow-700",
-      danger: "bg-red-200 dark:bg-red-700"
+      default: "bg-muted",
+      primary: "bg-primary/20",
+      success: "bg-[var(--progress-success)]/20",
+      warning: "bg-[var(--progress-warning)]/20",
+      danger: "bg-destructive/20",
     }
 
     const thumbVariantClasses = {
-      default: "bg-gray-400 hover:bg-gray-500 dark:bg-gray-500 dark:hover:bg-gray-400",
-      primary: "bg-primary hover:bg-primary/90 dark:bg-indigo-400 dark:hover:bg-indigo-500",
-      success: "bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500",
-      warning: "bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-400 dark:hover:bg-yellow-500",
-      danger: "bg-red-500 hover:bg-red-600 dark:bg-red-400 dark:hover:bg-red-500"
+      default: "bg-muted-foreground hover:bg-foreground",
+      primary: "bg-primary hover:bg-primary/90",
+      success: "bg-[var(--progress-success)] hover:bg-[var(--progress-success)]/90",
+      warning: "bg-[var(--progress-warning)] hover:bg-[var(--progress-warning)]/90",
+      danger: "bg-destructive hover:bg-destructive/90",
     }
 
     const sizeClasses = {
@@ -176,7 +176,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
       
       if (isRange) {
         return (
-          <div className="flex gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex gap-2 text-sm text-muted-foreground">
             {currentValue.map((val, index) => (
               <span key={index} className="font-mono">
                 {val}
@@ -187,7 +187,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
       }
       
       return (
-        <span className="text-sm font-mono text-gray-600 dark:text-gray-400">
+        <span className="text-sm font-mono text-muted-foreground">
           {currentValue[0]}
         </span>
       )
@@ -196,7 +196,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     return (
       <div className={merge("flex items-center gap-4", orientationClasses)}>
         {showLabel && label && (
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-0">
+          <label className="text-sm font-medium text-foreground min-w-0">
             {label}
           </label>
         )}
@@ -215,7 +215,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             {isRange ? (
               // 범위 슬라이더
               <div className={merge(
-                "absolute rounded-full bg-primary dark:bg-indigo-400",
+                "absolute rounded-full bg-primary",
                 sizeClasses[size],
                 orientation === "vertical"
                   ? "left-1/2 -translate-x-1/2"
@@ -235,7 +235,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             ) : (
               // 단일 슬라이더
               <div className={merge(
-                "absolute rounded-full bg-primary dark:bg-indigo-400",
+                "absolute rounded-full bg-primary",
                 sizeClasses[size],
                 orientation === "vertical"
                   ? "left-1/2 -translate-x-1/2 bottom-0"

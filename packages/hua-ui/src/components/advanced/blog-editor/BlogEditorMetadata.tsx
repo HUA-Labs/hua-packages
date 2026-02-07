@@ -27,17 +27,17 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
     const containerClasses = merge(
       'rounded-xl p-6 space-y-4',
       variant === 'glass'
-        ? 'bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/20 dark:border-slate-700/50'
+        ? 'bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-background/20 dark:border-border/50'
         : variant === 'minimal'
           ? 'bg-transparent'
-          : 'bg-white dark:bg-gray-800',
+          : 'bg-background',
       className
     )
 
     const inputClasses =
-      'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
+      'w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
 
-    const labelClasses = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'
+    const labelClasses = 'block text-sm font-medium text-foreground mb-1'
 
     // 태그 추가
     const addTag = useCallback((tag: string) => {
@@ -86,7 +86,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
 
     return (
       <div ref={ref} className={containerClasses}>
-        <h2 className="font-semibold text-gray-900 dark:text-white">{labels.basicInfo}</h2>
+        <h2 className="font-semibold text-foreground">{labels.basicInfo}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 슬러그 */}
@@ -96,7 +96,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                 {labels.slug} *
               </label>
               <div className="flex items-center">
-                <span className="text-gray-500 dark:text-gray-400 mr-1 text-sm">
+                <span className="text-muted-foreground mr-1 text-sm">
                   {labels.slugPrefix}
                 </span>
                 <input
@@ -118,19 +118,19 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
             <div>
               <label className={labelClasses}>{labels.tags}</label>
               <div className={merge(
-                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus-within:ring-1 focus-within:ring-ring focus-within:border-transparent transition-colors'
+                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-border rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring focus-within:border-transparent transition-colors'
               )}>
                 {/* 태그 칩들 */}
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm rounded-md"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-sm rounded-md"
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="hover:text-indigo-900 dark:hover:text-indigo-100 transition-colors"
+                      className="hover:text-primary transition-colors"
                       aria-label={`${tag} 태그 삭제`}
                     >
                       <Icon name="x" size={14} />
@@ -143,11 +143,11 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                   value={tagInput}
                   onChange={handleTagInputChange}
                   onKeyDown={handleTagKeyDown}
-                  className="flex-1 min-w-[100px] bg-transparent outline-none text-gray-900 dark:text-white text-sm"
+                  className="flex-1 min-w-[100px] bg-transparent outline-none text-foreground text-sm"
                   placeholder={formData.tags.length === 0 ? labels.tagsPlaceholder : '태그 추가...'}
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 쉼표(,) 또는 Enter로 태그 추가
               </p>
             </div>
@@ -161,7 +161,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
             <div className="space-y-3">
               {/* 이미지 미리보기 */}
               {formData.coverImage && (
-                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-muted">
                   <img
                     src={formData.coverImage}
                     alt="커버 이미지 미리보기"
@@ -208,7 +208,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   title="이미지 업로드"
                 >
                   {uploading ? (
@@ -233,7 +233,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                 onChange={(e) => updateField('publishedAt', e.target.value || null)}
                 className={inputClasses}
               />
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {labels.publishDateHint}
               </p>
             </div>
@@ -248,7 +248,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                 onChange={(e) => updateField('expiresAt', e.target.value || null)}
                 className={inputClasses}
               />
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {labels.expiresAtHint}
               </p>
             </div>

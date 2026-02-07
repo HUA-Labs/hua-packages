@@ -148,7 +148,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
           return 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300';
         case 'gray':
         default:
-          return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+          return 'bg-muted text-muted-foreground';
       }
     }, []);
 
@@ -176,7 +176,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
       <div
         ref={ref}
         className={merge(
-          'mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4',
+          'mb-4 bg-background rounded-lg shadow-sm border border-border p-3 sm:p-4',
           className
         )}
         {...props}

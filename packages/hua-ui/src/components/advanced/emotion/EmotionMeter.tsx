@@ -74,7 +74,7 @@ const EmotionMeter = React.forwardRef<HTMLDivElement, EmotionMeterProps>(
       <div
         ref={ref}
         className={merge(
-          "w-full bg-gray-200 rounded-full dark:bg-gray-700",
+          "w-full bg-muted rounded-full",
           sizeClasses[size],
           className
         )}

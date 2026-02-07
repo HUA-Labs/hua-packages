@@ -89,7 +89,7 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
     }
 
     const variantClasses = {
-      default: "bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50",
+      default: "bg-background/90 backdrop-blur-sm border border-border/50",
       gradient: `bg-gradient-to-br ${customGradient || getGradientClass(gradient)}`,
       glass: "bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border border-white/20 dark:border-gray-700/20",
       neon: "bg-gray-900/90 dark:bg-gray-900/90 border border-cyan-400/30 dark:border-cyan-400/30 shadow-lg shadow-cyan-400/20"
@@ -129,14 +129,14 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
         <h3 className={merge(
           "font-bold mb-2",
           size === "lg" ? "text-2xl" : size === "md" ? "text-xl" : "text-lg",
-          variant === "gradient" ? "text-white" : "text-gray-900 dark:text-white"
+          variant === "gradient" ? "text-white" : "text-foreground"
         )}>
           {title}
         </h3>
         
         <p className={merge(
           size === "lg" ? "text-base" : "text-sm",
-          variant === "gradient" ? "text-white/90" : "text-gray-600 dark:text-gray-300"
+          variant === "gradient" ? "text-white/90" : "text-muted-foreground"
         )}>
           {description}
         </p>

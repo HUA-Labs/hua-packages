@@ -99,12 +99,12 @@ function FormControl({
           htmlFor={htmlFor}
           className={merge(
             "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-            hasError && "text-red-500 dark:text-red-400"
+            hasError && "text-destructive"
           )}
         >
           {label}
           {required && (
-            <span className="text-red-500 ml-1" aria-hidden="true">
+            <span className="text-destructive ml-1" aria-hidden="true">
               *
             </span>
           )}
@@ -117,7 +117,7 @@ function FormControl({
       )}
 
       {/* Input - with :invalid styling support */}
-      <div className="relative [&_input:invalid]:border-red-300 [&_input:invalid]:dark:border-red-500/50 [&_select:invalid]:border-red-300 [&_select:invalid]:dark:border-red-500/50 [&_textarea:invalid]:border-red-300 [&_textarea:invalid]:dark:border-red-500/50">
+      <div className="relative [&_input:invalid]:border-destructive/50 [&_select:invalid]:border-destructive/50 [&_textarea:invalid]:border-destructive/50">
         {enhancedChildren}
       </div>
 
@@ -125,7 +125,7 @@ function FormControl({
       {hasError && (
         <div
           id={htmlFor ? `${htmlFor}-error` : undefined}
-          className="flex items-start gap-2 text-sm text-red-500 dark:text-red-400"
+          className="flex items-start gap-2 text-sm text-destructive"
           role="alert"
           aria-live="polite"
         >

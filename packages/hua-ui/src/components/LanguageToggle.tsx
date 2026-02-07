@@ -124,7 +124,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={merge(
-              "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
+              "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
               sizeClasses[size],
               className
             )}
@@ -134,13 +134,13 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           </button>
 
           {isOpen && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+            <div className="absolute top-full right-0 mt-2 w-48 bg-background rounded-lg shadow-lg border border-border py-2 z-50">
               {languages.map((language) => (
                 <button
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
                   className={merge(
-                    "w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
+                    "w-full px-4 py-3 text-left hover:bg-muted transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
                     currentLanguage === language.code && "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                   )}
                 >
@@ -160,13 +160,13 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={merge(
-              "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+              "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
               className
             )}
             {...props}
           >
             <span className="text-lg">{currentLang.flag}</span>
-            {showLabel && <span className="text-gray-700 dark:text-gray-300">{currentLang.name}</span>}
+            {showLabel && <span className="text-foreground">{currentLang.name}</span>}
             <svg
               className={merge(
                 "w-4 h-4 transition-transform duration-200",
@@ -181,13 +181,13 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           </button>
 
           {isOpen && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+            <div className="absolute top-full right-0 mt-2 w-48 bg-background rounded-lg shadow-lg border border-border py-2 z-50">
               {languages.map((language) => (
                 <button
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
                   className={merge(
-                    "w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
+                    "w-full px-4 py-3 text-left hover:bg-muted transition-colors duration-200 flex items-center gap-3", // 16px, 12px 패딩, 12px 간격
                     currentLanguage === language.code && "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                   )}
                 >
@@ -210,13 +210,13 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           onLanguageChange?.(languages[nextIndex].code)
         }}
         className={merge(
-          "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+          "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
           className
         )}
         {...props}
       >
         <span className="text-lg">{currentLang.flag}</span>
-        {showLabel && <span className="text-gray-700 dark:text-gray-300">{currentLang.name}</span>}
+        {showLabel && <span className="text-foreground">{currentLang.name}</span>}
       </button>
     )
   }

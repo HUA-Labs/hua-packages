@@ -101,7 +101,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         case "info":
           return "text-cyan-500 dark:text-cyan-400"
         default:
-          return "text-gray-500 dark:text-gray-400"
+          return "text-muted-foreground"
       }
     }
 

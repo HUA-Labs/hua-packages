@@ -113,7 +113,7 @@ export function ThemeToggle({
       <button
         onClick={handleClick}
         className={merge(
-          "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
+          "inline-flex items-center justify-center rounded-lg transition-all duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
           sizeClasses[size],
           className
         )}
@@ -148,8 +148,8 @@ export function ThemeToggle({
         className={merge(
           "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2",
           resolvedTheme === "dark" 
-            ? "bg-primary" 
-            : "bg-gray-200 dark:bg-gray-700",
+            ? "bg-primary"
+            : "bg-muted",
           className
         )}
         {...props}
@@ -172,14 +172,14 @@ export function ThemeToggle({
     <button
       onClick={handleClick}
       className={merge(
-        "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
+        "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2", // 12px 간격, 16px, 12px 패딩
         className
       )}
       {...props}
     >
       {renderIcon()}
       {showLabel && (
-        <span className="text-gray-700 dark:text-gray-300">
+        <span className="text-foreground">
           {theme === "system" ? label.system : theme === "dark" ? label.dark : label.light}
         </span>
       )}
