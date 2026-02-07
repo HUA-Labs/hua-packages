@@ -44,7 +44,7 @@ const BlogEditorPreview = React.forwardRef<HTMLDivElement, BlogEditorPreviewProp
 
     return (
       <div ref={ref} className={merge('p-6', className)}>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-xl font-bold text-foreground mb-4">
           {title}
         </h3>
         <div className="prose dark:prose-invert max-w-none">

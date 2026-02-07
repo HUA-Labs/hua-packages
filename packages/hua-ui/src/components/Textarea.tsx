@@ -1,17 +1,43 @@
 "use client"
 
 import React from "react"
+import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+import { FORM_STATE } from "../lib/styles/cva-base"
+
+export const textareaVariants = cva(
+  "flex w-full rounded-md border transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-offset-2 hover:border-accent-foreground hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-muted-foreground",
+  {
+    variants: {
+      variant: {
+        default: "border-input bg-background text-foreground focus:border-ring focus:ring-ring",
+        outline: "border-2 border-input bg-transparent text-foreground focus:border-ring focus:ring-ring",
+        filled: "border-transparent bg-secondary/50 text-foreground focus:bg-background focus:border-ring focus:ring-ring",
+        ghost: "border-transparent bg-transparent text-foreground focus:bg-muted focus:border-border focus:ring-muted-foreground",
+        glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:border-ring/50 focus:ring-ring/20 focus:bg-white/20",
+      },
+      size: {
+        sm: "px-3 py-2 text-sm min-h-[80px]",
+        md: "px-4 py-3 text-base min-h-[100px]",
+        lg: "px-4 py-3 text-lg min-h-[120px]",
+      },
+      resize: {
+        none: "resize-none",
+        vertical: "resize-y",
+        horizontal: "resize-x",
+        both: "resize",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+      resize: "vertical",
+    },
+  }
+)
 
 /**
  * Textarea 컴포넌트의 props / Textarea component props
- * @typedef {Object} TextareaProps
- * @property {"default" | "outline" | "filled" | "ghost" | "glass"} [variant="default"] - Textarea 스타일 변형 / Textarea style variant
- * @property {"sm" | "md" | "lg"} [size="md"] - Textarea 크기 / Textarea size
- * @property {boolean} [error=false] - 에러 상태 표시 / Error state
- * @property {boolean} [success=false] - 성공 상태 표시 / Success state
- * @property {"none" | "vertical" | "horizontal" | "both"} [resize="vertical"] - 크기 조절 방향 / Resize direction
- * @extends {React.TextareaHTMLAttributes<HTMLTextAreaElement>}
  */
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   variant?: "default" | "outline" | "filled" | "ghost" | "glass"
@@ -67,46 +93,15 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     resize = "vertical",
     ...props 
   }, ref) => {
-    const variantClasses = {
-      default: "border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-ring focus:ring-ring dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-ring dark:focus:ring-ring transition-all duration-200 hover:border-indigo-400 hover:shadow-sm",
-      outline: "border-2 border-gray-200 bg-transparent text-gray-900 placeholder-gray-500 focus:border-ring focus:ring-ring dark:border-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-ring dark:focus:ring-ring transition-all duration-200 hover:border-indigo-400 hover:shadow-sm",
-      filled: "border-transparent bg-gray-50 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-ring focus:ring-ring dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:bg-gray-800 dark:focus:border-ring dark:focus:ring-ring transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-600",
-      ghost: "border-transparent bg-transparent text-gray-900 placeholder-gray-500 focus:bg-gray-50 focus:border-gray-300 focus:ring-gray-500 dark:text-white dark:placeholder-gray-400 dark:focus:bg-gray-800 dark:focus:border-gray-600 dark:focus:ring-gray-400 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white placeholder-white/60 focus:border-ring/50 focus:ring-ring/20 focus:bg-white/20 dark:border-slate-600/50 dark:bg-slate-800/10 dark:text-slate-200 dark:placeholder-slate-400 dark:focus:border-ring/50 dark:focus:ring-ring/20 dark:focus:bg-slate-700/20 transition-all duration-200 hover:border-indigo-400/40 hover:bg-white/15 dark:hover:bg-slate-700/15"
-    }
-
-    const sizeClasses = {
-      sm: "px-3 py-2 text-sm min-h-[80px]",
-      md: "px-4 py-3 text-base min-h-[100px]",
-      lg: "px-4 py-3 text-lg min-h-[120px]"
-    }
-
-    const resizeClasses = {
-      none: "resize-none",
-      vertical: "resize-y",
-      horizontal: "resize-x",
-      both: "resize"
-    }
-
-    const stateClasses = error 
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400"
-      : success
-      ? "border-green-500 focus:border-green-500 focus:ring-green-500 dark:border-green-400 dark:focus:border-green-400 dark:focus:ring-green-400"
-      : ""
-    
-    // aria-invalid 자동 설정
-    // Auto-set aria-invalid
     const ariaInvalid = props['aria-invalid' as keyof typeof props] as boolean | undefined
     const isInvalid = error || (ariaInvalid !== undefined ? ariaInvalid : false)
 
     return (
       <textarea
         className={merge(
-          "flex w-full rounded-md border transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          variantClasses[variant],
-          sizeClasses[size],
-          resizeClasses[resize],
-          stateClasses,
+          textareaVariants({ variant, size, resize }),
+          error && FORM_STATE.error,
+          success && FORM_STATE.success,
           className
         )}
         ref={ref}

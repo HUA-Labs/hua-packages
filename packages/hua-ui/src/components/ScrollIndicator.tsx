@@ -123,10 +123,10 @@ const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>((
   }
 
   const variantClasses = {
-    default: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
-    primary: 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200',
-    secondary: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200',
-    outline: 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+    default: 'text-muted-foreground hover:text-foreground',
+    primary: 'text-primary hover:text-primary/80',
+    secondary: 'text-secondary-foreground hover:text-secondary-foreground/80',
+    outline: 'text-foreground hover:text-foreground'
   }
 
   if (!isVisible) return null

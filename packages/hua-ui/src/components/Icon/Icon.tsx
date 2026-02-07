@@ -124,12 +124,11 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   // 색상 변형 클래스
   const variantClasses = mergeMap({
     'text-current': variant === 'default',
-    'text-indigo-600 dark:text-indigo-400': variant === 'primary',
-    'text-gray-600 dark:text-gray-400': variant === 'secondary',
+    'text-primary': variant === 'primary',
+    'text-muted-foreground': variant === 'secondary' || variant === 'muted',
     'text-green-600 dark:text-green-400': variant === 'success',
     'text-yellow-600 dark:text-yellow-400': variant === 'warning',
-    'text-red-600 dark:text-red-400': variant === 'error',
-    'text-gray-500 dark:text-gray-500': variant === 'muted',
+    'text-destructive': variant === 'error',
   })
 
   // 서버사이드에서는 빈 span 반환
@@ -174,7 +173,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
       <span
         ref={ref}
         className={merge(
-          'inline-flex items-center justify-center rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600',
+          'inline-flex items-center justify-center rounded-full border-2 border-dashed border-border',
           variantClasses,
           className
         )}
@@ -182,7 +181,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
         aria-label={ariaLabel || `아이콘을 찾을 수 없음: ${iconName}`}
         title={`Icon not found: ${iconName}`}
       >
-        <span className="text-xs text-gray-400 dark:text-gray-500" aria-hidden="true">
+        <span className="text-xs text-muted-foreground" aria-hidden="true">
           ?
         </span>
       </span>

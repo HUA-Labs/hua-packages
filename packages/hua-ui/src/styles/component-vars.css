@@ -40,6 +40,32 @@
   --badge-glass-bg: rgba(255, 255, 255, 0.2);
   --badge-glass-border: rgba(255, 255, 255, 0.3);
   --badge-glass-text: white;
+
+  /* Alert */
+  --alert-success-bg: rgba(34, 197, 94, 0.1);
+  --alert-success-border: rgba(74, 222, 128, 0.3);
+  --alert-success-text: rgb(22, 163, 74);
+  --alert-warning-bg: rgba(234, 179, 8, 0.1);
+  --alert-warning-border: rgba(250, 204, 21, 0.3);
+  --alert-warning-text: rgb(161, 98, 7);
+  --alert-error-bg: rgba(239, 68, 68, 0.1);
+  --alert-error-border: rgba(248, 113, 113, 0.3);
+  --alert-error-text: rgb(220, 38, 38);
+  --alert-info-bg: rgba(99, 102, 241, 0.1);
+  --alert-info-border: rgba(129, 140, 248, 0.3);
+  --alert-info-text: rgb(79, 70, 229);
+
+  /* Progress */
+  --progress-success: rgb(34, 197, 94);
+  --progress-warning: rgb(234, 179, 8);
+  --progress-error: rgb(239, 68, 68);
+  --progress-info: rgb(99, 102, 241);
+  --progress-track: rgb(229, 231, 235);
+
+  /* Button neon/gradient */
+  --btn-neon-glow: rgba(34, 197, 94, 0.5);
+  --btn-gradient-from: rgb(20, 184, 166);
+  --btn-gradient-to: rgb(6, 182, 212);
 }
 
 .dark {
@@ -74,4 +100,30 @@
   --badge-glass-bg: rgba(30, 41, 59, 0.2);
   --badge-glass-border: rgba(51, 65, 85, 0.5);
   --badge-glass-text: rgb(226, 232, 240);
+
+  /* Alert */
+  --alert-success-bg: rgba(34, 197, 94, 0.15);
+  --alert-success-border: rgba(34, 197, 94, 0.3);
+  --alert-success-text: rgb(74, 222, 128);
+  --alert-warning-bg: rgba(234, 179, 8, 0.15);
+  --alert-warning-border: rgba(234, 179, 8, 0.3);
+  --alert-warning-text: rgb(250, 204, 21);
+  --alert-error-bg: rgba(239, 68, 68, 0.15);
+  --alert-error-border: rgba(239, 68, 68, 0.3);
+  --alert-error-text: rgb(248, 113, 113);
+  --alert-info-bg: rgba(99, 102, 241, 0.15);
+  --alert-info-border: rgba(99, 102, 241, 0.3);
+  --alert-info-text: rgb(129, 140, 248);
+
+  /* Progress */
+  --progress-success: rgb(74, 222, 128);
+  --progress-warning: rgb(250, 204, 21);
+  --progress-error: rgb(248, 113, 113);
+  --progress-info: rgb(129, 140, 248);
+  --progress-track: rgb(55, 65, 81);
+
+  /* Button neon/gradient */
+  --btn-neon-glow: rgba(74, 222, 128, 0.5);
+  --btn-gradient-from: rgb(45, 212, 191);
+  --btn-gradient-to: rgb(34, 211, 238);
 }

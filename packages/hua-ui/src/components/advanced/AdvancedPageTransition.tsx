@@ -212,13 +212,13 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
     <div className="relative">
       {showProgress && (
         <div className={merge(
-          'fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 shadow-lg border',
+          'fixed top-4 right-4 z-50 bg-background rounded-lg px-3 py-2 shadow-lg border',
           progressClassName
         )}>
-          <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="text-sm font-medium text-foreground">
             Progress: {Math.round(progress * 100)}%
           </div>
-          <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2">
+          <div className="w-24 h-2 bg-muted rounded-full mt-2">
             <div 
               className="h-full bg-primary rounded-full transition-all duration-100"
               style={{ width: `${progress * 100}%` }}

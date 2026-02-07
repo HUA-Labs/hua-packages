@@ -177,7 +177,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
           >
             <div
               className={merge(
-                "w-full max-w-2xl mx-4 bg-white dark:bg-gray-800 rounded-lg shadow-2xl", // 보더 대신 섀도우
+                "w-full max-w-2xl mx-4 bg-popover text-popover-foreground rounded-lg shadow-2xl", // 보더 대신 섀도우
                 "border-0 overflow-hidden" // 보더 제거
               )}
               onClick={(e) => e.stopPropagation()}
@@ -185,7 +185,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
               }}
             >
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700"> {/* 16px 패딩 */}
+              <div className="p-4 border-b border-border"> {/* 16px 패딩 */}
                 <input
                   ref={inputRef}
                   type="text"
@@ -195,8 +195,8 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                   onKeyDown={handleKeyDown}
                   className={merge(
                     "w-full bg-transparent text-lg font-medium outline-none", // 18px 텍스트
-                    "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                    "text-gray-900 dark:text-gray-100"
+                    "placeholder:text-muted-foreground",
+                    "text-foreground"
                   )}
                 />
               </div>
@@ -244,7 +244,7 @@ const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
       ref={ref}
       className={merge(
         "flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm outline-none", // 40px 높이, 12px, 8px 패딩
-        "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+        "placeholder:text-muted-foreground",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
@@ -296,11 +296,11 @@ const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
         data-command-item
         className={merge(
           "relative flex w-full items-center gap-3 rounded-sm px-4 py-3 text-sm", // 16px, 12px 패딩
-          "text-gray-700 dark:text-gray-300",
-          "hover:bg-gray-100 dark:hover:bg-gray-700",
-          "focus:bg-gray-100 dark:focus:bg-gray-700",
+          "text-foreground",
+          "hover:bg-muted",
+          "focus:bg-muted",
           "focus:outline-none",
-          selected && "bg-gray-100 dark:bg-gray-700",
+          selected && "bg-muted",
           "transition-colors",
           className
         )}
@@ -308,7 +308,7 @@ const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
         {...props}
       >
         {icon && (
-          <div className="flex-shrink-0 w-4 h-4 text-gray-500 dark:text-gray-400">
+          <div className="flex-shrink-0 w-4 h-4 text-muted-foreground">
             {icon}
           </div>
         )}
@@ -333,7 +333,7 @@ const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
   ({ className, heading, children, ...props }, ref) => (
     <div ref={ref} className={merge("py-2", className)} {...props}> {/* 8px 패딩 */}
       {heading && (
-        <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"> {/* 16px, 8px 패딩 */}
+        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide"> {/* 16px, 8px 패딩 */}
           {heading}
         </div>
       )}
@@ -356,7 +356,7 @@ const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("h-px bg-gray-200 dark:bg-gray-700 my-2", className)} // 8px 여백
+      className={merge("h-px bg-border my-2", className)} // 8px 여백
       {...props}
     />
   )
@@ -375,7 +375,7 @@ const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
     <div
       ref={ref}
       className={merge(
-        "py-8 text-center text-sm text-gray-500 dark:text-gray-400", // 32px 패딩
+        "py-8 text-center text-sm text-muted-foreground", // 32px 패딩
         className
       )}
       {...props}

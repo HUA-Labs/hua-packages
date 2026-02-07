@@ -59,7 +59,7 @@ const EmotionButton = React.forwardRef<HTMLButtonElement, EmotionButtonProps>(
           sizeClasses[size],
           isSelected
             ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-            : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800",
+            : "border-border bg-background",
           className
         )}
         {...props}

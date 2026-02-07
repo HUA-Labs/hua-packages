@@ -294,11 +294,11 @@ const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "destructive":
-          return "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+          return "text-destructive hover:bg-destructive/10"
         case "disabled":
-          return "text-gray-400 dark:text-gray-500 cursor-not-allowed"
+          return "text-muted-foreground cursor-not-allowed"
         default:
-          return "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          return "text-foreground hover:bg-muted"
       }
     }
 
@@ -306,7 +306,7 @@ const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProps>(
       <button
         ref={ref}
         className={merge(
-          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700", // 16px, 12px 패딩
+          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-muted", // 16px, 12px 패딩
           getVariantClasses(),
           className
         )}
@@ -331,7 +331,7 @@ const DropdownSeparator = React.forwardRef<HTMLDivElement, DropdownSeparatorProp
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("h-px bg-gray-200 dark:bg-gray-700 my-2", className)} // 8px 여백
+      className={merge("h-px bg-border my-2", className)} // 8px 여백
       {...props}
     />
   )
@@ -344,7 +344,7 @@ const DropdownLabel = React.forwardRef<HTMLDivElement, DropdownLabelProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide", className)} // 16px, 8px 패딩
+      className={merge("px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide", className)} // 16px, 8px 패딩
       {...props}
     >
       {children}

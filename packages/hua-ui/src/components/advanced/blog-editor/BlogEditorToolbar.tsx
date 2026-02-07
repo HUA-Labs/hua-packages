@@ -129,7 +129,7 @@ const BlogEditorToolbar = React.forwardRef<HTMLDivElement, BlogEditorToolbarProp
       <div
         ref={ref}
         className={merge(
-          'flex flex-wrap gap-1 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50',
+          'flex flex-wrap gap-1 px-4 py-2 border-b border-border bg-muted',
           className
         )}
         role="toolbar"
@@ -140,7 +140,7 @@ const BlogEditorToolbar = React.forwardRef<HTMLDivElement, BlogEditorToolbarProp
             key={item.icon}
             type="button"
             onClick={() => handleInsert(item)}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
             title={`${labels[item.label as keyof typeof labels] || item.label}${item.shortcut ? ` (${item.shortcut})` : ''}`}
             aria-label={labels[item.label as keyof typeof labels] || item.label}
           >

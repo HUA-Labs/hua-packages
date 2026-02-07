@@ -192,7 +192,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
         <div
           ref={ref}
           className={merge(
-            "absolute bg-white/95 dark:!bg-gray-800/95 backdrop-blur-xl border border-gray-200/50 dark:!border-gray-600/50 shadow-2xl transition-transform duration-300 ease-out",
+            "absolute bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl transition-transform duration-300 ease-out",
             sizeClasses[size],
             sideClasses[side],
             transformClasses[side],
@@ -238,14 +238,14 @@ const DrawerHeader = React.forwardRef<HTMLDivElement, DrawerHeaderProps>(
     return (
       <div
         ref={ref}
-        className={merge("flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50", className)}
+        className={merge("flex items-center justify-between p-6 border-b border-border/50", className)}
         {...props}
       >
         <div className="flex-1">{children}</div>
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors"
+            className="p-2 rounded-lg hover:bg-muted transition-colors"
           >
             <Icon name="close" size={20} />
           </button>
@@ -318,7 +318,7 @@ const DrawerFooter = React.forwardRef<HTMLDivElement, DrawerFooterProps>(
     return (
       <div
         ref={ref}
-        className={merge("flex items-center justify-end gap-3 p-6 border-t border-gray-200/50 dark:border-gray-700/50", className)}
+        className={merge("flex items-center justify-end gap-3 p-6 border-t border-border/50", className)}
         {...props}
       >
         {children}

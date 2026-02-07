@@ -94,11 +94,11 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
             {prevPage && (
                               <a
                   href={prevPage.href}
-                  className="group p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full shadow-lg hover:shadow-2xl hover:bg-white/90 active:scale-95 transition-all duration-200"
+                  className="group p-3 bg-white/80 backdrop-blur-sm border border-border rounded-full shadow-lg hover:shadow-2xl hover:bg-white/90 active:scale-95 transition-all duration-200"
                   title={`이전: ${prevPage.title}`}
                 >
-                  <svg 
-                    className="w-5 h-5 text-slate-600 group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
+                  <svg
+                    className="w-5 h-5 text-muted-foreground group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -116,11 +116,11 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
             {nextPage && (
                               <a
                   href={nextPage.href}
-                  className="group p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full shadow-lg hover:shadow-2xl hover:bg-white/90 active:scale-95 transition-all duration-200"
+                  className="group p-3 bg-white/80 backdrop-blur-sm border border-border rounded-full shadow-lg hover:shadow-2xl hover:bg-white/90 active:scale-95 transition-all duration-200"
                   title={`다음: ${nextPage.title}`}
                 >
-                  <svg 
-                    className="w-5 h-5 text-slate-600 group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
+                  <svg
+                    className="w-5 h-5 text-muted-foreground group-hover:text-indigo-600 group-active:text-indigo-800 transition-colors" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -155,7 +155,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
             {/* 페이지 헤더 */}
             <div className="mb-8">
               <h1 className="text-4xl font-bold mb-4">{title}</h1>
-              <p className="text-lg text-slate-600 dark:text-slate-400">
+              <p className="text-lg text-muted-foreground">
                 {description}
               </p>
             </div>
@@ -167,11 +167,11 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
 
             {/* 모바일 페이지 네비게이션 */}
             <div className="mt-12 lg:hidden">
-              <div className="flex items-center justify-between py-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between py-4 border-t border-border">
                 {prevPage && (
                   <a
                     href={prevPage.href}
-                    className="flex items-center text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+                    className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -182,7 +182,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
                 {nextPage && (
                   <a
                     href={nextPage.href}
-                    className="flex items-center text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+                    className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {nextPage.title}
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -96,14 +96,14 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     }
 
     const variantClasses = {
-      default: "bg-gray-200 peer-checked:bg-primary dark:bg-gray-700 dark:peer-checked:bg-primary",
-      outline: "bg-transparent border-2 border-gray-300 peer-checked:border-primary peer-checked:bg-primary dark:border-gray-600 dark:peer-checked:border-primary dark:peer-checked:bg-primary",
-      filled: "bg-gray-100 peer-checked:bg-primary dark:bg-gray-800 dark:peer-checked:bg-primary",
-      glass: "bg-white/20 backdrop-blur-sm border border-white/30 peer-checked:bg-primary/50 peer-checked:border-indigo-300/50 dark:bg-slate-800/20 dark:border-slate-700/50 dark:peer-checked:bg-primary/50 dark:peer-checked:border-indigo-300/50"
+      default: "bg-muted peer-checked:bg-primary",
+      outline: "bg-transparent border-2 border-input peer-checked:border-primary peer-checked:bg-primary",
+      filled: "bg-secondary peer-checked:bg-primary",
+      glass: "bg-white/20 backdrop-blur-sm border border-white/30 peer-checked:bg-primary/50 peer-checked:border-primary/30",
     }
 
-    const stateClasses = error 
-      ? "bg-red-200 peer-checked:bg-red-600 dark:bg-red-800 dark:peer-checked:bg-red-500"
+    const stateClasses = error
+      ? "bg-destructive/20 peer-checked:bg-destructive"
       : success
       ? "bg-green-200 peer-checked:bg-green-600 dark:bg-green-800 dark:peer-checked:bg-green-500"
       : ""
@@ -151,12 +151,12 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
         {(label || description) && (
           <div className="flex flex-col">
             {label && (
-              <label htmlFor={switchId} id={labelId} className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+              <label htmlFor={switchId} id={labelId} className="text-sm font-medium text-foreground cursor-pointer">
                 {label}
               </label>
             )}
             {description && (
-              <p id={descriptionId} className="text-sm text-gray-500 dark:text-gray-400">
+              <p id={descriptionId} className="text-sm text-muted-foreground">
                 {description}
               </p>
             )}

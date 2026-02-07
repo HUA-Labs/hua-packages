@@ -2,14 +2,11 @@
 
 import React from "react";
 import { merge } from "../lib/utils";
-import { createButtonStyles } from "../lib/styles/system/components";
-import { useTheme } from "./ThemeProvider";
-import type { Theme } from "../lib/styles/system/theme";
+import { buttonVariants, gradientPresets } from "./Button.variants";
 import { Slot } from "../lib/Slot";
 
 /**
  * 버튼 스타일 변형 / Button style variant
- * @typedef {"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"} Variant
  */
 type Variant =
   | "default" | "destructive" | "outline" | "secondary"
@@ -17,53 +14,32 @@ type Variant =
 
 /**
  * 버튼 크기 / Button size
- * @typedef {"sm" | "md" | "lg" | "xl" | "icon"} Size
  */
 type Size = "sm" | "md" | "lg" | "xl" | "icon";
 
 /**
  * 버튼 모서리 둥글기 / Button border radius
- * @typedef {"sm" | "md" | "lg" | "full"} Rounded
  */
 type Rounded = "sm" | "md" | "lg" | "full";
 
 /**
  * 버튼 그림자 / Button shadow
- * @typedef {"none" | "sm" | "md" | "lg" | "xl"} Shadow
  */
 type Shadow = "none" | "sm" | "md" | "lg" | "xl";
 
 /**
  * 버튼 호버 효과 / Button hover effect
  * "springy"가 HUA-UI 시그니처 - 공 튕기듯 미세한 반동
- * @typedef {"springy" | "scale" | "glow" | "slide" | "none"} Hover
  */
 type Hover = "springy" | "scale" | "glow" | "slide" | "none";
 
 /**
  * 그라디언트 색상 이름 / Gradient color name
- * @typedef {"blue" | "purple" | "green" | "orange" | "pink" | "custom"} GradientName
  */
 type GradientName = "blue" | "purple" | "green" | "orange" | "pink" | "custom";
 
 /**
  * Button 컴포넌트의 공통 props / Common props for Button component
- * @typedef {Object} CommonProps
- * @property {Variant} [variant="default"] - 버튼 스타일 변형 / Button style variant
- * @property {Size} [size="md"] - 버튼 크기 / Button size
- * @property {boolean} [loading=false] - 로딩 상태 (스피너 표시) / Loading state (shows spinner)
- * @property {React.ReactNode} [icon] - 아이콘 요소 / Icon element
- * @property {"left" | "right"} [iconPosition="left"] - 아이콘 위치 / Icon position
- * @property {GradientName} [gradient="blue"] - 그라디언트 색상 (variant="gradient"일 때) / Gradient color (when variant="gradient")
- * @property {string} [customGradient] - 커스텀 그라디언트 클래스 (variant="gradient"일 때) / Custom gradient class (when variant="gradient")
- * @property {Rounded} [rounded="md"] - 모서리 둥글기 / Border radius
- * @property {Shadow} [shadow="md"] - 그림자 크기 / Shadow size
- * @property {Hover} [hover="springy"] - 호버 효과 (HUA-UI 시그니처) / Hover effect (HUA-UI signature)
- * @property {boolean} [fullWidth=false] - 전체 너비 사용 / Use full width
- * @property {boolean} [iconOnly=false] - 아이콘만 표시 (aria-label 필수) / Icon only (aria-label required)
- * @property {string} [aria-label] - 접근성을 위한 레이블 (iconOnly일 때 필수) / Accessibility label (required when iconOnly)
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
- * @property {boolean} [disabled=false] - 비활성화 상태 / Disabled state
  */
 type CommonProps = {
   variant?: Variant;
@@ -97,8 +73,6 @@ type NativeButtonProps = CommonProps &
 /**
  * Button 컴포넌트의 props 타입 / Button component props type
  * href가 제공되면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
- * Renders as anchor tag if href is provided, otherwise as button tag.
- * @typedef {AnchorProps | NativeButtonProps} ButtonProps
  */
 export type ButtonProps = AnchorProps | NativeButtonProps;
 
@@ -120,45 +94,15 @@ function useReducedMotion() {
 
 /**
  * Button 컴포넌트 / Button component
- * 
+ *
  * 다양한 스타일과 크기를 지원하는 범용 버튼 컴포넌트입니다.
  * href prop을 제공하면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
- * 
- * Universal button component supporting various styles and sizes.
- * Renders as anchor tag if href prop is provided, otherwise as button tag.
- * 
- * @component
+ *
  * @example
- * // 기본 버튼 / Basic button
  * <Button onClick={() => console.log('클릭')}>클릭하세요</Button>
- * 
- * @example
- * // 다양한 변형 / Various variants
  * <Button variant="destructive" size="lg">삭제</Button>
- * <Button variant="outline" size="sm">취소</Button>
- * <Button variant="ghost">보기</Button>
- * 
- * @example
- * // 아이콘과 함께 사용 / With icon
- * <Button icon={<Icon name="download" />} iconPosition="left">
- *   다운로드
- * </Button>
- * 
- * @example
- * // 로딩 상태 / Loading state
- * <Button loading disabled>저장 중...</Button>
- * 
- * @example
- * // 링크 버튼 / Link button
+ * <Button variant="gradient" gradient="purple">그라디언트</Button>
  * <Button href="/about" variant="link">자세히 보기</Button>
- * 
- * @example
- * // 아이콘만 표시 (aria-label 필수) / Icon only (aria-label required)
- * <Button iconOnly aria-label="닫기" icon={<Icon name="close" />} />
- * 
- * @param {ButtonProps} props - Button 컴포넌트의 props / Button component props
- * @param {React.Ref<HTMLAnchorElement | HTMLButtonElement>} ref - ref 객체 / ref object
- * @returns {JSX.Element} Button 컴포넌트 / Button component
  */
 const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function ButtonInner(
   {
@@ -183,58 +127,25 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
   ref
 ) {
   const reduced = useReducedMotion();
-  
-  // ThemeProvider에서 테마 가져오기 (없으면 기본값 'light' 사용)
-  let resolvedTheme: Theme = "light";
-  try {
-    const themeContext = useTheme();
-    resolvedTheme = themeContext.resolvedTheme as Theme;
-  } catch {
-    // ThemeProvider가 없으면 기본값 사용
-    resolvedTheme = "light";
-  }
 
-  // 통합 스타일 시스템 사용
-  const styles = React.useMemo(() => {
-    // gradient variant의 경우 customGradient 처리
-    let gradientStyle = "";
-    if (variant === "gradient" && customGradient) {
-      gradientStyle = `bg-gradient-to-r ${customGradient}`;
-    } else if (variant === "gradient") {
-      gradientStyle = `bg-gradient-to-r ${getGradientClass(gradient)}`;
-    }
+  // gradient variant: 커스텀 그라디언트 클래스 처리
+  const gradientClass =
+    variant === "gradient"
+      ? customGradient
+        ? `bg-gradient-to-r ${customGradient}`
+        : `bg-gradient-to-r ${gradientPresets[gradient] || gradientPresets.blue}`
+      : undefined;
 
-    const buttonStyles = createButtonStyles({
+  const base = merge(
+    buttonVariants({
       variant,
       size,
       rounded,
       shadow,
-      hover,
-      theme: resolvedTheme,
-      reducedMotion: reduced,
-    });
-
-    // gradient variant는 별도 처리
-    if (variant === "gradient") {
-      return {
-        ...buttonStyles,
-        variant: gradientStyle + " text-white hover:shadow-lg",
-      };
-    }
-
-    return buttonStyles;
-  }, [variant, size, rounded, shadow, hover, resolvedTheme, reduced, gradient, customGradient]);
-
-  const base = merge(
-    styles.base,
-    styles.focus,
-    "disabled:pointer-events-none disabled:opacity-50 min-w-fit",
-    fullWidth && "w-full",
-    styles.variant,
-    styles.size,
-    styles.rounded,
-    styles.shadow,
-    styles.hover,
+      hover: reduced ? "none" : hover,
+      fullWidth: fullWidth ?? false,
+    }),
+    gradientClass,
     className
   );
 
@@ -309,7 +220,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
       className={merge(base, buttonClassName)}
-      type="button"                 // 폼 기본 제출 방지
+      type="button"
       disabled={isDisabled}
       aria-busy={loading || undefined}
       aria-disabled={isDisabled || undefined}
@@ -323,14 +234,3 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
 ButtonInner.displayName = "Button";
 
 export const Button = ButtonInner;
-
-function getGradientClass(gradient: GradientName): string {
-  const g: Record<Exclude<GradientName, "custom">, string> = {
-    blue: "from-teal-500 to-cyan-500",
-    purple: "from-purple-500 to-pink-500",
-    green: "from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400",
-    orange: "from-orange-500 to-red-500 dark:from-orange-300 dark:to-red-300",
-    pink: "from-pink-500 to-rose-500",
-  };
-  return g[gradient as keyof typeof g] || g.blue;
-}

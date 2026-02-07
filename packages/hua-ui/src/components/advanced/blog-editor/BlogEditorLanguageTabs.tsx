@@ -25,7 +25,7 @@ const BlogEditorLanguageTabs = React.forwardRef<HTMLDivElement, BlogEditorLangua
       <div
         ref={ref}
         className={merge(
-          'flex items-center border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 bg-white dark:bg-gray-800',
+          'flex items-center border-b border-border sticky top-0 z-10 bg-background',
           className
         )}
         role="tablist"
@@ -48,8 +48,8 @@ const BlogEditorLanguageTabs = React.forwardRef<HTMLDivElement, BlogEditorLangua
                 className={merge(
                   'flex-1 px-4 py-3 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-primary/10 text-primary border-b-2 border-primary'
+                    : 'text-muted-foreground hover:bg-muted'
                 )}
               >
                 {lang.flag && <span className="mr-1.5">{lang.flag}</span>}
@@ -64,7 +64,7 @@ const BlogEditorLanguageTabs = React.forwardRef<HTMLDivElement, BlogEditorLangua
           <button
             type="button"
             onClick={() => setShowPreview(!showPreview)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 mx-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-2 mx-2 text-sm border border-border rounded-lg hover:bg-muted transition-colors shrink-0"
           >
             <Icon name={showPreview ? 'pencil' : 'eye'} size={14} />
             {showPreview ? labels.editMode : labels.preview}

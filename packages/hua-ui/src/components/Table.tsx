@@ -140,9 +140,9 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "bordered":
-          return "border border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700"
+          return "border border-border divide-x divide-border"
         case "striped":
-          return "divide-y divide-slate-200 dark:divide-slate-700"
+          return "divide-y divide-border"
         default:
           return ""
       }
@@ -230,7 +230,7 @@ const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(
     <tfoot
       ref={ref}
       className={merge(
-        "border-t bg-slate-50 dark:bg-slate-800/50 font-medium [&>tr]:last:border-b-0",
+        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -254,7 +254,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
     const getVariantClasses = () => {
       switch (variant) {
         case "hover":
-          return "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+          return "hover:bg-muted/50"
         default:
           return ""
       }
@@ -264,7 +264,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
       <tr
         ref={ref}
         className={merge(
-          "border-b transition-colors data-[state=selected]:bg-slate-50 dark:data-[state=selected]:bg-slate-800/50",
+          "border-b transition-colors data-[state=selected]:bg-muted/50",
           getVariantClasses(),
           className
         )}
@@ -290,7 +290,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
     <th
       ref={ref}
       className={merge(
-        "h-12 px-4 text-left align-middle font-medium text-slate-500 dark:text-slate-400 [&:has([role=checkbox])]:pr-0",
+        "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -334,7 +334,7 @@ const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttribu
   ({ className, ...props }, ref) => (
     <caption
       ref={ref}
-      className={merge("mt-4 text-sm text-slate-500 dark:text-slate-400", className)}
+      className={merge("mt-4 text-sm text-muted-foreground", className)}
       {...props}
     />
   )
