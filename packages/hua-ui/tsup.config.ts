@@ -11,6 +11,9 @@ const coreEntry = {
   form: 'src/form.ts',
   navigation: 'src/navigation.ts',
   feedback: 'src/feedback.ts',
+  overlay: 'src/overlay.ts',
+  data: 'src/data.ts',
+  interactive: 'src/interactive.ts',
   sdui: 'src/sdui/index.ts',
 };
 
@@ -19,7 +22,7 @@ const shared = {
   treeshake: true,
   minify: true,
   target: 'es2019',
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', '@hua-labs/motion-core', '@hua-labs/motion-advanced', 'lucide-react', '@phosphor-icons/react'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'lucide-react', '@phosphor-icons/react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
   esbuildOptions(options: { jsx: string }) {
     options.jsx = 'automatic';
   },
