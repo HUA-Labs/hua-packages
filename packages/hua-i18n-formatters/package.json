@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "HUA Labs - Date, Number, and Currency formatting utilities for i18n",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
@@ -11,28 +12,28 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./date": {
       "types": "./dist/date/index.d.ts",
-      "import": "./dist/date/index.js",
+      "import": "./dist/date/index.mjs",
       "require": "./dist/date/index.js"
     },
     "./number": {
       "types": "./dist/number/index.d.ts",
-      "import": "./dist/number/index.js",
+      "import": "./dist/number/index.mjs",
       "require": "./dist/number/index.js"
     },
     "./currency": {
       "types": "./dist/currency/index.d.ts",
-      "import": "./dist/currency/index.js",
+      "import": "./dist/currency/index.mjs",
       "require": "./dist/currency/index.js"
     }
   },
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
-    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"
   },
@@ -47,6 +48,7 @@
     "@types/node": "^25.2.0",
     "@types/react": "^19.2.10",
     "react": "^19.2.4",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "keywords": [
