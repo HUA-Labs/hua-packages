@@ -5,7 +5,7 @@
  * 브라우저별 최적화 전략 포함
  */
 
-export interface PerformanceMetrics {
+export interface PerformanceOptimizerMetrics {
   fps: number
   memoryUsage?: number
   gpuTime?: number
@@ -27,7 +27,7 @@ export class PerformanceOptimizer {
   private static instance: PerformanceOptimizer
   private config: OptimizationConfig
   private performanceObserver: PerformanceObserver | null = null
-  private metrics: PerformanceMetrics
+  private metrics: PerformanceOptimizerMetrics
   private layerRegistry = new Set<HTMLElement>()
   private isMonitoring = false
 
@@ -283,7 +283,7 @@ export class PerformanceOptimizer {
   /**
    * 성능 메트릭 가져오기
    */
-  getMetrics(): PerformanceMetrics {
+  getMetrics(): PerformanceOptimizerMetrics {
     return { ...this.metrics }
   }
 

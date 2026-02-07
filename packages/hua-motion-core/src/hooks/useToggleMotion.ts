@@ -1,26 +1,26 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useCallback, useMemo } from 'react'
+import { ToggleMotionOptions, InteractionReturn, MotionElement } from '../types'
 
-interface ToggleMotionOptions {
-  duration?: number
-  delay?: number
-  easing?: string
-}
-
-export function useToggleMotion(options: ToggleMotionOptions = {}) {
+export function useToggleMotion<T extends MotionElement = HTMLDivElement>(
+  options: ToggleMotionOptions = {}
+): InteractionReturn<T> {
   const { duration = 300, delay = 0, easing = 'ease-in-out' } = options
-  const elementRef = useRef<HTMLDivElement | null>(null)
+
+  const ref = useRef<T>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
 
   const show = useCallback(() => {
     setIsVisible(true)
     setIsAnimating(true)
-  }, [])
+    setTimeout(() => setIsAnimating(false), duration + delay)
+  }, [duration, delay])
 
   const hide = useCallback(() => {
     setIsVisible(false)
     setIsAnimating(true)
-  }, [])
+    setTimeout(() => setIsAnimating(false), duration + delay)
+  }, [duration, delay])
 
   const toggle = useCallback(() => {
     if (isVisible) {
@@ -30,36 +30,32 @@ export function useToggleMotion(options: ToggleMotionOptions = {}) {
     }
   }, [isVisible, show, hide])
 
-  useEffect(() => {
-    if (!elementRef.current) return
+  const start = useCallback(() => show(), [show])
+  const stop = useCallback(() => setIsAnimating(false), [])
+  const reset = useCallback(() => {
+    setIsVisible(false)
+    setIsAnimating(false)
+  }, [])
 
-    const element = elementRef.current
-    element.style.transition = `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}`
-
-    if (isVisible) {
-      element.style.opacity = '1'
-      element.style.transform = 'translateY(0) scale(1)'
-    } else {
-      element.style.opacity = '0'
-      element.style.transform = 'translateY(10px) scale(0.95)'
-    }
-
-    const handleTransitionEnd = () => {
-      setIsAnimating(false)
-    }
-
-    element.addEventListener('transitionend', handleTransitionEnd)
-    return () => {
-      element.removeEventListener('transitionend', handleTransitionEnd)
-    }
-  }, [isVisible, duration, easing])
+  const style = useMemo(() => ({
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible
+      ? 'translateY(0) scale(1)'
+      : 'translateY(10px) scale(0.95)',
+    transition: `opacity ${duration}ms ${easing} ${delay}ms, transform ${duration}ms ${easing} ${delay}ms`
+  }), [isVisible, duration, easing, delay])
 
   return {
-    ref: elementRef,
+    ref,
     isVisible,
     isAnimating,
+    style,
+    progress: isVisible ? 1 : 0,
+    start,
+    stop,
+    reset,
+    toggle,
     show,
-    hide,
-    toggle
+    hide
   }
 }

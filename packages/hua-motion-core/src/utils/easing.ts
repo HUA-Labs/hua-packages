@@ -190,19 +190,9 @@ export function getEasing(easingName: unknown): EasingFunction {
       return easing[easingName as keyof typeof easing]
     }
 
-    const fallbackMap: Record<string, keyof typeof easing> = {
-      bounce: 'easeOutBounce',
-      easeInOut: 'easeInOutCubic',
-      easeIn: 'easeInQuad',
-      easeOut: 'easeOutQuad'
-    }
-
-    const fallback = fallbackMap[easingName]
-    if (fallback && fallback in easing) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`[HUA Motion] Unknown easing "${easingName}", using fallback "${fallback}".`)
-      }
-      return easing[fallback]
+    // 'bounce'는 easeOutBounce로 매핑 (별도 이름이므로)
+    if (easingName === 'bounce') {
+      return easing.easeOutBounce
     }
 
     if (process.env.NODE_ENV === 'development') {

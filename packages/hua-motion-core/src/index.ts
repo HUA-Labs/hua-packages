@@ -24,10 +24,10 @@ export {
 } from './core/TransitionEffects'
 
 // PerformanceOptimizer - 성능 최적화
-export { 
-  PerformanceOptimizer, 
+export {
+  PerformanceOptimizer,
   performanceOptimizer,
-  type PerformanceMetrics,
+  type PerformanceOptimizerMetrics,
   type OptimizationConfig
 } from './core/PerformanceOptimizer'
 
@@ -78,6 +78,15 @@ export { useRepeat } from './hooks/useRepeat'
 export { useToggleMotion } from './hooks/useToggleMotion'
 
 // ========================================
+// 슬라이드 방향 훅 (추가)
+export { useSlideDown } from './hooks/useSlideDown'
+
+// 유틸리티 훅들 (신규 export)
+export { useInView } from './hooks/useInView'
+export { useMouse } from './hooks/useMouse'
+export { useReducedMotion } from './hooks/useReducedMotion'
+export { useWindowSize } from './hooks/useWindowSize'
+
 // 기본 제스처 훅들 (Core 패키지 범위)
 // ========================================
 
@@ -118,7 +127,7 @@ export type {
   PageMotionElement,
   PageMotionsConfig,
   MotionState,
-  MotionRef,
+  PageMotionRef,
   // SmartMotionOptions 제거 (useMotion으로 대체)
   // SmartMotionReturn 제거 (useMotion으로 대체)
   
@@ -136,6 +145,35 @@ export type {
   GestureConfig,
   OrchestrationConfig,
   
+  // 훅별 확장 옵션 타입들
+  FadeInOptions,
+  SlideOptions,
+  ScaleOptions,
+  BounceOptions,
+  PulseOptions,
+  SpringOptions,
+  GestureOptions,
+  ScrollRevealOptions,
+  ScrollRevealMotionType,
+  GradientOptions,
+  ToggleMotionOptions,
+  RepeatOptions,
+  HoverMotionOptions,
+  InteractionReturn,
+
+  // 유틸리티 훅 타입들
+  InViewOptions,
+  InViewReturn,
+  MouseOptions,
+  MouseReturn,
+  ReducedMotionReturn,
+  WindowSizeOptions,
+  WindowSizeReturn,
+
+  // 성능 관련 타입들
+  PerformanceMetrics,
+  MotionConfig,
+
   // 기본 타입들
   MotionDirection,
   MotionEasing,
