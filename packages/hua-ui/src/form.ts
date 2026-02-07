@@ -12,13 +12,18 @@
  * import { Input, Select, DatePicker, Form } from '@hua-labs/ui/form';
  * 
  * @example
- * // Core에서도 여전히 사용 가능 / Still available from core
- * import { Input, Select } from '@hua-labs/ui';
+ * // 원자 컴포넌트(Input, Label, Switch, Toggle)는 코어에도 유지
+ * // Atomic components (Input, Label, Switch, Toggle) also remain in core
+ * import { Input, Switch } from '@hua-labs/ui';
  */
 
 // Form structure
 export { Form, FormField, FormGroup } from './components/Form';
 export type { FormProps, FormFieldProps, FormGroupProps } from './components/Form';
+
+// Form validation
+export { FormControl, useFormValidation } from './components/FormControl';
+export type { FormControlProps, ValidationRule, ValidationRules, ValidationErrors } from './components/FormControl';
 
 // Form labels
 export { Label } from './components/Label';
@@ -27,6 +32,8 @@ export type { LabelProps } from './components/Label';
 // Basic form inputs
 export { Input } from './components/Input';
 export type { InputProps } from './components/Input';
+export { NumberInput } from './components/NumberInput';
+export type { NumberInputProps } from './components/NumberInput';
 export { Textarea } from './components/Textarea';
 export type { TextareaProps } from './components/Textarea';
 
@@ -49,4 +56,6 @@ export { Upload } from './components/Upload';
 export type { UploadProps, UploadedFile } from './components/Upload';
 export { Autocomplete } from './components/Autocomplete';
 export type { AutocompleteProps, AutocompleteOption } from './components/Autocomplete';
+export { ColorPicker } from './components/ColorPicker';
+export type { ColorPickerProps } from './components/ColorPicker';
 
