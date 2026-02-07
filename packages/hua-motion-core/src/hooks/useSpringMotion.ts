@@ -1,21 +1,13 @@
 import { useRef, useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react'
-import { BaseMotionReturn, MotionElement } from '../types'
+import { SpringOptions, BaseMotionReturn, MotionElement } from '../types'
 
-interface SpringConfig {
-  mass?: number
-  stiffness?: number
-  damping?: number
-  restDelta?: number
-  restSpeed?: number
-}
-
-interface SpringMotionOptions {
+interface SpringMotionOptions extends SpringOptions {
+  /** 시작 값 */
   from: number
+  /** 목표 값 */
   to: number
-  config?: SpringConfig
-  onComplete?: () => void
+  /** 활성화 여부 */
   enabled?: boolean
-  autoStart?: boolean
 }
 
 export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
@@ -27,13 +19,11 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
   const {
     from,
     to,
-    config = {
-      mass: 1,
-      stiffness: 100,
-      damping: 10,
-      restDelta: 0.01,
-      restSpeed: 0.01
-    },
+    mass = 1,
+    stiffness = 100,
+    damping = 10,
+    restDelta = 0.01,
+    restSpeed = 0.01,
     onComplete,
     enabled = true,
     autoStart = false
@@ -53,29 +43,27 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
 
   // 스프링 물리 계산
   const calculateSpring = useCallback((currentValue: number, currentVelocity: number, targetValue: number, deltaTime: number) => {
-    const { mass = 1, stiffness = 100, damping = 10 } = config
-    
     // 스프링 힘 계산 (Hooke's Law)
     const displacement = currentValue - targetValue
     const springForce = -stiffness * displacement
-    
+
     // 댐핑 힘 계산
     const dampingForce = -damping * currentVelocity
-    
+
     // 총 힘
     const totalForce = springForce + dampingForce
-    
+
     // 가속도 (F = ma)
     const acceleration = totalForce / mass
-    
+
     // 새로운 속도
     const newVelocity = currentVelocity + acceleration * deltaTime
-    
+
     // 새로운 위치
     const newValue = currentValue + newVelocity * deltaTime
-    
+
     return { value: newValue, velocity: newVelocity }
-  }, [config])
+  }, [mass, stiffness, damping])
 
   // 모션 루프
   const animate = useCallback((currentTime: number) => {
@@ -97,7 +85,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     setProgress(currentProgress)
 
     // 정지 조건 확인
-    const isAtRest = Math.abs(value - to) < (config.restDelta || 0.01) && Math.abs(velocity) < (config.restSpeed || 0.01)
+    const isAtRest = Math.abs(value - to) < restDelta && Math.abs(velocity) < restSpeed
 
     if (isAtRest) {
       setSpringState({
@@ -117,7 +105,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     })
 
     motionRef.current = requestAnimationFrame(animate)
-  }, [enabled, springState.isAnimating, to, config, onComplete, calculateSpring])
+  }, [enabled, springState.isAnimating, to, from, restDelta, restSpeed, onComplete, calculateSpring])
 
   // 모션 시작
   const start = useCallback(() => {

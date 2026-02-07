@@ -52,7 +52,7 @@ export interface MotionState {
   isAnimating: boolean
 }
 
-export interface MotionRef<T extends HTMLElement = HTMLElement> {
+export interface PageMotionRef<T extends HTMLElement = HTMLElement> {
   ref: React.RefObject<T | null>
   style: React.CSSProperties
   isVisible: boolean

@@ -5,7 +5,9 @@ type MotionDirection = 'forward' | 'reverse' | 'alternate'
 
 interface MotionStateOptions {
   initialState?: MotionState
+  /** @deprecated Use autoStart instead */
   autoPlay?: boolean
+  autoStart?: boolean
   loop?: boolean
   direction?: MotionDirection
   duration?: number
@@ -32,7 +34,8 @@ interface MotionStateReturn {
 export function useMotionState(options: MotionStateOptions = {}): MotionStateReturn {
   const {
     initialState = 'idle',
-    autoPlay = false,
+    autoPlay,
+    autoStart = autoPlay ?? false,
     loop = false,
     direction = 'forward',
     duration = 1000,
@@ -233,10 +236,10 @@ export function useMotionState(options: MotionStateOptions = {}): MotionStateRet
 
   // 자동 재생
   useEffect(() => {
-    if (mounted && autoPlay && state === 'idle') {
+    if (mounted && autoStart && state === 'idle') {
       play()
     }
-  }, [mounted, autoPlay, state, play])
+  }, [mounted, autoStart, state, play])
 
   // 클린업
   useEffect(() => {

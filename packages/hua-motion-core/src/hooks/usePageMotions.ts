@@ -7,7 +7,7 @@ import type {
   PageMotionsConfig, 
   PageMotionElement, 
   MotionState, 
-  MotionRef 
+  PageMotionRef
 } from '../types'
 import { getMotionPreset, mergeWithPreset } from '../presets'
 import { motionStateManager } from '../managers/MotionStateManager'
@@ -25,7 +25,7 @@ import { motionStateManager } from '../managers/MotionStateManager'
  * ```
  */
 export function usePageMotions(config: PageMotionsConfig) {
-  const [motions, setMotions] = useState<Map<string, MotionRef>>(new Map())
+  const [motions, setMotions] = useState<Map<string, PageMotionRef>>(new Map())
   const observersRef = useRef<Map<string, IntersectionObserver>>(new Map())
   const unsubscribeRef = useRef<Map<string, () => void>>(new Map())
   const [resetKey, setResetKey] = useState(0)
@@ -107,7 +107,7 @@ export function usePageMotions(config: PageMotionsConfig) {
 
   // 모션 초기화
   useEffect(() => {
-    const newMotions = new Map<string, MotionRef>()
+    const newMotions = new Map<string, PageMotionRef>()
     
     // config가 유효하지 않으면 early return
     if (!config || typeof config !== 'object') {
@@ -167,7 +167,7 @@ export function usePageMotions(config: PageMotionsConfig) {
           // 변경이 없으면 이전 Map 반환 (불필요한 리렌더링 방지)
           if (!hasChanged) return prev
 
-          const newMotion: MotionRef = {
+          const newMotion: PageMotionRef = {
             ...current,
             style: {
               ...current.style,
@@ -402,8 +402,8 @@ export function usePageMotions(config: PageMotionsConfig) {
   // }, [])
 
   // 모션 refs 반환
-  const getMotionRefs = useCallback(() => {
-    const result: Record<string, MotionRef> = {}
+  const getPageMotionRefs = useCallback(() => {
+    const result: Record<string, PageMotionRef> = {}
     motions.forEach((motion, elementId) => {
       result[elementId] = motion
     })
@@ -411,7 +411,7 @@ export function usePageMotions(config: PageMotionsConfig) {
   }, [motions])
 
   return {
-    ...getMotionRefs(),
+    ...getPageMotionRefs(),
     reset
   }
 } 
