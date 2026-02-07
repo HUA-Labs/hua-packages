@@ -90,6 +90,14 @@
     "@hua-labs/i18n-formatters#build": {
       "dependsOn": ["@hua-labs/i18n-core#build"],
       "outputs": ["dist/**"]
+    },
+    "@hua-labs/hooks#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"]
+    },
+    "@hua-labs/state#build": {
+      "dependsOn": [],
+      "outputs": ["dist/**"]
     }
   }
 }

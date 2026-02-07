@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    [
+      "@hua-labs/i18n-core",
+      "@hua-labs/i18n-core-zustand",
+      "@hua-labs/i18n-formatters",
+      "@hua-labs/i18n-loaders"
+    ]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@hua-labs/pro",
+    "create-hua"
+  ]
+}

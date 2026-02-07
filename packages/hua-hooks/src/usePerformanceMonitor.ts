@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export interface PerformanceMetrics {
+export interface PerformanceMonitorMetrics {
   fps: number
   frameTime: number
   memory: number
@@ -15,13 +15,13 @@ export interface UsePerformanceMonitorOptions {
 /**
  * 성능 모니터링 훅
  */
-export function usePerformanceMonitor(config: UsePerformanceMonitorOptions = {}): PerformanceMetrics {
+export function usePerformanceMonitor(config: UsePerformanceMonitorOptions = {}): PerformanceMonitorMetrics {
   const {
     interval = 1000,
     targetFps = 60
   } = config
 
-  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+  const [metrics, setMetrics] = useState<PerformanceMonitorMetrics>({
     fps: 60,
     frameTime: 16.67,
     memory: 0,

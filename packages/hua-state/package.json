@@ -57,6 +57,7 @@
     "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
+  "sideEffects": false,
   "publishConfig": {
     "access": "public",
     "provenance": true
