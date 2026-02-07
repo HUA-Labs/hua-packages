@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
+import { MOTION_PRESETS } from '../presets'
 
 type MotionType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
 type ElementType = 'hero' | 'title' | 'button' | 'card' | 'text' | 'image'
@@ -52,17 +53,9 @@ export function useSmartMotion<T extends HTMLElement = HTMLDivElement>(options: 
     autoLanguageSync = false
   } = options
 
-  // 프리셋 설정
+  // 프리셋 설정 (MOTION_PRESETS 재사용)
   const getPresetConfig = useCallback(() => {
-    const presets = {
-      hero: { entrance: 'fadeIn', delay: 200, duration: 800, hover: false, click: false },
-      title: { entrance: 'slideUp', delay: 400, duration: 700, hover: false, click: false },
-      button: { entrance: 'scaleIn', delay: 600, duration: 300, hover: true, click: true },
-      card: { entrance: 'slideUp', delay: 800, duration: 500, hover: true, click: false },
-      text: { entrance: 'fadeIn', delay: 200, duration: 600, hover: false, click: false },
-      image: { entrance: 'scaleIn', delay: 400, duration: 600, hover: true, click: false }
-    }
-    return presets[type] || presets.text
+    return MOTION_PRESETS[type] || MOTION_PRESETS.text
   }, [type])
 
   const preset = getPresetConfig()

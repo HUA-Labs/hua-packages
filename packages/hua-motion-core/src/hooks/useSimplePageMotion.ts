@@ -3,7 +3,7 @@
 // ========================================
 
 import { useRef, useEffect, useState, useCallback } from 'react'
-import type { PageType, PageMotionsConfig, PageMotionElement, MotionRef } from '../types'
+import type { PageType, PageMotionsConfig, PageMotionElement, PageMotionRef } from '../types'
 import { getPagePreset, getMotionPreset, mergeWithPreset } from '../presets'
 
 /**
@@ -29,7 +29,7 @@ export function useSimplePageMotion(pageType: PageType) {
  * 1단계 내부 구현: 간단한 페이지 모션 (상태 관리자 없음)
  */
 function useSimplePageMotions(config: PageMotionsConfig) {
-  const [motions, setMotions] = useState<Map<string, MotionRef>>(new Map())
+  const [motions, setMotions] = useState<Map<string, PageMotionRef>>(new Map())
   const observersRef = useRef<Map<string, IntersectionObserver>>(new Map())
 
   // 모션 값 계산
@@ -50,7 +50,7 @@ function useSimplePageMotions(config: PageMotionsConfig) {
 
   // 모션 초기화
   useEffect(() => {
-    const newMotions = new Map<string, MotionRef>()
+    const newMotions = new Map<string, PageMotionRef>()
     
     Object.entries(config).forEach(([elementId, elementConfig]) => {
       const ref = { current: null }
@@ -97,7 +97,7 @@ function useSimplePageMotions(config: PageMotionsConfig) {
                   const current = prev.get(elementId)
                   if (!current) return prev
 
-                  const newMotion: MotionRef = {
+                  const newMotion: PageMotionRef = {
                     ...current,
                     style: {
                       ...current.style,
@@ -148,15 +148,15 @@ function useSimplePageMotions(config: PageMotionsConfig) {
   }, [config, calculateMotionValues])
 
   // 모션 refs 반환
-  const getMotionRefs = useCallback(() => {
-    const result: Record<string, MotionRef> = {}
+  const getPageMotionRefs = useCallback(() => {
+    const result: Record<string, PageMotionRef> = {}
     motions.forEach((motion, elementId) => {
       result[elementId] = motion
     })
     return result
   }, [motions])
 
-  return getMotionRefs()
+  return getPageMotionRefs()
 }
 
 /**

@@ -1,28 +1,9 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
-import { BaseMotionReturn, MotionElement } from '../types'
-
-export interface BounceInOptions {
-  duration?: number
-  delay?: number
-  autoStart?: boolean
-  intensity?: number
-  // IntersectionObserver 옵션 (useFadeIn과 동일 패턴)
-  threshold?: number
-  triggerOnce?: boolean
-  easing?: string
-  // 콜백
-  onComplete?: () => void
-  onStart?: () => void
-  onStop?: () => void
-  onReset?: () => void
-}
+import { BounceOptions, BaseMotionReturn, MotionElement } from '../types'
 
 export function useBounceIn<T extends MotionElement = HTMLDivElement>(
-  options: BounceInOptions = {}
-): BaseMotionReturn<T> & {
-  scale: number
-  opacity: number
-} {
+  options: BounceOptions = {}
+): BaseMotionReturn<T> {
   const {
     duration = 600,
     delay = 0,
@@ -163,8 +144,6 @@ export function useBounceIn<T extends MotionElement = HTMLDivElement>(
 
   return {
     ref,
-    scale,
-    opacity,
     isVisible,
     isAnimating,
     style,

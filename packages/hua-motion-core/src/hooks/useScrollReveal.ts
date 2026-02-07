@@ -1,27 +1,21 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
-import { BaseMotionReturn, MotionElement } from '../types'
-
-type MotionType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
-
-interface ScrollRevealOptions {
-  threshold?: number
-  rootMargin?: string
-  triggerOnce?: boolean
-  delay?: number
-  motionType?: MotionType
-}
+import { ScrollRevealOptions, BaseMotionReturn, MotionElement } from '../types'
 
 export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
   options: ScrollRevealOptions = {}
-): BaseMotionReturn<T> & {
-  progress: number
-} {
+): BaseMotionReturn<T> {
   const {
     threshold = 0.1,
     rootMargin = '0px',
     triggerOnce = true,
     delay = 0,
-    motionType = 'fadeIn'
+    duration = 700,
+    easing = 'ease-out',
+    motionType = 'fadeIn',
+    onComplete,
+    onStart,
+    onStop,
+    onReset
   } = options
 
   const ref = useRef<T>(null)
@@ -34,15 +28,17 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     entries.forEach(entry => {
       if (entry.isIntersecting && (!triggerOnce || !hasTriggered)) {
         setIsAnimating(true)
+        onStart?.()
         setTimeout(() => {
           setIsVisible(true)
           setHasTriggered(true)
           setProgress(1)
           setIsAnimating(false)
+          onComplete?.()
         }, delay)
       }
     })
-  }, [triggerOnce, hasTriggered, delay])
+  }, [triggerOnce, hasTriggered, delay, onStart, onComplete])
 
   useEffect(() => {
     if (!ref.current) return
@@ -59,10 +55,10 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     }
   }, [observerCallback, threshold, rootMargin])
 
-  // 모션 스타일 생성 - 메모이제이션으로 불필요한 리렌더링 방지
+  // 모션 스타일 생성 - duration/easing을 옵션에서 사용
   const style = useMemo(() => {
-    const baseTransition = 'all 700ms ease-out'
-    
+    const baseTransition = `all ${duration}ms ${easing}`
+
     if (!isVisible) {
       switch (motionType) {
         case 'fadeIn':
@@ -107,34 +103,38 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
           }
       }
     }
-    
+
     // 보이는 상태일 때
     return {
       opacity: 1,
       transform: 'none',
       transition: baseTransition
     }
-  }, [isVisible, motionType])
+  }, [isVisible, motionType, duration, easing])
 
   const start = useCallback(() => {
     setIsAnimating(true)
+    onStart?.()
     setTimeout(() => {
       setIsVisible(true)
       setProgress(1)
       setIsAnimating(false)
+      onComplete?.()
     }, delay)
-  }, [delay])
+  }, [delay, onStart, onComplete])
 
   const reset = useCallback(() => {
     setIsVisible(false)
     setIsAnimating(false)
     setProgress(0)
     setHasTriggered(false)
-  }, [])
+    onReset?.()
+  }, [onReset])
 
   const stop = useCallback(() => {
     setIsAnimating(false)
-  }, [])
+    onStop?.()
+  }, [onStop])
 
   return {
     ref,
@@ -146,4 +146,4 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     reset,
     stop
   }
-} 
+}
