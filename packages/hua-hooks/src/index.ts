@@ -8,4 +8,4 @@ export type { UseAutoScrollOptions, UseAutoScrollReturn } from './useAutoScroll'
 
 // Performance hooks
 export { usePerformanceMonitor } from './usePerformanceMonitor'
-export type { PerformanceMetrics, UsePerformanceMonitorOptions } from './usePerformanceMonitor' 
+export type { PerformanceMonitorMetrics, UsePerformanceMonitorOptions } from './usePerformanceMonitor'

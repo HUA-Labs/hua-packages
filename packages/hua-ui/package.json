@@ -136,8 +136,8 @@
   },
   "peerDependencies": {
     "@hua-labs/motion-core": "^2.1.0-alpha.0",
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "keywords": [
     "hua-labs",
@@ -167,5 +167,9 @@
     "**/*.css",
     "./dist/iconsax.mjs",
     "./dist/iconsax.js"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

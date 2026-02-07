@@ -1,0 +1,92 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install build tools for native modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3
+
+      - name: Clean node_modules to avoid stale symlinks
+        run: rm -rf node_modules
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts=false
+
+      - name: Build packages (topological order via turbo)
+        run: pnpm build --filter "@hua-labs/*"
+
+      - name: Type check
+        run: |
+          pnpm --filter=my-app \
+               --filter=@hua-labs/ui \
+               --filter=@hua-labs/utils \
+               --filter=@hua-labs/i18n-core \
+               --filter=@hua-labs/i18n-core-zustand \
+               --filter=@hua-labs/i18n-loaders \
+               --filter=@hua-labs/i18n-formatters \
+               --filter=@hua-labs/motion-core \
+               --filter=@hua-labs/hooks \
+               --filter=@hua-labs/state \
+               --filter=@hua-labs/hua-ux \
+               run type-check
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install build tools for native modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3
+
+      - name: Clean node_modules to avoid stale symlinks
+        run: rm -rf node_modules
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts=false
+
+      - name: Lint
+        run: |
+          pnpm --filter=my-app \
+               --filter=@hua-labs/ui \
+               --filter=@hua-labs/utils \
+               --filter=@hua-labs/i18n-core \
+               --filter=@hua-labs/i18n-core-zustand \
+               --filter=@hua-labs/i18n-loaders \
+               --filter=@hua-labs/motion-core \
+               --filter=@hua-labs/hooks \
+               run lint
