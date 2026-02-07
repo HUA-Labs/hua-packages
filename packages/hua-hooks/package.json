@@ -8,7 +8,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "files": [
@@ -18,17 +19,20 @@
     "build": "node ../../node_modules/typescript/lib/tsc.js",
     "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
     "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "dependencies": {
-    "react": "19.2.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/react": "^19.2.10",
-    "typescript": "^5.9.3"
+    "jsdom": "^27.4.0",
+    "react": "^19.2.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": ">=19.0.0"
   },
   "keywords": [
     "react",
@@ -37,5 +41,10 @@
     "typescript"
   ],
   "author": "HUA Labs",
-  "license": "MIT"
+  "license": "MIT",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }
