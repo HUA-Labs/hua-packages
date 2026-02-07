@@ -3,18 +3,18 @@
   "version": "1.0.0-alpha.5",
   "description": "HUA State - Unified state management for hua-ux framework with SSR support and integrations",
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./integrations/i18n": {
       "types": "./dist/integrations/i18n.d.ts",
-      "import": "./dist/integrations/i18n.js",
+      "import": "./dist/integrations/i18n.mjs",
       "require": "./dist/integrations/i18n.js",
       "default": "./dist/integrations/i18n.js"
     }
@@ -24,8 +24,8 @@
     "src"
   ],
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
-    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "lint": "echo 'Skipping lint for hua-state (ESLint 8, needs separate config)'",
     "type-check": "tsc --noEmit"
@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.2.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
 }
