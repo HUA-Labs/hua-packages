@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "공통 React 훅 모음",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     }
@@ -16,8 +17,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ../../node_modules/typescript/lib/tsc.js",
-    "dev": "node ../../node_modules/typescript/lib/tsc.js --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
@@ -28,6 +29,7 @@
     "@types/react": "^19.2.10",
     "jsdom": "^27.4.0",
     "react": "^19.2.4",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
