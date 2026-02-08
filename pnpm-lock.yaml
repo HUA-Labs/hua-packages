@@ -674,6 +674,9 @@ importers:
       '@hua-labs/ui':
         specifier: workspace:*
         version: link:../../packages/hua-ui
+      '@hua-labs/ui-dashboard':
+        specifier: workspace:*
+        version: link:../../packages/hua-ui-dashboard
       '@hua-labs/utils':
         specifier: workspace:*
         version: link:../../packages/hua-utils
@@ -1224,9 +1227,6 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.4)
-      '@hua-labs/ui':
-        specifier: '>=1.0.0'
-        version: 1.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1237,6 +1237,9 @@ importers:
         specifier: ^2.0.0
         version: 2.6.0
     devDependencies:
+      '@hua-labs/ui':
+        specifier: workspace:*
+        version: link:../hua-ui
       '@types/react':
         specifier: ^19.2.10
         version: 19.2.10
@@ -2190,12 +2193,6 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
-
-  '@hua-labs/ui@1.0.0':
-    resolution: {integrity: sha512-CrWqadW+obdN8GqTcKtwA+y8xg+pBcU5ncXPZq7fKpzL9mbt6CH2ZeXySdDyPfed38yFhsTLdjwzo/dpxkYfnA==}
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -7652,11 +7649,6 @@ packages:
     resolution: {integrity: sha512-Lkk/vx6ak3rYkRR0Nhu4lFUT2VDnQSxBe8Hbl7f36358p6ow8Bnvr8lrLt98H8J1aGxfhbX4Fs5tYg2+FTwr5Q==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
 
-  lucide-react@0.263.1:
-    resolution: {integrity: sha512-keqxAx97PlaEN89PXZ6ki1N8nRjGWtDa4021GFYLNj0RgruM5odbpl8GHTExj0hhPq3sF6Up0gnxt6TSHu+ovw==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
-
   lucide-react@0.563.0:
     resolution: {integrity: sha512-8dXPB2GI4dI8jV4MgUDGBeLdGk8ekfqVZ0BdLcrRzocGgG75ltNEmWS+gE7uokKF/0oSUuczNDT+g9hFJ23FkA==}
     peerDependencies:
@@ -11496,14 +11488,6 @@ snapshots:
   '@hono/node-server@1.19.9(hono@4.11.4)':
     dependencies:
       hono: 4.11.4
-
-  '@hua-labs/ui@1.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
-    dependencies:
-      clsx: 2.1.1
-      lucide-react: 0.263.1(react@19.2.4)
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-      tailwind-merge: 2.6.0
 
   '@humanfs/core@0.19.1': {}
 
@@ -18324,10 +18308,6 @@ snapshots:
       yallist: 4.0.0
 
   lru.min@1.1.3: {}
-
-  lucide-react@0.263.1(react@19.2.4):
-    dependencies:
-      react: 19.2.4
 
   lucide-react@0.563.0(react@19.2.4):
     dependencies:
