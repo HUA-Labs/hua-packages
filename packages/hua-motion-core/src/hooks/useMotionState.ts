@@ -5,8 +5,6 @@ type MotionDirection = 'forward' | 'reverse' | 'alternate'
 
 interface MotionStateOptions {
   initialState?: MotionState
-  /** @deprecated Use autoStart instead */
-  autoPlay?: boolean
   autoStart?: boolean
   loop?: boolean
   direction?: MotionDirection
@@ -34,8 +32,7 @@ interface MotionStateReturn {
 export function useMotionState(options: MotionStateOptions = {}): MotionStateReturn {
   const {
     initialState = 'idle',
-    autoPlay,
-    autoStart = autoPlay ?? false,
+    autoStart = false,
     loop = false,
     direction = 'forward',
     duration = 1000,

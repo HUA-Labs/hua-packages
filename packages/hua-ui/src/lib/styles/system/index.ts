@@ -24,8 +24,7 @@ export {
   getThemeColorClassWithDark,
 } from "./theme";
 
-// 컴포넌트 스타일 팩토리 — CVA로 마이그레이션 완료, 레거시 유지
-// @deprecated Button.variants.ts, Card.tsx의 cardVariants 사용
+// 컴포넌트 스타일 타입 (CVA로 마이그레이션됨, 타입만 유지)
 export type {
   ButtonVariant,
   ButtonSize,
@@ -39,7 +38,3 @@ export type {
   CardStyles,
   BrandingColors,
 } from "./components";
-/** @deprecated Use buttonVariants from Button.variants.ts instead */
-export { createButtonStyles } from "./components";
-/** @deprecated Use cardVariants from Card.tsx instead */
-export { createCardStyles } from "./components";

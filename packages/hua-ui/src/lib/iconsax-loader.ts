@@ -47,7 +47,7 @@ const loadingPromises = new Map<string, Promise<IconsaxIconComponent | null>>()
 export async function loadIconsaxIcon(
   iconName: string
 ): Promise<IconsaxIconComponent | null> {
-  const normalizedName = normalizeIconsaxIconName(iconName)
+  const normalizedName = toPascalCase(iconName)
 
   // getIconsaxIcon 함수를 통해 아이콘 조회
   const IconComponent = getIconsaxIcon(normalizedName)
@@ -82,7 +82,7 @@ export function getIconsaxIconSync(
   iconName: string,
   variant: IconsaxVariant = 'line'
 ): IconsaxIconComponent | null {
-  const normalizedName = normalizeIconsaxIconName(iconName)
+  const normalizedName = toPascalCase(iconName)
   // variant에 따라 다른 맵에서 조회
   if (variant === 'bold') {
     return getIconsaxBoldIcon(normalizedName) || null
@@ -132,7 +132,7 @@ export async function preloadCommonIconsaxIcons(): Promise<number> {
  * Checks if an icon is in the cache.
  */
 export function isIconsaxIconCached(iconName: string): boolean {
-  const normalizedName = normalizeIconsaxIconName(iconName)
+  const normalizedName = toPascalCase(iconName)
   return iconsaxIconCache.has(normalizedName)
 }
 
@@ -143,22 +143,6 @@ export function isIconsaxIconCached(iconName: string): boolean {
  */
 export function getCachedIconsaxIcons(): string[] {
   return Array.from(iconsaxIconCache.keys())
-}
-
-/**
- * Iconsax 아이콘 이름을 표준화합니다.
- * kebab-case나 camelCase를 PascalCase로 변환합니다.
- *
- * Normalizes Iconsax icon name.
- * Converts kebab-case or camelCase to PascalCase.
- *
- * @param name - 아이콘 이름
- * @returns PascalCase 아이콘 이름
- * @deprecated Use toPascalCase from normalize-icon-name.ts instead
- */
-export function normalizeIconsaxIconName(name: string): string {
-  // toPascalCase를 재사용하여 일관성 유지
-  return toPascalCase(name)
 }
 
 /**
@@ -177,7 +161,7 @@ export function normalizeIconsaxIconName(name: string): string {
  * </Suspense>
  */
 export function createLazyIconsaxIcon(iconName: string) {
-  const normalizedName = normalizeIconsaxIconName(iconName)
+  const normalizedName = toPascalCase(iconName)
   return React.lazy(() =>
     import(`../components/icons/${normalizedName}`).then(module => ({
       default: module.default

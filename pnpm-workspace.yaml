@@ -18,3 +18,6 @@ onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
   - prisma
+
+patchedDependencies:
+  '@phosphor-icons/react@2.1.10': patches/@phosphor-icons__react@2.1.10.patch

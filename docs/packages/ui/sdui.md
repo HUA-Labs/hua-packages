@@ -1,4 +1,4 @@
-# SDUI (Server-Driven UI) 시스템
+# Server-Driven UI (SDUI)
 
 **작성일**: 2026-01-11
 **버전**: 1.0.0

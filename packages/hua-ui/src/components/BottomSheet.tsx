@@ -23,12 +23,8 @@ import { Icon } from "./Icon"
 interface BottomSheetProps {
   /** BottomSheet 열림/닫힘 상태 / BottomSheet open/close state */
   isOpen?: boolean
-  /** @deprecated use isOpen instead */
-  open?: boolean
   /** BottomSheet 닫기 콜백 / BottomSheet close callback */
   onClose?: () => void
-  /** @deprecated use onClose instead */
-  onOpenChange?: (open: boolean) => void
   /** BottomSheet 내용 / BottomSheet content */
   children: React.ReactNode
   /** 추가 CSS 클래스 / Additional CSS class */
@@ -95,9 +91,7 @@ interface BottomSheetProps {
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
   ({
     isOpen,
-    open,
     onClose,
-    onOpenChange,
     children,
     className,
     height = "md",
@@ -111,12 +105,9 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     defaultSnap = 50,
     ...props
   }, ref) => {
-    // isOpen과 open 둘 다 지원 (isOpen 우선)
-    const _isOpen = isOpen ?? open ?? false
-    // onClose와 onOpenChange 둘 다 지원
+    const _isOpen = isOpen ?? false
     const handleClose = () => {
       onClose?.()
-      onOpenChange?.(false)
     }
 
     const [isVisible, setIsVisible] = React.useState(false)

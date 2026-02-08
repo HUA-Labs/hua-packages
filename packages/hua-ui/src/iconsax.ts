@@ -31,7 +31,6 @@ export {
   preloadCommonIconsaxIcons,
   isIconsaxIconCached,
   getCachedIconsaxIcons,
-  normalizeIconsaxIconName,
   createLazyIconsaxIcon,
 } from './lib/iconsax-loader'
 export type { IconsaxIconComponent } from './lib/iconsax-loader'

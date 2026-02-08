@@ -49,7 +49,7 @@ function isRetryableError(error: unknown): boolean {
   // Fetch API error messages
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
-    if (message.includes('failed to fetch') || 
+    if (message.includes('failed to fetch') ||
         message.includes('networkerror')) {
       return true;
     }

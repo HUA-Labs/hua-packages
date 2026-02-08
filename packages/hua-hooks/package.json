@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/hooks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "공통 React 훅 모음",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

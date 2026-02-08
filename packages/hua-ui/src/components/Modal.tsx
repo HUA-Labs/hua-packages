@@ -11,7 +11,7 @@ import { merge } from "../lib/utils"
  * @property {() => void} onClose - 모달 닫기 콜백 함수 / Modal close callback function
  * @property {React.ReactNode} children - 모달 내용 / Modal content
  * @property {"sm" | "md" | "lg" | "xl" | "2xl" | "3xl"} [size="md"] - 모달 크기 / Modal size
- * @property {boolean} [showCloseButton=true] - 닫기 버튼 표시 여부 / Show close button
+ * @property {boolean} [closable=true] - 닫기 버튼 표시 여부 / Show close button
  * @property {boolean} [closeOnOverlayClick=true] - 오버레이 클릭 시 닫기 여부 / Close on overlay click
  * @property {string} [title] - 모달 제목 / Modal title
  * @property {string} [description] - 모달 설명 / Modal description
@@ -31,8 +31,6 @@ export interface ModalProps {
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
   /** 닫기 버튼 표시 여부 / Show close button */
   closable?: boolean
-  /** @deprecated use closable instead */
-  showCloseButton?: boolean
   /** 오버레이 클릭 시 닫기 여부 / Close on overlay click */
   closeOnOverlayClick?: boolean
   /** 모달 제목 / Modal title */
@@ -119,7 +117,6 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   children,
   size = "md",
   closable,
-  showCloseButton,
   closeOnOverlayClick = true,
   title,
   description,
@@ -127,8 +124,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   backdropClassName,
   centered = true
   }, ref) => {
-  // closable과 showCloseButton 둘 다 지원 (closable 우선)
-  const _closable = closable ?? showCloseButton ?? true
+  const _closable = closable ?? true
   const modalRef = React.useRef<HTMLDivElement>(null)
     const combinedRef = useCombinedRefs(ref, modalRef)
 
@@ -251,7 +247,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         )}
 
         {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
-        {!title && showCloseButton && (
+        {!title && _closable && (
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20"

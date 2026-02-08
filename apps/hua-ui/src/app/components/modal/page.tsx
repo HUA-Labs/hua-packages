@@ -151,7 +151,7 @@ export default function ModalPage() {
               <Modal
                 isOpen={isOpenNoClose}
                 onClose={() => setIsOpenNoClose(false)}
-                showCloseButton={false}
+                closable={false}
                 title="닫기 버튼 없는 모달"
               >
                 <div className="p-6">
@@ -347,7 +347,7 @@ function MyComponent() {
 <Modal
   isOpen={isOpen}
   onClose={() => setIsOpen(false)}
-  showCloseButton={false}
+  closable={false}
   closeOnOverlayClick={false}
   showBackdrop={false}
   centered={false}
@@ -404,7 +404,7 @@ function MyComponent() {
                       <td className="p-2 text-sm">모달 제목</td>
                     </tr>
                     <tr className="border-b border-slate-100 dark:border-slate-800">
-                      <td className="p-2 font-mono text-sm">showCloseButton</td>
+                      <td className="p-2 font-mono text-sm">closable</td>
                       <td className="p-2 font-mono text-sm">boolean</td>
                       <td className="p-2 font-mono text-sm">true</td>
                       <td className="p-2 text-sm">닫기 버튼 표시 여부</td>

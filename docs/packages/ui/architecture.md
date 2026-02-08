@@ -1,4 +1,4 @@
-# HUA UI 아키텍처 문서
+# hua-ui Architecture
 
 **작성일**: 2026-02-06
 **버전**: 1.2.0
@@ -508,6 +508,5 @@ pnpm test:coverage
 
 ---
 
-**작성자**: Auto (AI Assistant)  
+**작성자**: Auto (AI Assistant)
 **최종 업데이트**: 2026-02-06
-
