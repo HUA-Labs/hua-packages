@@ -328,11 +328,6 @@ export function I18nProvider({
     return ''; // 프로덕션에서는 빈 문자열 반환하여 미싱 키 노출 방지
   }, [translator, config.debug, currentLanguage, config.fallbackLanguage, translationVersion, findInSSRTranslations, findInDefaultTranslations]) as (key: string, paramsOrLang?: TranslationParams | string, language?: string) => string;
 
-  // 파라미터가 있는 번역 함수 (deprecated: t()에 통합됨)
-  const tWithParams = useCallback((key: string, params?: TranslationParams, language?: string) => {
-    return t(key, params, language);
-  }, [t]);
-
   // 기존 비동기 번역 함수 (하위 호환성)
   const tAsync = useCallback(async (key: string, params?: TranslationParams) => {
     if (!translator) {
@@ -477,7 +472,6 @@ export function I18nProvider({
     currentLanguage,
     setLanguage,
     t,
-    tWithParams,
     tAsync,
     tSync,
     getRawValue,
@@ -485,12 +479,9 @@ export function I18nProvider({
     error,
     supportedLanguages: config.supportedLanguages,
     debug,
-    isInitialized, // 추가: 초기화 상태 직접 노출
-    translationVersion, // 번역 로드 완료 시 리렌더링 트리거
-  }), [currentLanguage, setLanguage, t, tWithParams, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
-  
-  // 의존성 배열은 이미 최적화되어 있음
-  // t, tWithParams, tAsync, tSync, getRawValue는 모두 useCallback으로 메모이제이션됨
+    isInitialized,
+    translationVersion,
+  }), [currentLanguage, setLanguage, t, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
 
   return (
     <I18nContext.Provider value={value}>
@@ -510,7 +501,6 @@ export function useI18n(): I18nContextType {
       currentLanguage: 'ko',
       setLanguage: () => {},
       t: (key: string) => key,
-      tWithParams: (key: string) => key, // deprecated
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
       getRawValue: () => undefined,
@@ -541,11 +531,10 @@ export function useI18n(): I18nContextType {
  * 간단한 번역 훅 (hua-api 스타일)
  */
 export function useTranslation() {
-  const { t, tWithParams, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
+  const { t, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
 
   return {
     t,
-    tWithParams,
     getRawValue,
     currentLanguage,
     setLanguage,
@@ -591,21 +580,3 @@ export function useLanguageChange() {
   };
 }
 
-// 기존 훅들 (하위 호환성을 위해 유지)
-export function usePreloadTranslations() {
-  const context = useContext(I18nContext);
-  
-  const preload = useCallback(async (namespaces: string[]) => {
-    if (!context) return;
-    
-    // 이미 초기화되어 있으므로 별도 로딩 불필요
-    console.warn('usePreloadTranslations is deprecated. Translations are now preloaded automatically.');
-  }, [context]);
-
-  return { preload };
-}
-
-export function useAutoLoadNamespace(namespace: string) {
-  // 이미 초기화되어 있으므로 별도 로딩 불필요
-  console.warn('useAutoLoadNamespace is deprecated. All namespaces are now loaded automatically.');
-} 

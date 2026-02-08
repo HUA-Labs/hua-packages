@@ -573,14 +573,6 @@ export class Translator implements TranslatorInterface {
   }
 
   /**
-   * 매개변수가 있는 번역
-   * @deprecated Use translate(key, params, language) instead
-   */
-  translateWithParams(key: string, params?: Record<string, unknown>, language?: string): string {
-    return this.translate(key, params, language);
-  }
-
-  /**
    * 언어 설정
    */
   setLanguage(language: string): void {

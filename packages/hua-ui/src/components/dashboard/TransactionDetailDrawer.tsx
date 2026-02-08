@@ -271,12 +271,8 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
 
   return (
     <Drawer
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) {
-          onClose();
-        }
-      }}
+      isOpen={open}
+      onClose={onClose}
       className={className}
     >
       <DrawerHeader onClose={onClose}>
