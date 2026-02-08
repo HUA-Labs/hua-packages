@@ -67,6 +67,10 @@
       "dependsOn": [],
       "outputs": ["dist/**"]
     },
+    "@hua-labs/ui-dashboard#build": {
+      "dependsOn": ["@hua-labs/ui#build"],
+      "outputs": ["dist/**"]
+    },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
