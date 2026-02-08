@@ -62,10 +62,3 @@ export function normalizePhosphorIconName(name: string): string {
   return normalizeIconName(name)
 }
 
-/**
- * Iconsax 아이콘 이름 정규화
- * Iconsax도 PascalCase 사용 (Heart, ArrowLeft 등)
- */
-export function normalizeIconsaxIconName(name: string): string {
-  return normalizeIconName(name)
-}

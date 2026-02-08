@@ -11,7 +11,6 @@ import { DateFormatterReturn, DateFormatterOptions, LocaleDateFormatterOptions, 
 import {
   formatDate,
   formatDateTime,
-  formatDateReadable,
   formatDateLocalized,
   formatDateTimeLocalized,
   getLocaleFromLanguage,

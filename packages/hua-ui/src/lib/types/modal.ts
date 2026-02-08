@@ -28,11 +28,6 @@ export interface BaseModalProps {
 export interface ModalCloseProps {
   /** 닫기 버튼 표시 여부 */
   closable?: boolean;
-  /**
-   * @deprecated use closable instead
-   * 닫기 버튼 표시 여부 (deprecated)
-   */
-  showCloseButton?: boolean;
   /** 오버레이 클릭 시 닫기 */
   closeOnOverlayClick?: boolean;
   /** ESC 키로 닫기 */

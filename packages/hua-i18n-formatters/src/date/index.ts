@@ -11,7 +11,6 @@ export { useDateFormatter } from './hooks/useDateFormatter';
 export {
   formatDate,
   formatDateTime,
-  formatDateReadable,
   formatDateLocalized,
   formatDateTimeLocalized,
   getLocaleFromLanguage,

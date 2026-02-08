@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/i18n-core-zustand",
-  "version": "1.1.0-alpha.1",
+  "version": "2.0.0",
   "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

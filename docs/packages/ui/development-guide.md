@@ -64,15 +64,15 @@ export interface MyComponentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * MyComponent 컴포넌트
- * 
+ *
  * 컴포넌트 설명을 여기에 작성합니다.
- * 
+ *
  * @component
  * @example
  * <MyComponent className="custom-class">
  *   Content
  * </MyComponent>
- * 
+ *
  * @param {MyComponentProps} props - MyComponent 컴포넌트의 props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref
  * @returns {JSX.Element} MyComponent 컴포넌트
@@ -375,6 +375,5 @@ Component.displayName = "Component";
 
 ---
 
-**작성자**: Auto (AI Assistant)  
+**작성자**: Auto (AI Assistant)
 **최종 업데이트**: 2026-01-11
-

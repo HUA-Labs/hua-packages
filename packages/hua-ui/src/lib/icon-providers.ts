@@ -251,8 +251,7 @@ export async function initPhosphorIcons() {
 }
 
 /**
- * Initialize Lucide Icons (lazy load - deprecated, backward compat)
- * @deprecated Use phosphor provider instead
+ * Initialize Lucide Icons (lazy load)
  */
 export async function initLucideIcons() {
   if (typeof window === 'undefined') return null

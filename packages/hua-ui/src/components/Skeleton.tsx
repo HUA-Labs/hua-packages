@@ -9,15 +9,15 @@ export const skeletonVariants = cva(
   {
     variants: {
       variant: {
-        text: "rounded",
-        circular: "rounded-full",
-        rounded: "rounded-lg",
-        rectangular: "rounded-none",
+        text: "rounded w-full h-4",
+        circular: "rounded-full w-10 h-10",
+        rounded: "rounded-lg w-full h-[200px]",
+        rectangular: "rounded-none w-full h-[200px]",
       },
       animation: {
         pulse: "animate-pulse bg-muted",
-        wave: "skeleton-shimmer",
-        shimmer: "skeleton-shimmer",
+        wave: "bg-muted",
+        shimmer: "bg-muted",
       },
     },
     defaultVariants: {
@@ -68,23 +68,6 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       return {}
     }
 
-    const getDefaultDimensions = () => {
-      switch (variant) {
-        case "circular":
-          return { width: "40px", height: "40px" }
-        case "rounded":
-        case "rectangular":
-          return { width: "100%", height: "200px" }
-        case "text":
-        default:
-          return { width: "100%", height: "1em" }
-      }
-    }
-
-    const defaultDims = getDefaultDimensions()
-    const finalWidth = width || defaultDims.width
-    const finalHeight = height || defaultDims.height
-
     return (
       <>
         {(animation === "wave" || animation === "shimmer") && (
@@ -102,8 +85,8 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
             className
           )}
           style={{
-            width: typeof finalWidth === "number" ? `${finalWidth}px` : finalWidth,
-            height: typeof finalHeight === "number" ? `${finalHeight}px` : finalHeight,
+            ...(width != null ? { width: typeof width === "number" ? `${width}px` : width } : {}),
+            ...(height != null ? { height: typeof height === "number" ? `${height}px` : height } : {}),
             ...getAnimationStyle(),
           }}
           {...props}

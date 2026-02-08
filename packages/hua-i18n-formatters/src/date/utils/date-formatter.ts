@@ -96,28 +96,6 @@ function formatDateString(date: Date, format: string): string {
 }
 
 /**
- * 읽기 쉬운 날짜 형식으로 변환 (한국어)
- * 예: "2025년 12월 7일 오전 1시 39분"
- * @deprecated formatDateLocalized 사용 권장
- */
-export function formatDateReadable(date: Date, timezone?: TimezoneConfig): string {
-  const targetDate = timezone
-    ? convertToTimezone(date, timezone)
-    : getKoreanDate(date);
-
-  const year = targetDate.getFullYear();
-  const month = targetDate.getMonth() + 1;
-  const day = targetDate.getDate();
-  const hours = targetDate.getHours();
-  const minutes = targetDate.getMinutes();
-
-  const ampm = hours < 12 ? '오전' : '오후';
-  const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-
-  return `${year}년 ${month}월 ${day}일 ${ampm} ${displayHours}시 ${minutes}분`;
-}
-
-/**
  * 로케일 기반 날짜 포맷팅 함수
  * 현재 언어에 맞는 네이티브 날짜 형식으로 포맷팅
  *

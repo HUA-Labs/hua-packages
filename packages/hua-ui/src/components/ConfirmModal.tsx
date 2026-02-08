@@ -178,7 +178,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
       <Modal 
         isOpen={isOpen} 
         onClose={onClose} 
-        showCloseButton={false}
+        closable={false}
         size={size}
       >
         <div className="text-center">
