@@ -1,9 +1,6 @@
 // Advanced Entrypoint
 // Aggregates all advanced modules; prefer importing from specific sub-entries when possible.
 
-// Dashboard widgets & data components
-export * from './advanced/dashboard';
-
 // Motion components
 export * from './advanced/motion';
 
