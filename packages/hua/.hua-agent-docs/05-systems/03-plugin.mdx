@@ -1,0 +1,133 @@
+---
+title: Plugin System
+description: Plugin registry, registration, lifecycle
+category: systems
+related:
+  - ./04-license.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Plugin System
+
+hua-ux allows extending framework functionality through plugins. Plugins register components, hooks, and config schemas into the registry.
+
+## HuaUxPlugin Interface
+
+```typescript
+interface HuaUxPlugin {
+  name: string                                    // Unique identifier (required)
+  version: string                                 // Semantic version (required)
+  license: LicenseType                            // 'free' | 'pro' | 'enterprise' (required)
+  description?: string                            // Plugin description
+  init?(config: HuaUxConfig): void | Promise<void>  // Initialization function
+  components?: Record<string, ComponentType<any>>    // Component extensions
+  hooks?: Record<string, Function>                   // Hook extensions
+  configSchema?: any                                 // Config schema (Zod, etc.)
+  checkLicense?(): boolean                           // License verification
+}
+```
+
+## Plugin Registry API
+
+### registerPlugin
+
+```typescript
+function registerPlugin(plugin: HuaUxPlugin): void
+```
+
+- License verification (`hasLicense(plugin.license)` or `plugin.checkLicense()`)
+- Duplicate name warning (overwrites)
+- Calls `plugin.init(config)` (only once)
+- Logs registration in dev environment
+
+### getPlugin
+
+```typescript
+function getPlugin(name: string): HuaUxPlugin | undefined
+```
+
+### getAllPlugins
+
+```typescript
+function getAllPlugins(): HuaUxPlugin[]
+```
+
+### pluginRegistry
+
+Direct access to the registry singleton instance:
+
+```typescript
+import { pluginRegistry } from '@hua-labs/hua-ux/framework'
+
+pluginRegistry.register(myPlugin)
+pluginRegistry.get('my-plugin')
+pluginRegistry.getAll()
+```
+
+## Plugin Lifecycle
+
+```
+1. defineConfig({ plugins: [myPlugin] })
+   ↓
+2. registerPlugin(myPlugin)
+   ├── hasLicense(plugin.license) → License check
+   ├── pluginRegistry.register(plugin) → Stored in Map
+   └── plugin.init(config) → Initialization (once only)
+   ↓
+3. getPlugin('my-plugin') → Usage
+```
+
+## Examples
+
+### 1. Defining a Plugin
+
+```typescript
+import type { HuaUxPlugin } from '@hua-labs/hua-ux/framework/shared'
+
+const analyticsPlugin: HuaUxPlugin = {
+  name: 'analytics',
+  version: '1.0.0',
+  license: 'pro',
+  description: 'User behavior analytics plugin',
+
+  init(config) {
+    // Initialization: set up analytics SDK
+    console.log(`Analytics initialized for ${config.branding?.name}`)
+  },
+
+  hooks: {
+    usePageView: () => { /* ... */ },
+    useTrackEvent: () => { /* ... */ }
+  }
+}
+```
+
+### 2. Registering in Config
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  license: { type: 'pro' },
+  plugins: [analyticsPlugin]
+})
+```
+
+### 3. Using a Plugin
+
+```tsx
+import { getPlugin } from '@hua-labs/hua-ux/framework'
+
+const analytics = getPlugin('analytics')
+if (analytics?.hooks?.useTrackEvent) {
+  const trackEvent = analytics.hooks.useTrackEvent()
+  trackEvent('button_click', { id: 'cta' })
+}
+```
+
+## Constraints & Gotchas
+
+- `plugin.init()` is called inside `defineConfig`. Async init is awaited, but `defineConfig` itself is a synchronous function — be cautious with long-running async init.
+- If plugin names are duplicated, the later one overwrites the earlier one. A warning is logged to the console.
+- If the license is insufficient, the plugin is still registered but a warning is logged.
+- `pluginRegistry` is a singleton. It is shared at the module level, so state is independent between instances in serverless environments.
+- `configSchema` is currently unused. Zod integration is planned for the future.

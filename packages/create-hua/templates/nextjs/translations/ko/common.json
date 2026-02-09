@@ -1,0 +1,69 @@
+{
+  "welcome": {
+    "hero": {
+      "eyebrow": "AI-first UX 프레임워크",
+      "title": "{{projectName}}로 제품을 더 빠르게 출시하세요",
+      "description": "UI, 모션, i18n, AI 컨텍스트를 한 번에 구성해 반복 설정 없이 제품 경험에 집중할 수 있습니다.",
+      "primaryCta": "문서 열기",
+      "secondaryCta": "컴포넌트 살펴보기"
+    },
+    "stats": {
+      "components": {
+        "label": "UI 빌딩 블록",
+        "value": "120+"
+      },
+      "locales": {
+        "label": "지원 언어",
+        "value": "70+"
+      },
+      "motion": {
+        "label": "모션 프리셋",
+        "value": "40+"
+      },
+      "ai": {
+        "label": "AI 컨텍스트",
+        "value": "3"
+      }
+    },
+    "features": {
+      "title": "필수 기능이 기본 제공",
+      "description": "디자인 토큰, 전역 상태, 번역, 워크플로 자동화가 첫날부터 준비되어 있습니다.",
+      "design": {
+        "title": "디자인 시스템 내장",
+        "description": "Tailwind v4 테마와 브랜딩 컨트롤로 일관된 스타일을 유지합니다."
+      },
+      "i18n": {
+        "title": "실무형 i18n",
+        "description": "API · SSR 로더, Zustand 어댑터, 번역 CLI로 전 과정을 관리합니다."
+      },
+      "motion": {
+        "title": "모션 키트",
+        "description": "motion-core/advanced 기반 애니메이션 프리셋으로 일관된 인터랙션을 제공합니다."
+      },
+      "workflow": {
+        "title": "개발자 워크플로",
+        "description": "CLI 검증, AI 컨텍스트, 워크스페이스 감지로 반복 작업을 줄입니다."
+      }
+    },
+    "links": {
+      "title": "다음 단계",
+      "description": "문서를 살펴보고, 템플릿으로 시작하거나 GitHub 저장소를 확인하세요.",
+      "docs": {
+        "title": "문서",
+        "description": "프레임워크 가이드, API, UX 패턴을 제공합니다."
+      },
+      "templates": {
+        "title": "스타터 템플릿",
+        "description": "제품·마케팅·대시보드 시나리오에 맞춘 예제 프로젝트."
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "소스 코드를 살펴보고 이슈/기여를 등록하세요."
+      }
+    },
+    "title": "HUA UX 앱",
+    "description": "app/page.tsx 파일을 수정하여 시작하세요",
+    "getStarted": "시작하기",
+    "learnMore": "자세히 보기"
+  }
+}

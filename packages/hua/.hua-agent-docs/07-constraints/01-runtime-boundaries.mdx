@@ -1,0 +1,198 @@
+---
+title: Runtime Boundaries
+description: server vs client constraints, edge runtime limitations, peer dependencies
+category: constraints
+related:
+  - ../01-getting-started/01-entry-points.mdx
+  - ../03-config/03-client-server-split.mdx
+---
+
+# Runtime Boundaries
+
+hua-ux operates across three Next.js runtime environments (Server, Client, Edge). Understanding the constraints of each environment is essential.
+
+## Available Entries by Environment
+
+| Entry | Server Component | Client Component | Edge (middleware) | API Route |
+|-------|-----------------|------------------|-------------------|-----------|
+| `framework` | ❌ ('use client') | ✅ | ❌ | ❌ |
+| `framework/shared` | ✅ | ✅ | ✅ | ✅ |
+| `framework/server` | ✅ | ❌ ('server-only') | ❌ (no fs) | ✅ |
+| `framework/config` | ✅ | ✅ | ✅ | ✅ |
+
+## 'use client' Boundary
+
+### Problem
+```tsx
+// ❌ Importing framework in a Server Component
+// → The 'use client' directive propagates, converting this file to a client module
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+
+export default async function Layout({ children }) {
+  // This is an async function, but it runs on the client → not the intended behavior
+  const data = await fetchData()  // Runs on the client!
+}
+```
+
+### Solution
+```tsx
+// ✅ Use the server entry for server-only logic
+import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server'
+
+// ✅ Use the config entry for configuration
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+
+// ✅ Use the shared entry for pure functions
+import { generateGEOMetadata } from '@hua-labs/hua-ux/framework/shared'
+```
+
+### 'use client' Propagation Rules
+1. Importing the `framework` entry turns the importing file into a Client Component
+2. Children of a Client Component also execute in the client environment
+3. **Solution**: In Server Components, separate framework components into a dedicated Client Component file
+
+```tsx
+// app/layout.tsx (Server Component)
+import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server'
+import { ClientLayout } from './client-layout'  // Separate client file
+
+export default async function Layout({ children }) {
+  const translations = await getSSRTranslations(config)
+  return <ClientLayout translations={translations}>{children}</ClientLayout>
+}
+
+// app/client-layout.tsx (Client Component)
+'use client'
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+
+export function ClientLayout({ translations, children }) {
+  return <HuaUxLayout config={{ i18n: { initialTranslations: translations } }}>
+    {children}
+  </HuaUxLayout>
+}
+```
+
+## Server-only Constraints
+
+### Functions with fs Dependencies
+
+| Function | Reason |
+|------|------|
+| `getSSRTranslations` | Reads translation JSON files from the filesystem |
+| `loadConfig` | Loads hua-ux.config.ts via require/eval |
+
+Importing in a client context produces:
+```
+Error: Module not found: Can't resolve 'server-only'
+```
+
+### Alternatives
+
+| Server Function | Client Alternative |
+|-----------|--------------|
+| `getSSRTranslations` | Pass `initialTranslations` as props |
+| `loadConfig` | Static import (`import config from '../hua-ux.config'`) |
+
+## Edge Runtime Constraints
+
+Next.js middleware runs in the Edge Runtime.
+
+### Available in Edge
+
+```typescript
+// ✅ Only framework/shared can be used
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import type { HuaUxConfig, GEOConfig } from '@hua-labs/hua-ux/framework/shared'
+```
+
+### Not Available in Edge
+
+| Function/Module | Reason |
+|----------|------|
+| `getSSRTranslations` | Uses the fs module |
+| `loadConfig` | Uses the fs module + eval |
+| `HuaUxLayout` | 'use client' (cannot render React components in Edge) |
+| `defineConfig` | Initializes license/plugins internally (side effects) |
+
+### Edge Runtime Alternatives
+
+```typescript
+// middleware.ts
+// ❌
+import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+const config = loadConfig()
+
+// ✅ Hard-code config values or read from environment variables
+const middleware = createI18nMiddleware({
+  defaultLanguage: process.env.DEFAULT_LANG || 'ko',
+  supportedLanguages: ['ko', 'en', 'ja']
+})
+```
+
+## Peer Dependencies
+
+hua-ux requires the following packages as peer dependencies:
+
+| Package | Version | Required |
+|---------|---------|------|
+| `react` | `^18 \|\| ^19` | ✅ |
+| `react-dom` | `^18 \|\| ^19` | ✅ |
+| `next` | `^14 \|\| ^15 \|\| ^16` | ✅ |
+
+### Optional Peer Dependencies
+
+| Package | When Needed |
+|---------|-----------|
+| `@phosphor-icons/react` | icons.set = 'phosphor' (default) |
+| `lucide-react` | icons.set = 'lucide' |
+
+## Common Errors and Solutions
+
+### 1. "Module not found: Can't resolve 'server-only'"
+
+```
+Cause: Importing framework/server in a Client Component
+Solution: Use framework/shared or framework/config instead
+```
+
+### 2. "fs is not defined" / "Module not found: Can't resolve 'fs'"
+
+```
+Cause: Using fs-dependent functions in Edge Runtime or on the client
+Solution: Use static imports or the shared entry
+```
+
+### 3. "Hydration mismatch"
+
+```
+Cause: Rendering different content on server vs client
+Solution:
+- Icon: Normal (server=empty span, client=SVG — intentional behavior)
+- Translations: Pass initial translations via getSSRTranslations
+- Branding: suppressHydrationWarning is automatically applied
+```
+
+### 4. "React Context is not available"
+
+```
+Cause: Using hooks outside a Provider (useBranding, useIconContext, etc.)
+Solution: Use within HuaUxLayout or UnifiedProviders
+```
+
+### 5. "'use client' directive propagation"
+
+```
+Cause: Importing framework (client) entry in a Server Component
+Solution: Use framework/config or framework/shared entry instead
+```
+
+## Environment Detection Utilities
+
+```typescript
+// Check if running on server or client
+const isServer = typeof window === 'undefined'
+const isClient = typeof window !== 'undefined'
+
+// Check if running in Edge Runtime
+const isEdge = typeof globalThis.EdgeRuntime !== 'undefined'
+```

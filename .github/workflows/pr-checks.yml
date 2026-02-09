@@ -46,7 +46,7 @@ jobs:
                --filter=@hua-labs/motion-core \
                --filter=@hua-labs/hooks \
                --filter=@hua-labs/state \
-               --filter=@hua-labs/hua-ux \
+               --filter=@hua-labs/hua \
                run type-check
 
   lint:

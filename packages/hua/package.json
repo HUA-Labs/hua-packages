@@ -1,0 +1,190 @@
+{
+  "name": "@hua-labs/hua",
+  "version": "0.1.0-alpha.12",
+  "description": "HUA - Ship UX faster: UI + motion + i18n, pre-wired. A framework for React product teams.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./framework": {
+      "types": "./dist/framework/index.d.mts",
+      "import": "./dist/framework/index.mjs",
+      "require": "./dist/framework/index.js",
+      "default": "./dist/framework/index.mjs"
+    },
+    "./framework/shared": {
+      "types": "./dist/framework/shared.d.mts",
+      "import": "./dist/framework/shared.mjs",
+      "require": "./dist/framework/shared.js",
+      "default": "./dist/framework/shared.mjs"
+    },
+    "./framework/server": {
+      "types": "./dist/framework/server.d.mts",
+      "import": "./dist/framework/server.mjs",
+      "require": "./dist/framework/server.js",
+      "default": "./dist/framework/server.mjs"
+    },
+    "./framework/config": {
+      "types": "./dist/framework/config.d.mts",
+      "import": "./dist/framework/config.mjs",
+      "require": "./dist/framework/config.js",
+      "default": "./dist/framework/config.mjs"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.mts",
+      "import": "./dist/presets/index.mjs",
+      "require": "./dist/presets/index.js",
+      "default": "./dist/presets/index.mjs"
+    },
+    "./framework/seo/geo": {
+      "types": "./dist/framework/seo/geo/index.d.mts",
+      "import": "./dist/framework/seo/geo/index.mjs",
+      "require": "./dist/framework/seo/geo/index.js",
+      "default": "./dist/framework/seo/geo/index.mjs"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.mts",
+      "import": "./dist/ui/index.mjs",
+      "require": "./dist/ui/index.js",
+      "default": "./dist/ui/index.mjs"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.mts",
+      "import": "./dist/i18n/index.mjs",
+      "require": "./dist/i18n/index.js",
+      "default": "./dist/i18n/index.mjs"
+    },
+    "./motion": {
+      "types": "./dist/motion/index.d.mts",
+      "import": "./dist/motion/index.mjs",
+      "require": "./dist/motion/index.js",
+      "default": "./dist/motion/index.mjs"
+    },
+    "./state": {
+      "types": "./dist/state/index.d.mts",
+      "import": "./dist/state/index.mjs",
+      "require": "./dist/state/index.js",
+      "default": "./dist/state/index.mjs"
+    },
+    "./pro": {
+      "types": "./dist/pro/index.d.mts",
+      "import": "./dist/pro/index.mjs",
+      "require": "./dist/pro/index.js",
+      "default": "./dist/pro/index.mjs"
+    },
+    "./formatters": {
+      "types": "./dist/formatters/index.d.mts",
+      "import": "./dist/formatters/index.mjs",
+      "require": "./dist/formatters/index.js",
+      "default": "./dist/formatters/index.mjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.mts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.js",
+      "default": "./dist/utils/index.mjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.mts",
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js",
+      "default": "./dist/hooks/index.mjs"
+    },
+    "./loaders": {
+      "types": "./dist/loaders/index.d.mts",
+      "import": "./dist/loaders/index.mjs",
+      "require": "./dist/loaders/index.js",
+      "default": "./dist/loaders/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/add-use-client.mjs",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "echo 'Skipping lint for hua (ESLint 8, needs separate config)'",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@hua-labs/hooks": "^1.1.0",
+    "@hua-labs/i18n-core": "workspace:*",
+    "@hua-labs/i18n-core-zustand": "^2.0.1-alpha.1",
+    "@hua-labs/i18n-formatters": "^1.1.1-alpha.0",
+    "@hua-labs/i18n-loaders": "^1.1.1-alpha.0",
+    "@hua-labs/motion-core": "workspace:*",
+    "@hua-labs/pro": "workspace:*",
+    "@hua-labs/state": "^1.0.0",
+    "@hua-labs/ui": "workspace:*",
+    "@hua-labs/utils": "^1.1.0",
+    "@phosphor-icons/react": "^2.1.10"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0",
+    "server-only": "^0.0.1"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "hua-labs",
+    "hua",
+    "react",
+    "framework",
+    "ui-components",
+    "motion",
+    "animation",
+    "i18n",
+    "internationalization",
+    "typescript",
+    "nextjs",
+    "ssr",
+    "zustand"
+  ],
+  "author": "HUA Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.2.0",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "jsdom": "^27.4.0",
+    "server-only": "^0.0.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

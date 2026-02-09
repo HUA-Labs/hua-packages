@@ -1,0 +1,47 @@
+/**
+ * @hua-labs/hua/framework/shared
+ *
+ * Pure exports — no "use client" directive.
+ * Safe to import from both server and client code.
+ */
+
+// Types
+export type { HuaConfig, PresetName, HuaProviderProps, HuaPageProps } from './types';
+export type {
+  LicenseInfo,
+  LicenseType,
+  LicenseFeature,
+  LicenseCheckResult,
+} from './license/types';
+export type { HuaPlugin } from './plugins/types';
+export type {
+  GEOConfig,
+  GEOMetadata,
+  StructuredData,
+  SoftwareApplicationType,
+  SoftwareCategory,
+  ProgrammingLanguage,
+} from './seo/geo';
+export type { SEOConfig } from './utils/metadata';
+export type { I18nMiddlewareConfig } from './middleware/i18n';
+
+// Pure functions — GEO / SEO
+export {
+  generateGEOMetadata,
+  renderJSONLD,
+  createAIContext,
+  generateSoftwareApplicationLD,
+  generateFAQPageLD,
+  generateTechArticleLD,
+  generateHowToLD,
+} from './seo/geo';
+
+// Metadata
+export { generatePageMetadata } from './utils/metadata';
+
+// Branding — pure CSS generation
+export { generateCSSVariables, generateCSSVariablesObject } from './branding/css-vars';
+export { generateTailwindConfig } from './branding/tailwind-config';
+
+// Middleware (server)
+export { createI18nMiddleware } from './middleware/i18n';

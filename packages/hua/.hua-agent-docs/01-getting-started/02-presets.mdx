@@ -1,0 +1,156 @@
+---
+title: Presets
+description: Comparing product and marketing presets, custom preset patterns
+category: getting-started
+related:
+  - ../03-config/01-define-config.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Presets
+
+hua-ux ships with two built-in presets. A preset configures motion, spacing, i18n, and icon defaults in one shot.
+
+## Vibe Mode vs Developer Mode
+
+Two ways to specify a preset:
+
+```typescript
+// Vibe mode — single string, simple setup
+defineConfig({ preset: 'product' })
+defineConfig({ preset: 'marketing' })
+
+// Developer mode — preset-based with granular overrides
+defineConfig({
+  preset: {
+    type: 'product',
+    motion: { duration: 500 },
+    spacing: { default: 'lg' }
+  }
+})
+```
+
+## product vs marketing Comparison
+
+### Motion
+
+| Element | product | marketing |
+|---------|---------|-----------|
+| hero.entrance | fadeIn | slideUp |
+| hero.delay | 100ms | 300ms |
+| hero.duration | 400ms | 800ms |
+| hero.hover / click | false / false | true / false |
+| title.entrance | slideUp | slideUp |
+| title.delay | 150ms | 400ms |
+| title.duration | 350ms | 600ms |
+| button.entrance | scaleIn | bounceIn |
+| button.delay | 200ms | 500ms |
+| button.duration | 200ms | 400ms |
+| button.hover / click | true / true | true / true |
+| card.entrance | slideUp | slideUp |
+| card.delay | 100ms | 300ms |
+| card.duration | 300ms | 600ms |
+| card.hover / click | true / false | true / true |
+| text.entrance | fadeIn | fadeIn |
+| text.delay | 50ms | 200ms |
+| text.duration | 300ms | 500ms |
+| image (marketing only) | — | scaleIn, 700ms delay, 1000ms dur |
+
+**Summary**: product = fast, restrained motion. marketing = dramatic, sequential motion.
+
+### Spacing
+
+| Property | product | marketing |
+|----------|---------|-----------|
+| default | md | xl |
+| section | lg | xl |
+| component | sm | md |
+
+### i18n
+
+| Property | product | marketing |
+|----------|---------|-----------|
+| defaultLanguage | ko | ko |
+| supportedLanguages | ['ko', 'en'] | ['ko', 'en'] |
+
+### Icons
+
+| Property | product | marketing |
+|----------|---------|-----------|
+| set | phosphor | phosphor |
+| weight | regular | bold |
+| size | 20 | 24 |
+| color | currentColor | currentColor |
+
+## Custom Presets
+
+Override specific values on top of a preset using developer mode:
+
+```typescript
+// hua-ux.config.ts
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+
+export default defineConfig({
+  preset: {
+    type: 'product',        // Based on product
+    motion: { duration: 500 }, // Longer motion only
+    spacing: { default: 'lg' } // Wider spacing only
+  },
+  icons: {
+    set: 'lucide',
+    strokeWidth: 2
+  }
+})
+```
+
+### Merge Priority
+
+```
+1. Built-in preset (product/marketing)
+   -> Developer mode overrides merged
+2. Preset + motion/spacing overrides
+   -> User config merged
+3. Final HuaUxConfig (user config always wins)
+```
+
+## Examples
+
+### 1. Product app (default)
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  i18n: {
+    defaultLanguage: 'ko',
+    supportedLanguages: ['ko', 'en', 'ja']
+  }
+})
+```
+
+### 2. Marketing landing page
+
+```typescript
+export default defineConfig({
+  preset: 'marketing',
+  branding: {
+    name: 'HUA Labs',
+    colors: { primary: '#0ea5e9', accent: '#f59e0b' }
+  }
+})
+```
+
+### 3. Minimal setup (no motion)
+
+```typescript
+export default defineConfig({
+  preset: { type: 'product', motion: { duration: 0 } },
+  motion: { enableAnimations: false }
+})
+```
+
+## Constraints & Gotchas
+
+- `preset` only accepts `'product'` or `'marketing'`. Other values cause a validateConfig error.
+- Calling defineConfig without a preset defaults to the product preset.
+- `motion.style` field (`'smooth'`, `'dramatic'`, `'minimal'`) maps internally to `motion.defaultPreset` (`smooth/minimal -> product`, `dramatic -> marketing`).
+- Developer mode `motion`/`spacing` overrides apply at the preset level. User config `motion`/`icons` etc. merge as a separate layer.

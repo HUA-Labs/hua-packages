@@ -1,0 +1,262 @@
+---
+title: Accessibility (A11y)
+description: Focus management, focus trap, skip-to-content, live region
+category: systems
+related:
+  - ./07-error-handling.mdx
+  - ../02-architecture/02-provider-chain.mdx
+---
+
+# Accessibility (A11y)
+
+hua-ux provides accessibility components and hooks for WCAG compliance from the framework entry.
+
+## SkipToContent
+
+A "skip to main content" link for keyboard users. Visually hidden by default, it appears when focused with the Tab key.
+
+```typescript
+interface SkipToContentProps {
+  targetId?: string          // default: 'main-content'
+  children?: React.ReactNode
+  className?: string
+}
+```
+
+```tsx
+import { SkipToContent } from '@hua-labs/hua-ux/framework'
+
+// app/layout.tsx
+<body>
+  <SkipToContent />
+  <Header />
+  <main id="main-content">
+    {children}
+  </main>
+</body>
+
+// Custom target
+<SkipToContent targetId="content-area">
+  Skip to content
+</SkipToContent>
+```
+
+**Default styles:**
+```
+sr-only → focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50
+focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md
+```
+
+## LiveRegion
+
+An ARIA live region that announces dynamic changes to screen readers:
+
+```typescript
+interface LiveRegionProps {
+  message?: string
+  politeness?: 'polite' | 'assertive' | 'off'  // default: 'polite'
+  className?: string
+}
+```
+
+```tsx
+import { LiveRegion } from '@hua-labs/hua-ux/framework'
+
+function SearchResults({ count }) {
+  return (
+    <>
+      <LiveRegion message={`${count} search results`} />
+      {/* Search results UI */}
+    </>
+  )
+}
+```
+
+**Rendered output:**
+```html
+<div role="status" aria-live="polite" aria-atomic="true">
+  3 search results
+</div>
+```
+
+**politeness:**
+| Value | Behavior |
+|---|-----|
+| `polite` | Announces after current speech finishes (default) |
+| `assertive` | Announces immediately (for critical errors, etc.) |
+| `off` | Disables announcements |
+
+## useFocusManagement
+
+A hook that automatically moves focus to the main content on page transitions:
+
+```typescript
+function useFocusManagement<T extends HTMLElement = HTMLElement>(
+  options?: {
+    autoFocus?: boolean              // default: true
+    focusSelector?: string           // Focus a specific child element
+    scrollIntoView?: boolean         // default: false
+    scrollOptions?: ScrollIntoViewOptions
+  }
+): RefObject<T | null>
+```
+
+```tsx
+function MainContent() {
+  const ref = useFocusManagement<HTMLDivElement>({
+    autoFocus: true,
+    scrollIntoView: true,
+    scrollOptions: { behavior: 'smooth' }
+  })
+
+  return <div ref={ref} tabIndex={-1}>...</div>
+}
+```
+
+```tsx
+// Focus a specific child
+const ref = useFocusManagement({
+  focusSelector: 'h1'  // Focus the heading
+})
+
+<div ref={ref}>
+  <h1 tabIndex={-1}>Page Title</h1>
+  <p>Content</p>
+</div>
+```
+
+## useFocusTrap
+
+A hook that traps focus within modals, drawers, etc. The Tab key only cycles through internal elements.
+
+```typescript
+function useFocusTrap<T extends HTMLElement = HTMLElement>(
+  options?: {
+    isActive?: boolean         // default: true
+    onEscape?: () => void      // Escape key callback
+    initialFocus?: string      // Initial focus CSS selector
+    onFocusOut?: () => void    // Called when focus leaves the trap
+  }
+): RefObject<T | null>
+```
+
+```tsx
+function Modal({ isOpen, onClose, children }) {
+  const ref = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    onEscape: onClose,
+    initialFocus: '.modal-close-button'
+  })
+
+  if (!isOpen) return null
+
+  return (
+    <div ref={ref} role="dialog" aria-modal="true">
+      <button className="modal-close-button" onClick={onClose}>
+        Close
+      </button>
+      {children}
+    </div>
+  )
+}
+```
+
+**Behavior:**
+1. Searches for focusable elements: `a[href]`, `button:not([disabled])`, `input:not([disabled])`, `[tabindex]:not([tabindex="-1"])`
+2. Tab: next element → wraps to first when at last
+3. Shift+Tab: previous element → wraps to last when at first
+4. Escape: calls `onEscape` callback
+5. Restores previous focus position on unmount
+
+## useLiveRegion (re-exported)
+
+A hook for programmatically controlling live regions:
+
+```tsx
+import { useLiveRegion } from '@hua-labs/hua-ux/framework'
+
+function Form() {
+  const announce = useLiveRegion()
+
+  const handleSubmit = async () => {
+    const result = await submitForm()
+    announce(result.success ? 'Saved successfully' : 'Save failed', 'assertive')
+  }
+}
+```
+
+## Examples
+
+### 1. Full Layout Accessibility
+
+```tsx
+import { SkipToContent, LiveRegion } from '@hua-labs/hua-ux/framework'
+
+function Layout({ children }) {
+  return (
+    <>
+      <SkipToContent />
+      <LiveRegion /> {/* For dynamic announcements */}
+      <Header />
+      <main id="main-content" tabIndex={-1}>
+        {children}
+      </main>
+    </>
+  )
+}
+```
+
+### 2. Accessible Modal
+
+```tsx
+function AccessibleModal({ isOpen, onClose, title, children }) {
+  const trapRef = useFocusTrap({
+    isActive: isOpen,
+    onEscape: onClose
+  })
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50" onClick={onClose}>
+      <div
+        ref={trapRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="modal-content"
+        onClick={e => e.stopPropagation()}
+      >
+        <h2>{title}</h2>
+        {children}
+        <button onClick={onClose}>Close</button>
+      </div>
+    </div>
+  )
+}
+```
+
+### 3. Search Result Announcements
+
+```tsx
+function Search() {
+  const [results, setResults] = useState([])
+  const announce = useLiveRegion()
+
+  const handleSearch = async (query) => {
+    const data = await search(query)
+    setResults(data)
+    announce(`Found ${data.length} results`)
+  }
+
+  return (/* ... */)
+}
+```
+
+## Constraints & Gotchas
+
+- `useFocusTrap` does not register event listeners when `isActive` is false. Always use the `isActive` prop for conditional modals.
+- `useFocusManagement`'s `autoFocus` only runs once on mount. The target element requires `tabIndex={-1}`.
+- The default target of `SkipToContent` is `#main-content`. The link will not work if that ID does not exist.
+- Setting `LiveRegion`'s `message` to an empty string will not cause the screen reader to repeat the previous message.
+- `useFocusTrap` restores the previous focus on unmount. It returns focus to the position before the modal was opened.
