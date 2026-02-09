@@ -1,6 +1,6 @@
 ---
 title: Icon Provider Config
-description: IconProvider component, weight, global settings and their relationship with hua-ux.config.ts
+description: IconProvider component, weight, global settings and their relationship with hua.config.ts
 category: icon-system
 related:
   - ./01-overview.mdx
@@ -10,12 +10,12 @@ related:
 
 # Icon Provider Config
 
-Global icon defaults can be configured in two ways: the `icons` section in `hua-ux.config.ts` or the `IconProvider` component.
+Global icon defaults can be configured in two ways: the `icons` section in `hua.config.ts` or the `IconProvider` component.
 
-## hua-ux.config.ts Settings
+## hua.config.ts Settings
 
 ```typescript
-import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+import { defineConfig } from '@hua-labs/hua/framework/config'
 
 export default defineConfig({
   icons: {
@@ -99,7 +99,7 @@ Default strokeWidth per provider:
    ↓
 2. Nearest IconProvider                     (in the component tree)
    ↓
-3. UnifiedProviders IconProvider            (based on hua-ux.config.ts)
+3. UnifiedProviders IconProvider            (based on hua.config.ts)
    ↓
 4. Global defaults                          (Phosphor, regular, 20px)
 ```
@@ -147,7 +147,7 @@ Default strokeWidth per provider:
 ### 1. Global settings (config)
 
 ```typescript
-// hua-ux.config.ts
+// hua.config.ts
 export default defineConfig({
   preset: 'product',
   icons: {

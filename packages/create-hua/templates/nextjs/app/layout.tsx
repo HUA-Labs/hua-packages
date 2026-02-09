@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { HuaUxLayout } from "@hua-labs/hua-ux/framework";
-import { getSSRTranslations } from "@hua-labs/hua-ux/framework/server";
-import config from "../hua-ux.config";
+import { HuaUxLayout } from "@hua-labs/hua/framework";
+import { getSSRTranslations } from "@hua-labs/hua/framework/server";
+import config from "../hua.config";
 
 export const metadata: Metadata = {
   title: "HUA UX App",
-  description: "Created with @hua-labs/hua-ux",
+  description: "Created with @hua-labs/hua",
   icons: { icon: '/favicon.ico' },
 };
 

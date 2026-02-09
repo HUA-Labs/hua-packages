@@ -1,0 +1,3 @@
+/* HUA Framework 기본 설정 - 모든 앱에서 import */
+/* next-themes class 기반 다크모드 (Tailwind v4 필수) */
+@custom-variant dark (&:where(.dark, .dark *));

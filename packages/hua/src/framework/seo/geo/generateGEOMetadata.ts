@@ -34,7 +34,7 @@ import { generateSoftwareApplicationLD } from './structuredData';
  * ```tsx
  * // Basic usage
  * const geoMetadata = generateGEOMetadata({
- *   name: 'hua-ux',
+ *   name: 'hua',
  *   description: 'Privacy-first UX framework for Next.js with built-in i18n, motion, and accessibility',
  *   version: '1.0.0',
  *   applicationCategory: ['UX Framework', 'Developer Tool'],
@@ -82,7 +82,7 @@ import { generateSoftwareApplicationLD } from './structuredData';
  * export async function generateMetadata() {
  *   const geoMeta = generateGEOMetadata({
  *     name: 'My App',
- *     description: 'Built with hua-ux',
+ *     description: 'Built with hua',
  *     features: ['i18n', 'Dark mode', 'Responsive'],
  *   });
  *
@@ -388,12 +388,12 @@ export function renderJSONLD(jsonLd: unknown, id?: string): {
  * @example
  * ```tsx
  * const context = createAIContext({
- *   name: 'hua-ux',
+ *   name: 'hua',
  *   description: 'Privacy-first UX framework',
  *   features: ['i18n', 'Motion', 'Accessibility'],
  *   useCases: ['Multilingual apps', 'Accessible UX'],
  * });
- * // Returns: "hua-ux is a Privacy-first UX framework. Key features include: i18n, Motion, Accessibility. Common use cases: Multilingual apps, Accessible UX."
+ * // Returns: "hua is a Privacy-first UX framework. Key features include: i18n, Motion, Accessibility. Common use cases: Multilingual apps, Accessible UX."
  * ```
  */
 export function createAIContext(config: GEOConfig): string {

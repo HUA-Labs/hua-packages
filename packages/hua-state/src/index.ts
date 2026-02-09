@@ -1,7 +1,7 @@
 /**
  * @hua-labs/state
  * 
- * Unified state management for hua-ux framework with SSR support and integrations
+ * Unified state management for hua framework with SSR support and integrations
  */
 
 // Store creation

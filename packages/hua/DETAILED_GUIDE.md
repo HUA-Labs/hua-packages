@@ -1,14 +1,14 @@
-# @hua-labs/hua-ux Detailed Guide
+# @hua-labs/hua Detailed Guide
 
-Technical reference for the @hua-labs/hua-ux framework architecture and features.
-이 문서는 @hua-labs/hua-ux 프레임워크의 아키텍처 및 세부 기능에 대한 기술 참조를 제공합니다.
+Technical reference for the @hua-labs/hua framework architecture and features.
+이 문서는 @hua-labs/hua 프레임워크의 아키텍처 및 세부 기능에 대한 기술 참조를 제공합니다.
 
 ---
 
 ## English
 
 ### Architecture Overview
-hua-ux is a framework layer built on Next.js. It integrates UI, motion, and internationalization libraries with pre-configured defaults to standardize product development.
+hua is a framework layer built on Next.js. It integrates UI, motion, and internationalization libraries with pre-configured defaults to standardize product development.
 
 ### Framework Integration Strategies
 
@@ -16,7 +16,7 @@ hua-ux is a framework layer built on Next.js. It integrates UI, motion, and inte
 Automates provider configuration through a central settings file. This method provides the full framework experience, including integrated state and i18n management.
 - **UI Benefit**: Framework users gain access to a curated selection of General-purpose Dashboard components from the Pro suite (StatCard, MetricCard, etc.) without additional licensing.
 ```tsx
-// hua-ux.config.ts
+// hua.config.ts
 export default defineConfig({
   preset: 'product',
   i18n: { defaultLanguage: 'ko', namespaces: ['common'] }
@@ -54,12 +54,12 @@ Generates structured metadata and JSON-LD to assist search engines and language 
 ## Korean
 
 ### 아키텍처 개요
-hua-ux는 Next.js 기반의 프레임워크 레이어입니다. 일관된 제품 개발을 위해 UI, 모션, 다국어 라이브러리를 사전에 구성된 상태로 통합하여 제공합니다.
+hua는 Next.js 기반의 프레임워크 레이어입니다. 일관된 제품 개발을 위해 UI, 모션, 다국어 라이브러리를 사전에 구성된 상태로 통합하여 제공합니다.
 
 ### 통합 전략
 
 #### 방법 1: 프레임워크 레이어
-중앙 설정 파일(`hua-ux.config.ts`)을 통해 프로바이더 구성을 자동화합니다.
+중앙 설정 파일(`hua.config.ts`)을 통해 프로바이더 구성을 자동화합니다.
 
 #### 방법 2: 모듈형 사용
 표준 환경이 아닌 프로젝트의 경우 개별 패키지(`@hua-labs/ui`, `@hua-labs/state` 등)를 직접 수동으로 통합합니다.

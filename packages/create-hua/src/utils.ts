@@ -356,7 +356,7 @@ function getHuaVersion(): string {
     // src/utils.ts인 경우: packages/create-hua/src/utils.ts
     const currentFile = __dirname;
     const createHuaRoot = path.resolve(currentFile, '../..');
-    const huaPackageJson = path.join(createHuaRoot, '../hua-ux/package.json');
+    const huaPackageJson = path.join(createHuaRoot, '../hua/package.json');
 
     if (fs.existsSync(huaPackageJson)) {
       const huaPackage = JSON.parse(fs.readFileSync(huaPackageJson, 'utf-8'));
@@ -518,7 +518,7 @@ async function generateTailwindConfig(projectPath: string): Promise<void> {
   if (context.isMonorepo && context.rootDir) {
     const packageMappings = [
       { dir: 'hua-ui', glob: 'src/**/*.{ts,tsx}' },
-      { dir: 'hua-ux', glob: 'src/**/*.{ts,tsx}' },
+      { dir: 'hua', glob: 'src/**/*.{ts,tsx}' },
       { dir: 'hua-motion-core', glob: 'src/**/*.{ts,tsx}' },
     ];
 

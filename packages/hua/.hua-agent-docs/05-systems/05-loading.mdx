@@ -9,7 +9,7 @@ related:
 
 # Loading System
 
-hua-ux provides components and hooks for consistent loading UI. Fast responses appear seamlessly without a loading indicator, while slow responses provide appropriate feedback.
+hua provides components and hooks for consistent loading UI. Fast responses appear seamlessly without a loading indicator, while slow responses provide appropriate feedback.
 
 ## SuspenseWrapper
 
@@ -24,7 +24,7 @@ interface SuspenseWrapperProps {
 ```
 
 ```tsx
-import { SuspenseWrapper } from '@hua-labs/hua-ux/framework'
+import { SuspenseWrapper } from '@hua-labs/hua/framework'
 
 <SuspenseWrapper>
   <AsyncComponent />
@@ -61,7 +61,7 @@ interface SkeletonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 | lg | `space-y-6` | 24px |
 
 ```tsx
-import { SkeletonGroup, Skeleton } from '@hua-labs/hua-ux/framework'
+import { SkeletonGroup, Skeleton } from '@hua-labs/hua/framework'
 
 <SkeletonGroup spacing="md">
   <Skeleton className="h-8 w-48" />    {/* Title */}
@@ -105,7 +105,7 @@ function DataList() {
 A hook for managing loading state (re-exported from framework):
 
 ```tsx
-import { useLoadingState } from '@hua-labs/hua-ux/framework'
+import { useLoadingState } from '@hua-labs/hua/framework'
 ```
 
 ## withSuspense HOC
@@ -120,7 +120,7 @@ function withSuspense<P>(
 ```
 
 ```tsx
-import { withSuspense } from '@hua-labs/hua-ux/framework'
+import { withSuspense } from '@hua-labs/hua/framework'
 
 const LazyChart = withSuspense(
   React.lazy(() => import('./Chart')),
@@ -136,7 +136,7 @@ const LazyChart = withSuspense(
 ### 1. Page-Level Loading
 
 ```tsx
-import { SuspenseWrapper, SkeletonGroup, Skeleton } from '@hua-labs/hua-ux/framework'
+import { SuspenseWrapper, SkeletonGroup, Skeleton } from '@hua-labs/hua/framework'
 
 function PageSkeleton() {
   return (

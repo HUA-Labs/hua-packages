@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * create-hua-ux CLI Entry Point
+ * create-hua CLI Entry Point
  * 
- * This file is compiled to dist/bin/create-hua-ux.js
+ * This file is compiled to dist/bin/create-hua.js
  * and used as the executable when the package is installed.
  */
 

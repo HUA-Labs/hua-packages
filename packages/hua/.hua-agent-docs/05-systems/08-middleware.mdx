@@ -9,7 +9,7 @@ related:
 
 # Middleware System
 
-hua-ux provides an i18n middleware for use in Next.js middleware. It detects the language of the request and sets it in the response headers.
+hua provides an i18n middleware for use in Next.js middleware. It detects the language of the request and sets it in the response headers.
 
 ## createI18nMiddleware
 
@@ -53,7 +53,7 @@ interface I18nMiddlewareConfig {
 
 ```typescript
 // middleware.ts
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
 
 const middleware = createI18nMiddleware({
   defaultLanguage: 'ko',
@@ -71,7 +71,7 @@ export const config = {
 
 ```typescript
 // middleware.ts
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
 
 const middleware = createI18nMiddleware({
   defaultLanguage: 'ko',
@@ -86,7 +86,7 @@ export default middleware
 
 ```typescript
 // middleware.ts
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
 import { auth } from './auth'
 
 const i18nMiddleware = createI18nMiddleware({
@@ -120,13 +120,13 @@ async function getLanguage() {
 
 ```typescript
 // ✅ Correct import (shared — Edge Runtime safe)
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
 
 // ❌ Wrong import (client entry — contains 'use client')
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework'
+import { createI18nMiddleware } from '@hua-labs/hua/framework'
 
 // ❌ Wrong import (server entry — depends on fs)
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/server'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/server'
 ```
 
 ## Constraints & Gotchas

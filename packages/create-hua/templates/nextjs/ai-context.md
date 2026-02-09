@@ -1,10 +1,10 @@
-# hua-ux Project AI Context
+# hua Project AI Context
 
 This document is a guide for AI tools (Cursor, etc.) to understand the structure and usage of this project.
 
 ## Project Overview
 
-This project uses the **hua-ux framework** for Next.js applications.
+This project uses the **hua framework** for Next.js applications.
 
 **Core Philosophy**: "You don't need to know Next.js. Just configure and tell AI what to do."
 
@@ -16,7 +16,7 @@ This project uses the **hua-ux framework** for Next.js applications.
 - `.claude/project-context.md`: Claude-specific context
 
 ### Middle Layer: Framework & Config
-- `hua-ux.config.ts`: Framework configuration
+- `hua.config.ts`: Framework configuration
 - `HuaUxLayout`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 
@@ -45,7 +45,7 @@ Project Root/
 │   │   └── common.json    # Common translations
 │   └── en/                # English
 │       └── common.json    # Common translations
-└── hua-ux.config.ts        # Framework configuration
+└── hua.config.ts        # Framework configuration
 ```
 
 ## Styling (Tailwind CSS v4)
@@ -132,7 +132,7 @@ The theme provides these CSS variables (usable as Tailwind classes):
 **Specialized**:
 - `ScrollArea`, `ScrollToTop`, `ThemeProvider`, `ThemeToggle`, `useTheme`
 
-### @hua-labs/hua-ux/framework
+### @hua-labs/hua/framework
 
 **Framework Components**:
 - `HuaUxLayout`: Automatic Provider setup
@@ -158,16 +158,16 @@ The theme provides these CSS variables (usable as Tailwind classes):
 - `defineConfig`: Framework configuration definition
 - `getConfig`: Get configuration
 
-### @hua-labs/hua-ux/hooks
+### @hua-labs/hua/hooks
 
-**Utility Hooks** (import from `@hua-labs/hua-ux/hooks`):
+**Utility Hooks** (import from `@hua-labs/hua/hooks`):
 - `useLoading`: Loading state management with delay support
 - `useAutoScroll`: Auto-scrolling for chat/feed UIs
 - `usePerformanceMonitor`: Performance metrics monitoring
 
-### @hua-labs/hua-ux/loaders
+### @hua-labs/hua/loaders
 
-**Translation Loaders** (import from `@hua-labs/hua-ux/loaders`):
+**Translation Loaders** (import from `@hua-labs/hua/loaders`):
 - `createApiTranslationLoader`: API-based translation loading with caching
 - `preloadNamespaces`: Preload translation namespaces for instant display
 - `warmFallbackLanguages`: Pre-warm fallback language translations
@@ -192,39 +192,39 @@ The theme provides these CSS variables (usable as Tailwind classes):
 
 ```tsx
 // Framework core
-import { HuaUxPage, useMotion, fetchData } from '@hua-labs/hua-ux/framework';
+import { HuaUxPage, useMotion, fetchData } from '@hua-labs/hua/framework';
 
 // UI components
-import { Button, Card } from '@hua-labs/hua-ux/ui';
+import { Button, Card } from '@hua-labs/hua/ui';
 
 // i18n
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 // Motion
-import { useFadeIn, useScrollReveal } from '@hua-labs/hua-ux/motion';
+import { useFadeIn, useScrollReveal } from '@hua-labs/hua/motion';
 
 // Utility hooks
-import { useLoading, useAutoScroll } from '@hua-labs/hua-ux/hooks';
+import { useLoading, useAutoScroll } from '@hua-labs/hua/hooks';
 
 // Translation loaders (for advanced i18n setup)
-import { createApiTranslationLoader, preloadNamespaces } from '@hua-labs/hua-ux/loaders';
+import { createApiTranslationLoader, preloadNamespaces } from '@hua-labs/hua/loaders';
 
 // State management
-import { createStore } from '@hua-labs/hua-ux/state';
+import { createStore } from '@hua-labs/hua/state';
 
 // Formatters
-import { formatDate, formatCurrency } from '@hua-labs/hua-ux/formatters';
+import { formatDate, formatCurrency } from '@hua-labs/hua/formatters';
 
 // Utilities
-import { cn } from '@hua-labs/hua-ux/utils';
+import { cn } from '@hua-labs/hua/utils';
 ```
 
 ### 1. Page Creation Pattern
 
 ```tsx
 // app/my-page/page.tsx
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { HuaUxPage } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
@@ -249,9 +249,9 @@ export default function MyPage() {
 // components/MyComponent.tsx
 'use client';
 
-import { Card, Button } from '@hua-labs/hua-ux/ui';
-import { useMotion } from '@hua-labs/hua-ux/framework';
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { Card, Button } from '@hua-labs/hua/ui';
+import { useMotion } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export function MyComponent() {
   const { t } = useTranslation('my-component');
@@ -276,7 +276,7 @@ export function MyComponent() {
 **Server Component**:
 ```tsx
 // app/data/page.tsx
-import { fetchData } from '@hua-labs/hua-ux/framework';
+import { fetchData } from '@hua-labs/hua/framework';
 
 export default async function DataPage() {
   const data = await fetchData<DataType>('/api/data');
@@ -289,8 +289,8 @@ export default async function DataPage() {
 // components/DataComponent.tsx
 'use client';
 
-import { useData } from '@hua-labs/hua-ux/framework';
-import { LoadingSpinner, AlertError } from '@hua-labs/hua-ux/ui';
+import { useData } from '@hua-labs/hua/framework';
+import { LoadingSpinner, AlertError } from '@hua-labs/hua/ui';
 
 export function DataComponent() {
   const { data, isLoading, error } = useData<DataType>('/api/data');
@@ -326,10 +326,10 @@ export function DataComponent() {
 
 ## Understanding Configuration Files
 
-### hua-ux.config.ts
+### hua.config.ts
 
 ```typescript
-import { defineConfig } from '@hua-labs/hua-ux/framework';
+import { defineConfig } from '@hua-labs/hua/framework';
 
 export default defineConfig({
   preset: 'product',  // 'product' or 'marketing'
@@ -394,7 +394,7 @@ branding: {
    - Use `common` namespace for shared translations
 
 4. **When Changing Configuration**:
-   - Only modify `hua-ux.config.ts`
+   - Only modify `hua.config.ts`
    - Prefer Preset (over manual configuration)
 
 5. **When Fetching Data**:
@@ -423,7 +423,7 @@ pnpm lint:fix
 
 ## References
 
-- Framework docs: `node_modules/@hua-labs/hua-ux/README.md`
+- Framework docs: `node_modules/@hua-labs/hua/README.md`
 - UI components: `node_modules/@hua-labs/ui/README.md`
 - Motion: `node_modules/@hua-labs/motion-core/README.md`
 - i18n: `node_modules/@hua-labs/i18n-core-zustand/README.md`

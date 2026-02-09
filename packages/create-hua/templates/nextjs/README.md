@@ -1,7 +1,7 @@
-# hua-ux 프로젝트 / hua-ux Project
+# hua 프로젝트 / hua Project
 
-이 프로젝트는 **hua-ux** 프레임워크로 생성되었습니다.  
-This project was created with the **hua-ux** framework.
+이 프로젝트는 **hua** 프레임워크로 생성되었습니다.  
+This project was created with the **hua** framework.
 
 ## 시작하기 / Getting Started
 
@@ -22,7 +22,7 @@ pnpm build
 pnpm start
 ```
 
-## hua-ux 사용 가이드 / hua-ux Usage Guide
+## hua 사용 가이드 / hua Usage Guide
 
 ### 0. GEO (AI 검색 엔진 최적화) / GEO (Generative Engine Optimization)
 
@@ -50,16 +50,16 @@ pnpm start
 ├── translations/          # 번역 파일
 │   ├── ko/
 │   └── en/
-└── hua-ux.config.ts      # hua-ux 설정 파일
+└── hua.config.ts      # hua 설정 파일
 ```
 
-### 2. 설정 파일 / Configuration File (`hua-ux.config.ts`)
+### 2. 설정 파일 / Configuration File (`hua.config.ts`)
 
-프로젝트 루트의 `hua-ux.config.ts`에서 프레임워크를 설정합니다.  
-Configure the framework in `hua-ux.config.ts` at the project root:
+프로젝트 루트의 `hua.config.ts`에서 프레임워크를 설정합니다.  
+Configure the framework in `hua.config.ts` at the project root:
 
 ```typescript
-import { defineConfig } from '@hua-labs/hua-ux/framework';
+import { defineConfig } from '@hua-labs/hua/framework';
 
 export default defineConfig({
   // 프리셋: 'product' (빠른 전환) 또는 'marketing' (드라마틱한 모션)
@@ -104,8 +104,8 @@ export default defineConfig({
 // app/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
-import { Button, Card } from '@hua-labs/hua-ux';
+import { HuaUxPage } from '@hua-labs/hua/framework';
+import { Button, Card } from '@hua-labs/hua';
 
 export default function HomePage() {
   return (
@@ -125,7 +125,7 @@ SEO를 위해 Next.js `metadata` export를 사용하는 것을 권장합니다:
 
 ```tsx
 // app/page.tsx (Server Component)
-import { generatePageMetadata } from '@hua-labs/hua-ux/framework';
+import { generatePageMetadata } from '@hua-labs/hua/framework';
 import { HomePageContent } from './HomePageContent';
 
 export const metadata = generatePageMetadata({
@@ -148,14 +148,14 @@ ChatGPT, Claude, Gemini, Perplexity 같은 AI 검색 엔진이 당신의 앱을 
 
 ```tsx
 // app/page.tsx (Server Component)
-import { generateGEOMetadata, renderJSONLD } from '@hua-labs/hua-ux/framework';
+import { generateGEOMetadata, renderJSONLD } from '@hua-labs/hua/framework';
 import Script from 'next/script';
 import { HomePageContent } from './page-content';
 
 // GEO 메타데이터 생성
 const geoMeta = generateGEOMetadata({
   name: 'My App',
-  description: 'Built with hua-ux framework',
+  description: 'Built with hua framework',
   version: '1.0.0',
   applicationCategory: ['UX Framework', 'Developer Tool'],
   programmingLanguage: ['TypeScript', 'React', 'Next.js'],
@@ -184,7 +184,7 @@ export default function HomePage() {
 // app/HomePageContent.tsx (Client Component)
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+import { HuaUxPage } from '@hua-labs/hua/framework';
 
 export function HomePageContent() {
   return (
@@ -201,7 +201,7 @@ export function HomePageContent() {
 // app/about/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+import { HuaUxPage } from '@hua-labs/hua/framework';
 
 export default function AboutPage() {
   return (
@@ -227,7 +227,7 @@ export default function AboutPage() {
 ### 4. UI 컴포넌트 사용하기 / Using UI Components
 
 ```tsx
-import { Button, Card, Input, Modal } from '@hua-labs/hua-ux';
+import { Button, Card, Input, Modal } from '@hua-labs/hua';
 
 // Button
 <Button variant="default">기본 버튼</Button>
@@ -244,13 +244,13 @@ import { Button, Card, Input, Modal } from '@hua-labs/hua-ux';
 </Card>
 ```
 
-**브랜딩 자동 적용 / Automatic Branding**: `hua-ux.config.ts`에서 `branding.colors`를 설정하면 Button과 Card가 자동으로 브랜드 색상을 사용합니다.  
-When you set `branding.colors` in `hua-ux.config.ts`, Button and Card components automatically use your brand colors.
+**브랜딩 자동 적용 / Automatic Branding**: `hua.config.ts`에서 `branding.colors`를 설정하면 Button과 Card가 자동으로 브랜드 색상을 사용합니다.  
+When you set `branding.colors` in `hua.config.ts`, Button and Card components automatically use your brand colors.
 
 ### 5. 모션 애니메이션 사용하기 / Using Motion Animations
 
 ```tsx
-import { useFadeIn, useSlideUp, useScaleIn } from '@hua-labs/hua-ux';
+import { useFadeIn, useSlideUp, useScaleIn } from '@hua-labs/hua';
 
 export default function AnimatedPage() {
   const fadeInRef = useFadeIn();
@@ -299,7 +299,7 @@ export default function AnimatedPage() {
 #### 컴포넌트에서 사용 / Using in Components
 
 ```tsx
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyComponent() {
   const { t } = useTranslation();
@@ -334,7 +334,7 @@ export default function LanguageSwitcher() {
 
 ```tsx
 // store/useAppStore.ts
-import { createHuaStore } from '@hua-labs/hua-ux/state';
+import { createHuaStore } from '@hua-labs/hua/state';
 
 interface AppState {
   count: number;
@@ -373,8 +373,8 @@ export default function Counter() {
 
 ## 브랜딩 커스터마이징 / Branding Customization
 
-`hua-ux.config.ts`에서 브랜드 색상을 설정하면 Button과 Card가 자동으로 적용됩니다.  
-Set brand colors in `hua-ux.config.ts` and Button and Card will automatically use them:
+`hua.config.ts`에서 브랜드 색상을 설정하면 Button과 Card가 자동으로 적용됩니다.  
+Set brand colors in `hua.config.ts` and Button and Card will automatically use them:
 
 ```typescript
 export default defineConfig({
@@ -390,7 +390,7 @@ export default defineConfig({
 
 ## 더 알아보기 / Learn More
 
-- [hua-ux 공식 문서 / Official Documentation](https://github.com/HUA-Labs/HUA-Labs-public)
+- [hua 공식 문서 / Official Documentation](https://github.com/HUA-Labs/HUA-Labs-public)
 - [UI 컴포넌트 가이드 / UI Components Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-ui)
 - [Motion 훅 가이드 / Motion Hooks Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-motion-core)
 - [i18n 가이드 / i18n Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-i18n-core)

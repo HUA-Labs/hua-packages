@@ -10,7 +10,7 @@ related:
 
 # Provider Chain
 
-hua-ux auto-composes multiple Context Providers via `UnifiedProviders`. No manual provider nesting required.
+hua auto-composes multiple Context Providers via `UnifiedProviders`. No manual provider nesting required.
 
 ## Provider Order
 
@@ -96,7 +96,7 @@ You can compose providers manually instead of using UnifiedProviders:
 
 ```tsx
 import { IconProvider } from '@hua-labs/ui'
-import { BrandingProvider } from '@hua-labs/hua-ux/framework'
+import { BrandingProvider } from '@hua-labs/hua/framework'
 import { createZustandI18n } from '@hua-labs/i18n-core-zustand'
 
 const i18n = createZustandI18n({
@@ -136,8 +136,8 @@ const LANGUAGE_MAP = {
 ### 1. Default usage (auto-composition)
 
 ```tsx
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
-import config from '../hua-ux.config'
+import { HuaUxLayout } from '@hua-labs/hua/framework'
+import config from '../hua.config'
 
 export default function Layout({ children }) {
   return <HuaUxLayout config={config}>{children}</HuaUxLayout>
@@ -147,7 +147,7 @@ export default function Layout({ children }) {
 ### 2. Config override for provider customization
 
 ```tsx
-import { UnifiedProviders, getConfig } from '@hua-labs/hua-ux/framework'
+import { UnifiedProviders, getConfig } from '@hua-labs/hua/framework'
 
 function CustomLayout({ children }) {
   const baseConfig = getConfig()

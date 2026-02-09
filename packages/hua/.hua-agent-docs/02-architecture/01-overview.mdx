@@ -1,6 +1,6 @@
 ---
 title: Architecture Overview
-description: hua-ux meta-framework layer structure and package integration
+description: hua meta-framework layer structure and package integration
 category: architecture
 related:
   - ../01-getting-started/01-entry-points.mdx
@@ -10,13 +10,13 @@ related:
 
 # Architecture Overview
 
-hua-ux is a **meta-framework** that unifies individual packages into a single integrated DX.
+hua is a **meta-framework** that unifies individual packages into a single integrated DX.
 
 ## Layer Structure
 
 ```
 +---------------------------------------------+
-|              @hua-labs/hua-ux                |  <- Meta-framework
+|              @hua-labs/hua                |  <- Meta-framework
 |  +----------------------------------------+  |
 |  |           framework layer              |  |  <- Config, Providers, Layout, Page
 |  |  +------+------+------+------+------+  |  |
@@ -34,7 +34,7 @@ hua-ux is a **meta-framework** that unifies individual packages into a single in
 ## Package Dependencies
 
 ```
-@hua-labs/hua-ux
+@hua-labs/hua
 +-- @hua-labs/ui           -> UI components (Button, Card, Icon, etc.)
 +-- @hua-labs/motion-core  -> CSS motion (useEntrance, useScrollReveal, etc.)
 +-- @hua-labs/i18n-core    -> i18n core (useTranslation, useLanguageChange)
@@ -48,7 +48,7 @@ hua-ux is a **meta-framework** that unifies individual packages into a single in
 
 ## Re-export Strategy
 
-The main entry (`@hua-labs/hua-ux`) re-exports everything from all sub-packages:
+The main entry (`@hua-labs/hua`) re-exports everything from all sub-packages:
 
 ```typescript
 // Main index.ts structure
@@ -87,7 +87,7 @@ The framework layer **integrates and extends** sub-packages:
 ## Config-to-Render Flow
 
 ```
-hua-ux.config.ts
+hua.config.ts
   | defineConfig()
   | preset merge + validation
   v
@@ -111,8 +111,8 @@ HuaUxLayout
 ### 1. Basic app setup
 
 ```typescript
-// hua-ux.config.ts
-import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
 
 export default defineConfig({
   preset: 'product',
@@ -122,8 +122,8 @@ export default defineConfig({
 
 ```tsx
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
-import config from '../hua-ux.config'
+import { HuaUxLayout } from '@hua-labs/hua/framework'
+import config from '../hua.config'
 
 export default function RootLayout({ children }) {
   return (
@@ -150,9 +150,9 @@ function MyComponent() {
 
 ```tsx
 // app/layout.tsx (Server Component)
-import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server'
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
-import config from '../hua-ux.config'
+import { getSSRTranslations } from '@hua-labs/hua/framework/server'
+import { HuaUxLayout } from '@hua-labs/hua/framework'
+import config from '../hua.config'
 
 export default async function RootLayout({ children }) {
   const initialTranslations = await getSSRTranslations(config)
@@ -171,6 +171,6 @@ export default async function RootLayout({ children }) {
 
 ## Constraints & Gotchas
 
-- hua-ux is optimized for Next.js. For other React frameworks, use sub-packages (hua-ui, motion-core, etc.) directly.
+- hua is optimized for Next.js. For other React frameworks, use sub-packages (hua-ui, motion-core, etc.) directly.
 - BrandedButton/BrandedCard only apply branding inside BrandingProvider. Outside the provider, they behave like regular Button/Card.
 - The `'use client'` directive in the framework layer means server components must use `framework/shared` or `framework/server`.

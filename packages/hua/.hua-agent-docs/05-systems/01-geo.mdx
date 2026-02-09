@@ -59,7 +59,7 @@ interface GEOMetadata {
 ```
 
 ```tsx
-import { generateGEOMetadata } from '@hua-labs/hua-ux/framework/shared'
+import { generateGEOMetadata } from '@hua-labs/hua/framework/shared'
 
 const geo = generateGEOMetadata({
   name: 'Sum Diary',
@@ -83,7 +83,7 @@ function openGraphToObject(og: GEOMetadata['openGraph']): Record<string, string>
 ```tsx
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { generateGEOMetadata, metaToObject } from '@hua-labs/hua-ux/framework/shared'
+import { generateGEOMetadata, metaToObject } from '@hua-labs/hua/framework/shared'
 
 export function generateMetadata(): Metadata {
   const geo = generateGEOMetadata({ name: 'Sum Diary', description: '...' })
@@ -108,7 +108,7 @@ function renderJSONLD(jsonLd: unknown, id?: string): {
 
 ```tsx
 import Script from 'next/script'
-import { renderJSONLD } from '@hua-labs/hua-ux/framework/shared'
+import { renderJSONLD } from '@hua-labs/hua/framework/shared'
 
 <Script {...renderJSONLD(geo.jsonLd, 'app-jsonld')} />
 ```
@@ -261,7 +261,7 @@ import {
   renderJSONLD,
   generateOrganizationLD,
   GEO_PRESETS
-} from '@hua-labs/hua-ux/framework/shared'
+} from '@hua-labs/hua/framework/shared'
 
 const geo = generateGEOMetadata({
   ...GEO_PRESETS.REACT_APP,
@@ -296,7 +296,7 @@ export default function Layout({ children }) {
 ### 2. FAQ Page
 
 ```tsx
-import { generateFAQPageLD, renderJSONLD } from '@hua-labs/hua-ux/framework/shared'
+import { generateFAQPageLD, renderJSONLD } from '@hua-labs/hua/framework/shared'
 
 const faqLd = generateFAQPageLD([
   { question: 'What is Sum Diary?', answer: 'A diary app where AI analyzes your emotions.' },

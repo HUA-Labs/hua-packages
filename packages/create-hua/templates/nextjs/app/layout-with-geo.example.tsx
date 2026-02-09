@@ -14,14 +14,14 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
-import { HuaUxLayout } from "@hua-labs/hua-ux/framework";
-import { generateGEOMetadata, renderJSONLD } from "@hua-labs/hua-ux/framework";
+import { HuaUxLayout } from "@hua-labs/hua/framework";
+import { generateGEOMetadata, renderJSONLD } from "@hua-labs/hua/framework";
 
 // GEO 메타데이터 생성
 // Generate GEO metadata for AI search engines
 const geoMetadata = generateGEOMetadata({
   name: 'My App',
-  description: 'Built with hua-ux framework - A modern UX framework for Next.js',
+  description: 'Built with hua framework - A modern UX framework for Next.js',
   version: '1.0.0',
   applicationCategory: ['UX Framework', 'Developer Tool'],
   programmingLanguage: ['TypeScript', 'React', 'Next.js'],

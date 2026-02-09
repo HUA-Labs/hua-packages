@@ -1,7 +1,7 @@
 # @hua-labs/hooks
 
-Common React hooks for the hua-ux ecosystem.
-hua-ux 생태계를 위한 공통 React 훅 모음.
+Common React hooks for the hua ecosystem.
+hua 생태계를 위한 공통 React 훅 모음.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/hooks.svg)](https://www.npmjs.com/package/@hua-labs/hooks)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/hooks.svg)](https://www.npmjs.com/package/@hua-labs/hooks)
@@ -13,9 +13,9 @@ hua-ux 생태계를 위한 공통 React 훅 모음.
 
 ## Overview | 개요
 
-A collection of commonly used React hooks optimized for the hua-ux ecosystem. Provides loading state management, auto-scroll functionality, and performance monitoring.
+A collection of commonly used React hooks optimized for the hua ecosystem. Provides loading state management, auto-scroll functionality, and performance monitoring.
 
-hua-ux 생태계에 최적화된 공통 React 훅 모음입니다. 로딩 상태 관리, 자동 스크롤, 성능 모니터링 기능을 제공합니다.
+hua 생태계에 최적화된 공통 React 훅 모음입니다. 로딩 상태 관리, 자동 스크롤, 성능 모니터링 기능을 제공합니다.
 
 ## Features
 
@@ -65,7 +65,7 @@ function ChatView({ messages }: { messages: Message[] }) {
 
 ## Related Packages | 관련 패키지
 
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — UX framework (re-exports these hooks)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (re-exports these hooks)
 - [`@hua-labs/ui`](https://www.npmjs.com/package/@hua-labs/ui) — UI component library
 
 ## Requirements | 요구사항

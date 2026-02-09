@@ -9,7 +9,7 @@ related:
 
 # Branding System
 
-The hua-ux branding system supports **CSS variable-based white-labeling**. Once configured, all UI components automatically use the brand colors and fonts.
+The hua branding system supports **CSS variable-based white-labeling**. Once configured, all UI components automatically use the brand colors and fonts.
 
 ## BrandingProvider
 
@@ -24,7 +24,7 @@ interface BrandingProviderProps {
 
 **Behavior:**
 1. Calls `generateCSSVariables(branding)`
-2. Injects a `<style id="hua-ux-branding-vars">` tag into the DOM
+2. Injects a `<style id="hua-branding-vars">` tag into the DOM
 3. Automatically updates the style tag when branding changes
 4. Removes the style tag on unmount
 5. SSR-safe with `suppressHydrationWarning`
@@ -41,7 +41,7 @@ function useBranding(): HuaUxConfig['branding'] | null
 
 ```tsx
 'use client'
-import { useBranding } from '@hua-labs/hua-ux/framework'
+import { useBranding } from '@hua-labs/hua/framework'
 
 function Logo() {
   const branding = useBranding()
@@ -129,7 +129,7 @@ function generateTailwindConfig(branding: BrandingConfig): {
 
 ```typescript
 // tailwind.config.ts
-import { generateTailwindConfig } from '@hua-labs/hua-ux/framework/shared'
+import { generateTailwindConfig } from '@hua-labs/hua/framework/shared'
 
 const brandingConfig = {
   colors: { primary: '#6366f1', secondary: '#8b5cf6' },
@@ -156,7 +156,7 @@ Wrapper components that automatically apply branding colors:
 ### BrandedButton
 
 ```tsx
-import { BrandedButton } from '@hua-labs/hua-ux/framework'
+import { BrandedButton } from '@hua-labs/hua/framework'
 
 // Brand colors are applied when used inside BrandingProvider
 <BrandedButton>Default</BrandedButton>           {/* bg-primary */}
@@ -178,7 +178,7 @@ import { BrandedButton } from '@hua-labs/hua-ux/framework'
 ### 1. Basic White-Labeling
 
 ```typescript
-// hua-ux.config.ts
+// hua.config.ts
 export default defineConfig({
   branding: {
     name: 'ClientApp',
@@ -206,7 +206,7 @@ export default defineConfig({
 
 ```tsx
 'use client'
-import { BrandingProvider } from '@hua-labs/hua-ux/framework'
+import { BrandingProvider } from '@hua-labs/hua/framework'
 
 function TenantLayout({ tenant, children }) {
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { useTranslation } from '@hua-labs/hua/i18n';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import Image from 'next/image';
 
@@ -47,7 +47,7 @@ export default function HomePage() {
             GitHub
           </a>
           <a
-            href="https://www.npmjs.com/package/@hua-labs/hua-ux"
+            href="https://www.npmjs.com/package/@hua-labs/hua"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-foreground/90 text-sm h-10 px-5"

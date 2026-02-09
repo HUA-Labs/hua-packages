@@ -1,7 +1,7 @@
 # @hua-labs/utils
 
-Common utility functions for the hua-ux ecosystem.
-hua-ux 생태계를 위한 공통 유틸리티 함수 모음.
+Common utility functions for the hua ecosystem.
+hua 생태계를 위한 공통 유틸리티 함수 모음.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
@@ -13,9 +13,9 @@ hua-ux 생태계를 위한 공통 유틸리티 함수 모음.
 
 ## Overview | 개요
 
-A comprehensive utility library for the hua-ux ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions.
+A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions.
 
-hua-ux 생태계를 위한 종합 유틸리티 라이브러리입니다. Tailwind 클래스 병합, 포맷터, 성능 유틸리티, 유효성 검사, 문자열 조작, 살균 함수를 포함합니다.
+hua 생태계를 위한 종합 유틸리티 라이브러리입니다. Tailwind 클래스 병합, 포맷터, 성능 유틸리티, 유효성 검사, 문자열 조작, 살균 함수를 포함합니다.
 
 ## Features
 
@@ -70,7 +70,7 @@ sanitizeInput('<script>alert("xss")</script>'); // safe string
 
 ## Related Packages | 관련 패키지
 
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — UX framework (re-exports these utils)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (re-exports these utils)
 - [`@hua-labs/hooks`](https://www.npmjs.com/package/@hua-labs/hooks) — React hooks collection
 
 ## Requirements | 요구사항
