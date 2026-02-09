@@ -35,7 +35,7 @@ END IF
 
 ### Top Layer: Framework & Config
 - `hua.config.ts`: Framework configuration
-- `HuaUxLayout`: Automatic Provider setup
+- `HuaProvider`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 
 ### Bottom Layer: Core Packages
@@ -127,7 +127,7 @@ export function MyComponent() {
 
 ### @hua-labs/hua/framework
 - `HuaUxPage`: Page wrapper
-- `HuaUxLayout`: Layout
+- `HuaProvider`: Layout
 - `UnifiedProviders`: Provider unification
 - `useMotion`: Unified motion hook
 - `useData`: Client data fetching
