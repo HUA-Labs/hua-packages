@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { HuaUxLayout } from "@hua-labs/hua/framework";
+import { HuaProvider } from "@hua-labs/hua/framework";
 import { getSSRTranslations } from "@hua-labs/hua/framework/server";
 import config from "../hua.config";
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="antialiased">
-        <HuaUxLayout config={configWithSSR}>{children}</HuaUxLayout>
+        <HuaProvider config={configWithSSR}>{children}</HuaProvider>
       </body>
     </html>
   );

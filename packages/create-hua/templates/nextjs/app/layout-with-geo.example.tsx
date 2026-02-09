@@ -14,7 +14,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
-import { HuaUxLayout } from "@hua-labs/hua/framework";
+import { HuaProvider } from "@hua-labs/hua/framework";
 import { generateGEOMetadata, renderJSONLD } from "@hua-labs/hua/framework";
 
 // GEO 메타데이터 생성
@@ -99,7 +99,7 @@ export default function RootLayout({
         ))}
       </head>
       <body className="antialiased">
-        <HuaUxLayout>{children}</HuaUxLayout>
+        <HuaProvider>{children}</HuaProvider>
       </body>
     </html>
   );

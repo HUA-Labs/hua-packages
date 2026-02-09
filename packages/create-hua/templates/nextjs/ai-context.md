@@ -17,7 +17,7 @@ This project uses the **hua framework** for Next.js applications.
 
 ### Middle Layer: Framework & Config
 - `hua.config.ts`: Framework configuration
-- `HuaUxLayout`: Automatic Provider setup
+- `HuaProvider`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 
 ### Bottom Layer: Core & Types
@@ -31,7 +31,7 @@ This project uses the **hua framework** for Next.js applications.
 ```
 Project Root/
 ├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout (uses HuaUxLayout)
+│   ├── layout.tsx          # Root layout (uses HuaProvider)
 │   ├── page.tsx            # Home page (uses HuaUxPage)
 │   └── api/                # API Routes
 │       └── translations/   # i18n translation API
@@ -135,7 +135,7 @@ The theme provides these CSS variables (usable as Tailwind classes):
 ### @hua-labs/hua/framework
 
 **Framework Components**:
-- `HuaUxLayout`: Automatic Provider setup
+- `HuaProvider`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
 - `BrandedButton`, `BrandedCard`: Components with automatic branding

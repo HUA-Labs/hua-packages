@@ -39,7 +39,7 @@ pnpm start
 ```
 .
 ├── app/                    # Next.js App Router
-│   ├── layout.tsx         # 루트 레이아웃 (HuaUxLayout 사용)
+│   ├── layout.tsx         # 루트 레이아웃 (HuaProvider 사용)
 │   ├── page.tsx           # 홈 페이지
 │   └── api/               # API 라우트
 │       └── translations/  # 번역 API

@@ -52,7 +52,7 @@ const TEMPLATE_CONFIG: TemplateConfig = {
   // Files that must contain specific patterns (Next.js 16 compatibility)
   mustContain: {
     'app/layout.tsx': [
-      'HuaUxLayout',  // TODO: rename to HuaLayout when component is renamed
+      'HuaProvider',
       'hua.config',
       'getSSRTranslations',
     ],
