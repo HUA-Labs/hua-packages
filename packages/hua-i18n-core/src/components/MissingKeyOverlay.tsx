@@ -195,7 +195,7 @@ export const reportMissingKey = (key: string, options: {
     }));
 
     // 콘솔에도 로그
-    console.warn(`Missing translation key: ${key}`, {
+    if (process.env.NODE_ENV !== 'production') console.warn(`Missing translation key: ${key}`, {
       namespace: options.namespace,
       language: options.language,
       component: options.component

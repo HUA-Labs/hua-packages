@@ -377,7 +377,7 @@ export const defaultErrorRecoveryStrategy: ErrorRecoveryStrategy = {
   backoffMultiplier: 2,
   shouldRetry: isRecoverableError,
   onRetry: (error: TranslationError, attempt: number) => {
-    console.warn(`Retrying translation operation (attempt ${attempt}/${error.maxRetries}):`, error.message);
+    if (process.env.NODE_ENV !== 'production') console.warn(`Retrying translation operation (attempt ${attempt}/${error.maxRetries}):`, error.message);
   },
   onMaxRetriesExceeded: (error: TranslationError) => {
     console.error('Max retries exceeded for translation operation:', error.message);
@@ -427,7 +427,7 @@ export function logTranslationError(
         console.error('Translation Error:', logData);
         break;
       case 'warn':
-        console.warn('Translation Warning:', logData);
+        if (process.env.NODE_ENV !== 'production') console.warn('Translation Warning:', logData);
         break;
       case 'info':
         console.info('Translation Info:', logData);
