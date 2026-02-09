@@ -16,7 +16,7 @@ HUA Labs의 메인 모노레포입니다. 감정을 엔지니어링하는 오픈
 
 ```bash
 # HUA UX로 새 프로젝트 시작
-npx create-hua-ux my-app
+npx create-hua my-app
 cd my-app
 pnpm dev
 ```
@@ -24,7 +24,7 @@ pnpm dev
 또는 기존 프로젝트에 추가:
 
 ```bash
-pnpm add @hua-labs/hua-ux
+pnpm add @hua-labs/hua
 ```
 
 ## Packages
@@ -33,9 +33,9 @@ pnpm add @hua-labs/hua-ux
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@hua-labs/hua-ux`](./packages/hua-ux) | ![npm](https://img.shields.io/npm/v/@hua-labs/hua-ux) | UI + Motion + i18n 통합 프레임워크 |
+| [`@hua-labs/hua`](./packages/hua) | ![npm](https://img.shields.io/npm/v/@hua-labs/hua) | UI + Motion + i18n 통합 프레임워크 |
 | [`@hua-labs/ui`](./packages/hua-ui) | ![npm](https://img.shields.io/npm/v/@hua-labs/ui) | 100+ React UI 컴포넌트 |
-| [`create-hua-ux`](./packages/create-hua-ux) | ![npm](https://img.shields.io/npm/v/create-hua-ux) | 프로젝트 생성 CLI |
+| [`create-hua`](./packages/create-hua) | ![npm](https://img.shields.io/npm/v/create-hua) | 프로젝트 생성 CLI |
 
 ### i18n (국제화)
 
@@ -89,7 +89,7 @@ hua-platform/
 │   ├── hua-docs/           # 프레임워크 문서 사이트
 │   └── hua-official/       # HUA Labs 공식 사이트
 ├── packages/
-│   ├── hua-ux/             # 통합 프레임워크 (@hua-labs/hua-ux)
+│   ├── hua/             # 통합 프레임워크 (@hua-labs/hua)
 │   ├── hua-ui/             # UI 컴포넌트 (@hua-labs/ui)
 │   ├── hua-i18n-*/         # i18n 패키지 (core, loaders, formatters, ...)
 │   ├── hua-motion-*/       # Motion 패키지 (core, presets, advanced)
@@ -141,7 +141,7 @@ fix: bug fix [deploy docs]
 - [SUM Diary](https://sumdiary.com) — AI 감정 분석 일기
 - [HUA Docs](https://docs.hua-labs.com) — 프레임워크 문서
 - [HUA Labs](https://hua-labs.com) — 공식 사이트
-- [npm: @hua-labs/hua-ux](https://www.npmjs.com/package/@hua-labs/hua-ux)
+- [npm: @hua-labs/hua](https://www.npmjs.com/package/@hua-labs/hua)
 - [GitHub Issues](https://github.com/HUA-Labs/HUA-platform/issues)
 
 ## License

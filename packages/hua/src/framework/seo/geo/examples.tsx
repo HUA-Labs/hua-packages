@@ -25,7 +25,7 @@ import { generateFAQPageLD, generateHowToLD } from './structuredData';
  */
 export function Example1_BasicGEO() {
   const geoMetadata = generateGEOMetadata({
-    name: 'hua-ux',
+    name: 'hua',
     alternateName: ['@hua-labs/hua', 'HUA Framework'],
     description:
       'Privacy-first UX framework for Next.js with built-in i18n, motion, and accessibility',
@@ -146,29 +146,29 @@ export async function Example2_NextjsMetadata() {
 export function Example3_FAQPage() {
   const faqLd = generateFAQPageLD([
     {
-      question: 'What is hua-ux?',
+      question: 'What is hua?',
       answer:
-        'hua-ux is a privacy-first UX framework for Next.js applications. It provides built-in internationalization (i18n), motion animations, accessibility features (WCAG 2.1 compliant), automatic error handling, and loading state optimization.',
+        'hua is a privacy-first UX framework for Next.js applications. It provides built-in internationalization (i18n), motion animations, accessibility features (WCAG 2.1 compliant), automatic error handling, and loading state optimization.',
     },
     {
-      question: 'How do I install hua-ux?',
+      question: 'How do I install hua?',
       answer:
-        'You can create a new hua-ux project using the CLI: npx create-hua-ux my-app. Or install it in an existing Next.js project: pnpm add @hua-labs/hua',
+        'You can create a new hua project using the CLI: npx create-hua my-app. Or install it in an existing Next.js project: pnpm add @hua-labs/hua',
     },
     {
-      question: 'Is hua-ux free to use?',
+      question: 'Is hua free to use?',
       answer:
-        'Yes, hua-ux is open-source and available under the MIT license. You can use it freely in both personal and commercial projects.',
+        'Yes, hua is open-source and available under the MIT license. You can use it freely in both personal and commercial projects.',
     },
     {
-      question: 'What makes hua-ux privacy-first?',
+      question: 'What makes hua privacy-first?',
       answer:
-        'hua-ux has no tracking, no analytics, and no data collection by default. It respects user privacy and follows GDPR/CCPA principles. You have full control over what data your application collects.',
+        'hua has no tracking, no analytics, and no data collection by default. It respects user privacy and follows GDPR/CCPA principles. You have full control over what data your application collects.',
     },
     {
-      question: 'Does hua-ux support TypeScript?',
+      question: 'Does hua support TypeScript?',
       answer:
-        'Yes, hua-ux is written in TypeScript and provides full type safety. All components, hooks, and utilities come with TypeScript definitions.',
+        'Yes, hua is written in TypeScript and provides full type safety. All components, hooks, and utilities come with TypeScript definitions.',
     },
   ]);
 
@@ -186,14 +186,14 @@ export function Example3_FAQPage() {
  */
 export function Example4_HowToGuide() {
   const howToLd = generateHowToLD({
-    name: 'How to add internationalization (i18n) to your Next.js app with hua-ux',
+    name: 'How to add internationalization (i18n) to your Next.js app with hua',
     description:
-      'Step-by-step guide to implementing multilingual support in your Next.js application using hua-ux',
+      'Step-by-step guide to implementing multilingual support in your Next.js application using hua',
     totalTime: 'PT10M', // 10 minutes
     steps: [
       {
-        name: 'Create a new hua-ux project',
-        text: 'Run the CLI command: npx create-hua-ux my-app. This creates a new Next.js project with hua-ux pre-configured.',
+        name: 'Create a new hua project',
+        text: 'Run the CLI command: npx create-hua my-app. This creates a new Next.js project with hua pre-configured.',
       },
       {
         name: 'Configure supported locales',
@@ -228,7 +228,7 @@ export function Example4_HowToGuide() {
  */
 export function Example5_AIContext() {
   const context = createAIContext({
-    name: 'hua-ux',
+    name: 'hua',
     description: 'Privacy-first UX framework for Next.js',
     features: [
       'Internationalization (i18n)',
@@ -247,7 +247,7 @@ export function Example5_AIContext() {
   });
 
   // Returns:
-  // "hua-ux is a Privacy-first UX framework for Next.js. Key features include:
+  // "hua is a Privacy-first UX framework for Next.js. Key features include:
   // Internationalization (i18n), Motion animations, WCAG 2.1 accessibility, Error
   // boundaries, Loading state optimization. Common use cases: Multilingual web
   // applications, Accessible enterprise applications, Privacy-compliant consumer
@@ -268,7 +268,7 @@ export function Example5_AIContext() {
 export function Example6_CompleteLandingPage() {
   // Software metadata
   const geoMeta = generateGEOMetadata({
-    name: 'hua-ux',
+    name: 'hua',
     description: 'Privacy-first UX framework for Next.js',
     version: '1.0.0',
     applicationCategory: 'UX Framework',
@@ -281,15 +281,15 @@ export function Example6_CompleteLandingPage() {
 
   // FAQ structured data
   const faqLd = generateFAQPageLD([
-    { question: 'What is hua-ux?', answer: 'Privacy-first UX framework for Next.js' },
-    { question: 'How to install?', answer: 'npx create-hua-ux my-app' },
+    { question: 'What is hua?', answer: 'Privacy-first UX framework for Next.js' },
+    { question: 'How to install?', answer: 'npx create-hua my-app' },
   ]);
 
   // HowTo guide
   const howToLd = generateHowToLD({
-    name: 'Getting started with hua-ux',
+    name: 'Getting started with hua',
     steps: [
-      { name: 'Install', text: 'npx create-hua-ux my-app' },
+      { name: 'Install', text: 'npx create-hua my-app' },
       { name: 'Configure', text: 'Edit hua.config.ts' },
       { name: 'Build', text: 'pnpm dev' },
     ],
@@ -297,7 +297,7 @@ export function Example6_CompleteLandingPage() {
 
   // AI context
   const aiContext = createAIContext({
-    name: 'hua-ux',
+    name: 'hua',
     description: 'Privacy-first UX framework',
     features: ['i18n', 'Motion', 'Accessibility'],
   });

@@ -1,6 +1,6 @@
-# hua-ux Project Cursor Rules
+# hua Project Cursor Rules
 
-This project uses the **hua-ux framework** for Next.js applications.
+This project uses the **hua framework** for Next.js applications.
 
 ## Core Philosophy
 
@@ -13,7 +13,7 @@ This project uses the **hua-ux framework** for Next.js applications.
 - `lib/`: Utility functions
 - `store/`: Zustand stores
 - `translations/`: Translation files (ko/, en/)
-- `hua-ux.config.ts`: Framework configuration
+- `hua.config.ts`: Framework configuration
 
 ## Available Components
 
@@ -50,7 +50,7 @@ This project uses the **hua-ux framework** for Next.js applications.
 - `Icon`, `EmotionIcon`, `StatusIcon`, `LoadingIcon`, `SuccessIcon`, `ErrorIcon`
 - Icon providers: Phosphor Icons (default), Lucide React
 
-### @hua-labs/hua-ux/framework
+### @hua-labs/hua/framework
 
 **Framework Components**:
 - `HuaUxLayout`: Automatic Provider setup
@@ -95,8 +95,8 @@ This project uses the **hua-ux framework** for Next.js applications.
 
 1. **Always wrap with `HuaUxPage`**:
   ```tsx
-  import { HuaUxPage } from '@hua-labs/hua-ux/framework';
-  import { useTranslation } from '@hua-labs/hua-ux/i18n';
+  import { HuaUxPage } from '@hua-labs/hua/framework';
+  import { useTranslation } from '@hua-labs/hua/i18n';
   
   export default function MyPage() {
     const { t } = useTranslation('my-page');
@@ -136,9 +136,9 @@ This project uses the **hua-ux framework** for Next.js applications.
   ```tsx
   'use client';
   
-  import { Card, Button } from '@hua-labs/hua-ux/ui';
-  import { useFadeIn } from '@hua-labs/hua-ux/motion';
-  import { useTranslation } from '@hua-labs/hua-ux/i18n';
+  import { Card, Button } from '@hua-labs/hua/ui';
+  import { useFadeIn } from '@hua-labs/hua/motion';
+  import { useTranslation } from '@hua-labs/hua/i18n';
   
   export function MyComponent() {
     const { t } = useTranslation('my-component');
@@ -166,7 +166,7 @@ This project uses the **hua-ux framework** for Next.js applications.
 
 ### When Changing Configuration
 
-1. **Only modify `hua-ux.config.ts`**
+1. **Only modify `hua.config.ts`**
 2. **Prefer Preset over manual configuration**:
   ```typescript
   // Good: Use Preset
@@ -190,7 +190,7 @@ This project uses the **hua-ux framework** for Next.js applications.
 
 ### Branding
 
-- Customize colors and typography with `branding` setting in `hua-ux.config.ts`
+- Customize colors and typography with `branding` setting in `hua.config.ts`
 - All components automatically apply branding
 - `BrandedButton`, `BrandedCard` automatically apply branding
 
@@ -215,10 +215,10 @@ This project uses the **hua-ux framework** for Next.js applications.
 
 1. **Prefer framework components**
   - Use components from `@hua-labs/ui` first
-  - Utilize framework components from `@hua-labs/hua-ux/framework`
+  - Utilize framework components from `@hua-labs/hua/framework`
 
 2. **Auto-apply based on config**
-  - Settings in `hua-ux.config.ts` are automatically applied
+  - Settings in `hua.config.ts` are automatically applied
   - Preset usage recommended
 
 3. **Always generate translation keys together**
@@ -240,8 +240,8 @@ This project uses the **hua-ux framework** for Next.js applications.
 
 ### Page Creation Pattern
 ```tsx
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { HuaUxPage } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
@@ -257,8 +257,8 @@ export default function MyPage() {
 ```tsx
 'use client';
 
-import { Card, Button } from '@hua-labs/hua-ux/ui';
-import { useMotion } from '@hua-labs/hua-ux/framework';
+import { Card, Button } from '@hua-labs/hua/ui';
+import { useMotion } from '@hua-labs/hua/framework';
 
 export function MyComponent() {
   const motion = useMotion();
@@ -273,7 +273,7 @@ export function MyComponent() {
 ### Data Fetching Pattern
 ```tsx
 // Server Component
-import { fetchData } from '@hua-labs/hua-ux/framework';
+import { fetchData } from '@hua-labs/hua/framework';
 
 export default async function MyPage() {
   const data = await fetchData<MyDataType>('/api/data');
@@ -282,7 +282,7 @@ export default async function MyPage() {
 
 // Client Component
 'use client';
-import { useData } from '@hua-labs/hua-ux/framework';
+import { useData } from '@hua-labs/hua/framework';
 
 export function MyComponent() {
   const { data, isLoading, error } = useData<MyDataType>('/api/data');
@@ -295,8 +295,8 @@ export function MyComponent() {
 ## References
 
 - `ai-context.md`: Detailed project structure explanation
-- `hua-ux.config.ts`: Framework configuration file
-- Framework docs: `node_modules/@hua-labs/hua-ux/README.md`
+- `hua.config.ts`: Framework configuration file
+- Framework docs: `node_modules/@hua-labs/hua/README.md`
 - UI components: `node_modules/@hua-labs/ui/README.md`
 - Motion: `node_modules/@hua-labs/motion-core/README.md`
 - i18n: `node_modules/@hua-labs/i18n-core-zustand/README.md`

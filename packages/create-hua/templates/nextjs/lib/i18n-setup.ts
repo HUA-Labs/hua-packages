@@ -1,4 +1,4 @@
-import { createZustandI18n } from '@hua-labs/hua-ux/i18n';
+import { createZustandI18n } from '@hua-labs/hua/i18n';
 import { useAppStore } from '../store/useAppStore';
 
 export const I18nProvider = createZustandI18n(useAppStore, {

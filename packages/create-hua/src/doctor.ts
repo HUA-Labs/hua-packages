@@ -1,5 +1,5 @@
 /**
- * create-hua-ux - Doctor Command
+ * create-hua - Doctor Command
  * 
  * Diagnoses project health and provides solutions
  */
@@ -50,21 +50,21 @@ export async function diagnoseProject(projectPath: string): Promise<{
       type: 'error',
       message: isEn ? 'package.json not found' : 'package.json을 찾을 수 없습니다',
       solution: isEn
-        ? 'This might not be a valid hua-ux project. Run create-hua-ux to initialize.'
-        : '유효한 hua-ux 프로젝트가 아닐 수 있습니다. create-hua-ux를 실행하여 초기화하세요.',
+        ? 'This might not be a valid hua project. Run create-hua to initialize.'
+        : '유효한 hua 프로젝트가 아닐 수 있습니다. create-hua를 실행하여 초기화하세요.',
     });
   } else {
     try {
       const packageJson = await fs.readJSON(packageJsonPath);
 
-      // Check for hua-ux dependency
-      if (!packageJson.dependencies?.['@hua-labs/hua-ux']) {
+      // Check for hua dependency
+      if (!packageJson.dependencies?.['@hua-labs/hua']) {
         issues.push({
           type: 'error',
-          message: isEn ? '@hua-labs/hua-ux not found in dependencies' : '의존성에 @hua-labs/hua-ux가 없습니다',
+          message: isEn ? '@hua-labs/hua not found in dependencies' : '의존성에 @hua-labs/hua가 없습니다',
           solution: isEn
-            ? 'Run: pnpm install @hua-labs/hua-ux'
-            : '실행: pnpm install @hua-labs/hua-ux',
+            ? 'Run: pnpm install @hua-labs/hua'
+            : '실행: pnpm install @hua-labs/hua',
         });
       }
     } catch (error) {
@@ -77,15 +77,15 @@ export async function diagnoseProject(projectPath: string): Promise<{
     }
   }
 
-  // Check hua-ux.config.ts
-  const configPath = path.join(projectPath, 'hua-ux.config.ts');
+  // Check hua.config.ts
+  const configPath = path.join(projectPath, 'hua.config.ts');
   if (!(await fs.pathExists(configPath))) {
     issues.push({
       type: 'error',
-      message: isEn ? 'hua-ux.config.ts not found' : 'hua-ux.config.ts를 찾을 수 없습니다',
+      message: isEn ? 'hua.config.ts not found' : 'hua.config.ts를 찾을 수 없습니다',
       solution: isEn
-        ? 'This file is required for hua-ux framework. Re-run create-hua-ux.'
-        : '이 파일은 hua-ux 프레임워크에 필요합니다. create-hua-ux를 다시 실행하세요.',
+        ? 'This file is required for hua framework. Re-run create-hua.'
+        : '이 파일은 hua 프레임워크에 필요합니다. create-hua를 다시 실행하세요.',
     });
   }
 
@@ -98,8 +98,8 @@ export async function diagnoseProject(projectPath: string): Promise<{
         type: 'warning',
         message: isEn ? `Required directory missing: ${dir}` : `필수 디렉토리 누락: ${dir}`,
         solution: isEn
-          ? 'Re-run create-hua-ux to restore project structure'
-          : '프로젝트 구조를 복원하려면 create-hua-ux를 다시 실행하세요',
+          ? 'Re-run create-hua to restore project structure'
+          : '프로젝트 구조를 복원하려면 create-hua를 다시 실행하세요',
       });
     }
   }

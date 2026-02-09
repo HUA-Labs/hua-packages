@@ -13,7 +13,7 @@
 // ============================================
 // app/page.tsx (Server Component)
 // ============================================
-import { generatePageMetadata, generateGEOMetadata, renderJSONLD } from '@hua-labs/hua-ux/framework';
+import { generatePageMetadata, generateGEOMetadata, renderJSONLD } from '@hua-labs/hua/framework';
 import Script from 'next/script';
 import { HomePageContent } from './page-content';
 
@@ -21,7 +21,7 @@ import { HomePageContent } from './page-content';
 // Generate page-specific GEO metadata
 const pageGeoMetadata = generateGEOMetadata({
   name: 'Home - My App',
-  description: 'Welcome to My App - Built with hua-ux framework',
+  description: 'Welcome to My App - Built with hua framework',
   applicationCategory: 'WebApplication',
   keywords: ['home', 'welcome', 'nextjs', 'react'],
 });
@@ -52,9 +52,9 @@ export default function HomePage() {
 // ============================================
 'use client';
 
-import { HuaUxPage } from "@hua-labs/hua-ux/framework";
-import { Button, Card } from "@hua-labs/hua-ux/ui";
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { HuaUxPage } from "@hua-labs/hua/framework";
+import { Button, Card } from "@hua-labs/hua/ui";
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export function HomePageContent() {
   const { t } = useTranslation('common');

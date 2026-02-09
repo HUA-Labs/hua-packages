@@ -9,7 +9,7 @@ related:
 
 # Error Handling
 
-hua-ux extends React's ErrorBoundary pattern to provide automatic error handling in HuaUxPage.
+hua extends React's ErrorBoundary pattern to provide automatic error handling in HuaUxPage.
 
 ## ErrorBoundary
 
@@ -25,7 +25,7 @@ interface ErrorBoundaryProps {
 ```
 
 ```tsx
-import { ErrorBoundary } from '@hua-labs/hua-ux/framework'
+import { ErrorBoundary } from '@hua-labs/hua/framework'
 
 <ErrorBoundary
   fallback={(error, reset) => (
@@ -130,7 +130,7 @@ function HuaUxPage({ children, enableErrorBoundary = true, ... }) {
 ### 1. Basic Page
 
 ```tsx
-import { HuaUxPage } from '@hua-labs/hua-ux/framework'
+import { HuaUxPage } from '@hua-labs/hua/framework'
 
 export default function DiaryPage() {
   return (

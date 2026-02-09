@@ -1,11 +1,11 @@
-# @hua-labs/hua-ux
+# @hua-labs/hua
 
 Ship UX faster: UI + Motion + i18n, pre-wired.
 더 빠른 UX 개발을 위한 UI, Motion, i18n 통합 프레임워크.
 
-[![npm version](https://img.shields.io/npm/v/@hua-labs/hua-ux.svg)](https://www.npmjs.com/package/@hua-labs/hua-ux)
-[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/hua-ux.svg)](https://www.npmjs.com/package/@hua-labs/hua-ux)
-[![license](https://img.shields.io/npm/l/@hua-labs/hua-ux.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@hua-labs/hua.svg)](https://www.npmjs.com/package/@hua-labs/hua)
+[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/hua.svg)](https://www.npmjs.com/package/@hua-labs/hua)
+[![license](https://img.shields.io/npm/l/@hua-labs/hua.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
@@ -30,7 +30,7 @@ React 제품 팀을 위한 올인원 프레임워크입니다. UI 컴포넌트, 
 ## Installation | 설치
 
 ```bash
-pnpm add @hua-labs/hua-ux
+pnpm add @hua-labs/hua
 ```
 
 Peer dependencies: `react >= 19.0.0`, `react-dom >= 19.0.0`, `server-only ^0.0.1`
@@ -40,8 +40,8 @@ Optional peer: `next >= 13.0.0`
 ## Quick Start | 빠른 시작
 
 ```tsx
-// hua-ux.config.ts
-import { defineConfig } from '@hua-labs/hua-ux/framework';
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework';
 
 export default defineConfig({
   preset: 'product',
@@ -55,7 +55,7 @@ export default defineConfig({
 });
 
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework';
+import { HuaUxLayout } from '@hua-labs/hua/framework';
 
 export default function RootLayout({ children }) {
   return (
@@ -72,22 +72,22 @@ export default function RootLayout({ children }) {
 
 | Path | Re-exports from |
 |------|-----------------|
-| `@hua-labs/hua-ux` | Root — all re-exports |
-| `@hua-labs/hua-ux/framework` | Framework layer (HuaUxLayout, defineConfig, HuaUxPage) |
-| `@hua-labs/hua-ux/framework/server` | Server-only framework utilities |
-| `@hua-labs/hua-ux/framework/config` | Configuration types |
-| `@hua-labs/hua-ux/framework/shared` | Shared framework utilities |
-| `@hua-labs/hua-ux/framework/seo/geo` | GEO optimization |
-| `@hua-labs/hua-ux/presets` | Preset configurations |
-| `@hua-labs/hua-ux/ui` | @hua-labs/ui |
-| `@hua-labs/hua-ux/motion` | @hua-labs/motion-core |
-| `@hua-labs/hua-ux/pro` | @hua-labs/pro |
-| `@hua-labs/hua-ux/i18n` | @hua-labs/i18n-core |
-| `@hua-labs/hua-ux/state` | @hua-labs/state |
-| `@hua-labs/hua-ux/formatters` | @hua-labs/i18n-formatters |
-| `@hua-labs/hua-ux/utils` | @hua-labs/utils |
-| `@hua-labs/hua-ux/hooks` | @hua-labs/hooks |
-| `@hua-labs/hua-ux/loaders` | @hua-labs/i18n-loaders |
+| `@hua-labs/hua` | Root — all re-exports |
+| `@hua-labs/hua/framework` | Framework layer (HuaUxLayout, defineConfig, HuaUxPage) |
+| `@hua-labs/hua/framework/server` | Server-only framework utilities |
+| `@hua-labs/hua/framework/config` | Configuration types |
+| `@hua-labs/hua/framework/shared` | Shared framework utilities |
+| `@hua-labs/hua/framework/seo/geo` | GEO optimization |
+| `@hua-labs/hua/presets` | Preset configurations |
+| `@hua-labs/hua/ui` | @hua-labs/ui |
+| `@hua-labs/hua/motion` | @hua-labs/motion-core |
+| `@hua-labs/hua/pro` | @hua-labs/pro |
+| `@hua-labs/hua/i18n` | @hua-labs/i18n-core |
+| `@hua-labs/hua/state` | @hua-labs/state |
+| `@hua-labs/hua/formatters` | @hua-labs/i18n-formatters |
+| `@hua-labs/hua/utils` | @hua-labs/utils |
+| `@hua-labs/hua/hooks` | @hua-labs/hooks |
+| `@hua-labs/hua/loaders` | @hua-labs/i18n-loaders |
 
 ## API Overview | API 개요
 
@@ -95,7 +95,7 @@ export default function RootLayout({ children }) {
 
 | Export | Description |
 |--------|-------------|
-| `defineConfig(config)` | Define hua-ux configuration |
+| `defineConfig(config)` | Define hua configuration |
 | `HuaUxLayout` | Root layout with auto provider setup |
 | `HuaUxPage` | Page wrapper with ErrorBoundary |
 
@@ -124,7 +124,7 @@ export default function RootLayout({ children }) {
 - [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core) — i18n engine
 - [`@hua-labs/state`](https://www.npmjs.com/package/@hua-labs/state) — State management
 - [`@hua-labs/pro`](https://www.npmjs.com/package/@hua-labs/pro) — Advanced motion hooks
-- [`create-hua-ux`](https://www.npmjs.com/package/create-hua-ux) — Project scaffolding CLI
+- [`create-hua`](https://www.npmjs.com/package/create-hua) — Project scaffolding CLI
 
 ## Requirements | 요구사항
 

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Tailwind v4: scan hua-labs packages for class names */
-@source "../node_modules/@hua-labs/hua-ux/dist";
+@source "../node_modules/@hua-labs/hua/dist";
 @source "../node_modules/@hua-labs/ui/dist";
 @source "../node_modules/@hua-labs/ui/src";
 
