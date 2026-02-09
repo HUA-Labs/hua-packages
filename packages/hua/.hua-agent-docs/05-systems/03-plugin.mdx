@@ -9,7 +9,7 @@ related:
 
 # Plugin System
 
-hua-ux allows extending framework functionality through plugins. Plugins register components, hooks, and config schemas into the registry.
+hua allows extending framework functionality through plugins. Plugins register components, hooks, and config schemas into the registry.
 
 ## HuaUxPlugin Interface
 
@@ -57,7 +57,7 @@ function getAllPlugins(): HuaUxPlugin[]
 Direct access to the registry singleton instance:
 
 ```typescript
-import { pluginRegistry } from '@hua-labs/hua-ux/framework'
+import { pluginRegistry } from '@hua-labs/hua/framework'
 
 pluginRegistry.register(myPlugin)
 pluginRegistry.get('my-plugin')
@@ -82,7 +82,7 @@ pluginRegistry.getAll()
 ### 1. Defining a Plugin
 
 ```typescript
-import type { HuaUxPlugin } from '@hua-labs/hua-ux/framework/shared'
+import type { HuaUxPlugin } from '@hua-labs/hua/framework/shared'
 
 const analyticsPlugin: HuaUxPlugin = {
   name: 'analytics',
@@ -115,7 +115,7 @@ export default defineConfig({
 ### 3. Using a Plugin
 
 ```tsx
-import { getPlugin } from '@hua-labs/hua-ux/framework'
+import { getPlugin } from '@hua-labs/hua/framework'
 
 const analytics = getPlugin('analytics')
 if (analytics?.hooks?.useTrackEvent) {

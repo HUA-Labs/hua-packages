@@ -6,7 +6,7 @@
 
 ```
 @hua-labs/
-├── hua-ux              # 메인 프레임워크 (ui + motion + i18n 통합)
+├── hua              # 메인 프레임워크 (ui + motion + i18n 통합)
 ├── ui                  # 100+ React 컴포넌트
 ├── motion-core         # 28개 애니메이션 훅
 ├── i18n-core           # Zero-flicker i18n
@@ -17,7 +17,7 @@
 ├── pro                 # 프리미엄 기능
 ├── encryption          # GCP KMS 암호화
 ├── docs-engine         # 문서 컴포넌트
-└── create-hua-ux       # CLI 스캐폴딩
+└── create-hua       # CLI 스캐폴딩
 ```
 
 ## 문서 폴더
@@ -32,7 +32,7 @@
 
 ### 프레임워크 사용 (권장)
 ```bash
-npx create-hua-ux my-app
+npx create-hua my-app
 ```
 
 ### 개별 패키지 사용
@@ -43,7 +43,7 @@ pnpm add @hua-labs/ui @hua-labs/motion-core @hua-labs/i18n-core
 ## 패키지별 README
 
 각 패키지의 `README.md`는 해당 패키지 폴더에 있습니다:
-- `packages/hua-ux/README.md`
+- `packages/hua/README.md`
 - `packages/hua-ui/README.md`
 - `packages/hua-motion-core/README.md`
 - 등

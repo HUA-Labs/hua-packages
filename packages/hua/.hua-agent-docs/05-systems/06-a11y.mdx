@@ -9,7 +9,7 @@ related:
 
 # Accessibility (A11y)
 
-hua-ux provides accessibility components and hooks for WCAG compliance from the framework entry.
+hua provides accessibility components and hooks for WCAG compliance from the framework entry.
 
 ## SkipToContent
 
@@ -24,7 +24,7 @@ interface SkipToContentProps {
 ```
 
 ```tsx
-import { SkipToContent } from '@hua-labs/hua-ux/framework'
+import { SkipToContent } from '@hua-labs/hua/framework'
 
 // app/layout.tsx
 <body>
@@ -60,7 +60,7 @@ interface LiveRegionProps {
 ```
 
 ```tsx
-import { LiveRegion } from '@hua-labs/hua-ux/framework'
+import { LiveRegion } from '@hua-labs/hua/framework'
 
 function SearchResults({ count }) {
   return (
@@ -173,7 +173,7 @@ function Modal({ isOpen, onClose, children }) {
 A hook for programmatically controlling live regions:
 
 ```tsx
-import { useLiveRegion } from '@hua-labs/hua-ux/framework'
+import { useLiveRegion } from '@hua-labs/hua/framework'
 
 function Form() {
   const announce = useLiveRegion()
@@ -190,7 +190,7 @@ function Form() {
 ### 1. Full Layout Accessibility
 
 ```tsx
-import { SkipToContent, LiveRegion } from '@hua-labs/hua-ux/framework'
+import { SkipToContent, LiveRegion } from '@hua-labs/hua/framework'
 
 function Layout({ children }) {
   return (

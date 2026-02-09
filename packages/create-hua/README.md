@@ -13,14 +13,14 @@ Scaffold HUA-UX projects with a single command.
 
 ## Overview | 개요
 
-A convenience alias for [`create-hua-ux`](https://www.npmjs.com/package/create-hua-ux). Generates a fully configured Next.js + hua-ux project with TypeScript, Tailwind CSS, i18n, and animation support out of the box.
+A convenience alias for [`create-hua`](https://www.npmjs.com/package/create-hua). Generates a fully configured Next.js + hua project with TypeScript, Tailwind CSS, i18n, and animation support out of the box.
 
-[`create-hua-ux`](https://www.npmjs.com/package/create-hua-ux)의 편의 별칭입니다. TypeScript, Tailwind CSS, i18n, 애니메이션을 포함한 Next.js + hua-ux 프로젝트를 즉시 생성합니다.
+[`create-hua`](https://www.npmjs.com/package/create-hua)의 편의 별칭입니다. TypeScript, Tailwind CSS, i18n, 애니메이션을 포함한 Next.js + hua 프로젝트를 즉시 생성합니다.
 
 ## Features
 
 - **Zero config** — Production-ready project in seconds
-- **Next.js + hua-ux** — Pre-wired UI, motion, i18n, and state management
+- **Next.js + hua** — Pre-wired UI, motion, i18n, and state management
 - **TypeScript** — Strict type checking enabled by default
 - **Interactive CLI** — Choose templates and options interactively
 
@@ -33,7 +33,7 @@ npx create-hua my-app
 Or use the full package name:
 
 ```bash
-npx create-hua-ux my-app
+npx create-hua my-app
 ```
 
 ## Documentation | 문서
@@ -42,8 +42,8 @@ npx create-hua-ux my-app
 
 ## Related Packages | 관련 패키지
 
-- [`create-hua-ux`](https://www.npmjs.com/package/create-hua-ux) — Full scaffolding tool (this package delegates to it)
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — The UX framework installed by this CLI
+- [`create-hua`](https://www.npmjs.com/package/create-hua) — Full scaffolding tool (this package delegates to it)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — The UX framework installed by this CLI
 
 ## Requirements | 요구사항
 

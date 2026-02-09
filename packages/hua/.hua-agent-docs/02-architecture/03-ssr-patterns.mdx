@@ -10,11 +10,11 @@ related:
 
 # SSR Patterns
 
-hua-ux fully supports Next.js server components and SSR. Correct entry point usage is essential.
+hua fully supports Next.js server components and SSR. Correct entry point usage is essential.
 
 ## Server Entry (`framework/server`)
 
-`@hua-labs/hua-ux/framework/server` provides two server-only functions:
+`@hua-labs/hua/framework/server` provides two server-only functions:
 
 ### getSSRTranslations
 
@@ -36,13 +36,13 @@ function getSSRTranslations(
 
 ### loadConfig
 
-Dynamically loads `hua-ux.config.ts` (or `.js`, `.mjs`) from the filesystem.
+Dynamically loads `hua.config.ts` (or `.js`, `.mjs`) from the filesystem.
 
 ```typescript
 function loadConfig(): HuaUxConfig
 ```
 
-**Search order:** `hua-ux.config.ts` -> `.js` -> `.mjs` -> product preset defaults
+**Search order:** `hua.config.ts` -> `.js` -> `.mjs` -> product preset defaults
 
 ## Hydration Mismatch Prevention
 
@@ -92,8 +92,8 @@ translations/
 
 ```tsx
 // app/layout.tsx
-import { getSSRTranslations, loadConfig } from '@hua-labs/hua-ux/framework/server'
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+import { getSSRTranslations, loadConfig } from '@hua-labs/hua/framework/server'
+import { HuaUxLayout } from '@hua-labs/hua/framework'
 
 export default async function RootLayout({ children }) {
   const config = loadConfig()
@@ -127,7 +127,7 @@ defineConfig({
 
 ```typescript
 // middleware.ts (Edge Runtime)
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
 
 const i18nMiddleware = createI18nMiddleware({
   defaultLanguage: 'ko',

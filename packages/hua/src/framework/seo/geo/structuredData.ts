@@ -42,7 +42,7 @@ function joinNonEmpty(values: string[] | undefined, separator: string): string |
  * @example
  * ```tsx
  * const jsonLd = generateSoftwareApplicationLD({
- *   name: 'hua-ux',
+ *   name: 'hua',
  *   description: 'Privacy-first UX framework for Next.js',
  *   version: '1.0.0',
  *   applicationCategory: 'UX Framework',
@@ -202,8 +202,8 @@ export function generateCodeLD(code: {
  * @example
  * ```tsx
  * const videoLd = generateVideoLD({
- *   name: 'Getting Started with hua-ux',
- *   description: 'Learn how to build with hua-ux',
+ *   name: 'Getting Started with hua',
+ *   description: 'Learn how to build with hua',
  *   thumbnailUrl: 'https://example.com/thumb.jpg',
  *   uploadDate: '2025-12-29',
  *   duration: 'PT10M30S',
@@ -276,12 +276,12 @@ export function generateOrganizationLD(org: {
  * ```tsx
  * const faqLd = generateFAQPageLD([
  *   {
- *     question: 'What is hua-ux?',
- *     answer: 'hua-ux is a privacy-first UX framework for Next.js applications.',
+ *     question: 'What is hua?',
+ *     answer: 'hua is a privacy-first UX framework for Next.js applications.',
  *   },
  *   {
- *     question: 'How do I install hua-ux?',
- *     answer: 'Run: npx @hua-labs/create-hua-ux my-app',
+ *     question: 'How do I install hua?',
+ *     answer: 'Run: npx @hua-labs/create-hua my-app',
  *   },
  * ]);
  * ```
@@ -328,8 +328,8 @@ export function generateFAQPageLD(
  * @example
  * ```tsx
  * const articleLd = generateTechArticleLD({
- *   headline: 'Getting Started with hua-ux',
- *   description: 'Learn how to build privacy-first UX with hua-ux',
+ *   headline: 'Getting Started with hua',
+ *   description: 'Learn how to build privacy-first UX with hua',
  *   datePublished: '2025-12-29',
  *   author: { name: 'hua-labs' },
  * });
@@ -375,7 +375,7 @@ export function generateTechArticleLD(article: {
  *   name: 'How to add i18n to your Next.js app',
  *   description: 'Step-by-step guide to internationalization',
  *   steps: [
- *     { name: 'Install hua-ux', text: 'Run: npx @hua-labs/create-hua-ux my-app' },
+ *     { name: 'Install hua', text: 'Run: npx @hua-labs/create-hua my-app' },
  *     { name: 'Configure i18n', text: 'Add locales to your config' },
  *   ],
  * });

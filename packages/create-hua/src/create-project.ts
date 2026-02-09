@@ -12,7 +12,7 @@ import { copyTemplate, generatePackageJson, generateConfig, generateAiContextFil
 /**
  * Resolve project path
  * 
- * If running from within the monorepo (packages/create-hua-ux), create project in monorepo root.
+ * If running from within the monorepo (packages/create-hua), create project in monorepo root.
  * Otherwise, create in current working directory.
  */
 export function resolveProjectPath(projectName: string): string {

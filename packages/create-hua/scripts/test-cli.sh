@@ -26,7 +26,7 @@ cd "$TEST_DIR"
 # 3. CLI 실행
 echo -e "${YELLOW}🚀 Step 2: CLI 실행...${NC}"
 PROJECT_NAME="test-cli-$(date +%s)"
-NON_INTERACTIVE=1 node "$(dirname "$0")/../dist/bin/create-hua-ux.js" "$PROJECT_NAME" --no-install
+NON_INTERACTIVE=1 node "$(dirname "$0")/../dist/bin/create-hua.js" "$PROJECT_NAME" --no-install
 
 if [ ! -d "$PROJECT_NAME" ]; then
   echo -e "${RED}❌ 프로젝트 생성 실패${NC}"
@@ -40,7 +40,7 @@ cd "$PROJECT_NAME"
 
 REQUIRED_FILES=(
   "package.json"
-  "hua-ux.config.ts"
+  "hua.config.ts"
   "tailwind.config.js"
   "tsconfig.json"
   "app/layout.tsx"
@@ -59,8 +59,8 @@ echo -e "${GREEN}✅ 모든 필수 파일 존재 확인${NC}"
 
 # 5. package.json 검증
 echo -e "${YELLOW}📦 Step 4: package.json 검증...${NC}"
-if ! grep -q '"@hua-labs/hua-ux"' package.json; then
-  echo -e "${RED}❌ @hua-labs/hua-ux 의존성 누락${NC}"
+if ! grep -q '"@hua-labs/hua"' package.json; then
+  echo -e "${RED}❌ @hua-labs/hua 의존성 누락${NC}"
   exit 1
 fi
 if ! grep -q '"next"' package.json; then

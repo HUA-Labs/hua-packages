@@ -10,7 +10,7 @@ related:
 
 # defineConfig
 
-`defineConfig` is the core function for defining hua-ux configuration. It handles preset merging, validation, and license/plugin initialization in one call.
+`defineConfig` is the core function for defining hua configuration. It handles preset merging, validation, and license/plugin initialization in one call.
 
 ## API
 
@@ -28,8 +28,8 @@ function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig
 7. Cache the result
 
 ```typescript
-// hua-ux.config.ts
-import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
 
 export default defineConfig({
   preset: 'product',
@@ -128,7 +128,7 @@ export default defineConfig({
 ### 4. Test environment
 
 ```typescript
-import { setConfig, resetConfig, defineConfig } from '@hua-labs/hua-ux/framework/config'
+import { setConfig, resetConfig, defineConfig } from '@hua-labs/hua/framework/config'
 
 beforeEach(() => {
   setConfig(defineConfig({ preset: 'product', motion: { enableAnimations: false } }))

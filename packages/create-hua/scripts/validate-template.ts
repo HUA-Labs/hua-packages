@@ -22,7 +22,7 @@ interface TemplateConfig {
 
 const TEMPLATE_CONFIG: TemplateConfig = {
   // Files that MUST exist in the template
-  // Note: package.json, .gitignore, hua-ux.config.ts are generated dynamically by create-project.ts
+  // Note: package.json, .gitignore, hua.config.ts are generated dynamically by create-project.ts
   required: [
     'app/layout.tsx',
     'app/page.tsx',
@@ -52,8 +52,8 @@ const TEMPLATE_CONFIG: TemplateConfig = {
   // Files that must contain specific patterns (Next.js 16 compatibility)
   mustContain: {
     'app/layout.tsx': [
-      'HuaUxLayout',
-      'hua-ux.config',
+      'HuaUxLayout',  // TODO: rename to HuaLayout when component is renamed
+      'hua.config',
       'getSSRTranslations',
     ],
     'app/api/translations/[language]/[namespace]/route.ts': [

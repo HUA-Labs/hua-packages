@@ -10,7 +10,7 @@ related:
 
 # Client vs Server Config
 
-The hua-ux config system works in both client and server, but some functions are environment-specific.
+The hua config system works in both client and server, but some functions are environment-specific.
 
 ## Module Split
 
@@ -45,15 +45,15 @@ Uses `require`/`eval` to load config from filesystem. Not available in Edge Runt
 ### Pattern 1: Static config import
 
 ```typescript
-// hua-ux.config.ts
-import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
 export default defineConfig({ preset: 'product' })
 ```
 
 ```tsx
 // app/layout.tsx (Server Component)
-import config from '../hua-ux.config'          // Static import
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+import config from '../hua.config'          // Static import
+import { HuaUxLayout } from '@hua-labs/hua/framework'
 export default function Layout({ children }) {
   return <HuaUxLayout config={config}>{children}</HuaUxLayout>
 }
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
 ### Pattern 2: Dynamic load on server
 
 ```tsx
-import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+import { loadConfig } from '@hua-labs/hua/framework/server'
 const config = loadConfig()  // Loads from fs
 ```
 
@@ -70,7 +70,7 @@ const config = loadConfig()  // Loads from fs
 
 ```tsx
 'use client'
-import { getConfig } from '@hua-labs/hua-ux/framework/config'
+import { getConfig } from '@hua-labs/hua/framework/config'
 const config = getConfig()  // Reads from cache
 ```
 
@@ -79,19 +79,19 @@ const config = getConfig()  // Reads from cache
 ```tsx
 // Client component importing server module
 'use client'
-import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+import { loadConfig } from '@hua-labs/hua/framework/server'
 // -> Error: server-only module imported in client
 
 // Edge Runtime using loadConfig
 // middleware.ts
-import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+import { loadConfig } from '@hua-labs/hua/framework/server'
 // -> Error: fs module not available in edge runtime
 
 // Server component importing framework client entry
-import { defineConfig } from '@hua-labs/hua-ux/framework'
+import { defineConfig } from '@hua-labs/hua/framework'
 // -> 'use client' directive propagates
 // Use instead:
-import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+import { defineConfig } from '@hua-labs/hua/framework/config'
 ```
 
 ## Environment Availability

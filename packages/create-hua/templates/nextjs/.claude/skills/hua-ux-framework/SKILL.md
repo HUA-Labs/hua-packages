@@ -1,14 +1,14 @@
 ---
-name: hua-ux Framework Usage
-description: Guide for developing Next.js applications using the hua-ux framework
+name: hua Framework Usage
+description: Guide for developing Next.js applications using the hua framework
 license: MIT
 compatibility:
   - claude
 ---
 
-# hua-ux Framework Usage Skill
+# hua Framework Usage Skill
 
-This skill guides you on how to develop Next.js applications using the hua-ux framework.
+This skill guides you on how to develop Next.js applications using the hua framework.
 
 ## 🚨 Required Guidelines for Claude Assistants
 
@@ -16,7 +16,7 @@ This skill guides you on how to develop Next.js applications using the hua-ux fr
 
 ```
 IF (creating a new page or component) THEN
-  1. Use hua-ux framework components first
+  1. Use hua framework components first
      → Wrap page with `HuaUxPage`
      → Use components from `@hua-labs/ui` first
   2. Generate translation files together
@@ -34,7 +34,7 @@ END IF
 ## Framework Structure
 
 ### Top Layer: Framework & Config
-- `hua-ux.config.ts`: Framework configuration
+- `hua.config.ts`: Framework configuration
 - `HuaUxLayout`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 
@@ -50,8 +50,8 @@ END IF
 
 ```tsx
 // app/my-page/page.tsx
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { HuaUxPage } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
@@ -76,9 +76,9 @@ export default function MyPage() {
 // components/MyComponent.tsx
 'use client';
 
-import { Card, Button } from '@hua-labs/hua-ux/ui';
-import { useMotion } from '@hua-labs/hua-ux/framework';
-import { useTranslation } from '@hua-labs/hua-ux/i18n';
+import { Card, Button } from '@hua-labs/hua/ui';
+import { useMotion } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
 
 export function MyComponent() {
   const { t } = useTranslation('my-component');
@@ -125,7 +125,7 @@ export function MyComponent() {
 - `Button`, `Card`, `Input`, `Modal`, `Alert`, `Toast`, `Table`, `Form`, etc.
 - See `ai-context.md` for detailed list
 
-### @hua-labs/hua-ux/framework
+### @hua-labs/hua/framework
 - `HuaUxPage`: Page wrapper
 - `HuaUxLayout`: Layout
 - `UnifiedProviders`: Provider unification
@@ -133,12 +133,12 @@ export function MyComponent() {
 - `useData`: Client data fetching
 - `fetchData`: Server data fetching
 
-### @hua-labs/hua-ux/hooks
+### @hua-labs/hua/hooks
 - `useLoading`: Loading state management with delay support
 - `useAutoScroll`: Auto-scrolling for chat/feed UIs
 - `usePerformanceMonitor`: Performance metrics monitoring
 
-### @hua-labs/hua-ux/loaders
+### @hua-labs/hua/loaders
 - `createApiTranslationLoader`: API-based translation loading with caching
 - `preloadNamespaces`: Preload translation namespaces
 - `warmFallbackLanguages`: Pre-warm fallback translations
@@ -146,10 +146,10 @@ export function MyComponent() {
 
 ## Configuration File
 
-### hua-ux.config.ts
+### hua.config.ts
 
 ```typescript
-import { defineConfig } from '@hua-labs/hua-ux/framework';
+import { defineConfig } from '@hua-labs/hua/framework';
 
 export default defineConfig({
   preset: 'product',  // 'product' or 'marketing'
@@ -188,11 +188,11 @@ export default defineConfig({
    - Maintain namespace consistency
 
 4. **When Changing Configuration**:
-   - Only modify `hua-ux.config.ts`
+   - Only modify `hua.config.ts`
    - Prefer Preset (over manual configuration)
 
 ## References
 
 - `ai-context.md`: Detailed project structure explanation
 - `.cursorrules`: Cursor IDE rules
-- Framework docs: `node_modules/@hua-labs/hua-ux/README.md`
+- Framework docs: `node_modules/@hua-labs/hua/README.md`

@@ -42,7 +42,7 @@ import { generateGEOMetadata, metaToObject, openGraphToObject } from './generate
  *
  * export async function generateMetadata() {
  *   return generateGEOForMetadata({
- *     name: 'hua-ux',
+ *     name: 'hua',
  *     description: 'Privacy-first UX framework for Next.js',
  *     features: ['i18n', 'Motion', 'Accessibility'],
  *     keywords: ['nextjs', 'react', 'i18n'],

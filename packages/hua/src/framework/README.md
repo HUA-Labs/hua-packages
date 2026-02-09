@@ -1,21 +1,21 @@
-# @hua-labs/hua-ux/framework
+# @hua-labs/hua/framework
 
-**Framework layer for hua-ux** - Structure and rules enforcement with developer affordances.
+**Framework layer for hua** - Structure and rules enforcement with developer affordances.
 
 A framework layer that wraps Next.js to enforce structure and conventions while providing maximum convenience through affordances.
 
 ## Installation
 
-This is part of `@hua-labs/hua-ux`. Install the main package:
+This is part of `@hua-labs/hua`. Install the main package:
 
 ```bash
-pnpm add @hua-labs/hua-ux zustand
+pnpm add @hua-labs/hua zustand
 ```
 
 ## Features
 
 - ✅ **Automatic Provider Setup**: `HuaUxLayout` automatically configures i18n, motion, and state
-- ✅ **Configuration System**: Type-safe configuration via `hua-ux.config.ts`
+- ✅ **Configuration System**: Type-safe configuration via `hua.config.ts`
 - ✅ **Data Fetching**: Type-safe utilities for server and client components
 - ✅ **Middleware System**: Built-in i18n middleware for language detection
 - ✅ **File Structure Validation**: Ensures project follows framework conventions
@@ -35,10 +35,10 @@ pnpm add @hua-labs/hua-ux zustand
 
 ### 1. Configuration
 
-Create `hua-ux.config.ts` in your project root:
+Create `hua.config.ts` in your project root:
 
 ```tsx
-import { defineConfig } from '@hua-labs/hua-ux/framework';
+import { defineConfig } from '@hua-labs/hua/framework';
 
 export default defineConfig({
   i18n: {
@@ -63,7 +63,7 @@ export default defineConfig({
 
 ```tsx
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework';
+import { HuaUxLayout } from '@hua-labs/hua/framework';
 
 export default function RootLayout({ children }) {
   return (
@@ -84,7 +84,7 @@ export default function RootLayout({ children }) {
 // app/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+import { HuaUxPage } from '@hua-labs/hua/framework';
 
 export default function HomePage() {
   return (
@@ -101,7 +101,7 @@ For better SEO, use Next.js `metadata` export in Server Components:
 
 ```tsx
 // app/page.tsx
-import { generatePageMetadata } from '@hua-labs/hua-ux/framework';
+import { generatePageMetadata } from '@hua-labs/hua/framework';
 import { HomePageContent } from './HomePageContent';
 
 export const metadata = generatePageMetadata({
@@ -124,7 +124,7 @@ export default function HomePage() {
 // app/HomePageContent.tsx (Client Component)
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+import { HuaUxPage } from '@hua-labs/hua/framework';
 
 export function HomePageContent() {
   return (
@@ -139,9 +139,9 @@ export function HomePageContent() {
 
 | Path | 환경 | 용도 |
 |------|------|------|
-| `@hua-labs/hua-ux/framework` | Client | 컴포넌트, 훅, 클라이언트 런타임 + shared re-export |
-| `@hua-labs/hua-ux/framework/shared` | Server & Client | 타입, 순수 함수 (GEO, metadata, CSS vars 등) |
-| `@hua-labs/hua-ux/framework/server` | Server only | SSR 번역, config 로딩 + shared re-export |
+| `@hua-labs/hua/framework` | Client | 컴포넌트, 훅, 클라이언트 런타임 + shared re-export |
+| `@hua-labs/hua/framework/shared` | Server & Client | 타입, 순수 함수 (GEO, metadata, CSS vars 등) |
+| `@hua-labs/hua/framework/server` | Server only | SSR 번역, config 로딩 + shared re-export |
 
 ### `framework/shared` — "use client" 없는 순수 export
 
@@ -154,17 +154,17 @@ import {
   generatePageMetadata,
   generateCSSVariables,
   createI18nMiddleware,
-} from '@hua-labs/hua-ux/framework/shared';
+} from '@hua-labs/hua/framework/shared';
 
 // 또는 server entrypoint에서 (shared 자동 re-export)
 import {
   generateGEOMetadata,
   getSSRTranslations,
   loadConfig,
-} from '@hua-labs/hua-ux/framework/server';
+} from '@hua-labs/hua/framework/server';
 ```
 
-> **하위호환**: `@hua-labs/hua-ux/framework` (client)에서도 shared의 모든 export를 사용할 수 있음. 기존 import가 깨지지 않음.
+> **하위호환**: `@hua-labs/hua/framework` (client)에서도 shared의 모든 export를 사용할 수 있음. 기존 import가 깨지지 않음.
 
 ## API
 
@@ -210,7 +210,7 @@ export default defineConfig({
 
 Load translations server-side to prevent language flickering. **Server Component only.**
 
-**Import**: `@hua-labs/hua-ux/framework/server`
+**Import**: `@hua-labs/hua/framework/server`
 
 **Parameters**:
 - `config`: HuaUxConfig object (reads `i18n.namespaces` and `i18n.supportedLanguages`)
@@ -237,9 +237,9 @@ your-app/
 
 ```tsx
 // app/layout.tsx (Server Component)
-import { HuaUxLayout } from '@hua-labs/hua-ux/framework';
-import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server';
-import huaUxConfig from '../hua-ux.config';
+import { HuaUxLayout } from '@hua-labs/hua/framework';
+import { getSSRTranslations } from '@hua-labs/hua/framework/server';
+import huaUxConfig from '../hua.config';
 
 export default async function RootLayout({ children }) {
   // Load all translations server-side
@@ -295,7 +295,7 @@ Client-side data fetching hook.
 ```tsx
 'use client';
 
-import { useData } from '@hua-labs/hua-ux/framework';
+import { useData } from '@hua-labs/hua/framework';
 
 interface Post {
   id: string;
@@ -335,7 +335,7 @@ Server-side data fetching utility.
 
 ```tsx
 // app/posts/page.tsx (Server Component)
-import { fetchData } from '@hua-labs/hua-ux/framework';
+import { fetchData } from '@hua-labs/hua/framework';
 
 interface Post {
   id: string;
@@ -374,7 +374,7 @@ Create i18n middleware for Next.js.
 
 ```tsx
 // middleware.ts
-import { createI18nMiddleware } from '@hua-labs/hua-ux/framework';
+import { createI18nMiddleware } from '@hua-labs/hua/framework';
 
 // Edge Runtime 명시 (권장)
 // Next.js middleware는 기본적으로 Edge Runtime에서 실행됩니다.

@@ -10,7 +10,7 @@
  * 3. Make sure Edge Runtime is explicitly set
  */
 
-// import { createI18nMiddleware } from '@hua-labs/hua-ux/framework';
+// import { createI18nMiddleware } from '@hua-labs/hua/framework';
 
 // Edge Runtime 명시 (Vercel 자동 감지 방지)
 // export const runtime = 'edge';

@@ -79,7 +79,7 @@ export function markStoreRehydrated(persistKey: string): void {
 }
 
 /**
- * Create a hua-ux optimized Zustand store
+ * Create a hua optimized Zustand store
  *
  * @example
  * ```ts

@@ -1,7 +1,7 @@
 # @hua-labs/state
 
-Unified state management for the hua-ux ecosystem with SSR support.
-hua-ux 생태계를 위한 SSR 지원 통합 상태 관리 솔루션.
+Unified state management for the hua ecosystem with SSR support.
+hua 생태계를 위한 SSR 지원 통합 상태 관리 솔루션.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
@@ -13,9 +13,9 @@ hua-ux 생태계를 위한 SSR 지원 통합 상태 관리 솔루션.
 
 ## Overview | 개요
 
-Zustand-based state management wrapper optimized for the hua-ux ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
+Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
 
-hua-ux 생태계에 최적화된 Zustand 기반 상태 관리 래퍼입니다. SSR hydration 자동 처리, partialize를 지원하는 localStorage 영속성, React 및 Next.js를 위한 i18n 통합을 제공합니다.
+hua 생태계에 최적화된 Zustand 기반 상태 관리 래퍼입니다. SSR hydration 자동 처리, partialize를 지원하는 localStorage 영속성, React 및 Next.js를 위한 i18n 통합을 제공합니다.
 
 ## Features
 
@@ -89,7 +89,7 @@ function ThemeToggle() {
 ## Related Packages | 관련 패키지
 
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand i18n adapter
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — UX framework (uses this for state)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (uses this for state)
 
 ## Requirements | 요구사항
 

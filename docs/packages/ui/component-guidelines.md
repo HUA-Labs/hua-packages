@@ -116,7 +116,7 @@ interface Props {
 HUA UI is structured to separate fundamental UI elements from specialized business logic components.
 - **Core (Open Source)**: Fundamental UI and layout components available in the public distribution.
 - **Advanced / Pro (Specialized)**: High-level widgets for dashboards and specific business domains (Payment, Analytics).
-  - *Framework Benefit*: A selection of General-purpose Pro components is included in the `@hua-labs/hua-ux` framework as built-in value.
+  - *Framework Benefit*: A selection of General-purpose Pro components is included in the `@hua-labs/hua` framework as built-in value.
   - *Pro Exclusive*: Domain-specific components (Settlement, Payment Analysis) require a specialized Pro distribution.
 
 ---
@@ -146,7 +146,7 @@ Available in the standard public distribution.
 Specialized components for data-intensive applications.
 
 #### General Dashboard Widgets (Included in Framework)
-These are re-exported via `@hua-labs/hua-ux` for framework users.
+These are re-exported via `@hua-labs/hua` for framework users.
 - **StatCard / MetricCard**: Visual metrics with trend analysis.
 - **QuickActionCard / ProfileCard**: Specialized layout for common dashboard actions.
 - **MembershipBadge / NotificationCard**: User-centric data display widgets.
@@ -165,7 +165,7 @@ Specialized for financial and operational management. Available via Pro distribu
 HUA UI는 기본 UI 요소와 특수 비즈니스 로직용 컴포넌트를 분리하여 효율적인 번들링과 라이선스 관리를 지원합니다.
 - **Core (공개)**: 모든 환경에서 사용 가능한 기초 UI 및 레이아웃 컴포넌트입니다.
 - **Advanced / Pro (특수)**: 대시보드 및 특정 도메인(결제, 분석 등) 전용 고기능 위젯입니다.
-  - *프레임워크 혜택*: 범용 대시보드 컴포넌트 일부는 `@hua-labs/hua-ux` 프레임워크에 기본 내장되어 제공됩니다.
+  - *프레임워크 혜택*: 범용 대시보드 컴포넌트 일부는 `@hua-labs/hua` 프레임워크에 기본 내장되어 제공됩니다.
   - *Pro 전용*: 결제 정산, 데이터 분석 등 특화 도메인 컴포넌트는 별도의 Pro 배포본을 통해 제공됩니다.
 
 ---
@@ -192,7 +192,7 @@ HUA UI는 기본 UI 요소와 특수 비즈니스 로직용 컴포넌트를 분�
 데이터 중심 애플리케이션을 위한 특수 컴포넌트군입니다.
 
 #### 범용 대시보드 위젯 (프레임워크 포함)
-프레임워크 사용자의 개발 생산성을 위해 `@hua-labs/hua-ux`에서 기본 제공하는 프로 컴포넌트입니다.
+프레임워크 사용자의 개발 생산성을 위해 `@hua-labs/hua`에서 기본 제공하는 프로 컴포넌트입니다.
 - **StatCard / MetricCard**: 지표 및 추이 분석을 시각화합니다.
 - **QuickActionCard / ProfileCard**: 대시보드에서 자주 쓰이는 레이아웃 프리셋입니다.
 - **ActivityFeed / NotificationCard**: 활동 기록 및 알림 관리를 위한 위젯입니다.
