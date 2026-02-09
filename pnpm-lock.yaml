@@ -1217,20 +1217,20 @@ importers:
   packages/hua-ux:
     dependencies:
       '@hua-labs/hooks':
-        specifier: workspace:*
-        version: link:../hua-hooks
+        specifier: ^1.1.0
+        version: 1.1.0(react@19.2.4)
       '@hua-labs/i18n-core':
         specifier: workspace:*
         version: link:../hua-i18n-core
       '@hua-labs/i18n-core-zustand':
-        specifier: workspace:*
-        version: link:../hua-i18n-core-zustand
+        specifier: ^2.0.1-alpha.1
+        version: 2.0.1-alpha.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zustand@5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)))
       '@hua-labs/i18n-formatters':
-        specifier: workspace:*
-        version: link:../hua-i18n-formatters
+        specifier: ^1.1.1-alpha.0
+        version: 1.1.1-alpha.0(react@19.2.4)
       '@hua-labs/i18n-loaders':
-        specifier: workspace:*
-        version: link:../hua-i18n-loaders
+        specifier: ^1.1.1-alpha.0
+        version: 1.1.1-alpha.0(react@19.2.4)
       '@hua-labs/motion-core':
         specifier: workspace:*
         version: link:../hua-motion-core
@@ -1238,14 +1238,14 @@ importers:
         specifier: workspace:*
         version: link:../hua-pro
       '@hua-labs/state':
-        specifier: workspace:*
-        version: link:../hua-state
+        specifier: ^1.0.0
+        version: 1.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zustand@5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)))
       '@hua-labs/ui':
         specifier: workspace:*
         version: link:../hua-ui
       '@hua-labs/utils':
-        specifier: workspace:*
-        version: link:../hua-utils
+        specifier: ^1.1.0
+        version: 1.1.0(react@19.2.4)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(patch_hash=24fee71f874419cf5d3f8884242ad01cac9906794febadc32b085b2c2c646831)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -2129,6 +2129,44 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hua-labs/hooks@1.1.0':
+    resolution: {integrity: sha512-w9jIvql5RMrMZHHO1ghozZuL3qDgqw0g/NAJcMv+806Xn9llsHEfvPcwXKQ56KlSFuEAhlDwtaNUss61FNz+Kw==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@hua-labs/i18n-core-zustand@2.0.1-alpha.1':
+    resolution: {integrity: sha512-1foxhAjonWlkOrPzPt9tiHSy/p7glpaFcMEdn0KmD1pJ3zwvDYccDV7IQiwFoUwth9Cd80JsGKAX5OhcMAPUCg==}
+    peerDependencies:
+      react: '>=19.0.0'
+      zustand: ^4.0.0 || ^5.0.0
+
+  '@hua-labs/i18n-core@1.1.0':
+    resolution: {integrity: sha512-seXKAKR3tzCvXT62jRfd8yqVfc4sIRSuUZYF9Z4IDokqUULo6eHDL5BJyGV+nlInxGTqUCyw0mimxRwRTfLV/A==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@hua-labs/i18n-formatters@1.1.1-alpha.0':
+    resolution: {integrity: sha512-5yJGHaTX+Wcw4HOLLsp9thBEqiYroe4fQx6c3HJC5SrpBDskCy8KkFf/RGyJyLqozaEVjePuP8q8VabW8lHVHg==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@hua-labs/i18n-loaders@1.1.1-alpha.0':
+    resolution: {integrity: sha512-3fj3+bWWFR72DCZbCMbUI8U+4542irqNwY6WCfuVe8pEseRl/1R7WQh55OQ59mgSj3OUTiwZ24jep24gUIsvqA==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@hua-labs/state@1.0.0':
+    resolution: {integrity: sha512-LtCnbAoiNmsT4GwIjL+3BXqYsgOwApbaauPDDvoYk+Xu7KLoz1+1FEbLsPbJ2QWdAr+Un4BWQYRAuVSb877GRg==}
+    peerDependencies:
+      react: '>=19.0.0'
+      react-dom: '>=19.0.0'
+      zustand: '>=5.0.0'
+
+  '@hua-labs/utils@1.1.0':
+    resolution: {integrity: sha512-9FkUFMO3J+IVIj+dxyAAVfKXsHZnK3TfozCuQH1VTTikGML95oNsxs3bYYKe6jxLILIIynHaDSP7u+C2O9kq0A==}
+    peerDependencies:
+      react: '>=19.0.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -11430,6 +11468,45 @@ snapshots:
   '@hono/node-server@1.19.9(hono@4.11.4)':
     dependencies:
       hono: 4.11.4
+
+  '@hua-labs/hooks@1.1.0(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
+  '@hua-labs/i18n-core-zustand@2.0.1-alpha.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zustand@5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)))':
+    dependencies:
+      '@hua-labs/i18n-core': 1.1.0(react@19.2.4)
+      '@hua-labs/state': 1.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zustand@5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)))
+      react: 19.2.4
+      zustand: 5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
+    transitivePeerDependencies:
+      - react-dom
+
+  '@hua-labs/i18n-core@1.1.0(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
+  '@hua-labs/i18n-formatters@1.1.1-alpha.0(react@19.2.4)':
+    dependencies:
+      '@hua-labs/i18n-core': 1.1.0(react@19.2.4)
+      react: 19.2.4
+
+  '@hua-labs/i18n-loaders@1.1.1-alpha.0(react@19.2.4)':
+    dependencies:
+      '@hua-labs/i18n-core': 1.1.0(react@19.2.4)
+      react: 19.2.4
+
+  '@hua-labs/state@1.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zustand@5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4)))':
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      zustand: 5.0.11(@types/react@19.2.10)(immer@11.1.3)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
+
+  '@hua-labs/utils@1.1.0(react@19.2.4)':
+    dependencies:
+      clsx: 2.1.1
+      react: 19.2.4
+      tailwind-merge: 2.6.0
 
   '@humanfs/core@0.19.1': {}
 
