@@ -1,8 +1,6 @@
 packages:
   - apps/*
   - packages/*
-  - tools/*
-  - demo-app
 
 ignoredBuiltDependencies:
   - '@prisma/client'
