@@ -1,0 +1,195 @@
+---
+title: Error Handling
+description: ErrorBoundary, HuaUxPage error boundaries, custom fallback
+category: systems
+related:
+  - ./05-loading.mdx
+  - ../02-architecture/01-overview.mdx
+---
+
+# Error Handling
+
+hua-ux extends React's ErrorBoundary pattern to provide automatic error handling in HuaUxPage.
+
+## ErrorBoundary
+
+A React class component-based error boundary:
+
+```typescript
+interface ErrorBoundaryProps {
+  children: ReactNode
+  fallback?: ReactNode | ((error: Error, reset: () => void) => ReactNode)
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onReset?: () => void
+}
+```
+
+```tsx
+import { ErrorBoundary } from '@hua-labs/hua-ux/framework'
+
+<ErrorBoundary
+  fallback={(error, reset) => (
+    <div>
+      <h2>An error occurred</h2>
+      <p>{error.message}</p>
+      <button onClick={reset}>Try again</button>
+    </div>
+  )}
+  onError={(error, info) => {
+    // Send to error reporting service
+    reportError(error, info)
+  }}
+>
+  <MyComponent />
+</ErrorBoundary>
+```
+
+### Default Fallback
+
+When no fallback is provided, a default error UI is displayed:
+- Error icon
+- "Something went wrong" message
+- Error message (detailed in dev only)
+- "Try again" button
+
+### Error Reporting Integration
+
+```typescript
+// Automatically called if window.__ERROR_REPORTER__ is defined
+window.__ERROR_REPORTER__ = {
+  captureException(error, context) {
+    // Sentry, LogRocket, etc.
+  }
+}
+```
+
+- **Dev**: Logs error + componentStack to console
+- **Prod**: Calls `window.__ERROR_REPORTER__` if available
+
+### Reset Behavior
+
+When `reset()` is called:
+1. Executes the `onReset` callback
+2. Clears the error state (`hasError: false, error: null`)
+3. Re-renders child components
+
+## HuaUxPage
+
+A page wrapper component that **automatically includes an ErrorBoundary**.
+
+```typescript
+interface HuaUxPageProps {
+  children: React.ReactNode
+  title?: string
+  description?: string
+  vibe?: 'clean' | 'minimal' | 'fancy'
+  i18nKey?: string
+  enableMotion?: boolean          // default: true
+  enableErrorBoundary?: boolean   // default: true
+  errorBoundaryFallback?: ReactNode | ((error: Error, reset: () => void) => ReactNode)
+  motion?: MotionType             // override vibe-based motion
+  seo?: any                       // dev warning only
+}
+```
+
+### Vibe → Motion Mapping
+
+| vibe | Motion | Duration |
+|------|--------|----------|
+| `'fancy'` | slideUp | 800ms |
+| `'minimal'` | fadeIn | 300ms |
+| default (`'clean'`) | fadeIn | 600ms |
+
+### Structure
+
+```tsx
+// Internal structure of HuaUxPage
+function HuaUxPage({ children, enableErrorBoundary = true, ... }) {
+  const content = (
+    <div ref={motionRef} className={vibeClasses}>
+      {title && <h1>{translatedTitle}</h1>}
+      {description && <p>{translatedDescription}</p>}
+      {children}
+    </div>
+  )
+
+  if (enableErrorBoundary) {
+    return (
+      <ErrorBoundary fallback={errorBoundaryFallback}>
+        {content}
+      </ErrorBoundary>
+    )
+  }
+
+  return content
+}
+```
+
+## Examples
+
+### 1. Basic Page
+
+```tsx
+import { HuaUxPage } from '@hua-labs/hua-ux/framework'
+
+export default function DiaryPage() {
+  return (
+    <HuaUxPage title="Write Diary" vibe="clean">
+      <DiaryEditor />
+    </HuaUxPage>
+  )
+}
+```
+
+### 2. Custom Error Fallback
+
+```tsx
+<HuaUxPage
+  title="Dashboard"
+  errorBoundaryFallback={(error, reset) => (
+    <div className="text-center py-12">
+      <ErrorIcon size={48} />
+      <h2 className="text-xl mt-4">Unable to load dashboard</h2>
+      <p className="text-muted mt-2">{error.message}</p>
+      <button onClick={reset} className="mt-4 btn-primary">
+        Refresh
+      </button>
+    </div>
+  )}
+>
+  <Dashboard />
+</HuaUxPage>
+```
+
+### 3. Without Error Boundary
+
+```tsx
+// When error handling is already done at a higher level
+<HuaUxPage enableErrorBoundary={false}>
+  <SimpleContent />
+</HuaUxPage>
+```
+
+### 4. Standalone ErrorBoundary
+
+```tsx
+// Error handling for a specific section without HuaUxPage
+<div>
+  <Header />
+  <ErrorBoundary
+    fallback={<div>Widget failed to load</div>}
+    onError={(error) => logToService(error)}
+  >
+    <DangerousWidget />
+  </ErrorBoundary>
+  <Footer />
+</div>
+```
+
+## Constraints & Gotchas
+
+- `ErrorBoundary` is a React class component. It cannot catch errors inside event handlers — use `try/catch` instead.
+- `ErrorBoundary` cannot catch async errors (Promise rejections). It only catches errors that occur during rendering and in `useEffect`.
+- The `seo` prop of `HuaUxPage` is currently unused and only logs a warning message in dev. Use the GEO system instead.
+- The `vibe` prop determines the CSS classes and motion of the top-level `<div>`. You can override directly with the `motion` prop.
+- Even with `enableErrorBoundary={false}`, a parent ErrorBoundary will still catch errors if one exists.

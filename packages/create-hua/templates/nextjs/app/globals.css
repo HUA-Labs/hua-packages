@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* Tailwind v4: scan hua-labs packages for class names */
+@source "../node_modules/@hua-labs/hua-ux/dist";
+@source "../node_modules/@hua-labs/ui/dist";
+@source "../node_modules/@hua-labs/ui/src";
+
+/**
+ * HUA-UI Recommended Theme
+ *
+ * Tailwind v4 requires @theme directive for color utilities.
+ * This imports the complete HUA-UI design system colors.
+ *
+ * If you see "bg-primary not working" errors, make sure this import exists.
+ */
+@import "@hua-labs/ui/styles/recommended-theme.css";
+
+/* @custom-variant dark 는 recommended-theme.css에서 자동 포함됨 */
+
+/* Custom CSS animations for WelcomePage */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+/* Base body styles */
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: system-ui, -apple-system, sans-serif;
+}

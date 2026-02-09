@@ -1,0 +1,328 @@
+---
+title: GEO System
+description: Generative Engine Optimization — 14 functions for AI search optimization
+category: systems
+related:
+  - ../02-architecture/03-ssr-patterns.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# GEO System (Generative Engine Optimization)
+
+GEO is a system that generates **metadata optimized for AI search engines** like ChatGPT, Claude, Gemini, and Perplexity. While SEO is for Google search, GEO helps AI accurately understand and cite your site.
+
+> **Server-only**: GEO functions are exported from `framework/shared`. Use them in server components or `generateMetadata()`.
+
+## Core Functions
+
+### generateGEOMetadata
+
+Generates metadata for AI search engines.
+
+```typescript
+function generateGEOMetadata(config: GEOConfig): GEOMetadata
+```
+
+```typescript
+interface GEOConfig {
+  name: string                    // Required: app/service name
+  description: string             // Required: description
+  version?: string
+  applicationCategory?: string    // e.g. 'Health', 'Developer Tool'
+  programmingLanguage?: string[]
+  technologyStack?: string[]
+  applicationType?: SoftwareApplicationType
+  url?: string
+  documentationUrl?: string
+  codeRepository?: string
+  license?: string
+  author?: string | { name: string; url?: string }
+  features?: string[]
+  useCases?: string[]
+  keywords?: string[]
+  operatingSystem?: string
+  softwareRequirements?: string[]
+  relatedTo?: string[]
+}
+
+type SoftwareApplicationType =
+  | 'WebApplication' | 'MobileApplication'
+  | 'DesktopApplication' | 'DeveloperApplication'
+
+interface GEOMetadata {
+  meta: Array<{ name: string; content: string }>
+  jsonLd: object           // Schema.org JSON-LD
+  openGraph?: object
+  twitter?: object
+  version: string
+}
+```
+
+```tsx
+import { generateGEOMetadata } from '@hua-labs/hua-ux/framework/shared'
+
+const geo = generateGEOMetadata({
+  name: 'Sum Diary',
+  description: 'AI emotion diary app',
+  applicationCategory: 'Health',
+  technologyStack: ['Next.js', 'React', 'TypeScript'],
+  features: ['E2E encryption', 'AI emotion analysis', 'Multi-language support']
+})
+```
+
+### Next.js Metadata API Helpers
+
+```typescript
+// Convert meta array to Next.js other object
+function metaToObject(meta: GEOMetadata['meta']): Record<string, string>
+
+// Convert OpenGraph array to object
+function openGraphToObject(og: GEOMetadata['openGraph']): Record<string, string>
+```
+
+```tsx
+// app/layout.tsx
+import type { Metadata } from 'next'
+import { generateGEOMetadata, metaToObject } from '@hua-labs/hua-ux/framework/shared'
+
+export function generateMetadata(): Metadata {
+  const geo = generateGEOMetadata({ name: 'Sum Diary', description: '...' })
+  return {
+    title: 'Sum Diary',
+    other: metaToObject(geo.meta)
+  }
+}
+```
+
+### renderJSONLD
+
+Renders JSON-LD as a Next.js Script tag. Internally escapes content for XSS prevention.
+
+```typescript
+function renderJSONLD(jsonLd: unknown, id?: string): {
+  id: string
+  type: 'application/ld+json'
+  dangerouslySetInnerHTML: { __html: string }
+}
+```
+
+```tsx
+import Script from 'next/script'
+import { renderJSONLD } from '@hua-labs/hua-ux/framework/shared'
+
+<Script {...renderJSONLD(geo.jsonLd, 'app-jsonld')} />
+```
+
+### createAIContext
+
+Generates a context description string that helps AI understand the site.
+
+```typescript
+function createAIContext(config: GEOConfig): string
+```
+
+## Structured Data Helpers
+
+Functions that generate Schema.org structured data:
+
+### generateSoftwareApplicationLD
+
+```typescript
+function generateSoftwareApplicationLD(config: GEOConfig): StructuredData
+// → { @context: 'https://schema.org', @type: 'SoftwareApplication', ... }
+```
+
+### generateFAQPageLD
+
+```typescript
+function generateFAQPageLD(faqs: Array<{ question: string; answer: string }>): StructuredData
+// → { @context: 'https://schema.org', @type: 'FAQPage', mainEntity: [...] }
+```
+
+### generateHowToLD
+
+```typescript
+function generateHowToLD(howTo: {
+  name: string
+  description?: string
+  steps: Array<{ name: string; text: string; url?: string; image?: string }>
+  totalTime?: string  // ISO 8601 duration (e.g. 'PT10M')
+}): StructuredData
+```
+
+### generateCodeLD
+
+```typescript
+function generateCodeLD(code: {
+  name: string
+  description?: string
+  programmingLanguage: string
+  codeRepository?: string
+  runtimePlatform?: string
+}): StructuredData
+```
+
+### generateTechArticleLD
+
+```typescript
+function generateTechArticleLD(article: {
+  name: string
+  description?: string
+  author?: string | { name: string; url?: string }
+  datePublished?: string
+  dateModified?: string
+}): StructuredData
+```
+
+### generateVideoLD
+
+```typescript
+function generateVideoLD(video: {
+  name: string
+  description: string
+  thumbnailUrl: string
+  uploadDate: string
+  duration?: string
+  contentUrl?: string
+  embedUrl?: string
+}): StructuredData
+```
+
+### generateOrganizationLD
+
+```typescript
+function generateOrganizationLD(org: {
+  name: string
+  url?: string
+  logo?: string
+  description?: string
+  sameAs?: string[]
+}): StructuredData
+```
+
+## GEO Presets
+
+Predefined GEO configurations:
+
+```typescript
+const GEO_PRESETS = {
+  NEXTJS_FRAMEWORK: {
+    applicationType: 'DeveloperApplication',
+    programmingLanguage: ['TypeScript'],
+    technologyStack: ['Next.js', 'React'],
+    applicationCategory: 'Developer Tool'
+  },
+  UI_LIBRARY: { ... },
+  REACT_APP: { ... },
+  NPM_PACKAGE: { ... }
+}
+```
+
+```typescript
+const geo = generateGEOMetadata({
+  ...GEO_PRESETS.NEXTJS_FRAMEWORK,
+  name: 'My App',
+  description: 'Description'
+})
+```
+
+## Validation
+
+```typescript
+function validateJsonLd(jsonLd: any): ValidationResult
+function validateGEOMetadata(jsonLdArray: any[]): ValidationResult
+function formatValidationResult(result: ValidationResult): string
+
+interface ValidationResult {
+  valid: boolean
+  errors: string[]
+  warnings: string[]
+}
+```
+
+```typescript
+const result = validateJsonLd(geo.jsonLd)
+if (!result.valid) {
+  console.error(formatValidationResult(result))
+}
+```
+
+## Examples
+
+### 1. Full GEO Setup (Next.js)
+
+```tsx
+// app/layout.tsx
+import type { Metadata } from 'next'
+import Script from 'next/script'
+import {
+  generateGEOMetadata,
+  metaToObject,
+  renderJSONLD,
+  generateOrganizationLD,
+  GEO_PRESETS
+} from '@hua-labs/hua-ux/framework/shared'
+
+const geo = generateGEOMetadata({
+  ...GEO_PRESETS.REACT_APP,
+  name: 'Sum Diary',
+  description: 'AI emotion diary app — secure emotion recording with E2E encryption',
+  url: 'https://my-app.app',
+  features: ['E2E encryption', 'AI emotion analysis', 'Multi-language']
+})
+
+export const metadata: Metadata = {
+  title: 'Sum Diary',
+  description: 'AI emotion diary app',
+  other: metaToObject(geo.meta)
+}
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <head>
+        <Script {...renderJSONLD(geo.jsonLd)} />
+        <Script {...renderJSONLD(generateOrganizationLD({
+          name: 'HUA Labs',
+          url: 'https://hua-labs.com'
+        }), 'org-jsonld')} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### 2. FAQ Page
+
+```tsx
+import { generateFAQPageLD, renderJSONLD } from '@hua-labs/hua-ux/framework/shared'
+
+const faqLd = generateFAQPageLD([
+  { question: 'What is Sum Diary?', answer: 'A diary app where AI analyzes your emotions.' },
+  { question: 'Is my data safe?', answer: 'With E2E encryption, even the server cannot read your data.' }
+])
+
+<Script {...renderJSONLD(faqLd, 'faq-jsonld')} />
+```
+
+### 3. HowTo Guide
+
+```tsx
+const howToLd = generateHowToLD({
+  name: 'Getting Started with Sum Diary',
+  steps: [
+    { name: 'Sign up', text: 'Register with email or social login.' },
+    { name: 'Write your first diary', text: 'Freely write about your emotions today.' },
+    { name: 'Check AI analysis', text: 'Review the emotion report analyzed by AI.' }
+  ],
+  totalTime: 'PT5M'
+})
+```
+
+## Constraints & Gotchas
+
+- GEO functions must be imported from `framework/shared`. They are not exported from `framework` (the client entry).
+- `renderJSONLD` escapes `</script>` strings for XSS prevention. Do not use `JSON.stringify` directly.
+- `validateJsonLd` only checks required fields of the Schema.org schema. Use Google Rich Results Test for final validation.
+- `GEO_PRESETS` only include a subset of `GEOConfig` fields. You must always specify `name` and `description` yourself.

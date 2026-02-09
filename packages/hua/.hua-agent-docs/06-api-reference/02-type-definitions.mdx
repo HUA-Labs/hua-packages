@@ -1,0 +1,289 @@
+---
+title: Type Definitions
+description: Core type and interface definitions
+category: api-reference
+related:
+  - ./01-framework-exports.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Type Definitions
+
+Core types and interfaces used in the hua-ux framework.
+
+## Config Types
+
+### HuaUxConfig
+
+```typescript
+interface HuaUxConfig {
+  preset?: Preset
+  i18n?: {
+    defaultLanguage: string
+    supportedLanguages: string[]
+    fallbackLanguage?: string
+    namespaces?: string[]
+    translationLoader?: 'api' | 'static' | 'custom'
+    translationApiPath?: string
+    loadTranslations?: (lang: string, namespace: string) => Promise<Record<string, string>>
+    debug?: boolean
+    autoUpdateHtmlLang?: boolean
+    initialTranslations?: Record<string, Record<string, Record<string, string>>>
+    languageStore?: unknown
+    storageKey?: string
+  }
+  motion?: {
+    style?: 'smooth' | 'dramatic' | 'minimal'
+    defaultPreset?: 'product' | 'marketing'
+    enableAnimations?: boolean
+    duration?: number
+    easing?: string
+  }
+  state?: { persist?: boolean; ssr?: boolean }
+  fileStructure?: { enforce?: boolean }
+  icons?: {
+    set?: 'phosphor' | 'lucide' | 'iconsax'
+    weight?: 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
+    size?: number
+    color?: string
+    strokeWidth?: number
+  }
+  toast?: {
+    position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'
+    maxToasts?: number
+  }
+  branding?: {
+    name?: string
+    logo?: string
+    colors?: {
+      primary?: string; secondary?: string; accent?: string
+      success?: string; warning?: string; error?: string; info?: string
+    }
+    typography?: {
+      fontFamily?: string
+      fontSize?: { h1?: string; h2?: string; h3?: string; body?: string }
+    }
+    customVariables?: Record<string, string>
+  }
+  plugins?: HuaUxPlugin[]
+  license?: { apiKey?: string; type?: 'free' | 'pro' | 'enterprise' }
+}
+```
+
+### Preset Types
+
+```typescript
+type PresetName = 'product' | 'marketing'
+
+type PresetConfig = {
+  type: PresetName
+  motion?: { duration?: number; easing?: string }
+  spacing?: { default?: 'sm' | 'md' | 'lg' | 'xl' }
+}
+
+type Preset = PresetName | PresetConfig
+```
+
+## Component Props
+
+### HuaUxLayoutProps
+
+```typescript
+interface HuaUxLayoutProps {
+  children: React.ReactNode
+  config?: Partial<HuaUxConfig>
+}
+```
+
+### HuaUxPageProps
+
+```typescript
+interface HuaUxPageProps {
+  children: React.ReactNode
+  title?: string
+  description?: string
+  vibe?: 'clean' | 'fancy' | 'minimal'
+  i18nKey?: string
+  enableMotion?: boolean          // default: true
+  motion?: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
+  seo?: {
+    keywords?: string[]
+    ogImage?: string
+    ogTitle?: string
+    ogDescription?: string
+    ogType?: string
+  }
+  enableErrorBoundary?: boolean   // default: true
+  errorBoundaryFallback?: React.ReactNode | ((error: Error, reset: () => void) => React.ReactNode)
+}
+```
+
+### ErrorBoundaryProps
+
+```typescript
+interface ErrorBoundaryProps {
+  children: React.ReactNode
+  fallback?: React.ReactNode | ((error: Error, reset: () => void) => React.ReactNode)
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onReset?: () => void
+}
+```
+
+## Plugin Types
+
+### HuaUxPlugin
+
+```typescript
+interface HuaUxPlugin {
+  name: string
+  version: string
+  license: LicenseType
+  description?: string
+  init?(config: HuaUxConfig): void | Promise<void>
+  components?: Record<string, React.ComponentType<any>>
+  hooks?: Record<string, Function>
+  configSchema?: any
+  checkLicense?(): boolean
+}
+```
+
+## License Types
+
+### LicenseInfo
+
+```typescript
+interface LicenseInfo {
+  type: LicenseType
+  valid: boolean
+  expiresAt?: Date
+  features: LicenseFeature[]
+  companyName?: string
+  apiKey?: string
+}
+```
+
+### LicenseType
+
+```typescript
+type LicenseType = 'free' | 'pro' | 'enterprise'
+```
+
+### LicenseFeature
+
+```typescript
+type LicenseFeature =
+  | 'core'
+  | 'motion-basic' | 'motion-pro'
+  | 'i18n-basic' | 'i18n-pro'
+  | 'preset-basic' | 'preset-pro'
+  | 'white-labeling'
+```
+
+### LicenseCheckResult
+
+```typescript
+interface LicenseCheckResult {
+  valid: boolean
+  reason?: string
+  expiresAt?: Date
+}
+```
+
+## GEO Types
+
+### GEOConfig
+
+```typescript
+interface GEOConfig {
+  name: string
+  description: string
+  version?: string
+  applicationCategory?: string
+  programmingLanguage?: string[]
+  technologyStack?: string[]
+  applicationType?: SoftwareApplicationType
+  url?: string
+  documentationUrl?: string
+  codeRepository?: string
+  license?: string
+  author?: string | { name: string; url?: string }
+  features?: string[]
+  useCases?: string[]
+  keywords?: string[]
+  operatingSystem?: string
+  softwareRequirements?: string[]
+  relatedTo?: string[]
+}
+```
+
+### GEOMetadata
+
+```typescript
+interface GEOMetadata {
+  meta: Array<{ name: string; content: string }>
+  jsonLd: object
+  openGraph?: object
+  twitter?: object
+  version: string
+}
+```
+
+### SoftwareApplicationType
+
+```typescript
+type SoftwareApplicationType =
+  | 'WebApplication'
+  | 'MobileApplication'
+  | 'DesktopApplication'
+  | 'DeveloperApplication'
+```
+
+### StructuredData
+
+```typescript
+interface StructuredData {
+  '@context': 'https://schema.org'
+  '@type': string
+  [key: string]: any
+}
+```
+
+### ValidationResult
+
+```typescript
+interface ValidationResult {
+  valid: boolean
+  errors: string[]
+  warnings: string[]
+}
+```
+
+## Middleware Types
+
+### I18nMiddlewareConfig
+
+```typescript
+interface I18nMiddlewareConfig {
+  defaultLanguage: string
+  supportedLanguages: string[]
+  detectionStrategy?: 'header' | 'cookie' | 'path' | 'query'
+}
+```
+
+## Icon Types
+
+```typescript
+type IconSet = 'lucide' | 'phosphor' | 'iconsax'
+type PhosphorWeight = 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
+type IconsaxVariant = 'line' | 'bold'
+
+type IconName = keyof typeof icons           // 96 static icons
+type ProjectIconName = keyof typeof PROJECT_ICONS  // 125 mapped icons
+type AllIconName = IconName | ProjectIconName
+
+interface NormalizeResult {
+  normalized: string
+  wasAlias: boolean
+  originalAlias?: string
+}
+```

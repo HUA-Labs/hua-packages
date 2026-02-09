@@ -1,0 +1,139 @@
+---
+title: Middleware System
+description: createI18nMiddleware, Next.js middleware integration, locale detection
+category: systems
+related:
+  - ../02-architecture/03-ssr-patterns.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# Middleware System
+
+hua-ux provides an i18n middleware for use in Next.js middleware. It detects the language of the request and sets it in the response headers.
+
+## createI18nMiddleware
+
+```typescript
+function createI18nMiddleware(config: I18nMiddlewareConfig): MiddlewareFunction
+
+interface I18nMiddlewareConfig {
+  defaultLanguage: string
+  supportedLanguages: string[]
+  detectionStrategy?: 'header' | 'cookie' | 'path' | 'query'  // default: 'header'
+}
+```
+
+**Returns**: A middleware function of the form `(request: Request) => Response`
+
+## Detection Strategies
+
+| Strategy | Source | Example |
+|------|------|------|
+| `header` | Accept-Language header | `Accept-Language: ko-KR,ko;q=0.9,en;q=0.8` |
+| `cookie` | `language` cookie | `Cookie: language=en` |
+| `path` | First URL segment | `/en/about` → `en` |
+| `query` | `lang` query parameter | `?lang=ko` |
+
+**header strategy (default):**
+1. Parses the `Accept-Language` header
+2. Sorts by q-value priority
+3. Selects the first language found in `supportedLanguages`
+4. Falls back to `defaultLanguage` if none match
+
+## Middleware Behavior
+
+1. Detects language using the configured strategy
+2. Uses `defaultLanguage` if the detected language is not in `supportedLanguages`
+3. Sets the `x-language` header on the response
+4. Forwards the original request to Next.js
+
+## Examples
+
+### 1. Basic Usage
+
+```typescript
+// middleware.ts
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+
+const middleware = createI18nMiddleware({
+  defaultLanguage: 'ko',
+  supportedLanguages: ['ko', 'en', 'ja']
+})
+
+export default middleware
+
+export const config = {
+  matcher: ['/((?!api|_next|.*\\..*).*)']
+}
+```
+
+### 2. Cookie-Based Language Detection
+
+```typescript
+// middleware.ts
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+
+const middleware = createI18nMiddleware({
+  defaultLanguage: 'ko',
+  supportedLanguages: ['ko', 'en', 'ja'],
+  detectionStrategy: 'cookie'  // Reads from the 'language' cookie
+})
+
+export default middleware
+```
+
+### 3. Combining with Other Middleware
+
+```typescript
+// middleware.ts
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+import { auth } from './auth'
+
+const i18nMiddleware = createI18nMiddleware({
+  defaultLanguage: 'ko',
+  supportedLanguages: ['ko', 'en']
+})
+
+export default async function middleware(request: Request) {
+  // Auth check
+  const authResult = await auth(request)
+  if (!authResult.ok) return authResult.response
+
+  // i18n handling
+  return i18nMiddleware(request)
+}
+```
+
+### 4. Reading the Language Header on the Client
+
+```typescript
+// In a server component
+import { headers } from 'next/headers'
+
+async function getLanguage() {
+  const headersList = await headers()
+  return headersList.get('x-language') || 'ko'
+}
+```
+
+## Import Path
+
+```typescript
+// ✅ Correct import (shared — Edge Runtime safe)
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+
+// ❌ Wrong import (client entry — contains 'use client')
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework'
+
+// ❌ Wrong import (server entry — depends on fs)
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/server'
+```
+
+## Constraints & Gotchas
+
+- `createI18nMiddleware` must **only be imported from `framework/shared`**. This is because the Edge Runtime must not include fs modules or 'use client' directives.
+- Middleware runs in the Next.js Edge Runtime. You cannot use Node.js-only APIs (fs, path, etc.).
+- The `x-language` header is only set on the response. For client components, use the Zustand-based i18n state.
+- Only one `detectionStrategy` can be selected. To combine multiple strategies, write a custom middleware.
+- In environments where Next.js is not installed, a dummy implementation is used (always returns defaultLanguage).
+- The `path` strategy does not perform URL redirects. It only detects the language and sets the `x-language` header.

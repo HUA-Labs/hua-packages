@@ -1,0 +1,140 @@
+---
+title: Entry Points
+description: All 16 hua-ux entry points and correct import path guide
+category: getting-started
+related:
+  - ../02-architecture/01-overview.mdx
+  - ../03-config/03-client-server-split.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# Entry Points
+
+hua-ux provides **16 entry points** separated by purpose. Importing from the wrong entry causes bundle bloat or runtime errors.
+
+## Full Entry Point List
+
+### Main Entry (All-in-One)
+
+```typescript
+// @hua-labs/hua-ux
+// Includes UI + Motion + i18n + State. For rapid prototyping.
+import { Button, Card, useMotion, useTranslation } from '@hua-labs/hua-ux'
+```
+
+> **Warning**: The main entry re-exports all sub-packages. Use granular entries for production.
+
+### Framework Entries (Core)
+
+```typescript
+// @hua-labs/hua-ux/framework — Client entry ('use client')
+// HuaUxLayout, HuaUxPage, UnifiedProviders, defineConfig,
+// BrandedButton, BrandedCard, ErrorBoundary, WelcomePage,
+// License, Plugin, Branding, A11y, Loading, Motion hooks
+import { HuaUxLayout, defineConfig, useBranding } from '@hua-labs/hua-ux/framework'
+```
+
+```typescript
+// @hua-labs/hua-ux/framework/shared — Pure exports (server + client safe)
+// Types and pure functions only. No 'use client' / 'server-only' directives.
+// GEO, CSS var generation, Tailwind config generation, createI18nMiddleware
+import { generateGEOMetadata, generateCSSVariables } from '@hua-labs/hua-ux/framework/shared'
+```
+
+```typescript
+// @hua-labs/hua-ux/framework/server — Server-only (fs-dependent)
+// Everything from shared + getSSRTranslations, loadConfig
+// Will cause build error if imported on client
+import { getSSRTranslations, loadConfig } from '@hua-labs/hua-ux/framework/server'
+```
+
+```typescript
+// @hua-labs/hua-ux/framework/config — Config system
+// defineConfig, getConfig, setConfig, resetConfig
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+```
+
+### Sub-package Entries
+
+```typescript
+// @hua-labs/hua-ux/ui — Full hua-ui component re-export
+import { Button, Card, Input, Modal } from '@hua-labs/hua-ux/ui'
+
+// @hua-labs/hua-ux/i18n — i18n-core + i18n-core-zustand re-export
+import { useTranslation, useLanguageChange } from '@hua-labs/hua-ux/i18n'
+
+// @hua-labs/hua-ux/motion — motion-core re-export
+import { useFadeIn, useSlideUp, AnimatePresence } from '@hua-labs/hua-ux/motion'
+
+// @hua-labs/hua-ux/state — State package re-export
+import { createHuaStore } from '@hua-labs/hua-ux/state'
+
+// @hua-labs/hua-ux/hooks — Common hooks re-export
+import { useLoading, useAutoScroll } from '@hua-labs/hua-ux/hooks'
+
+// @hua-labs/hua-ux/utils — Utilities re-export
+import { cn, createLogger } from '@hua-labs/hua-ux/utils'
+
+// @hua-labs/hua-ux/loaders — i18n loaders re-export
+import { createApiTranslationLoader } from '@hua-labs/hua-ux/loaders'
+
+// @hua-labs/hua-ux/formatters — i18n formatters re-export
+import { useCurrencyFormatter, useDateFormatter } from '@hua-labs/hua-ux/formatters'
+
+// @hua-labs/hua-ux/presets — Preset definitions
+import { productPreset, marketingPreset } from '@hua-labs/hua-ux/presets'
+
+// @hua-labs/hua-ux/pro — Pro license features (future)
+import { /* pro features */ } from '@hua-labs/hua-ux/pro'
+```
+
+## Choosing the Right Import
+
+| Scenario | Correct Entry |
+|----------|--------------|
+| App root layout setup | `@hua-labs/hua-ux/framework` |
+| Server component translation loading | `@hua-labs/hua-ux/framework/server` |
+| i18n middleware in middleware.ts | `@hua-labs/hua-ux/framework/shared` |
+| UI components only | `@hua-labs/hua-ux/ui` |
+| Motion hooks only | `@hua-labs/hua-ux/motion` |
+| GEO metadata generation | `@hua-labs/hua-ux/framework/shared` |
+| Rapid prototyping | `@hua-labs/hua-ux` (main) |
+
+## Anti-patterns
+
+```typescript
+// Server component importing client entry
+// 'use client' propagates, converting server component to client
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+
+// Client importing server entry
+// 'server-only' or fs module error
+import { getSSRTranslations } from '@hua-labs/hua-ux/framework/server'
+
+// Importing everything from main entry (bundle bloat)
+import { Button, useMotion, useTranslation, defineConfig } from '@hua-labs/hua-ux'
+
+// Use purpose-specific entries instead
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+import { Button } from '@hua-labs/hua-ux/ui'
+import { useMotion } from '@hua-labs/hua-ux/motion'
+```
+
+## framework vs framework/shared vs framework/server
+
+| Property | `./framework` | `./framework/shared` | `./framework/server` |
+|----------|-------------|---------------------|---------------------|
+| Directive | `'use client'` | None | `'server-only'` |
+| Components | Yes | No | No |
+| Hooks | Yes | No | No |
+| Pure functions | Yes | Yes | Yes |
+| Types | Yes | Yes | Yes |
+| fs-dependent | No | No | Yes |
+| middleware.ts | No | Yes | No |
+| Server Component | No | Yes | Yes |
+
+## Constraints & Gotchas
+
+- `framework/server`'s `getSSRTranslations` and `loadConfig` use Node.js fs. Not available in Edge Runtime.
+- `framework/shared` is safe to import anywhere. Use it exclusively in middleware.ts.
+- The main entry (`@hua-labs/hua-ux`) may not tree-shake perfectly. Use granular entries for production apps.

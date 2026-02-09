@@ -1,0 +1,197 @@
+---
+title: Loading System
+description: SuspenseWrapper, SkeletonGroup, useDelayedLoading, withSuspense
+category: systems
+related:
+  - ./07-error-handling.mdx
+  - ../02-architecture/02-provider-chain.mdx
+---
+
+# Loading System
+
+hua-ux provides components and hooks for consistent loading UI. Fast responses appear seamlessly without a loading indicator, while slow responses provide appropriate feedback.
+
+## SuspenseWrapper
+
+A wrapper for easy use of React Suspense. Provides Skeleton as the default fallback.
+
+```typescript
+interface SuspenseWrapperProps {
+  children: ReactNode
+  fallback?: ReactNode             // Custom fallback
+  useDefaultFallback?: boolean     // default: true (uses Skeleton)
+}
+```
+
+```tsx
+import { SuspenseWrapper } from '@hua-labs/hua-ux/framework'
+
+<SuspenseWrapper>
+  <AsyncComponent />
+</SuspenseWrapper>
+
+// Custom fallback
+<SuspenseWrapper fallback={<MyLoader />}>
+  <AsyncComponent />
+</SuspenseWrapper>
+
+// Without fallback
+<SuspenseWrapper useDefaultFallback={false}>
+  <AsyncComponent />
+</SuspenseWrapper>
+```
+
+## SkeletonGroup
+
+Groups multiple Skeletons with consistent spacing:
+
+```typescript
+interface SkeletonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode
+  spacing?: 'sm' | 'md' | 'lg'   // default: 'md'
+  className?: string
+}
+```
+
+**Spacing:**
+| Value | CSS | Gap |
+|---|-----|-----|
+| sm | `space-y-2` | 8px |
+| md | `space-y-4` | 16px |
+| lg | `space-y-6` | 24px |
+
+```tsx
+import { SkeletonGroup, Skeleton } from '@hua-labs/hua-ux/framework'
+
+<SkeletonGroup spacing="md">
+  <Skeleton className="h-8 w-48" />    {/* Title */}
+  <Skeleton className="h-4 w-full" />  {/* Body line 1 */}
+  <Skeleton className="h-4 w-3/4" />   {/* Body line 2 */}
+</SkeletonGroup>
+```
+
+## useDelayedLoading
+
+A hook that hides the loading indicator for fast responses (under 300ms) to prevent UI flickering.
+
+```typescript
+function useDelayedLoading(
+  isLoading: boolean,
+  options?: {
+    delay?: number            // default: 300 (ms)
+    minDisplayTime?: number   // default: 0 (ms)
+  }
+): boolean  // → whether to actually show loading
+```
+
+**Behavior:**
+- Waits for `delay` ms after `isLoading` becomes true
+- If loading finishes within `delay` → no loading indicator shown (stays false)
+- If still loading after `delay` → returns true
+- `minDisplayTime`: once the loading indicator appears, it stays visible for at least this duration
+
+```tsx
+function DataList() {
+  const { data, isLoading } = useFetch('/api/data')
+  const showLoading = useDelayedLoading(isLoading, { delay: 300 })
+
+  if (showLoading) return <Skeleton />  // Only shown after 300ms
+  return <List data={data} />
+}
+```
+
+## useLoadingState
+
+A hook for managing loading state (re-exported from framework):
+
+```tsx
+import { useLoadingState } from '@hua-labs/hua-ux/framework'
+```
+
+## withSuspense HOC
+
+A Higher-Order Component that wraps a component with Suspense:
+
+```typescript
+function withSuspense<P>(
+  Component: ComponentType<P>,
+  fallback?: ReactNode
+): ComponentType<P>
+```
+
+```tsx
+import { withSuspense } from '@hua-labs/hua-ux/framework'
+
+const LazyChart = withSuspense(
+  React.lazy(() => import('./Chart')),
+  <Skeleton className="h-64 w-full" />
+)
+
+// Usage
+<LazyChart data={chartData} />
+```
+
+## Examples
+
+### 1. Page-Level Loading
+
+```tsx
+import { SuspenseWrapper, SkeletonGroup, Skeleton } from '@hua-labs/hua-ux/framework'
+
+function PageSkeleton() {
+  return (
+    <SkeletonGroup spacing="lg">
+      <Skeleton className="h-10 w-64" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-48 w-full" />
+    </SkeletonGroup>
+  )
+}
+
+<SuspenseWrapper fallback={<PageSkeleton />}>
+  <DiaryPage />
+</SuspenseWrapper>
+```
+
+### 2. Data Loading (Flicker Prevention)
+
+```tsx
+function UserProfile({ userId }) {
+  const { user, isLoading } = useUser(userId)
+  const showSkeleton = useDelayedLoading(isLoading, {
+    delay: 200,          // Skip if under 200ms
+    minDisplayTime: 500  // Once shown, display for at least 500ms
+  })
+
+  if (showSkeleton) {
+    return <SkeletonGroup>
+      <Skeleton className="h-12 w-12 rounded-full" />
+      <Skeleton className="h-4 w-32" />
+    </SkeletonGroup>
+  }
+
+  return <ProfileCard user={user} />
+}
+```
+
+### 3. Multiple Async Components
+
+```tsx
+<div className="grid grid-cols-2 gap-4">
+  <SuspenseWrapper>
+    <AsyncStats />
+  </SuspenseWrapper>
+  <SuspenseWrapper>
+    <AsyncChart />
+  </SuspenseWrapper>
+</div>
+```
+
+## Constraints & Gotchas
+
+- `useDelayedLoading` manages timers with `useRef`. Cleanup happens automatically on component unmount.
+- The default fallback of `SuspenseWrapper` is a single Skeleton. Provide a custom fallback for complex layouts.
+- Setting `minDisplayTime` too high (>1000ms) may make the user perceive loading as slow.
+- `withSuspense` is most useful when combined with `React.lazy`.

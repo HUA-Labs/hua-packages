@@ -1,0 +1,74 @@
+---
+title: hua-ux Framework Documentation
+description: AI agent guide for hua-ux framework architecture and systems
+category: index
+---
+
+# hua-ux Framework Documentation
+
+hua-ux is a **meta-framework** for Next.js apps. It unifies UI (hua-ui), motion (motion-core), i18n (i18n-core), and state management into a single cohesive developer experience.
+
+## Scope
+
+This documentation covers **framework architecture and systems**. For individual component/hook APIs, refer to hua-docs site and `ai-docs/*.ai.yaml`.
+
+## Quick Navigation
+
+### Getting Started
+| Task | Doc |
+|------|-----|
+| Import paths confusion | [01-entry-points](./01-getting-started/01-entry-points.mdx) |
+| Preset configuration | [02-presets](./01-getting-started/02-presets.mdx) |
+
+### Architecture
+| Task | Doc |
+|------|-----|
+| Framework structure | [01-overview](./02-architecture/01-overview.mdx) |
+| Provider composition | [02-provider-chain](./02-architecture/02-provider-chain.mdx) |
+| SSR / server patterns | [03-ssr-patterns](./02-architecture/03-ssr-patterns.mdx) |
+
+### Config
+| Task | Doc |
+|------|-----|
+| defineConfig usage | [01-define-config](./03-config/01-define-config.mdx) |
+| Full config schema | [02-config-schema](./03-config/02-config-schema.mdx) |
+| Client/server boundary | [03-client-server-split](./03-config/03-client-server-split.mdx) |
+
+### Icon System
+| Task | Doc |
+|------|-----|
+| Icon architecture | [01-overview](./04-icon-system/01-overview.mdx) |
+| Icon names & aliases | [02-icon-names](./04-icon-system/02-icon-names.mdx) |
+| IconProvider config | [03-icon-provider-config](./04-icon-system/03-icon-provider-config.mdx) |
+| EmotionIcon / StatusIcon | [04-special-icons](./04-icon-system/04-special-icons.mdx) |
+
+### Systems
+| Task | Doc |
+|------|-----|
+| AI search optimization (GEO) | [01-geo](./05-systems/01-geo.mdx) |
+| Branding / white-labeling | [02-branding](./05-systems/02-branding.mdx) |
+| Plugin registry | [03-plugin](./05-systems/03-plugin.mdx) |
+| License management | [04-license](./05-systems/04-license.mdx) |
+| Loading UI | [05-loading](./05-systems/05-loading.mdx) |
+| Accessibility (A11y) | [06-a11y](./05-systems/06-a11y.mdx) |
+| Error handling | [07-error-handling](./05-systems/07-error-handling.mdx) |
+| i18n middleware | [08-middleware](./05-systems/08-middleware.mdx) |
+
+### API Reference
+| Task | Doc |
+|------|-----|
+| All exports | [01-framework-exports](./06-api-reference/01-framework-exports.mdx) |
+| Type definitions | [02-type-definitions](./06-api-reference/02-type-definitions.mdx) |
+
+### Constraints
+| Task | Doc |
+|------|-----|
+| Runtime boundaries | [01-runtime-boundaries](./07-constraints/01-runtime-boundaries.mdx) |
+
+## External References
+
+- **Component API**: hua-docs site or `apps/hua-docs/public/ai-docs/ui.ai.yaml`
+- **Hook API**: `apps/hua-docs/public/ai-docs/hooks.ai.yaml`
+- **Motion API**: `apps/hua-docs/public/ai-docs/motion-core.ai.yaml`
+- **i18n API**: `apps/hua-docs/public/ai-docs/i18n-core.ai.yaml`
+- **State**: `apps/hua-docs/public/ai-docs/state.ai.yaml`

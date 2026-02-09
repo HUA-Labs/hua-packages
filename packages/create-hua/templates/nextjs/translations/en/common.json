@@ -1,0 +1,69 @@
+{
+  "welcome": {
+    "hero": {
+      "eyebrow": "AI-first UX framework",
+      "title": "{{projectName}} ships better experiences faster",
+      "description": "HUA UX bundles UI, motion, i18n, and AI context so you can scaffold once and focus on product sense.",
+      "primaryCta": "Open documentation",
+      "secondaryCta": "Browse components"
+    },
+    "stats": {
+      "components": {
+        "label": "UI building blocks",
+        "value": "120+"
+      },
+      "locales": {
+        "label": "Locales ready",
+        "value": "70+"
+      },
+      "motion": {
+        "label": "Motion presets",
+        "value": "40+"
+      },
+      "ai": {
+        "label": "AI context files",
+        "value": "3"
+      }
+    },
+    "features": {
+      "title": "Everything wired in",
+      "description": "Design tokens, global state, translations, and dev workflow automation are ready on day one.",
+      "design": {
+        "title": "Design system baked in",
+        "description": "Tailwind v4 theme, @theme variables, and branding controls keep styles consistent."
+      },
+      "i18n": {
+        "title": "Production i18n",
+        "description": "API + SSR loaders, Zustand adapter, and CLI helpers manage translations end-to-end."
+      },
+      "motion": {
+        "title": "Motion kit",
+        "description": "Shared animation primitives from motion-core and motion-advanced provide consistent interactions."
+      },
+      "workflow": {
+        "title": "Developer workflow",
+        "description": "CLI validations, AI context, and workspace detection remove repetitive setup."
+      }
+    },
+    "links": {
+      "title": "Next steps",
+      "description": "Jump into the docs, start from a template, or explore the GitHub repository.",
+      "docs": {
+        "title": "Documentation",
+        "description": "Framework guides, API references, and UX patterns."
+      },
+      "templates": {
+        "title": "Starter templates",
+        "description": "HUA UX powered examples for product, marketing, and dashboard flows."
+      },
+      "github": {
+        "title": "GitHub",
+        "description": "Audit the source, open issues, or contribute fixes."
+      }
+    },
+    "title": "HUA UX App",
+    "description": "Get started by editing app/page.tsx",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
+  }
+}
