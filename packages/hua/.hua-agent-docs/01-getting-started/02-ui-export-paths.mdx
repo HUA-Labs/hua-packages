@@ -1,0 +1,186 @@
+---
+title: UI Export Paths
+description: "@hua-labs/ui sub-path exports — which components live where"
+category: getting-started
+related:
+  - ./01-entry-points.mdx
+  - ../04-icon-system/02-icon-names.mdx
+---
+
+# UI Export Paths (`@hua-labs/ui`)
+
+`@hua-labs/ui` has **12 sub-path exports**. Importing from the wrong path causes `not exported` errors.
+
+> **Common mistake**: `FeatureCard`, `GlowCard`, `TiltCard` are in `/advanced`, NOT the root. `CodeBlock` is in `/data`, NOT the root.
+
+## Quick Lookup Table
+
+| Component | Import Path |
+|-----------|-------------|
+| Button, Badge, Card, Input, Modal, Alert, Icon, Avatar, ThemeToggle, ThemeProvider | `@hua-labs/ui` |
+| GlowCard, TiltCard, SpotlightCard, FeatureCard, Carousel, Marquee, Parallax, TextReveal, AnimatedGradient, VideoBackground, HeroSection, InfoCard, Timeline, Bookmark, ChatMessage, LanguageToggle, ScrollIndicator | `@hua-labs/ui/advanced` |
+| StatCard, DashboardGrid, KanbanBoard, ActivityFeed, TrendChart, BarChart | `@hua-labs/ui/advanced/dashboard` |
+| EmotionMeter, EmotionButton, EmotionSelector, EmotionAnalysis | `@hua-labs/ui/advanced/emotion` |
+| BlogEditor, BlogEditorProvider | `@hua-labs/ui/advanced` |
+| Form, FormField, FormControl, Checkbox, Radio, Select, Slider, DatePicker, Upload, Autocomplete, ColorPicker | `@hua-labs/ui/form` |
+| Table, CodeBlock, InlineCode | `@hua-labs/ui/data` |
+| Accordion, Tabs, Menu, ContextMenu, Command | `@hua-labs/ui/interactive` |
+| Navigation, Breadcrumb, Pagination, PageNavigation, PageTransition | `@hua-labs/ui/navigation` |
+| Toast (ToastProvider, useToast), Alert, LoadingSpinner, Tooltip | `@hua-labs/ui/feedback` |
+| Modal, ConfirmModal, Popover, Dropdown, Drawer, BottomSheet | `@hua-labs/ui/overlay` |
+| SDUIRenderer, SDUIFromJSON | `@hua-labs/ui/sdui` |
+
+## Sub-path Details
+
+### Root — `@hua-labs/ui`
+
+Core atomic components. Always available, no extra import needed.
+
+```typescript
+import { Button, Badge, Card, Input, Modal, Icon, Avatar,
+         ThemeProvider, ThemeToggle, useTheme,
+         Label, Switch, Toggle, Progress, Skeleton,
+         Alert, LoadingSpinner, Tooltip, ScrollArea,
+         Container, Grid, Stack, Divider, Panel } from '@hua-labs/ui'
+```
+
+Also exports utilities: `merge`, `cn`, icon helpers, motion micro-utilities.
+
+### Advanced — `@hua-labs/ui/advanced`
+
+Premium visual components, motion effects, blog editor, and specialized UI.
+
+```typescript
+import { GlowCard, TiltCard, SpotlightCard, FeatureCard,
+         Carousel, Marquee, Parallax, TextReveal,
+         AnimatedGradient, VideoBackground,
+         HeroSection, InfoCard, Timeline,
+         Bookmark, ChatMessage, ScrollIndicator,
+         BlogEditor, BlogEditorProvider,
+         Logo } from '@hua-labs/ui/advanced'
+```
+
+> **Note**: Advanced and Pro components are distributed as **pre-built dist** (not source). Tree-shaking may be limited — import only what you need.
+
+### Advanced Dashboard — `@hua-labs/ui/advanced/dashboard`
+
+Dashboard-specific components for admin panels and data visualization.
+
+```typescript
+import { StatCard, DashboardGrid, DashboardSidebar, DashboardToolbar,
+         ActivityFeed, ProfileCard, MembershipBadge,
+         TrendChart, BarChart, MiniBarChart,
+         KanbanBoard, KanbanColumn, KanbanCard,
+         TransactionsTable, TransactionDetailDrawer } from '@hua-labs/ui/advanced/dashboard'
+```
+
+### Form — `@hua-labs/ui/form`
+
+Form components and validation utilities.
+
+```typescript
+import { Form, FormField, FormGroup, FormControl,
+         Input, NumberInput, Textarea, Select,
+         Checkbox, Radio, Switch, Slider,
+         DatePicker, Upload, Autocomplete, ColorPicker } from '@hua-labs/ui/form'
+```
+
+### Data — `@hua-labs/ui/data`
+
+Data display components. `CodeBlock` requires `sugar-high` peer dependency.
+
+```typescript
+import { Table, TableHeader, TableBody, TableRow, TableCell,
+         CodeBlock, InlineCode } from '@hua-labs/ui/data'
+```
+
+### Interactive — `@hua-labs/ui/interactive`
+
+Composite multi-part components.
+
+```typescript
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent,
+         Tabs, TabsList, TabsTrigger, TabsContent,
+         Menu, MenuItem, ContextMenu, Command } from '@hua-labs/ui/interactive'
+```
+
+### Navigation — `@hua-labs/ui/navigation`
+
+```typescript
+import { Navigation, NavigationList, NavigationItem,
+         Breadcrumb, BreadcrumbItem,
+         Pagination, PageNavigation, PageTransition } from '@hua-labs/ui/navigation'
+```
+
+### Overlay — `@hua-labs/ui/overlay`
+
+```typescript
+import { Modal, ConfirmModal, Popover, Dropdown,
+         Drawer, BottomSheet } from '@hua-labs/ui/overlay'
+```
+
+### Feedback — `@hua-labs/ui/feedback`
+
+```typescript
+import { ToastProvider, useToast, Alert, LoadingSpinner, Tooltip } from '@hua-labs/ui/feedback'
+```
+
+### Icons — `@hua-labs/ui/icons`, `@hua-labs/ui/iconsax`
+
+See [Icon Names & Aliases](../04-icon-system/02-icon-names.mdx) for full icon list.
+
+```typescript
+// Phosphor icons (default) — just use <Icon name="..." />
+import { Icon } from '@hua-labs/ui'
+
+// Iconsax plugin — import once to activate
+import '@hua-labs/ui/iconsax'
+```
+
+### Styles
+
+```css
+@import "@hua-labs/ui/styles/recommended-theme.css";  /* Theme CSS variables */
+@import "@hua-labs/ui/styles/codeblock.css";           /* CodeBlock syntax colors */
+@import "@hua-labs/ui/styles/base.css";                /* Reset + base styles */
+@import "@hua-labs/ui/styles/toast.css";               /* Toast animations */
+```
+
+### SDUI — `@hua-labs/ui/sdui`
+
+Server-Driven UI for dynamic rendering.
+
+```typescript
+import { SDUIRenderer, SDUIFromJSON, useSDUI,
+         defaultRegistry, extendRegistry } from '@hua-labs/ui/sdui'
+```
+
+## FeatureCard `icon` Prop
+
+`FeatureCard` accepts an `icon` prop that maps to the Icon system. Use any name from the [Icon Names list](../04-icon-system/02-icon-names.mdx).
+
+Common choices:
+- UI: `palette`, `sparkle`, `sparkles`
+- AI: `brain`, `cpu`, `lightbulb`
+- Theme: `sun`, `moon`, `monitor`
+- Data: `database`, `chart`, `barChart`
+- i18n: `translate`, `globe`
+- Code: `code`, `fileCode`
+- Security: `shield`, `lock`
+- Status: `check`, `info`, `warning`
+
+Aliases also work: `"ai"` → `brain`, `"light"` → `sun`, etc.
+
+## Peer Dependencies
+
+| Path | Peer Dependency |
+|------|----------------|
+| `@hua-labs/ui/data` (CodeBlock) | `sugar-high` |
+| `@hua-labs/ui/iconsax` | (none, self-contained) |
+| `@hua-labs/ui/advanced` (BlogEditor) | `marked` (optional) |
+
+## Constraints
+
+- **Root re-exports**: Some components (Button, Input, Alert, etc.) are available from both root and category paths. Prefer the category path for smaller bundles.
+- **Advanced = dist**: Advanced/Pro components ship as pre-built bundles. Do not attempt to import from source paths.
+- **CodeBlock**: Will throw at runtime if `sugar-high` is not installed. Add it to your project's dependencies.

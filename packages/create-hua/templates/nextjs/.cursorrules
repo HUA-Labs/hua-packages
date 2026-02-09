@@ -53,7 +53,7 @@ This project uses the **hua framework** for Next.js applications.
 ### @hua-labs/hua/framework
 
 **Framework Components**:
-- `HuaUxLayout`: Automatic Provider setup
+- `HuaProvider`: Automatic Provider setup
 - `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
 - `BrandedButton`, `BrandedCard`: Components with automatic branding
