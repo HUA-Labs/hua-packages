@@ -192,7 +192,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
       if (autoUpdateHtmlLang && typeof document !== 'undefined') {
         document.documentElement.lang = currentLanguage;
         if (debug) {
-          console.log(`[ZUSTAND-I18N] Updated html[lang] to: ${currentLanguage}`);
+          if (process.env.NODE_ENV !== 'production') console.log(`[ZUSTAND-I18N] Updated html[lang] to: ${currentLanguage}`);
         }
       }
     }, [currentLanguage, autoUpdateHtmlLang, debug]);
@@ -224,7 +224,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
         const storeLanguage = store.getState().language;
         if (storeLanguage !== currentLanguage) {
           if (debug) {
-            console.log(`🔄 [ZUSTAND-I18N] Syncing i18n -> store: ${storeLanguage} -> ${currentLanguage}`);
+            if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Syncing i18n -> store: ${storeLanguage} -> ${currentLanguage}`);
           }
           state.isSyncing = true;
           store.getState().setLanguage(currentLanguage as L);
@@ -250,7 +250,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
         hydrationStateRef.current.isInitialized = isInitialized;
 
         if (debug) {
-          console.log(`✅ [ZUSTAND-I18N] Store rehydration complete`);
+          if (process.env.NODE_ENV !== 'production') console.log(`✅ [ZUSTAND-I18N] Store rehydration complete`);
         }
 
         // rehydration 완료 후 저장된 언어로 동기화
@@ -260,7 +260,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
         // 현재 i18n 언어와 다를 때만 동기화
         if (storeLanguage !== state.currentI18nLanguage && !state.isSyncing) {
           if (debug) {
-            console.log(`🔄 [ZUSTAND-I18N] Syncing language after rehydration: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+            if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Syncing language after rehydration: ${state.currentI18nLanguage} -> ${storeLanguage}`);
           }
           state.isSyncing = true;
           setI18nLanguage(storeLanguage);
@@ -268,7 +268,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
           state.isSyncing = false;
         } else {
           if (debug) {
-            console.log(`⏭️ [ZUSTAND-I18N] No sync needed (store: ${storeLanguage}, current: ${state.currentI18nLanguage})`);
+            if (process.env.NODE_ENV !== 'production') console.log(`⏭️ [ZUSTAND-I18N] No sync needed (store: ${storeLanguage}, current: ${state.currentI18nLanguage})`);
           }
           state.previousStoreLanguage = storeLanguage;
         }
@@ -287,7 +287,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
       const storeLanguage = store.getState().language;
       if (storeLanguage !== state.currentI18nLanguage) {
         if (debug) {
-          console.log(`🔄 [ZUSTAND-I18N] Syncing language from store: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+          if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Syncing language from store: ${state.currentI18nLanguage} -> ${storeLanguage}`);
         }
         setI18nLanguage(storeLanguage);
         state.previousStoreLanguage = storeLanguage;
@@ -321,7 +321,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
           // 하이드레이션 완료 후에만 동기화
           if (state.isComplete && newLanguage !== state.currentI18nLanguage) {
             if (debug) {
-              console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${state.currentI18nLanguage} -> ${newLanguage}`);
+              if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${state.currentI18nLanguage} -> ${newLanguage}`);
             }
             state.isSyncing = true;
             setI18nLanguage(newLanguage);
@@ -335,7 +335,7 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
         const storeLanguage = store.getState().language;
         if (storeLanguage !== state.currentI18nLanguage) {
           if (debug) {
-            console.log(`🔄 [ZUSTAND-I18N] Already hydrated, syncing language: ${state.currentI18nLanguage} -> ${storeLanguage}`);
+            if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Already hydrated, syncing language: ${state.currentI18nLanguage} -> ${storeLanguage}`);
           }
           state.isSyncing = true;
           setI18nLanguage(storeLanguage);

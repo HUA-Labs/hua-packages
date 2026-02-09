@@ -569,7 +569,7 @@ export function useLanguageChange() {
     if (supported) {
       setLanguage(language);
     } else {
-      console.warn(`Language ${language} is not supported`);
+      if (process.env.NODE_ENV !== 'production') console.warn(`Language ${language} is not supported`);
     }
   }, [setLanguage, supportedLanguages]);
 
