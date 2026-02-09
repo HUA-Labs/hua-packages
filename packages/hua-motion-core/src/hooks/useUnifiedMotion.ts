@@ -11,7 +11,7 @@ import type { BaseMotionReturn, MotionElement, EntranceType, BaseMotionOptions }
 export interface UseUnifiedMotionOptions extends Omit<BaseMotionOptions, 'autoStart'> {
   /** Motion type to use */
   type: EntranceType
-  /** Auto start animation @default false */
+  /** Auto start animation @default true */
   autoStart?: boolean
   /** Slide distance (px) for slide types @default 50 */
   distance?: number
@@ -52,7 +52,7 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
   const {
     type,
     duration = 600,
-    autoStart = false,
+    autoStart = true,
     delay = 0,
     easing,
     threshold = 0.1,
