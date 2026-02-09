@@ -1,0 +1,145 @@
+---
+title: defineConfig
+description: defineConfig API, validation, and environment-specific patterns
+category: config
+related:
+  - ./02-config-schema.mdx
+  - ./03-client-server-split.mdx
+  - ../01-getting-started/02-presets.mdx
+---
+
+# defineConfig
+
+`defineConfig` is the core function for defining hua-ux configuration. It handles preset merging, validation, and license/plugin initialization in one call.
+
+## API
+
+```typescript
+function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig
+```
+
+**Process:**
+1. If preset is a string, load that preset (vibe mode)
+2. If preset is an object, merge base preset + overrides (developer mode)
+3. Deep merge user config (user config always wins)
+4. Run `validateConfig()`
+5. Initialize license (`initLicense`)
+6. Initialize plugins (`registerPlugin` + `plugin.init()`)
+7. Cache the result
+
+```typescript
+// hua-ux.config.ts
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+
+export default defineConfig({
+  preset: 'product',
+  i18n: { defaultLanguage: 'ko', supportedLanguages: ['ko', 'en', 'ja'] },
+  icons: { set: 'phosphor', weight: 'regular' }
+})
+```
+
+## Related Functions
+
+### getConfig
+
+```typescript
+function getConfig(): HuaUxConfig
+```
+
+Returns cached config. If `defineConfig` was never called, returns product preset defaults.
+
+### setConfig
+
+```typescript
+function setConfig(config: HuaUxConfig): void
+```
+
+Directly overwrites the cache. **Testing only.** Use `defineConfig` in production.
+
+### resetConfig
+
+```typescript
+function resetConfig(): void
+```
+
+Clears the cache. Next `getConfig()` call returns defaults.
+
+## Validation
+
+`validateConfig` runs inside `defineConfig`:
+
+1. **preset**: Only `'product'` or `'marketing'` are valid
+2. **i18n.defaultLanguage**: Must be included in `supportedLanguages`
+3. **motion.style**: Only `'smooth'`/`'dramatic'`/`'minimal'` — maps to `defaultPreset` internally
+
+### motion.style Mapping
+
+```typescript
+'smooth' | 'minimal' -> defaultPreset: 'product'
+'dramatic'           -> defaultPreset: 'marketing'
+```
+
+## Deep Merge Rules
+
+- Objects: Recursively merged
+- Arrays: Replaced by user value (not merged)
+- `undefined`: Skipped (existing value preserved)
+- Everything else: Replaced by user value
+
+## Examples
+
+### 1. Minimal
+
+```typescript
+export default defineConfig({})
+// product preset + all defaults applied
+```
+
+### 2. Multi-language app
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  i18n: {
+    defaultLanguage: 'ko',
+    supportedLanguages: ['ko', 'en', 'ja', 'zh'],
+    namespaces: ['common', 'auth', 'diary', 'settings'],
+    translationLoader: 'api',
+    translationApiPath: '/api/translations'
+  }
+})
+```
+
+### 3. White-label app
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  branding: {
+    name: 'ClientApp',
+    logo: '/logo.svg',
+    colors: { primary: '#6366f1', secondary: '#8b5cf6', accent: '#f59e0b' },
+    typography: { fontFamily: 'Pretendard, sans-serif' }
+  },
+  license: { type: 'enterprise', apiKey: process.env.HUA_UX_LICENSE_KEY }
+})
+```
+
+### 4. Test environment
+
+```typescript
+import { setConfig, resetConfig, defineConfig } from '@hua-labs/hua-ux/framework/config'
+
+beforeEach(() => {
+  setConfig(defineConfig({ preset: 'product', motion: { enableAnimations: false } }))
+})
+afterEach(() => { resetConfig() })
+```
+
+## Constraints & Gotchas
+
+- Call `defineConfig` **once**. Multiple calls overwrite the cache with the last result.
+- Calling `getConfig()` without `defineConfig` returns product preset defaults — no error thrown.
+- Without a `preset` field, product preset is applied by default.
+- Plugin `init()` runs synchronously inside `defineConfig`. Async init needs separate handling.
+- `setConfig` and `resetConfig` are for testing only. Runtime config changes after provider initialization won't take effect.

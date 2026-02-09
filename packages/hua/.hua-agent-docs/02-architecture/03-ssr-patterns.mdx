@@ -1,0 +1,148 @@
+---
+title: SSR Patterns
+description: SSR/hydration, getSSRTranslations, server entry usage patterns
+category: architecture
+related:
+  - ./01-overview.mdx
+  - ../01-getting-started/01-entry-points.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# SSR Patterns
+
+hua-ux fully supports Next.js server components and SSR. Correct entry point usage is essential.
+
+## Server Entry (`framework/server`)
+
+`@hua-labs/hua-ux/framework/server` provides two server-only functions:
+
+### getSSRTranslations
+
+Loads translation files on the server and passes them to the client. Renders translated UI immediately without hydration mismatch.
+
+```typescript
+function getSSRTranslations(
+  config: HuaUxConfig,
+  translationsDir?: string  // default: 'translations'
+): Record<string, Record<string, Record<string, string>>>
+// Returns: { [lang]: { [namespace]: { [key]: value } } }
+```
+
+**Process:**
+1. Extracts namespaces and languages from `config.i18n`
+2. Loads files from: `${cwd}/${translationsDir}/${lang}/${namespace}.json`
+3. Falls back to 'ko' if specified language file is missing
+4. Dev: warns on missing files. Prod: returns empty object silently.
+
+### loadConfig
+
+Dynamically loads `hua-ux.config.ts` (or `.js`, `.mjs`) from the filesystem.
+
+```typescript
+function loadConfig(): HuaUxConfig
+```
+
+**Search order:** `hua-ux.config.ts` -> `.js` -> `.mjs` -> product preset defaults
+
+## Hydration Mismatch Prevention
+
+### 1. Translations
+
+```tsx
+// BAD — client-side translation loading causes flicker
+<HuaUxLayout config={config}>{children}</HuaUxLayout>
+
+// GOOD — SSR pre-loads translations
+const initialTranslations = await getSSRTranslations(config)
+<HuaUxLayout config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
+  {children}
+</HuaUxLayout>
+```
+
+### 2. Icons (SSR-safe by design)
+
+Icon component renders an empty `<span>` on server, hydrates to actual SVG on client. Same dimensions prevent CLS.
+
+### 3. Motion (SSR-safe by design)
+
+Motion hooks apply initial styles (opacity: 0, etc.) on server. IntersectionObserver triggers animation on client.
+
+### 4. Branding CSS variables
+
+BrandingProvider uses `suppressHydrationWarning` to prevent style tag hydration mismatch.
+
+## Translation File Structure
+
+```
+translations/
+├── ko/
+│   ├── common.json     # { "title": "제목", "save": "저장" }
+│   ├── auth.json       # { "login": "로그인" }
+│   └── diary.json      # { "write": "일기 쓰기" }
+├── en/
+│   ├── common.json
+│   └── auth.json
+└── ja/
+    └── common.json
+```
+
+## Examples
+
+### 1. Full SSR layout
+
+```tsx
+// app/layout.tsx
+import { getSSRTranslations, loadConfig } from '@hua-labs/hua-ux/framework/server'
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+
+export default async function RootLayout({ children }) {
+  const config = loadConfig()
+  const initialTranslations = await getSSRTranslations(config)
+  return (
+    <html lang={config.i18n?.defaultLanguage}>
+      <body>
+        <HuaUxLayout config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
+          {children}
+        </HuaUxLayout>
+      </body>
+    </html>
+  )
+}
+```
+
+### 2. API-based translation loader (no SSR)
+
+```typescript
+defineConfig({
+  i18n: {
+    defaultLanguage: 'ko',
+    supportedLanguages: ['ko', 'en'],
+    translationLoader: 'api',
+    translationApiPath: '/api/translations'
+  }
+})
+```
+
+### 3. i18n middleware
+
+```typescript
+// middleware.ts (Edge Runtime)
+import { createI18nMiddleware } from '@hua-labs/hua-ux/framework/shared'
+
+const i18nMiddleware = createI18nMiddleware({
+  defaultLanguage: 'ko',
+  supportedLanguages: ['ko', 'en', 'ja'],
+  detectionStrategy: 'header'
+})
+
+export default i18nMiddleware
+export const config = { matcher: ['/((?!api|_next|.*\\..*).*)'] }
+```
+
+## Constraints & Gotchas
+
+- `getSSRTranslations` and `loadConfig` use Node.js fs. **Not available in Edge Runtime.**
+- Importing `framework/server` in a client component causes a `server-only` module error.
+- `loadConfig` uses `eval` as a fallback. In strict CSP environments, import config statically instead.
+- Translation files must be JSON. For YAML or other formats, implement a custom `loadTranslations` loader.
+- `getSSRTranslations` runs at build time; not suitable for dynamic (DB-based) translations. Use an API loader instead.

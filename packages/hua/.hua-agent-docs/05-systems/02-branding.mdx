@@ -1,0 +1,241 @@
+---
+title: Branding System
+description: BrandingProvider, CSS variable generation, Tailwind config, white-labeling patterns
+category: systems
+related:
+  - ../03-config/02-config-schema.mdx
+  - ../02-architecture/02-provider-chain.mdx
+---
+
+# Branding System
+
+The hua-ux branding system supports **CSS variable-based white-labeling**. Once configured, all UI components automatically use the brand colors and fonts.
+
+## BrandingProvider
+
+A React Context-based Provider that injects CSS variables into the DOM.
+
+```typescript
+interface BrandingProviderProps {
+  branding: NonNullable<HuaUxConfig['branding']> | null
+  children: React.ReactNode
+}
+```
+
+**Behavior:**
+1. Calls `generateCSSVariables(branding)`
+2. Injects a `<style id="hua-ux-branding-vars">` tag into the DOM
+3. Automatically updates the style tag when branding changes
+4. Removes the style tag on unmount
+5. SSR-safe with `suppressHydrationWarning`
+
+> When using `HuaUxLayout`, `BrandingProvider` is automatically added if `config.branding` is present.
+
+## Hooks
+
+### useBranding
+
+```typescript
+function useBranding(): HuaUxConfig['branding'] | null
+```
+
+```tsx
+'use client'
+import { useBranding } from '@hua-labs/hua-ux/framework'
+
+function Logo() {
+  const branding = useBranding()
+  if (!branding) return <DefaultLogo />
+  return <img src={branding.logo} alt={branding.name} />
+}
+```
+
+### useBrandingColor
+
+A convenience hook for quick access to a specific color key:
+
+```typescript
+function useBrandingColor(
+  colorKey: string,
+  defaultValue?: string
+): string | undefined
+```
+
+```tsx
+function Header() {
+  const primaryColor = useBrandingColor('primary', '#0ea5e9')
+  return <header style={{ backgroundColor: primaryColor }}>...</header>
+}
+```
+
+## CSS Variables Generation
+
+### generateCSSVariables
+
+```typescript
+function generateCSSVariables(branding: BrandingConfig): string
+```
+
+Returns a CSS string in `:root { ... }` format.
+
+**Generated variables:**
+```css
+:root {
+  /* colors */
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* typography */
+  --font-family: Pretendard, sans-serif;
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.875rem;
+  --font-size-h3: 1.5rem;
+  --font-size-body: 1rem;
+
+  /* custom */
+  --custom-sidebar-width: 240px;
+}
+```
+
+### generateCSSVariablesObject
+
+```typescript
+function generateCSSVariablesObject(branding: BrandingConfig): Record<string, string>
+```
+
+Returns an object format. Can be used directly with React's `style` prop.
+
+```typescript
+generateCSSVariablesObject({
+  colors: { primary: '#6366f1' }
+})
+// → { '--color-primary': '#6366f1' }
+```
+
+## Tailwind Config Generation
+
+### generateTailwindConfig
+
+```typescript
+function generateTailwindConfig(branding: BrandingConfig): {
+  theme: { extend: { colors: Record<string, string>, fontFamily?: Record<string, string[]> } }
+}
+```
+
+```typescript
+// tailwind.config.ts
+import { generateTailwindConfig } from '@hua-labs/hua-ux/framework/shared'
+
+const brandingConfig = {
+  colors: { primary: '#6366f1', secondary: '#8b5cf6' },
+  typography: { fontFamily: 'Pretendard, sans-serif' }
+}
+
+const tailwindBranding = generateTailwindConfig(brandingConfig)
+// → { theme: { extend: { colors: { primary: '#6366f1', secondary: '#8b5cf6' }, fontFamily: { brand: ['Pretendard', 'sans-serif'] } } } }
+
+export default {
+  // ...
+  theme: {
+    extend: {
+      ...tailwindBranding.theme.extend
+    }
+  }
+}
+```
+
+## BrandedButton / BrandedCard
+
+Wrapper components that automatically apply branding colors:
+
+### BrandedButton
+
+```tsx
+import { BrandedButton } from '@hua-labs/hua-ux/framework'
+
+// Brand colors are applied when used inside BrandingProvider
+<BrandedButton>Default</BrandedButton>           {/* bg-primary */}
+<BrandedButton variant="secondary">Secondary</BrandedButton>  {/* bg-secondary */}
+<BrandedButton variant="outline">Outline</BrandedButton>  {/* border-accent */}
+```
+
+**Color mapping:**
+| variant | CSS class |
+|---------|----------|
+| default | `bg-[var(--color-primary)] text-white hover:opacity-90` |
+| secondary | `bg-[var(--color-secondary)] text-white hover:opacity-90` |
+| outline | `border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-accent/10` |
+
+> Outside of BrandingProvider, it behaves the same as a regular Button.
+
+## Examples
+
+### 1. Basic White-Labeling
+
+```typescript
+// hua-ux.config.ts
+export default defineConfig({
+  branding: {
+    name: 'ClientApp',
+    logo: '/client-logo.svg',
+    colors: {
+      primary: '#6366f1',
+      secondary: '#8b5cf6',
+      accent: '#f59e0b',
+      success: '#22c55e',
+      error: '#ef4444'
+    },
+    typography: {
+      fontFamily: 'Pretendard, sans-serif',
+      fontSize: { h1: '2.5rem', body: '1rem' }
+    },
+    customVariables: {
+      'sidebar-width': '240px',
+      'header-height': '64px'
+    }
+  }
+})
+```
+
+### 2. Dynamic Branding (Runtime)
+
+```tsx
+'use client'
+import { BrandingProvider } from '@hua-labs/hua-ux/framework'
+
+function TenantLayout({ tenant, children }) {
+  return (
+    <BrandingProvider branding={{
+      name: tenant.name,
+      colors: tenant.colors
+    }}>
+      {children}
+    </BrandingProvider>
+  )
+}
+```
+
+### 3. Using CSS Variables Directly
+
+```tsx
+function CustomComponent() {
+  return (
+    <div className="bg-[var(--color-primary)] text-white p-4">
+      Brand color background
+    </div>
+  )
+}
+```
+
+## Constraints & Gotchas
+
+- `useBranding()` and `useBrandingColor()` only work inside BrandingProvider. Outside the Provider, they return `null`.
+- CSS variables are injected into `:root`. Defining the same variable name elsewhere may cause conflicts.
+- BrandingProvider dynamically inserts a style tag into the DOM. This requires `style-src 'unsafe-inline'` in your CSP.
+- The result of `generateTailwindConfig` is only useful at build time. Use CSS variables for runtime branding changes.
+- Both HuaUxLayout's ThemeInjector and BrandingProvider inject CSS variables. BrandingProvider's variables override ThemeInjector's default theme.

@@ -1,0 +1,302 @@
+# hua-ux Project Cursor Rules
+
+This project uses the **hua-ux framework** for Next.js applications.
+
+## Core Philosophy
+
+**"You don't need to know Next.js. Just configure and tell AI what to do."**
+
+## Project Structure
+
+- `app/`: Next.js App Router pages (use HuaUxPage)
+- `components/`: Reusable components
+- `lib/`: Utility functions
+- `store/`: Zustand stores
+- `translations/`: Translation files (ko/, en/)
+- `hua-ux.config.ts`: Framework configuration
+
+## Available Components
+
+### @hua-labs/ui (Core Components)
+
+**Core UI**:
+- `Button`, `Action`, `Input`, `Link`, `Icon`, `Avatar`, `Modal`
+
+**Layout**:
+- `Container`, `Grid`, `Stack`, `Divider`, `Card` (CardHeader, CardTitle, CardDescription, CardContent, CardFooter), `Panel`, `ActionToolbar`, `ComponentLayout`
+
+**Navigation**:
+- `Navigation`, `Breadcrumb`, `Pagination`, `PageNavigation`, `PageTransition`
+
+**Data Display**:
+- `Table`, `Badge`, `Progress`, `Skeleton` (various variants)
+
+**Feedback**:
+- `Alert` (Success, Warning, Error, Info), `Toast` (ToastProvider, useToast), `LoadingSpinner`, `Tooltip`
+
+**Overlay**:
+- `Popover`, `Dropdown`, `Drawer`, `BottomSheet`, `ConfirmModal`
+
+**Form**:
+- `Form`, `Label`, `Checkbox`, `Radio`, `Select`, `Switch`, `Slider`, `Textarea`, `DatePicker`, `Upload`, `Autocomplete`
+
+**Interactive**:
+- `Accordion`, `Tabs`, `Menu`, `ContextMenu`, `Command`
+
+**Specialized**:
+- `ScrollArea`, `ScrollToTop`, `ThemeProvider`, `ThemeToggle`, `useTheme`
+
+**Icons**:
+- `Icon`, `EmotionIcon`, `StatusIcon`, `LoadingIcon`, `SuccessIcon`, `ErrorIcon`
+- Icon providers: Phosphor Icons (default), Lucide React
+
+### @hua-labs/hua-ux/framework
+
+**Framework Components**:
+- `HuaUxLayout`: Automatic Provider setup
+- `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
+- `UnifiedProviders`: All Providers unified
+- `BrandedButton`, `BrandedCard`: Components with automatic branding
+- `ErrorBoundary`: Error boundary
+
+**Hooks**:
+- `useMotion`: Unified motion hook
+- `useData`: Client data fetching
+- `useFocusManagement`, `useFocusTrap`: Accessibility hooks
+- `useDelayedLoading`, `useLoadingState`: Loading state hooks
+- `useLiveRegion`: Screen reader support
+
+**Utilities**:
+- `fetchData`: Server data fetching
+- `generatePageMetadata`: SEO metadata generation
+- `generateGEOMetadata`: GEO metadata generation
+- `createI18nMiddleware`: i18n middleware creation
+
+**Configuration**:
+- `defineConfig`: Framework configuration definition
+- `getConfig`: Get configuration
+
+### @hua-labs/motion-core
+
+**Motion Hooks**:
+- `useFadeIn`, `useSlideUp`, `useSlideLeft`, `useSlideRight`, `useScaleIn`, `useBounceIn`, `usePulse`, `useSpringMotion`
+- `useHoverMotion`, `useClickToggle`, `useFocusToggle`
+- `useScrollReveal`, `useScrollProgress`
+
+### @hua-labs/i18n-core
+
+**i18n Hooks**:
+- `useTranslation`: Translation hook
+- `useLanguage`: Language change hook
+
+## Code Generation Rules
+
+### When Creating Pages
+
+1. **Always wrap with `HuaUxPage`**:
+  ```tsx
+  import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+  import { useTranslation } from '@hua-labs/hua-ux/i18n';
+  
+  export default function MyPage() {
+    const { t } = useTranslation('my-page');
+    
+    return (
+      <HuaUxPage 
+        title={t('title')} 
+        description={t('description')}
+        // SEO metadata is automatically generated
+      >
+        <h1>{t('title')}</h1>
+        {/* content */}
+      </HuaUxPage>
+    );
+  }
+  ```
+
+2. **Generate translation files too**:
+  - `translations/ko/my-page.json`
+  - `translations/en/my-page.json`
+  
+  ```json
+  {
+    "title": "Page Title",
+    "description": "Page Description"
+  }
+  ```
+
+3. **Prefer Server Components**:
+  - Create as Server Component by default
+  - Add `'use client'` only when client features are needed
+
+### When Creating Components
+
+1. **Client components require `'use client'`**
+2. **Use framework components**:
+  ```tsx
+  'use client';
+  
+  import { Card, Button } from '@hua-labs/hua-ux/ui';
+  import { useFadeIn } from '@hua-labs/hua-ux/motion';
+  import { useTranslation } from '@hua-labs/hua-ux/i18n';
+  
+  export function MyComponent() {
+    const { t } = useTranslation('my-component');
+    const motion = useFadeIn();
+    
+    return (
+      <Card ref={motion.ref} style={motion.style}>
+        <h2>{t('title')}</h2>
+        <Button>{t('button')}</Button>
+      </Card>
+    );
+  }
+  ```
+
+3. **Consider motion**:
+  - Wrapping with `HuaUxPage` automatically applies motion
+  - Individual components can use `useMotion` or individual motion hooks
+
+### When Adding Translations
+
+1. **Add both Korean and English**
+2. **Maintain namespace consistency**
+3. **File name matches page/component name**
+4. **Use `common` namespace for shared translations**
+
+### When Changing Configuration
+
+1. **Only modify `hua-ux.config.ts`**
+2. **Prefer Preset over manual configuration**:
+  ```typescript
+  // Good: Use Preset
+  export default defineConfig({
+    preset: 'product',  // or 'marketing'
+  });
+  
+  // Avoid: Direct configuration (only when needed)
+  export default defineConfig({
+    motion: { /* ... */ },
+    i18n: { /* ... */ },
+  });
+  ```
+
+## Key Patterns
+
+### Preset System
+
+- `'product'`: For product pages (professional, efficient)
+- `'marketing'`: For marketing pages (dramatic, eye-catching)
+
+### Branding
+
+- Customize colors and typography with `branding` setting in `hua-ux.config.ts`
+- All components automatically apply branding
+- `BrandedButton`, `BrandedCard` automatically apply branding
+
+### Motion
+
+- Wrapping with `HuaUxPage` automatically applies motion
+- Can be disabled with `enableMotion={false}`
+- Individual components can use `useMotion` or individual motion hooks
+
+### i18n / Internationalization
+
+- Use `useTranslation` hook for translations
+- Translation files are in `translations/{language}/{namespace}.json`
+- API Route: `/api/translations/{language}/{namespace}`
+
+### SEO / Search Engine Optimization
+
+- Providing `title` and `description` to `HuaUxPage` automatically generates SEO metadata
+- Can generate GEO metadata with `generateGEOMetadata`
+
+## When AI Generates Code
+
+1. **Prefer framework components**
+  - Use components from `@hua-labs/ui` first
+  - Utilize framework components from `@hua-labs/hua-ux/framework`
+
+2. **Auto-apply based on config**
+  - Settings in `hua-ux.config.ts` are automatically applied
+  - Preset usage recommended
+
+3. **Always generate translation keys together**
+  - Generate translation files when creating pages/components
+  - Provide both Korean and English
+
+4. **Maintain type safety**
+  - Explicitly specify TypeScript types
+  - Avoid using `any`
+
+5. **Prefer Server Components**
+  - Add `'use client'` only when client features are needed
+
+6. **Consider accessibility**
+  - Use `aria-label`, `aria-describedby` appropriately
+  - Support keyboard navigation
+
+## Common Patterns
+
+### Page Creation Pattern
+```tsx
+import { HuaUxPage } from '@hua-labs/hua-ux/framework';
+import { useTranslation } from '@hua-labs/hua-ux/i18n';
+
+export default function MyPage() {
+  const { t } = useTranslation('my-page');
+  return (
+    <HuaUxPage title={t('title')} description={t('description')}>
+      {/* content */}
+    </HuaUxPage>
+  );
+}
+```
+
+### Client Component Pattern
+```tsx
+'use client';
+
+import { Card, Button } from '@hua-labs/hua-ux/ui';
+import { useMotion } from '@hua-labs/hua-ux/framework';
+
+export function MyComponent() {
+  const motion = useMotion();
+  return (
+    <Card ref={motion.ref} style={motion.style}>
+      {/* content */}
+    </Card>
+  );
+}
+```
+
+### Data Fetching Pattern
+```tsx
+// Server Component
+import { fetchData } from '@hua-labs/hua-ux/framework';
+
+export default async function MyPage() {
+  const data = await fetchData<MyDataType>('/api/data');
+  return <div>{/* display data */}</div>;
+}
+
+// Client Component
+'use client';
+import { useData } from '@hua-labs/hua-ux/framework';
+
+export function MyComponent() {
+  const { data, isLoading, error } = useData<MyDataType>('/api/data');
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <AlertError>{error.message}</AlertError>;
+  return <div>{/* display data */}</div>;
+}
+```
+
+## References
+
+- `ai-context.md`: Detailed project structure explanation
+- `hua-ux.config.ts`: Framework configuration file
+- Framework docs: `node_modules/@hua-labs/hua-ux/README.md`
+- UI components: `node_modules/@hua-labs/ui/README.md`
+- Motion: `node_modules/@hua-labs/motion-core/README.md`
+- i18n: `node_modules/@hua-labs/i18n-core-zustand/README.md`

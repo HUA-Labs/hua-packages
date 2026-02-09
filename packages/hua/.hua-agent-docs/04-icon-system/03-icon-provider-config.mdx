@@ -1,0 +1,205 @@
+---
+title: Icon Provider Config
+description: IconProvider component, weight, global settings and their relationship with hua-ux.config.ts
+category: icon-system
+related:
+  - ./01-overview.mdx
+  - ./02-icon-names.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Icon Provider Config
+
+Global icon defaults can be configured in two ways: the `icons` section in `hua-ux.config.ts` or the `IconProvider` component.
+
+## hua-ux.config.ts Settings
+
+```typescript
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+
+export default defineConfig({
+  icons: {
+    set: 'phosphor',       // 'phosphor' | 'lucide' | 'iconsax'
+    weight: 'regular',     // 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
+    size: 20,              // number (px)
+    color: 'currentColor', // CSS color value
+    strokeWidth: 1.25      // number (px) — used by Lucide/Phosphor
+  }
+})
+```
+
+This configuration is passed internally to `IconProvider` through `UnifiedProviders` / `HuaUxLayout`.
+
+## IconProvider Component
+
+Use IconProvider directly to override icon settings for a specific section:
+
+```typescript
+interface IconProviderProps {
+  set?: IconSet            // default icon provider
+  weight?: PhosphorWeight  // Phosphor weight
+  iconsaxVariant?: 'line' | 'bold'  // Iconsax variant
+  size?: number            // default size (px)
+  color?: string           // default color
+  strokeWidth?: number     // stroke width
+  children: ReactNode
+}
+```
+
+```tsx
+import { IconProvider } from '@hua-labs/ui'
+
+// All icons in this section will be bold, 24px
+<IconProvider set="phosphor" weight="bold" size={24}>
+  <Icon name="home" />     {/* bold, 24px */}
+  <Icon name="settings" /> {/* bold, 24px */}
+</IconProvider>
+```
+
+## useIconContext Hook
+
+A hook to read the current IconProvider's settings:
+
+```typescript
+function useIconContext(): IconConfig
+
+interface IconConfig {
+  set: IconSet             // 'lucide' | 'phosphor' | 'iconsax'
+  weight: PhosphorWeight   // 'thin' | 'light' | 'regular' | 'bold' | 'duotone' | 'fill'
+  size: number             // default: 20
+  color: string            // default: 'currentColor'
+  strokeWidth?: number     // Lucide: 1.25, Phosphor: 1.25, Iconsax: 1.5
+  iconsaxVariant?: 'line' | 'bold'
+}
+```
+
+```tsx
+import { useIconContext } from '@hua-labs/ui'
+
+function MyComponent() {
+  const { set, weight, size } = useIconContext()
+  // → { set: 'phosphor', weight: 'regular', size: 20 }
+}
+```
+
+## Default strokeWidth
+
+Default strokeWidth per provider:
+
+| Provider | Default strokeWidth |
+|----------|---------------------|
+| Lucide | 1.25 |
+| Phosphor | 1.25 |
+| Iconsax | 1.5 |
+
+## Provider Priority
+
+```
+1. Direct prop on the Icon component       (highest priority)
+   ↓
+2. Nearest IconProvider                     (in the component tree)
+   ↓
+3. UnifiedProviders IconProvider            (based on hua-ux.config.ts)
+   ↓
+4. Global defaults                          (Phosphor, regular, 20px)
+```
+
+```tsx
+<IconProvider set="phosphor" weight="regular" size={20}>   {/* 3. config-based */}
+  <Icon name="home" />                                      {/* → phosphor, regular, 20 */}
+
+  <IconProvider weight="bold" size={24}>                    {/* 2. section override */}
+    <Icon name="settings" />                                {/* → phosphor, bold, 24 */}
+    <Icon name="user" size={32} />                          {/* 1. direct prop → 32px */}
+  </IconProvider>
+</IconProvider>
+```
+
+## Weight Comparison (Phosphor)
+
+| Weight | Thickness | Usage |
+|--------|-----------|-------|
+| thin | Thinnest | Decorative, background |
+| light | Thin | Secondary UI |
+| regular | Normal | **Default**, most UI elements |
+| bold | Thick | Emphasis, CTA |
+| duotone | Two-tone | Status indicators (filled part + outline) |
+| fill | Filled | Active state, selected |
+
+```tsx
+// Changing weight
+<Icon name="heart" weight="regular" />  {/* outline */}
+<Icon name="heart" weight="fill" />     {/* filled heart */}
+<Icon name="heart" weight="duotone" />  {/* two-tone heart */}
+```
+
+## Default Icon Settings by Preset
+
+| Setting | product preset | marketing preset |
+|---------|---------------|-----------------|
+| set | phosphor | phosphor |
+| weight | regular | bold |
+| size | 20 | 24 |
+| color | currentColor | currentColor |
+
+## Examples
+
+### 1. Global settings (config)
+
+```typescript
+// hua-ux.config.ts
+export default defineConfig({
+  preset: 'product',
+  icons: {
+    set: 'phosphor',
+    weight: 'regular',
+    size: 20
+  }
+})
+```
+
+### 2. Section-level override
+
+```tsx
+function Sidebar({ children }) {
+  return (
+    <IconProvider size={18} weight="light">
+      {/* Sidebar icons: small and lightweight style */}
+      <nav>{children}</nav>
+    </IconProvider>
+  )
+}
+
+function MainContent({ children }) {
+  return (
+    <IconProvider size={24} weight="bold">
+      {/* Main content icons: large and bold style */}
+      <main>{children}</main>
+    </IconProvider>
+  )
+}
+```
+
+### 3. Switching to Iconsax
+
+```tsx
+// 1. Register iconsax first
+import '@hua-labs/ui/iconsax'
+
+// 2. Set globally in config
+export default defineConfig({
+  icons: { set: 'iconsax' }
+})
+
+// Or apply to a specific section only
+<IconProvider set="iconsax" iconsaxVariant="bold">
+  <Icon name="home" />
+</IconProvider>
+```
+
+## Constraints & Gotchas
+
+- `weight` is Phosphor-only. Lucide uses `strokeWidth` to control thickness, and Iconsax uses `iconsaxVariant` (line/bold).
+- When nesting `IconProvider`s, the nearest one takes effect. Unspecified values from a parent Provider are not inherited; they fall back to global defaults.
+- `duotone` and `fill` weights are only supported in Phosphor. They are ignored in Lucide/Iconsax.
+- Using `color: 'currentColor'` makes the icon color follow the parent element's CSS `color` property. This can be controlled with Tailwind's `text-*` classes.

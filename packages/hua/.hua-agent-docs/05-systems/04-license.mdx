@@ -1,0 +1,176 @@
+---
+title: License System
+description: License checking, feature gating patterns
+category: systems
+related:
+  - ./03-plugin.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# License System
+
+hua-ux supports per-feature license management. Available features vary by tier: Free, Pro, or Enterprise.
+
+## License Types
+
+```typescript
+type LicenseType = 'free' | 'pro' | 'enterprise'
+```
+
+## License Features
+
+```typescript
+type LicenseFeature =
+  | 'core'             // All licenses
+  | 'motion-basic'     // Free+
+  | 'motion-pro'       // Pro+
+  | 'i18n-basic'       // Free+
+  | 'i18n-pro'         // Pro+
+  | 'preset-basic'     // Free+
+  | 'preset-pro'       // Pro+
+  | 'white-labeling'   // Enterprise only
+```
+
+**Features by tier:**
+
+| Feature | Free | Pro | Enterprise |
+|---------|------|-----|-----------|
+| core | ✅ | ✅ | ✅ |
+| motion-basic | ✅ | ✅ | ✅ |
+| motion-pro | ❌ | ✅ | ✅ |
+| i18n-basic | ✅ | ✅ | ✅ |
+| i18n-pro | ❌ | ✅ | ✅ |
+| preset-basic | ✅ | ✅ | ✅ |
+| preset-pro | ❌ | ✅ | ✅ |
+| white-labeling | ❌ | ❌ | ✅ |
+
+## API
+
+### initLicense
+
+```typescript
+function initLicense(configLicense?: { apiKey?: string; type?: LicenseType }): void
+```
+
+Loads and caches the license.
+
+**Loading priority:**
+1. `HUA_UX_LICENSE_KEY` environment variable
+2. `configLicense` parameter
+3. Default (Free)
+
+> Automatically called inside `defineConfig`. Manual invocation is usually unnecessary.
+
+### getLicense
+
+```typescript
+function getLicense(): LicenseInfo
+
+interface LicenseInfo {
+  type: LicenseType
+  valid: boolean
+  expiresAt?: Date
+  features: LicenseFeature[]
+  companyName?: string
+  apiKey?: string
+}
+```
+
+### checkLicense
+
+```typescript
+function checkLicense(feature: LicenseFeature): LicenseCheckResult
+
+interface LicenseCheckResult {
+  valid: boolean
+  reason?: string
+  expiresAt?: Date
+}
+```
+
+**Validation order:**
+1. License validity (`valid` field)
+2. Expiration check (`expiresAt`)
+3. Whether the feature is included in the license (`features` array)
+
+### hasLicense
+
+```typescript
+function hasLicense(feature: LicenseFeature): boolean
+```
+
+Boolean shorthand for `checkLicense`.
+
+### requireLicense
+
+```typescript
+function requireLicense(feature: LicenseFeature): void  // throws if invalid
+```
+
+Throws an error if the license is missing. Used for feature gating.
+
+```typescript
+// Error message format
+// "License required: 'white-labeling' feature requires 'enterprise' license. Current: 'free'."
+```
+
+### resetLicenseCache (for testing)
+
+```typescript
+function resetLicenseCache(): void
+```
+
+## Examples
+
+### 1. Feature Gating
+
+```typescript
+import { hasLicense, requireLicense } from '@hua-labs/hua-ux/framework'
+
+// Soft check (hide UI)
+function AdvancedSettings() {
+  if (!hasLicense('preset-pro')) {
+    return <UpgradePrompt feature="Advanced presets" />
+  }
+  return <ProSettings />
+}
+
+// Hard check (throw error)
+function initWhiteLabeling(config) {
+  requireLicense('white-labeling')
+  // enterprise-only logic
+}
+```
+
+### 2. Setting License in Config
+
+```typescript
+export default defineConfig({
+  license: {
+    type: 'pro',
+    apiKey: process.env.HUA_UX_LICENSE_KEY
+  }
+})
+```
+
+### 3. Setting via Environment Variable
+
+```bash
+# .env
+HUA_UX_LICENSE_KEY=your-license-key-here
+```
+
+```typescript
+// Auto-loads from environment variable even without apiKey
+export default defineConfig({
+  license: { type: 'pro' }
+})
+```
+
+## Constraints & Gotchas
+
+- The default features for the Free license are `['core', 'motion-basic', 'i18n-basic', 'preset-basic']`.
+- The error message from `requireLicense` uses the `createLicenseError(feature, currentLicense)` function.
+- The license cache is a module-level global variable. Only use `resetLicenseCache()` in tests.
+- API key-based license validation currently only performs local checks (no server-side validation implemented).
+- `initLicense` is called inside `defineConfig`. If you call `hasLicense` before `defineConfig`, it will always evaluate as Free.

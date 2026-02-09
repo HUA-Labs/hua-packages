@@ -1,0 +1,196 @@
+---
+title: Framework Exports
+description: Complete export list for framework, framework/shared, and framework/server
+category: api-reference
+related:
+  - ../01-getting-started/01-entry-points.mdx
+  - ./02-type-definitions.mdx
+---
+
+# Framework Exports
+
+## `@hua-labs/hua-ux/framework` (Client)
+
+> Contains the `'use client'` directive. Use only in client components.
+
+### Components
+
+| Export | Description |
+|--------|------|
+| `HuaUxLayout` | Root layout wrapper (Provider + Theme + Language transition) |
+| `HuaUxPage` | Page wrapper (Motion + Error boundary + Vibe) |
+| `UnifiedProviders` | Provider chain (Branding + Toast + Icon + I18n) |
+| `BrandedButton` | Button with branding colors applied |
+| `BrandedCard` | Card with branding applied |
+| `WelcomePage` | Preset-based welcome page |
+| `ErrorBoundary` | React error boundary |
+| `SkipToContent` | Skip to main content link (A11y) |
+| `LiveRegion` | ARIA live region (A11y) |
+| `SuspenseWrapper` | Suspense wrapper + default Skeleton fallback |
+| `SkeletonGroup` | Skeleton group (consistent spacing) |
+| `Skeleton` | Skeleton component (re-export from hua-ui) |
+
+### Config
+
+| Export | Description |
+|--------|------|
+| `defineConfig` | Define config + validation + initialization |
+| `getConfig` | Return cached config |
+| `setConfig` | Overwrite config cache (for testing) |
+| `resetConfig` | Reset config cache |
+
+### Branding
+
+| Export | Description |
+|--------|------|
+| `BrandingProvider` | Branding CSS variables Provider |
+| `useBranding` | Hook for reading branding config |
+| `useBrandingColor` | Hook for reading a specific branding color |
+
+### License
+
+| Export | Description |
+|--------|------|
+| `initLicense` | Initialize license |
+| `getLicense` | Current license info |
+| `checkLicense` | Check feature license |
+| `hasLicense` | Feature availability (boolean) |
+| `requireLicense` | Throw if license missing |
+
+### Plugin
+
+| Export | Description |
+|--------|------|
+| `pluginRegistry` | Plugin registry singleton |
+| `registerPlugin` | Register a plugin |
+| `getPlugin` | Look up plugin by name |
+| `getAllPlugins` | Get all plugins list |
+
+### Accessibility
+
+| Export | Description |
+|--------|------|
+| `useFocusManagement` | Auto focus management hook |
+| `useFocusTrap` | Focus trap hook |
+| `useLiveRegion` | Programmatic live region hook |
+
+### Loading
+
+| Export | Description |
+|--------|------|
+| `useDelayedLoading` | Delayed loading display hook (flicker prevention) |
+| `useLoadingState` | Loading state management hook |
+| `withSuspense` | Suspense HOC |
+
+### Data
+
+| Export | Description |
+|--------|------|
+| `useData` | Data fetching hook |
+| `fetchData` | Data fetching utility |
+
+### Motion
+
+| Export | Description |
+|--------|------|
+| `useMotion` | Unified motion hook (motion-core wrapper) |
+| `useFadeIn` | Fade-in motion |
+| `useSlideUp` | Slide-up motion |
+| `useSlideLeft` | Slide-left motion |
+| `useSlideRight` | Slide-right motion |
+| `useScaleIn` | Scale-in motion |
+| `useBounceIn` | Bounce-in motion |
+| `usePulse` | Pulse motion |
+| `useSpringMotion` | Spring motion |
+| `useGradient` | Gradient motion |
+| `useHoverMotion` | Hover motion |
+| `useClickToggle` | Click toggle motion |
+| `useFocusToggle` | Focus toggle motion |
+| `useScrollReveal` | Scroll reveal motion |
+| `useScrollProgress` | Scroll progress |
+| `useMotionState` | Motion state management |
+| `useRepeat` | Repeat motion |
+| `useToggleMotion` | Toggle motion |
+| `useGesture` | Gesture motion |
+| `useGestureMotion` | Gesture-based motion |
+
+---
+
+## `@hua-labs/hua-ux/framework/shared` (Pure)
+
+> No directives. Safe to use anywhere — server, client, or middleware.
+
+### Types
+
+| Export | Description |
+|--------|------|
+| `HuaUxConfig` | Full config type |
+| `PresetName` | `'product' \| 'marketing'` |
+| `HuaUxLayoutProps` | HuaUxLayout props type |
+| `HuaUxPageProps` | HuaUxPage props type |
+| `LicenseInfo` | License info type |
+| `HuaUxPlugin` | Plugin interface |
+| `GEOConfig` | GEO config type |
+| `SEOConfig` | SEO config type |
+
+### GEO
+
+| Export | Description |
+|--------|------|
+| `generateGEOMetadata` | Generate AI search optimization metadata |
+| `metaToObject` | Convert meta array to object |
+| `openGraphToObject` | Convert OG array to object |
+| `renderJSONLD` | Render JSON-LD (XSS safe) |
+| `createAIContext` | Generate AI context string |
+| `generateSoftwareApplicationLD` | SoftwareApplication JSON-LD |
+| `generateFAQPageLD` | FAQ page JSON-LD |
+| `generateHowToLD` | HowTo JSON-LD |
+| `generateCodeLD` | Code JSON-LD |
+| `generateTechArticleLD` | TechArticle JSON-LD |
+| `generateVideoLD` | Video JSON-LD |
+| `generateOrganizationLD` | Organization JSON-LD |
+| `validateJsonLd` | Validate JSON-LD |
+| `validateGEOMetadata` | Validate GEO metadata array |
+| `formatValidationResult` | Format validation result |
+| `GEO_PRESETS` | GEO preset constants |
+| `generatePageMetadata` | Generate page metadata |
+
+### Branding Utilities
+
+| Export | Description |
+|--------|------|
+| `generateCSSVariables` | Generate CSS variables string |
+| `generateCSSVariablesObject` | Generate CSS variables object |
+| `generateTailwindConfig` | Generate Tailwind config object |
+
+### Middleware
+
+| Export | Description |
+|--------|------|
+| `createI18nMiddleware` | Create i18n middleware (Edge Runtime safe) |
+
+---
+
+## `@hua-labs/hua-ux/framework/server` (Server-Only)
+
+> `'server-only'` directive. Use only in Node.js server environments.
+
+All exports from shared, plus the following:
+
+| Export | Description |
+|--------|------|
+| `getSSRTranslations` | Load translation files from fs (SSR) |
+| `loadConfig` | Dynamically load hua-ux.config.ts from fs |
+
+---
+
+## `@hua-labs/hua-ux/framework/config`
+
+> Config system dedicated entry.
+
+| Export | Description |
+|--------|------|
+| `defineConfig` | Define config |
+| `getConfig` | Read config |
+| `setConfig` | Overwrite config |
+| `resetConfig` | Reset config |

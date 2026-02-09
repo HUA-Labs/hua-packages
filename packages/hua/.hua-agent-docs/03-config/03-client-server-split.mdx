@@ -1,0 +1,110 @@
+---
+title: Client vs Server Config
+description: Client-safe vs server-only config boundaries and correct patterns
+category: config
+related:
+  - ./01-define-config.mdx
+  - ../01-getting-started/01-entry-points.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# Client vs Server Config
+
+The hua-ux config system works in both client and server, but some functions are environment-specific.
+
+## Module Split
+
+```
+framework/config/
+├── index.ts       -> Re-exports client.ts
+├── client.ts      -> defineConfig, getConfig, setConfig, resetConfig
+└── server.ts      -> loadConfig (fs-dependent)
+```
+
+### client.ts (Safe everywhere)
+
+```typescript
+export function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig
+export function getConfig(): HuaUxConfig
+export function setConfig(config: HuaUxConfig): void
+export function resetConfig(): void
+```
+
+Memory cache-based. No fs access. Safe in `'use client'` environment.
+
+### server.ts (Server only)
+
+```typescript
+export function loadConfig(): HuaUxConfig
+```
+
+Uses `require`/`eval` to load config from filesystem. Not available in Edge Runtime.
+
+## Correct Patterns
+
+### Pattern 1: Static config import
+
+```typescript
+// hua-ux.config.ts
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+export default defineConfig({ preset: 'product' })
+```
+
+```tsx
+// app/layout.tsx (Server Component)
+import config from '../hua-ux.config'          // Static import
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+export default function Layout({ children }) {
+  return <HuaUxLayout config={config}>{children}</HuaUxLayout>
+}
+```
+
+### Pattern 2: Dynamic load on server
+
+```tsx
+import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+const config = loadConfig()  // Loads from fs
+```
+
+### Pattern 3: Read config on client
+
+```tsx
+'use client'
+import { getConfig } from '@hua-labs/hua-ux/framework/config'
+const config = getConfig()  // Reads from cache
+```
+
+## Anti-patterns
+
+```tsx
+// Client component importing server module
+'use client'
+import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+// -> Error: server-only module imported in client
+
+// Edge Runtime using loadConfig
+// middleware.ts
+import { loadConfig } from '@hua-labs/hua-ux/framework/server'
+// -> Error: fs module not available in edge runtime
+
+// Server component importing framework client entry
+import { defineConfig } from '@hua-labs/hua-ux/framework'
+// -> 'use client' directive propagates
+// Use instead:
+import { defineConfig } from '@hua-labs/hua-ux/framework/config'
+```
+
+## Environment Availability
+
+| Function | Client | Server Component | middleware.ts | API Route |
+|----------|--------|------------------|---------------|-----------|
+| defineConfig | Yes | Yes | Yes | Yes |
+| getConfig | Yes | Yes | Yes | Yes |
+| loadConfig | No | Yes | No | Yes |
+
+## Constraints & Gotchas
+
+- Use `framework/config` entry in server components for `defineConfig`. The `framework` entry has `'use client'` that converts server components to client.
+- `loadConfig` uses `eval` as fallback. Use static imports in strict CSP environments.
+- Config cache is a module-level variable. In serverless (Vercel Functions), each instance has an independent cache.
+- `getConfig()` returns product preset defaults if `defineConfig()` was never called — no error thrown.

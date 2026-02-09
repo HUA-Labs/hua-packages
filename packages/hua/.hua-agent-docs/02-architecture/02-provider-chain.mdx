@@ -1,0 +1,185 @@
+---
+title: Provider Chain
+description: UnifiedProviders internal structure and automatic provider composition
+category: architecture
+related:
+  - ./01-overview.mdx
+  - ../03-config/01-define-config.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Provider Chain
+
+hua-ux auto-composes multiple Context Providers via `UnifiedProviders`. No manual provider nesting required.
+
+## Provider Order
+
+```
+<BrandingProvider>        <- 1. Branding CSS variables (outermost)
+  <ToastProvider>         <- 2. Toast notifications
+    <IconProvider>        <- 3. Icon defaults
+      <I18nProvider>      <- 4. Internationalization (innermost)
+        {children}
+      </I18nProvider>
+    </IconProvider>
+  </ToastProvider>
+</BrandingProvider>
+```
+
+Why order matters:
+- BrandingProvider must be outermost so all child components can access CSS variables.
+- I18nProvider must be innermost so language changes don't trigger re-renders of upper providers.
+
+## UnifiedProviders Internals
+
+```typescript
+// Actual implementation (createProviders)
+function createProviders(config: HuaUxConfig) {
+  const providers = []
+
+  // 1. BrandingProvider (conditional)
+  if (config.branding) {
+    providers.push(({ children }) => (
+      <BrandingProvider branding={config.branding}>{children}</BrandingProvider>
+    ))
+  }
+
+  // 2. ToastProvider
+  providers.push(({ children }) => (
+    <ToastProvider position={config.toast?.position} maxToasts={config.toast?.maxToasts}>
+      {children}
+    </ToastProvider>
+  ))
+
+  // 3. IconProvider
+  providers.push(({ children }) => (
+    <IconProvider set={config.icons?.set} weight={config.icons?.weight}
+      size={config.icons?.size} color={config.icons?.color}
+      strokeWidth={config.icons?.strokeWidth}>
+      {children}
+    </IconProvider>
+  ))
+
+  // 4. I18nProvider (via createZustandI18n)
+  providers.push(({ children }) => {
+    const i18n = createZustandI18n({ ... })
+    return <i18n.Provider>{children}</i18n.Provider>
+  })
+
+  // reduceRight for proper nesting (last = innermost)
+  return providers.reduceRight((acc, Provider) => <Provider>{acc}</Provider>, children)
+}
+```
+
+## HuaUxLayout
+
+HuaUxLayout = UnifiedProviders + extras:
+
+```tsx
+function HuaUxLayout({ children, config }) {
+  const resolvedConfig = config || getConfig()
+  return (
+    <UnifiedProviders config={resolvedConfig}>
+      <ThemeInjector branding={resolvedConfig.branding} />
+      <LanguageTransitionWrapper>{children}</LanguageTransitionWrapper>
+    </UnifiedProviders>
+  )
+}
+```
+
+- **ThemeInjector**: Calls `generateThemeCSS(branding?)`, injects CSS vars into `:root` and `.dark`
+- **LanguageTransitionWrapper**: Detects `useTranslation().isLoading`, applies opacity fade during translation loading
+
+## Manual Provider Composition
+
+You can compose providers manually instead of using UnifiedProviders:
+
+```tsx
+import { IconProvider } from '@hua-labs/ui'
+import { BrandingProvider } from '@hua-labs/hua-ux/framework'
+import { createZustandI18n } from '@hua-labs/i18n-core-zustand'
+
+const i18n = createZustandI18n({
+  languages: [
+    { code: 'ko', name: 'Korean', nativeName: '한국어' },
+    { code: 'en', name: 'English', nativeName: 'English' }
+  ],
+  defaultLanguage: 'ko'
+})
+
+function App({ children }) {
+  return (
+    <BrandingProvider branding={{ name: 'My App', colors: { primary: '#0ea5e9' } }}>
+      <IconProvider set="phosphor" weight="regular" size={20}>
+        <i18n.Provider>{children}</i18n.Provider>
+      </IconProvider>
+    </BrandingProvider>
+  )
+}
+```
+
+## Language Mapping
+
+UnifiedProviders internally maps language codes to i18n-core format:
+
+```typescript
+const LANGUAGE_MAP = {
+  'ko': { name: 'Korean', nativeName: '한국어' },
+  'en': { name: 'English', nativeName: 'English' },
+  'ja': { name: 'Japanese', nativeName: '日本語' },
+  'zh': { name: 'Chinese', nativeName: '中文' },
+}
+```
+
+## Examples
+
+### 1. Default usage (auto-composition)
+
+```tsx
+import { HuaUxLayout } from '@hua-labs/hua-ux/framework'
+import config from '../hua-ux.config'
+
+export default function Layout({ children }) {
+  return <HuaUxLayout config={config}>{children}</HuaUxLayout>
+}
+```
+
+### 2. Config override for provider customization
+
+```tsx
+import { UnifiedProviders, getConfig } from '@hua-labs/hua-ux/framework'
+
+function CustomLayout({ children }) {
+  const baseConfig = getConfig()
+  return (
+    <UnifiedProviders config={{
+      ...baseConfig,
+      icons: { ...baseConfig.icons, set: 'lucide' },
+      toast: { position: 'bottom-center', maxToasts: 3 }
+    }}>
+      {children}
+    </UnifiedProviders>
+  )
+}
+```
+
+### 3. Nested provider (section-level theme)
+
+```tsx
+import { IconProvider } from '@hua-labs/ui'
+
+function MarketingSection({ children }) {
+  return (
+    <IconProvider set="phosphor" weight="bold" size={28}>
+      {children}
+    </IconProvider>
+  )
+}
+```
+
+## Constraints & Gotchas
+
+- BrandingProvider is only added when `config.branding` exists. Without branding config, it's excluded from the chain.
+- Changing provider order may cause CSS variable access or language state issues. Follow the documented order for manual composition.
+- I18nProvider is Zustand store-based. Cannot be accessed directly in server components — use `getSSRTranslations` to pass initial values.
+- ToastProvider's `position` and `maxToasts` are config-only. Runtime changes are not supported.

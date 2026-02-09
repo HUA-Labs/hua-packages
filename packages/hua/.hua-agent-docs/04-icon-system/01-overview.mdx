@@ -1,0 +1,157 @@
+---
+title: Icon System Overview
+description: 3-provider icon architecture (Lucide/Phosphor/Iconsax) explained
+category: icon-system
+related:
+  - ./02-icon-names.mdx
+  - ./03-icon-provider-config.mdx
+  - ./04-special-icons.mdx
+---
+
+# Icon System Overview
+
+The hua-ui icon system provides **3 independent icon libraries** through a single unified API. Using `<Icon name="home" />` will render the appropriate icon based on the configured provider.
+
+## 3-Provider Architecture
+
+```
+┌─────────────────────────────────────────┐
+│            <Icon name="home" />          │
+│                    ↓                     │
+│         normalizeIconName("home")        │  ← alias resolution + camelCase conversion
+│                    ↓                     │
+│         PROJECT_ICONS["home"]            │  ← per-provider name mapping
+│            ↓         ↓         ↓         │
+│        Phosphor    Lucide    Iconsax     │
+│        "House"     "Home"    "Home2"     │
+│                    ↓                     │
+│         Render with the active provider  │
+└─────────────────────────────────────────┘
+```
+
+### Phosphor Icons (default provider)
+
+- **Bundling**: 96 core icons are statically imported (SSR-safe)
+- **Lazy fallback**: Icons not pre-imported are loaded dynamically
+- **Weight system**: thin / light / regular / bold / duotone / fill
+- **Import**: `@phosphor-icons/react/dist/ssr`
+- **Defaults**: weight=regular, size=20, strokeWidth=1.25
+
+### Lucide Icons (deprecated)
+
+- **Bundling**: All lazy-loaded (dynamic import on demand)
+- **Features**: Tree-shakable, customizable strokeWidth
+- **Status**: **deprecated** — maintained only for backward compatibility
+- **Defaults**: strokeWidth=1.25
+
+### Iconsax Icons (plugin)
+
+- **Bundling**: Separate entry point (`@hua-labs/ui/iconsax`)
+- **335 icons** (line + bold variants)
+- **Registration**: Plugin pattern — auto-registered on import
+- **Variant**: line (default) / bold
+- **Cache**: Once loaded, cached in memory
+
+```typescript
+// Activate Iconsax: just import to auto-register
+import '@hua-labs/ui/iconsax'
+
+// Then use the iconsax provider in Icon
+<Icon name="home" provider="iconsax" />
+```
+
+## Provider Selection Guide
+
+| Criteria | Phosphor (recommended) | Lucide | Iconsax |
+|----------|------------------------|--------|---------|
+| SSR | ✅ static import | ❌ lazy | ❌ lazy |
+| Weight variants | 6 types | ❌ | 2 types (line/bold) |
+| Bundle size | Medium (96 static) | Small (lazy) | Large (335) |
+| Icon count | 125+ | 125+ | 335 |
+| Status | **current default** | deprecated | optional plugin |
+| Style | Clean, consistent | Minimal, crisp | Rich, bold |
+
+## Icon Component Base Props
+
+```typescript
+interface IconProps {
+  name: AllIconName          // icon name (required)
+  size?: number | string     // size (default: IconProvider setting)
+  provider?: IconSet         // 'phosphor' | 'lucide' | 'iconsax'
+  weight?: PhosphorWeight    // Phosphor weight override
+  variant?: IconVariant      // color variant
+
+  // Animation
+  animated?: boolean         // smooth transition
+  pulse?: boolean            // pulse animation
+  spin?: boolean             // spin animation
+  bounce?: boolean           // bounce animation
+
+  // Special mapping
+  emotion?: EmotionType      // emotion icon mapping
+  status?: StatusType        // status icon mapping
+
+  // Accessibility
+  'aria-label'?: string
+  'aria-hidden'?: boolean
+}
+```
+
+## Rendering Pipeline
+
+1. **Input**: `<Icon name="back" provider="phosphor" />`
+2. **Alias resolution**: `back` → `arrowLeft` (looked up in ICON_ALIASES)
+3. **Normalization**: `arrowLeft` (already camelCase)
+4. **Provider mapping**: `PROJECT_ICONS['arrowLeft']` → Phosphor: `'ArrowLeft'`
+5. **Rendering**: Phosphor's `<ArrowLeft weight="regular" size={20} />`
+6. **Fallback**: If no icon is found, a `?` placeholder is displayed (dashed border)
+
+## SSR Safety
+
+The Icon component renders an empty `<span>` on the server:
+
+```tsx
+// Server rendering
+<span style={{ display: 'inline-block', width: 20, height: 20 }} />
+
+// After client hydration
+<svg>...</svg>  // actual icon
+```
+
+As a result, icons are invisible until hydration completes. The empty span occupies the same dimensions to prevent CLS (Cumulative Layout Shift).
+
+## Examples
+
+### 1. Basic usage
+
+```tsx
+import { Icon } from '@hua-labs/ui'
+
+<Icon name="home" />
+<Icon name="settings" size={24} />
+<Icon name="heart" variant="error" />
+```
+
+### 2. Provider override
+
+```tsx
+// Use a different provider for specific icons
+<Icon name="home" provider="lucide" />
+<Icon name="home" provider="iconsax" />
+```
+
+### 3. Animation
+
+```tsx
+<Icon name="loader" spin />        {/* loading spinner */}
+<Icon name="bell" pulse />         {/* notification indicator */}
+<Icon name="heart" bounce />       {/* like effect */}
+<Icon name="check" animated />     {/* smooth transition */}
+```
+
+## Constraints & Gotchas
+
+- Iconsax requires a one-time `import '@hua-labs/ui/iconsax'` to be usable. Using `provider="iconsax"` without this import will display the fallback (`?`).
+- Only 96 Phosphor icons are statically imported. The rest are dynamically loaded via `initPhosphorIcons()`, so there may be a slight delay on first render.
+- Passing a non-existent icon name to the `name` prop will display a `?` placeholder. Use the `AllIconName` TypeScript type for compile-time validation.
+- The Icon component uses `React.memo` with a custom equality check. It only re-renders when props actually change.

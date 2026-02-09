@@ -1,0 +1,226 @@
+---
+title: Special Icons
+description: EmotionIcon, StatusIcon, LoadingIcon + mapping tables
+category: icon-system
+related:
+  - ./01-overview.mdx
+  - ./02-icon-names.mdx
+---
+
+# Special Icons
+
+hua-ui provides icon components optimized for specific use cases such as emotions, statuses, and loading states.
+
+## EmotionIcon
+
+A wrapper component that maps emotion keys to icons. Directly integrates with my-app's emotion analysis.
+
+```tsx
+import { Icon } from '@hua-labs/ui'
+
+<Icon emotion="happy" />
+<Icon emotion="sad" />
+<Icon emotion="love" />
+```
+
+### Emotion Mapping Table
+
+| emotion key | → Icon Name | Description |
+|-------------|-------------|-------------|
+| `happy` | `smile` | Happiness |
+| `sad` | `frown` | Sadness |
+| `neutral` | `meh` | Neutral face |
+| `excited` | `smile` | Excitement (same as happy) |
+| `angry` | `frown` | Anger (same icon as sad) |
+| `love` | `heart` | Love |
+| `like` | `heart` | Like (same as love) |
+| `dislike` | `frown` | Dislike |
+
+```typescript
+// Internal implementation
+const emotionIcons = {
+  happy: 'smile',
+  sad: 'frown',
+  neutral: 'meh',
+  excited: 'smile',
+  angry: 'frown',
+  love: 'heart',
+  like: 'heart',
+  dislike: 'frown',
+}
+```
+
+### Dedicated EmotionIcon Component
+
+```tsx
+import { EmotionIcon } from '@hua-labs/ui'
+
+// Only the emotion prop is required
+<EmotionIcon emotion="happy" />
+<EmotionIcon emotion="sad" size={24} />
+```
+
+## StatusIcon
+
+A wrapper component that maps statuses to icons.
+
+```tsx
+import { Icon } from '@hua-labs/ui'
+
+<Icon status="loading" />
+<Icon status="success" />
+<Icon status="error" />
+```
+
+### Status Mapping Table
+
+| status key | → Icon Name | Auto Behavior |
+|------------|-------------|---------------|
+| `loading` | `loader` | spin animation |
+| `success` | `success` | success variant |
+| `error` | `error` | error variant |
+| `warning` | `warning` | warning variant |
+| `info` | `info` | — |
+| `locked` | `lock` | — |
+| `unlocked` | `unlock` | — |
+| `visible` | `eye` | — |
+| `hidden` | `eyeOff` | — |
+
+```typescript
+// Internal implementation
+const statusIcons = {
+  loading: 'loader',
+  success: 'success',
+  error: 'error',
+  warning: 'warning',
+  info: 'info',
+  locked: 'lock',
+  unlocked: 'unlock',
+  visible: 'eye',
+  hidden: 'eyeOff',
+}
+```
+
+### Dedicated StatusIcon Component
+
+```tsx
+import { StatusIcon } from '@hua-labs/ui'
+
+<StatusIcon status="success" />
+<StatusIcon status="error" size={24} />
+```
+
+## Pre-configured Shortcut Components
+
+Components with frequently used combinations pre-configured:
+
+### LoadingIcon
+
+```tsx
+import { LoadingIcon } from '@hua-labs/ui'
+
+// = <Icon name="loader" spin />
+<LoadingIcon />
+<LoadingIcon size={24} />
+```
+
+### SuccessIcon
+
+```tsx
+import { SuccessIcon } from '@hua-labs/ui'
+
+// = <Icon name="check" variant="success" />
+<SuccessIcon />
+```
+
+### ErrorIcon
+
+```tsx
+import { ErrorIcon } from '@hua-labs/ui'
+
+// = <Icon name="alertCircle" variant="error" />
+<ErrorIcon />
+```
+
+## Icon variant (color)
+
+```typescript
+type IconVariant =
+  | 'default'    // default (currentColor)
+  | 'primary'    // primary color
+  | 'secondary'  // secondary color
+  | 'success'    // green (success)
+  | 'warning'    // orange (warning)
+  | 'error'      // red (error)
+  | 'muted'      // faded gray
+  | 'inherit'    // inherit from parent
+```
+
+```tsx
+<Icon name="check" variant="success" />
+<Icon name="alertCircle" variant="error" />
+<Icon name="info" variant="primary" />
+<Icon name="clock" variant="muted" />
+```
+
+## Using emotion and status Together
+
+When both `emotion` and `status` are provided, `emotion` takes priority. However, using only one at a time is recommended.
+
+```tsx
+// emotion takes priority (name="smile")
+<Icon emotion="happy" status="success" />
+```
+
+## SSR Safety
+
+All special icons are based on the base Icon component, so they follow the same SSR pattern:
+- Server: empty `<span>` (same dimensions)
+- Client: actual SVG icon after hydration
+
+## Examples
+
+### 1. Displaying emotion analysis results
+
+```tsx
+function EmotionDisplay({ emotion }: { emotion: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Icon emotion={emotion as keyof typeof emotionIcons} size={24} />
+      <span>{emotion}</span>
+    </div>
+  )
+}
+```
+
+### 2. Form field status indicator
+
+```tsx
+function FieldStatus({ status }: { status: 'loading' | 'success' | 'error' }) {
+  return <Icon status={status} size={16} />
+}
+
+<Input
+  label="Email"
+  suffix={<FieldStatus status={isValidating ? 'loading' : isValid ? 'success' : 'error'} />}
+/>
+```
+
+### 3. Password visibility toggle
+
+```tsx
+function PasswordToggle({ visible, onToggle }) {
+  return (
+    <button onClick={onToggle}>
+      <Icon status={visible ? 'visible' : 'hidden'} size={18} />
+    </button>
+  )
+}
+```
+
+## Constraints & Gotchas
+
+- `excited` and `happy` in `emotionIcons` use the same `smile` icon. If you need visual distinction, use a separate custom icon.
+- `angry`, `sad`, and `dislike` all map to `frown`. For more nuanced emotion representation, specify the icon directly via the `name` prop.
+- The automatic `spin` animation for `status="loading"` is only guaranteed in the dedicated StatusIcon component. For the base `<Icon status="loading" />`, it is safer to explicitly add the `spin` prop.
+- Variant colors are implemented with Tailwind CSS classes. Custom themes must have the corresponding color variables defined.
