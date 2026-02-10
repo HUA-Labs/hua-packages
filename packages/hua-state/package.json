@@ -58,6 +58,9 @@
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
   "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true

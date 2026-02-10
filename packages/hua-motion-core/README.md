@@ -81,7 +81,7 @@ All hooks return a consistent `BaseMotionReturn` interface:
 ## Related Packages | 관련 패키지
 
 - [`@hua-labs/pro`](https://www.npmjs.com/package/@hua-labs/pro) — Advanced motion hooks (orchestration, auto-animations)
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — UX framework (includes motion)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (includes motion)
 
 ## Requirements | 요구사항
 

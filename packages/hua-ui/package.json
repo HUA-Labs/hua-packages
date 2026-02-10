@@ -180,10 +180,13 @@
   },
   "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
   "sideEffects": [
-    "**/*.css",
+    "./src/styles/*.css",
     "./dist/iconsax.mjs",
     "./dist/iconsax.js"
   ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true

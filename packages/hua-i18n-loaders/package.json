@@ -25,6 +25,9 @@
     "type-check": "tsc --noEmit"
   },
   "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "@hua-labs/i18n-core": "workspace:*"
   },
