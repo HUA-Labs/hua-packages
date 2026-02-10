@@ -41,7 +41,18 @@
   ],
   "author": "HUA Labs",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+  },
+  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
   "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
