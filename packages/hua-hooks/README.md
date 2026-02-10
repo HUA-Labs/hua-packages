@@ -1,7 +1,6 @@
 # @hua-labs/hooks
 
 Common React hooks for the hua ecosystem.
-hua 생태계를 위한 공통 React 훅 모음.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/hooks.svg)](https://www.npmjs.com/package/@hua-labs/hooks)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/hooks.svg)](https://www.npmjs.com/package/@hua-labs/hooks)
@@ -9,13 +8,9 @@ hua 생태계를 위한 공통 React 훅 모음.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 A collection of commonly used React hooks optimized for the hua ecosystem. Provides loading state management, auto-scroll functionality, and performance monitoring.
-
-hua 생태계에 최적화된 공통 React 훅 모음입니다. 로딩 상태 관리, 자동 스크롤, 성능 모니터링 기능을 제공합니다.
 
 ## Features
 
@@ -23,7 +18,7 @@ hua 생태계에 최적화된 공통 React 훅 모음입니다. 로딩 상태 �
 - **useAutoScroll** — Auto-scroll for chat-like interfaces with threshold control
 - **usePerformanceMonitor** — Runtime FPS, frame time, and memory tracking
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/hooks
@@ -31,7 +26,7 @@ pnpm add @hua-labs/hooks
 
 Peer dependency: `react >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { useLoading, useAutoScroll } from '@hua-labs/hooks';
@@ -51,7 +46,7 @@ function ChatView({ messages }: { messages: Message[] }) {
 }
 ```
 
-## API Overview | API 개요
+## API Overview
 
 | Hook | Returns | Description |
 |------|---------|-------------|
@@ -59,16 +54,16 @@ function ChatView({ messages }: { messages: Message[] }) {
 | `useAutoScroll(deps, opts?)` | `containerRef`, `isAtBottom`, `scrollToBottom`, `setIsAtBottom` | Chat-style auto-scroll |
 | `usePerformanceMonitor(opts?)` | `fps`, `frameTime`, `memory`, `isStable` | Runtime performance metrics |
 
-## Documentation | 문서
+## Documentation
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (re-exports these hooks)
 - [`@hua-labs/ui`](https://www.npmjs.com/package/@hua-labs/ui) — UI component library
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · TypeScript >= 5.9
 

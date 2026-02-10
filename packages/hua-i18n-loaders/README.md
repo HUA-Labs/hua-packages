@@ -1,7 +1,6 @@
 # @hua-labs/i18n-loaders
 
 Translation loaders with caching and preloading for @hua-labs/i18n-core.
-캐싱 및 프리로딩 기능을 갖춘 번역 로더.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-loaders.svg)](https://www.npmjs.com/package/@hua-labs/i18n-loaders)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/i18n-loaders.svg)](https://www.npmjs.com/package/@hua-labs/i18n-loaders)
@@ -9,13 +8,9 @@ Translation loaders with caching and preloading for @hua-labs/i18n-core.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 Production-ready translation loaders with built-in TTL caching, duplicate request prevention, and namespace preloading. Designed to work seamlessly with @hua-labs/i18n-core. Supports both server and client environments.
-
-TTL 캐싱, 중복 요청 방지, 네임스페이스 프리로딩이 내장된 프로덕션 레디 번역 로더입니다. @hua-labs/i18n-core와 원활하게 작동하도록 설계되었습니다. 서버/클라이언트 환경 모두 지원합니다.
 
 ## Features
 
@@ -25,7 +20,7 @@ TTL 캐싱, 중복 요청 방지, 네임스페이스 프리로딩이 내장된 �
 - **Preloading** — Warm up namespaces and fallback languages at startup
 - **Default merging** — Merge API translations with bundled defaults
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/i18n-loaders
@@ -33,7 +28,7 @@ pnpm add @hua-labs/i18n-loaders
 
 Peer dependency: `react >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { createCoreI18n } from '@hua-labs/i18n-core';
@@ -58,7 +53,7 @@ const I18nProvider = createCoreI18n({
 });
 ```
 
-## API Overview | API 개요
+## API Overview
 
 | Function | Description |
 |----------|-------------|
@@ -74,17 +69,17 @@ const I18nProvider = createCoreI18n({
 | `cacheTtlMs` | `number` | `300000` | Cache TTL in ms |
 | `enableGlobalCache` | `boolean` | `true` | Enable global cache |
 
-## Documentation | 문서
+## Documentation
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core) — Core i18n library
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand state adapter
 - [`@hua-labs/i18n-formatters`](https://www.npmjs.com/package/@hua-labs/i18n-formatters) — Date, number, currency formatters
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · TypeScript >= 5.9
 
