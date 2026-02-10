@@ -1,53 +1,117 @@
 # create-hua
 
-Scaffold HUA-UX projects with a single command.
-한 줄 명령어로 HUA-UX 프로젝트를 생성합니다.
+Interactively scaffold a Next.js + hua project.
 
 [![npm version](https://img.shields.io/npm/v/create-hua.svg)](https://www.npmjs.com/package/create-hua)
 [![npm downloads](https://img.shields.io/npm/dw/create-hua.svg)](https://www.npmjs.com/package/create-hua)
 [![license](https://img.shields.io/npm/l/create-hua.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
-
-A convenience alias for [`create-hua`](https://www.npmjs.com/package/create-hua). Generates a fully configured Next.js + hua project with TypeScript, Tailwind CSS, i18n, and animation support out of the box.
-
-[`create-hua`](https://www.npmjs.com/package/create-hua)의 편의 별칭입니다. TypeScript, Tailwind CSS, i18n, 애니메이션을 포함한 Next.js + hua 프로젝트를 즉시 생성합니다.
-
-## Features
-
-- **Zero config** — Production-ready project in seconds
-- **Next.js + hua** — Pre-wired UI, motion, i18n, and state management
-- **TypeScript** — Strict type checking enabled by default
-- **Interactive CLI** — Choose templates and options interactively
-
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```bash
 npx create-hua my-app
+cd my-app
+pnpm install
+pnpm dev
 ```
 
-Or use the full package name:
+The CLI walks you through interactive prompts to choose AI context files and documentation language.
+
+## What You Get
+
+Generated project structure:
+
+```
+my-app/
+├── app/                  # Next.js App Router
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── globals.css
+│   └── api/translations/ # i18n API route
+├── components/           # LanguageToggle, etc.
+├── lib/                  # i18n-setup, utils
+├── store/                # Zustand store (useAppStore)
+├── translations/         # ko/en JSON translation files
+├── hua.config.ts         # hua framework config (preset, i18n, motion, state)
+├── next.config.ts
+├── tailwind.config.js    # Auto-generated with monorepo awareness
+├── tsconfig.json
+└── package.json          # Dependencies auto-configured
+```
+
+### Pre-wired Stack
+
+| Category | Included |
+|----------|----------|
+| Framework | Next.js 16, React 19, TypeScript 5.9 |
+| Styling | Tailwind CSS 4, PostCSS |
+| State | Zustand 5 (SSR + persist pre-configured) |
+| i18n | `@hua-labs/hua` i18n (ko/en, API route loader) |
+| Motion | `@hua-labs/hua` motion (product/marketing presets) |
+| Icons | Phosphor Icons |
+| AI Context | .cursorrules, ai-context.md, .claude/ (optional) |
+
+## CLI Options
 
 ```bash
-npx create-hua my-app
+npx create-hua <project-name> [options]
 ```
 
-## Documentation | 문서
+| Flag | Description |
+|------|-------------|
+| `--lang ko\|en\|both` | AI context documentation language (default: both) |
+| `--claude-skills` | Include Claude skills files |
+| `--no-cursorrules` | Skip .cursorrules generation |
+| `--no-ai-context` | Skip ai-context.md generation |
+| `--no-claude-context` | Skip .claude/project-context.md generation |
+| `--install` | Run `pnpm install` automatically after creation |
+| `--dry-run` | Preview without creating files |
+| `--non-interactive` | Use defaults without prompts |
+| `--english-only` | Display CLI messages in English only |
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+### Doctor Command
 
-## Related Packages | 관련 패키지
+Diagnose an existing project's health:
 
-- [`create-hua`](https://www.npmjs.com/package/create-hua) — Full scaffolding tool (this package delegates to it)
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — The UX framework installed by this CLI
+```bash
+npx create-hua doctor [path]
+```
 
-## Requirements | 요구사항
+Checks: package.json, hua.config.ts, required directories, translation file JSON syntax, Node.js/pnpm versions.
 
-Node.js >= 18.0.0
+## Configuration
+
+The generated `hua.config.ts` controls most settings via presets:
+
+```typescript
+import { defineConfig } from '@hua-labs/hua/framework/config';
+
+export default defineConfig({
+  preset: 'product',      // 'product' | 'marketing'
+  i18n: { defaultLanguage: 'ko', supportedLanguages: ['ko', 'en'] },
+  motion: { defaultPreset: 'product', enableAnimations: true },
+  state: { persist: true, ssr: true },
+});
+```
+
+## Monorepo Support
+
+Automatically detects pnpm workspace environments:
+
+- Dependency versions resolve to `workspace:*`
+- `tailwind.config.js` content paths reference monorepo packages directly
+
+## Requirements
+
+- Node.js >= 22.0.0
+- pnpm
+
+## Related Packages
+
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UI + motion + i18n + state framework
+- [`@hua-labs/ui`](https://www.npmjs.com/package/@hua-labs/ui) — React UI component library
+
+> `create-hua-ux` has been renamed to this package. (deprecated)
 
 ## License
 

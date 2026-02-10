@@ -1,7 +1,6 @@
 # @hua-labs/state
 
 Unified state management for the hua ecosystem with SSR support.
-hua 생태계를 위한 SSR 지원 통합 상태 관리 솔루션.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
@@ -9,13 +8,9 @@ hua 생태계를 위한 SSR 지원 통합 상태 관리 솔루션.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
-
-hua 생태계에 최적화된 Zustand 기반 상태 관리 래퍼입니다. SSR hydration 자동 처리, partialize를 지원하는 localStorage 영속성, React 및 Next.js를 위한 i18n 통합을 제공합니다.
 
 ## Features
 
@@ -25,7 +20,7 @@ hua 생태계에 최적화된 Zustand 기반 상태 관리 래퍼입니다. SSR 
 - **i18n integration** — Pre-configured store for language management
 - **Type-safe** — Full TypeScript support with strict typing
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/state
@@ -33,7 +28,7 @@ pnpm add @hua-labs/state
 
 Peer dependencies: `react >= 19.0.0`, `react-dom >= 19.0.0`, `zustand >= 5.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { createHuaStore } from '@hua-labs/state';
@@ -59,14 +54,14 @@ function ThemeToggle() {
 }
 ```
 
-## Entry Points | 진입점
+## Entry Points
 
 | Path | Description |
 |------|-------------|
 | `@hua-labs/state` | `createHuaStore` and core state utilities |
 | `@hua-labs/state/integrations/i18n` | `createI18nStore` for language management |
 
-## API Overview | API 개요
+## API Overview
 
 | Function | Description |
 |----------|-------------|
@@ -82,16 +77,16 @@ function ThemeToggle() {
 | `ssr` | `boolean` | `false` | Enable SSR hydration handling |
 | `partialize` | `(state) => Partial` | — | Select state to persist |
 
-## Documentation | 문서
+## Documentation
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand i18n adapter
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (uses this for state)
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · React DOM >= 19.0.0 · Zustand >= 5.0.0 · TypeScript >= 5.9
 

@@ -1,7 +1,6 @@
 # @hua-labs/motion-core
 
 Production-ready React animation hooks — zero dependencies, SSR-ready.
-프로덕션 레디 React 애니메이션 훅 — 의존성 없음, SSR 지원.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
@@ -9,13 +8,9 @@ Production-ready React animation hooks — zero dependencies, SSR-ready.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 A collection of 25+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible.
-
-ref 기반 엔진으로 구축된 25개 이상의 React 애니메이션 훅 컬렉션입니다. 외부 의존성 없이 직접 DOM 조작으로 일관된 성능을 제공합니다. 모든 훅은 TypeScript 네이티브이며 SSR 호환됩니다.
 
 ## Features
 
@@ -25,7 +20,7 @@ ref 기반 엔진으로 구축된 25개 이상의 React 애니메이션 훅 컬�
 - **SSR compatible** — Works with Next.js, Remix, and SSR frameworks
 - **Tested** — 517 test cases
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/motion-core
@@ -33,7 +28,7 @@ pnpm add @hua-labs/motion-core
 
 Peer dependencies: `react >= 19.0.0`, `react-dom >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { useFadeIn, useSlideUp } from '@hua-labs/motion-core';
@@ -51,7 +46,7 @@ function Hero() {
 }
 ```
 
-## API Overview | API 개요
+## API Overview
 
 All hooks return a consistent `BaseMotionReturn` interface:
 
@@ -73,17 +68,16 @@ All hooks return a consistent `BaseMotionReturn` interface:
 | List | `useStaggerMotion`, `useCardList`, `useSkeleton` |
 | Utility | `useMotionState`, `useRepeat`, `useSmartMotion`, `useUnifiedMotion`, `useSimplePageMotion`, `usePageMotions`, `useGesture`, `useGestureMotion` |
 
-## Documentation | 문서
+## Documentation
 
 - [Detailed Guide](./DETAILED_GUIDE.md)
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
-- [`@hua-labs/pro`](https://www.npmjs.com/package/@hua-labs/pro) — Advanced motion hooks (orchestration, auto-animations)
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (includes motion)
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · React DOM >= 19.0.0 · TypeScript >= 5.9
 

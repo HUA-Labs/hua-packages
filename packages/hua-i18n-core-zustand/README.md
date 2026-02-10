@@ -1,7 +1,6 @@
 # @hua-labs/i18n-core-zustand
 
 Zustand adapter for @hua-labs/i18n-core with type-safe state integration.
-Zustand 상태 관리와 i18n-core를 타입 안전하게 통합하는 어댑터.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-core-zustand.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/i18n-core-zustand.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand)
@@ -9,13 +8,10 @@ Zustand 상태 관리와 i18n-core를 타입 안전하게 통합하는 어댑터
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
 
-## Overview | 개요
+## Overview
 
 Type-safe adapter for integrating Zustand state management with @hua-labs/i18n-core. Provides seamless language state synchronization with SSR hydration support and circular reference prevention.
-
-Zustand 상태 관리와 @hua-labs/i18n-core를 타입 안전하게 통합하는 어댑터입니다. SSR hydration 지원 및 순환 참조 방지와 함께 원활한 언어 상태 동기화를 제공합니다.
 
 ## Features
 
@@ -25,7 +21,7 @@ Zustand 상태 관리와 @hua-labs/i18n-core를 타입 안전하게 통합하는
 - **Circular reference prevention** — Safe unidirectional data flow
 - **Minimal** — Only Zustand as peer dependency
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/i18n-core-zustand
@@ -33,7 +29,7 @@ pnpm add @hua-labs/i18n-core-zustand
 
 Peer dependencies: `zustand ^4.0.0 || ^5.0.0`, `react >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { createZustandI18n } from '@hua-labs/i18n-core-zustand';
@@ -61,7 +57,7 @@ function MyComponent() {
 }
 ```
 
-## API Overview | API 개요
+## API Overview
 
 | Function | Description |
 |----------|-------------|
@@ -80,17 +76,17 @@ function MyComponent() {
 | `initialTranslations` | `Record<...>` | SSR pre-loaded translations |
 | `debug` | `boolean` | Enable debug mode |
 
-## Documentation | 문서
+## Documentation
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core) — Core i18n library
 - [`@hua-labs/i18n-loaders`](https://www.npmjs.com/package/@hua-labs/i18n-loaders) — Translation loaders and caching
 - [`@hua-labs/state`](https://www.npmjs.com/package/@hua-labs/state) — State management
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · Zustand ^4.0.0 || ^5.0.0 · TypeScript >= 5.9
 

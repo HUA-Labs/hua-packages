@@ -1,7 +1,6 @@
 # @hua-labs/utils
 
 Common utility functions for the hua ecosystem.
-hua 생태계를 위한 공통 유틸리티 함수 모음.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
@@ -9,13 +8,9 @@ hua 생태계를 위한 공통 유틸리티 함수 모음.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions.
-
-hua 생태계를 위한 종합 유틸리티 라이브러리입니다. Tailwind 클래스 병합, 포맷터, 성능 유틸리티, 유효성 검사, 문자열 조작, 살균 함수를 포함합니다.
 
 ## Features
 
@@ -26,7 +21,7 @@ hua 생태계를 위한 종합 유틸리티 라이브러리입니다. Tailwind �
 - **String utils** — UUID, slugify, truncate, case conversion (camel/pascal/snake/kebab)
 - **Sanitization** — XSS prevention, HTML escaping, email masking
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/utils
@@ -34,7 +29,7 @@ pnpm add @hua-labs/utils
 
 Peer dependency: `react >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { cn, formatTimeAgo, debounce, validateEmail, sanitizeInput } from '@hua-labs/utils';
@@ -53,7 +48,7 @@ validateEmail('test@example.com'); // true
 sanitizeInput('<script>alert("xss")</script>'); // safe string
 ```
 
-## API Overview | API 개요
+## API Overview
 
 | Category | Functions |
 |----------|-----------|
@@ -64,16 +59,16 @@ sanitizeInput('<script>alert("xss")</script>'); // safe string
 | Strings | `generateId`, `generateUUID`, `slugify`, `truncate`, `toCamelCase`, `toPascalCase`, `toSnakeCase`, `toKebabCase`, `capitalize`, `titleCase` |
 | Sanitization | `sanitizeInput`, `sanitizeTitle`, `sanitizeEmail`, `sanitizeName`, `escapeHtml`, `maskEmailForLog` |
 
-## Documentation | 문서
+## Documentation
 
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (re-exports these utils)
 - [`@hua-labs/hooks`](https://www.npmjs.com/package/@hua-labs/hooks) — React hooks collection
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · TypeScript >= 5.9
 

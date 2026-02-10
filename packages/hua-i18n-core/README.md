@@ -1,7 +1,6 @@
 # @hua-labs/i18n-core
 
 Type-safe i18n library with SSR/CSR support and zero-flicker language transitions.
-SSR/CSR 지원 및 깜빡임 없는 언어 전환을 제공하는 타입 안전 i18n 라이브러리.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
 [![npm downloads](https://img.shields.io/npm/dw/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
@@ -9,13 +8,9 @@ SSR/CSR 지원 및 깜빡임 없는 언어 전환을 제공하는 타입 안전 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-> **Alpha**: APIs may change before stable release. | **알파**: 안정 릴리스 전 API가 변경될 수 있습니다.
-
-## Overview | 개요
+## Overview
 
 Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~2.8KB gzipped with zero dependencies (React only).
-
-React를 위한 경량 프로덕션 레디 i18n 라이브러리입니다. 지능적 캐싱, SSR 우선 hydration 처리, 내장 상태 관리 통합을 통해 깜빡임 없는 언어 전환을 제공합니다. React만 의존하며 ~2.8KB gzipped.
 
 ## Features
 
@@ -26,7 +21,7 @@ React를 위한 경량 프로덕션 레디 i18n 라이브러리입니다. 지능
 - **Automatic retry** — Exponential backoff for API loader failures
 - **~2.8KB gzipped** — Zero external dependencies
 
-## Installation | 설치
+## Installation
 
 ```bash
 pnpm add @hua-labs/i18n-core
@@ -34,7 +29,7 @@ pnpm add @hua-labs/i18n-core
 
 Peer dependency: `react >= 19.0.0`
 
-## Quick Start | 빠른 시작
+## Quick Start
 
 ```tsx
 import { createCoreI18n, useTranslation } from '@hua-labs/i18n-core';
@@ -65,7 +60,7 @@ function Welcome() {
 }
 ```
 
-## API Overview | API 개요
+## API Overview
 
 | Function | Description |
 |----------|-------------|
@@ -90,18 +85,18 @@ function Welcome() {
 - `t('namespace:key', { name: 'World' })` — With interpolation
 - `getRawValue('namespace:key')` — Get arrays, objects, or non-string values
 
-## Documentation | 문서
+## Documentation
 
 - [Detailed Guide](./DETAILED_GUIDE.md)
-- [📚 Documentation Site | 문서 사이트](https://docs.hua-labs.com)
+- [Documentation Site](https://docs.hua-labs.com)
 
-## Related Packages | 관련 패키지
+## Related Packages
 
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand state adapter
 - [`@hua-labs/i18n-loaders`](https://www.npmjs.com/package/@hua-labs/i18n-loaders) — Translation loaders and caching
 - [`@hua-labs/i18n-formatters`](https://www.npmjs.com/package/@hua-labs/i18n-formatters) — Date, number, currency formatters
 
-## Requirements | 요구사항
+## Requirements
 
 React >= 19.0.0 · TypeScript >= 5.9
 
