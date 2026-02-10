@@ -94,7 +94,7 @@ function App() {
 
 ## Related Packages | 관련 패키지
 
-- [`@hua-labs/hua-ux`](https://www.npmjs.com/package/@hua-labs/hua-ux) — UX framework (UI + Motion + i18n)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (UI + Motion + i18n)
 - [`@hua-labs/ui-dashboard`](https://www.npmjs.com/package/@hua-labs/ui-dashboard) — Dashboard domain components
 - [`@hua-labs/motion-core`](https://www.npmjs.com/package/@hua-labs/motion-core) — Animation hooks
 

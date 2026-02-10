@@ -17,17 +17,17 @@
       "default": "./dist/advanced.mjs"
     },
     "./advanced/dashboard": {
-      "types": "./dist/advanced-dashboard.d.ts",
+      "types": "./dist/advanced/dashboard.d.ts",
       "import": "./dist/advanced-dashboard.mjs",
       "default": "./dist/advanced-dashboard.mjs"
     },
     "./advanced/motion": {
-      "types": "./dist/advanced-motion.d.ts",
+      "types": "./dist/advanced/motion.d.ts",
       "import": "./dist/advanced-motion.mjs",
       "default": "./dist/advanced-motion.mjs"
     },
     "./advanced/emotion": {
-      "types": "./dist/advanced-emotion.d.ts",
+      "types": "./dist/components/advanced/emotion/index.d.ts",
       "import": "./dist/advanced-emotion.mjs",
       "default": "./dist/advanced-emotion.mjs"
     },
