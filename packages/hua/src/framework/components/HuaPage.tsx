@@ -11,6 +11,9 @@ import type { HuaPageProps } from '../types';
 import { getConfig } from '../config';
 import { useMotion } from '../hooks/useMotion';
 import { ErrorBoundary } from './ErrorBoundary';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('hua:page');
 
 /**
  * HuaPage Component
@@ -102,8 +105,8 @@ export function HuaPage({
   // SEO 설정이 있으면 개발자에게 경고 메시지 표시 (개발 모드에서만)
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'development' && seo) {
-      console.warn(
-        '[HuaPage] SEO metadata should be set using `export const metadata` in page.tsx.\n' +
+      log.warn(
+        'SEO metadata should be set using `export const metadata` in page.tsx. ' +
         'Use `generatePageMetadata()` helper function from @hua-labs/hua/framework'
       );
     }

@@ -158,7 +158,7 @@ export default defineConfig({
 
 ```typescript
 // packages/hua/src/framework/config/schema.ts
-export interface HuaUxConfig {
+export interface HuaConfig {
   // Core
   preset?: 'product' | 'marketing' | 'dashboard' | 'minimal';
   strictMode?: boolean;
@@ -192,8 +192,8 @@ export interface HuaUxConfig {
 // packages/hua/src/framework/config/merge.ts
 export function mergePresetWithConfig(
   preset: Preset,
-  userConfig: Partial<HuaUxConfig>
-): HuaUxConfig {
+  userConfig: Partial<HuaConfig>
+): HuaConfig {
   // Preset defaults + user config merge
   // User config takes priority
   return {
@@ -208,7 +208,7 @@ export function mergePresetWithConfig(
 
 ```typescript
 // packages/hua/src/framework/config/index.ts
-export function loadConfig(): HuaUxConfig {
+export function loadConfig(): HuaConfig {
   // 1. Attempt to load config file
   // 2. If none, use Preset defaults (product)
   // 3. If no Preset, use minimum defaults
@@ -221,7 +221,7 @@ export function loadConfig(): HuaUxConfig {
 ### 1. Component-Level Opt-out
 
 ```typescript
-// Skip HuaUxPage and use pure Next.js
+// Skip HuaPage and use pure Next.js
 export default function Page() {
   return <div>Content</div>;  // No framework
 }
@@ -249,7 +249,7 @@ export default defineConfig({
 ### 3. Provider-Level Opt-out
 
 ```typescript
-// Use specific providers directly instead of HuaUxLayout
+// Use specific providers directly instead of HuaProvider
 import { I18nProvider } from './lib/i18n-setup';
 
 export default function Layout({ children }) {
@@ -277,7 +277,7 @@ const configSchema = z.object({
   // ...
 });
 
-export function validateConfig(config: unknown): HuaUxConfig {
+export function validateConfig(config: unknown): HuaConfig {
   return configSchema.parse(config);
 }
 ```
@@ -285,9 +285,9 @@ export function validateConfig(config: unknown): HuaUxConfig {
 ### Compile-Time Validation with TypeScript
 
 ```typescript
-export function defineConfig<T extends Partial<HuaUxConfig>>(
+export function defineConfig<T extends Partial<HuaConfig>>(
   config: T
-): HuaUxConfig {
+): HuaConfig {
   // Type check + runtime validation
   return validateConfig(config);
 }
@@ -312,7 +312,7 @@ export function defineConfig<T extends Partial<HuaUxConfig>>(
  * });
  * ```
  */
-export function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig {
+export function defineConfig(config: Partial<HuaConfig>): HuaConfig {
   // ...
 }
 ```

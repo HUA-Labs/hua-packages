@@ -22,10 +22,11 @@ const FREE_LICENSE: LicenseInfo = {
 
 /**
  * API 키 검증 (미구현 - 향후 구현)
- * 
+ *
  * 실제 구현 시에는 서버 API를 호출하여 라이선스를 검증합니다.
  * In actual implementation, this would call a server API to validate the license.
- * 
+ *
+ * @internal This is a placeholder implementation. Real license validation will be added later.
  * @param apiKey - API 키
  * @returns 라이선스 정보 또는 null
  */
@@ -59,7 +60,8 @@ function validateLicenseKey(apiKey: string): LicenseInfo | null {
 
 /**
  * 환경 변수에서 라이선스 로드
- * 
+ *
+ * @internal This is a placeholder implementation. Real license validation will be added later.
  * @returns 라이선스 정보 또는 null
  */
 function loadLicenseFromEnv(): LicenseInfo | null {
@@ -78,7 +80,8 @@ function loadLicenseFromEnv(): LicenseInfo | null {
 
 /**
  * 설정 파일에서 라이선스 로드
- * 
+ *
+ * @internal This is a placeholder implementation. Real license validation will be added later.
  * @param configLicense - 설정 파일의 라이선스 정보
  * @returns 라이선스 정보 또는 null
  */

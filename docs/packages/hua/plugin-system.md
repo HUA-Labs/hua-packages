@@ -35,9 +35,9 @@ Brand themes for white-labeling.
 ```typescript
 // packages/hua/src/plugins/types.ts
 import type { ZodSchema } from 'zod';
-import type { HuaUxConfig } from '../types';
+import type { HuaConfig } from '../types';
 
-export interface HuaUxPlugin {
+export interface HuaPlugin {
   /**
    * Plugin name
    */
@@ -51,7 +51,7 @@ export interface HuaUxPlugin {
   /**
    * Plugin initialization
    */
-  init(config: HuaUxConfig): void;
+  init(config: HuaConfig): void;
 
   /**
    * Component extensions
@@ -75,17 +75,17 @@ export interface HuaUxPlugin {
 ```typescript
 // packages/hua/src/framework/plugins/registry.ts
 class PluginRegistry {
-  private plugins: Map<string, HuaUxPlugin> = new Map();
+  private plugins: Map<string, HuaPlugin> = new Map();
 
-  register(plugin: HuaUxPlugin): void {
+  register(plugin: HuaPlugin): void {
     this.plugins.set(plugin.name, plugin);
   }
 
-  get(name: string): HuaUxPlugin | undefined {
+  get(name: string): HuaPlugin | undefined {
     return this.plugins.get(name);
   }
 
-  getAll(): HuaUxPlugin[] {
+  getAll(): HuaPlugin[] {
     return Array.from(this.plugins.values());
   }
 }
@@ -116,9 +116,9 @@ export default defineConfig({
 
 ```typescript
 // packages/my-plugin/src/index.ts
-import type { HuaUxPlugin } from '@hua-labs/hua/framework';
+import type { HuaPlugin } from '@hua-labs/hua/framework';
 
-export const myPlugin: HuaUxPlugin = {
+export const myPlugin: HuaPlugin = {
   name: 'my-plugin',
   version: '1.0.0',
 
@@ -184,9 +184,9 @@ export default function Page() {
 
 ```typescript
 // analytics-plugin.ts
-import type { HuaUxPlugin } from '@hua-labs/hua/framework';
+import type { HuaPlugin } from '@hua-labs/hua/framework';
 
-export const analyticsPlugin: HuaUxPlugin = {
+export const analyticsPlugin: HuaPlugin = {
   name: 'analytics',
   version: '1.0.0',
   description: 'Page view and event tracking',
@@ -238,7 +238,7 @@ import {
   getAllPlugins       // Get all plugins
 } from '@hua-labs/hua/framework';
 
-import type { HuaUxPlugin } from '@hua-labs/hua/framework';
+import type { HuaPlugin } from '@hua-labs/hua/framework';
 ```
 
 ## Implementation Files

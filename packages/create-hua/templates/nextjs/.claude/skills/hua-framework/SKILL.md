@@ -17,7 +17,7 @@ This skill guides you on how to develop Next.js applications using the hua frame
 ```
 IF (creating a new page or component) THEN
   1. Use hua framework components first
-     → Wrap page with `HuaUxPage`
+     → Wrap page with `HuaPage`
      → Use components from `@hua-labs/ui` first
   2. Generate translation files together
      → `translations/ko/{namespace}.json`
@@ -36,7 +36,7 @@ END IF
 ### Top Layer: Framework & Config
 - `hua.config.ts`: Framework configuration
 - `HuaProvider`: Automatic Provider setup
-- `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
+- `HuaPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 
 ### Bottom Layer: Core Packages
 - `@hua-labs/ui`: UI component library
@@ -50,23 +50,23 @@ END IF
 
 ```tsx
 // app/my-page/page.tsx
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
   
   return (
-    <HuaUxPage title={t('title')} description={t('description')}>
+    <HuaPage title={t('title')} description={t('description')}>
       <h1>{t('title')}</h1>
       {/* content */}
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
 
 **Important**:
-- Wrapping with `HuaUxPage` automatically applies Motion, i18n, SEO
+- Wrapping with `HuaPage` automatically applies Motion, i18n, SEO
 - Add translation keys to `translations/{language}/my-page.json`
 - Create as Server Component (default)
 
@@ -126,7 +126,7 @@ export function MyComponent() {
 - See `ai-context.md` for detailed list
 
 ### @hua-labs/hua/framework
-- `HuaUxPage`: Page wrapper
+- `HuaPage`: Page wrapper
 - `HuaProvider`: Layout
 - `UnifiedProviders`: Provider unification
 - `useMotion`: Unified motion hook
@@ -173,7 +173,7 @@ export default defineConfig({
 ## Guidelines for Claude Code Generation
 
 1. **When Creating Pages**:
-   - Wrap with `HuaUxPage`
+   - Wrap with `HuaPage`
    - Generate translation files together
    - Use `useTranslation` hook
    - Prefer Server Components
@@ -193,6 +193,8 @@ export default defineConfig({
 
 ## References
 
-- `ai-context.md`: Detailed project structure explanation
-- `.cursorrules`: Cursor IDE rules
+- `ai-context.md`: Detailed project structure explanation (SSOT)
+- `.cursor/rules/hua-framework.mdc`: Cursor IDE rules
+- `AGENTS.md`: OpenAI Codex context
+- `skills.md`: Antigravity skills
 - Framework docs: `node_modules/@hua-labs/hua/README.md`

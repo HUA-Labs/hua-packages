@@ -55,7 +55,7 @@ function initLicense(configLicense?: { apiKey?: string; type?: LicenseType }): v
 Loads and caches the license.
 
 **Loading priority:**
-1. `HUA_UX_LICENSE_KEY` environment variable
+1. `HUA_LICENSE_KEY` environment variable
 2. `configLicense` parameter
 3. Default (Free)
 
@@ -148,7 +148,7 @@ function initWhiteLabeling(config) {
 export default defineConfig({
   license: {
     type: 'pro',
-    apiKey: process.env.HUA_UX_LICENSE_KEY
+    apiKey: process.env.HUA_LICENSE_KEY
   }
 })
 ```
@@ -157,7 +157,7 @@ export default defineConfig({
 
 ```bash
 # .env
-HUA_UX_LICENSE_KEY=your-license-key-here
+HUA_LICENSE_KEY=your-license-key-here
 ```
 
 ```typescript

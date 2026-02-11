@@ -26,7 +26,7 @@ hua operates across three Next.js runtime environments (Server, Client, Edge). U
 ```tsx
 // ❌ Importing framework in a Server Component
 // → The 'use client' directive propagates, converting this file to a client module
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 
 export default async function Layout({ children }) {
   // This is an async function, but it runs on the client → not the intended behavior
@@ -63,12 +63,12 @@ export default async function Layout({ children }) {
 
 // app/client-layout.tsx (Client Component)
 'use client'
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 
 export function ClientLayout({ translations, children }) {
-  return <HuaUxLayout config={{ i18n: { initialTranslations: translations } }}>
+  return <HuaProvider config={{ i18n: { initialTranslations: translations } }}>
     {children}
-  </HuaUxLayout>
+  </HuaProvider>
 }
 ```
 
@@ -102,7 +102,7 @@ Next.js middleware runs in the Edge Runtime.
 ```typescript
 // ✅ Only framework/shared can be used
 import { createI18nMiddleware } from '@hua-labs/hua/framework/shared'
-import type { HuaUxConfig, GEOConfig } from '@hua-labs/hua/framework/shared'
+import type { HuaConfig, GEOConfig } from '@hua-labs/hua/framework/shared'
 ```
 
 ### Not Available in Edge
@@ -111,7 +111,7 @@ import type { HuaUxConfig, GEOConfig } from '@hua-labs/hua/framework/shared'
 |----------|------|
 | `getSSRTranslations` | Uses the fs module |
 | `loadConfig` | Uses the fs module + eval |
-| `HuaUxLayout` | 'use client' (cannot render React components in Edge) |
+| `HuaProvider` | 'use client' (cannot render React components in Edge) |
 | `defineConfig` | Initializes license/plugins internally (side effects) |
 
 ### Edge Runtime Alternatives
@@ -176,7 +176,7 @@ Solution:
 
 ```
 Cause: Using hooks outside a Provider (useBranding, useIconContext, etc.)
-Solution: Use within HuaUxLayout or UnifiedProviders
+Solution: Use within HuaProvider or UnifiedProviders
 ```
 
 ### 5. "'use client' directive propagation"

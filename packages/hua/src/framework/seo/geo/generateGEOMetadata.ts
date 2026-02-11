@@ -8,6 +8,9 @@
 import type { GEOConfig, GEOMetadata } from './types';
 import { META_NAMES, OG_PROPERTIES } from './types';
 import { generateSoftwareApplicationLD } from './structuredData';
+import { createLogger } from '../../../utils/logger';
+
+const log = createLogger('hua:seo:geo');
 
 /**
  * Generate GEO (Generative Engine Optimization) Metadata
@@ -184,8 +187,8 @@ export function generateGEOMetadata(config: GEOConfig): GEOMetadata {
   }
 
   if (config.description.length > 160) {
-    console.warn(
-      `[GEO] Description is ${config.description.length} characters. ` +
+    log.warn(
+      `Description is ${config.description.length} characters. ` +
       `Consider keeping it under 160 for better AI parsing.`
     );
   }

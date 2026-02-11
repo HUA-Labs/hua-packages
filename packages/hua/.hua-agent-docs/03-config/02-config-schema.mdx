@@ -1,6 +1,6 @@
 ---
 title: Config Schema
-description: Full HuaUxConfig schema reference
+description: Full HuaConfig schema reference
 category: config
 related:
   - ./01-define-config.mdx
@@ -24,7 +24,7 @@ interface HuaConfig {
   icons?: IconsConfig
   toast?: ToastConfig
   branding?: BrandingConfig
-  plugins?: HuaUxPlugin[]
+  plugins?: HuaPlugin[]
   license?: LicenseConfig
 }
 ```
@@ -113,5 +113,5 @@ type Preset = PresetName | PresetConfig
 - `i18n.defaultLanguage` must be included in `supportedLanguages`. Validation error otherwise.
 - When `branding` is defined, BrandingProvider is automatically added to the provider chain.
 - Each plugin in `plugins` must have a unique `name`. Duplicates trigger a warning and are overwritten.
-- Without `license.apiKey`, the system checks `HUA_UX_LICENSE_KEY` env var. Both missing = free license.
+- Without `license.apiKey`, the system checks `HUA_LICENSE_KEY` env var. Both missing = free license.
 - `toast` settings cannot be changed at runtime. Applied once during provider initialization.

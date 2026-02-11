@@ -212,10 +212,19 @@ function App() {
 | `UseWindowSizeReturn` | type |  |
 
 
+## Documentation
+
+- [Documentation Site](https://docs.hua-labs.com)
+
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
-- [`@hua-labs/ui-dashboard`](https://www.npmjs.com/package/@hua-labs/ui-dashboard)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — Framework (UI + Motion + i18n)
+- [`@hua-labs/ui-dashboard`](https://www.npmjs.com/package/@hua-labs/ui-dashboard) — Dashboard domain components
+- [`@hua-labs/motion-core`](https://www.npmjs.com/package/@hua-labs/motion-core) — Animation hooks
+
+## Requirements
+
+React >= 19.0.0 · React DOM >= 19.0.0 · Tailwind CSS · TypeScript >= 5.9
 
 ## License
 
