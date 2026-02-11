@@ -32,6 +32,9 @@ import 'server-only';
 import fs from 'fs';
 import path from 'path';
 import type { HuaConfig } from '../types';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('hua:i18n:ssr');
 
 /**
  * SSR 번역 데이터 로드
@@ -91,10 +94,7 @@ export async function getSSRTranslations(
       } catch (error) {
         // 에러 발생 시 빈 객체 (개발 환경에서만 경고)
         if (process.env.NODE_ENV === 'development') {
-          console.warn(
-            `[hua] Failed to load SSR translation for ${lang}/${namespace}:`,
-            error
-          );
+          log.warn('Failed to load SSR translation', { lang, namespace, error: String(error) });
         }
         initialTranslations[lang][namespace] = {};
       }

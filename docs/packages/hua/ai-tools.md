@@ -143,7 +143,7 @@ const motion = useFadeIn({ duration: 300 });
 
 **Provides**:
 - `defineConfig` (declarative configuration)
-- `HuaUxLayout` (auto Provider setup)
+- `HuaProvider` (auto Provider setup)
 - Preset system (one word resolves most things)
 
 ```typescript
@@ -182,17 +182,17 @@ AI grasps context more accurately with adjectives/nouns expressing 'intent' rath
 
 #### 2. Many Decisions in One File
 
-`HuaUxPage` combines SEO, Motion, and i18n Key all as props:
+`HuaPage` combines SEO, Motion, and i18n Key all as props:
 
 ```tsx
-<HuaUxPage
+<HuaPage
   title="Main Page"
   description="Welcome"
   i18nKey="home"
   motion="fadeIn"
 >
   {/* AI generates a complete page from just one file */}
-</HuaUxPage>
+</HuaPage>
 ```
 
 #### 3. Strong Type System (Guides AI Autocomplete)

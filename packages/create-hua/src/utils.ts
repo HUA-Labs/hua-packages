@@ -10,6 +10,16 @@ import { execSync } from 'child_process';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { HUA_VERSION } from './version';
+import {
+  MIN_NODE_VERSION,
+  AI_CONTEXT_FILES,
+  isEnglishOnly,
+  isInteractive,
+  t,
+  compareVersions,
+  validateProjectName,
+  listEnabledAiFiles,
+} from './shared';
 
 /**
  * Detect which package manager was used to run the CLI
@@ -46,29 +56,12 @@ const TEMPLATE_DIR = path.join(__dirname, '../templates/nextjs');
  * AI context generation options
  */
 export interface AiContextOptions {
-  /**
-   * Generate .cursorrules file
-   */
-  cursorrules: boolean;
-
-  /**
-   * Generate ai-context.md file
-   */
+  cursorRules: boolean;
   aiContext: boolean;
-
-  /**
-   * Generate .claude/project-context.md file
-   */
+  agentsMd: boolean;
+  skillsMd: boolean;
   claudeContext: boolean;
-
-  /**
-   * Generate .claude/skills/ files
-   */
   claudeSkills: boolean;
-
-  /**
-   * Language for documentation (ko, en, both)
-   */
   language: 'ko' | 'en' | 'both';
 }
 
@@ -79,43 +72,11 @@ interface MonorepoContext {
 }
 
 /**
- * Check if English-only mode is enabled
- */
-function isEnglishOnly(): boolean {
-  return process.env.LANG === 'en' || process.env.CLI_LANG === 'en' || process.argv.includes('--english-only');
-}
-
-/**
- * Get localized message
- */
-function t(key: 'projectNamePrompt' | 'projectNameRequired' | 'selectAiContext' | 'documentationLanguage'): string {
-  if (isEnglishOnly()) {
-    const messages: Record<string, string> = {
-      projectNamePrompt: 'What is your project name?',
-      projectNameRequired: 'Project name is required',
-      selectAiContext: 'Select AI context files to generate:',
-      documentationLanguage: 'Documentation language:',
-    };
-    return messages[key] || key;
-  }
-
-  // Bilingual (Korean + English)
-  const messages: Record<string, string> = {
-    projectNamePrompt: 'What is your project name? / 프로젝트 이름을 입력하세요:',
-    projectNameRequired: 'Project name is required / 프로젝트 이름이 필요합니다',
-    selectAiContext: 'Select AI context files to generate / 생성할 AI 컨텍스트 파일을 선택하세요:',
-    documentationLanguage: 'Documentation language / 문서 언어:',
-  };
-  return messages[key] || key;
-}
-
-/**
- * Prompt for project name
+ * Prompt for project name with npm naming validation
  */
 export async function promptProjectName(): Promise<string> {
-  // If not interactive, cannot prompt
   if (!isInteractive()) {
-    throw new Error('Project name is required when running in non-interactive mode. Please provide it as an argument: npx tsx src/index.ts <project-name>');
+    throw new Error('Project name is required when running in non-interactive mode. Please provide it as an argument: npx create-hua <project-name>');
   }
 
   const { projectName } = await inquirer.prompt([
@@ -124,54 +85,14 @@ export async function promptProjectName(): Promise<string> {
       name: 'projectName',
       message: t('projectNamePrompt'),
       validate: (input: string) => {
-        if (!input.trim()) {
-          return t('projectNameRequired');
-        }
+        const result = validateProjectName(input);
+        if (!result.valid) return result.message!;
         return true;
       },
     },
   ]);
 
   return projectName;
-}
-
-/**
- * Check if running in interactive mode
- * 
- * For PowerShell and other environments, we check:
- * 1. stdin/stdout are TTY (if available)
- * 2. Not in CI environment
- * 3. Not explicitly set to non-interactive
- * 4. stdin is readable (not piped)
- * 
- * In PowerShell, isTTY might be undefined, so we use a more lenient check.
- */
-function isInteractive(): boolean {
-  // Explicitly non-interactive via environment variable
-  if (process.env.CI || process.env.NON_INTERACTIVE) {
-    return false;
-  }
-
-  // Explicitly non-interactive via CLI flag
-  if (process.argv.includes('--non-interactive')) {
-    return false;
-  }
-
-  // Check if stdin is TTY (available in most terminals)
-  // In PowerShell, this might be undefined, so we check if it's explicitly false
-  // If undefined, we assume it might be interactive (PowerShell can be interactive)
-  const stdinTTY = process.stdin.isTTY;
-  const stdoutTTY = process.stdout.isTTY;
-
-  // If both are explicitly false, definitely not interactive
-  if (stdinTTY === false && stdoutTTY === false) {
-    return false;
-  }
-
-  // If either is true, or both are undefined (PowerShell case), assume interactive
-  // This allows inquirer to attempt to use prompts
-  // Inquirer will handle the actual TTY check internally
-  return stdinTTY !== false && stdoutTTY !== false;
 }
 
 /**
@@ -189,19 +110,19 @@ export async function isEmptyDir(dirPath: string): Promise<boolean> {
  * Prompt for AI context generation options
  */
 export async function promptAiContextOptions(): Promise<AiContextOptions> {
-  // If not interactive, use defaults
   if (!isInteractive()) {
     console.log('Running in non-interactive mode, using default options...');
     return {
-      cursorrules: true,
+      cursorRules: true,
       aiContext: true,
+      agentsMd: true,
+      skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
       language: 'both',
     };
   }
 
-  // Use inquirer with proper error handling
   try {
     const isEn = isEnglishOnly();
     const answers = await inquirer.prompt([
@@ -211,13 +132,23 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
         message: t('selectAiContext'),
         choices: [
           {
-            name: isEn ? '.cursorrules (Cursor IDE rules)' : '.cursorrules (Cursor IDE rules) / Cursor IDE 규칙',
-            value: 'cursorrules',
+            name: isEn ? '.cursor/rules/ (Cursor IDE rules)' : '.cursor/rules/ (Cursor IDE rules) / Cursor IDE 규칙',
+            value: 'cursorRules',
             checked: true,
           },
           {
             name: isEn ? 'ai-context.md (General AI context)' : 'ai-context.md (General AI context) / 범용 AI 컨텍스트',
             value: 'aiContext',
+            checked: true,
+          },
+          {
+            name: isEn ? 'AGENTS.md (OpenAI Codex)' : 'AGENTS.md (OpenAI Codex) / Codex 컨텍스트',
+            value: 'agentsMd',
+            checked: true,
+          },
+          {
+            name: isEn ? 'skills.md (Antigravity)' : 'skills.md (Antigravity) / Antigravity 스킬',
+            value: 'skillsMd',
             checked: true,
           },
           {
@@ -246,18 +177,21 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
     ]);
 
     return {
-      cursorrules: answers.options.includes('cursorrules'),
+      cursorRules: answers.options.includes('cursorRules'),
       aiContext: answers.options.includes('aiContext'),
+      agentsMd: answers.options.includes('agentsMd'),
+      skillsMd: answers.options.includes('skillsMd'),
       claudeContext: answers.options.includes('claudeContext'),
       claudeSkills: answers.options.includes('claudeSkills'),
       language: answers.language || 'both',
     };
   } catch (error) {
-    // If inquirer fails (e.g., in non-interactive environment), use defaults
     console.warn('Failed to get interactive input, using default options...');
     return {
-      cursorrules: true,
+      cursorRules: true,
       aiContext: true,
+      agentsMd: true,
+      skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
       language: 'both',
@@ -267,10 +201,6 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
 
 /**
  * Copy template files to project directory
- * 
- * @param projectPath - Target project directory
- * @param options - Copy options
- * @param options.skipAiContext - Skip AI context files (.cursorrules, ai-context.md, .claude/)
  */
 export async function copyTemplate(
   projectPath: string,
@@ -278,18 +208,17 @@ export async function copyTemplate(
 ): Promise<void> {
   await fs.copy(TEMPLATE_DIR, projectPath, {
     filter: (src: string) => {
-      // Use relative path to avoid issues with template being inside node_modules
       const relativePath = path.relative(TEMPLATE_DIR, src);
 
-      // Skip node_modules and .git within the template
       if (relativePath.includes('node_modules') || relativePath.includes('.git')) {
         return false;
       }
 
-      // Conditionally skip AI context files
       if (options?.skipAiContext) {
-        if (relativePath === '.cursorrules' ||
-          relativePath === 'ai-context.md' ||
+        if (relativePath === 'ai-context.md' ||
+          relativePath === 'AGENTS.md' ||
+          relativePath === 'skills.md' ||
+          relativePath.startsWith('.cursor') ||
           relativePath.startsWith('.claude')) {
           return false;
         }
@@ -303,75 +232,44 @@ export async function copyTemplate(
 /**
  * Get hua package version
  *
- * 모노레포 내부에서는 workspace 버전을, 외부에서는 npm 버전을 사용
- *
- * 감지 우선순위:
- * 1. 환경 변수 (HUA_WORKSPACE_VERSION)
- * 2. pnpm-workspace.yaml 파일 존재 여부 (더 견고한 방법)
- * 3. 폴더 이름 기반 감지 (하위 호환성)
- * 4. hua 패키지의 package.json에서 버전 읽기 (자동화)
- * 5. npm 버전 (기본값)
+ * Detection priority:
+ * 1. HUA_WORKSPACE_VERSION env var
+ * 2. Monorepo detection (packages/hua/package.json)
+ * 3. Fallback: HUA_VERSION constant (set at build time)
  */
 function getHuaVersion(): string {
-  // 1. 환경 변수 우선 확인
+  // 1. Explicit workspace env
   if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
     return 'workspace:*';
   }
 
-  // 2. pnpm-workspace.yaml 파일 존재 여부로 모노레포 감지 (더 견고한 방법)
+  // 2. Monorepo: look for sibling hua package
   try {
-    const fs = require('fs');
-    const path = require('path');
-    let currentDir = process.cwd();
-    const maxDepth = 10; // 최대 10단계 상위 디렉토리까지 확인
-
-    for (let i = 0; i < maxDepth; i++) {
-      const workspaceFile = path.join(currentDir, 'pnpm-workspace.yaml');
-      if (fs.existsSync(workspaceFile)) {
-        return 'workspace:*';
-      }
-      const parentDir = path.dirname(currentDir);
-      if (parentDir === currentDir) break; // 루트 도달
-      currentDir = parentDir;
-    }
-  } catch (error) {
-    // fs 모듈을 사용할 수 없는 경우 (Edge Runtime 등) 무시
-  }
-
-  // 3. 하위 호환성: 폴더 이름 기반 감지 (기존 방식)
-  const cwd = process.cwd();
-  if (cwd.includes('hua-platform') && !cwd.includes('node_modules')) {
-    return 'workspace:*';
-  }
-
-  // 4. hua 패키지의 package.json에서 버전 읽기 (자동화)
-  // create-hua 패키지에서 hua 패키지의 package.json을 읽어서 버전 추출
-  try {
-    const fs = require('fs');
-    const path = require('path');
-
-    // create-hua의 위치에서 hua 패키지 찾기
-    // __dirname은 dist/utils.js 또는 src/utils.ts의 위치
-    // dist/utils.js인 경우: packages/create-hua/dist/utils.js
-    // src/utils.ts인 경우: packages/create-hua/src/utils.ts
-    const currentFile = __dirname;
-    const createHuaRoot = path.resolve(currentFile, '../..');
+    const createHuaRoot = path.resolve(__dirname, '..');
     const huaPackageJson = path.join(createHuaRoot, '../hua/package.json');
 
-    if (fs.existsSync(huaPackageJson)) {
-      const huaPackage = JSON.parse(fs.readFileSync(huaPackageJson, 'utf-8'));
-      const version = huaPackage.version;
-      if (version) {
-        // 버전 앞에 ^ 추가 (예: 0.1.0 -> ^0.1.0)
-        return `^${version}`;
+    if (fs.pathExistsSync(huaPackageJson)) {
+      const huaPackage = fs.readJSONSync(huaPackageJson);
+      // If we can read sibling package, we're in a monorepo
+      if (huaPackage.version) {
+        // Check for pnpm-workspace.yaml to confirm monorepo
+        let currentDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          if (fs.pathExistsSync(path.join(currentDir, 'pnpm-workspace.yaml'))) {
+            return 'workspace:*';
+          }
+          const parentDir = path.dirname(currentDir);
+          if (parentDir === currentDir) break;
+          currentDir = parentDir;
+        }
+        return `^${huaPackage.version}`;
       }
     }
-  } catch (error) {
-    // 파일을 읽을 수 없는 경우 무시하고 다음 단계로
+  } catch {
+    // Cannot read sibling package, continue to fallback
   }
 
-  // 5. 빌드 시점에 생성된 버전 상수 사용 (npm 배포 후)
-  // 빌드 스크립트에서 hua 패키지의 버전을 읽어서 생성한 상수
+  // 3. Build-time constant (npm publish)
   return HUA_VERSION;
 }
 
@@ -460,14 +358,10 @@ export async function generatePackageJson(
 ): Promise<void> {
   const packageJsonPath = path.join(projectPath, 'package.json');
 
-  // 기존 package.json이 있다면 삭제 (템플릿에서 복사된 파일이 있을 수 있음)
   if (await fs.pathExists(packageJsonPath)) {
     await fs.remove(packageJsonPath);
   }
 
-  // @hua-labs/hua가 i18n-core, i18n-core-zustand, motion-core, state를
-  // 전부 transitive dependency로 제공하므로 직접 추가하지 않음.
-  // 직접 추가하면 npm이 별도 복사본을 설치하여 React Context 중복 문제 발생.
   const packageJson = {
     name: projectName,
     version: '0.1.0',
@@ -591,23 +485,23 @@ export async function generateConfig(projectPath: string): Promise<void> {
 
 /**
  * hua 프레임워크 설정
- * 
+ *
  * Preset을 선택하면 대부분의 설정이 자동으로 적용됩니다.
  * - 'product': 제품 페이지용 (전문적, 효율적)
  * - 'marketing': 마케팅 페이지용 (화려함, 눈에 띄는)
- * 
+ *
  * **바이브 모드 (간단)**: \`preset: 'product'\`
  * **개발자 모드 (세부 설정)**: \`preset: { type: 'product', motion: {...} }\`
  */
 export default defineConfig({
   /**
    * 프리셋 선택
-   * 
+   *
    * Preset을 선택하면 motion, spacing, i18n 등이 자동 설정됩니다.
-   * 
+   *
    * 바이브 모드 (간단):
    *   preset: 'product'
-   * 
+   *
    * 개발자 모드 (세부 설정):
    *   preset: {
    *     type: 'product',
@@ -615,7 +509,7 @@ export default defineConfig({
    *   }
    */
   preset: 'product',
-  
+
   /**
    * 다국어 설정
    */
@@ -626,13 +520,13 @@ export default defineConfig({
     translationLoader: 'api',
     translationApiPath: '/api/translations',
   },
-  
+
   /**
    * 모션/애니메이션 설정
-   * 
+   *
    * 바이브 코더용 (명사 중심):
    *   motion: { style: 'smooth' }  // 'smooth' | 'dramatic' | 'minimal'
-   * 
+   *
    * 개발자용 (기술적):
    *   motion: {
    *     defaultPreset: 'product',
@@ -645,7 +539,7 @@ export default defineConfig({
     enableAnimations: true,
     // style: 'smooth',  // 바이브 코더용: 'smooth' | 'dramatic' | 'minimal'
   },
-  
+
   /**
    * 상태 관리 설정
    */
@@ -653,12 +547,12 @@ export default defineConfig({
     persist: true,
     ssr: true,
   },
-  
+
   /**
    * 브랜딩 설정 (화이트 라벨링)
-   * 
+   *
    * 색상, 타이포그래피 등을 설정하면 모든 컴포넌트에 자동 적용됩니다.
-   * 
+   *
    * branding: {
    *   colors: {
    *     primary: '#3B82F6',
@@ -671,10 +565,10 @@ export default defineConfig({
   //     primary: '#3B82F6',
   //   },
   // },
-  
+
   /**
    * 라이선스 설정 (Pro/Enterprise 플러그인 사용 시)
-   * 
+   *
    * license: {
    *   apiKey: process.env.HUA_LICENSE_KEY,
    * }
@@ -682,10 +576,10 @@ export default defineConfig({
   // license: {
   //   apiKey: process.env.HUA_LICENSE_KEY,
   // },
-  
+
   /**
    * 플러그인 설정 (Pro/Enterprise 기능)
-   * 
+   *
    * plugins: [
    *   motionProPlugin,
    *   i18nProPlugin,
@@ -705,7 +599,7 @@ export default defineConfig({
   } catch (error) {
     console.warn(
       chalk.yellow(
-        `⚠️  Failed to generate Tailwind config: ${error instanceof Error ? error.message : String(error)}`
+        `Warning: Failed to generate Tailwind config: ${error instanceof Error ? error.message : String(error)}`
       )
     );
   }
@@ -713,9 +607,8 @@ export default defineConfig({
 
 /**
  * Generate AI context files
- * 
- * Cursor, Claude 등 다양한 AI 도구를 위한 컨텍스트 파일 생성
- * 템플릿 파일을 복사한 후 프로젝트별 정보를 동적으로 추가합니다.
+ *
+ * Data-driven: uses AI_CONTEXT_FILES from shared.ts to remove disabled files.
  */
 export async function generateAiContextFiles(
   projectPath: string,
@@ -723,50 +616,33 @@ export async function generateAiContextFiles(
   options?: AiContextOptions
 ): Promise<void> {
   const opts = options || {
-    cursorrules: true,
+    cursorRules: true,
     aiContext: true,
+    agentsMd: true,
+    skillsMd: true,
     claudeContext: true,
     claudeSkills: false,
     language: 'both',
   };
 
-  // 옵션에 따라 파일 삭제 (생성하지 않을 파일)
-  if (!opts.cursorrules) {
-    const cursorrulesPath = path.join(projectPath, '.cursorrules');
-    if (await fs.pathExists(cursorrulesPath)) {
-      await fs.remove(cursorrulesPath);
+  // Data-driven: remove files for disabled options
+  for (const entry of AI_CONTEXT_FILES) {
+    if (!opts[entry.key]) {
+      for (const p of entry.paths) {
+        const fullPath = path.join(projectPath, p);
+        if (await fs.pathExists(fullPath)) {
+          await fs.remove(fullPath);
+        }
+      }
     }
   }
 
-  if (!opts.aiContext) {
-    const aiContextPath = path.join(projectPath, 'ai-context.md');
-    if (await fs.pathExists(aiContextPath)) {
-      await fs.remove(aiContextPath);
-    }
-  }
-
-  if (!opts.claudeContext) {
-    const claudeContextPath = path.join(projectPath, '.claude', 'project-context.md');
-    if (await fs.pathExists(claudeContextPath)) {
-      await fs.remove(claudeContextPath);
-    }
-  }
-
-  if (!opts.claudeSkills) {
-    const claudeSkillsPath = path.join(projectPath, '.claude', 'skills');
-    if (await fs.pathExists(claudeSkillsPath)) {
-      await fs.remove(claudeSkillsPath);
-    }
-  }
-
-  // 프로젝트별 커스터마이징
+  // Project-specific customization
   if (projectName) {
-    // ai-context.md에 프로젝트 이름 추가
     if (opts.aiContext) {
       const aiContextPath = path.join(projectPath, 'ai-context.md');
       if (await fs.pathExists(aiContextPath)) {
         let content = await fs.readFile(aiContextPath, 'utf-8');
-        // Add project name to document header
         content = content.replace(
           /^# hua Project AI Context/,
           `# ${projectName} - hua Project AI Context\n\n**Project Name**: ${projectName}`
@@ -775,7 +651,6 @@ export async function generateAiContextFiles(
       }
     }
 
-    // .claude/project-context.md에도 프로젝트 이름 추가
     if (opts.claudeContext) {
       const claudeContextPath = path.join(projectPath, '.claude', 'project-context.md');
       if (await fs.pathExists(claudeContextPath)) {
@@ -789,7 +664,7 @@ export async function generateAiContextFiles(
     }
   }
 
-  // package.json에서 실제 설치된 패키지 버전 정보 추출하여 컨텍스트에 추가
+  // Inject package version info into ai-context.md
   const packageJsonPath = path.join(projectPath, 'package.json');
   if (await fs.pathExists(packageJsonPath)) {
     try {
@@ -797,30 +672,27 @@ export async function generateAiContextFiles(
       const dependencies = packageJson.dependencies || {};
       const devDependencies = packageJson.devDependencies || {};
 
-      // 버전 정보를 ai-context.md에 추가
       if (opts.aiContext) {
         const aiContextPath = path.join(projectPath, 'ai-context.md');
         if (await fs.pathExists(aiContextPath)) {
           let content = await fs.readFile(aiContextPath, 'utf-8');
 
-          // 의존성 정보 섹션 추가
           const depsSection = `
-## 설치된 패키지 버전 / Installed Package Versions
+## Installed Package Versions
 
-### 핵심 의존성 / Core Dependencies
+### Core Dependencies
 ${Object.entries(dependencies)
-              .filter(([name]) => name.startsWith('@hua-labs/') || name === 'next' || name === 'react')
-              .map(([name, version]) => `- \`${name}\`: ${version}`)
-              .join('\n')}
+            .filter(([name]) => name.startsWith('@hua-labs/') || name === 'next' || name === 'react')
+            .map(([name, version]) => `- \`${name}\`: ${version}`)
+            .join('\n')}
 
-### 개발 의존성 / Dev Dependencies
+### Dev Dependencies
 ${Object.entries(devDependencies)
-              .filter(([name]) => name.includes('typescript') || name.includes('tailwind') || name.includes('@types'))
-              .map(([name, version]) => `- \`${name}\`: ${version}`)
-              .join('\n')}
+            .filter(([name]) => name.includes('typescript') || name.includes('tailwind') || name.includes('@types'))
+            .map(([name, version]) => `- \`${name}\`: ${version}`)
+            .join('\n')}
 `;
 
-          // 참고 자료 섹션 앞에 추가
           content = content.replace(
             /## 참고 자료/,
             `${depsSection}\n## 참고 자료`
@@ -830,7 +702,6 @@ ${Object.entries(devDependencies)
         }
       }
     } catch (error) {
-      // package.json 파싱 실패 시 무시 (선택적 기능)
       console.warn('Failed to extract package versions for AI context:', error);
     }
   }
@@ -838,8 +709,6 @@ ${Object.entries(devDependencies)
 
 /**
  * Check prerequisites before project creation
- * 
- * Verifies Node.js version, pnpm installation, and template integrity
  */
 export async function checkPrerequisites(): Promise<void> {
   const isEn = isEnglishOnly();
@@ -848,29 +717,11 @@ export async function checkPrerequisites(): Promise<void> {
 
   // 1. Node.js version check
   const nodeVersion = process.version;
-  const requiredVersion = '22.0.0';
-
-  // Simple version comparison (major.minor.patch)
-  const parseVersion = (v: string): number[] => {
-    return v.replace(/^v/, '').split('.').map(Number);
-  };
-
-  const compareVersions = (v1: string, v2: string): number => {
-    const v1Parts = parseVersion(v1);
-    const v2Parts = parseVersion(v2);
-
-    for (let i = 0; i < 3; i++) {
-      if (v1Parts[i] > v2Parts[i]) return 1;
-      if (v1Parts[i] < v2Parts[i]) return -1;
-    }
-    return 0;
-  };
-
-  if (compareVersions(nodeVersion, requiredVersion) < 0) {
+  if (compareVersions(nodeVersion, MIN_NODE_VERSION) < 0) {
     errors.push(
       isEn
-        ? `Node.js ${requiredVersion}+ required. Current: ${nodeVersion}`
-        : `Node.js ${requiredVersion}+ 필요합니다. 현재: ${nodeVersion}`
+        ? `Node.js ${MIN_NODE_VERSION}+ required. Current: ${nodeVersion}`
+        : `Node.js ${MIN_NODE_VERSION}+ 필요합니다. 현재: ${nodeVersion}`
     );
   }
 
@@ -896,17 +747,15 @@ export async function checkPrerequisites(): Promise<void> {
     );
   }
 
-  // Display warnings
   if (warnings.length > 0) {
-    console.log(chalk.yellow('\n⚠️  Warnings:'));
+    console.log(chalk.yellow('\nWarnings:'));
     warnings.forEach(w => console.log(chalk.yellow(`  - ${w}`)));
   }
 
-  // Throw error if prerequisites not met
   if (errors.length > 0) {
     const errorMessage = isEn
-      ? `Prerequisites check failed:\n${errors.map(e => `  ❌ ${e}`).join('\n')}\n\n💡 Tips:\n  - Update Node.js: https://nodejs.org/\n  - Install pnpm: npm install -g pnpm`
-      : `사전 검증 실패:\n${errors.map(e => `  ❌ ${e}`).join('\n')}\n\n💡 팁:\n  - Node.js 업데이트: https://nodejs.org/\n  - pnpm 설치: npm install -g pnpm`;
+      ? `Prerequisites check failed:\n${errors.map(e => `  - ${e}`).join('\n')}\n\nTips:\n  - Update Node.js: https://nodejs.org/\n  - Install pnpm: npm install -g pnpm`
+      : `사전 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}\n\n팁:\n  - Node.js 업데이트: https://nodejs.org/\n  - pnpm 설치: npm install -g pnpm`;
 
     throw new Error(errorMessage);
   }
@@ -914,11 +763,8 @@ export async function checkPrerequisites(): Promise<void> {
 
 /**
  * Validate template files integrity
- * 
- * Checks if all required template files exist before project creation
  */
 export async function validateTemplate(): Promise<void> {
-  // Check if template directory exists
   if (!(await fs.pathExists(TEMPLATE_DIR))) {
     const isEn = isEnglishOnly();
     throw new Error(
@@ -928,7 +774,6 @@ export async function validateTemplate(): Promise<void> {
     );
   }
 
-  // Note: package.json is generated dynamically, not in template
   const requiredFiles = [
     'tsconfig.json',
     'next.config.ts',
@@ -942,7 +787,9 @@ export async function validateTemplate(): Promise<void> {
     'translations/ko/common.json',
     'translations/en/common.json',
     'ai-context.md',
-    '.cursorrules',
+    'AGENTS.md',
+    'skills.md',
+    '.cursor/rules/hua-framework.mdc',
   ];
 
   const missingFiles: string[] = [];
@@ -966,56 +813,62 @@ export async function validateTemplate(): Promise<void> {
 
 /**
  * Validate generated project
- * 
- * 프로젝트 생성 후 필수 파일과 설정이 올바르게 생성되었는지 검증
  */
 export async function validateGeneratedProject(projectPath: string): Promise<void> {
+  const isEn = isEnglishOnly();
   const errors: string[] = [];
 
-  // 1. package.json 검증
+  // 1. package.json
   const packageJsonPath = path.join(projectPath, 'package.json');
   if (!(await fs.pathExists(packageJsonPath))) {
-    const isEn = isEnglishOnly();
     errors.push(isEn ? 'package.json file was not created' : 'package.json 파일이 생성되지 않았습니다.');
   } else {
     try {
       const packageJson = await fs.readJSON(packageJsonPath);
 
-      // lint 스크립트 검증
       if (packageJson.scripts?.lint !== 'next lint') {
-        errors.push(`package.json의 lint 스크립트가 올바르지 않습니다. 예상: "next lint", 실제: "${packageJson.scripts?.lint}"`);
+        errors.push(
+          isEn
+            ? `package.json lint script is incorrect. Expected: "next lint", Got: "${packageJson.scripts?.lint}"`
+            : `package.json의 lint 스크립트가 올바르지 않습니다. 예상: "next lint", 실제: "${packageJson.scripts?.lint}"`
+        );
       }
 
-      // 필수 의존성 검증
       const requiredDeps = ['@hua-labs/hua', 'next', 'react', 'react-dom'];
       for (const dep of requiredDeps) {
         if (!packageJson.dependencies?.[dep]) {
-          errors.push(`필수 의존성 ${dep}이 package.json에 없습니다.`);
+          errors.push(
+            isEn
+              ? `Required dependency ${dep} is missing from package.json`
+              : `필수 의존성 ${dep}이 package.json에 없습니다.`
+          );
         }
       }
     } catch (error) {
-      errors.push(`package.json 파싱 실패: ${error}`);
+      errors.push(
+        isEn
+          ? `Failed to parse package.json: ${error}`
+          : `package.json 파싱 실패: ${error}`
+      );
     }
   }
 
-  // 2. hua.config.ts 검증
+  // 2. hua.config.ts
   const configPath = path.join(projectPath, 'hua.config.ts');
   if (!(await fs.pathExists(configPath))) {
-    const isEn = isEnglishOnly();
     errors.push(isEn ? 'hua.config.ts file was not created' : 'hua.config.ts 파일이 생성되지 않았습니다.');
   }
 
-  // 3. 필수 디렉토리 검증
+  // 3. Required directories
   const requiredDirs = ['app', 'lib', 'store', 'translations'];
   for (const dir of requiredDirs) {
     const dirPath = path.join(projectPath, dir);
     if (!(await fs.pathExists(dirPath))) {
-      const isEn = isEnglishOnly();
       errors.push(isEn ? `Required directory ${dir} was not created` : `필수 디렉토리 ${dir}가 생성되지 않았습니다.`);
     }
   }
 
-  // 4. 필수 파일 검증
+  // 4. Required files
   const requiredFiles = [
     'app/layout.tsx',
     'app/page.tsx',
@@ -1025,17 +878,14 @@ export async function validateGeneratedProject(projectPath: string): Promise<voi
   for (const file of requiredFiles) {
     const filePath = path.join(projectPath, file);
     if (!(await fs.pathExists(filePath))) {
-      const isEn = isEnglishOnly();
       errors.push(isEn ? `Required file ${file} was not created` : `필수 파일 ${file}이 생성되지 않았습니다.`);
     }
   }
 
-  // 에러가 있으면 예외 발생
   if (errors.length > 0) {
-    const isEn = isEnglishOnly();
     throw new Error(isEn
-      ? `Project validation failed:\n${errors.map(e => `  ❌ ${e}`).join('\n')}\n\n💡 Tips:\n  - Check file permissions\n  - Ensure disk space is available\n  - Try running again`
-      : `프로젝트 검증 실패:\n${errors.map(e => `  ❌ ${e}`).join('\n')}\n\n💡 팁:\n  - 파일 권한 확인\n  - 디스크 공간 확인\n  - 다시 실행해보세요`);
+      ? `Project validation failed:\n${errors.map(e => `  - ${e}`).join('\n')}\n\nTips:\n  - Check file permissions\n  - Ensure disk space is available\n  - Try running again`
+      : `프로젝트 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}\n\n팁:\n  - 파일 권한 확인\n  - 디스크 공간 확인\n  - 다시 실행해보세요`);
   }
 }
 
@@ -1078,8 +928,8 @@ export async function validateTranslationFiles(projectPath: string): Promise<voi
   if (errors.length > 0) {
     throw new Error(
       isEn
-        ? `Translation files validation failed:\n${errors.map(e => `  ❌ ${e}`).join('\n')}`
-        : `번역 파일 검증 실패:\n${errors.map(e => `  ❌ ${e}`).join('\n')}`
+        ? `Translation files validation failed:\n${errors.map(e => `  - ${e}`).join('\n')}`
+        : `번역 파일 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}`
     );
   }
 }
@@ -1103,8 +953,7 @@ export async function generateSummary(
     try {
       const items = await fs.readdir(dirPath, { withFileTypes: true });
       for (const item of items) {
-        // Skip hidden files and common ignore patterns
-        if (item.name.startsWith('.') && item.name !== '.cursorrules' && !item.name.startsWith('.claude')) {
+        if (item.name.startsWith('.') && !item.name.startsWith('.cursor') && !item.name.startsWith('.claude')) {
           continue;
         }
         if (item.name === 'node_modules' || item.name === '.git') {
@@ -1120,19 +969,15 @@ export async function generateSummary(
         }
       }
     } catch (error) {
-      // Ignore permission errors or other issues
+      // Ignore permission errors
     }
   };
 
   await countItems(projectPath);
 
-  const aiContextFiles: string[] = [];
-  if (aiContextOptions) {
-    if (aiContextOptions.cursorrules) aiContextFiles.push('.cursorrules');
-    if (aiContextOptions.aiContext) aiContextFiles.push('ai-context.md');
-    if (aiContextOptions.claudeContext) aiContextFiles.push('.claude/project-context.md');
-    if (aiContextOptions.claudeSkills) aiContextFiles.push('.claude/skills/');
-  }
+  const aiContextFiles = aiContextOptions
+    ? listEnabledAiFiles(aiContextOptions)
+    : [];
 
   const languages: string[] = [];
   if (aiContextOptions?.language === 'ko' || aiContextOptions?.language === 'both') {
@@ -1159,20 +1004,18 @@ export function displaySummary(summary: {
   aiContextFiles: string[];
   languages: string[];
 }): void {
-  const isEn = isEnglishOnly();
-
-  console.log(chalk.cyan('\n📊 Summary:'));
-  console.log(chalk.white(`  📁 Directories: ${summary.directories}`));
-  console.log(chalk.white(`  📄 Files: ${summary.files}`));
+  console.log(chalk.cyan('\nSummary:'));
+  console.log(chalk.white(`  Directories: ${summary.directories}`));
+  console.log(chalk.white(`  Files: ${summary.files}`));
 
   if (summary.aiContextFiles.length > 0) {
-    console.log(chalk.white(`  🤖 AI Context: ${summary.aiContextFiles.join(', ')}`));
+    console.log(chalk.white(`  AI Context: ${summary.aiContextFiles.join(', ')}`));
   } else {
-    console.log(chalk.gray(`  🤖 AI Context: None`));
+    console.log(chalk.gray(`  AI Context: None`));
   }
 
   if (summary.languages.length > 0) {
-    console.log(chalk.white(`  🌐 Languages: ${summary.languages.join(', ')}`));
+    console.log(chalk.white(`  Languages: ${summary.languages.join(', ')}`));
   }
 }
 
@@ -1189,13 +1032,13 @@ export function displayNextSteps(
 
   const packageManager = detectPackageManager();
   const devCommand = packageManager === 'npm' ? 'npm run dev' : `${packageManager} dev`;
-  console.log(chalk.cyan(`\n📚 Next Steps:`));
+  console.log(chalk.cyan(`\nNext Steps:`));
   console.log(chalk.white(`  cd ${displayPath}`));
   console.log(chalk.white(`  ${packageManager} install`));
   console.log(chalk.white(`  ${devCommand}`));
 
   if (aiContextOptions?.claudeSkills) {
-    console.log(chalk.cyan(`\n💡 Claude Skills enabled:`));
+    console.log(chalk.cyan(`\nClaude Skills enabled:`));
     console.log(chalk.white(
       isEn
         ? '  Check .claude/skills/ for framework usage guide'
@@ -1204,7 +1047,7 @@ export function displayNextSteps(
   }
 
   if (aiContextOptions?.language === 'both') {
-    console.log(chalk.cyan(`\n🌐 Bilingual mode:`));
+    console.log(chalk.cyan(`\nBilingual mode:`));
     console.log(chalk.white(
       isEn
         ? '  Edit translations/ko/ and translations/en/ for your content'

@@ -1,0 +1,176 @@
+---
+description: Rules for generating code in hua framework projects (Next.js + @hua-labs ecosystem)
+globs:
+  - "app/**/*.{ts,tsx}"
+  - "components/**/*.{ts,tsx}"
+  - "lib/**/*.{ts,tsx}"
+  - "store/**/*.{ts,tsx}"
+  - "hua.config.ts"
+alwaysApply: true
+---
+
+# hua Framework — Cursor Rules
+
+## Core Philosophy
+
+"You don't need to know Next.js. Just configure and tell AI what to do."
+
+- **Config-driven**: `hua.config.ts` controls motion, i18n, branding, state
+- **SDK-first**: Always use `@hua-labs/ui` and `@hua-labs/hua` before custom code
+- **Server-first**: Default to Server Components; add `'use client'` only when needed
+
+## Import Paths
+
+```tsx
+// Framework core
+import { HuaPage, HuaProvider, useMotion, useData, fetchData } from '@hua-labs/hua/framework';
+
+// UI components
+import { Button, Card, Input, Icon, Modal } from '@hua-labs/hua/ui';
+
+// i18n
+import { useTranslation, useLanguage } from '@hua-labs/hua/i18n';
+
+// Motion
+import { useFadeIn, useSlideUp, useScrollReveal } from '@hua-labs/hua/motion';
+
+// Hooks
+import { useLoading, useAutoScroll } from '@hua-labs/hua/hooks';
+
+// Translation loaders
+import { createApiTranslationLoader, preloadNamespaces } from '@hua-labs/hua/loaders';
+
+// State
+import { createStore } from '@hua-labs/hua/state';
+
+// Formatters
+import { formatDate, formatCurrency } from '@hua-labs/hua/formatters';
+
+// Utilities
+import { cn } from '@hua-labs/hua/utils';
+```
+
+### UI Subpath Imports (composite components)
+
+```tsx
+import { Form, Select, DatePicker, Autocomplete } from '@hua-labs/ui/form';
+import { Modal, Popover, Dropdown, Drawer, BottomSheet } from '@hua-labs/ui/overlay';
+import { Table, CodeBlock } from '@hua-labs/ui/data';
+import { Accordion, Tabs, Menu, Command } from '@hua-labs/ui/interactive';
+import { Navigation, Breadcrumb, Pagination } from '@hua-labs/ui/navigation';
+import { Toast, Alert, LoadingSpinner, Tooltip } from '@hua-labs/ui/feedback';
+```
+
+## Code Generation Rules
+
+### 1. Page Creation
+
+Always wrap pages with `HuaPage` and generate translation files alongside:
+
+```tsx
+// app/my-page/page.tsx
+import { HuaPage } from '@hua-labs/hua/framework';
+import { useTranslation } from '@hua-labs/hua/i18n';
+
+export default function MyPage() {
+  const { t } = useTranslation('my-page');
+
+  return (
+    <HuaPage title={t('title')} description={t('description')}>
+      <h1>{t('title')}</h1>
+      {/* content */}
+    </HuaPage>
+  );
+}
+```
+
+Create matching translation files:
+- `translations/ko/my-page.json`
+- `translations/en/my-page.json`
+
+### 2. Client Component Creation
+
+```tsx
+'use client';
+
+import { Card, Button } from '@hua-labs/hua/ui';
+import { useFadeIn } from '@hua-labs/hua/motion';
+import { useTranslation } from '@hua-labs/hua/i18n';
+
+export function MyComponent() {
+  const { t } = useTranslation('my-component');
+  const motion = useFadeIn();
+
+  return (
+    <Card ref={motion.ref} style={motion.style}>
+      <h2>{t('title')}</h2>
+      <Button>{t('button')}</Button>
+    </Card>
+  );
+}
+```
+
+### 3. Data Fetching
+
+```tsx
+// Server Component
+import { fetchData } from '@hua-labs/hua/framework';
+const data = await fetchData<MyType>('/api/data');
+
+// Client Component
+'use client';
+import { useData } from '@hua-labs/hua/framework';
+const { data, isLoading, error } = useData<MyType>('/api/data');
+```
+
+## Components Reference
+
+**Core UI**: Button, Action, Input, NumberInput, Link, Icon, Avatar, Modal
+**Layout**: Container, Grid, Stack, Divider, Card, Panel, ActionToolbar
+**Data**: Badge, Progress, Skeleton (10+ variants), Table, CodeBlock
+**Feedback**: Alert (4 variants), Toast, LoadingSpinner, Tooltip
+**Form**: Form, Label, Checkbox, Radio, Select, Switch, Slider, Textarea, DatePicker, Upload, Autocomplete
+**Overlay**: Popover, Dropdown, Drawer, BottomSheet, ConfirmModal
+**Interactive**: Accordion, Tabs, Menu, ContextMenu, Command
+**Navigation**: Navigation, Breadcrumb, Pagination, PageNavigation, PageTransition
+**Theme**: ThemeProvider, ThemeToggle, useTheme, ScrollArea, ScrollToTop
+
+## Styling
+
+This project uses **Tailwind CSS v4** with `@theme` directive.
+
+```css
+/* globals.css */
+@import "tailwindcss";
+@import "@hua-labs/ui/styles/recommended-theme.css";
+```
+
+Available semantic classes: `bg-background`, `text-foreground`, `bg-primary`, `text-primary-foreground`, `bg-card`, `border-border`, `text-muted-foreground`, `bg-accent`, `bg-destructive`
+
+Dark mode: use `dark:` variants. ThemeProvider handles `<html>` class toggling.
+
+## Configuration
+
+```typescript
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config';
+
+export default defineConfig({
+  preset: 'product',  // 'product' | 'marketing'
+  i18n: { defaultLanguage: 'ko', supportedLanguages: ['ko', 'en'] },
+  motion: { defaultPreset: 'product', enableAnimations: true },
+  state: { persist: true, ssr: true },
+});
+```
+
+## Rules Summary
+
+1. **Always use framework components** before writing custom UI
+2. **Always generate i18n files** (ko + en) when creating pages/components
+3. **Prefer Server Components** — only add `'use client'` when hooks/interactivity needed
+4. **Use `cn()` for class merging** — never raw string concatenation
+5. **Wrap pages with `HuaPage`** — SEO, motion, i18n applied automatically
+6. **Only modify `hua.config.ts`** for framework-level changes
+7. **Use Preset** over manual configuration when possible
+8. **Consider accessibility** — aria-label, keyboard nav, focus management
+9. **TypeScript strict** — no `any`, explicit types

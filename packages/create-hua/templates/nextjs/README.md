@@ -104,17 +104,17 @@ export default defineConfig({
 // app/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 import { Button, Card } from '@hua-labs/hua';
 
 export default function HomePage() {
   return (
-    <HuaUxPage title="홈" description="환영합니다">
+    <HuaPage title="홈" description="환영합니다">
       <Card>
         <h1>안녕하세요!</h1>
         <Button>시작하기</Button>
       </Card>
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
@@ -184,13 +184,13 @@ export default function HomePage() {
 // app/HomePageContent.tsx (Client Component)
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 
 export function HomePageContent() {
   return (
-    <HuaUxPage title="홈" description="환영합니다">
+    <HuaPage title="홈" description="환영합니다">
       <h1>안녕하세요!</h1>
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
@@ -201,11 +201,11 @@ export function HomePageContent() {
 // app/about/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 
 export default function AboutPage() {
   return (
-    <HuaUxPage
+    <HuaPage
       title="회사 소개"
       description="우리 회사에 대해 알아보세요"
       seo={{
@@ -219,7 +219,7 @@ export default function AboutPage() {
         <h1>회사 소개</h1>
         <p>우리 회사는...</p>
       </div>
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```

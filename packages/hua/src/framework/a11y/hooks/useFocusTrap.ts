@@ -8,6 +8,9 @@
 'use client';
 
 import { useEffect, useRef, useCallback, type RefObject } from 'react';
+import { createLogger } from '../../../utils/logger';
+
+const log = createLogger('hua:a11y:focus-trap');
 
 /**
  * Focus Trap 옵션
@@ -142,7 +145,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
         // focus() 실패 시 (예: 요소가 아직 렌더링되지 않음)
         // 조용히 실패 (접근성 기능이므로 에러를 던지지 않음)
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[useFocusTrap] Failed to focus initial element:', error);
+          log.warn('Failed to focus initial element', { error: String(error) });
         }
       }
     };
@@ -176,7 +179,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
             } catch (error) {
               // focus() 실패 시 조용히 처리
               if (process.env.NODE_ENV === 'development') {
-                console.warn('[useFocusTrap] Failed to focus last element:', error);
+                log.warn('Failed to focus last element', { error: String(error) });
               }
             }
           }
@@ -189,7 +192,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
             } catch (error) {
               // focus() 실패 시 조용히 처리
               if (process.env.NODE_ENV === 'development') {
-                console.warn('[useFocusTrap] Failed to focus first element:', error);
+                log.warn('Failed to focus first element', { error: String(error) });
               }
             }
           }
@@ -210,7 +213,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(
         } catch (error) {
           // focus() 실패 시 조용히 처리
           if (process.env.NODE_ENV === 'development') {
-            console.warn('[useFocusTrap] Failed to refocus element:', error);
+            log.warn('Failed to refocus element', { error: String(error) });
           }
         }
       }

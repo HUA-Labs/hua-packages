@@ -7,6 +7,9 @@
 'use client';
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('hua:error-boundary');
 
 /**
  * Global error reporter interface
@@ -161,8 +164,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // 개발 모드: 콘솔에 에러 로그
     // Development mode: Log error to console
     if (process.env.NODE_ENV === 'development') {
-      console.error('[ErrorBoundary] Caught error:', error);
-      console.error('[ErrorBoundary] Error info:', errorInfo);
+      log.error('Caught error', { error: String(error), stack: error.stack });
+      log.error('Error info', { componentStack: errorInfo.componentStack });
     }
 
     // 프로덕션 모드: 에러 리포팅 서비스 통합 (선택적)
@@ -176,7 +179,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         } catch (reportingError) {
           // 에러 리포팅 자체가 실패해도 앱은 계속 동작해야 함
           // App should continue working even if error reporting fails
-          console.error('[ErrorBoundary] Error reporting failed:', reportingError);
+          log.error('Error reporting failed', { reportingError: String(reportingError) });
         }
       }
     }

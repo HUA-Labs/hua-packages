@@ -17,6 +17,9 @@
 import Script from 'next/script';
 import { generateGEOMetadata, renderJSONLD, createAIContext } from './generateGEOMetadata';
 import { generateFAQPageLD, generateHowToLD } from './structuredData';
+import { createLogger } from '../../../utils/logger';
+
+const log = createLogger('hua:seo:geo:examples');
 
 /**
  * Example 1: Basic GEO for a software project
@@ -370,7 +373,7 @@ export function Example8_ErrorHandling() {
     });
     return <div>Success</div>;
   } catch (error) {
-    console.error('GEO metadata generation failed:', error);
+    log.error('GEO metadata generation failed', { error: String(error) });
     return (
       <div>
         <h1>Error</h1>
