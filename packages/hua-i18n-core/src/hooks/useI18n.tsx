@@ -226,6 +226,26 @@ export function I18nProvider({
     return { namespace: 'common', key };
   }, []);
 
+  // 네스티드 키 해석 (예: "nav.docs" → obj.nav.docs)
+  const resolveNestedKey = useCallback((obj: Record<string, unknown>, key: string): string | null => {
+    // 1차: flat 접근 시도 (키에 점이 없거나 flat 구조인 경우)
+    if (key in obj && typeof obj[key] === 'string') {
+      return obj[key] as string;
+    }
+
+    // 2차: 네스티드 접근 (점 경로 탐색)
+    const parts = key.split('.');
+    let current: unknown = obj;
+    for (const part of parts) {
+      if (current && typeof current === 'object' && current !== null && part in (current as Record<string, unknown>)) {
+        current = (current as Record<string, unknown>)[part];
+      } else {
+        return null;
+      }
+    }
+    return typeof current === 'string' ? current : null;
+  }, []);
+
   // SSR 번역에서 찾기
   const findInSSRTranslations = useCallback((key: string, targetLang: string): string | null => {
     if (!config.initialTranslations) {
@@ -233,39 +253,41 @@ export function I18nProvider({
     }
 
     const { namespace, key: actualKey } = parseKey(key);
-    
+
     // 현재 언어의 SSR 번역 확인
     const ssrTranslations = config.initialTranslations[targetLang]?.[namespace];
-    if (ssrTranslations && ssrTranslations[actualKey]) {
-      const value = ssrTranslations[actualKey];
-      if (typeof value === 'string') {
+    if (ssrTranslations) {
+      const value = resolveNestedKey(ssrTranslations as Record<string, unknown>, actualKey);
+      if (value !== null) {
         return value;
       }
     }
-    
+
     // 폴백 언어의 SSR 번역 확인
     const fallbackLang = config.fallbackLanguage || 'en';
     if (targetLang !== fallbackLang) {
       const fallbackTranslations = config.initialTranslations[fallbackLang]?.[namespace];
-      if (fallbackTranslations && fallbackTranslations[actualKey]) {
-        const value = fallbackTranslations[actualKey];
-        if (typeof value === 'string') {
+      if (fallbackTranslations) {
+        const value = resolveNestedKey(fallbackTranslations as Record<string, unknown>, actualKey);
+        if (value !== null) {
           return value;
         }
       }
     }
-    
+
     return null;
-  }, [config.initialTranslations, config.fallbackLanguage, parseKey]);
+  }, [config.initialTranslations, config.fallbackLanguage, parseKey, resolveNestedKey]);
 
   // 기본 번역에서 찾기
   const findInDefaultTranslations = useCallback((key: string, targetLang: string): string | null => {
     const { namespace, key: actualKey } = parseKey(key);
     const defaultTranslations = getDefaultTranslations(targetLang, namespace);
     const fallbackTranslations = getDefaultTranslations(config.fallbackLanguage || 'en', namespace);
-    
-    return defaultTranslations[actualKey] || fallbackTranslations[actualKey] || null;
-  }, [config.fallbackLanguage, parseKey]);
+
+    return resolveNestedKey(defaultTranslations as Record<string, unknown>, actualKey)
+      || resolveNestedKey(fallbackTranslations as Record<string, unknown>, actualKey)
+      || null;
+  }, [config.fallbackLanguage, parseKey, resolveNestedKey]);
 
   // hua-api 스타일의 간단한 번역 함수 (메모이제이션)
   // translationVersion과 currentLanguage에 의존하여 번역 로드 및 언어 변경 시 리렌더링 트리거
