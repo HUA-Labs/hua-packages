@@ -69,7 +69,7 @@ export default defineConfig([
     outDir: 'dist',
     clean: false,
   },
-  // Iconsax ESM (separate entry, no splitting to avoid 600+ chunks)
+  // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {
     ...shared,
     entry: { iconsax: 'src/iconsax.ts' },
@@ -83,10 +83,34 @@ export default defineConfig([
     outDir: 'dist',
     clean: false,
   },
-  // Iconsax CJS (separate entry, last build - adds "use client" to all files)
+  // Iconsax Essential CJS
   {
     ...shared,
     entry: { iconsax: 'src/iconsax.ts' },
+    dts: false,
+    format: ['cjs'],
+    splitting: false,
+    outDir: 'dist',
+    clean: false,
+  },
+  // Iconsax Extended ESM (all icons - for gallery/admin use)
+  {
+    ...shared,
+    entry: { 'iconsax-extended': 'src/iconsax-extended.ts' },
+    dts: {
+      compilerOptions: {
+        incremental: false,
+      },
+    },
+    format: ['esm'],
+    splitting: false,
+    outDir: 'dist',
+    clean: false,
+  },
+  // Iconsax Extended CJS (last build - adds "use client" to all files)
+  {
+    ...shared,
+    entry: { 'iconsax-extended': 'src/iconsax-extended.ts' },
     dts: false,
     format: ['cjs'],
     splitting: false,
