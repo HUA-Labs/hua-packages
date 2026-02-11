@@ -10,11 +10,14 @@ import {
   logTranslationError,
   defaultErrorRecoveryStrategy,
   defaultErrorLoggingConfig,
-  isRecoverableError
+  isRecoverableError,
+  isPluralValue,
+  PluralCategory
 } from '../types';
 
 export interface TranslatorInterface {
   translate(key: string, paramsOrLang?: Record<string, unknown> | string, language?: string): string;
+  tPlural(key: string, count: number, params?: Record<string, unknown>, language?: string): string;
   setLanguage(lang: string): void;
   getCurrentLanguage(): string;
   initialize(): Promise<void>;
@@ -26,6 +29,7 @@ export interface TranslatorInterface {
 
 export class Translator implements TranslatorInterface {
   private cache = new Map<string, CacheEntry>();
+  private pluralRulesCache = new Map<string, Intl.PluralRules>();
   private loadedNamespaces = new Set<string>();
   private loadingPromises = new Map<string, Promise<TranslationNamespace>>();
   private allTranslations: Record<string, Record<string, TranslationNamespace>> = {};
@@ -570,6 +574,51 @@ export class Translator implements TranslatorInterface {
       console.warn(`tArray: "${key}" is not a string array`);
     }
     return [];
+  }
+
+  /**
+   * Intl.PluralRules 인스턴스 (언어별 캐시)
+   */
+  private getPluralRules(language: string): Intl.PluralRules {
+    let rules = this.pluralRulesCache.get(language);
+    if (!rules) {
+      rules = new Intl.PluralRules(language);
+      this.pluralRulesCache.set(language, rules);
+    }
+    return rules;
+  }
+
+  /**
+   * 복수형 번역 (ICU / Intl.PluralRules 기반)
+   *
+   * JSON: { "other": "총 {count}개" }  (ko)
+   *       { "one": "{count} item", "other": "{count} items" }  (en)
+   *
+   * tPlural('common:total_count', 1) → en: "1 item" / ko: "총 1개"
+   * tPlural('common:total_count', 5) → en: "5 items" / ko: "총 5개"
+   */
+  tPlural(key: string, count: number, params?: Record<string, unknown>, language?: string): string {
+    const targetLang = language || this.currentLang;
+    const raw = this.getRawValue(key, targetLang);
+    const mergedParams: Record<string, unknown> = { count, ...params };
+
+    // PluralValue 객체인 경우: Intl.PluralRules로 카테고리 결정
+    if (isPluralValue(raw)) {
+      const category = this.getPluralRules(targetLang).select(count) as PluralCategory;
+      const text = raw[category] ?? raw.other;
+      return this.interpolate(text, mergedParams);
+    }
+
+    // fallback: plain string이면 interpolate만
+    if (typeof raw === 'string') {
+      return this.interpolate(raw, mergedParams);
+    }
+
+    // 키를 찾지 못한 경우
+    if (this.config.debug) {
+      return this.interpolate(key, mergedParams);
+    }
+    return '';
   }
 
   /**

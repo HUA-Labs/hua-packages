@@ -9,7 +9,7 @@ related:
 
 # Error Handling
 
-hua extends React's ErrorBoundary pattern to provide automatic error handling in HuaUxPage.
+hua extends React's ErrorBoundary pattern to provide automatic error handling in HuaPage.
 
 ## ErrorBoundary
 
@@ -73,12 +73,12 @@ When `reset()` is called:
 2. Clears the error state (`hasError: false, error: null`)
 3. Re-renders child components
 
-## HuaUxPage
+## HuaPage
 
 A page wrapper component that **automatically includes an ErrorBoundary**.
 
 ```typescript
-interface HuaUxPageProps {
+interface HuaPageProps {
   children: React.ReactNode
   title?: string
   description?: string
@@ -103,8 +103,8 @@ interface HuaUxPageProps {
 ### Structure
 
 ```tsx
-// Internal structure of HuaUxPage
-function HuaUxPage({ children, enableErrorBoundary = true, ... }) {
+// Internal structure of HuaPage
+function HuaPage({ children, enableErrorBoundary = true, ... }) {
   const content = (
     <div ref={motionRef} className={vibeClasses}>
       {title && <h1>{translatedTitle}</h1>}

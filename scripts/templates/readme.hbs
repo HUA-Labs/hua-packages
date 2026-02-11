@@ -1,0 +1,67 @@
+# @hua-labs/{{shortName}}
+
+{{overview}}
+
+[![npm version](https://img.shields.io/npm/v/@hua-labs/{{shortName}}.svg)](https://www.npmjs.com/package/@hua-labs/{{shortName}})
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/{{shortName}}.svg)](https://www.npmjs.com/package/@hua-labs/{{shortName}})
+[![license](https://img.shields.io/npm/l/@hua-labs/{{shortName}}.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+{{#if reactMajor}}
+[![React](https://img.shields.io/badge/React-{{reactMajor}}-blue)](https://reactjs.org/)
+{{/if}}
+
+## Features
+
+{{#each features}}
+- **{{this}}**
+{{/each}}
+
+## Installation
+
+```bash
+pnpm add @hua-labs/{{shortName}}
+```
+
+{{#if peerDepsList}}
+> Peer dependencies: {{peerDepsList}}
+{{/if}}
+
+## Quick Start
+
+```{{codeBlockLang}}
+{{{quickStart}}}
+```
+
+## API
+
+| Export | Type | Description |
+|--------|------|-------------|
+{{#each exports}}
+| `{{name}}` | {{kind}} | {{description}} |
+{{/each}}
+
+{{#if docsUrl}}
+## Documentation
+
+[Full Documentation]({{{docsUrl}}})
+{{/if}}
+
+{{#if sections}}
+{{#each sections}}
+## {{title}}
+
+{{{content}}}
+
+{{/each}}
+{{/if}}
+{{#if related}}
+## Related Packages
+
+{{#each related}}
+- [`@hua-labs/{{this}}`](https://www.npmjs.com/package/@hua-labs/{{this}})
+{{/each}}
+{{/if}}
+
+## License
+
+MIT — [HUA Labs](https://hua-labs.com)

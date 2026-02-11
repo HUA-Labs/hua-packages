@@ -22,6 +22,8 @@
     "generate:review-checklist": "tsx scripts/generate-review-checklist.ts",
     "update:docs": "tsx scripts/update-docs.ts",
     "update:docs:check": "tsx scripts/update-docs.ts --check-only",
+    "generate:docs": "tsx scripts/generate-docs.ts",
+    "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
@@ -38,6 +40,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "esbuild": "^0.27.3",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "handlebars": "^4.7.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "node-gyp": "^12.2.0",
@@ -49,6 +52,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0",
     "vitest": "^4.0.18",
+    "yaml": "^2.8.2",
     "zustand": "^5.0.11"
   },
   "lint-staged": {

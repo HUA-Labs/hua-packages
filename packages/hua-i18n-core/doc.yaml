@@ -1,0 +1,72 @@
+overview: "Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~6.5KB gzipped with zero dependencies (React only)."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "Zero-flicker — Shows previous language during transition"
+  - "SSR-first — Built-in hydration handling, no mismatch issues"
+  - "Namespace lazy loading — Load translations on demand"
+  - "Pluralization — ICU-compliant plural support via Intl.PluralRules (zero bundle cost)"
+  - "Type-safe arrays — tArray() returns string[] without casting"
+  - "State management — First-class Zustand support via i18n-core-zustand"
+  - "Automatic retry — Exponential backoff for API loader failures"
+  - "~6.5KB gzipped — Zero external dependencies"
+
+quickStart: |
+  import { createCoreI18n, useTranslation } from '@hua-labs/i18n-core';
+
+  const I18nProvider = createCoreI18n({
+    defaultLanguage: 'ko',
+    fallbackLanguage: 'en',
+    namespaces: ['common', 'pages'],
+  });
+
+  export default function Layout({ children }) {
+    return <I18nProvider>{children}</I18nProvider>;
+  }
+
+  function Welcome() {
+    const { t, tPlural } = useTranslation();
+    return (
+      <div>
+        <h1>{t('common:welcome')}</h1>
+        <p>{tPlural('common:total_count', 5)}</p>
+      </div>
+    );
+  }
+
+related:
+  - "i18n-core-zustand"
+  - "eslint-plugin-i18n"
+  - "i18n-loaders"
+  - "i18n-formatters"
+
+subpathExports:
+  - path: "server"
+    description: "Server-side translation utilities (ssrTranslate)"
+
+apiNotes:
+  createCoreI18n:
+    description: "Create an i18n Provider component with configuration"
+  useTranslation:
+    description: "Main translation hook — returns t, tPlural, tArray, getRawValue and state"
+  useLanguageChange:
+    description: "Language change hook with validation against supported languages"
+  useI18n:
+    description: "Full context hook — all translation functions plus language management"
+  I18nProvider:
+    description: "Direct Provider component (for advanced use)"
+  Translator:
+    description: "Core translator class (for manual instantiation)"
+    kind: "class"
+  ssrTranslate:
+    description: "Server-side translation function (no React needed)"
+  serverTranslate:
+    description: "Server-side translate with full config"
+  CoreProvider:
+    description: "Minimal Provider with zero config"
+  createLanguageProvider:
+    description: "Create a Provider with just a language setting"
+  createNamespaceProvider:
+    description: "Create a Provider with just namespace settings"
+  createCustomLoaderProvider:
+    description: "Create a Provider with custom translation loader"

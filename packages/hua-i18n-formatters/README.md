@@ -1,24 +1,20 @@
 # @hua-labs/i18n-formatters
 
-Date, number, and currency formatting utilities for i18n applications.
+Locale-aware formatting utilities that integrate with @hua-labs/i18n-core. Provides React hooks and standalone functions for dates, numbers, and currencies with full Korean/English/Japanese support.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-formatters.svg)](https://www.npmjs.com/package/@hua-labs/i18n-formatters)
-[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/i18n-formatters.svg)](https://www.npmjs.com/package/@hua-labs/i18n-formatters)
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/i18n-formatters.svg)](https://www.npmjs.com/package/@hua-labs/i18n-formatters)
 [![license](https://img.shields.io/npm/l/@hua-labs/i18n-formatters.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-## Overview
-
-Locale-aware formatting utilities that integrate with `@hua-labs/i18n-core`. Provides React hooks and standalone functions for dates, numbers, and currencies with full Korean/English/Japanese support.
-
 ## Features
 
-- **Date formatting** — Custom patterns, relative time ("3분 전"), timezone support
-- **Number formatting** — Locale-aware grouping, compact notation (1K, 1M), percentages
-- **Currency formatting** — Symbol positioning, decimal control, 6 currencies (KRW, USD, EUR, GBP, JPY, CNY)
-- **React hooks** — `useDateFormatter`, `useNumberFormatter`, `useCurrencyFormatter`
-- **Tree-shakeable** — Subpath exports for date, number, currency independently
+- **Date formatting — Custom patterns, relative time, timezone support**
+- **Number formatting — Locale-aware grouping, compact notation (1K, 1M), percentages**
+- **Currency formatting — Symbol positioning, decimal control, 6 currencies (KRW, USD, EUR, GBP, JPY, CNY)**
+- **React hooks — useDateFormatter, useNumberFormatter, useCurrencyFormatter**
+- **Tree-shakeable — Subpath exports for date, number, currency independently**
 
 ## Installation
 
@@ -26,7 +22,7 @@ Locale-aware formatting utilities that integrate with `@hua-labs/i18n-core`. Pro
 pnpm add @hua-labs/i18n-formatters
 ```
 
-Peer dependency: `react >= 19.0.0`
+> Peer dependencies: react >=19.0.0
 
 ## Quick Start
 
@@ -45,39 +41,53 @@ function PriceCard({ date, amount }: { date: Date; amount: number }) {
     </div>
   );
 }
+
 ```
 
-## Entry Points
+## API
 
-| Path | Description |
-|------|-------------|
-| `@hua-labs/i18n-formatters` | All formatters |
-| `@hua-labs/i18n-formatters/date` | Date utilities only |
-| `@hua-labs/i18n-formatters/number` | Number utilities only |
-| `@hua-labs/i18n-formatters/currency` | Currency utilities only |
-
-## API Overview
-
-| Hook | Functions |
-|------|-----------|
-| `useDateFormatter()` | `formatDate`, `formatDateTime`, `formatRelativeTime`, `formatDateReadable` |
-| `useNumberFormatter()` | `formatNumber`, `formatCompact`, `formatPercent` |
-| `useCurrencyFormatter()` | `formatCurrency`, `getDefaultCurrency`, `getCurrencyDecimals` |
+| Export | Type | Description |
+|--------|------|-------------|
+| `useDateFormatter` | hook | Date formatting hook — formatDate, formatRelativeTime, monthNames, dayNames |
+| `formatDate` | function |  |
+| `formatDateTime` | function |  |
+| `formatRelativeTime` | function |  |
+| `applyTimezoneOffset` | function |  |
+| `getKoreanDate` | function |  |
+| `getKoreanDateString` | function |  |
+| `parseDateAsTimezone` | function |  |
+| `convertToTimezone` | function |  |
+| `KST_OFFSET` | component |  |
+| `useNumberFormatter` | hook | Number formatting hook — formatNumber, formatPercent, formatCompact |
+| `formatNumber` | function |  |
+| `formatCompact` | function |  |
+| `formatPercent` | function |  |
+| `useCurrencyFormatter` | hook | Currency formatting hook — formatCurrency with 6 currency support |
+| `formatCurrency` | function |  |
+| `getDefaultCurrency` | function |  |
+| `getCurrencyDecimals` | function |  |
+| `LANGUAGE_TO_CURRENCY` | component |  |
+| `CURRENCY_DECIMALS` | component |  |
+| `DateFormatterOptions` | type |  |
+| `TimezoneConfig` | type |  |
+| `RelativeTimeOptions` | type |  |
+| `DateFormatterReturn` | type |  |
+| `NumberFormatterOptions` | type |  |
+| `PercentFormatterOptions` | type |  |
+| `NumberFormatterReturn` | type |  |
+| `CurrencyFormatterOptions` | type |  |
+| `CurrencyFormatterReturn` | type |  |
 
 ## Documentation
 
-- [Documentation Site](https://docs.hua-labs.com)
+[Full Documentation](https://docs.hua-labs.com)
 
 ## Related Packages
 
-- [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core) — Core i18n engine
-- [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand state adapter
-- [`@hua-labs/i18n-loaders`](https://www.npmjs.com/package/@hua-labs/i18n-loaders) — Translation loaders and caching
-
-## Requirements
-
-React >= 19.0.0 · TypeScript >= 5.9
+- [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core)
+- [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand)
+- [`@hua-labs/i18n-loaders`](https://www.npmjs.com/package/@hua-labs/i18n-loaders)
 
 ## License
 
-MIT — [HUA Labs](https://github.com/HUA-Labs/HUA-Labs-public)
+MIT — [HUA Labs](https://hua-labs.com)

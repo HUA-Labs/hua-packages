@@ -1,0 +1,42 @@
+overview: "Type-safe adapter for integrating Zustand state management with @hua-labs/i18n-core. Provides seamless language state synchronization with SSR hydration support and circular reference prevention."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "Type-safe — Full TypeScript support"
+  - "Auto-sync — Zustand store changes automatically sync to i18n"
+  - "SSR compatible — Language syncs after hydration to prevent mismatches"
+  - "Circular reference prevention — Safe unidirectional data flow"
+  - "Minimal — Only Zustand as peer dependency"
+
+quickStart: |
+  import { createZustandI18n } from '@hua-labs/i18n-core-zustand';
+  import { useTranslation } from '@hua-labs/i18n-core';
+  import { useAppStore } from './store';
+
+  const I18nProvider = createZustandI18n(useAppStore, {
+    fallbackLanguage: 'en',
+    namespaces: ['common', 'navigation'],
+    translationLoader: 'api',
+    translationApiPath: '/api/translations',
+    defaultLanguage: 'ko',
+  });
+
+  export default function Layout({ children }) {
+    return <I18nProvider>{children}</I18nProvider>;
+  }
+
+  function MyComponent() {
+    const { t } = useTranslation();
+    return <h1>{t('common:welcome')}</h1>;
+  }
+
+related:
+  - "i18n-core"
+  - "i18n-loaders"
+  - "state"
+
+apiNotes:
+  createZustandI18n:
+    description: "Create an i18n Provider integrated with Zustand store"
+  useZustandI18n:
+    description: "Hook returning { language, setLanguage } from Zustand"
