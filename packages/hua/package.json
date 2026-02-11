@@ -120,16 +120,16 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@hua-labs/hooks": "^1.1.0",
+    "@hua-labs/hooks": "workspace:*",
     "@hua-labs/i18n-core": "workspace:*",
-    "@hua-labs/i18n-core-zustand": "^2.0.1-alpha.1",
-    "@hua-labs/i18n-formatters": "^1.1.1-alpha.0",
-    "@hua-labs/i18n-loaders": "^1.1.1-alpha.0",
+    "@hua-labs/i18n-core-zustand": "workspace:*",
+    "@hua-labs/i18n-formatters": "workspace:*",
+    "@hua-labs/i18n-loaders": "workspace:*",
     "@hua-labs/motion-core": "workspace:*",
     "@hua-labs/pro": "workspace:*",
-    "@hua-labs/state": "^1.0.0",
+    "@hua-labs/state": "workspace:*",
     "@hua-labs/ui": "workspace:*",
-    "@hua-labs/utils": "^1.1.0",
+    "@hua-labs/utils": "workspace:*",
     "@phosphor-icons/react": "^2.1.10"
   },
   "peerDependencies": {
