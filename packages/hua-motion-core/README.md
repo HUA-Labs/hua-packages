@@ -155,9 +155,19 @@ function Hero() {
 
 [Full Documentation](https://docs.hua-labs.com)
 
+## Documentation
+
+- [Detailed Guide](./DETAILED_GUIDE.md)
+- [Documentation Site](https://docs.hua-labs.com)
+
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
+- [`@hua-labs/pro`](https://www.npmjs.com/package/@hua-labs/pro) — Advanced motion hooks (orchestration, auto-animations)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — Framework (includes motion)
+
+## Requirements
+
+React >= 19.0.0 · React DOM >= 19.0.0 · TypeScript >= 5.9
 
 ## License
 

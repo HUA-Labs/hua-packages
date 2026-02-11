@@ -1,6 +1,6 @@
 /**
  * create-hua - Doctor Command
- * 
+ *
  * Diagnoses project health and provides solutions
  */
 
@@ -8,24 +8,23 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-import { checkPrerequisites, validateTemplate, validateGeneratedProject, validateTranslationFiles } from './utils';
-
-/**
- * Check if English-only mode is enabled
- */
-function isEnglishOnly(): boolean {
-  return process.env.LANG === 'en' || process.env.CLI_LANG === 'en' || process.argv.includes('--english-only');
-}
+import { checkPrerequisites, validateTranslationFiles } from './utils';
+import {
+  MIN_NODE_VERSION,
+  AI_CONTEXT_FILES,
+  isEnglishOnly,
+  compareVersions,
+} from './shared';
 
 /**
  * Diagnose project health
  */
 export async function diagnoseProject(projectPath: string): Promise<{
   healthy: boolean;
-  issues: Array<{ type: 'error' | 'warning'; message: string; solution?: string }>;
+  issues: Array<{ type: 'error' | 'warning' | 'info'; message: string; solution?: string }>;
 }> {
   const isEn = isEnglishOnly();
-  const issues: Array<{ type: 'error' | 'warning'; message: string; solution?: string }> = [];
+  const issues: Array<{ type: 'error' | 'warning' | 'info'; message: string; solution?: string }> = [];
 
   // Check if project directory exists
   if (!(await fs.pathExists(projectPath))) {
@@ -57,7 +56,6 @@ export async function diagnoseProject(projectPath: string): Promise<{
     try {
       const packageJson = await fs.readJSON(packageJsonPath);
 
-      // Check for hua dependency
       if (!packageJson.dependencies?.['@hua-labs/hua']) {
         issues.push({
           type: 'error',
@@ -104,6 +102,69 @@ export async function diagnoseProject(projectPath: string): Promise<{
     }
   }
 
+  // Check app/layout.tsx exists
+  const layoutPath = path.join(projectPath, 'app/layout.tsx');
+  if (!(await fs.pathExists(layoutPath))) {
+    issues.push({
+      type: 'error',
+      message: isEn ? 'app/layout.tsx not found' : 'app/layout.tsx를 찾을 수 없습니다',
+      solution: isEn
+        ? 'This is required by Next.js. Re-run create-hua to restore.'
+        : 'Next.js에 필수 파일입니다. create-hua를 다시 실행하세요.',
+    });
+  } else {
+    // Check HuaProvider usage in layout
+    try {
+      const layoutContent = await fs.readFile(layoutPath, 'utf-8');
+      if (!layoutContent.includes('HuaProvider')) {
+        issues.push({
+          type: 'warning',
+          message: isEn
+            ? 'HuaProvider not found in app/layout.tsx'
+            : 'app/layout.tsx에 HuaProvider가 없습니다',
+          solution: isEn
+            ? 'Wrap your app with <HuaProvider> from @hua-labs/hua'
+            : '@hua-labs/hua에서 <HuaProvider>로 앱을 감싸세요',
+        });
+      }
+    } catch {
+      // Ignore read errors
+    }
+  }
+
+  // Check app/page.tsx exists
+  const pagePath = path.join(projectPath, 'app/page.tsx');
+  if (!(await fs.pathExists(pagePath))) {
+    issues.push({
+      type: 'warning',
+      message: isEn ? 'app/page.tsx not found' : 'app/page.tsx를 찾을 수 없습니다',
+      solution: isEn
+        ? 'Create app/page.tsx for your home page'
+        : '홈 페이지를 위해 app/page.tsx를 생성하세요',
+    });
+  }
+
+  // Check globals.css for hua theme import
+  const globalsCssPath = path.join(projectPath, 'app/globals.css');
+  if (await fs.pathExists(globalsCssPath)) {
+    try {
+      const cssContent = await fs.readFile(globalsCssPath, 'utf-8');
+      if (!cssContent.includes('recommended-theme') && !cssContent.includes('@hua-labs/hua')) {
+        issues.push({
+          type: 'warning',
+          message: isEn
+            ? 'globals.css does not import hua theme'
+            : 'globals.css에 hua 테마 import가 없습니다',
+          solution: isEn
+            ? 'Add @import "@hua-labs/hua/recommended-theme.css" to globals.css'
+            : 'globals.css에 @import "@hua-labs/hua/recommended-theme.css"를 추가하세요',
+        });
+      }
+    } catch {
+      // Ignore read errors
+    }
+  }
+
   // Check translation files
   try {
     await validateTranslationFiles(projectPath);
@@ -122,32 +183,18 @@ export async function diagnoseProject(projectPath: string): Promise<{
   // Check Node.js and pnpm
   try {
     const nodeVersion = process.version;
-    const requiredVersion = '22.0.0';
-    const parseVersion = (v: string): number[] => {
-      return v.replace(/^v/, '').split('.').map(Number);
-    };
-    const compareVersions = (v1: string, v2: string): number => {
-      const v1Parts = parseVersion(v1);
-      const v2Parts = parseVersion(v2);
-      for (let i = 0; i < 3; i++) {
-        if (v1Parts[i] > v2Parts[i]) return 1;
-        if (v1Parts[i] < v2Parts[i]) return -1;
-      }
-      return 0;
-    };
-
-    if (compareVersions(nodeVersion, requiredVersion) < 0) {
+    if (compareVersions(nodeVersion, MIN_NODE_VERSION) < 0) {
       issues.push({
         type: 'warning',
         message: isEn
-          ? `Node.js ${requiredVersion}+ recommended. Current: ${nodeVersion}`
-          : `Node.js ${requiredVersion}+ 권장. 현재: ${nodeVersion}`,
+          ? `Node.js ${MIN_NODE_VERSION}+ recommended. Current: ${nodeVersion}`
+          : `Node.js ${MIN_NODE_VERSION}+ 권장. 현재: ${nodeVersion}`,
         solution: isEn
           ? 'Update Node.js: https://nodejs.org/'
           : 'Node.js 업데이트: https://nodejs.org/',
       });
     }
-  } catch (error) {
+  } catch {
     // Ignore
   }
 
@@ -163,6 +210,32 @@ export async function diagnoseProject(projectPath: string): Promise<{
     });
   }
 
+  // Report AI context file status
+  const aiFileStatus: string[] = [];
+  for (const entry of AI_CONTEXT_FILES) {
+    for (const p of entry.paths) {
+      const fullPath = path.join(projectPath, p);
+      if (await fs.pathExists(fullPath)) {
+        aiFileStatus.push(entry.label);
+      }
+    }
+  }
+  if (aiFileStatus.length > 0) {
+    issues.push({
+      type: 'info',
+      message: isEn
+        ? `AI context files present: ${aiFileStatus.join(', ')}`
+        : `AI 컨텍스트 파일 감지: ${aiFileStatus.join(', ')}`,
+    });
+  } else {
+    issues.push({
+      type: 'info',
+      message: isEn
+        ? 'No AI context files found. Run create-hua to generate them.'
+        : 'AI 컨텍스트 파일이 없습니다. create-hua를 실행하여 생성하세요.',
+    });
+  }
+
   return {
     healthy: issues.filter(i => i.type === 'error').length === 0,
     issues,
@@ -175,59 +248,66 @@ export async function diagnoseProject(projectPath: string): Promise<{
 export async function runDoctor(projectPath: string): Promise<void> {
   const isEn = isEnglishOnly();
 
-  console.log(chalk.blue(`\n🔍 Diagnosing project: ${projectPath}\n`));
+  console.log(chalk.blue(`\nDiagnosing project: ${projectPath}\n`));
 
   try {
     // Check prerequisites
-    console.log(chalk.blue('📋 Checking prerequisites...'));
+    console.log(chalk.blue('Checking prerequisites...'));
     try {
       await checkPrerequisites();
-      console.log(chalk.green('✅ Prerequisites OK'));
+      console.log(chalk.green('  Prerequisites OK'));
     } catch (error) {
-      console.log(chalk.yellow('⚠️  Prerequisites check failed (non-critical)'));
+      console.log(chalk.yellow('  Prerequisites check failed (non-critical)'));
     }
 
     // Diagnose project
-    console.log(chalk.blue('\n🔬 Diagnosing project structure...'));
+    console.log(chalk.blue('\nDiagnosing project structure...'));
     const diagnosis = await diagnoseProject(projectPath);
 
-    if (diagnosis.healthy && diagnosis.issues.length === 0) {
-      console.log(chalk.green('\n✅ Project is healthy! No issues found.'));
-      return;
+    if (diagnosis.healthy && diagnosis.issues.filter(i => i.type !== 'info').length === 0) {
+      console.log(chalk.green('\nProject is healthy! No issues found.'));
     }
 
     // Display issues
     const errors = diagnosis.issues.filter(i => i.type === 'error');
     const warnings = diagnosis.issues.filter(i => i.type === 'warning');
+    const infos = diagnosis.issues.filter(i => i.type === 'info');
 
     if (errors.length > 0) {
-      console.log(chalk.red(`\n❌ Found ${errors.length} error(s):`));
+      console.log(chalk.red(`\nFound ${errors.length} error(s):`));
       errors.forEach((issue, index) => {
         console.log(chalk.red(`  ${index + 1}. ${issue.message}`));
         if (issue.solution) {
-          console.log(chalk.yellow(`     💡 ${issue.solution}`));
+          console.log(chalk.yellow(`     -> ${issue.solution}`));
         }
       });
     }
 
     if (warnings.length > 0) {
-      console.log(chalk.yellow(`\n⚠️  Found ${warnings.length} warning(s):`));
+      console.log(chalk.yellow(`\nFound ${warnings.length} warning(s):`));
       warnings.forEach((issue, index) => {
         console.log(chalk.yellow(`  ${index + 1}. ${issue.message}`));
         if (issue.solution) {
-          console.log(chalk.cyan(`     💡 ${issue.solution}`));
+          console.log(chalk.cyan(`     -> ${issue.solution}`));
         }
       });
     }
 
+    if (infos.length > 0) {
+      console.log(chalk.blue(`\nInfo:`));
+      infos.forEach((issue) => {
+        console.log(chalk.gray(`  - ${issue.message}`));
+      });
+    }
+
     if (!diagnosis.healthy) {
-      console.log(chalk.red('\n❌ Project has critical issues that need to be fixed.'));
+      console.log(chalk.red('\nProject has critical issues that need to be fixed.'));
       process.exit(1);
-    } else {
-      console.log(chalk.yellow('\n⚠️  Project has warnings but should work.'));
+    } else if (warnings.length > 0) {
+      console.log(chalk.yellow('\nProject has warnings but should work.'));
     }
   } catch (error) {
-    console.error(chalk.red('\n❌ Doctor command failed:'));
+    console.error(chalk.red('\nDoctor command failed:'));
     console.error(error);
     process.exit(1);
   }

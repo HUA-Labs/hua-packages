@@ -1,6 +1,6 @@
 ---
 title: Error Handling
-description: ErrorBoundary, HuaUxPage error boundaries, custom fallback
+description: ErrorBoundary, HuaPage error boundaries, custom fallback
 category: systems
 related:
   - ./05-loading.mdx
@@ -130,13 +130,13 @@ function HuaPage({ children, enableErrorBoundary = true, ... }) {
 ### 1. Basic Page
 
 ```tsx
-import { HuaUxPage } from '@hua-labs/hua/framework'
+import { HuaPage } from '@hua-labs/hua/framework'
 
 export default function DiaryPage() {
   return (
-    <HuaUxPage title="Write Diary" vibe="clean">
+    <HuaPage title="Write Diary" vibe="clean">
       <DiaryEditor />
-    </HuaUxPage>
+    </HuaPage>
   )
 }
 ```
@@ -144,7 +144,7 @@ export default function DiaryPage() {
 ### 2. Custom Error Fallback
 
 ```tsx
-<HuaUxPage
+<HuaPage
   title="Dashboard"
   errorBoundaryFallback={(error, reset) => (
     <div className="text-center py-12">
@@ -158,22 +158,22 @@ export default function DiaryPage() {
   )}
 >
   <Dashboard />
-</HuaUxPage>
+</HuaPage>
 ```
 
 ### 3. Without Error Boundary
 
 ```tsx
 // When error handling is already done at a higher level
-<HuaUxPage enableErrorBoundary={false}>
+<HuaPage enableErrorBoundary={false}>
   <SimpleContent />
-</HuaUxPage>
+</HuaPage>
 ```
 
 ### 4. Standalone ErrorBoundary
 
 ```tsx
-// Error handling for a specific section without HuaUxPage
+// Error handling for a specific section without HuaPage
 <div>
   <Header />
   <ErrorBoundary
@@ -190,6 +190,6 @@ export default function DiaryPage() {
 
 - `ErrorBoundary` is a React class component. It cannot catch errors inside event handlers — use `try/catch` instead.
 - `ErrorBoundary` cannot catch async errors (Promise rejections). It only catches errors that occur during rendering and in `useEffect`.
-- The `seo` prop of `HuaUxPage` is currently unused and only logs a warning message in dev. Use the GEO system instead.
+- The `seo` prop of `HuaPage` is currently unused and only logs a warning message in dev. Use the GEO system instead.
 - The `vibe` prop determines the CSS classes and motion of the top-level `<div>`. You can override directly with the `motion` prop.
 - Even with `enableErrorBoundary={false}`, a parent ErrorBoundary will still catch errors if one exists.

@@ -10,13 +10,13 @@ Batteries-included framework for React product teams. Unifies UI components, ani
 
 ## Features
 
-- **Pre-wired — UI, motion, i18n, state configured and ready to use**
-- **Framework layer — Next.js-optimized with defineConfig and automatic providers**
-- **Accessibility — WCAG 2.1 compliant utilities (focus management, skip-to-content)**
-- **Loading UX — Built-in delayed loading, suspense wrappers**
-- **Error handling — ErrorBoundary built into HuaPage**
-- **White-labeling — SSR-compatible CSS variable injection via branding config**
-- **GEO support — Generative Engine Optimization for AI search engines**
+- **Pre-wired** — UI, Motion, i18n, State configured and ready to use
+- **Framework layer** — Next.js-optimized with `defineConfig` and automatic providers
+- **Accessibility** — WCAG 2.1 compliant utilities (focus management, skip-to-content)
+- **Loading UX** — Built-in delayed loading, suspense wrappers
+- **Error handling** — ErrorBoundary built into HuaPage
+- **White-labeling** — SSR-compatible CSS variable injection via branding config
+- **GEO support** — Generative Engine Optimization for AI search engines
 
 ## Installation
 
@@ -60,13 +60,24 @@ export default function RootLayout({ children }) {
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `Button` | component | Branded button — auto-applies branding colors when configured |
-| `Card` | component | Branded card — auto-applies branding colors when configured |
-| `defineConfig` | function | Define hua configuration with presets (product, landing, docs) |
-| `HuaProvider` | component | Root layout provider — auto-wires theme, i18n, motion, branding |
-| `HuaPage` | component | Page wrapper with ErrorBoundary and loading states |
+| Path | Re-exports from |
+|------|-----------------|
+| `@hua-labs/hua` | Root — all re-exports |
+| `@hua-labs/hua/framework` | Framework layer (HuaProvider, defineConfig, HuaPage) |
+| `@hua-labs/hua/framework/server` | Server-only framework utilities |
+| `@hua-labs/hua/framework/config` | Configuration types |
+| `@hua-labs/hua/framework/shared` | Shared framework utilities |
+| `@hua-labs/hua/framework/seo/geo` | GEO optimization |
+| `@hua-labs/hua/presets` | Preset configurations |
+| `@hua-labs/hua/ui` | @hua-labs/ui |
+| `@hua-labs/hua/motion` | @hua-labs/motion-core |
+| `@hua-labs/hua/pro` | @hua-labs/pro |
+| `@hua-labs/hua/i18n` | @hua-labs/i18n-core |
+| `@hua-labs/hua/state` | @hua-labs/state |
+| `@hua-labs/hua/formatters` | @hua-labs/i18n-formatters |
+| `@hua-labs/hua/utils` | @hua-labs/utils |
+| `@hua-labs/hua/hooks` | @hua-labs/hooks |
+| `@hua-labs/hua/loaders` | @hua-labs/i18n-loaders |
 
 ## Documentation
 

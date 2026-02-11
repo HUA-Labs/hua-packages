@@ -8,6 +8,9 @@
 'use client';
 
 import React from 'react';
+import { createLogger } from '../../../utils/logger';
+
+const log = createLogger('hua:a11y:skip-to-content');
 
 /**
  * SkipToContent 컴포넌트 props
@@ -79,12 +82,12 @@ export function SkipToContent({
         target.focus();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (process.env.NODE_ENV === 'development') {
-        console.warn(`[SkipToContent] Target element with id "${targetId}" not found`);
+        log.warn('Target element not found', { targetId });
       }
     } catch (error) {
       // focus() 또는 scrollIntoView() 실패 시 조용히 처리
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[SkipToContent] Failed to focus or scroll to target:', error);
+        log.warn('Failed to focus or scroll to target', { error: String(error) });
       }
     }
   };

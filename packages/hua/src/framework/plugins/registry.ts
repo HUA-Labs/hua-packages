@@ -7,6 +7,9 @@
 import type { HuaPlugin } from './types';
 import { hasLicense } from '../license';
 import type { LicenseFeature } from '../license/types';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('hua:plugins');
 
 /**
  * 플러그인 레지스트리 / Plugin registry
@@ -35,9 +38,7 @@ class PluginRegistry {
   register(plugin: HuaPlugin): void {
     // 중복 등록 확인
     if (this.plugins.has(plugin.name)) {
-      console.warn(
-        `[hua] Plugin "${plugin.name}" is already registered. Overwriting...`
-      );
+      log.warn('Plugin already registered. Overwriting...', { pluginName: plugin.name });
     }
 
     // 라이선스 검증
@@ -57,9 +58,10 @@ class PluginRegistry {
         if (!hasLicense(feature)) {
           // 라이선스가 없어도 경고만 표시 (개발 환경)
           if (process.env.NODE_ENV === 'development') {
-            console.warn(
-              `[hua] ⚠️ Plugin "${plugin.name}" may require a ${plugin.license} license.\n` +
-              `[hua] ⚠️ Some features may not work without a valid license.`
+            log.warn(
+              `Plugin may require a ${plugin.license} license. ` +
+              `Some features may not work without a valid license.`,
+              { pluginName: plugin.name, license: plugin.license }
             );
           }
         }
@@ -70,9 +72,7 @@ class PluginRegistry {
     this.plugins.set(plugin.name, plugin);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `[hua] ✅ Plugin "${plugin.name}" v${plugin.version} registered successfully`
-      );
+      log.info('Plugin registered successfully', { pluginName: plugin.name, version: plugin.version });
     }
   }
 

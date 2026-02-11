@@ -11,14 +11,16 @@ This project uses the **hua framework** for Next.js applications.
 ## Architecture Layers
 
 ### Top Layer: AI Context & CLI
-- `.cursorrules`: Rules for Cursor IDE
+- `.cursor/rules/hua-framework.mdc`: Cursor IDE rules (MDC format)
 - `.claude/project-context.md`: This document (for Claude)
-- `ai-context.md`: General AI context
+- `ai-context.md`: General AI context (SSOT)
+- `AGENTS.md`: OpenAI Codex context
+- `skills.md`: Antigravity skills
 
 ### Middle Layer: Framework & Config
 - `hua.config.ts`: Framework configuration
 - `HuaProvider`: Automatic Provider setup
-- `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
+- `HuaPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
 
 ### Bottom Layer: Core & Types
@@ -33,7 +35,7 @@ This project uses the **hua framework** for Next.js applications.
 Project Root/
 ├── app/                    # Next.js App Router pages
 │   ├── layout.tsx          # Root layout (uses HuaProvider)
-│   ├── page.tsx            # Home page (uses HuaUxPage)
+│   ├── page.tsx            # Home page (uses HuaPage)
 │   └── api/                # API Routes
 │       └── translations/   # i18n translation API
 │           └── [language]/[namespace]/route.ts
@@ -76,7 +78,7 @@ Project Root/
 
 **Framework Components**:
 - `HuaProvider`: Automatic Provider setup
-- `HuaUxPage`: Page wrapper (Motion, i18n, SEO automatically applied)
+- `HuaPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
 - `BrandedButton`, `BrandedCard`: Components with automatic branding
 - `ErrorBoundary`: Error boundary
@@ -128,23 +130,23 @@ Project Root/
 
 ```tsx
 // app/my-page/page.tsx
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 import { useTranslation } from '@hua-labs/hua/i18n';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
   
   return (
-    <HuaUxPage title={t('title')} description={t('description')}>
+    <HuaPage title={t('title')} description={t('description')}>
       <h1>{t('title')}</h1>
       {/* content */}
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
 
 **Important**: 
-- Wrapping with `HuaUxPage` automatically applies Motion, i18n, SEO
+- Wrapping with `HuaPage` automatically applies Motion, i18n, SEO
 - Add translation keys to `translations/{language}/my-page.json`
 - Create as Server Component (add `'use client'` only when client features are needed)
 
@@ -282,7 +284,7 @@ branding: {
 ## Guidelines for Claude Code Generation
 
 1. **When Creating Pages**:
-   - Wrap with `HuaUxPage`
+   - Wrap with `HuaPage`
    - Generate translation files together
    - Use `useTranslation` hook
    - Prefer Server Components (add `'use client'` only when client features are needed)
@@ -312,13 +314,15 @@ branding: {
 This project supports **vibe coding**:
 
 - **Noun-centered configuration**: `preset: 'product'` (expresses intent)
-- **Many decisions in one file**: `HuaUxPage` handles SEO, Motion, i18n all together
+- **Many decisions in one file**: `HuaPage` handles SEO, Motion, i18n all together
 - **AI-friendly documentation**: Clear and comprehensive
 
 ## References
 
-- `ai-context.md`: Detailed project structure explanation
-- `.cursorrules`: Cursor IDE rules
+- `ai-context.md`: Detailed project structure explanation (SSOT)
+- `.cursor/rules/hua-framework.mdc`: Cursor IDE rules
+- `AGENTS.md`: OpenAI Codex context
+- `skills.md`: Antigravity skills
 - Framework docs: `node_modules/@hua-labs/hua/README.md`
 - UI components: `node_modules/@hua-labs/ui/README.md`
 - Motion: `node_modules/@hua-labs/motion-core/README.md`
