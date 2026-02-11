@@ -36,10 +36,6 @@ const TEMPLATE_CONFIG: TemplateConfig = {
     'next.config.ts',
     'tailwind.config.js',
     'tsconfig.json',
-    'ai-context.md',
-    'AGENTS.md',
-    'skills.md',
-    '.cursor/rules/hua-framework.mdc',
   ],
 
   // Files that are optional (user can add later)
