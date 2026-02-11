@@ -263,9 +263,13 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
             if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Syncing language after rehydration: ${state.currentI18nLanguage} -> ${storeLanguage}`);
           }
           state.isSyncing = true;
-          setI18nLanguage(storeLanguage);
           state.previousStoreLanguage = storeLanguage;
-          state.isSyncing = false;
+          const result = setI18nLanguage(storeLanguage);
+          if (result && typeof result.then === 'function') {
+            result.finally(() => { state.isSyncing = false; });
+          } else {
+            queueMicrotask(() => { state.isSyncing = false; });
+          }
         } else {
           if (debug) {
             if (process.env.NODE_ENV !== 'production') console.log(`⏭️ [ZUSTAND-I18N] No sync needed (store: ${storeLanguage}, current: ${state.currentI18nLanguage})`);
@@ -324,8 +328,12 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
               if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${state.currentI18nLanguage} -> ${newLanguage}`);
             }
             state.isSyncing = true;
-            setI18nLanguage(newLanguage);
-            state.isSyncing = false;
+            const result = setI18nLanguage(newLanguage);
+            if (result && typeof result.then === 'function') {
+              result.finally(() => { state.isSyncing = false; });
+            } else {
+              queueMicrotask(() => { state.isSyncing = false; });
+            }
           }
         }
       });
@@ -338,9 +346,13 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
             if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Already hydrated, syncing language: ${state.currentI18nLanguage} -> ${storeLanguage}`);
           }
           state.isSyncing = true;
-          setI18nLanguage(storeLanguage);
           state.previousStoreLanguage = storeLanguage;
-          state.isSyncing = false;
+          const result = setI18nLanguage(storeLanguage);
+          if (result && typeof result.then === 'function') {
+            result.finally(() => { state.isSyncing = false; });
+          } else {
+            queueMicrotask(() => { state.isSyncing = false; });
+          }
         }
       }
 

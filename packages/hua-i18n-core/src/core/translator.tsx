@@ -21,6 +21,7 @@ export interface TranslatorInterface {
   isReady(): boolean;
   debug(): unknown;
   getRawValue(key: string, language?: string): unknown;
+  tArray(key: string, language?: string): string[];
 }
 
 export class Translator implements TranslatorInterface {
@@ -555,6 +556,20 @@ export class Translator implements TranslatorInterface {
     }
 
     return undefined;
+  }
+
+  /**
+   * 배열 번역 값 가져오기 (타입 안전)
+   */
+  tArray(key: string, language?: string): string[] {
+    const raw = this.getRawValue(key, language);
+    if (Array.isArray(raw) && raw.every((v: unknown) => typeof v === 'string')) {
+      return raw as string[];
+    }
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`tArray: "${key}" is not a string array`);
+    }
+    return [];
   }
 
   /**
