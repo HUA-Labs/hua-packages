@@ -1,5 +1,5 @@
 export interface TranslationNamespace {
-  [key: string]: string | TranslationNamespace;
+  [key: string]: string | string[] | TranslationNamespace;
 }
 
 export interface TranslationData {
@@ -120,15 +120,17 @@ export interface TranslationResult {
 
 export interface I18nContextType {
   currentLanguage: string;
-  setLanguage: (language: string) => void;
+  setLanguage: (language: string) => void | Promise<void>;
   // 통합 번역 함수: t(key), t(key, language), t(key, params), t(key, params, language)
-  t: (key: string, paramsOrLang?: TranslationParams | string, language?: string) => string;
+  t: (key: ResolveStringKey, paramsOrLang?: TranslationParams | string, language?: string) => string;
   // 기존 비동기 번역 함수 (하위 호환성)
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
   // 기존 동기 번역 함수 (하위 호환성)
   tSync: (key: string, namespace?: string, params?: TranslationParams) => string;
   // 원시 값 가져오기 (배열, 객체 포함)
   getRawValue: (key: string, language?: string) => unknown;
+  // 배열 번역 값 가져오기 (타입 안전)
+  tArray: (key: ResolveArrayKey, language?: string) => string[];
   isLoading: boolean;
   error: TranslationError | null;
   supportedLanguages: LanguageConfig[];
@@ -154,7 +156,29 @@ export interface I18nContextType {
 
 export interface TranslationParams {
   [key: string]: string | number;
-} 
+}
+
+/**
+ * 타입 안전한 번역 키를 위한 augmentation point.
+ *
+ * 앱에서 declaration merging으로 좁힐 수 있음:
+ * ```ts
+ * declare module '@hua-labs/i18n-core' {
+ *   interface TypedTranslationKeys {
+ *     stringKey: TranslationStringKey;
+ *     arrayKey: TranslationArrayKey;
+ *   }
+ * }
+ * ```
+ *
+ * augmentation이 없으면 string으로 fallback (breaking 없음).
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface TypedTranslationKeys {}
+
+/** augmentation 시 좁혀진 타입, 미설정 시 string */
+export type ResolveStringKey = TypedTranslationKeys extends { stringKey: infer K } ? K & string : string;
+export type ResolveArrayKey = TypedTranslationKeys extends { arrayKey: infer K } ? K & string : string;
 
 // 타입 안전한 번역 키 시스템 (단순화된 버전)
 export type TranslationKey<T> = T extends Record<string, unknown>

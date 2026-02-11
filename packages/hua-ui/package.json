@@ -84,6 +84,11 @@
       "types": "./dist/iconsax.d.ts",
       "import": "./dist/iconsax.mjs",
       "default": "./dist/iconsax.mjs"
+    },
+    "./iconsax-extended": {
+      "types": "./dist/iconsax-extended.d.ts",
+      "import": "./dist/iconsax-extended.mjs",
+      "default": "./dist/iconsax-extended.mjs"
     }
   },
   "files": [
@@ -182,7 +187,9 @@
   "sideEffects": [
     "./src/styles/*.css",
     "./dist/iconsax.mjs",
-    "./dist/iconsax.js"
+    "./dist/iconsax.js",
+    "./dist/iconsax-extended.mjs",
+    "./dist/iconsax-extended.js"
   ],
   "engines": {
     "node": ">=20.0.0"

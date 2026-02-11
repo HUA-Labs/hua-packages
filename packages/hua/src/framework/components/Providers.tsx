@@ -77,17 +77,27 @@ function createProviders(config: HuaConfig) {
   // Icon Provider (기본값 적용)
   // Icon Provider (with defaults)
   const iconConfig = config.icons || {};
-  providers.push(({ children }) => (
-    <IconProvider
-      set={iconConfig.set || 'phosphor'}
-      weight={iconConfig.weight || 'regular'}
-      size={iconConfig.size || 20}
-      color={iconConfig.color || 'currentColor'}
-      strokeWidth={iconConfig.strokeWidth || 1.25}
-    >
-      {children}
-    </IconProvider>
-  ));
+  const iconSet = iconConfig.set || 'phosphor';
+  providers.push(({ children }) => {
+    // iconsax set 사용 시 resolver 자동 등록 (side-effect import 불필요)
+    React.useEffect(() => {
+      if (iconSet === 'iconsax') {
+        import('@hua-labs/ui/iconsax').catch(() => {})
+      }
+    }, [])
+
+    return (
+      <IconProvider
+        set={iconSet}
+        weight={iconConfig.weight || 'regular'}
+        size={iconConfig.size || 20}
+        color={iconConfig.color || 'currentColor'}
+        strokeWidth={iconConfig.strokeWidth || 1.25}
+      >
+        {children}
+      </IconProvider>
+    )
+  });
 
   // i18n Provider
   if (config.i18n) {
