@@ -65,7 +65,7 @@ function Welcome() {
 | Function | Description |
 |----------|-------------|
 | `createCoreI18n(config)` | Create an i18n Provider component |
-| `useTranslation()` | Hook returning `{ t, language, setLanguage, isLoading }` |
+| `useTranslation()` | Hook returning `{ t, tArray, language, setLanguage, isLoading }` |
 
 **Config options:**
 
@@ -80,19 +80,63 @@ function Welcome() {
 | `initialTranslations` | `Record<...>` | SSR pre-loaded data |
 | `debug` | `boolean` | Enable debug logging |
 
-**`t()` function:**
+**`t()` / `tArray()` functions:**
 - `t('namespace:key')` — Get translation string
 - `t('namespace:key', { name: 'World' })` — With interpolation
-- `getRawValue('namespace:key')` — Get arrays, objects, or non-string values
+- `tArray('namespace:key')` — Get string array (type-safe, no casting needed)
+- `getRawValue('namespace:key')` — Get raw value (unknown type)
+
+## Type Safety (Opt-in)
+
+Generate TypeScript types from your translation JSON files for build-time key validation:
+
+```bash
+# Generate types from base language (ko)
+pnpm tsx node_modules/@hua-labs/i18n-core/scripts/generate-i18n-types.ts \
+  --translations-dir ./translations/ko \
+  --output ./types/i18n-types.generated.ts
+
+# Validate translations across languages
+pnpm tsx node_modules/@hua-labs/i18n-core/scripts/validate-translations.ts \
+  --translations-dir ./translations \
+  --base ko --strict ko,en,ja
+```
+
+Activate type narrowing via declaration merging:
+
+```typescript
+// types/i18n.d.ts
+import type { TranslationStringKey, TranslationArrayKey } from './i18n-types.generated';
+
+declare module '@hua-labs/i18n-core' {
+  interface TypedTranslationKeys {
+    stringKey: TranslationStringKey;
+    arrayKey: TranslationArrayKey;
+  }
+}
+```
+
+Once activated:
+- `t('common:savee')` — TS error (typo caught at build time)
+- `tArray('analysis:metrics.guides')` — `string[]` return guaranteed
+- IDE autocomplete for all translation keys
 
 ## Documentation
 
 - [Detailed Guide](./DETAILED_GUIDE.md)
 - [Documentation Site](https://docs.hua-labs.com)
 
+## CLI Scripts
+
+| Script | Description |
+|--------|-------------|
+| `generate:types` | Generate TypeScript types from translation JSON files |
+| `validate:translations` | Cross-language translation validation (missing keys, orphans, interpolation) |
+
 ## Related Packages
 
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand state adapter
+- [`@hua-labs/eslint-plugin-i18n`](https://www.npmjs.com/package/@hua-labs/eslint-plugin-i18n) — ESLint rules for i18n (missing keys, raw text, dynamic keys)
 - [`@hua-labs/i18n-loaders`](https://www.npmjs.com/package/@hua-labs/i18n-loaders) — Translation loaders and caching
 - [`@hua-labs/i18n-formatters`](https://www.npmjs.com/package/@hua-labs/i18n-formatters) — Date, number, currency formatters
 
