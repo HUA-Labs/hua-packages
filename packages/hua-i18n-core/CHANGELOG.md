@@ -1,5 +1,20 @@
 # @hua-labs/i18n-core
 
+## Unreleased
+
+### Minor Changes
+
+- **feat(i18n): tPlural — ICU plural support via Intl.PluralRules**
+
+  - Add `tPlural(key, count, params?, language?)` to Translator, useI18n, useTranslation
+  - Add `PluralCategory`, `PluralValue`, `isPluralValue` types and type guard
+  - Add `ResolvePluralKey` conditional type for type-safe plural keys
+  - Update `TranslationNamespace` to accept `PluralValue` objects
+  - Update `generate-i18n-types.ts` to detect plural objects and emit `TranslationPluralKey`
+  - Zero bundle cost — uses browser-native `Intl.PluralRules`
+  - Supports all CLDR categories: zero, one, two, few, many, other
+  - Fallback: plain string values still work (interpolates `{count}`)
+
 ## 1.1.0-alpha.3
 
 ### Patch Changes

@@ -1,0 +1,46 @@
+overview: "Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "Zustand-based — Lightweight, performant state management"
+  - "SSR support — Automatic hydration handling for Next.js App Router"
+  - "Persistence — Built-in localStorage with partialize support"
+  - "i18n integration — Pre-configured store for language management"
+  - "Type-safe — Full TypeScript support with strict typing"
+
+quickStart: |
+  import { createHuaStore } from '@hua-labs/state';
+
+  interface AppState {
+    theme: 'light' | 'dark';
+    setTheme: (theme: 'light' | 'dark') => void;
+  }
+
+  const useAppStore = createHuaStore<AppState>((set) => ({
+    theme: 'light',
+    setTheme: (theme) => set({ theme }),
+  }), {
+    persist: true,
+    persistKey: 'app-storage',
+    ssr: true,
+  });
+
+  function ThemeToggle() {
+    const theme = useAppStore((s) => s.theme);
+    const setTheme = useAppStore((s) => s.setTheme);
+    return <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
+  }
+
+related:
+  - "i18n-core-zustand"
+  - "hua"
+
+subpathExports:
+  - path: "integrations/i18n"
+    description: "createI18nStore for language management"
+
+apiNotes:
+  createHuaStore:
+    description: "Create a Zustand store with SSR/persistence support"
+  createI18nStore:
+    description: "Create a pre-configured i18n language store"

@@ -15,7 +15,7 @@ related:
 ## API
 
 ```typescript
-function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig
+function defineConfig(config: Partial<HuaConfig>): HuaConfig
 ```
 
 **Process:**
@@ -43,7 +43,7 @@ export default defineConfig({
 ### getConfig
 
 ```typescript
-function getConfig(): HuaUxConfig
+function getConfig(): HuaConfig
 ```
 
 Returns cached config. If `defineConfig` was never called, returns product preset defaults.
@@ -51,7 +51,7 @@ Returns cached config. If `defineConfig` was never called, returns product prese
 ### setConfig
 
 ```typescript
-function setConfig(config: HuaUxConfig): void
+function setConfig(config: HuaConfig): void
 ```
 
 Directly overwrites the cache. **Testing only.** Use `defineConfig` in production.

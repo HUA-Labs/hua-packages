@@ -34,7 +34,7 @@ Why order matters:
 
 ```typescript
 // Actual implementation (createProviders)
-function createProviders(config: HuaUxConfig) {
+function createProviders(config: HuaConfig) {
   const providers = []
 
   // 1. BrandingProvider (conditional)
@@ -71,12 +71,12 @@ function createProviders(config: HuaUxConfig) {
 }
 ```
 
-## HuaUxLayout
+## HuaProvider
 
-HuaUxLayout = UnifiedProviders + extras:
+HuaProvider = UnifiedProviders + extras:
 
 ```tsx
-function HuaUxLayout({ children, config }) {
+function HuaProvider({ children, config }) {
   const resolvedConfig = config || getConfig()
   return (
     <UnifiedProviders config={resolvedConfig}>
@@ -136,11 +136,11 @@ const LANGUAGE_MAP = {
 ### 1. Default usage (auto-composition)
 
 ```tsx
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 import config from '../hua.config'
 
 export default function Layout({ children }) {
-  return <HuaUxLayout config={config}>{children}</HuaUxLayout>
+  return <HuaProvider config={config}>{children}</HuaProvider>
 }
 ```
 

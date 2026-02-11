@@ -381,6 +381,16 @@ export function I18nProvider({
     return translator.tArray(key, language);
   }, [translator, isInitialized, translationVersion, currentLanguage]);
 
+  // 복수형 번역 (ICU / Intl.PluralRules 기반)
+  const tPlural = useCallback((key: string, count: number, params?: Record<string, unknown>, language?: string): string => {
+    void translationVersion;
+    void currentLanguage;
+    if (!translator || !isInitialized) {
+      return key;
+    }
+    return translator.tPlural(key, count, params, language);
+  }, [translator, isInitialized, translationVersion, currentLanguage]);
+
   // 개발자 도구 (메모이제이션)
   const debug = useMemo(() => ({
     getCurrentLanguage: () => {
@@ -482,6 +492,7 @@ export function I18nProvider({
     currentLanguage,
     setLanguage,
     t,
+    tPlural,
     tArray,
     tAsync,
     tSync,
@@ -492,7 +503,7 @@ export function I18nProvider({
     debug,
     isInitialized,
     translationVersion,
-  }), [currentLanguage, setLanguage, t, tArray, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
+  }), [currentLanguage, setLanguage, t, tPlural, tArray, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
 
   return (
     <I18nContext.Provider value={value}>
@@ -512,6 +523,7 @@ export function useI18n(): I18nContextType {
       currentLanguage: 'ko',
       setLanguage: () => {},
       t: (key: string) => key,
+      tPlural: (key: string) => key,
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
       getRawValue: () => undefined,
@@ -539,57 +551,4 @@ export function useI18n(): I18nContextType {
   return context;
 }
 
-/**
- * 간단한 번역 훅 (hua-api 스타일)
- */
-export function useTranslation() {
-  const { t, tArray, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
-
-  return {
-    t,
-    tArray,
-    getRawValue,
-    currentLanguage,
-    setLanguage,
-    isLoading,
-    error,
-    supportedLanguages,
-  };
-}
-
-/**
- * 언어 변경 훅
- */
-export function useLanguageChange() {
-  const context = useContext(I18nContext);
-  
-  // Provider 밖에서 호출되면 기본값 반환
-  if (!context) {
-    return {
-      currentLanguage: 'ko',
-      changeLanguage: () => {},
-      supportedLanguages: [
-        { code: 'ko', name: 'Korean', nativeName: '한국어' },
-        { code: 'en', name: 'English', nativeName: 'English' },
-      ],
-    };
-  }
-  
-  const { currentLanguage, setLanguage, supportedLanguages } = context;
-  
-  const changeLanguage = useCallback((language: string) => {
-    const supported = supportedLanguages.find(lang => lang.code === language);
-    if (supported) {
-      setLanguage(language);
-    } else {
-      if (process.env.NODE_ENV !== 'production') console.warn(`Language ${language} is not supported`);
-    }
-  }, [setLanguage, supportedLanguages]);
-
-  return {
-    currentLanguage,
-    changeLanguage,
-    supportedLanguages,
-  };
-}
 

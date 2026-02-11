@@ -1,0 +1,46 @@
+overview: "Locale-aware formatting utilities that integrate with @hua-labs/i18n-core. Provides React hooks and standalone functions for dates, numbers, and currencies with full Korean/English/Japanese support."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "Date formatting — Custom patterns, relative time, timezone support"
+  - "Number formatting — Locale-aware grouping, compact notation (1K, 1M), percentages"
+  - "Currency formatting — Symbol positioning, decimal control, 6 currencies (KRW, USD, EUR, GBP, JPY, CNY)"
+  - "React hooks — useDateFormatter, useNumberFormatter, useCurrencyFormatter"
+  - "Tree-shakeable — Subpath exports for date, number, currency independently"
+
+quickStart: |
+  import { useDateFormatter } from '@hua-labs/i18n-formatters/date';
+  import { useCurrencyFormatter } from '@hua-labs/i18n-formatters/currency';
+
+  function PriceCard({ date, amount }: { date: Date; amount: number }) {
+    const { formatRelativeTime } = useDateFormatter();
+    const { formatCurrency } = useCurrencyFormatter();
+
+    return (
+      <div>
+        <span>{formatRelativeTime(date)}</span>
+        <span>{formatCurrency(amount)}</span>
+      </div>
+    );
+  }
+
+related:
+  - "i18n-core"
+  - "i18n-core-zustand"
+  - "i18n-loaders"
+
+subpathExports:
+  - path: "date"
+    description: "Date utilities only"
+  - path: "number"
+    description: "Number utilities only"
+  - path: "currency"
+    description: "Currency utilities only"
+
+apiNotes:
+  useDateFormatter:
+    description: "Date formatting hook — formatDate, formatRelativeTime, monthNames, dayNames"
+  useNumberFormatter:
+    description: "Number formatting hook — formatNumber, formatPercent, formatCompact"
+  useCurrencyFormatter:
+    description: "Currency formatting hook — formatCurrency with 6 currency support"

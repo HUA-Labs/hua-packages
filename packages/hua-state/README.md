@@ -1,24 +1,20 @@
 # @hua-labs/state
 
-Unified state management for the hua ecosystem with SSR support.
+Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
-[![npm downloads](https://img.shields.io/npm/dw/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
 [![license](https://img.shields.io/npm/l/@hua-labs/state.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
-## Overview
-
-Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
-
 ## Features
 
-- **Zustand-based** — Lightweight, performant state management
-- **SSR support** — Automatic hydration handling for Next.js App Router
-- **Persistence** — Built-in localStorage with partialize support
-- **i18n integration** — Pre-configured store for language management
-- **Type-safe** — Full TypeScript support with strict typing
+- **Zustand-based — Lightweight, performant state management**
+- **SSR support — Automatic hydration handling for Next.js App Router**
+- **Persistence — Built-in localStorage with partialize support**
+- **i18n integration — Pre-configured store for language management**
+- **Type-safe — Full TypeScript support with strict typing**
 
 ## Installation
 
@@ -26,7 +22,7 @@ Zustand-based state management wrapper optimized for the hua ecosystem. Provides
 pnpm add @hua-labs/state
 ```
 
-Peer dependencies: `react >= 19.0.0`, `react-dom >= 19.0.0`, `zustand >= 5.0.0`
+> Peer dependencies: react >=19.0.0, react-dom >=19.0.0, zustand >=5.0.0
 
 ## Quick Start
 
@@ -52,44 +48,37 @@ function ThemeToggle() {
   const setTheme = useAppStore((s) => s.setTheme);
   return <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
 }
+
 ```
 
-## Entry Points
+## API
 
-| Path | Description |
-|------|-------------|
-| `@hua-labs/state` | `createHuaStore` and core state utilities |
-| `@hua-labs/state/integrations/i18n` | `createI18nStore` for language management |
-
-## API Overview
-
-| Function | Description |
-|----------|-------------|
-| `createHuaStore(creator, config?)` | Create a Zustand store with SSR/persistence |
-| `createI18nStore(config)` | Create a pre-configured i18n language store |
-
-**StoreConfig:**
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `persist` | `boolean` | `false` | Enable localStorage persistence |
-| `persistKey` | `string` | `'hua-state-storage'` | Storage key |
-| `ssr` | `boolean` | `false` | Enable SSR hydration handling |
-| `partialize` | `(state) => Partial` | — | Select state to persist |
+| Export | Type | Description |
+|--------|------|-------------|
+| `createHuaStore` | function | Create a Zustand store with SSR/persistence support |
+| `isStoreRehydrated` | function |  |
+| `onStoreRehydrated` | function |  |
+| `markStoreRehydrated` | function |  |
+| `createI18nStore` | function | Create a pre-configured i18n language store |
+| `StoreCreator` | type |  |
+| `StoreConfig` | type |  |
+| `HuaStore` | type |  |
+| `BaseStoreState` | type |  |
+| `UseBoundStore` | type |  |
+| `StoreApi` | type |  |
+| `I18nStoreState` | type |  |
+| `I18nStoreConfig` | type |  |
+| `UseStoreHook` | type |  |
 
 ## Documentation
 
-- [Documentation Site](https://docs.hua-labs.com)
+[Full Documentation](https://docs.hua-labs.com)
 
 ## Related Packages
 
-- [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand) — Zustand i18n adapter
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua) — UX framework (uses this for state)
-
-## Requirements
-
-React >= 19.0.0 · React DOM >= 19.0.0 · Zustand >= 5.0.0 · TypeScript >= 5.9
+- [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand)
+- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
 
 ## License
 
-MIT — [HUA Labs](https://github.com/HUA-Labs/HUA-Labs-public)
+MIT — [HUA Labs](https://hua-labs.com)

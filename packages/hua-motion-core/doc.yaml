@@ -1,0 +1,47 @@
+overview: "A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "35+ animation hooks — Fade, slide, scale, scroll, interactions, gestures"
+  - "Zero dependencies — Pure JavaScript motion engine"
+  - "Ref-based — Direct DOM manipulation for consistent performance"
+  - "SSR compatible — Works with Next.js, Remix, and SSR frameworks"
+  - "Fully tested — Comprehensive test coverage"
+
+quickStart: |
+  import { useFadeIn, useSlideUp } from '@hua-labs/motion-core';
+
+  function Hero() {
+    const fadeIn = useFadeIn({ duration: 800 });
+    const slideUp = useSlideUp({ delay: 200 });
+
+    return (
+      <div>
+        <h1 ref={fadeIn.ref} style={fadeIn.style}>Welcome</h1>
+        <p ref={slideUp.ref} style={slideUp.style}>Animated content</p>
+      </div>
+    );
+  }
+
+related:
+  - "hua"
+
+apiNotes:
+  useFadeIn:
+    description: "Fade-in animation hook"
+  useSlideUp:
+    description: "Slide-up animation hook"
+  useSlideLeft:
+    description: "Slide-left animation hook"
+  useSlideRight:
+    description: "Slide-right animation hook"
+  useScaleIn:
+    description: "Scale-in animation hook"
+  useBounceIn:
+    description: "Bounce-in animation hook"
+  useScrollReveal:
+    description: "Scroll-triggered reveal animation"
+  useStaggerMotion:
+    description: "Staggered list animation hook"
+  useHoverMotion:
+    description: "Hover interaction animation"
