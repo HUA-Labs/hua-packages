@@ -31,10 +31,10 @@ import { Button, Card, useMotion, useTranslation } from '@hua-labs/hua'
 
 ```typescript
 // @hua-labs/hua/framework — Client entry ('use client')
-// HuaUxLayout, HuaUxPage, UnifiedProviders, defineConfig,
+// HuaProvider, HuaPage, UnifiedProviders, defineConfig,
 // BrandedButton, BrandedCard, ErrorBoundary, WelcomePage,
 // License, Plugin, Branding, A11y, Loading, Motion hooks
-import { HuaUxLayout, defineConfig, useBranding } from '@hua-labs/hua/framework'
+import { HuaProvider, defineConfig, useBranding } from '@hua-labs/hua/framework'
 ```
 
 ```typescript
@@ -108,7 +108,7 @@ import { /* pro features */ } from '@hua-labs/hua/pro'
 ```typescript
 // Server component importing client entry
 // 'use client' propagates, converting server component to client
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 
 // Client importing server entry
 // 'server-only' or fs module error

@@ -11,15 +11,15 @@ related:
 
 hua allows extending framework functionality through plugins. Plugins register components, hooks, and config schemas into the registry.
 
-## HuaUxPlugin Interface
+## HuaPlugin Interface
 
 ```typescript
-interface HuaUxPlugin {
+interface HuaPlugin {
   name: string                                    // Unique identifier (required)
   version: string                                 // Semantic version (required)
   license: LicenseType                            // 'free' | 'pro' | 'enterprise' (required)
   description?: string                            // Plugin description
-  init?(config: HuaUxConfig): void | Promise<void>  // Initialization function
+  init?(config: HuaConfig): void | Promise<void>  // Initialization function
   components?: Record<string, ComponentType<any>>    // Component extensions
   hooks?: Record<string, Function>                   // Hook extensions
   configSchema?: any                                 // Config schema (Zod, etc.)
@@ -32,7 +32,7 @@ interface HuaUxPlugin {
 ### registerPlugin
 
 ```typescript
-function registerPlugin(plugin: HuaUxPlugin): void
+function registerPlugin(plugin: HuaPlugin): void
 ```
 
 - License verification (`hasLicense(plugin.license)` or `plugin.checkLicense()`)
@@ -43,13 +43,13 @@ function registerPlugin(plugin: HuaUxPlugin): void
 ### getPlugin
 
 ```typescript
-function getPlugin(name: string): HuaUxPlugin | undefined
+function getPlugin(name: string): HuaPlugin | undefined
 ```
 
 ### getAllPlugins
 
 ```typescript
-function getAllPlugins(): HuaUxPlugin[]
+function getAllPlugins(): HuaPlugin[]
 ```
 
 ### pluginRegistry
@@ -82,9 +82,9 @@ pluginRegistry.getAll()
 ### 1. Defining a Plugin
 
 ```typescript
-import type { HuaUxPlugin } from '@hua-labs/hua/framework/shared'
+import type { HuaPlugin } from '@hua-labs/hua/framework/shared'
 
-const analyticsPlugin: HuaUxPlugin = {
+const analyticsPlugin: HuaPlugin = {
   name: 'analytics',
   version: '1.0.0',
   license: 'pro',

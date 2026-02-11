@@ -24,9 +24,9 @@ framework/config/
 ### client.ts (Safe everywhere)
 
 ```typescript
-export function defineConfig(config: Partial<HuaUxConfig>): HuaUxConfig
-export function getConfig(): HuaUxConfig
-export function setConfig(config: HuaUxConfig): void
+export function defineConfig(config: Partial<HuaConfig>): HuaConfig
+export function getConfig(): HuaConfig
+export function setConfig(config: HuaConfig): void
 export function resetConfig(): void
 ```
 
@@ -53,9 +53,9 @@ export default defineConfig({ preset: 'product' })
 ```tsx
 // app/layout.tsx (Server Component)
 import config from '../hua.config'          // Static import
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 export default function Layout({ children }) {
-  return <HuaUxLayout config={config}>{children}</HuaUxLayout>
+  return <HuaProvider config={config}>{children}</HuaProvider>
 }
 ```
 

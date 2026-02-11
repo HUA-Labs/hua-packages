@@ -1,0 +1,44 @@
+overview: "Production-ready translation loaders with built-in TTL caching, duplicate request prevention, and namespace preloading. Designed to work seamlessly with @hua-labs/i18n-core. Supports both server and client environments."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "API loader — createApiTranslationLoader with configurable endpoints"
+  - "TTL caching — Time-based cache with global cache support"
+  - "Duplicate prevention — Deduplicates concurrent requests for the same resource"
+  - "Preloading — Warm up namespaces and fallback languages at startup"
+  - "Default merging — Merge API translations with bundled defaults"
+
+quickStart: |
+  import { createCoreI18n } from '@hua-labs/i18n-core';
+  import { createApiTranslationLoader, preloadNamespaces } from '@hua-labs/i18n-loaders';
+
+  const loader = createApiTranslationLoader({
+    translationApiPath: '/api/translations',
+    cacheTtlMs: 60_000,
+    retryCount: 2,
+  });
+
+  // Preload at startup
+  preloadNamespaces('ko', ['common', 'dashboard'], loader);
+
+  // Use with i18n-core
+  const I18nProvider = createCoreI18n({
+    defaultLanguage: 'ko',
+    translationLoader: 'custom',
+    loadTranslations: loader,
+  });
+
+related:
+  - "i18n-core"
+  - "i18n-core-zustand"
+  - "i18n-formatters"
+
+apiNotes:
+  createApiTranslationLoader:
+    description: "Create API-based loader with caching and retry"
+  preloadNamespaces:
+    description: "Preload translation namespaces"
+  warmFallbackLanguages:
+    description: "Warm up fallback language caches"
+  withDefaultTranslations:
+    description: "Merge API results with bundled defaults"

@@ -1,0 +1,35 @@
+overview: "A collection of commonly used React hooks optimized for the hua ecosystem. Provides loading state management, auto-scroll functionality, and performance monitoring."
+
+features:
+  - "useLoading — Loading state with delay, message, and async wrapper"
+  - "useAutoScroll — Auto-scroll for chat-like interfaces with threshold control"
+  - "usePerformanceMonitor — Runtime FPS, frame time, and memory tracking"
+
+quickStart: |
+  import { useLoading, useAutoScroll } from '@hua-labs/hooks';
+
+  function ChatView({ messages }: { messages: Message[] }) {
+    const { isLoading, withLoading } = useLoading({ delay: 200 });
+    const { containerRef, scrollToBottom } = useAutoScroll([messages]);
+
+    const handleSend = () => withLoading(() => sendMessage(), 'Sending...');
+
+    return (
+      <div ref={containerRef} style={{ overflow: 'auto', height: 400 }}>
+        {messages.map((m) => <Message key={m.id} {...m} />)}
+        {isLoading && <Spinner />}
+      </div>
+    );
+  }
+
+related:
+  - "hua"
+  - "ui"
+
+apiNotes:
+  useLoading:
+    description: "Async loading state management with delay and message"
+  useAutoScroll:
+    description: "Chat-style auto-scroll with threshold control"
+  usePerformanceMonitor:
+    description: "Runtime FPS, frame time, and memory tracking"

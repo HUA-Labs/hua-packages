@@ -17,7 +17,7 @@ A React Context-based Provider that injects CSS variables into the DOM.
 
 ```typescript
 interface BrandingProviderProps {
-  branding: NonNullable<HuaUxConfig['branding']> | null
+  branding: NonNullable<HuaConfig['branding']> | null
   children: React.ReactNode
 }
 ```
@@ -36,7 +36,7 @@ interface BrandingProviderProps {
 ### useBranding
 
 ```typescript
-function useBranding(): HuaUxConfig['branding'] | null
+function useBranding(): HuaConfig['branding'] | null
 ```
 
 ```tsx
@@ -238,4 +238,4 @@ function CustomComponent() {
 - CSS variables are injected into `:root`. Defining the same variable name elsewhere may cause conflicts.
 - BrandingProvider dynamically inserts a style tag into the DOM. This requires `style-src 'unsafe-inline'` in your CSP.
 - The result of `generateTailwindConfig` is only useful at build time. Use CSS variables for runtime branding changes.
-- Both HuaUxLayout's ThemeInjector and BrandingProvider inject CSS variables. BrandingProvider's variables override ThemeInjector's default theme.
+- Both HuaProvider's ThemeInjector and BrandingProvider inject CSS variables. BrandingProvider's variables override ThemeInjector's default theme.

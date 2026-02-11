@@ -1,0 +1,125 @@
+overview: "Batteries-included framework for React product teams. Unifies UI components, animation hooks, internationalization, state management, and utilities into a single dependency with automatic provider setup for Next.js."
+docsUrl: "https://docs.hua-labs.com"
+
+features:
+  - "Pre-wired — UI, motion, i18n, state configured and ready to use"
+  - "Framework layer — Next.js-optimized with defineConfig and automatic providers"
+  - "Accessibility — WCAG 2.1 compliant utilities (focus management, skip-to-content)"
+  - "Loading UX — Built-in delayed loading, suspense wrappers"
+  - "Error handling — ErrorBoundary built into HuaPage"
+  - "White-labeling — SSR-compatible CSS variable injection via branding config"
+  - "GEO support — Generative Engine Optimization for AI search engines"
+
+quickStart: |
+  // hua.config.ts
+  import { defineConfig } from '@hua-labs/hua/framework/config';
+
+  export default defineConfig({
+    preset: 'product',
+    i18n: {
+      defaultLanguage: 'ko',
+      supportedLanguages: ['ko', 'en'],
+      namespaces: ['common'],
+      translationLoader: 'api',
+      translationApiPath: '/api/translations',
+    },
+  });
+
+  // app/layout.tsx
+  import { HuaProvider } from '@hua-labs/hua/framework';
+
+  export default function RootLayout({ children }) {
+    return (
+      <html lang="ko">
+        <body>
+          <HuaProvider>{children}</HuaProvider>
+        </body>
+      </html>
+    );
+  }
+
+related:
+  - "ui"
+  - "motion-core"
+  - "i18n-core"
+  - "state"
+  - "pro"
+
+subpathExports:
+  - path: "framework"
+    description: "Framework layer (HuaProvider, defineConfig, HuaPage)"
+  - path: "framework/server"
+    description: "Server-only framework utilities"
+  - path: "framework/config"
+    description: "Configuration types and defineConfig"
+  - path: "ui"
+    description: "Re-exports from @hua-labs/ui"
+  - path: "motion"
+    description: "Re-exports from @hua-labs/motion-core"
+  - path: "i18n"
+    description: "Re-exports from @hua-labs/i18n-core"
+  - path: "state"
+    description: "Re-exports from @hua-labs/state"
+  - path: "pro"
+    description: "Re-exports from @hua-labs/pro"
+  - path: "formatters"
+    description: "Re-exports from @hua-labs/i18n-formatters"
+  - path: "utils"
+    description: "Re-exports from @hua-labs/utils"
+  - path: "hooks"
+    description: "Re-exports from @hua-labs/hooks"
+  - path: "loaders"
+    description: "Re-exports from @hua-labs/i18n-loaders"
+
+apiFilter: notes-only
+
+apiNotes:
+  defineConfig:
+    description: "Define hua configuration with presets (product, landing, docs)"
+    kind: "function"
+  HuaProvider:
+    description: "Root layout provider — auto-wires theme, i18n, motion, branding"
+    kind: "component"
+  HuaPage:
+    description: "Page wrapper with ErrorBoundary and loading states"
+    kind: "component"
+  Button:
+    description: "Branded button — auto-applies branding colors when configured"
+    kind: "component"
+  Card:
+    description: "Branded card — auto-applies branding colors when configured"
+    kind: "component"
+
+sections:
+  - title: "Architecture"
+    content: |
+      `@hua-labs/hua` is a **meta-framework** that re-exports from sub-packages and adds a framework layer on top.
+
+      ```
+      @hua-labs/hua
+      ├── /framework     ← HuaProvider, defineConfig, HuaPage (framework-only)
+      ├── /ui             ← re-export @hua-labs/ui (100+ components)
+      ├── /motion          ← re-export @hua-labs/motion-core
+      ├── /i18n            ← re-export @hua-labs/i18n-core
+      ├── /state           ← re-export @hua-labs/state
+      ├── /formatters      ← re-export @hua-labs/i18n-formatters
+      ├── /hooks           ← re-export @hua-labs/hooks
+      ├── /utils           ← re-export @hua-labs/utils
+      ├── /loaders         ← re-export @hua-labs/i18n-loaders
+      └── /pro             ← re-export @hua-labs/pro
+      ```
+
+      The main entry (`@hua-labs/hua`) exports everything flat for convenience. Use subpath imports for tree-shaking.
+
+  - title: "Configuration Presets"
+    content: |
+      | Preset | Use Case | Includes |
+      |--------|----------|----------|
+      | `product` | Full-featured product app | UI + i18n + state + motion + branding |
+      | `landing` | Marketing/landing pages | UI + motion + GEO |
+      | `docs` | Documentation sites | UI + i18n + code blocks |
+
+      ```tsx
+      // Minimal config — preset handles defaults
+      export default defineConfig({ preset: 'product' });
+      ```

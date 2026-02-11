@@ -68,7 +68,7 @@ The framework layer **integrates and extends** sub-packages:
 
 ### Integration
 - **UnifiedProviders**: Auto-composes Icon + i18n + Motion + Toast + Branding Providers
-- **HuaUxLayout**: Layout + theme CSS injection + language transition animation
+- **HuaProvider**: Layout + theme CSS injection + language transition animation
 - **defineConfig**: Single config file for all sub-systems
 
 ### Extension (Branded Overrides)
@@ -82,7 +82,7 @@ The framework layer **integrates and extends** sub-packages:
 - **Plugin**: Extension plugin registry
 - **A11y**: Accessibility (focus management, live region)
 - **Loading**: Loading UI (SuspenseWrapper, useDelayedLoading)
-- **Error**: ErrorBoundary, HuaUxPage error boundaries
+- **Error**: ErrorBoundary, HuaPage error boundaries
 
 ## Config-to-Render Flow
 
@@ -91,9 +91,9 @@ hua.config.ts
   | defineConfig()
   | preset merge + validation
   v
-HuaUxConfig (cached)
+HuaConfig (cached)
   v
-HuaUxLayout
+HuaProvider
   +-- ThemeInjector -> CSS variable <style> injection
   +-- UnifiedProviders
   |   +-- BrandingProvider -> Branding CSS variables
@@ -102,7 +102,7 @@ HuaUxLayout
   |   +-- I18nProvider -> Language/translations
   +-- LanguageTransitionWrapper -> Fade on language switch
       +-- {children}
-          +-- HuaUxPage -> Motion + error boundary + vibe
+          +-- HuaPage -> Motion + error boundary + vibe
               +-- Actual page content
 ```
 
@@ -122,13 +122,13 @@ export default defineConfig({
 
 ```tsx
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 import config from '../hua.config'
 
 export default function RootLayout({ children }) {
   return (
     <html><body>
-      <HuaUxLayout config={config}>{children}</HuaUxLayout>
+      <HuaProvider config={config}>{children}</HuaProvider>
     </body></html>
   )
 }
@@ -151,19 +151,19 @@ function MyComponent() {
 ```tsx
 // app/layout.tsx (Server Component)
 import { getSSRTranslations } from '@hua-labs/hua/framework/server'
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 import config from '../hua.config'
 
 export default async function RootLayout({ children }) {
   const initialTranslations = await getSSRTranslations(config)
   return (
     <html><body>
-      <HuaUxLayout config={{
+      <HuaProvider config={{
         ...config,
         i18n: { ...config.i18n, initialTranslations }
       }}>
         {children}
-      </HuaUxLayout>
+      </HuaProvider>
     </body></html>
   )
 }
