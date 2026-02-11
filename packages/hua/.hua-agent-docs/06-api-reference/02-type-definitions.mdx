@@ -13,10 +13,10 @@ Core types and interfaces used in the hua framework.
 
 ## Config Types
 
-### HuaUxConfig
+### HuaConfig
 
 ```typescript
-interface HuaUxConfig {
+interface HuaConfig {
   preset?: Preset
   i18n?: {
     defaultLanguage: string
@@ -65,7 +65,7 @@ interface HuaUxConfig {
     }
     customVariables?: Record<string, string>
   }
-  plugins?: HuaUxPlugin[]
+  plugins?: HuaPlugin[]
   license?: { apiKey?: string; type?: 'free' | 'pro' | 'enterprise' }
 }
 ```
@@ -86,19 +86,19 @@ type Preset = PresetName | PresetConfig
 
 ## Component Props
 
-### HuaUxLayoutProps
+### HuaProviderProps
 
 ```typescript
-interface HuaUxLayoutProps {
+interface HuaProviderProps {
   children: React.ReactNode
-  config?: Partial<HuaUxConfig>
+  config?: Partial<HuaConfig>
 }
 ```
 
-### HuaUxPageProps
+### HuaPageProps
 
 ```typescript
-interface HuaUxPageProps {
+interface HuaPageProps {
   children: React.ReactNode
   title?: string
   description?: string
@@ -131,15 +131,15 @@ interface ErrorBoundaryProps {
 
 ## Plugin Types
 
-### HuaUxPlugin
+### HuaPlugin
 
 ```typescript
-interface HuaUxPlugin {
+interface HuaPlugin {
   name: string
   version: string
   license: LicenseType
   description?: string
-  init?(config: HuaUxConfig): void | Promise<void>
+  init?(config: HuaConfig): void | Promise<void>
   components?: Record<string, React.ComponentType<any>>
   hooks?: Record<string, Function>
   configSchema?: any

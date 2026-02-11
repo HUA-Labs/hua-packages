@@ -8,7 +8,7 @@ A system that makes it easy to remove default branding and apply custom brand id
 
 ### 1. Branding Configuration Type
 
-`HuaUxConfig` includes a `branding` field:
+`HuaConfig` includes a `branding` field:
 - `name`: Company/service name
 - `logo`: Logo path
 - `colors`: Color palette (primary, secondary, accent, success, warning, error, info)
@@ -75,7 +75,7 @@ export default defineConfig({
 ### Branding Config Type
 
 ```typescript
-export interface HuaUxConfig {
+export interface HuaConfig {
   // ...existing config
 
   branding?: {

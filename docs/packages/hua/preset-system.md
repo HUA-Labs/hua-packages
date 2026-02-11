@@ -48,9 +48,9 @@ export const productPreset = {
 
 **Usage**:
 ```tsx
-<HuaUxLayout preset="product">
+<HuaProvider preset="product">
   <Button>Click</Button>  // productPreset applied automatically
-</HuaUxLayout>
+</HuaProvider>
 ```
 
 ### 2. Marketing Preset
@@ -66,9 +66,9 @@ export const productPreset = {
 
 **Usage**:
 ```tsx
-<HuaUxLayout preset="marketing">
+<HuaProvider preset="marketing">
   <Button>Click</Button>  // marketingPreset applied automatically
-</HuaUxLayout>
+</HuaProvider>
 ```
 
 ## Applying Presets
@@ -86,13 +86,13 @@ export default defineConfig({
 
 ```tsx
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua/framework';
+import { HuaProvider } from '@hua-labs/hua/framework';
 
 export default function RootLayout({ children }) {
   return (
-    <HuaUxLayout preset="product">
+    <HuaProvider preset="product">
       {children}
-    </HuaUxLayout>
+    </HuaProvider>
   );
 }
 ```

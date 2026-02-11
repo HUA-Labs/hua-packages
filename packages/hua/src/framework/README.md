@@ -14,7 +14,7 @@ pnpm add @hua-labs/hua zustand
 
 ## Features
 
-- ✅ **Automatic Provider Setup**: `HuaUxLayout` automatically configures i18n, motion, and state
+- ✅ **Automatic Provider Setup**: `HuaProvider` automatically configures i18n, motion, and state
 - ✅ **Configuration System**: Type-safe configuration via `hua.config.ts`
 - ✅ **Data Fetching**: Type-safe utilities for server and client components
 - ✅ **Middleware System**: Built-in i18n middleware for language detection
@@ -26,7 +26,7 @@ pnpm add @hua-labs/hua zustand
 ### 사용 방법 선택
 
 **프레임워크 레이어를 사용하는 방법 (권장)**:
-- `HuaUxLayout`을 사용하면 모든 Provider가 자동으로 설정됩니다
+- `HuaProvider`를 사용하면 모든 Provider가 자동으로 설정됩니다
 - 설정 파일만으로 간단하게 시작할 수 있습니다
 
 **직접 사용하는 방법**:
@@ -63,13 +63,13 @@ export default defineConfig({
 
 ```tsx
 // app/layout.tsx
-import { HuaUxLayout } from '@hua-labs/hua/framework';
+import { HuaProvider } from '@hua-labs/hua/framework';
 
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
-        <HuaUxLayout>{children}</HuaUxLayout>
+        <HuaProvider>{children}</HuaProvider>
       </body>
     </html>
   );
@@ -84,13 +84,13 @@ export default function RootLayout({ children }) {
 // app/page.tsx
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 
 export default function HomePage() {
   return (
-    <HuaUxPage title="Home" description="Welcome page">
+    <HuaPage title="Home" description="Welcome page">
       <h1>Welcome</h1>
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
@@ -124,13 +124,13 @@ export default function HomePage() {
 // app/HomePageContent.tsx (Client Component)
 'use client';
 
-import { HuaUxPage } from '@hua-labs/hua/framework';
+import { HuaPage } from '@hua-labs/hua/framework';
 
 export function HomePageContent() {
   return (
-    <HuaUxPage title="Home" description="Welcome page">
+    <HuaPage title="Home" description="Welcome page">
       <h1>Welcome</h1>
-    </HuaUxPage>
+    </HuaPage>
   );
 }
 ```
@@ -170,24 +170,24 @@ import {
 
 ### Components
 
-#### `HuaUxLayout`
+#### `HuaProvider`
 
 Root layout wrapper that automatically sets up all providers.
 
 ```tsx
-<HuaUxLayout config={overrideConfig}>
+<HuaProvider config={overrideConfig}>
   {children}
-</HuaUxLayout>
+</HuaProvider>
 ```
 
-#### `HuaUxPage`
+#### `HuaPage`
 
 Page wrapper with automatic motion and i18n support.
 
 ```tsx
-<HuaUxPage title="Page Title" enableMotion={true}>
+<HuaPage title="Page Title" enableMotion={true}>
   {children}
-</HuaUxPage>
+</HuaPage>
 ```
 
 ### Configuration
@@ -213,7 +213,7 @@ Load translations server-side to prevent language flickering. **Server Component
 **Import**: `@hua-labs/hua/framework/server`
 
 **Parameters**:
-- `config`: HuaUxConfig object (reads `i18n.namespaces` and `i18n.supportedLanguages`)
+- `config`: HuaConfig object (reads `i18n.namespaces` and `i18n.supportedLanguages`)
 - `translationsDir`: Path to translations directory (default: `'lib/translations'`)
 
 **Returns**: `Promise<Record<string, Record<string, Record<string, string>>>>`
@@ -237,21 +237,21 @@ your-app/
 
 ```tsx
 // app/layout.tsx (Server Component)
-import { HuaUxLayout } from '@hua-labs/hua/framework';
+import { HuaProvider } from '@hua-labs/hua/framework';
 import { getSSRTranslations } from '@hua-labs/hua/framework/server';
-import huaUxConfig from '../hua.config';
+import huaConfig from '../hua.config';
 
 export default async function RootLayout({ children }) {
   // Load all translations server-side
-  const initialTranslations = await getSSRTranslations(huaUxConfig);
+  const initialTranslations = await getSSRTranslations(huaConfig);
 
   // Or with custom path
-  // const initialTranslations = await getSSRTranslations(huaUxConfig, 'app/lib/translations');
+  // const initialTranslations = await getSSRTranslations(huaConfig, 'app/lib/translations');
 
   const configWithSSR = {
-    ...huaUxConfig,
+    ...huaConfig,
     i18n: {
-      ...huaUxConfig.i18n,
+      ...huaConfig.i18n,
       initialTranslations,
     },
   };
@@ -259,9 +259,9 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
-        <HuaUxLayout config={configWithSSR}>
+        <HuaProvider config={configWithSSR}>
           {children}
-        </HuaUxLayout>
+        </HuaProvider>
       </body>
     </html>
   );

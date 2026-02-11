@@ -1,12 +1,14 @@
 /**
  * create-hua - Main Logic
- * 
+ *
  * Project creation logic
  */
 
+import chalk from 'chalk';
 import { createProject } from './create-project';
 import { promptProjectName, promptAiContextOptions, type AiContextOptions } from './utils';
 import { checkVersion } from './version-check';
+import { isEnglishOnly, validateProjectName } from './shared';
 
 /**
  * Parse CLI arguments for AI context options and other flags
@@ -18,8 +20,10 @@ function parseAiContextOptions(): {
 } {
   const args = process.argv.slice(2);
   const flags = {
-    '--no-cursorrules': false,
+    '--no-cursor-rules': false,
     '--no-ai-context': false,
+    '--no-agents-md': false,
+    '--no-skills-md': false,
     '--no-claude-context': false,
     '--claude-skills': false,
     '--lang': 'both',
@@ -28,9 +32,10 @@ function parseAiContextOptions(): {
     '--non-interactive': false,
   };
 
-  // Simple flag parsing
-  if (args.includes('--no-cursorrules')) flags['--no-cursorrules'] = true;
+  if (args.includes('--no-cursor-rules')) flags['--no-cursor-rules'] = true;
   if (args.includes('--no-ai-context')) flags['--no-ai-context'] = true;
+  if (args.includes('--no-agents-md')) flags['--no-agents-md'] = true;
+  if (args.includes('--no-skills-md')) flags['--no-skills-md'] = true;
   if (args.includes('--no-claude-context')) flags['--no-claude-context'] = true;
   if (args.includes('--claude-skills')) flags['--claude-skills'] = true;
   if (args.includes('--dry-run')) flags['--dry-run'] = true;
@@ -52,11 +57,12 @@ function parseAiContextOptions(): {
     nonInteractive?: boolean;
   } = {};
 
-  // If any flags are set, return parsed options
   if (args.some(arg => arg.startsWith('--'))) {
     result.options = {
-      cursorrules: !flags['--no-cursorrules'],
+      cursorRules: !flags['--no-cursor-rules'],
       aiContext: !flags['--no-ai-context'],
+      agentsMd: !flags['--no-agents-md'],
+      skillsMd: !flags['--no-skills-md'],
       claudeContext: !flags['--no-claude-context'],
       claudeSkills: flags['--claude-skills'],
       language: flags['--lang'] as 'ko' | 'en' | 'both',
@@ -70,7 +76,7 @@ function parseAiContextOptions(): {
 }
 
 export async function main(): Promise<void> {
-  // Check version (skip in CI/test environments)
+  // Check version (skip in CI/test environments or --skip-version-check)
   if (!process.env.CI && !process.env.NON_INTERACTIVE) {
     await checkVersion().catch(() => {
       // Silently continue if version check fails
@@ -89,21 +95,39 @@ export async function main(): Promise<void> {
   // Get project name from args (first non-flag argument)
   const projectName = args.find(arg => !arg.startsWith('--'));
 
+  // Validate project name if provided via CLI
+  if (projectName) {
+    const validation = validateProjectName(projectName);
+    if (!validation.valid) {
+      const isEn = isEnglishOnly();
+      console.error(chalk.red(validation.message!));
+      console.error(
+        isEn
+          ? 'Usage: npx create-hua <project-name> [options]'
+          : 'Usage: npx create-hua <project-name> [options]'
+      );
+      process.exit(1);
+    }
+  }
+
   if (!projectName) {
     try {
       const name = await promptProjectName();
       if (!name) {
-        const isEn = process.env.LANG === 'en' || process.env.CLI_LANG === 'en' || process.argv.includes('--english-only');
-        console.error(isEn ? 'Project name is required' : 'Project name is required / 프로젝트 이름이 필요합니다');
-        console.error('Usage: npx @hua-labs/create-hua <project-name> [--claude-skills] [--lang ko|en|both] [--dry-run] [--install] [--non-interactive] [--english-only]');
+        const isEn = isEnglishOnly();
+        console.error(
+          isEn
+            ? 'Project name is required'
+            : 'Project name is required / 프로젝트 이름이 필요합니다'
+        );
+        console.error('Usage: npx create-hua <project-name> [--no-cursor-rules] [--no-agents-md] [--no-skills-md] [--claude-skills] [--lang ko|en|both] [--dry-run] [--install] [--non-interactive] [--english-only] [--skip-version-check]');
         process.exit(1);
       }
-      // AI context generation options
       const aiContextOptions = await promptAiContextOptions();
       const parsed = parseAiContextOptions();
       await createProject(name, aiContextOptions, {
         dryRun: parsed.dryRun,
-        skipPrerequisites: parsed.dryRun, // Skip prerequisites in dry-run
+        skipPrerequisites: parsed.dryRun,
       });
       return;
     } catch (error) {
@@ -119,17 +143,17 @@ export async function main(): Promise<void> {
   let aiContextOptions: AiContextOptions;
 
   if (parsed.options) {
-    // Use CLI options if provided
     aiContextOptions = parsed.options;
   } else {
-    // Try to prompt, fallback to defaults if not interactive
     try {
       aiContextOptions = await promptAiContextOptions();
     } catch (error) {
       console.warn('Failed to get interactive options, using defaults');
       aiContextOptions = {
-        cursorrules: true,
+        cursorRules: true,
         aiContext: true,
+        agentsMd: true,
+        skillsMd: true,
         claudeContext: true,
         claudeSkills: false,
         language: 'both',
@@ -147,21 +171,19 @@ export async function main(): Promise<void> {
     const { execSync } = await import('child_process');
     const { resolveProjectPath } = await import('./create-project');
     const projectPath = resolveProjectPath(projectName);
-    const chalk = (await import('chalk')).default;
 
-    console.log(chalk.blue('\n📦 Installing dependencies...'));
+    console.log(chalk.blue('\nInstalling dependencies...'));
     try {
       execSync('pnpm install', {
         cwd: projectPath,
         stdio: 'inherit',
       });
-      console.log(chalk.green('✅ Dependencies installed'));
+      console.log(chalk.green('Dependencies installed'));
     } catch (error) {
-      console.error(chalk.red('❌ Failed to install dependencies'));
+      console.error(chalk.red('Failed to install dependencies'));
       throw error;
     }
   }
 }
-
 // Export for use in bin file
 export { createProject };

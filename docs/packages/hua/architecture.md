@@ -41,8 +41,8 @@ A **layered architecture** designed to satisfy both traditional developers and v
 |-- .                     -> Full integration (UI+Motion+i18n+State+Pro)
 |
 |-- /framework            -> Framework layer
-|   |-- HuaUxLayout       -> Provider auto-setup
-|   |-- HuaUxPage         -> Page wrapper (motion + i18n)
+|   |-- HuaProvider       -> Provider auto-setup
+|   |-- HuaPage         -> Page wrapper (motion + i18n)
 |   |-- WelcomePage       -> Start page
 |   |-- defineConfig       -> Declarative config
 |   |-- useMotion          -> Unified motion hook
@@ -99,13 +99,13 @@ import { createHuaStore, createI18nStore } from '@hua-labs/hua/state';
 
 **Features**:
 - Declarative config (`defineConfig`)
-- Auto Provider setup (`HuaUxLayout`)
+- Auto Provider setup (`HuaProvider`)
 - Preset system
 
 **Usage**:
 ```typescript
 // Framework components
-import { HuaUxLayout, HuaUxPage, WelcomePage } from '@hua-labs/hua/framework';
+import { HuaProvider, HuaPage, WelcomePage } from '@hua-labs/hua/framework';
 import { defineConfig } from '@hua-labs/hua/framework';
 import { useMotion } from '@hua-labs/hua/framework';
 
@@ -171,7 +171,7 @@ project/
 
 ```typescript
 // Recommended - framework subpath
-import { HuaUxLayout, useMotion } from '@hua-labs/hua/framework';
+import { HuaProvider, useMotion } from '@hua-labs/hua/framework';
 import { Button, Card } from '@hua-labs/hua/ui';
 import { useTranslation } from '@hua-labs/hua/i18n';
 import { useFadeIn } from '@hua-labs/hua/motion';
@@ -182,7 +182,7 @@ import { createI18nStore } from '@hua-labs/hua/state';
 
 ```typescript
 // Allowed - full integration (tree-shaking supported)
-import { Button, useTranslation, useFadeIn, HuaUxLayout } from '@hua-labs/hua';
+import { Button, useTranslation, useFadeIn, HuaProvider } from '@hua-labs/hua';
 ```
 
 ### Advanced: Direct Package Usage

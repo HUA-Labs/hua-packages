@@ -145,14 +145,14 @@ export function usePreset(): Preset {
 }
 ```
 
-#### 2.2 HuaUxLayout Auto-Applies Preset
+#### 2.2 HuaProvider Auto-Applies Preset
 
 ```typescript
-// packages/hua/src/framework/components/HuaUxLayout.tsx
+// packages/hua/src/framework/components/HuaProvider.tsx
 import { PresetProvider } from '../context/PresetContext';
 import { productPreset } from '../../presets/product';
 
-export function HuaUxLayout({
+export function HuaProvider({
   children,
   preset = 'product'  // Default
 }: {
@@ -404,7 +404,7 @@ export default defineConfig({
 - Preset typography (with future font subsetting in mind)
 - Preset component defaults
 - PresetContext implementation
-- HuaUxLayout PresetProvider integration
+- HuaProvider PresetProvider integration
 
 ### Phase 2 (Beta) - Auto-Application
 - Stack, Grid layout components use Preset spacing automatically

@@ -40,13 +40,15 @@ const shared = {
     '@hua-labs/i18n-core-zustand',
     '@hua-labs/i18n-formatters',
     '@hua-labs/state',
-    '@hua-labs/pro',
+    // '@hua-labs/pro' — intentionally NOT external: bundled into hua dist (source-private strategy)
     '@hua-labs/utils',
     '@hua-labs/hooks',
     '@hua-labs/i18n-loaders',
     // Icon libraries
     '@phosphor-icons/react',
   ],
+  // Force bundle @hua-labs/pro into hua dist (source-private strategy)
+  noExternal: ['@hua-labs/pro'],
   esbuildOptions(options: { jsx?: string }) {
     options.jsx = 'automatic';
   },

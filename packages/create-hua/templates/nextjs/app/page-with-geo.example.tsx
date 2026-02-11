@@ -52,7 +52,7 @@ export default function HomePage() {
 // ============================================
 'use client';
 
-import { HuaUxPage } from "@hua-labs/hua/framework";
+import { HuaPage } from "@hua-labs/hua/framework";
 import { Button, Card } from "@hua-labs/hua/ui";
 import { useTranslation } from '@hua-labs/hua/i18n';
 
@@ -60,7 +60,7 @@ export function HomePageContent() {
   const { t } = useTranslation('common');
   
   return (
-    <HuaUxPage title={t('title')} description={t('welcome')}>
+    <HuaPage title={t('title')} description={t('welcome')}>
       <div className="min-h-screen flex items-center justify-center p-8">
         <Card className="max-w-2xl w-full">
           <div className="p-8 text-center space-y-6">
@@ -75,6 +75,6 @@ export function HomePageContent() {
           </div>
         </Card>
       </div>
-    </HuaUxPage>
+    </HuaPage>
   );
 }

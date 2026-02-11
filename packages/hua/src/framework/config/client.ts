@@ -10,6 +10,9 @@ import { validateConfig } from './schema';
 import { mergePresetWithConfig, createConfigFromUserConfig } from './merge';
 import { initLicense } from '../license';
 import { pluginRegistry } from '../plugins';
+import { createLogger } from '../../utils/logger';
+
+const log = createLogger('hua:config');
 
 /**
  * Global config cache
@@ -70,7 +73,7 @@ export function defineConfig(config: Partial<HuaConfig>): HuaConfig {
     // 플러그인 초기화 (설정이 완료된 후)
     if (config.plugins && config.plugins.length > 0) {
       pluginRegistry.initializeAll(validated).catch((error: Error) => {
-        console.error('[hua] Plugin initialization error:', error);
+        log.error('Plugin initialization error', { error: String(error) });
       });
     }
 
@@ -84,7 +87,7 @@ export function defineConfig(config: Partial<HuaConfig>): HuaConfig {
   // 플러그인 초기화 (설정이 완료된 후)
   if (config.plugins && config.plugins.length > 0) {
     pluginRegistry.initializeAll(validated).catch((error: Error) => {
-      console.error('[hua] Plugin initialization error:', error);
+      log.error('Plugin initialization error', { error: String(error) });
     });
   }
 

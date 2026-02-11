@@ -7,9 +7,10 @@
 import type { LicenseFeature } from './types';
 
 /**
- * 구매 링크 (향후 실제 링크로 변경)
+ * 구매 링크
+ * Purchase link for license information
  */
-const PURCHASE_URL = ''; // TODO: Add purchase link when domain is available
+const PURCHASE_URL = 'https://github.com/HUA-Labs/hua-platform/blob/main/packages/hua/docs/LICENSE.md';
 
 /**
  * 라이선스 에러 메시지 생성

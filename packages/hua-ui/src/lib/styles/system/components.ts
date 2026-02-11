@@ -114,7 +114,7 @@ function createButtonVariantStyle(
   }
 
   // HUA UI 기본 색상: CSS 변수 arbitrary value 사용
-  // @theme 없이도 동작 - HuaUxLayout에서 CSS 변수 자동 주입
+  // @theme 없이도 동작 - HuaProvider에서 CSS 변수 자동 주입
   switch (variant) {
     case "default":
       // 프라이머리 (CSS 변수 - arbitrary value)

@@ -8,6 +8,9 @@
 'use client';
 
 import { useEffect, useRef, useMemo, type RefObject } from 'react';
+import { createLogger } from '../../../utils/logger';
+
+const log = createLogger('hua:a11y:focus-management');
 
 /**
  * Focus Management 옵션
@@ -110,7 +113,7 @@ export function useFocusManagement<T extends HTMLElement = HTMLElement>(
         } catch (error) {
           // focus() 실패 시 조용히 처리
           if (process.env.NODE_ENV === 'development') {
-            console.warn('[useFocusManagement] Failed to focus element:', error);
+            log.warn('Failed to focus element', { error: String(error) });
           }
         }
       }, 0);

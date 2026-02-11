@@ -35,7 +35,7 @@ Memory cache-based. No fs access. Safe in `'use client'` environment.
 ### server.ts (Server only)
 
 ```typescript
-export function loadConfig(): HuaUxConfig
+export function loadConfig(): HuaConfig
 ```
 
 Uses `require`/`eval` to load config from filesystem. Not available in Edge Runtime.
