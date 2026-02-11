@@ -23,7 +23,7 @@ describe('Input', () => {
     const { container } = render(<Input type="text" />);
     
     const input = container.querySelector('input');
-    expect(input).toHaveClass('hover:border-cyan-400', 'hover:shadow-sm');
+    expect(input).toHaveClass('hover:border-accent-foreground', 'hover:shadow-sm');
   });
 
   it('should handle user input', async () => {
