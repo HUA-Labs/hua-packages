@@ -20,7 +20,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "test": "echo \"No tests defined\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "echo 'Skipping lint for hua-i18n-loaders (TypeScript only, linted by tsc)'",
     "type-check": "tsc --noEmit"
   },
@@ -40,7 +41,8 @@
     "eslint": "^10.0.0",
     "react": "^19.2.4",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.1"
   },
   "keywords": [
     "hua-labs",
