@@ -371,6 +371,16 @@ export function I18nProvider({
     return translator.getRawValue(key, language);
   }, [translator, isInitialized]);
 
+  // 배열 번역 값 가져오기 (타입 안전)
+  const tArray = useCallback((key: string, language?: string): string[] => {
+    void translationVersion;
+    void currentLanguage;
+    if (!translator || !isInitialized) {
+      return [];
+    }
+    return translator.tArray(key, language);
+  }, [translator, isInitialized, translationVersion, currentLanguage]);
+
   // 개발자 도구 (메모이제이션)
   const debug = useMemo(() => ({
     getCurrentLanguage: () => {
@@ -472,6 +482,7 @@ export function I18nProvider({
     currentLanguage,
     setLanguage,
     t,
+    tArray,
     tAsync,
     tSync,
     getRawValue,
@@ -481,7 +492,7 @@ export function I18nProvider({
     debug,
     isInitialized,
     translationVersion,
-  }), [currentLanguage, setLanguage, t, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
+  }), [currentLanguage, setLanguage, t, tArray, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
 
   return (
     <I18nContext.Provider value={value}>
@@ -504,6 +515,7 @@ export function useI18n(): I18nContextType {
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
       getRawValue: () => undefined,
+      tArray: () => [],
       isLoading: false,
       error: null,
       supportedLanguages: [
@@ -531,10 +543,11 @@ export function useI18n(): I18nContextType {
  * 간단한 번역 훅 (hua-api 스타일)
  */
 export function useTranslation() {
-  const { t, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
+  const { t, tArray, getRawValue, currentLanguage, setLanguage, isLoading, error, supportedLanguages } = useI18n();
 
   return {
     t,
+    tArray,
     getRawValue,
     currentLanguage,
     setLanguage,

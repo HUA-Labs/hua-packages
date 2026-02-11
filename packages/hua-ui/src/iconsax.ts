@@ -1,14 +1,15 @@
 /**
- * Iconsax Icons Entry Point
+ * Iconsax Icons Entry Point (Essential Only)
  *
- * iconsax 아이콘은 코어 번들에서 분리되어 있습니다.
- * 이 entry를 import하면 자동으로 iconsax resolver가 등록됩니다.
+ * 에센셜 아이콘(57개)만 번들에 포함됩니다.
+ * PROJECT_ICONS에서 실제 사용되는 iconsax 매핑만 즉시 로드.
  *
  * 사용법:
- * - import { IconsaxGallery } from '@hua-labs/ui/iconsax'
- * - import '@hua-labs/ui/iconsax' (resolver 등록만)
+ * - import '@hua-labs/ui/iconsax' (resolver 등록 + 에센셜 아이콘)
+ * - import { getIconsaxIconSync } from '@hua-labs/ui/iconsax'
  *
- * 프레임워크(hua)에서도 이 entry를 통해 iconsax를 지원할 수 있습니다.
+ * 전체 아이콘이 필요하면:
+ * - import '@hua-labs/ui/iconsax-extended'
  */
 
 import { registerIconsaxResolver } from './lib/icon-providers'
@@ -19,9 +20,8 @@ registerIconsaxResolver((name: string, variant?: string) => {
   return getIconsaxIconSync(name, (variant as 'line' | 'bold') ?? 'line')
 })
 
-// Gallery
-export { IconsaxGallery, ICONSAX_ICON_NAMES } from './components/IconsaxGallery'
-export type { IconsaxGalleryProps, IconsaxIconName } from './components/IconsaxGallery'
+// Gallery is only available in iconsax-extended (imports all icons)
+// import { IconsaxGallery } from '@hua-labs/ui/iconsax-extended'
 
 // Loader utilities
 export {
@@ -30,11 +30,11 @@ export {
   preloadIconsaxIcons,
   preloadCommonIconsaxIcons,
   isIconsaxIconCached,
-  getCachedIconsaxIcons,
   createLazyIconsaxIcon,
+  registerExtendedIcons,
 } from './lib/iconsax-loader'
 export type { IconsaxIconComponent } from './lib/iconsax-loader'
 
-// Re-export icon maps for direct access
-export { getIconsaxIcon, ICONSAX_ICONS } from './components/icons'
-export { getIconsaxBoldIcon, ICONSAX_BOLD_ICONS } from './components/icons-bold'
+// Essential icon maps (for direct access)
+export { ESSENTIAL_ICONSAX_ICONS, getEssentialIconsaxIcon } from './components/icons/essential'
+export { ESSENTIAL_ICONSAX_BOLD_ICONS, getEssentialIconsaxBoldIcon } from './components/icons-bold/essential'

@@ -9,7 +9,7 @@ import React from 'react';
 import { I18nProvider, useI18n } from './hooks/useI18n';
 import { useTranslation, useLanguageChange } from './hooks/useTranslation';
 import { Translator, ssrTranslate, serverTranslate } from './core/translator';
-import { I18nConfig } from './types';
+import { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey } from './types';
 
 // Window 객체 타입 확장
 declare global {
@@ -392,4 +392,4 @@ export { I18nProvider };
 export { Translator, ssrTranslate, serverTranslate };
 
 // 타입 export
-export type { I18nConfig }; 
+export type { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey };

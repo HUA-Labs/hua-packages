@@ -23,10 +23,11 @@ import { useI18n } from './useI18n';
  * ```
  */
 export function useTranslation() {
-  const { t, currentLanguage, setLanguage, getRawValue, isLoading, error, supportedLanguages, debug, isInitialized } = useI18n();
+  const { t, tArray, currentLanguage, setLanguage, getRawValue, isLoading, error, supportedLanguages, debug, isInitialized } = useI18n();
 
   return {
     t,
+    tArray,
     currentLanguage,
     setLanguage,
     getRawValue,

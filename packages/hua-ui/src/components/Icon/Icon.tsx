@@ -165,8 +165,14 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   }
 
   if (!ResolvedIcon) {
-    // iconsax resolver 미등록 시 조용히 처리
-    if (iconSet !== 'iconsax' || getIconsaxResolver()) {
+    if (iconSet === 'iconsax' && !getIconsaxResolver()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          `Icon "${iconName}" — iconsax resolver not registered. ` +
+          `Use HuaProvider with icons.set='iconsax', or add: import '@hua-labs/ui/iconsax'`
+        )
+      }
+    } else {
       console.warn(`Icon "${iconName}" not found for provider "${iconSet}"`)
     }
     return (
