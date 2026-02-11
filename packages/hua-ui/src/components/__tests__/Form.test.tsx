@@ -6,7 +6,7 @@ import { Label } from '../Label';
 
 describe('Form', () => {
   it('should render form element', () => {
-    render(
+    const { container } = render(
       <Form>
         <FormField>
           <Label>Test</Label>
@@ -15,13 +15,13 @@ describe('Form', () => {
       </Form>
     );
     
-    const form = screen.getByRole('form', { hidden: true });
+    const form = container.querySelector('form');
     expect(form).toBeInTheDocument();
   });
 
   it('should call onSubmit when form is submitted', () => {
     const handleSubmit = vi.fn((e) => e.preventDefault());
-    render(
+    const { container } = render(
       <Form onSubmit={handleSubmit}>
         <FormField>
           <Label>Test</Label>
@@ -29,8 +29,8 @@ describe('Form', () => {
         </FormField>
       </Form>
     );
-    
-    const form = screen.getByRole('form', { hidden: true });
+
+    const form = container.querySelector('form')!;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     
     expect(handleSubmit).toHaveBeenCalled();
