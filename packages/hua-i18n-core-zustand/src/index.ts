@@ -376,18 +376,21 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
 
 /**
  * Zustand 스토어와 i18n-core를 통합하는 Hook
- * 
+ *
+ * @template L - 언어 코드 타입
  * @param store - Zustand 스토어
- * @returns { language, setLanguage, t } - i18n 훅과 동일한 인터페이스
- * 
+ * @returns { language, setLanguage } - 언어 상태 및 변경 함수
+ *
  * @example
  * ```tsx
  * import { useZustandI18n } from '@hua-labs/i18n-core-zustand';
+ * import { useTranslation } from '@hua-labs/i18n-core';
  * import { useAppStore } from './store/useAppStore';
- * 
+ *
  * function MyComponent() {
- *   const { language, setLanguage, t } = useZustandI18n(useAppStore);
- *   
+ *   const { language, setLanguage } = useZustandI18n(useAppStore);
+ *   const { t } = useTranslation(); // t is from i18n-core, not from useZustandI18n
+ *
  *   return (
  *     <div>
  *       <p>{t('common:welcome')}</p>
@@ -396,13 +399,6 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
  *   );
  * }
  * ```
- */
-/**
- * Zustand 스토어와 i18n-core를 통합하는 Hook
- * 
- * @template L - 언어 코드 타입
- * @param store - Zustand 스토어
- * @returns { language, setLanguage } - 언어 상태 및 변경 함수
  */
 export function useZustandI18n<L extends string = SupportedLanguage | string>(
   store: UseBoundStore<StoreApi<ZustandLanguageStore<L>>>

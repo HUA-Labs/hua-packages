@@ -22,7 +22,7 @@ Loads translation files on the server and passes them to the client. Renders tra
 
 ```typescript
 function getSSRTranslations(
-  config: HuaUxConfig,
+  config: HuaConfig,
   translationsDir?: string  // default: 'translations'
 ): Record<string, Record<string, Record<string, string>>>
 // Returns: { [lang]: { [namespace]: { [key]: value } } }
@@ -39,7 +39,7 @@ function getSSRTranslations(
 Dynamically loads `hua.config.ts` (or `.js`, `.mjs`) from the filesystem.
 
 ```typescript
-function loadConfig(): HuaUxConfig
+function loadConfig(): HuaConfig
 ```
 
 **Search order:** `hua.config.ts` -> `.js` -> `.mjs` -> product preset defaults
@@ -50,13 +50,13 @@ function loadConfig(): HuaUxConfig
 
 ```tsx
 // BAD — client-side translation loading causes flicker
-<HuaUxLayout config={config}>{children}</HuaUxLayout>
+<HuaProvider config={config}>{children}</HuaProvider>
 
 // GOOD — SSR pre-loads translations
 const initialTranslations = await getSSRTranslations(config)
-<HuaUxLayout config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
+<HuaProvider config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
   {children}
-</HuaUxLayout>
+</HuaProvider>
 ```
 
 ### 2. Icons (SSR-safe by design)
@@ -93,7 +93,7 @@ translations/
 ```tsx
 // app/layout.tsx
 import { getSSRTranslations, loadConfig } from '@hua-labs/hua/framework/server'
-import { HuaUxLayout } from '@hua-labs/hua/framework'
+import { HuaProvider } from '@hua-labs/hua/framework'
 
 export default async function RootLayout({ children }) {
   const config = loadConfig()
@@ -101,9 +101,9 @@ export default async function RootLayout({ children }) {
   return (
     <html lang={config.i18n?.defaultLanguage}>
       <body>
-        <HuaUxLayout config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
+        <HuaProvider config={{ ...config, i18n: { ...config.i18n, initialTranslations } }}>
           {children}
-        </HuaUxLayout>
+        </HuaProvider>
       </body>
     </html>
   )

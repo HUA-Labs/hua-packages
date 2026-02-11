@@ -1,0 +1,41 @@
+overview: "A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions."
+
+features:
+  - "cn() class merging — Tailwind-safe class name merging via clsx + tailwind-merge"
+  - "Formatters — Date, number, file size, relative time"
+  - "Performance — debounce, throttle, memoize, delay, retry"
+  - "Validation — Email, password, URL, phone number, range checks"
+  - "String utils — UUID, slugify, truncate, case conversion (camel/pascal/snake/kebab)"
+  - "Sanitization — XSS prevention, HTML escaping, email masking"
+
+quickStart: |
+  import { cn, formatTimeAgo, debounce, validateEmail, sanitizeInput } from '@hua-labs/utils';
+
+  // Tailwind class merging
+  const cls = cn('px-4 py-2 bg-blue-500', isActive && 'bg-blue-700', 'px-6');
+
+  // Formatting
+  formatTimeAgo(new Date('2026-02-07')); // "4 days ago"
+
+  // Performance
+  const debouncedSearch = debounce(search, 300);
+
+  // Validation & sanitization
+  validateEmail('test@example.com'); // true
+  sanitizeInput('<script>alert("xss")</script>'); // safe string
+
+related:
+  - "hua"
+  - "hooks"
+
+apiNotes:
+  cn:
+    description: "Tailwind-safe class name merging (clsx + tailwind-merge)"
+  debounce:
+    description: "Debounce function calls with configurable delay"
+  throttle:
+    description: "Throttle function calls"
+  validateEmail:
+    description: "Email format validation"
+  sanitizeInput:
+    description: "XSS prevention input sanitizer"

@@ -1,5 +1,36 @@
+// ---------------------------------------------------------------------------
+// Plural (ICU / Intl.PluralRules)
+// ---------------------------------------------------------------------------
+export type PluralCategory = 'zero' | 'one' | 'two' | 'few' | 'many' | 'other';
+
+export interface PluralValue {
+  zero?: string;
+  one?: string;
+  two?: string;
+  few?: string;
+  many?: string;
+  other: string; // 필수
+}
+
+const PLURAL_CATEGORIES = new Set<string>(['zero', 'one', 'two', 'few', 'many', 'other']);
+
+export function isPluralValue(value: unknown): value is PluralValue {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj);
+  return (
+    keys.length > 0 &&
+    keys.every(k => PLURAL_CATEGORIES.has(k)) &&
+    Object.values(obj).every(v => typeof v === 'string') &&
+    typeof obj.other === 'string'
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Translation namespace
+// ---------------------------------------------------------------------------
 export interface TranslationNamespace {
-  [key: string]: string | string[] | TranslationNamespace;
+  [key: string]: string | string[] | PluralValue | TranslationNamespace;
 }
 
 export interface TranslationData {
@@ -123,6 +154,8 @@ export interface I18nContextType {
   setLanguage: (language: string) => void | Promise<void>;
   // 통합 번역 함수: t(key), t(key, language), t(key, params), t(key, params, language)
   t: (key: ResolveStringKey, paramsOrLang?: TranslationParams | string, language?: string) => string;
+  // 복수형 번역 함수: tPlural(key, count), tPlural(key, count, params), tPlural(key, count, params, language)
+  tPlural: (key: ResolvePluralKey, count: number, params?: Record<string, unknown>, language?: string) => string;
   // 기존 비동기 번역 함수 (하위 호환성)
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
   // 기존 동기 번역 함수 (하위 호환성)
@@ -179,6 +212,7 @@ export interface TypedTranslationKeys {}
 /** augmentation 시 좁혀진 타입, 미설정 시 string */
 export type ResolveStringKey = TypedTranslationKeys extends { stringKey: infer K } ? K & string : string;
 export type ResolveArrayKey = TypedTranslationKeys extends { arrayKey: infer K } ? K & string : string;
+export type ResolvePluralKey = TypedTranslationKeys extends { pluralKey: infer K } ? K & string : string;
 
 // 타입 안전한 번역 키 시스템 (단순화된 버전)
 export type TranslationKey<T> = T extends Record<string, unknown>

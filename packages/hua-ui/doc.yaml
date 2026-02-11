@@ -1,0 +1,45 @@
+overview: "Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and Tailwind CSS integration."
+
+features:
+  - "70+ components — Buttons, forms, tables, modals, overlays, and more"
+  - "Modular entry points — Import only what you need for optimal bundle size"
+  - "Accessible — ARIA attributes, keyboard navigation, WCAG compliant"
+  - "Dark mode — Built-in dark mode support"
+  - "Tailwind CSS — Utility-first styling with class variance authority"
+  - "Tree-shakeable — Side-effect free (except CSS)"
+
+quickStart: |
+  import { Button, Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
+  import { Input, Select } from '@hua-labs/ui/form';
+
+  function App() {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="Email" />
+          <Button>Submit</Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+related:
+  - "hua"
+  - "ui-dashboard"
+
+subpathExports:
+  - path: "form"
+    description: "Form components (Input, Select, DatePicker, Upload, etc.)"
+  - path: "icons"
+    description: "Icon components"
+  - path: "chart"
+    description: "Chart components"
+  - path: "data-display"
+    description: "Data display components (Table, Timeline, etc.)"
+  - path: "overlay"
+    description: "Overlay components (Modal, Drawer, Popover, etc.)"
+  - path: "feedback"
+    description: "Feedback components (Toast, Alert, etc.)"

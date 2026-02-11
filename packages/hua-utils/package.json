@@ -1,7 +1,7 @@
 {
   "name": "@hua-labs/utils",
   "version": "1.1.0",
-  "description": "공통 유틸리티 함수 모음",
+  "description": "Common utility functions for the hua ecosystem",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
