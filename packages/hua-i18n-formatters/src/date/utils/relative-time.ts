@@ -44,13 +44,13 @@ export function formatRelativeTime(
   const absDiff = Math.abs(diff);
   const isPast = diff > 0;
 
-  // 단위 순서
+  // 단위 순서 (큰 단위부터 작은 단위로)
   const unitOrder: TimeUnit[] = ['year', 'month', 'week', 'day', 'hour', 'minute', 'second'];
   const minIndex = unitOrder.indexOf(minUnit);
   const maxIndex = unitOrder.indexOf(maxUnit);
 
-  // 적절한 단위 찾기
-  for (let i = minIndex; i <= maxIndex; i++) {
+  // 적절한 단위 찾기 (maxUnit부터 minUnit까지, 큰 단위부터 작은 단위로)
+  for (let i = maxIndex; i <= minIndex; i++) {
     const unit = unitOrder[i];
     const unitMs = TIME_UNITS[unit];
     const value = Math.floor(absDiff / unitMs);
