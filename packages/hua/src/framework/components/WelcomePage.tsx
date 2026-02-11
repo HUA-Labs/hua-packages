@@ -128,8 +128,8 @@ export function WelcomePage({
 
   return (
     <HuaPage
-      title={t('welcome.title', 'Welcome')}
-      description={t('welcome.description', `Get started by editing app/page.tsx`)}
+      title={t('welcome.title' as any, 'Welcome')}
+      description={t('welcome.description' as any, `Get started by editing app/page.tsx`)}
       vibe="clean"
       {...pageProps}
     >
