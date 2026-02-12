@@ -1,6 +1,6 @@
 # @hua-labs/motion-core
 
-## 2.1.1
+## 2.2.1
 
 ### Patch Changes
 
