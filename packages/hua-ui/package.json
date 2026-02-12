@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/ui",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "HUA Labs - Modern React UI Component Library - Beautiful, accessible, and customizable components for React applications",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

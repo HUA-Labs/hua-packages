@@ -1,10 +1,17 @@
 # @hua-labs/ui
 
+## 2.0.2
+
+### Patch Changes
+
+- Complete test coverage across all 16 packages (3,255 tests). Regenerate README.md and ai.yaml documentation for all packages. Fix docs-engine vitest compatibility.
+
 ## [Unreleased] - 2026-01-11
 
 ### Added
 
 - **ColorPicker**: Tailwind 색상 팔레트 + HSL 커스텀 피커 지원
+
   - Tailwind 탭: 전체 Tailwind CSS 색상 프리셋
   - Custom 탭: HSL 2D 피커 + Hue 슬라이더 + HEX 입력
   - Black, White, Transparent 특수 색상 지원
@@ -12,6 +19,7 @@
   - `forwardRef` 지원
 
 - **MicroMotion System**: "스륵 부드럽고 쫀득한" 마이크로 모션
+
   - `useMicroMotion` 훅
   - `getMicroMotionClasses` 유틸리티
   - CSS 변수 기반 일관된 이징/듀레이션
@@ -24,11 +32,13 @@
 ### Changed
 
 - **Button hover 효과 개선**
+
   - `scale`: 1.05 → 1.02 (더 미묘하게) + `active:scale-[0.98]` 클릭 피드백
   - `glow`: 하드코딩 blue/cyan → `shadow-primary/20` 테마 연동
   - `slide`: -1 → -0.5 (더 미묘하게)
 
 - **ESLint v9 Flat Config 마이그레이션**
+
   - `eslint.config.mjs` 신규 생성
   - `typescript-eslint` ^8.35.1 사용
   - `eslint-plugin-react-hooks` ^5.2.0 사용
@@ -42,6 +52,7 @@
 ### Fixed
 
 - **조건부 Hooks 호출 버그 수정** (React rules-of-hooks 위반)
+
   - `Checkbox.tsx`, `Radio.tsx`, `Switch.tsx`, `Modal.tsx`
   - `id || React.useId()` → `const generatedId = useId(); id || generatedId`
 
