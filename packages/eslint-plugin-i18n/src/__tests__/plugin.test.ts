@@ -13,30 +13,30 @@ describe('eslint-plugin-i18n', () => {
 
   it('should export no-missing-key rule', () => {
     expect(plugin.rules['no-missing-key']).toBeDefined();
-    expect(plugin.rules['no-missing-key'].meta).toBeDefined();
-    expect(plugin.rules['no-missing-key'].meta.type).toBe('problem');
-    expect(plugin.rules['no-missing-key'].create).toBeTypeOf('function');
+    expect(plugin.rules['no-missing-key']!.meta).toBeDefined();
+    expect(plugin.rules['no-missing-key']!.meta!.type).toBe('problem');
+    expect(plugin.rules['no-missing-key']!.create).toBeTypeOf('function');
   });
 
   it('should export no-dynamic-key rule', () => {
     expect(plugin.rules['no-dynamic-key']).toBeDefined();
-    expect(plugin.rules['no-dynamic-key'].meta).toBeDefined();
-    expect(plugin.rules['no-dynamic-key'].meta.type).toBe('suggestion');
-    expect(plugin.rules['no-dynamic-key'].create).toBeTypeOf('function');
+    expect(plugin.rules['no-dynamic-key']!.meta).toBeDefined();
+    expect(plugin.rules['no-dynamic-key']!.meta!.type).toBe('suggestion');
+    expect(plugin.rules['no-dynamic-key']!.create).toBeTypeOf('function');
   });
 
   it('should export no-raw-text rule', () => {
     expect(plugin.rules['no-raw-text']).toBeDefined();
-    expect(plugin.rules['no-raw-text'].meta).toBeDefined();
-    expect(plugin.rules['no-raw-text'].meta.type).toBe('suggestion');
-    expect(plugin.rules['no-raw-text'].create).toBeTypeOf('function');
+    expect(plugin.rules['no-raw-text']!.meta).toBeDefined();
+    expect(plugin.rules['no-raw-text']!.meta!.type).toBe('suggestion');
+    expect(plugin.rules['no-raw-text']!.create).toBeTypeOf('function');
   });
 
   it('should export no-unused-key rule', () => {
     expect(plugin.rules['no-unused-key']).toBeDefined();
-    expect(plugin.rules['no-unused-key'].meta).toBeDefined();
-    expect(plugin.rules['no-unused-key'].meta.type).toBe('suggestion');
-    expect(plugin.rules['no-unused-key'].create).toBeTypeOf('function');
+    expect(plugin.rules['no-unused-key']!.meta).toBeDefined();
+    expect(plugin.rules['no-unused-key']!.meta!.type).toBe('suggestion');
+    expect(plugin.rules['no-unused-key']!.create).toBeTypeOf('function');
   });
 
   it('should export recommended config', () => {
@@ -55,23 +55,23 @@ describe('eslint-plugin-i18n', () => {
 
   it('should have proper rule meta schemas', () => {
     // no-dynamic-key schema
-    const dynamicKeySchema = plugin.rules['no-dynamic-key'].meta.schema;
+    const dynamicKeySchema = plugin.rules['no-dynamic-key']!.meta!.schema;
     expect(dynamicKeySchema).toBeDefined();
     expect(Array.isArray(dynamicKeySchema)).toBe(true);
-    expect(dynamicKeySchema[0].properties).toHaveProperty('functionNames');
-    expect(dynamicKeySchema[0].properties).toHaveProperty('allowPatterns');
+    expect((dynamicKeySchema as any)[0].properties).toHaveProperty('functionNames');
+    expect((dynamicKeySchema as any)[0].properties).toHaveProperty('allowPatterns');
 
     // no-raw-text schema
-    const rawTextSchema = plugin.rules['no-raw-text'].meta.schema;
+    const rawTextSchema = plugin.rules['no-raw-text']!.meta!.schema;
     expect(rawTextSchema).toBeDefined();
     expect(Array.isArray(rawTextSchema)).toBe(true);
-    expect(rawTextSchema[0].properties).toHaveProperty('allowedTerms');
-    expect(rawTextSchema[0].properties).toHaveProperty('checkAttributes');
+    expect((rawTextSchema as any)[0].properties).toHaveProperty('allowedTerms');
+    expect((rawTextSchema as any)[0].properties).toHaveProperty('checkAttributes');
 
     // no-missing-key schema
-    const missingKeySchema = plugin.rules['no-missing-key'].meta.schema;
+    const missingKeySchema = plugin.rules['no-missing-key']!.meta!.schema;
     expect(missingKeySchema).toBeDefined();
     expect(Array.isArray(missingKeySchema)).toBe(true);
-    expect(missingKeySchema[0].properties).toHaveProperty('keysFile');
+    expect((missingKeySchema as any)[0].properties).toHaveProperty('keysFile');
   });
 });
