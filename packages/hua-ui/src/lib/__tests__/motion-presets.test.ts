@@ -71,7 +71,7 @@ describe('EASING_FUNCTIONS', () => {
 
   it('should have valid cubic-bezier strings', () => {
     Object.values(EASING_FUNCTIONS).forEach(easing => {
-      expect(easing).toMatch(/^cubic-bezier\([\d\.\-\s,]+\)$/);
+      expect(easing).toMatch(/^cubic-bezier\([\d.\-\s,]+\)$/);
     });
   });
 
@@ -217,9 +217,9 @@ describe('CSS_MOTION_VARS', () => {
   it('should have valid CSS values', () => {
     expect(CSS_MOTION_VARS['--hua-motion-duration']).toMatch(/^\d+ms$/);
     expect(CSS_MOTION_VARS['--hua-motion-easing']).toMatch(/^cubic-bezier\(/);
-    expect(CSS_MOTION_VARS['--hua-motion-scale-hover']).toMatch(/^[\d\.]+$/);
-    expect(CSS_MOTION_VARS['--hua-motion-scale-active']).toMatch(/^[\d\.]+$/);
-    expect(CSS_MOTION_VARS['--hua-motion-translate-y']).toMatch(/^-?[\d\.]+px$/);
+    expect(CSS_MOTION_VARS['--hua-motion-scale-hover']).toMatch(/^[\d.]+$/);
+    expect(CSS_MOTION_VARS['--hua-motion-scale-active']).toMatch(/^[\d.]+$/);
+    expect(CSS_MOTION_VARS['--hua-motion-translate-y']).toMatch(/^-?[\d.]+px$/);
   });
 
   it('should have specific CSS values', () => {
