@@ -1,0 +1,88 @@
+overview: "Unified security toolkit with Free/Pro tiers. Free tier provides encryption (AES-256-GCM, PBKDF2), rate limiting (memory + Redis), password validation, and key management with zero external dependencies. Pro tier adds KMS envelope encryption, abuse pattern detection, and token estimation."
+
+features:
+  - "Envelope encryption — KMS-managed keys with AES-256-GCM + PBKDF2 fallback"
+  - "Smart detection — Auto-detects KMS (v2) and legacy PBKDF2 formats"
+  - "Rate limiting — Memory + Storage-backed (Redis), with built-in presets"
+  - "Password validation — Strength checks with bilingual error messages"
+  - "Client identity — Framework-agnostic IP/UA extraction and bot detection"
+  - "Key management — Config-based key rotation without app dependencies"
+  - "Abuse detection — Jailbreak/injection pattern matching engine"
+  - "Token estimation — LLM operation cost estimation"
+  - "Invisible CAPTCHA — Behavioral bot detection (browser-only)"
+
+quickStart: |
+  import {
+    encryptSmart, decryptSmart,
+    createMemoryRateLimiter, createStorageRateLimiter,
+    RATE_LIMIT_PRESETS,
+  } from '@hua-labs/security';
+  import { createRedisAdapter } from '@hua-labs/security/adapters';
+
+  // Encrypt (uses KMS if available, otherwise PBKDF2)
+  const encrypted = await encryptSmart('sensitive data');
+  const decrypted = await decryptSmart(encrypted);
+
+  // Rate limiting (in-memory)
+  const limiter = createMemoryRateLimiter();
+  const result = await limiter.checkRateLimit('user-123', '1.2.3.4', RATE_LIMIT_PRESETS.auth);
+
+  // Rate limiting (Redis-backed)
+  const adapter = createRedisAdapter({ client: redis });
+  const distributed = createStorageRateLimiter(adapter);
+  const res = await distributed.checkRateLimit('user-123', '1.2.3.4', RATE_LIMIT_PRESETS.analyze);
+
+codeBlockLang: typescript
+
+related:
+  - "hua"
+
+subpathExports:
+  - path: "server"
+    description: "Server-only exports (prevents client-side import)"
+  - path: "pro"
+    description: "Pro tier: KMS, abuse detection, token estimation"
+  - path: "client"
+    description: "Browser-only exports (InvisibleCaptcha)"
+  - path: "adapters"
+    description: "Storage adapters (StorageAdapter, RedisAdapter)"
+
+apiNotes:
+  encryptSmart:
+    description: "Encrypt with best available method (KMS or PBKDF2)"
+  decryptSmart:
+    description: "Decrypt with auto-format detection"
+  envelopeEncrypt:
+    description: "Direct KMS envelope encryption"
+  envelopeDecrypt:
+    description: "Direct KMS envelope decryption"
+  createMemoryRateLimiter:
+    description: "Create in-memory rate limiter instance"
+    kind: "function"
+  createStorageRateLimiter:
+    description: "Create storage-backed rate limiter (Redis, DB)"
+    kind: "function"
+  RATE_LIMIT_PRESETS:
+    description: "Built-in presets (default, auth, diary, search, analyze, sensitive)"
+    kind: "const"
+  validatePassword:
+    description: "Validate password strength with bilingual messages"
+  getClientIP:
+    description: "Extract client IP from request headers"
+  getUserAgent:
+    description: "Extract user agent from request headers"
+  KeyManager:
+    description: "Config-based encryption key manager"
+    kind: "class"
+  shouldSkipAnalysis:
+    description: "Check if input matches abuse patterns"
+  matchAbusePatterns:
+    description: "Match input against abuse detection patterns"
+  estimateTokens:
+    description: "Estimate LLM token count for text"
+  InvisibleCaptcha:
+    description: "Behavioral bot detection class (browser-only)"
+    kind: "class"
+  createRedisAdapter:
+    description: "Create Redis-backed StorageAdapter via DI"
+    kind: "function"

@@ -18,6 +18,7 @@
     "@hua-labs/pro",
     "create-hua",
     "@hua-labs/encryption",
+    "@hua-labs/security",
     "@hua-labs/docs-engine",
     "@hua-labs/ui-dashboard",
     "@hua-labs/api-lite"
