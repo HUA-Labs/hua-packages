@@ -264,9 +264,9 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
           }
           state.isSyncing = true;
           state.previousStoreLanguage = storeLanguage;
-          const result = setI18nLanguage(storeLanguage);
-          if (result && typeof result.then === 'function') {
-            result.finally(() => { state.isSyncing = false; });
+          const result = setI18nLanguage(storeLanguage) as unknown;
+          if (result && typeof (result as Promise<void>).then === 'function') {
+            (result as Promise<void>).finally(() => { state.isSyncing = false; });
           } else {
             queueMicrotask(() => { state.isSyncing = false; });
           }
@@ -328,9 +328,9 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
               if (process.env.NODE_ENV !== 'production') console.log(`🔄 [ZUSTAND-I18N] Store language changed, syncing to i18n: ${state.currentI18nLanguage} -> ${newLanguage}`);
             }
             state.isSyncing = true;
-            const result = setI18nLanguage(newLanguage);
-            if (result && typeof result.then === 'function') {
-              result.finally(() => { state.isSyncing = false; });
+            const result = setI18nLanguage(newLanguage) as unknown;
+            if (result && typeof (result as Promise<void>).then === 'function') {
+              (result as Promise<void>).finally(() => { state.isSyncing = false; });
             } else {
               queueMicrotask(() => { state.isSyncing = false; });
             }
@@ -347,9 +347,9 @@ export function createZustandI18n<L extends string = SupportedLanguage | string>
           }
           state.isSyncing = true;
           state.previousStoreLanguage = storeLanguage;
-          const result = setI18nLanguage(storeLanguage);
-          if (result && typeof result.then === 'function') {
-            result.finally(() => { state.isSyncing = false; });
+          const result = setI18nLanguage(storeLanguage) as unknown;
+          if (result && typeof (result as Promise<void>).then === 'function') {
+            (result as Promise<void>).finally(() => { state.isSyncing = false; });
           } else {
             queueMicrotask(() => { state.isSyncing = false; });
           }
