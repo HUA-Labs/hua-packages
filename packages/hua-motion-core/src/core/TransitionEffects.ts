@@ -403,7 +403,16 @@ export class TransitionEffects {
    */
   private enableGPUAcceleration(element: HTMLElement): void {
     element.style.willChange = 'transform, opacity'
-    element.style.transform = 'translateZ(0)'
+    // Preserve existing transform and append translateZ(0) for GPU acceleration
+    const currentTransform = element.style.transform
+    if (currentTransform && currentTransform !== 'none' && currentTransform !== '') {
+      // Only append if translateZ is not already present
+      if (!currentTransform.includes('translateZ')) {
+        element.style.transform = `${currentTransform} translateZ(0)`
+      }
+    } else {
+      element.style.transform = 'translateZ(0)'
+    }
   }
 
   /**
