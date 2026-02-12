@@ -15,12 +15,15 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@hua-labs/pro",
     "create-hua",
     "@hua-labs/encryption",
     "@hua-labs/security",
     "@hua-labs/docs-engine",
     "@hua-labs/ui-dashboard",
-    "@hua-labs/api-lite"
+    "@hua-labs/api-lite",
+    "my-app",
+    "hua-docs",
+    "hua-official",
+    "hua-api"
   ]
 }
