@@ -32,7 +32,19 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build publishable packages
-        run: pnpm build --filter "@hua-labs/*" --filter "!@hua-labs/pro" --filter "!@hua-labs/ui-dashboard" --filter "!@hua-labs/docs-engine" --filter "!@hua-labs/encryption" --filter "!@hua-labs/security" --filter "!@hua-labs/api-lite"
+        run: |
+          pnpm build \
+            --filter @hua-labs/utils \
+            --filter @hua-labs/hooks \
+            --filter @hua-labs/state \
+            --filter @hua-labs/motion-core \
+            --filter @hua-labs/i18n-core \
+            --filter @hua-labs/i18n-core-zustand \
+            --filter @hua-labs/i18n-formatters \
+            --filter @hua-labs/i18n-loaders \
+            --filter @hua-labs/eslint-plugin-i18n \
+            --filter @hua-labs/ui \
+            --filter @hua-labs/hua
 
       - name: Create .npmrc for npm token
         run: |
