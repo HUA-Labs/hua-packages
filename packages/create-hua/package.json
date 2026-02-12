@@ -15,7 +15,7 @@
     "prebuild": "tsx scripts/generate-version.ts && tsx scripts/validate-template.ts",
     "build": "node ../../node_modules/typescript/lib/tsc.js",
     "dev": "tsx src/index.ts",
-    "test": "tsx src/index.ts test-project",
+    "test": "vitest run",
     "test:cli": "bash scripts/test-cli.sh",
     "validate:template": "tsx scripts/validate-template.ts",
     "clean": "rm -rf dist",
@@ -31,7 +31,8 @@
     "@types/inquirer": "^9.0.7",
     "@types/node": "^25.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
   },
   "keywords": [
     "hua-labs",
