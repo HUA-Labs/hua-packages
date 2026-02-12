@@ -1,6 +1,7 @@
 {
   "name": "@hua-labs/security",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "HUA Labs Security - Encryption, Rate Limiting, Abuse Detection, and more",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
