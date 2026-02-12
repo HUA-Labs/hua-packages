@@ -53,6 +53,7 @@ export interface AiContextOptionFlags {
 export function parseVersion(v: string): number[] {
   return v
     .replace(/^v/, '')
+    .replace(/-.*$/, '')
     .split('.')
     .map((s) => parseInt(s, 10) || 0);
 }
@@ -183,7 +184,7 @@ export function validateProjectName(name: string): { valid: boolean; message?: s
   if (/^[._]/.test(name)) {
     return { valid: false, message: t('projectNameInvalidStartChar') };
   }
-  if (!/^[a-z0-9@][a-z0-9._-]*$/.test(name)) {
+  if (!/^[a-z0-9@][a-z0-9._\/-]*$/.test(name)) {
     return { valid: false, message: t('projectNameInvalidChars') };
   }
   return { valid: true };

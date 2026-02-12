@@ -83,7 +83,7 @@ function displayCacheClearInstructions() {
 /**
  * Check if version check should be skipped
  */
-function shouldSkipVersionCheck(): boolean {
+export function shouldSkipVersionCheck(): boolean {
   return !!(
     process.env.CI ||
     process.env.NON_INTERACTIVE ||
