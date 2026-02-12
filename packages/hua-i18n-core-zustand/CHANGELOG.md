@@ -1,5 +1,14 @@
 # @hua-labs/i18n-core-zustand
 
+## 2.0.2
+
+### Patch Changes
+
+- Complete test coverage across all 16 packages (3,255 tests). Regenerate README.md and ai.yaml documentation for all packages. Fix docs-engine vitest compatibility.
+- Updated dependencies
+  - @hua-labs/state@1.0.1
+  - @hua-labs/i18n-core@2.0.2
+
 ## 2.0.0-alpha.4
 
 ### Major Changes
