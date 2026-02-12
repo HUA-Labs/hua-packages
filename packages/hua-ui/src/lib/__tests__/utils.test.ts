@@ -24,7 +24,8 @@ describe('merge', () => {
 
   it('should handle arrays and conditional classes', () => {
     expect(merge(['text-sm', 'font-bold'])).toBe('text-sm font-bold');
-    expect(merge('text-sm', false && 'hidden', 'block')).toBe('text-sm block');
+    const shouldBeHidden = false;
+    expect(merge('text-sm', shouldBeHidden && 'hidden', 'block')).toBe('text-sm block');
   });
 
   it('should handle complex Tailwind merges', () => {
