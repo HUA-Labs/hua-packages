@@ -1,5 +1,11 @@
 # @hua-labs/motion-core
 
+## 2.1.1
+
+### Patch Changes
+
+- Complete test coverage across all 16 packages (3,255 tests). Regenerate README.md and ai.yaml documentation for all packages. Fix docs-engine vitest compatibility.
+
 ## 2.1.0-alpha.3
 
 ### Patch Changes
@@ -84,6 +90,7 @@
 - 950a40d: # HUA Motion Core v2.0.0 - React 19 compatibility and essential motion hooks
 
   **React 19 Migration:**
+
   - Updated peerDependencies to React >=19.0.0
   - Refactored type definitions for React 19 compatibility
   - Updated ref handling to work with React 19's stricter element types
@@ -91,16 +98,19 @@
   - Updated style types to support React 19's new CSS properties
 
   **Breaking Changes:**
+
   - Minimum React version: 19.0.0 (previously >=16.8.0)
   - Type definitions updated for React 19's stricter typing
 
   **Migration Guide:**
+
   - If you're using React 18 or earlier, stay on v1.x
   - For React 19 projects, upgrade to v2.x
   - No code changes required for most use cases
   - TypeScript users may need to update type annotations if using custom element types
 
   **Other Changes:**
+
   - 25 essential motion hooks for React applications
   - Full TypeScript support with comprehensive type definitions
   - Zero external dependencies, lightweight and performant

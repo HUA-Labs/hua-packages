@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/eslint-plugin-i18n",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint plugin for i18n type safety — missing keys, unused keys, raw text, dynamic keys",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
