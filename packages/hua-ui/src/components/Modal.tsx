@@ -198,10 +198,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       {showBackdrop && (
         <div
           className={merge(
-            "fixed inset-0 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
+            "fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
             backdropClassName
           )}
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
         />
       )}
 

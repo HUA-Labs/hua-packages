@@ -46,6 +46,18 @@ export type { VideoBackgroundProps } from "./VideoBackground";
 export { Carousel } from "./Carousel";
 export type { CarouselProps } from "./Carousel";
 
+// ImageReveal - 스크롤 기반 이미지 공개
+export { ImageReveal } from "./ImageReveal";
+export type { ImageRevealProps } from "./ImageReveal";
+
+// DotNav - 섹션 도트 네비게이터
+export { DotNav } from "./DotNav";
+export type { DotNavProps, DotNavItem } from "./DotNav";
+
+// HorizontalScroll - 가로 스크롤 변환
+export { HorizontalScroll } from "./HorizontalScroll";
+export type { HorizontalScrollProps } from "./HorizontalScroll";
+
 // ============================================
 // Emotion Analysis Components (Premium)
 // 감정 분석 컴포넌트 (프리미엄)

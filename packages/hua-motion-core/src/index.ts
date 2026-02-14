@@ -95,6 +95,25 @@ export { useGesture } from './hooks/useGesture'
 export { useGestureMotion } from './hooks/useGestureMotion'
 
 // ========================================
+// 고급 인터랙션 훅들 (Phase E)
+// ========================================
+
+export { useTypewriter } from './hooks/useTypewriter'
+export type { TypewriterOptions, TypewriterReturn } from './hooks/useTypewriter'
+
+export { useCustomCursor } from './hooks/useCustomCursor'
+export type { CustomCursorOptions, CustomCursorReturn } from './hooks/useCustomCursor'
+
+export { useMagneticCursor } from './hooks/useMagneticCursor'
+export type { MagneticCursorOptions, MagneticCursorReturn } from './hooks/useMagneticCursor'
+
+export { useSmoothScroll } from './hooks/useSmoothScroll'
+export type { SmoothScrollOptions, SmoothScrollReturn } from './hooks/useSmoothScroll'
+
+export { useElementProgress } from './hooks/useElementProgress'
+export type { ElementProgressOptions, ElementProgressReturn } from './hooks/useElementProgress'
+
+// ========================================
 // 프리셋 시스템 (Core 패키지 범위)
 // ========================================
 

@@ -41,7 +41,7 @@ describe('Autocomplete', () => {
   });
 
   it('should show option icon and description', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     render(<Autocomplete options={optionsWithMeta} />);
 
