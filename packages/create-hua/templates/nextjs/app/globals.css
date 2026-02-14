@@ -14,6 +14,8 @@
  * If you see "bg-primary not working" errors, make sure this import exists.
  */
 @import "@hua-labs/ui/styles/recommended-theme.css";
+@import "@hua-labs/ui/styles/utilities.css";
+@import "@hua-labs/ui/styles/landing.css";
 
 /* @custom-variant dark 는 recommended-theme.css에서 자동 포함됨 */
 

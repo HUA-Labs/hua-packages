@@ -1,0 +1,145 @@
+---
+title: Motion Hooks & Components
+description: "@hua-labs/motion-core API reference — Motion component, useStagger, useScrollReveal, useUnifiedMotion"
+category: api-reference
+related:
+  - ../01-getting-started/02-ui-export-paths.mdx
+---
+
+# Motion Hooks & Components (`@hua-labs/motion-core`)
+
+## `<Motion>` — Wrapper Component
+
+Eliminates manual `ref={motion.ref} style={motion.style}` wiring.
+
+```tsx
+import { Motion } from '@hua-labs/motion-core'
+
+// Basic fade-in (auto-start with IntersectionObserver)
+<Motion>content</Motion>
+
+// Scroll reveal with options
+<Motion scroll delay={200} className="grid grid-cols-3">
+  {children}
+</Motion>
+
+// Custom element type + motion type
+<Motion as="section" type="slideUp" duration={800}>
+  {children}
+</Motion>
+
+// Multi-effect mode
+<Motion effects={{ fade: true, slide: { direction: 'up' } }}>
+  {children}
+</Motion>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `as` | `'div' \| 'span' \| 'section' \| 'article' \| 'header' \| 'footer' \| 'main' \| 'nav'` | `'div'` | Wrapper element type |
+| `type` | `EntranceType` | `'fadeIn'` | Motion type |
+| `effects` | `MotionEffects` | — | Multi-effect mode |
+| `scroll` | `boolean \| ScrollRevealOptions` | — | Scroll-based reveal |
+| `delay` | `number` | — | Delay in ms |
+| `duration` | `number` | — | Duration in ms |
+
+Plus all standard HTML attributes (`className`, `style`, `id`, etc.).
+
+---
+
+## `useStagger` — List Stagger Hook
+
+Single IntersectionObserver for parent + automatic `transition-delay` per child.
+
+```tsx
+import { useStagger } from '@hua-labs/motion-core'
+
+const stagger = useStagger({ count: items.length, staggerDelay: 100 })
+
+<div ref={stagger.containerRef}>
+  {items.map((item, i) => (
+    <div style={stagger.styles[i]} key={i}>{item}</div>
+  ))}
+</div>
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `count` | `number` | required | Number of child items |
+| `staggerDelay` | `number` | `100` | Delay between items (ms) |
+| `baseDelay` | `number` | `0` | Initial delay before first item (ms) |
+| `duration` | `number` | `700` | Animation duration (ms) |
+| `motionType` | `ScrollRevealMotionType` | `'fadeIn'` | Motion type |
+| `threshold` | `number` | `0.1` | IntersectionObserver threshold |
+| `easing` | `string` | `'ease-out'` | CSS easing function |
+
+### Return
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `containerRef` | `RefObject<HTMLDivElement>` | Attach to parent container |
+| `styles` | `CSSProperties[]` | Per-item styles (index-matched) |
+| `isVisible` | `boolean` | Whether container is in viewport |
+
+---
+
+## `useScrollReveal` — Scroll Reveal Hook
+
+```tsx
+import { useScrollReveal } from '@hua-labs/motion-core'
+
+const reveal = useScrollReveal({ motionType: 'slideUp', delay: 200 })
+<div ref={reveal.ref} style={reveal.style}>...</div>
+```
+
+Motion types: `'fadeIn'` | `'slideUp'` | `'slideLeft'` | `'slideRight'` | `'scaleIn'` | `'bounceIn'`
+
+---
+
+## `useUnifiedMotion` — Unified Motion Hook
+
+Single hook for all entrance animations, supports multi-effect mode.
+
+```tsx
+import { useUnifiedMotion } from '@hua-labs/motion-core'
+
+// Single type
+const motion = useUnifiedMotion({ type: 'slideUp', delay: 100 })
+
+// Multi-effect
+const motion = useUnifiedMotion({
+  effects: { fade: true, slide: { direction: 'up' }, scale: { from: 0.95 } },
+})
+
+<div ref={motion.ref} style={motion.style}>...</div>
+```
+
+---
+
+## Landing Page Pattern
+
+```tsx
+import { Motion, useStagger } from '@hua-labs/motion-core'
+import { Section } from '@hua-labs/ui'
+
+function FeaturesSection({ features }) {
+  const stagger = useStagger({ count: features.length, staggerDelay: 100 })
+
+  return (
+    <Section header={{ title: "Features", subtitle: "What we offer" }}>
+      <div ref={stagger.containerRef} className="grid grid-cols-3 gap-6">
+        {features.map((f, i) => (
+          <div key={f.id} style={stagger.styles[i]} className="card-hover-lift">
+            <h3>{f.title}</h3>
+            <p>{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+```

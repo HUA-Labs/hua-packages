@@ -8,9 +8,18 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { BaseMotionReturn, MotionElement, EntranceType, BaseMotionOptions } from '../types'
 
+export interface MotionEffects {
+  fade?: boolean | { targetOpacity?: number }
+  slide?: boolean | { direction?: 'up' | 'down' | 'left' | 'right'; distance?: number }
+  scale?: boolean | { from?: number; to?: number }
+  bounce?: boolean
+}
+
 export interface UseUnifiedMotionOptions extends Omit<BaseMotionOptions, 'autoStart'> {
-  /** Motion type to use */
-  type: EntranceType
+  /** Motion type to use (single effect mode) */
+  type?: EntranceType
+  /** Multiple effects to combine (multi-effect mode) */
+  effects?: MotionEffects
   /** Auto start animation @default true */
   autoStart?: boolean
   /** Slide distance (px) for slide types @default 50 */
@@ -46,11 +55,85 @@ function getEasingForType(type: EntranceType, easing?: string): string {
   return 'ease-out'
 }
 
+function getMultiEffectInitialStyle(effects: MotionEffects, defaultDistance: number): Record<string, string | number> {
+  const style: Record<string, string | number> = {}
+  const transforms: string[] = []
+
+  if (effects.fade) {
+    style.opacity = 0
+  }
+
+  if (effects.slide) {
+    const config = typeof effects.slide === 'object' ? effects.slide : {}
+    const direction = config.direction ?? 'up'
+    const distance = config.distance ?? defaultDistance
+    switch (direction) {
+      case 'up': transforms.push(`translateY(${distance}px)`); break
+      case 'down': transforms.push(`translateY(-${distance}px)`); break
+      case 'left': transforms.push(`translateX(${distance}px)`); break
+      case 'right': transforms.push(`translateX(-${distance}px)`); break
+    }
+    if (!effects.fade) style.opacity = 0
+  }
+
+  if (effects.scale) {
+    const config = typeof effects.scale === 'object' ? effects.scale : {}
+    const from = config.from ?? 0.95
+    transforms.push(`scale(${from})`)
+    if (!effects.fade && !effects.slide) style.opacity = 0
+  }
+
+  if (effects.bounce) {
+    transforms.push('scale(0)')
+    if (!effects.fade && !effects.slide && !effects.scale) style.opacity = 0
+  }
+
+  if (transforms.length > 0) {
+    style.transform = transforms.join(' ')
+  } else {
+    style.transform = 'none'
+  }
+
+  // fade만 있을 때 transform 기본값
+  if (effects.fade && transforms.length === 0) {
+    style.transform = 'none'
+  }
+
+  return style
+}
+
+function getMultiEffectVisibleStyle(effects: MotionEffects): Record<string, string | number> {
+  const style: Record<string, string | number> = {}
+
+  if (effects.fade) {
+    const config = typeof effects.fade === 'object' ? effects.fade : {}
+    style.opacity = config.targetOpacity ?? 1
+  } else {
+    style.opacity = 1
+  }
+
+  if (effects.scale) {
+    const config = typeof effects.scale === 'object' ? effects.scale : {}
+    style.transform = `scale(${config.to ?? 1})`
+  } else {
+    style.transform = 'none'
+  }
+
+  return style
+}
+
+function getMultiEffectEasing(effects: MotionEffects, easing?: string): string {
+  if (easing) return easing
+  if (effects.bounce) return 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+  return 'ease-out'
+}
+
 export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
   options: UseUnifiedMotionOptions
 ): BaseMotionReturn<T> {
   const {
     type,
+    effects,
     duration = 600,
     autoStart = true,
     delay = 0,
@@ -64,7 +147,8 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
     onReset
   } = options
 
-  const resolvedEasing = getEasingForType(type, easing)
+  const resolvedType = type ?? 'fadeIn'
+  const resolvedEasing = getEasingForType(resolvedType, easing)
 
   const ref = useRef<T>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -137,7 +221,21 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
 
   // type에 맞는 스타일을 CSS transition으로 처리
   const style = useMemo(() => {
-    const base = isVisible ? getVisibleStyle() : getInitialStyle(type, distance)
+    if (effects) {
+      const base = isVisible ? getMultiEffectVisibleStyle(effects) : getMultiEffectInitialStyle(effects, distance)
+      const resolvedEasingMulti = getMultiEffectEasing(effects, easing)
+      return {
+        ...base,
+        transition: `all ${duration}ms ${resolvedEasingMulti}`,
+        '--motion-delay': `${delay}ms`,
+        '--motion-duration': `${duration}ms`,
+        '--motion-easing': resolvedEasingMulti,
+        '--motion-progress': `${progress}`
+      } as const
+    }
+
+    // 기존 단일 type 모드
+    const base = isVisible ? getVisibleStyle() : getInitialStyle(resolvedType, distance)
     return {
       ...base,
       transition: `all ${duration}ms ${resolvedEasing}`,
@@ -146,7 +244,7 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
       '--motion-easing': resolvedEasing,
       '--motion-progress': `${progress}`
     } as const
-  }, [isVisible, type, distance, duration, resolvedEasing, delay, progress])
+  }, [isVisible, type, effects, distance, duration, resolvedEasing, easing, delay, progress, resolvedType])
 
   return {
     ref,
