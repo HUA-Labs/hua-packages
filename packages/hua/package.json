@@ -106,6 +106,7 @@
   "files": [
     "dist",
     "src",
+    ".hua-agent-docs",
     "README.md"
   ],
   "scripts": {

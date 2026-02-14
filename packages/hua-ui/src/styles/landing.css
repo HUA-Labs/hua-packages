@@ -1,0 +1,107 @@
+/**
+ * HUA-UI Landing Page Utilities
+ *
+ * Usage: @import "@hua-labs/ui/styles/landing.css";
+ *
+ * Opt-in CSS utilities for landing pages.
+ * All values use CSS custom properties — works with any theme.
+ *
+ * Provides: .gradient-bg, .gradient-bg-soft, .section-line, .section-line-left,
+ *           .mesh-primary, .mesh-accent, .stat-number, .card-hover-lift
+ */
+
+/* ── Gradient backgrounds ─────────────────────────── */
+
+.gradient-bg {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary, hsl(var(--primary))) 0%,
+    var(--color-accent, hsl(var(--accent-foreground))) 100%
+  );
+}
+
+.gradient-bg-soft {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 15%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 10%, transparent) 100%
+  );
+}
+
+/* ── Section decorator ────────────────────────────── */
+
+.section-line {
+  width: 80px;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary, hsl(var(--primary))),
+    var(--color-accent, hsl(var(--accent-foreground)))
+  );
+  margin-bottom: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-line-left {
+  width: 80px;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary, hsl(var(--primary))),
+    var(--color-accent, hsl(var(--accent-foreground)))
+  );
+  margin-bottom: 1.5rem;
+}
+
+/* ── Mesh backgrounds ─────────────────────────────── */
+
+.mesh-primary {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 20% 40%,
+      color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 8%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 80% at 80% 60%,
+      color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 5%, transparent),
+      transparent
+    );
+}
+
+.mesh-accent {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 80% 30%,
+      color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 8%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 80% at 20% 70%,
+      color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 5%, transparent),
+      transparent
+    );
+}
+
+/* ── Stat number ──────────────────────────────────── */
+
+.stat-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ── Card hover lift ──────────────────────────────── */
+
+.card-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.15),
+    0 8px 16px -8px rgba(0, 0, 0, 0.1);
+}
