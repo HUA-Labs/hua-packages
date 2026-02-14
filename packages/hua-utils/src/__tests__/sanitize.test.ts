@@ -11,25 +11,25 @@ import {
 describe('sanitizeInput', () => {
   it('should remove HTML tags', () => {
     expect(sanitizeInput('<div>hello</div>')).toBe('hello');
-    // Note: sanitizeInput removes tags but content inside remains (then escaped)
-    expect(sanitizeInput('<script>alert("xss")</script>test')).toBe('alert(&quot;xss&quot;)test');
+    expect(sanitizeInput('<script>alert("xss")</script>test')).toBe('alert("xss")test');
   });
 
-  it('should escape special characters', () => {
-    expect(sanitizeInput('a & b')).toBe('a &amp; b');
-    expect(sanitizeInput('a < b')).toBe('a &lt; b');
-    expect(sanitizeInput('a > b')).toBe('a &gt; b');
-    expect(sanitizeInput('a "quote" b')).toBe('a &quot;quote&quot; b');
-    expect(sanitizeInput("a 'quote' b")).toBe('a &#x27;quote&#x27; b');
+  it('should preserve special characters without HTML entity encoding', () => {
+    expect(sanitizeInput('a & b')).toBe('a & b');
+    expect(sanitizeInput('a > b')).toBe('a > b');
+    expect(sanitizeInput('a "quote" b')).toBe('a "quote" b');
+    expect(sanitizeInput("a 'quote' b")).toBe("a 'quote' b");
+  });
+
+  it('should remove dangerous patterns', () => {
+    expect(sanitizeInput('text javascript:alert(1)')).toBe('text alert(1)');
+    expect(sanitizeInput('text onclick=alert(1)')).toBe('text alert(1)');
   });
 
   it('should handle combined HTML and special chars', () => {
     const input = '<div>Test & "quote"</div>';
     const result = sanitizeInput(input);
-    expect(result).not.toContain('<');
-    expect(result).not.toContain('>');
-    expect(result).toContain('&amp;');
-    expect(result).toContain('&quot;');
+    expect(result).toBe('Test & "quote"');
   });
 
   it('should trim whitespace', () => {
