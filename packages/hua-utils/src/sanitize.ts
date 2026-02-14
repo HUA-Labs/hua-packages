@@ -4,7 +4,9 @@
  */
 
 /**
- * HTML 태그를 제거하고 특수 문자를 이스케이프
+ * HTML 태그와 위험한 패턴을 제거
+ * React가 렌더링 시 자동으로 XSS를 방지하므로, HTML 엔티티 변환은 하지 않음
+ * (이중 이스케이프 방지: > 가 &gt;로 표시되는 문제)
  * @param input 사용자 입력 문자열
  * @returns sanitized 문자열
  */
@@ -15,15 +17,13 @@ export function sanitizeInput(input: string): string {
 
   // HTML 태그 제거
   let sanitized = input.replace(/<[^>]*>/g, '');
-  
-  // 특수 문자 이스케이프 (기본적인 XSS 방지)
-  // 주의: /는 이스케이프하지 않음 (XSS 위험도 낮고, 일반 텍스트에서 자주 사용됨)
+
+  // 위험한 패턴만 제거 (script, iframe, javascript:, 이벤트 핸들러)
   sanitized = sanitized
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;');
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '');
 
   return sanitized.trim();
 }
