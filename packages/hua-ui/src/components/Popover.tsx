@@ -27,6 +27,8 @@ export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
   /** Popover 콘텐츠 영역 추가 클래스 / Additional class for popover content area */
   contentClassName?: string
+  /** 트리거를 full-width로 렌더링 (DatePicker 등) / Render trigger as full-width */
+  fullWidth?: boolean
 }
 
 /**
@@ -63,7 +65,7 @@ export interface PopoverProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
   ({ 
-    className, 
+    className,
     children,
     trigger,
     open: controlledOpen,
@@ -73,6 +75,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
     offset = 8,
     disabled = false,
     contentClassName,
+    fullWidth = false,
     ...props
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
@@ -178,7 +181,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
         <div
           ref={triggerRef}
           onClick={handleTriggerClick}
-          className="inline-block cursor-pointer"
+          className={merge(fullWidth ? "block w-full" : "inline-block", "cursor-pointer")}
         >
           {trigger}
         </div>
