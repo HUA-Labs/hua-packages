@@ -128,27 +128,37 @@ Project Root/
 
 ### 1. Page Creation Pattern
 
+**Direct approach (recommended)** — use hooks directly for full control:
+
 ```tsx
-// app/my-page/page.tsx
-import { HuaPage } from '@hua-labs/hua/framework';
+'use client';
+
 import { useTranslation } from '@hua-labs/hua/i18n';
+import { useFadeIn, useScrollReveal } from '@hua-labs/hua/motion';
+import { Card, Button } from '@hua-labs/hua/ui';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
-  
+  const fade = useFadeIn({ duration: 600 });
+
   return (
-    <HuaPage title={t('title')} description={t('description')}>
-      <h1>{t('title')}</h1>
-      {/* content */}
-    </HuaPage>
+    <div ref={fade.ref} style={fade.style}>
+      <h1>{t('my-page:title')}</h1>
+    </div>
   );
 }
 ```
 
-**Important**: 
-- Wrapping with `HuaPage` automatically applies Motion, i18n, SEO
+**HuaPage wrapper (optional)** — auto-applies motion, i18n key, and head metadata:
+```tsx
+import { HuaPage } from '@hua-labs/hua/framework';
+<HuaPage title={t('title')} description={t('description')}>{/* content */}</HuaPage>
+```
+
+**Important**:
 - Add translation keys to `translations/{language}/my-page.json`
-- Create as Server Component (add `'use client'` only when client features are needed)
+- Motion hooks return `{ ref, style }` — apply **both** to the target element
+- `HuaPage` is optional; using hooks directly gives more flexibility
 
 ### 2. Client Component Creation Pattern
 
@@ -317,13 +327,76 @@ This project supports **vibe coding**:
 - **Many decisions in one file**: `HuaPage` handles SEO, Motion, i18n all together
 - **AI-friendly documentation**: Clear and comprehensive
 
+## Framework Deep Docs (hua-agent-docs)
+
+The `@hua-labs/hua` package ships with detailed framework documentation at:
+
+```
+node_modules/@hua-labs/hua/.hua-agent-docs/
+```
+
+**IMPORTANT**: When answering questions about hua framework architecture, icons, config, or advanced patterns, search these docs FIRST:
+
+| Topic | Path |
+|-------|------|
+| Getting Started | `.hua-agent-docs/01-getting-started/` |
+| Architecture | `.hua-agent-docs/02-architecture/` |
+| Configuration | `.hua-agent-docs/03-config/` |
+| Icon System | `.hua-agent-docs/04-icon-system/` |
+| Systems (GEO, Branding, a11y, etc.) | `.hua-agent-docs/05-systems/` |
+| API Reference | `.hua-agent-docs/06-api-reference/` |
+| Runtime Constraints | `.hua-agent-docs/07-constraints/` |
+
+### Icon System
+Icon: 96 static + 174 aliases. Use `<Icon name="zap" size={20} />`.
+Categories: navigation, actions, status, user, data, files, communication, media, emotions, security, time, ui, theme
+Aliases: "back"→arrowLeft, "trash"→delete, "ai"→brain etc.
+Full list: `node_modules/@hua-labs/hua/.hua-agent-docs/04-icon-system/02-icon-names.mdx`
+
+### ThemeToggle
+```tsx
+import { ThemeToggle } from '@hua-labs/hua/ui';
+<ThemeToggle variant="icon" />  // "button" | "icon" | "switch"
+```
+
+### Advanced Components
+```tsx
+import { GlowCard, TiltCard, SpotlightCard, Timeline, Marquee } from '@hua-labs/ui/advanced';
+```
+
+### i18n Lint
+`@hua-labs/eslint-plugin-i18n` — 4 rules: no-missing-key, no-raw-text, no-dynamic-key, no-unused-key
+
+### CSS Utilities
+```css
+@import "@hua-labs/ui/styles/utilities.css";
+```
+Provides: `.glass`, `.gradient-text`, `.sr-only`
+
+### Motion Hook API
+
+Motion hooks return `{ ref, style }` — always apply BOTH to the target element:
+
+```tsx
+const fade = useFadeIn({ duration: 800 });
+<div ref={fade.ref} style={fade.style}>Animated content</div>
+```
+
+### Namespace Separator
+
+i18n namespace separator is `:` (colon), NOT `.` (dot):
+```tsx
+t('landing:hero.title')  // correct
+t('landing.hero.title')  // wrong
+```
+
 ## References
 
-- `ai-context.md`: Detailed project structure explanation (SSOT)
+- **Framework deep docs**: `node_modules/@hua-labs/hua/.hua-agent-docs/` (SSOT for framework internals)
+- `ai-context.md`: Project structure overview
 - `.cursor/rules/hua-framework.mdc`: Cursor IDE rules
 - `AGENTS.md`: OpenAI Codex context
 - `skills.md`: Antigravity skills
-- Framework docs: `node_modules/@hua-labs/hua/README.md`
 - UI components: `node_modules/@hua-labs/ui/README.md`
 - Motion: `node_modules/@hua-labs/motion-core/README.md`
 - i18n: `node_modules/@hua-labs/i18n-core-zustand/README.md`

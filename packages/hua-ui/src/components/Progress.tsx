@@ -61,6 +61,7 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   striped?: boolean
   label?: string
   description?: string
+  autoVariant?: boolean
 }
 
 /**
@@ -85,9 +86,18 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     striped = false,
     label,
     description,
+    autoVariant = false,
     ...props
   }, ref) => {
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+
+    const resolvedVariant = (() => {
+      if (!autoVariant) return variant;
+      const ratio = value / max;
+      if (ratio > 0.5) return 'success';
+      if (ratio > 0.25) return 'warning';
+      return 'error';
+    })();
 
     return (
       <div className={merge("w-full", className)} {...props}>
@@ -108,11 +118,11 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 
         <div
           ref={ref}
-          className={progressTrackVariants({ variant, size })}
+          className={progressTrackVariants({ variant: resolvedVariant, size })}
         >
           <div
             className={merge(
-              progressBarVariants({ variant }),
+              progressBarVariants({ variant: resolvedVariant }),
               striped && "bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:20px_100%] animate-pulse",
               animated && "animate-pulse"
             )}

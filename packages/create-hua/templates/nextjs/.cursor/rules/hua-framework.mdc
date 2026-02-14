@@ -11,6 +11,41 @@ alwaysApply: true
 
 # hua Framework — Cursor Rules
 
+## Framework Deep Docs
+IMPORTANT: Search `node_modules/@hua-labs/hua/.hua-agent-docs/` FIRST for:
+- Architecture → 01-overview/
+- Motion/i18n/Branding → 02-systems/
+- Config → 03-config/
+- Icon system (174 aliases, 96 icons, 12 categories) → 04-icon-system/
+- API reference (all hooks, components) → 05-api-reference/
+- Constraints & rules → 06-constraints/
+
+### Icon System
+Icon: 96 static + 174 aliases. Use `<Icon name="zap" size={20} />`.
+Categories: navigation, actions, status, user, data, files, communication, media, emotions, security, time, ui, theme
+Aliases: "back"→arrowLeft, "trash"→delete, "ai"→brain etc.
+Full list: `node_modules/@hua-labs/hua/.hua-agent-docs/04-icon-system/02-icon-names.mdx`
+
+### ThemeToggle
+```tsx
+import { ThemeToggle } from '@hua-labs/hua/ui';
+<ThemeToggle variant="icon" />  // "button" | "icon" | "switch"
+```
+
+### Advanced Components
+```tsx
+import { GlowCard, TiltCard, SpotlightCard, Timeline, Marquee } from '@hua-labs/ui/advanced';
+```
+
+### i18n Lint
+`@hua-labs/eslint-plugin-i18n` — 4 rules: no-missing-key, no-raw-text, no-dynamic-key, no-unused-key
+
+### CSS Utilities
+```css
+@import "@hua-labs/ui/styles/utilities.css";
+```
+Provides: `.glass`, `.gradient-text`, `.sr-only`
+
 ## Core Philosophy
 
 "You don't need to know Next.js. Just configure and tell AI what to do."

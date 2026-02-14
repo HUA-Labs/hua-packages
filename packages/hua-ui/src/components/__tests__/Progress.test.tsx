@@ -100,4 +100,37 @@ describe('Progress', () => {
     const wrapper = container.querySelector('.w-full');
     expect(wrapper).toHaveClass('custom-class');
   });
+
+  describe('autoVariant', () => {
+    it('should use success variant when value > 50%', () => {
+      const { container } = render(<Progress value={60} autoVariant />);
+      const progressBar = container.querySelector('.h-full');
+      expect(progressBar).toHaveClass('bg-[var(--progress-success)]');
+    });
+
+    it('should use warning variant when value > 25% and <= 50%', () => {
+      const { container } = render(<Progress value={30} autoVariant />);
+      const progressBar = container.querySelector('.h-full');
+      expect(progressBar).toHaveClass('bg-[var(--progress-warning)]');
+    });
+
+    it('should use error variant when value <= 25%', () => {
+      const { container } = render(<Progress value={20} autoVariant />);
+      const progressBar = container.querySelector('.h-full');
+      expect(progressBar).toHaveClass('bg-[var(--progress-error)]');
+    });
+
+    it('should respect explicit variant when autoVariant is false', () => {
+      const { container } = render(<Progress value={10} variant="success" />);
+      const progressBar = container.querySelector('.h-full');
+      expect(progressBar).toHaveClass('bg-[var(--progress-success)]');
+    });
+
+    it('should handle custom max with autoVariant', () => {
+      // 60/200 = 0.3 → > 0.25 → warning
+      const { container } = render(<Progress value={60} max={200} autoVariant />);
+      const progressBar = container.querySelector('.h-full');
+      expect(progressBar).toHaveClass('bg-[var(--progress-warning)]');
+    });
+  });
 });

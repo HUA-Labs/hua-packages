@@ -1,0 +1,58 @@
+/**
+ * HUA-UI CSS Utilities
+ *
+ * Usage: @import "@hua-labs/ui/styles/utilities.css";
+ *
+ * Provides: .glass, .gradient-text, .sr-only
+ */
+
+/* Glass effect — theme-aware backdrop blur */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Gradient text — CSS variable based */
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradient-from, hsl(var(--primary))) 0%, var(--gradient-to, hsl(var(--accent-foreground))) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Screen reader only — accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.sr-only:focus-visible {
+  position: absolute;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  top: 1rem;
+  left: 1rem;
+  z-index: 50;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0.375rem;
+  font-weight: 500;
+}

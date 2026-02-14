@@ -2,6 +2,41 @@
 
 This document is a guide for AI tools (Cursor, etc.) to understand the structure and usage of this project.
 
+## Framework Deep Docs
+IMPORTANT: Search `node_modules/@hua-labs/hua/.hua-agent-docs/` FIRST for:
+- Architecture → 01-overview/
+- Motion/i18n/Branding → 02-systems/
+- Config → 03-config/
+- Icon system (174 aliases, 96 icons, 12 categories) → 04-icon-system/
+- API reference (all hooks, components) → 05-api-reference/
+- Constraints & rules → 06-constraints/
+
+### Icon System
+Icon: 96 static + 174 aliases. Use `<Icon name="zap" size={20} />`.
+Categories: navigation, actions, status, user, data, files, communication, media, emotions, security, time, ui, theme
+Aliases: "back"→arrowLeft, "trash"→delete, "ai"→brain etc.
+Full list: `node_modules/@hua-labs/hua/.hua-agent-docs/04-icon-system/02-icon-names.mdx`
+
+### ThemeToggle
+```tsx
+import { ThemeToggle } from '@hua-labs/hua/ui';
+<ThemeToggle variant="icon" />  // "button" | "icon" | "switch"
+```
+
+### Advanced Components
+```tsx
+import { GlowCard, TiltCard, SpotlightCard, Timeline, Marquee } from '@hua-labs/ui/advanced';
+```
+
+### i18n Lint
+`@hua-labs/eslint-plugin-i18n` — 4 rules: no-missing-key, no-raw-text, no-dynamic-key, no-unused-key
+
+### CSS Utilities
+```css
+@import "@hua-labs/ui/styles/utilities.css";
+```
+Provides: `.glass`, `.gradient-text`, `.sr-only`
+
 ## Project Overview
 
 This project uses the **hua framework** for Next.js applications.
@@ -134,6 +169,55 @@ The theme provides these CSS variables (usable as Tailwind classes):
 **Specialized**:
 - `ScrollArea`, `ScrollToTop`, `ThemeProvider`, `ThemeToggle`, `useTheme`
 
+### Component Props Quick Reference
+
+**Button**:
+```tsx
+<Button variant="default | secondary | outline | destructive | ghost | link" size="sm | default | lg | icon">
+```
+
+**Badge**:
+```tsx
+<Badge variant="default | secondary | outline | destructive">
+```
+
+**Card**:
+```tsx
+<Card>
+  <CardHeader><CardTitle>Title</CardTitle><CardDescription>Desc</CardDescription></CardHeader>
+  <CardContent>Content</CardContent>
+  <CardFooter>Footer</CardFooter>
+</Card>
+```
+
+**Progress**:
+```tsx
+<Progress value={75} variant="default | success | warning | error | info" size="sm | default | lg" />
+```
+
+**Switch**:
+```tsx
+<Switch checked={value} onChange={(e) => setValue(e.target.checked)} />
+```
+
+**Alert**:
+```tsx
+<Alert variant="default | success | warning | error | info">Message</Alert>
+```
+
+**Tabs**:
+```tsx
+<Tabs defaultValue="tab1">
+  <TabsList><TabsTrigger value="tab1">Tab 1</TabsTrigger></TabsList>
+  <TabsContent value="tab1">Content</TabsContent>
+</Tabs>
+```
+
+**CodeBlock**:
+```tsx
+<CodeBlock code={sourceCode} language="tsx" filename="example.tsx" showLineNumbers />
+```
+
 ### @hua-labs/hua/framework
 
 **Framework Components**:
@@ -223,27 +307,47 @@ import { cn } from '@hua-labs/hua/utils';
 
 ### 1. Page Creation Pattern
 
+**Direct approach (recommended)** — use hooks directly for full control:
+
 ```tsx
 // app/my-page/page.tsx
-import { HuaPage } from '@hua-labs/hua/framework';
+'use client';
+
 import { useTranslation } from '@hua-labs/hua/i18n';
+import { useFadeIn, useScrollReveal } from '@hua-labs/hua/motion';
+import { Card, Button } from '@hua-labs/hua/ui';
 
 export default function MyPage() {
   const { t } = useTranslation('my-page');
-  
+  const fade = useFadeIn({ duration: 600 });
+  const reveal = useScrollReveal({ threshold: 0.1 });
+
   return (
-    <HuaPage title={t('title')} description={t('description')}>
-      <h1>{t('title')}</h1>
-      {/* content */}
-    </HuaPage>
+    <div>
+      <div ref={fade.ref} style={fade.style}>
+        <h1>{t('my-page:title')}</h1>
+      </div>
+      <div ref={reveal.ref} style={reveal.style}>
+        <Card>{/* content */}</Card>
+      </div>
+    </div>
   );
 }
 ```
 
-**Important**: 
-- Wrapping with `HuaPage` automatically applies Motion, i18n, SEO
+**HuaPage wrapper (optional)** — auto-applies motion, i18n key, and head metadata:
+
+```tsx
+import { HuaPage } from '@hua-labs/hua/framework';
+<HuaPage title={t('title')} description={t('description')} i18nKey="my-page">
+  {/* content */}
+</HuaPage>
+```
+
+**Important**:
 - Add translation keys to `translations/{language}/my-page.json`
-- Create as Server Component (add `'use client'` only when client features are needed)
+- Motion hooks return `{ ref, style }` — apply **both** to the target element
+- `HuaPage` is optional; using hooks directly gives more layout flexibility
 
 ### 2. Client Component Creation Pattern
 
