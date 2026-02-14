@@ -138,6 +138,13 @@ import {
   WifiSlash,
   Cpu,
   MaskHappy,
+  Rocket,
+
+  // Admin
+  Layout,
+  Megaphone,
+  Stack,
+  Prohibit,
 } from '@phosphor-icons/react/dist/ssr'
 
 // 핵심 아이콘 객체 (키는 기존과 동일, 값만 Phosphor로 교체)
@@ -262,6 +269,13 @@ export const icons = {
   wifiOff: WifiSlash,
   cpu: Cpu,
   mask: MaskHappy,
+  rocket: Rocket,
+
+  // Admin
+  layout: Layout,
+  megaphone: Megaphone,
+  layers: Stack,
+  ban: Prohibit,
 
   // Text Formatting (Markdown Toolbar)
   bold: TextB,
