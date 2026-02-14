@@ -21,7 +21,7 @@ export interface IconConfig {
 }
 
 export const defaultIconConfig: IconConfig = {
-  set: 'lucide',
+  set: 'phosphor',
   weight: 'regular',
   size: 20,
   color: 'currentColor',
