@@ -66,6 +66,11 @@
       "import": "./dist/sdui.mjs",
       "default": "./dist/sdui.mjs"
     },
+    "./landing": {
+      "types": "./dist/landing.d.ts",
+      "import": "./dist/landing.mjs",
+      "default": "./dist/landing.mjs"
+    },
     "./styles/base.css": "./src/styles/base.css",
     "./styles/toast.css": "./src/styles/toast.css",
     "./styles/codeblock.css": "./src/styles/codeblock.css",
@@ -120,7 +125,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
     "sugar-high": "^0.9.5",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -149,6 +154,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@hua-labs/motion-core": ">=2.0.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   },
@@ -160,6 +166,9 @@
       "optional": true
     },
     "@dnd-kit/utilities": {
+      "optional": true
+    },
+    "@hua-labs/motion-core": {
       "optional": true
     }
   },

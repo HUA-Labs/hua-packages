@@ -171,7 +171,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
         {showBackdrop && (
           <div
             className={merge(
-              "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
+              "absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
               isAnimating ? (_isOpen ? "opacity-100" : "opacity-0") : "",
               backdropClassName
             )}

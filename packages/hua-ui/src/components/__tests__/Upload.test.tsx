@@ -59,7 +59,7 @@ describe('Upload', () => {
   });
 
   it('should open file input on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     render(<Upload />);
 

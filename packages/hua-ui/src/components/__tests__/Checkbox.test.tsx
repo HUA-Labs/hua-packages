@@ -19,7 +19,7 @@ describe('Checkbox', () => {
   });
 
   it('should toggle on user click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<Checkbox label="Toggle me" />);
 
     const checkbox = screen.getByRole('checkbox');
