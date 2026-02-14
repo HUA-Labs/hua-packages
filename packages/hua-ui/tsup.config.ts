@@ -15,6 +15,7 @@ const coreEntry = {
   data: 'src/data.ts',
   interactive: 'src/interactive.ts',
   sdui: 'src/sdui/index.ts',
+  landing: 'src/landing/index.ts',
 };
 
 const shared = {
@@ -22,7 +23,7 @@ const shared = {
   treeshake: true,
   minify: true,
   target: 'es2019',
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'lucide-react', '@phosphor-icons/react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'lucide-react', '@phosphor-icons/react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities', '@hua-labs/motion-core'],
   esbuildOptions(options: { jsx: string }) {
     options.jsx = 'automatic';
   },

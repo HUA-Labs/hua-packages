@@ -121,6 +121,9 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
 
         case "mesh":
         default:
+          // Render blobs only after mount to prevent SSR hydration mismatch
+          // (Math.sin/cos produce floating-point values that differ between server and client)
+          if (!mounted) return null;
           return (
             <>
               {colors.map((color, index) => {
@@ -140,8 +143,6 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
                         ? `gradient-blob ${speed}s ease-in-out infinite`
                         : undefined,
                       animationDelay: shouldAnimate ? `${-delay}s` : undefined,
-                      opacity: mounted ? 1 : 0,
-                      transition: "opacity 0.5s ease-out",
                     }}
                   />
                 );
