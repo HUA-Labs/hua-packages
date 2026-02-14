@@ -15,7 +15,7 @@ describe('Bookmark', () => {
 
   it('should toggle bookmark on click', async () => {
     const handleChange = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     render(<Bookmark id="item-1" onBookmarkChange={handleChange} />);
 

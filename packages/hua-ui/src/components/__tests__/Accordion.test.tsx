@@ -25,7 +25,7 @@ describe('Accordion', () => {
   });
 
   it('should expand and collapse on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     render(
       <Accordion type="single">

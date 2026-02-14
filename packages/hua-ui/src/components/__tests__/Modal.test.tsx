@@ -112,7 +112,7 @@ describe('Modal', () => {
       </Modal>
     );
 
-    const backdrop = baseElement.querySelector('.bg-black\\/60');
+    const backdrop = baseElement.querySelector('.backdrop-blur-md');
     expect(backdrop).toBeInTheDocument();
   });
 

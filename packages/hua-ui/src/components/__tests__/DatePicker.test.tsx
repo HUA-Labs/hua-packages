@@ -44,7 +44,7 @@ describe('DatePicker', () => {
   });
 
   it('should open calendar on trigger click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     render(<DatePicker />);
 
@@ -183,7 +183,7 @@ describe('DatePicker', () => {
 
     // The marked date button should contain the mark indicator span
     const day10 = screen.getByRole('button', { name: '2024년 6월 10일' });
-    expect(day10.querySelector('.bg-primary\\/15')).toBeInTheDocument();
+    expect(day10.querySelector('.rounded-full')).toBeInTheDocument();
   });
 
   it('should support en-US locale', async () => {

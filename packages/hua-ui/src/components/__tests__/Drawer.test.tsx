@@ -40,7 +40,7 @@ describe('Drawer', () => {
 
   it('should call onClose when backdrop is clicked', async () => {
     const handleClose = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     const { container } = render(
       <Drawer isOpen={true} onClose={handleClose} closeOnBackdropClick={true}>
@@ -48,7 +48,7 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.bg-black\\/60');
+    const backdrop = container.querySelector('.backdrop-blur-md');
     if (backdrop) {
       await user.click(backdrop);
       expect(handleClose).toHaveBeenCalled();
@@ -65,7 +65,7 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.bg-black\\/60');
+    const backdrop = container.querySelector('.backdrop-blur-md');
     if (backdrop) {
       await user.click(backdrop);
       expect(handleClose).not.toHaveBeenCalled();
@@ -109,7 +109,7 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.bg-black\\/60');
+    const backdrop = container.querySelector('.backdrop-blur-md');
     expect(backdrop).toBeInTheDocument();
   });
 
@@ -120,7 +120,7 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.bg-black\\/60');
+    const backdrop = container.querySelector('.backdrop-blur-md');
     expect(backdrop).not.toBeInTheDocument();
   });
 

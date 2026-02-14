@@ -9,7 +9,7 @@ related:
 
 # UI Export Paths (`@hua-labs/ui`)
 
-`@hua-labs/ui` has **12 sub-path exports**. Importing from the wrong path causes `not exported` errors.
+`@hua-labs/ui` has **13 sub-path exports**. Importing from the wrong path causes `not exported` errors.
 
 > **Common mistake**: `FeatureCard`, `GlowCard`, `TiltCard` are in `/advanced`, NOT the root. `CodeBlock` is in `/data`, NOT the root.
 
@@ -28,6 +28,7 @@ related:
 | Navigation, Breadcrumb, Pagination, PageNavigation, PageTransition | `@hua-labs/ui/navigation` |
 | Toast (ToastProvider, useToast), Alert, LoadingSpinner, Tooltip | `@hua-labs/ui/feedback` |
 | Modal, ConfirmModal, Popover, Dropdown, Drawer, BottomSheet | `@hua-labs/ui/overlay` |
+| Landing (Provider, Hero, Features, Stats, CTA, Testimonials, LogoCloud, Showcase) | `@hua-labs/ui/landing` |
 | SDUIRenderer, SDUIFromJSON | `@hua-labs/ui/sdui` |
 
 ## Sub-path Details
@@ -148,6 +149,71 @@ import '@hua-labs/ui/iconsax'
 @import "@hua-labs/ui/styles/landing.css";             /* Landing page: .gradient-bg, .section-line, .mesh-*, .card-hover-lift */
 ```
 
+### Landing — `@hua-labs/ui/landing`
+
+Composite landing page builder. Theme-driven — pick a preset and compose sections.
+
+```typescript
+import { Landing, LandingProvider, LandingHero, LandingFeatures,
+         LandingStats, LandingCTA, LandingTestimonials,
+         LandingLogoCloud, LandingShowcase,
+         createLandingTheme, resolveTheme,
+         corporate, marketing, product, dashboard, app } from '@hua-labs/ui/landing'
+
+import type { LandingThemeName, LandingTheme, LandingMotionOverride,
+              LandingHeroProps, LandingFeaturesProps, LandingFeatureItem,
+              LandingStatsProps, LandingStatItem, LandingCTAProps,
+              LandingTestimonialsProps, LandingTestimonialItem,
+              LandingLogoCloudProps, LandingLogoItem,
+              LandingShowcaseProps, LandingShowcaseItem } from '@hua-labs/ui/landing'
+```
+
+**Quick start:**
+
+```tsx
+<Landing.Provider theme="marketing">
+  <Landing.Hero title="Ship faster" subtitle="Build in minutes" primaryAction={<Button>Start</Button>} />
+  <Landing.Features items={[{ icon: 'sparkle', title: 'Fast', description: '...' }]} />
+  <Landing.Stats items={[{ value: '10M+', label: 'Users' }]} />
+  <Landing.Testimonials items={[{ quote: '...', author: 'Jane' }]} />
+  <Landing.LogoCloud logos={[{ src: '/logo.svg', alt: 'Acme' }]} />
+  <Landing.Showcase items={[{ image: '/demo.png', title: 'Feature', description: '...' }]} />
+  <Landing.CTA title="Ready?" primaryAction={<Button>Go</Button>} />
+</Landing.Provider>
+```
+
+**5 theme presets:**
+
+| Theme | Hero BG | Card | Motion | Best for |
+|-------|---------|------|--------|----------|
+| `corporate` | gradient | SpotlightCard | fadeIn 900ms | Enterprise, B2B |
+| `marketing` | AnimatedGradient | GlowCard | bounceIn 500ms | SaaS marketing |
+| `product` | dark | FeatureCard glass | slideUp 700ms | Developer tools |
+| `dashboard` | gradient (xl) | FeatureCard glass | scaleIn 650ms | SaaS dashboard |
+| `app` | gradient (full) | FeatureCard glass | slideUp 600ms spring | Mobile apps |
+
+**Custom themes** with `createLandingTheme`:
+
+```typescript
+const myTheme = createLandingTheme('marketing', {
+  name: 'my-saas',
+  hero: { background: 'dark', size: 'full' },
+  features: { card: 'glow', staggerDelay: 100 },
+})
+```
+
+**Component props** — all support per-component `motion` and `staggerDelay` overrides:
+- `Landing.Hero`: `title`, `subtitle`, `description`, `primaryAction`, `secondaryAction`, `size`, `background`, `gradientColors`, `scrollIndicator`, `motion`
+- `Landing.Features`: `items[]` (`icon`, `title`, `description`), `title`, `subtitle`, `columns` (2|3|4), `card`, `decorator`, `motion`, `staggerDelay`
+- `Landing.Stats`: `items[]` (`value`, `label`, `prefix?`, `suffix?`), `countUp`, `numberSize`, `motion`, `staggerDelay`
+- `Landing.CTA`: `title`, `subtitle`, `primaryAction`, `secondaryAction`, `background`, `gradientColors`, `motion`
+- `Landing.Testimonials`: `items[]` (`quote`, `author`, `role?`, `company?`, `avatar?`), `variant` (carousel|grid|marquee), `columns` (2|3), `autoPlay`, `interval`, `motion`, `staggerDelay`
+- `Landing.LogoCloud`: `logos[]` (`src`, `alt`, `href?`), `variant` (marquee|grid), `speed`, `logoHeight`, `motion`
+- `Landing.Showcase`: `items[]` (`image`, `title`, `description`), `motion`, `staggerDelay`
+
+> **Requires**: `@import "@hua-labs/ui/styles/landing.css"` in your CSS for gradient-bg-soft, section-line, stat-number utilities.
+> **Optional**: `@hua-labs/motion-core` for useStagger/useScrollReveal animations (gracefully degrades without it).
+
 ### SDUI — `@hua-labs/ui/sdui`
 
 Server-Driven UI for dynamic rendering.
@@ -180,6 +246,7 @@ Aliases also work: `"ai"` → `brain`, `"light"` → `sun`, etc.
 | `@hua-labs/ui/data` (CodeBlock) | `sugar-high` |
 | `@hua-labs/ui/iconsax` | (none, self-contained) |
 | `@hua-labs/ui/advanced` (BlogEditor) | `marked` (optional) |
+| `@hua-labs/ui/landing` (motion effects) | `@hua-labs/motion-core` (optional, graceful degradation) |
 
 ## Constraints
 
