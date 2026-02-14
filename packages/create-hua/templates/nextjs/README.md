@@ -250,31 +250,46 @@ When you set `branding.colors` in `hua.config.ts`, Button and Card components au
 ### 5. 모션 애니메이션 사용하기 / Using Motion Animations
 
 ```tsx
-import { useFadeIn, useSlideUp, useScaleIn } from '@hua-labs/hua';
+'use client';
+
+import { useFadeIn, useSlideUp, useScaleIn, useScrollReveal } from '@hua-labs/hua/motion';
 
 export default function AnimatedPage() {
-  const fadeInRef = useFadeIn();
-  const slideUpRef = useSlideUp();
-  const scaleInRef = useScaleIn();
+  // Each hook returns { ref, style } — apply BOTH to the element
+  const fadeIn = useFadeIn({ duration: 600 });
+  const slideUp = useSlideUp({ duration: 500, delay: 200 });
+  const scaleIn = useScaleIn({ duration: 400, delay: 400 });
+  const reveal = useScrollReveal({ threshold: 0.2 });
 
   return (
     <div>
-      <div ref={fadeInRef}>페이드 인</div>
-      <div ref={slideUpRef}>슬라이드 업</div>
-      <div ref={scaleInRef}>스케일 인</div>
+      <div ref={fadeIn.ref} style={fadeIn.style}>페이드 인 / Fade in</div>
+      <div ref={slideUp.ref} style={slideUp.style}>슬라이드 업 / Slide up</div>
+      <div ref={scaleIn.ref} style={scaleIn.style}>스케일 인 / Scale in</div>
+      <div ref={reveal.ref} style={reveal.style}>스크롤 리빌 / Scroll reveal</div>
     </div>
   );
 }
 ```
 
 **사용 가능한 모션 훅 / Available Motion Hooks**:
-- `useFadeIn` - 페이드 인 / Fade in
-- `useSlideUp` - 아래에서 위로 슬라이드 / Slide up from bottom
-- `useSlideDown` - 위에서 아래로 슬라이드 / Slide down from top
-- `useScaleIn` - 스케일 인 / Scale in
-- `useBounceIn` - 바운스 인 / Bounce in
-- `useHoverMotion` - 호버 모션 / Hover motion
-- `useScrollReveal` - 스크롤 리빌 / Scroll reveal
+
+| Hook | Description | Options |
+|------|-------------|---------|
+| `useFadeIn` | 페이드 인 / Fade in | `duration`, `delay` |
+| `useSlideUp` | 아래에서 위로 / Slide up | `duration`, `delay` |
+| `useSlideDown` | 위에서 아래로 / Slide down | `duration`, `delay` |
+| `useSlideLeft` | 오른쪽에서 왼쪽 / Slide left | `duration`, `delay` |
+| `useSlideRight` | 왼쪽에서 오른쪽 / Slide right | `duration`, `delay` |
+| `useScaleIn` | 스케일 인 / Scale in | `duration`, `delay` |
+| `useBounceIn` | 바운스 인 / Bounce in | `duration`, `delay` |
+| `useHoverMotion` | 호버 모션 / Hover motion | — |
+| `useScrollReveal` | 스크롤 리빌 / Scroll reveal | `threshold` |
+| `useScrollProgress` | 스크롤 진행률 / Scroll progress | — |
+| `useMouse` | 마우스 위치 추적 / Mouse position | — |
+
+> **주의 / Important**: 모든 훅은 `{ ref, style }`을 반환합니다. 반드시 **둘 다** 적용하세요.
+> All hooks return `{ ref, style }`. You MUST apply **both** to the target element.
 
 ### 6. 다국어 지원 (i18n) / Internationalization (i18n)
 

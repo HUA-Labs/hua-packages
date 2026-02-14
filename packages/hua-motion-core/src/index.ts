@@ -7,12 +7,12 @@
 // ========================================
 
 // MotionEngine - 순수 JavaScript 모션 엔진
-export { 
-  MotionEngine, 
+export {
+  MotionEngine,
   motionEngine,
   type MotionFrame,
   type MotionOptions,
-  type Motion
+  type Motion as MotionInstance
 } from './core/MotionEngine'
 
 // TransitionEffects - 전환 효과 시스템
@@ -46,7 +46,7 @@ export { useSmartMotion } from './hooks/useSmartMotion'
 
 // 통합 Motion Hook (단일 타입으로 여러 hook 중 선택)
 export { useUnifiedMotion } from './hooks/useUnifiedMotion'
-export type { UseUnifiedMotionOptions } from './hooks/useUnifiedMotion'
+export type { UseUnifiedMotionOptions, MotionEffects } from './hooks/useUnifiedMotion'
 
 // ========================================
 // 기본 모션 훅들 (Core 패키지 범위)
@@ -118,6 +118,20 @@ export {
 // ========================================
 // 기본 타입들 (Core 패키지 범위)
 // ========================================
+
+// ========================================
+// 컴포넌트 (래퍼)
+// ========================================
+
+export { Motion } from './components'
+export type { MotionProps } from './components'
+
+// ========================================
+// Stagger 훅
+// ========================================
+
+export { useStagger } from './hooks/useStagger'
+export type { UseStaggerOptions, UseStaggerReturn } from './hooks/useStagger'
 
 export type {
   // 3단계 추상화 타입들

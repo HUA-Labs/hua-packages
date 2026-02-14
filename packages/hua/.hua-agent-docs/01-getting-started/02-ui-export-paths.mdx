@@ -17,7 +17,7 @@ related:
 
 | Component | Import Path |
 |-----------|-------------|
-| Button, Badge, Card, Input, Modal, Alert, Icon, Avatar, ThemeToggle, ThemeProvider | `@hua-labs/ui` |
+| Button, Badge, Card, Input, Modal, Alert, Icon, Avatar, Section, ThemeToggle, ThemeProvider | `@hua-labs/ui` |
 | GlowCard, TiltCard, SpotlightCard, FeatureCard, Carousel, Marquee, Parallax, TextReveal, AnimatedGradient, VideoBackground, HeroSection, InfoCard, Timeline, Bookmark, ChatMessage, LanguageToggle, ScrollIndicator | `@hua-labs/ui/advanced` |
 | StatCard, DashboardGrid, KanbanBoard, ActivityFeed, TrendChart, BarChart | `@hua-labs/ui/advanced/dashboard` |
 | EmotionMeter, EmotionButton, EmotionSelector, EmotionAnalysis | `@hua-labs/ui/advanced/emotion` |
@@ -41,7 +41,7 @@ import { Button, Badge, Card, Input, Modal, Icon, Avatar,
          ThemeProvider, ThemeToggle, useTheme,
          Label, Switch, Toggle, Progress, Skeleton,
          Alert, LoadingSpinner, Tooltip, ScrollArea,
-         Container, Grid, Stack, Divider, Panel } from '@hua-labs/ui'
+         Container, Section, Grid, Stack, Divider, Panel } from '@hua-labs/ui'
 ```
 
 Also exports utilities: `merge`, `cn`, icon helpers, motion micro-utilities.
@@ -144,6 +144,8 @@ import '@hua-labs/ui/iconsax'
 @import "@hua-labs/ui/styles/codeblock.css";           /* CodeBlock syntax colors */
 @import "@hua-labs/ui/styles/base.css";                /* Reset + base styles */
 @import "@hua-labs/ui/styles/toast.css";               /* Toast animations */
+@import "@hua-labs/ui/styles/utilities.css";           /* .glass, .gradient-text, .sr-only */
+@import "@hua-labs/ui/styles/landing.css";             /* Landing page: .gradient-bg, .section-line, .mesh-*, .card-hover-lift */
 ```
 
 ### SDUI — `@hua-labs/ui/sdui`
