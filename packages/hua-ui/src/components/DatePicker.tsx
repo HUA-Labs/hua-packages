@@ -233,20 +233,22 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     }
 
     const calendarDays: (Date | null)[] = []
-    
+
     // 이전 달의 마지막 날들
     for (let i = firstDay - 1; i >= 0; i--) {
       const date = new Date(year, month, -i)
       calendarDays.push(date)
     }
-    
+
     // 현재 달의 날들
     for (let day = 1; day <= daysInMonth; day++) {
       calendarDays.push(new Date(year, month, day))
     }
-    
-    // 다음 달의 첫 날들 (캘린더를 6주로 채우기)
-    const remainingDays = 42 - calendarDays.length
+
+    // 다음 달의 첫 날들 (현재 행만 채우기 - 불필요한 추가 행 방지)
+    const totalRows = Math.ceil(calendarDays.length / 7)
+    const totalSlots = totalRows * 7
+    const remainingDays = totalSlots - calendarDays.length
     for (let day = 1; day <= remainingDays; day++) {
       calendarDays.push(new Date(year, month + 1, day))
     }
@@ -267,26 +269,28 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         <span className={merge("flex-1", !displayDate && "text-muted-foreground")}>
           {displayDate || placeholder}
         </span>
-        <Icon 
-          name="calendar" 
-          className={merge(
-            "ml-2 h-4 w-4 transition-transform",
-            isOpen && "rotate-180"
-          )} 
+        <Icon
+          name="calendar"
+          className="ml-2 h-4 w-4"
         />
       </button>
     )
 
     return (
       <div ref={ref} className={merge("relative", className)} {...props}>
-        <Popover 
-          open={isOpen} 
+        <Popover
+          open={isOpen}
           onOpenChange={setIsOpen}
           trigger={triggerButton}
           position="bottom"
           align="start"
+          fullWidth
+          contentClassName="p-0"
         >
-          <div className="w-auto p-0">
+          <div
+            className="rounded-lg"
+            style={{ backgroundColor: 'var(--color-popover, #111827)' }}
+          >
             <div className="p-4">
               {/* 헤더 */}
               <div className="flex items-center justify-between mb-4">
@@ -331,7 +335,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               <div className="grid grid-cols-7 gap-1">
                 {calendarDays.map((date, index) => {
                   if (!date) return <div key={index} />
-                  
+
                   const isCurrentMonth = date.getMonth() === month
                   const isDisabled = isDateDisabled(date)
                   const isSelected = isDateSelected(date)
@@ -342,6 +346,16 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                     date.getMonth() === hoveredDate.getMonth() &&
                     date.getDate() === hoveredDate.getDate()
 
+                  const buttonStyle: React.CSSProperties = {
+                    ...(!isCurrentMonth && !isSelected ? { opacity: 0.3 } : {}),
+                    ...(isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%))', color: '#fff' } : {}),
+                    ...(isTodayDate && !isSelected ? {
+                      boxShadow: 'inset 0 0 0 2px hsl(var(--primary, 187 92% 50%))',
+                      fontWeight: 700,
+                    } : {}),
+                    ...(isHovered && !isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%) / 0.15)' } : {}),
+                  }
+
                   return (
                     <button
                       key={index}
@@ -350,26 +364,23 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       onClick={() => handleDateSelect(date)}
                       onMouseEnter={() => setHoveredDate(date)}
                       onMouseLeave={() => setHoveredDate(null)}
-                      className={merge(
-                        "relative h-9 w-9 rounded-lg text-sm font-medium transition-all",
-                        "hover:bg-primary/10",
-                        "focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1",
-                        !isCurrentMonth && "text-muted-foreground",
-                        isDisabled && "cursor-not-allowed opacity-30",
-                        isSelected && "bg-primary text-white hover:bg-primary/80 shadow-md",
-                        isTodayDate && !isSelected && "ring-1 ring-ring",
-                        isHovered && !isSelected && "bg-primary/15"
-                      )}
+                      className="relative flex flex-col items-center justify-center h-9 w-9 rounded-lg text-sm font-medium transition-all focus:outline-none"
+                      style={buttonStyle}
                       aria-label={formatDateAriaLabel(date, locale)}
                     >
-                      <span className={merge(
-                        "relative z-10",
-                        isMarked && !isSelected && "text-primary font-semibold"
-                      )}>
+                      <span className="relative z-10 leading-none">
                         {date.getDate()}
                       </span>
-                      {isMarked && !isSelected && (
-                        <span className="absolute inset-1 rounded-lg bg-primary/15" />
+                      {isMarked && (
+                        <span
+                          className="absolute rounded-full"
+                          style={{
+                            bottom: '1px',
+                            width: '6px',
+                            height: '6px',
+                            backgroundColor: isSelected ? '#fff' : 'hsl(var(--primary, 187 92% 50%))',
+                          }}
+                        />
                       )}
                     </button>
                   )

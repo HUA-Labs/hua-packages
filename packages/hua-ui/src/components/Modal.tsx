@@ -196,10 +196,13 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
     >
       {/* 배경 오버레이 - pointer-events-none으로 클릭이 뒤로 전달됨 */}
       {showBackdrop && (
-        <div className={merge(
-          "fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
-          backdropClassName
-        )} />
+        <div
+          className={merge(
+            "fixed inset-0 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
+            backdropClassName
+          )}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+        />
       )}
 
       {/* 센터링 컨테이너 */}
