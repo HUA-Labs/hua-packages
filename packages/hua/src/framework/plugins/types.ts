@@ -76,7 +76,7 @@ export interface HuaPlugin {
    * }
    * ```
    */
-  hooks?: Record<string, Function>;
+  hooks?: Record<string, (...args: unknown[]) => unknown>;
   
   /**
    * 설정 스키마 확장 / Config schema extension

@@ -113,7 +113,7 @@
     "build": "tsup && node scripts/add-use-client.mjs",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "lint": "echo 'Skipping lint for hua (ESLint 8, needs separate config)'",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "pnpm run build",
     "test": "vitest",

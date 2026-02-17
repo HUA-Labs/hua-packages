@@ -1,52 +1,77 @@
-import js from '@eslint/js';
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import tseslint from 'typescript-eslint'
 
-// Storybook plugin is optional - only used in packages that have storybook
-// If needed, install eslint-plugin-storybook in the root package.json
-
-export default [js.configs.recommended, {
-  files: ['**/*.{js,jsx,mjs,cjs}'],
-  languageOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-    globals: {
-      console: 'readonly',
-      process: 'readonly',
-      Buffer: 'readonly',
-      __dirname: 'readonly',
-      __filename: 'readonly',
-      global: 'readonly',
-      module: 'readonly',
-      require: 'readonly',
-      exports: 'readonly',
-      window: 'readonly',
-      document: 'readonly',
-      navigator: 'readonly',
-      fetch: 'readonly',
-      sessionStorage: 'readonly',
-      localStorage: 'readonly',
-      setTimeout: 'readonly',
-      clearTimeout: 'readonly',
-      setInterval: 'readonly',
-      clearInterval: 'readonly',
-      CustomEvent: 'readonly',
+export default tseslint.config([
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      '**/*.config.js',
+      '**/*.config.mjs',
+      '**/_reference/**',
+      '**/scripts/**',
+      '**/__generated__/**',
+      '**/prisma/generated/**',
+    ],
+  },
+  {
+    files: ['**/*.{js,jsx,mjs,cjs}'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-unused-vars': 'warn',
+      'prefer-const': 'warn',
+      'no-var': 'warn',
+      'no-undef': 'off',
     },
   },
-  rules: {
-    'no-unused-vars': 'warn',
-    'prefer-const': 'warn',
-    'no-var': 'warn',
-    'no-undef': 'off',
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
+      'no-empty': 'warn',
+      'no-case-declarations': 'warn',
+      'no-constant-binary-expression': 'off',
+      'no-async-promise-executor': 'warn',
+      'prefer-const': 'warn',
+    },
   },
-}, {
-  ignores: [
-    'node_modules/**',
-    '.next/**',
-    'dist/**',
-    'build/**',
-    'coverage/**',
-    '*.config.js',
-    '*.config.mjs',
-    '**/*.ts',
-    '**/*.tsx',
-  ],
-}]; 
+])

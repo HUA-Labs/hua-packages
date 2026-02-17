@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { Suspense, useMemo, type ComponentType, type ReactNode } from 'react';
+import React, { Suspense, type ComponentType, type ReactNode } from 'react';
 import { Skeleton } from '@hua-labs/ui';
 import { SkeletonGroup } from '../components/SkeletonGroup';
 
@@ -70,17 +70,13 @@ export function withSuspense<P extends object>(
     }
   }
 
-  const defaultFallback = useMemo(
-    () =>
-      useDefaultFallback ? (
-        <SkeletonGroup>
-          <Skeleton width="60%" height={32} />
-          <Skeleton width="80%" />
-          <Skeleton width="70%" />
-        </SkeletonGroup>
-      ) : null,
-    [useDefaultFallback]
-  );
+  const defaultFallback = useDefaultFallback ? (
+    <SkeletonGroup>
+      <Skeleton width="60%" height={32} />
+      <Skeleton width="80%" />
+      <Skeleton width="70%" />
+    </SkeletonGroup>
+  ) : null;
 
   const WrappedComponent = (props: P) => {
     return (
