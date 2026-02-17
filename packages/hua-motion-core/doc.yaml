@@ -26,22 +26,81 @@ quickStart: |
 related:
   - "hua"
 
+apiFilter: notes-only
+
 apiNotes:
+  # Page-level motion
+  useSimplePageMotion:
+    description: "Simple fade+slide page entrance animation"
+  usePageMotions:
+    description: "Multi-element page entrance orchestration"
+  useSmartMotion:
+    description: "Adaptive motion based on device performance"
+  useUnifiedMotion:
+    description: "All-in-one motion hook with presets"
+
+  # Entrance animations
   useFadeIn:
     description: "Fade-in animation hook"
   useSlideUp:
-    description: "Slide-up animation hook"
+    description: "Slide-up entrance animation"
+  useSlideDown:
+    description: "Slide-down entrance animation"
   useSlideLeft:
-    description: "Slide-left animation hook"
+    description: "Slide-left entrance animation"
   useSlideRight:
-    description: "Slide-right animation hook"
+    description: "Slide-right entrance animation"
   useScaleIn:
-    description: "Scale-in animation hook"
+    description: "Scale-in entrance animation"
   useBounceIn:
-    description: "Bounce-in animation hook"
-  useScrollReveal:
-    description: "Scroll-triggered reveal animation"
-  useStaggerMotion:
-    description: "Staggered list animation hook"
+    description: "Bounce-in entrance animation"
+
+  # Continuous animations
+  usePulse:
+    description: "Repeating pulse animation"
+  useSpringMotion:
+    description: "Spring physics animation"
+  useGradient:
+    description: "Animated gradient background"
+  useRepeat:
+    description: "Repeating animation with configurable count"
+  useToggleMotion:
+    description: "Toggle between two animation states"
+
+  # Interaction hooks
   useHoverMotion:
     description: "Hover interaction animation"
+  useClickToggle:
+    description: "Click-triggered toggle animation"
+  useFocusToggle:
+    description: "Focus-triggered toggle animation"
+  useGesture:
+    description: "Multi-gesture handler (drag, swipe, pinch)"
+  useGestureMotion:
+    description: "Gesture-driven motion animation"
+
+  # Scroll hooks
+  useScrollReveal:
+    description: "Scroll-triggered reveal animation"
+  useScrollProgress:
+    description: "Scroll position as 0-1 progress value"
+  useInView:
+    description: "IntersectionObserver-based visibility detection"
+
+  # Utility hooks
+  useMotionState:
+    description: "Animation state tracking (idle, running, complete)"
+  useMouse:
+    description: "Mouse position tracking"
+  useReducedMotion:
+    description: "Detect prefers-reduced-motion setting"
+  useWindowSize:
+    description: "Responsive window size tracking"
+
+  # Easing functions
+  easeInOut:
+    description: "Smooth ease-in-out curve"
+    kind: "function"
+  getEasing:
+    description: "Get easing function by name"
+    kind: "function"
