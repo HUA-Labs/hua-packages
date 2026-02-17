@@ -62,7 +62,7 @@ export function loadConfig(): HuaConfig {
   if (typeof process !== 'undefined' && process.cwd && typeof require !== 'undefined') {
     try {
       // webpack이 분석하지 못하도록 eval 사용
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+       
       const dynamicRequire = eval('require') as NodeRequire;
       const fs = dynamicRequire('fs') as typeof import('fs');
       const path = dynamicRequire('path') as typeof import('path');
@@ -98,19 +98,19 @@ export function loadConfig(): HuaConfig {
                   _setCachedConfig(loadedConfig);
                   return loadedConfig;
                 }
-              } catch (requireError) {
+              } catch {
                 // require 실패 (TypeScript 파일 등)
                 // 기본값 사용
                 break;
               }
             }
-          } catch (fileError) {
+          } catch {
             // 파일 읽기 실패
             continue;
           }
         }
       }
-    } catch (error) {
+    } catch {
       // fs, path 등이 없는 환경 (브라우저, Edge Runtime 등)
       // 기본값 사용
     }

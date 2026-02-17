@@ -367,7 +367,7 @@ export function Example7_MinimalConfig() {
  */
 export function Example8_ErrorHandling() {
   try {
-    const geoMeta = generateGEOMetadata({
+    generateGEOMetadata({
       name: '', // Invalid!
       description: 'Test',
     });

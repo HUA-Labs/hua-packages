@@ -8,10 +8,6 @@
 import type {
   GEOConfig,
   StructuredData,
-  SoftwareApplicationType,
-  ProgrammingLanguage,
-  SoftwareCategory,
-  TechnologyStack,
 } from './types';
 
 /**

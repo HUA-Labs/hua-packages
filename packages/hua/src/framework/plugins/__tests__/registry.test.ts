@@ -51,8 +51,7 @@ describe('plugins/registry', () => {
     });
 
     it('should warn on duplicate registration', async () => {
-      const { createLogger } = await import('../../../utils/logger.js');
-      const logger = createLogger('test');
+      await import('../../../utils/logger.js');
       pluginRegistry.register(freePlugin);
       pluginRegistry.register(freePlugin);
       // Note: Since logger is mocked at module level, we can't check individual calls here

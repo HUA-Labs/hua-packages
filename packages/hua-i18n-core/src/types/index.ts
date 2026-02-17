@@ -206,7 +206,7 @@ export interface TranslationParams {
  *
  * augmentation이 없으면 string으로 fallback (breaking 없음).
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface TypedTranslationKeys {}
 
 /** augmentation 시 좁혀진 타입, 미설정 시 string */
