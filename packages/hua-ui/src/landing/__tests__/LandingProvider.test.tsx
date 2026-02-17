@@ -76,6 +76,20 @@ describe('LandingProvider', () => {
     const m = { type: 'fadeIn' as const, duration: 500, easing: 'ease', delay: 0 }
     const custom: LandingTheme = {
       name: 'custom' as LandingTheme['name'],
+      colors: {
+        background: '0 0% 100%',
+        foreground: '0 0% 0%',
+        muted: '220 13% 91%',
+        mutedForeground: '220 9% 46%',
+        primary: '217 91% 60%',
+        primaryForeground: '0 0% 100%',
+        secondary: '220 14% 96%',
+        secondaryForeground: '0 0% 0%',
+        card: '0 0% 100%',
+        cardForeground: '0 0% 0%',
+        border: '220 13% 91%',
+        sectionAlt: '220 14% 96%',
+      },
       hero: { background: 'dark', size: 'full', motion: m },
       features: { card: 'glow', staggerDelay: 100, motion: m, decorator: false },
       stats: { numberSize: 'text-4xl', countUp: true, staggerDelay: 100, motion: m },
