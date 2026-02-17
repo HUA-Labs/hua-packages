@@ -43,7 +43,6 @@ related:
   - "motion-core"
   - "i18n-core"
   - "state"
-  - "pro"
 
 subpathExports:
   - path: "framework"
@@ -60,8 +59,6 @@ subpathExports:
     description: "Re-exports from @hua-labs/i18n-core"
   - path: "state"
     description: "Re-exports from @hua-labs/state"
-  - path: "pro"
-    description: "Re-exports from @hua-labs/pro"
   - path: "formatters"
     description: "Re-exports from @hua-labs/i18n-formatters"
   - path: "utils"
@@ -105,8 +102,7 @@ sections:
       ├── /formatters      ← re-export @hua-labs/i18n-formatters
       ├── /hooks           ← re-export @hua-labs/hooks
       ├── /utils           ← re-export @hua-labs/utils
-      ├── /loaders         ← re-export @hua-labs/i18n-loaders
-      └── /pro             ← re-export @hua-labs/pro
+      └── /loaders         ← re-export @hua-labs/i18n-loaders
       ```
 
       The main entry (`@hua-labs/hua`) exports everything flat for convenience. Use subpath imports for tree-shaking.

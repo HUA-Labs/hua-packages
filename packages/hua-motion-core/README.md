@@ -47,109 +47,36 @@ function Hero() {
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `MotionEngine` | component |  |
-| `motionEngine` | function |  |
-| `type MotionFrame` | function |  |
-| `type MotionOptions` | function |  |
-| `type Motion` | function |  |
-| `TransitionEffects` | component |  |
-| `transitionEffects` | function |  |
-| `type TransitionType` | function |  |
-| `type TransitionOptions` | function |  |
-| `PerformanceOptimizer` | component |  |
-| `performanceOptimizer` | function |  |
-| `type PerformanceOptimizerMetrics` | function |  |
-| `type OptimizationConfig` | function |  |
-| `useSimplePageMotion` | hook |  |
-| `usePageMotions` | hook |  |
-| `useSmartMotion` | hook |  |
-| `useUnifiedMotion` | hook |  |
+| `useSimplePageMotion` | hook | Simple fade+slide page entrance animation |
+| `usePageMotions` | hook | Multi-element page entrance orchestration |
+| `useSmartMotion` | hook | Adaptive motion based on device performance |
+| `useUnifiedMotion` | hook | All-in-one motion hook with presets |
 | `useFadeIn` | hook | Fade-in animation hook |
-| `useSlideUp` | hook | Slide-up animation hook |
-| `useSlideLeft` | hook | Slide-left animation hook |
-| `useSlideRight` | hook | Slide-right animation hook |
-| `useScaleIn` | hook | Scale-in animation hook |
-| `useBounceIn` | hook | Bounce-in animation hook |
-| `usePulse` | hook |  |
-| `useSpringMotion` | hook |  |
-| `useGradient` | hook |  |
+| `useSlideUp` | hook | Slide-up entrance animation |
+| `useSlideLeft` | hook | Slide-left entrance animation |
+| `useSlideRight` | hook | Slide-right entrance animation |
+| `useScaleIn` | hook | Scale-in entrance animation |
+| `useBounceIn` | hook | Bounce-in entrance animation |
+| `usePulse` | hook | Repeating pulse animation |
+| `useSpringMotion` | hook | Spring physics animation |
+| `useGradient` | hook | Animated gradient background |
 | `useHoverMotion` | hook | Hover interaction animation |
-| `useClickToggle` | hook |  |
-| `useFocusToggle` | hook |  |
+| `useClickToggle` | hook | Click-triggered toggle animation |
+| `useFocusToggle` | hook | Focus-triggered toggle animation |
 | `useScrollReveal` | hook | Scroll-triggered reveal animation |
-| `useScrollProgress` | hook |  |
-| `useMotionState` | hook |  |
-| `useRepeat` | hook |  |
-| `useToggleMotion` | hook |  |
-| `useSlideDown` | hook |  |
-| `useInView` | hook |  |
-| `useMouse` | hook |  |
-| `useReducedMotion` | hook |  |
-| `useWindowSize` | hook |  |
-| `useGesture` | hook |  |
-| `useGestureMotion` | hook |  |
-| `linear` | function |  |
-| `easeIn` | function |  |
-| `easeOut` | function |  |
-| `easeInOut` | function |  |
-| `easeInQuad` | function |  |
-| `easeOutQuad` | function |  |
-| `easeInOutQuad` | function |  |
-| `type EasingFunction` | function |  |
-| `type EasingType` | function |  |
-| `getEasing` | function |  |
-| `applyEasing` | function |  |
-| `safeApplyEasing` | function |  |
-| `isValidEasing` | function |  |
-| `getAvailableEasings` | function |  |
-| `isEasingFunction` | function |  |
-| `easingPresets` | function |  |
-| `getPresetEasing` | function |  |
-| `UseUnifiedMotionOptions` | type |  |
-| `PageType` | type |  |
-| `MotionType` | type |  |
-| `EntranceType` | type |  |
-| `PageMotionElement` | type |  |
-| `PageMotionsConfig` | type |  |
-| `MotionState` | type |  |
-| `PageMotionRef` | type |  |
-| `BaseMotionOptions` | type |  |
-| `BaseMotionReturn` | type |  |
-| `MotionElement` | type |  |
-| `MotionPreset` | type |  |
-| `PresetConfig` | type |  |
-| `SpringConfig` | type |  |
-| `GestureConfig` | type |  |
-| `OrchestrationConfig` | type |  |
-| `FadeInOptions` | type |  |
-| `SlideOptions` | type |  |
-| `ScaleOptions` | type |  |
-| `BounceOptions` | type |  |
-| `PulseOptions` | type |  |
-| `SpringOptions` | type |  |
-| `GestureOptions` | type |  |
-| `ScrollRevealOptions` | type |  |
-| `ScrollRevealMotionType` | type |  |
-| `GradientOptions` | type |  |
-| `ToggleMotionOptions` | type |  |
-| `RepeatOptions` | type |  |
-| `HoverMotionOptions` | type |  |
-| `InteractionReturn` | type |  |
-| `InViewOptions` | type |  |
-| `InViewReturn` | type |  |
-| `MouseOptions` | type |  |
-| `MouseReturn` | type |  |
-| `ReducedMotionReturn` | type |  |
-| `WindowSizeOptions` | type |  |
-| `WindowSizeReturn` | type |  |
-| `PerformanceMetrics` | type |  |
-| `MotionConfig` | type |  |
-| `MotionDirection` | type |  |
-| `MotionEasing` | type |  |
-| `MotionTrigger` | type |  |
-| `MotionCallback` | type |  |
-| `MotionProgressCallback` | type |  |
-| `MotionStateCallback` | type |  |
+| `useScrollProgress` | hook | Scroll position as 0-1 progress value |
+| `useMotionState` | hook | Animation state tracking (idle, running, complete) |
+| `useRepeat` | hook | Repeating animation with configurable count |
+| `useToggleMotion` | hook | Toggle between two animation states |
+| `useSlideDown` | hook | Slide-down entrance animation |
+| `useInView` | hook | IntersectionObserver-based visibility detection |
+| `useMouse` | hook | Mouse position tracking |
+| `useReducedMotion` | hook | Detect prefers-reduced-motion setting |
+| `useWindowSize` | hook | Responsive window size tracking |
+| `useGesture` | hook | Multi-gesture handler (drag, swipe, pinch) |
+| `useGestureMotion` | hook | Gesture-driven motion animation |
+| `easeInOut` | function | Smooth ease-in-out curve |
+| `getEasing` | function | Get easing function by name |
 
 ## Documentation
 

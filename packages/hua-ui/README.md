@@ -23,7 +23,7 @@ Accessible, TypeScript-first component library for React applications. Provides 
 pnpm add @hua-labs/ui
 ```
 
-> Peer dependencies: @dnd-kit/core ^6.3.1, @dnd-kit/sortable ^10.0.0, @dnd-kit/utilities ^3.2.2, react >=19.0.0, react-dom >=19.0.0
+> Peer dependencies: @dnd-kit/core ^6.3.1, @dnd-kit/sortable ^10.0.0, @dnd-kit/utilities ^3.2.2, @hua-labs/motion-core >=2.0.0, react >=19.0.0, react-dom >=19.0.0
 
 ## Quick Start
 
@@ -51,171 +51,44 @@ function App() {
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `Button` | component |  |
-| `Action` | component |  |
-| `Input` | component |  |
-| `NumberInput` | component |  |
-| `Link` | component |  |
-| `Icon` | component |  |
-| `EmotionIcon` | component |  |
-| `StatusIcon` | component |  |
-| `LoadingIcon` | component |  |
-| `SuccessIcon` | component |  |
-| `ErrorIcon` | component |  |
-| `Avatar` | component |  |
-| `AvatarImage` | component |  |
-| `AvatarFallback` | component |  |
-| `Modal` | component |  |
-| `Container` | component |  |
-| `Grid` | component |  |
-| `Stack` | component |  |
-| `Divider` | component |  |
-| `Card` | component |  |
-| `CardHeader` | component |  |
-| `CardFooter` | component |  |
-| `CardTitle` | component |  |
-| `CardDescription` | component |  |
-| `CardContent` | component |  |
-| `Panel` | component |  |
-| `ActionToolbar` | component |  |
-| `ComponentLayout` | component |  |
-| `Badge` | component |  |
-| `Progress` | component |  |
-| `ProgressSuccess` | component |  |
-| `ProgressWarning` | component |  |
-| `ProgressError` | component |  |
-| `ProgressInfo` | component |  |
-| `ProgressGroup` | component |  |
-| `Skeleton` | component |  |
-| `SkeletonText` | component |  |
-| `SkeletonCircle` | component |  |
-| `SkeletonRectangle` | component |  |
-| `SkeletonRounded` | component |  |
-| `SkeletonCard` | component |  |
-| `SkeletonAvatar` | component |  |
-| `SkeletonImage` | component |  |
-| `SkeletonUserProfile` | component |  |
-| `SkeletonList` | component |  |
-| `SkeletonTable` | component |  |
-| `Alert` | component |  |
-| `AlertSuccess` | component |  |
-| `AlertWarning` | component |  |
-| `AlertError` | component |  |
-| `AlertInfo` | component |  |
-| `ToastProvider` | component |  |
-| `useToast` | hook |  |
-| `useToastSafe` | hook |  |
-| `LoadingSpinner` | component |  |
-| `Tooltip` | component |  |
-| `TooltipLight` | component |  |
-| `TooltipDark` | component |  |
-| `Label` | component |  |
-| `Switch` | component |  |
-| `Toggle` | component |  |
-| `ScrollArea` | component |  |
-| `ScrollToTop` | component |  |
-| `ThemeProvider` | component |  |
-| `ThemeToggle` | component |  |
-| `useTheme` | hook |  |
-| `iconCategories` | function |  |
-| `emotionIcons` | function |  |
-| `statusIcons` | function |  |
-| `iconNames` | function |  |
-| `iconProviderMapping` | function |  |
-| `isValidIconName` | function |  |
-| `getIconNameForProvider` | function |  |
-| `ICON_ALIASES` | component |  |
-| `resolveIconAlias` | function |  |
-| `getIconAliases` | function |  |
-| `IconProvider` | component |  |
-| `useIconContext` | hook |  |
-| `defaultIconConfig` | function |  |
-| `getDefaultStrokeWidth` | function |  |
-| `merge` | function |  |
-| `mergeIf` | function |  |
-| `mergeMap` | function |  |
-| `cn` | function |  |
-| `formatRelativeTime` | function |  |
-| `Slot` | component |  |
-| `composeRefs` | function |  |
-| `mergeProps` | function |  |
-| `createColorStyles` | function |  |
-| `useColorStyles` | hook |  |
-| `createVariantStyles` | function |  |
-| `createSizeStyles` | function |  |
-| `createRoundedStyles` | function |  |
-| `createShadowStyles` | function |  |
-| `createHoverStyles` | function |  |
-| `HUA_SPRING_EASING` | component |  |
-| `withDarkMode` | function |  |
-| `createGradient` | function |  |
-| `withOpacity` | function |  |
-| `isTextWhite` | function |  |
-| `isGradientVariant` | function |  |
-| `responsive` | function |  |
-| `conditionalClass` | function |  |
-| `useMicroMotion` | hook |  |
-| `getMicroMotionClasses` | function |  |
-| `EASING_FUNCTIONS` | component |  |
-| `DURATIONS` | component |  |
-| `COMPONENT_MOTION_DEFAULTS` | component |  |
-| `CSS_MOTION_VARS` | component |  |
-| `useInView` | hook |  |
-| `useScrollProgress` | hook |  |
-| `useMouse` | hook |  |
-| `useReducedMotion` | hook |  |
-| `useWindowSize` | hook |  |
-| `ButtonProps` | type |  |
-| `NumberInputProps` | type |  |
-| `IconProps` | type |  |
-| `ModalProps` | type |  |
-| `CardProps` | type |  |
-| `CardHeaderProps` | type |  |
-| `CardTitleProps` | type |  |
-| `CardDescriptionProps` | type |  |
-| `CardContentProps` | type |  |
-| `CardFooterProps` | type |  |
-| `ActionToolbarProps` | type |  |
-| `ActionButton` | type |  |
-| `Toast` | type |  |
-| `ToggleProps` | type |  |
-| `ThemeProviderProps` | type |  |
-| `ThemeProviderState` | type |  |
-| `IconName` | type |  |
-| `ProjectIconName` | type |  |
-| `AllIconName` | type |  |
-| `IconProviderProps` | type |  |
-| `IconSet` | type |  |
-| `PhosphorWeight` | type |  |
-| `IconConfig` | type |  |
-| `SlotProps` | type |  |
-| `ColorStyleConfig` | type |  |
-| `ColorStyles` | type |  |
-| `SizeStyles` | type |  |
-| `Rounded` | type |  |
-| `Shadow` | type |  |
-| `HoverEffect` | type |  |
-| `MicroMotionConfig` | type |  |
-| `MicroMotionPreset` | type |  |
-| `MicroMotionState` | type |  |
-| `Color` | type |  |
-| `Size` | type |  |
-| `BaseVariant` | type |  |
-| `ExtendedVariant` | type |  |
-| `UseInViewOptions` | type |  |
-| `UseInViewReturn` | type |  |
-| `UseScrollProgressOptions` | type |  |
-| `UseScrollProgressReturn` | type |  |
-| `UseMouseOptions` | type |  |
-| `UseMouseReturn` | type |  |
-| `UseWindowSizeOptions` | type |  |
-| `UseWindowSizeReturn` | type |  |
+| `Button` | component | Primary action button with variants, sizes, and loading state |
+| `Action` | component | Compact icon action button |
+| `Input` | component | Text input with validation, prefix/suffix, and error states |
+| `NumberInput` | component | Numeric input with increment/decrement controls |
+| `Link` | component | Styled anchor with router integration |
+| `Icon` | component | Universal icon component (Lucide, Phosphor, custom) |
+| `Avatar` | component | User avatar with image fallback |
+| `Modal` | component | Dialog overlay with backdrop and focus trap |
+| `Container` | component | Responsive max-width container |
+| `Grid` | component | CSS Grid layout wrapper |
+| `Stack` | component | Flex stack layout (vertical/horizontal) |
+| `Divider` | component | Visual separator (horizontal/vertical) |
+| `Card` | component | Content container with header, body, footer slots |
+| `Panel` | component | Collapsible content panel |
+| `Badge` | component | Status badge with color variants |
+| `Progress` | component | Progress bar with percentage |
+| `Skeleton` | component | Content placeholder during loading |
+| `Alert` | component | Inline alert with success/warning/error/info variants |
+| `ToastProvider` | component | Toast notification provider |
+| `useToast` | hook | Imperative toast API — toast.success(), toast.error() |
+| `LoadingSpinner` | component | Animated loading indicator |
+| `Tooltip` | component | Hover tooltip with positioning |
+| `Label` | component | Form label with required indicator |
+| `Switch` | component | Toggle switch for boolean values |
+| `Toggle` | component | Pressable toggle button |
+| `ScrollArea` | component | Custom scrollbar container |
+| `ScrollToTop` | component | Scroll-to-top floating button |
+| `ThemeProvider` | component | Dark/light theme context provider |
+| `ThemeToggle` | component | Theme switch button |
+| `useTheme` | hook | Theme context hook — { theme, setTheme } |
+| `IconProvider` | component | Icon configuration context provider |
+| `cn` | function | Tailwind-safe class name merging (clsx + tailwind-merge) |
+| `Slot` | component | Polymorphic slot for asChild pattern |
 
 
 ## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
-- [`@hua-labs/ui-dashboard`](https://www.npmjs.com/package/@hua-labs/ui-dashboard)
 
 ## License
 
