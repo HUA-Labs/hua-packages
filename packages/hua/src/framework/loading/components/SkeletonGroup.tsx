@@ -8,7 +8,6 @@
 'use client';
 
 import React from 'react';
-import { Skeleton } from '@hua-labs/ui';
 
 /**
  * SkeletonGroup 컴포넌트 props

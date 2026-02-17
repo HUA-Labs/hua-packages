@@ -57,8 +57,8 @@ const log = createLogger('hua:page');
  */
 export function HuaPage({
   children,
-  title,
-  description,
+  title: _title,
+  description: _description,
   vibe,
   i18nKey,
   enableMotion = true,
