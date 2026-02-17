@@ -4,7 +4,7 @@
  * Configuration schema and validation
  */
 
-import type { HuaConfig, Preset } from '../types';
+import type { HuaConfig } from '../types';
 
 /**
  * Default configuration

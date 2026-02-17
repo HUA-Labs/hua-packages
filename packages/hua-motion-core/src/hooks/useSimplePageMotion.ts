@@ -40,10 +40,10 @@ function useSimplePageMotions(config: PageMotionsConfig) {
     const preset = getMotionPreset(elementConfig.type)
     const mergedConfig = mergeWithPreset(preset, elementConfig)
     
-    let opacity = isVisible ? 1 : 0
-    let translateY = isVisible ? 0 : 20
-    let translateX = 0
-    let scale = isVisible ? 1 : 0.95
+    const opacity = isVisible ? 1 : 0
+    const translateY = isVisible ? 0 : 20
+    const translateX = 0
+    const scale = isVisible ? 1 : 0.95
 
     return { opacity, translateY, translateX, scale }
   }, [])

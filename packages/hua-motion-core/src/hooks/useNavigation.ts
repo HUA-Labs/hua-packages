@@ -255,7 +255,7 @@ export function useNavigation<T extends MotionElement = HTMLDivElement>(
 
   // 네비게이션 스타일 계산
   const getNavigationStyle = (): React.CSSProperties => {
-    let baseStyle: React.CSSProperties = {
+    const baseStyle: React.CSSProperties = {
       transition: `all ${duration}ms ${easing}`,
       willChange: 'transform, opacity'
     }

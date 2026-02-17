@@ -61,7 +61,7 @@ export function usePageMotions(config: PageMotionsConfig) {
     // 스크롤 리빌 모션 처리
     let opacity = state.finalVisibility ? 1 : 0
     let translateY = state.finalVisibility ? 0 : 20
-    let translateX = 0
+    const translateX = 0
     let scale = state.finalVisibility ? 1 : 0.95
 
     // 호버 효과 (더 눈에 띄게)

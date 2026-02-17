@@ -66,7 +66,7 @@ try {
     next: () => ({
       headers: new Headers(),
     } as BaseNextResponse),
-    redirect: (url: string) => ({
+    redirect: (_url: string) => ({
       headers: new Headers(),
     } as BaseNextResponse),
   };

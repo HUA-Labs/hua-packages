@@ -4,7 +4,6 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { defineConfig, getConfig, setConfig, resetConfig } from '../../config';
-import type { HuaUxConfig } from '../../types';
 
 describe('defineConfig', () => {
   it('should create config with preset', () => {
