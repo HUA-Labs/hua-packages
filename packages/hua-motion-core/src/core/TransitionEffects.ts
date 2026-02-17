@@ -1,13 +1,13 @@
 /**
  * HUA Motion Core - 전환 효과 시스템
- * 
+ *
  * CSS Motion API를 활용한 고성능 전환 효과들
  * GPU 가속 및 레이어 분리 최적화 포함
  */
 
 import { motionEngine, MotionOptions } from './MotionEngine'
 
-export type TransitionType = 
+export type TransitionType =
   | 'fade'
   | 'slide'
   | 'slide-up'
@@ -45,329 +45,347 @@ export class TransitionEffects {
    * 페이드 인/아웃 전환
    */
   async fade(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
-    
-    return new Promise(async (resolve) => {
-      const initialOpacity = parseFloat(getComputedStyle(element).opacity) || 1
-      const targetOpacity = options.direction === 'reverse' ? 0 : 1
-      
-      // 초기 상태 설정
-      if (options.direction === 'reverse') {
-        element.style.opacity = initialOpacity.toString()
-      } else {
-        element.style.opacity = '0'
-      }
+    const initialOpacity = parseFloat(getComputedStyle(element).opacity) || 1
+    const targetOpacity = options.direction === 'reverse' ? 0 : 1
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 초기 상태 설정
+    if (options.direction === 'reverse') {
+      element.style.opacity = initialOpacity.toString()
+    } else {
+      element.style.opacity = '0'
+    }
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { opacity: options.direction === 'reverse' ? initialOpacity : 0 } },
-          { progress: 1, properties: { opacity: targetOpacity } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentOpacity = options.direction === 'reverse' 
-              ? initialOpacity * (1 - progress)
-              : targetOpacity * progress
-            element.style.opacity = currentOpacity.toString()
-          },
-          onComplete: () => {
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
 
-      this.activeTransitions.set(transitionId, motionId)
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { opacity: options.direction === 'reverse' ? initialOpacity : 0 } },
+        { progress: 1, properties: { opacity: targetOpacity } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentOpacity = options.direction === 'reverse'
+            ? initialOpacity * (1 - progress)
+            : targetOpacity * progress
+          element.style.opacity = currentOpacity.toString()
+        },
+        onComplete: () => {
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
    * 슬라이드 전환
    */
   async slide(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const distance = options.distance || 100
-    
-    return new Promise(async (resolve) => {
-      const initialTransform = getComputedStyle(element).transform
-      const isReverse = options.direction === 'reverse'
-      
-      // 초기 위치 설정
-      if (!isReverse) {
-        element.style.transform = `translateX(${distance}px)`
-      }
+    const initialTransform = getComputedStyle(element).transform
+    const isReverse = options.direction === 'reverse'
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 초기 위치 설정
+    if (!isReverse) {
+      element.style.transform = `translateX(${distance}px)`
+    }
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { translateX: isReverse ? 0 : distance } },
-          { progress: 1, properties: { translateX: isReverse ? distance : 0 } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentTranslateX = isReverse 
-              ? distance * progress
-              : distance * (1 - progress)
-            element.style.transform = `translateX(${currentTranslateX}px)`
-          },
-          onComplete: () => {
-            element.style.transform = initialTransform
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
 
-      this.activeTransitions.set(transitionId, motionId)
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { translateX: isReverse ? 0 : distance } },
+        { progress: 1, properties: { translateX: isReverse ? distance : 0 } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentTranslateX = isReverse
+            ? distance * progress
+            : distance * (1 - progress)
+          element.style.transform = `translateX(${currentTranslateX}px)`
+        },
+        onComplete: () => {
+          element.style.transform = initialTransform
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
    * 스케일 전환
    */
   async scale(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const scaleValue = options.scale || 0.8
-    
-    return new Promise(async (resolve) => {
-      const initialTransform = getComputedStyle(element).transform
-      const isReverse = options.direction === 'reverse'
-      
-      // 초기 스케일 설정
-      if (!isReverse) {
-        element.style.transform = `scale(${scaleValue})`
-      }
+    const initialTransform = getComputedStyle(element).transform
+    const isReverse = options.direction === 'reverse'
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 초기 스케일 설정
+    if (!isReverse) {
+      element.style.transform = `scale(${scaleValue})`
+    }
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { scale: isReverse ? 1 : scaleValue } },
-          { progress: 1, properties: { scale: isReverse ? scaleValue : 1 } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentScale = isReverse 
-              ? 1 - (1 - scaleValue) * progress
-              : scaleValue + (1 - scaleValue) * progress
-            element.style.transform = `scale(${currentScale})`
-          },
-          onComplete: () => {
-            element.style.transform = initialTransform
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
 
-      this.activeTransitions.set(transitionId, motionId)
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { scale: isReverse ? 1 : scaleValue } },
+        { progress: 1, properties: { scale: isReverse ? scaleValue : 1 } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentScale = isReverse
+            ? 1 - (1 - scaleValue) * progress
+            : scaleValue + (1 - scaleValue) * progress
+          element.style.transform = `scale(${currentScale})`
+        },
+        onComplete: () => {
+          element.style.transform = initialTransform
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
    * 플립 전환 (3D 회전)
    */
   async flip(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const perspective = options.perspective || 1000
-    
-    return new Promise(async (resolve) => {
-      const initialTransform = getComputedStyle(element).transform
-      const isReverse = options.direction === 'reverse'
-      
-      // 3D 설정
-      element.style.perspective = `${perspective}px`
-      element.style.transformStyle = 'preserve-3d'
-      
-      // 초기 회전 설정
-      if (!isReverse) {
-        element.style.transform = `rotateY(90deg)`
-      }
+    const initialTransform = getComputedStyle(element).transform
+    const isReverse = options.direction === 'reverse'
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 3D 설정
+    element.style.perspective = `${perspective}px`
+    element.style.transformStyle = 'preserve-3d'
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { rotateY: isReverse ? 0 : 90 } },
-          { progress: 1, properties: { rotateY: isReverse ? 90 : 0 } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentRotateY = isReverse 
-              ? 90 * progress
-              : 90 * (1 - progress)
-            element.style.transform = `rotateY(${currentRotateY}deg)`
-          },
-          onComplete: () => {
-            element.style.transform = initialTransform
-            element.style.perspective = ''
-            element.style.transformStyle = ''
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // 초기 회전 설정
+    if (!isReverse) {
+      element.style.transform = `rotateY(90deg)`
+    }
 
-      this.activeTransitions.set(transitionId, motionId)
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
+
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { rotateY: isReverse ? 0 : 90 } },
+        { progress: 1, properties: { rotateY: isReverse ? 90 : 0 } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentRotateY = isReverse
+            ? 90 * progress
+            : 90 * (1 - progress)
+          element.style.transform = `rotateY(${currentRotateY}deg)`
+        },
+        onComplete: () => {
+          element.style.transform = initialTransform
+          element.style.perspective = ''
+          element.style.transformStyle = ''
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
    * 큐브 전환 (3D 큐브 회전)
    */
   async cube(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
     const perspective = options.perspective || 1200
-    
-    return new Promise(async (resolve) => {
-      const initialTransform = getComputedStyle(element).transform
-      const isReverse = options.direction === 'reverse'
-      
-      // 3D 큐브 설정
-      element.style.perspective = `${perspective}px`
-      element.style.transformStyle = 'preserve-3d'
-      
-      // 초기 큐브 회전 설정
-      if (!isReverse) {
-        element.style.transform = `rotateX(90deg) rotateY(45deg)`
-      }
+    const initialTransform = getComputedStyle(element).transform
+    const isReverse = options.direction === 'reverse'
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 3D 큐브 설정
+    element.style.perspective = `${perspective}px`
+    element.style.transformStyle = 'preserve-3d'
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { rotateX: isReverse ? 0 : 90, rotateY: isReverse ? 0 : 45 } },
-          { progress: 1, properties: { rotateX: isReverse ? 90 : 0, rotateY: isReverse ? 45 : 0 } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentRotateX = isReverse 
-              ? 90 * progress
-              : 90 * (1 - progress)
-            const currentRotateY = isReverse 
-              ? 45 * progress
-              : 45 * (1 - progress)
-            element.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`
-          },
-          onComplete: () => {
-            element.style.transform = initialTransform
-            element.style.perspective = ''
-            element.style.transformStyle = ''
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // 초기 큐브 회전 설정
+    if (!isReverse) {
+      element.style.transform = `rotateX(90deg) rotateY(45deg)`
+    }
 
-      this.activeTransitions.set(transitionId, motionId)
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
+
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { rotateX: isReverse ? 0 : 90, rotateY: isReverse ? 0 : 45 } },
+        { progress: 1, properties: { rotateX: isReverse ? 90 : 0, rotateY: isReverse ? 45 : 0 } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentRotateX = isReverse
+            ? 90 * progress
+            : 90 * (1 - progress)
+          const currentRotateY = isReverse
+            ? 45 * progress
+            : 45 * (1 - progress)
+          element.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`
+        },
+        onComplete: () => {
+          element.style.transform = initialTransform
+          element.style.perspective = ''
+          element.style.transformStyle = ''
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
    * 모프 전환 (복합 변형)
    */
   async morph(
-    element: HTMLElement, 
+    element: HTMLElement,
     options: Omit<TransitionOptions, 'type'>
   ): Promise<void> {
     const transitionId = this.generateTransitionId()
-    
-    return new Promise(async (resolve) => {
-      const initialTransform = getComputedStyle(element).transform
-      const isReverse = options.direction === 'reverse'
-      
-      // 초기 모프 상태 설정
-      if (!isReverse) {
-        element.style.transform = `scale(0.9) rotate(5deg)`
-      }
+    const initialTransform = getComputedStyle(element).transform
+    const isReverse = options.direction === 'reverse'
 
-      // GPU 가속 활성화
-      this.enableGPUAcceleration(element)
+    // 초기 모프 상태 설정
+    if (!isReverse) {
+      element.style.transform = `scale(0.9) rotate(5deg)`
+    }
 
-      const motionId = await motionEngine.motion(
-        element,
-        [
-          { progress: 0, properties: { scale: isReverse ? 1 : 0.9, rotate: isReverse ? 0 : 5 } },
-          { progress: 1, properties: { scale: isReverse ? 0.9 : 1, rotate: isReverse ? 5 : 0 } }
-        ],
-        {
-          duration: options.duration,
-          easing: options.easing || this.getDefaultEasing(),
-          delay: options.delay,
-          onStart: options.onTransitionStart,
-          onUpdate: (progress) => {
-            const currentScale = isReverse 
-              ? 1 - 0.1 * progress
-              : 0.9 + 0.1 * progress
-            const currentRotate = isReverse 
-              ? 5 * progress
-              : 5 * (1 - progress)
-            element.style.transform = `scale(${currentScale}) rotate(${currentRotate}deg)`
-          },
-          onComplete: () => {
-            element.style.transform = initialTransform
-            options.onTransitionComplete?.()
-            this.activeTransitions.delete(transitionId)
-            resolve()
-          }
-        }
-      )
+    // GPU 가속 활성화
+    this.enableGPUAcceleration(element)
 
-      this.activeTransitions.set(transitionId, motionId)
+    let resolveTransition: () => void
+    const completed = new Promise<void>((resolve) => {
+      resolveTransition = resolve
     })
+
+    const motionId = await motionEngine.motion(
+      element,
+      [
+        { progress: 0, properties: { scale: isReverse ? 1 : 0.9, rotate: isReverse ? 0 : 5 } },
+        { progress: 1, properties: { scale: isReverse ? 0.9 : 1, rotate: isReverse ? 5 : 0 } }
+      ],
+      {
+        duration: options.duration,
+        easing: options.easing || this.getDefaultEasing(),
+        delay: options.delay,
+        onStart: options.onTransitionStart,
+        onUpdate: (progress) => {
+          const currentScale = isReverse
+            ? 1 - 0.1 * progress
+            : 0.9 + 0.1 * progress
+          const currentRotate = isReverse
+            ? 5 * progress
+            : 5 * (1 - progress)
+          element.style.transform = `scale(${currentScale}) rotate(${currentRotate}deg)`
+        },
+        onComplete: () => {
+          element.style.transform = initialTransform
+          options.onTransitionComplete?.()
+          this.activeTransitions.delete(transitionId)
+          resolveTransition()
+        }
+      }
+    )
+
+    this.activeTransitions.set(transitionId, motionId)
+    return completed
   }
 
   /**
