@@ -22,7 +22,7 @@
     "clean": "rm -rf dist",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "echo 'Skipping lint for hua-i18n-core-zustand'",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "sideEffects": false,

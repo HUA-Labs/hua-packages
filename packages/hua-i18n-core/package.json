@@ -27,7 +27,7 @@
     "clean": "rm -rf dist",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "echo 'Skipping lint for hua-i18n-core (ESLint 8, needs separate config)'",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "generate:types": "tsx scripts/generate-i18n-types.ts",
     "validate:translations": "tsx scripts/validate-translations.ts"
