@@ -22,7 +22,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "lint": "echo 'Skipping lint for hua-motion-core (ESLint 8, needs separate config)'",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
