@@ -86,8 +86,7 @@ export default function RootLayout({ children }) {
 ├── /formatters      ← re-export @hua-labs/i18n-formatters
 ├── /hooks           ← re-export @hua-labs/hooks
 ├── /utils           ← re-export @hua-labs/utils
-├── /loaders         ← re-export @hua-labs/i18n-loaders
-└── /pro             ← re-export @hua-labs/pro
+└── /loaders         ← re-export @hua-labs/i18n-loaders
 ```
 
 The main entry (`@hua-labs/hua`) exports everything flat for convenience. Use subpath imports for tree-shaking.
@@ -113,7 +112,6 @@ export default defineConfig({ preset: 'product' });
 - [`@hua-labs/motion-core`](https://www.npmjs.com/package/@hua-labs/motion-core)
 - [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core)
 - [`@hua-labs/state`](https://www.npmjs.com/package/@hua-labs/state)
-- [`@hua-labs/pro`](https://www.npmjs.com/package/@hua-labs/pro)
 
 ## License
 

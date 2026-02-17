@@ -28,7 +28,6 @@ quickStart: |
 
 related:
   - "hua"
-  - "ui-dashboard"
 
 subpathExports:
   - path: "form"
@@ -43,3 +42,117 @@ subpathExports:
     description: "Overlay components (Modal, Drawer, Popover, etc.)"
   - path: "feedback"
     description: "Feedback components (Toast, Alert, etc.)"
+
+apiFilter: notes-only
+
+apiNotes:
+  # Core components
+  Button:
+    description: "Primary action button with variants, sizes, and loading state"
+    kind: "component"
+  Action:
+    description: "Compact icon action button"
+    kind: "component"
+  Input:
+    description: "Text input with validation, prefix/suffix, and error states"
+    kind: "component"
+  NumberInput:
+    description: "Numeric input with increment/decrement controls"
+    kind: "component"
+  Label:
+    description: "Form label with required indicator"
+    kind: "component"
+  Switch:
+    description: "Toggle switch for boolean values"
+    kind: "component"
+  Toggle:
+    description: "Pressable toggle button"
+    kind: "component"
+  Link:
+    description: "Styled anchor with router integration"
+    kind: "component"
+  Icon:
+    description: "Universal icon component (Lucide, Phosphor, custom)"
+    kind: "component"
+  Avatar:
+    description: "User avatar with image fallback"
+    kind: "component"
+  Badge:
+    description: "Status badge with color variants"
+    kind: "component"
+
+  # Layout
+  Card:
+    description: "Content container with header, body, footer slots"
+    kind: "component"
+  Container:
+    description: "Responsive max-width container"
+    kind: "component"
+  Grid:
+    description: "CSS Grid layout wrapper"
+    kind: "component"
+  Stack:
+    description: "Flex stack layout (vertical/horizontal)"
+    kind: "component"
+  Divider:
+    description: "Visual separator (horizontal/vertical)"
+    kind: "component"
+  Panel:
+    description: "Collapsible content panel"
+    kind: "component"
+  ScrollArea:
+    description: "Custom scrollbar container"
+    kind: "component"
+
+  # Overlay
+  Modal:
+    description: "Dialog overlay with backdrop and focus trap"
+    kind: "component"
+  Tooltip:
+    description: "Hover tooltip with positioning"
+    kind: "component"
+
+  # Feedback
+  Alert:
+    description: "Inline alert with success/warning/error/info variants"
+    kind: "component"
+  ToastProvider:
+    description: "Toast notification provider"
+    kind: "component"
+  useToast:
+    description: "Imperative toast API — toast.success(), toast.error()"
+    kind: "hook"
+  LoadingSpinner:
+    description: "Animated loading indicator"
+    kind: "component"
+  Progress:
+    description: "Progress bar with percentage"
+    kind: "component"
+  Skeleton:
+    description: "Content placeholder during loading"
+    kind: "component"
+
+  # Theme
+  ThemeProvider:
+    description: "Dark/light theme context provider"
+    kind: "component"
+  ThemeToggle:
+    description: "Theme switch button"
+    kind: "component"
+  useTheme:
+    description: "Theme context hook — { theme, setTheme }"
+    kind: "hook"
+
+  # Utilities
+  cn:
+    description: "Tailwind-safe class name merging (clsx + tailwind-merge)"
+    kind: "function"
+  Slot:
+    description: "Polymorphic slot for asChild pattern"
+    kind: "component"
+  IconProvider:
+    description: "Icon configuration context provider"
+    kind: "component"
+  ScrollToTop:
+    description: "Scroll-to-top floating button"
+    kind: "component"

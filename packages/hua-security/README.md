@@ -25,7 +25,7 @@ Unified security toolkit with Free/Pro tiers. Free tier provides encryption (AES
 pnpm add @hua-labs/security
 ```
 
-> Peer dependencies: @google-cloud/kms ^4.5.0, next >=14.0.0
+> Peer dependencies: @google-cloud/kms ^5.3.0, next >=14.0.0
 
 ## Quick Start
 

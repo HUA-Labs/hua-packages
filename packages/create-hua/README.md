@@ -36,8 +36,7 @@ pnpm dev
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `createProject` | function |  |
-| `main` | function |  |
+| `createProject` | function | Scaffold a new Next.js + hua project with interactive prompts |
 
 
 ## Related Packages

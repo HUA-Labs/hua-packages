@@ -18,3 +18,10 @@ codeBlockLang: bash
 related:
   - "hua"
   - "ui"
+
+apiFilter: notes-only
+
+apiNotes:
+  createProject:
+    description: "Scaffold a new Next.js + hua project with interactive prompts"
+    kind: "function"
