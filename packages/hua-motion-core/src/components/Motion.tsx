@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useUnifiedMotion } from '../hooks/useUnifiedMotion'
-import type { EntranceType, ScrollRevealOptions, MotionElement } from '../types'
+import type { EntranceType, ScrollRevealOptions } from '../types'
 import type { MotionEffects } from '../hooks/useUnifiedMotion'
 
 type MotionAs = 'div' | 'span' | 'section' | 'article' | 'header' | 'footer' | 'main' | 'nav'

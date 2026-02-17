@@ -200,7 +200,7 @@ function validateSoftwareApplication(
 /**
  * Validate WebSite specific fields
  */
-function validateWebSite(jsonLd: any, errors: ValidationError[], warnings: ValidationError[]) {
+function validateWebSite(jsonLd: any, errors: ValidationError[], _warnings: ValidationError[]) {
   if (!jsonLd.url) {
     errors.push({
       field: 'url',

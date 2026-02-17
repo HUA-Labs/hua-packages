@@ -4,7 +4,7 @@
  * Preset 병합 및 깊은 병합 로직
  */
 
-import type { HuaConfig, Preset, PresetName, PresetConfig } from '../types';
+import type { HuaConfig, Preset, PresetName } from '../types';
 import { productPreset } from '../../presets/product';
 import { marketingPreset } from '../../presets/marketing';
 
@@ -91,7 +91,7 @@ export function mergePresetWithConfig(
 ): HuaConfig {
   // 1. Preset 타입 추출
   let presetName: PresetName;
-  let presetOverrides: Partial<HuaConfig> = {};
+  const presetOverrides: Partial<HuaConfig> = {};
   
   if (typeof preset === 'string') {
     // 바이브 모드: 문자열 Preset

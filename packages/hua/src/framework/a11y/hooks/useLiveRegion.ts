@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { LiveRegion, type LiveRegionProps } from '../components/LiveRegion';
+import { LiveRegion } from '../components/LiveRegion';
 
 /**
  * useLiveRegion 반환 타입

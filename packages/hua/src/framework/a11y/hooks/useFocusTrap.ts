@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useRef, useCallback, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { createLogger } from '../../../utils/logger';
 
 const log = createLogger('hua:a11y:focus-trap');

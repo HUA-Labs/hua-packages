@@ -7,7 +7,6 @@ import { renderHook, act } from '@testing-library/react'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 import { useScrollProgress } from '../../hooks/useScrollProgress'
 import { useScrollToggle } from '../../hooks/useScrollToggle'
-import { getLastObserver } from '../setup'
 
 // ========================================
 // useScrollReveal Tests (~15 tests)

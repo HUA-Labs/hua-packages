@@ -9,7 +9,7 @@ const mockUnobserve = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
-  global.IntersectionObserver = vi.fn().mockImplementation((callback) => ({
+  global.IntersectionObserver = vi.fn().mockImplementation((_callback) => ({
     observe: mockObserve,
     disconnect: mockDisconnect,
     unobserve: mockUnobserve,
