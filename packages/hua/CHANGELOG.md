@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.3
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+- Updated dependencies
+  - @hua-labs/ui@2.1.1
+  - @hua-labs/motion-core@2.2.3
+  - @hua-labs/i18n-core@2.0.5
+  - @hua-labs/i18n-core-zustand@2.0.5
+  - @hua-labs/i18n-formatters@2.0.5
+  - @hua-labs/i18n-loaders@2.0.5
+  - @hua-labs/hooks@1.1.2
+  - @hua-labs/state@1.0.2
+  - @hua-labs/utils@1.1.2
+
 ## 1.0.1
 
 ### Patch Changes

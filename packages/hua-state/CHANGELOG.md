@@ -1,5 +1,11 @@
 # @hua-labs/state
 
+## 1.0.2
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+
 ## 1.0.1
 
 ### Patch Changes

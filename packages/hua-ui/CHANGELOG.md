@@ -1,5 +1,13 @@
 # @hua-labs/ui
 
+## 2.1.1
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+- Updated dependencies
+  - @hua-labs/motion-core@2.2.3
+
 ## 2.0.2
 
 ### Patch Changes

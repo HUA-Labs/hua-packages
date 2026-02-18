@@ -1,5 +1,11 @@
 # @hua-labs/utils
 
+## 1.1.2
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/i18n-formatters",
-  "version": "2.0.2",
+  "version": "2.0.5",
   "description": "HUA Labs - Date, Number, and Currency formatting utilities for i18n",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
