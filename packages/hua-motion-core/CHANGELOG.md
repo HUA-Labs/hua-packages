@@ -1,5 +1,11 @@
 # @hua-labs/motion-core
 
+## 2.2.3
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+
 ## 2.2.1
 
 ### Patch Changes

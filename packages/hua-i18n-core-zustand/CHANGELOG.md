@@ -1,5 +1,14 @@
 # @hua-labs/i18n-core-zustand
 
+## 2.0.5
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+- Updated dependencies
+  - @hua-labs/i18n-core@2.0.5
+  - @hua-labs/state@1.0.2
+
 ## 2.0.3
 
 ### Patch Changes
