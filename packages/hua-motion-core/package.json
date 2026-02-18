@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/motion-core",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "HUA Motion Core - Essential animation hooks for React developers",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
