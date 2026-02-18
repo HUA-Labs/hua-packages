@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/i18n-loaders",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "Production-ready loaders, caching, and preloading helpers for @hua-labs/i18n-core.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
