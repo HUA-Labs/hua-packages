@@ -1,5 +1,11 @@
 # @hua-labs/i18n-core
 
+## 2.0.5
+
+### Patch Changes
+
+- docs: update package READMEs and clean internal references
+
 ## 2.0.2
 
 ### Patch Changes

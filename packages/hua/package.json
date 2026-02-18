@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/hua",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "HUA - Ship UX faster: UI + motion + i18n, pre-wired. A framework for React product teams.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
