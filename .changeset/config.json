@@ -22,8 +22,11 @@
     "@hua-labs/ui-dashboard",
     "@hua-labs/api-lite",
     "my-app",
+    "my-api",
+    "my-chat",
+    "hue",
     "hua-docs",
     "hua-official",
-    "hua-api"
+    "@hua-labs/eslint-plugin-i18n"
   ]
 }
