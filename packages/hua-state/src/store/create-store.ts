@@ -102,6 +102,11 @@ export function createHuaStore<T extends BaseStoreState>(
 
   // If persist is enabled, wrap with persist middleware
   if (enablePersist) {
+    // 이전 store의 rehydration 상태 초기화 — 새 store가 실제 rehydrate 전에
+    // onStoreRehydrated가 즉시 fire되는 레이스 컨디션 방지
+    rehydrationStatus.delete(storageKey);
+    rehydrationListeners.delete(storageKey);
+
     return create<T>()(
       persist(
         storeCreator,

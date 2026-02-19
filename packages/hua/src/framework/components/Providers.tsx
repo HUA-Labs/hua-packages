@@ -97,6 +97,7 @@ function createProviders(config: HuaConfig) {
         initialTranslations: config.i18n.initialTranslations,
         supportedLanguages: config.i18n.supportedLanguages,
         storageKey: config.i18n.storageKey,
+        autoUpdateHtmlLang: true,
       }
     );
 
@@ -133,9 +134,13 @@ export function UnifiedProviders({
     ? { ...baseConfig, ...overrideConfig }
     : baseConfig;
 
-  const Provider = React.useMemo(() => createProviders(config), [config]);
+  // useRef로 Provider를 한 번만 생성 — config 객체가 매 렌더마다 새로 만들어져도
+  // store가 재생성되지 않음 (language 초기값 'en'으로 리셋 방지)
+  const providerRef = React.useRef<React.ComponentType<{ children: ReactNode }> | null>(null);
+  if (!providerRef.current) {
+    providerRef.current = createProviders(config);
+  }
+  const Provider = providerRef.current;
 
-  // Provider 체인은 createProviders 내부에서 처리됨
-  // Provider chain is handled inside createProviders
   return <Provider>{children}</Provider>;
 }
