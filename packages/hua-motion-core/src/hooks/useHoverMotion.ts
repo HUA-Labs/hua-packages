@@ -1,14 +1,16 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { HoverMotionOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useHoverMotion<T extends MotionElement = HTMLDivElement>(
   options: HoverMotionOptions = {}
 ): BaseMotionReturn<T> & { isHovered: boolean } {
+  const profile = useMotionProfile()
   const {
-    duration = 200,
-    easing = 'ease-out',
-    hoverScale = 1.05,
-    hoverY = -2,
+    duration = profile.interaction.hover.duration,
+    easing = profile.interaction.hover.easing,
+    hoverScale = profile.interaction.hover.scale,
+    hoverY = profile.interaction.hover.y,
     hoverOpacity = 1
   } = options
 

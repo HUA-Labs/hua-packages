@@ -139,10 +139,10 @@ describe('useUnifiedMotion', () => {
     it('should handle all four slide directions', () => {
       const directions: Array<'up' | 'down' | 'left' | 'right'> = ['up', 'down', 'left', 'right']
       const expectedTransforms = [
-        'translateY(50px)',
-        'translateY(-50px)',
-        'translateX(50px)',
-        'translateX(-50px)',
+        'translateY(32px)',
+        'translateY(-32px)',
+        'translateX(32px)',
+        'translateX(-32px)',
       ]
 
       directions.forEach((direction, index) => {

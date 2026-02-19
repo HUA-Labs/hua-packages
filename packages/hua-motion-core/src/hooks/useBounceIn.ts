@@ -1,17 +1,19 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { BounceOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useBounceIn<T extends MotionElement = HTMLDivElement>(
   options: BounceOptions = {}
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
     duration = 600,
     delay = 0,
     autoStart = true,
-    intensity = 0.3,
-    threshold = 0.1,
-    triggerOnce = true,
-    easing = 'cubic-bezier(0.34, 1.56, 0.64, 1)', // 바운스 이징
+    intensity = profile.entrance.bounce.intensity,
+    threshold = profile.base.threshold,
+    triggerOnce = profile.base.triggerOnce,
+    easing = profile.entrance.bounce.easing,
     onComplete,
     onStart,
     onStop,

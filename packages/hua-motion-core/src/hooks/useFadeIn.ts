@@ -1,17 +1,19 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { FadeInOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useFadeIn<T extends MotionElement = HTMLDivElement>(
   options: FadeInOptions = {}
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
     delay = 0,
-    duration = 700,
-    threshold = 0.1,
-    triggerOnce = true,
-    easing = 'ease-out',
+    duration = profile.base.duration,
+    threshold = profile.base.threshold,
+    triggerOnce = profile.base.triggerOnce,
+    easing = profile.base.easing,
     autoStart = true,
-    initialOpacity = 0,
+    initialOpacity = profile.entrance.fade.initialOpacity,
     targetOpacity = 1,
     onComplete,
     onStart,

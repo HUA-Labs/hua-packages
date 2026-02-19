@@ -7,6 +7,7 @@
 
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { BaseMotionReturn, MotionElement, EntranceType, BaseMotionOptions } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export interface MotionEffects {
   fade?: boolean | { targetOpacity?: number }
@@ -131,16 +132,17 @@ function getMultiEffectEasing(effects: MotionEffects, easing?: string): string {
 export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
   options: UseUnifiedMotionOptions
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
     type,
     effects,
-    duration = 600,
+    duration = profile.base.duration,
     autoStart = true,
     delay = 0,
     easing,
-    threshold = 0.1,
-    triggerOnce = true,
-    distance = 50,
+    threshold = profile.base.threshold,
+    triggerOnce = profile.base.triggerOnce,
+    distance = profile.entrance.slide.distance,
     onComplete,
     onStart,
     onStop,
