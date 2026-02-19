@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useMemo, type CSSProperties, type RefObject } from 'react'
 import type { ScrollRevealMotionType } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export interface UseStaggerOptions {
   /** 자식 아이템 개수 */
@@ -27,16 +28,16 @@ export interface UseStaggerReturn {
   isVisible: boolean
 }
 
-function getInitialTransform(motionType: ScrollRevealMotionType): string {
+function getInitialTransform(motionType: ScrollRevealMotionType, slideDistance: number, scaleFrom: number): string {
   switch (motionType) {
     case 'slideUp':
-      return 'translateY(32px)'
+      return `translateY(${slideDistance}px)`
     case 'slideLeft':
-      return 'translateX(-32px)'
+      return `translateX(-${slideDistance}px)`
     case 'slideRight':
-      return 'translateX(32px)'
+      return `translateX(${slideDistance}px)`
     case 'scaleIn':
-      return 'scale(0.95)'
+      return `scale(${scaleFrom})`
     case 'bounceIn':
       return 'scale(0.75)'
     case 'fadeIn':
@@ -60,14 +61,15 @@ function getInitialTransform(motionType: ScrollRevealMotionType): string {
  * </div>
  */
 export function useStagger(options: UseStaggerOptions): UseStaggerReturn {
+  const profile = useMotionProfile()
   const {
     count,
-    staggerDelay = 100,
-    baseDelay = 0,
-    duration = 700,
+    staggerDelay = profile.stagger.perItem,
+    baseDelay = profile.stagger.baseDelay,
+    duration = profile.base.duration,
     motionType = 'fadeIn',
-    threshold = 0.1,
-    easing = 'ease-out',
+    threshold = profile.base.threshold,
+    easing = profile.base.easing,
   } = options
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -95,7 +97,9 @@ export function useStagger(options: UseStaggerOptions): UseStaggerReturn {
     }
   }, [threshold])
 
-  const initialTransform = useMemo(() => getInitialTransform(motionType), [motionType])
+  const slideDistance = profile.entrance.slide.distance
+  const scaleFrom = profile.entrance.scale.from
+  const initialTransform = useMemo(() => getInitialTransform(motionType, slideDistance, scaleFrom), [motionType, slideDistance, scaleFrom])
 
   const styles = useMemo<CSSProperties[]>(() => {
     return Array.from({ length: count }, (_, i) => {

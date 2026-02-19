@@ -120,6 +120,32 @@ export type { ElementProgressOptions, ElementProgressReturn } from './hooks/useE
 export * from './presets'
 
 // ========================================
+// 모션 프로필 시스템
+// ========================================
+
+export {
+  neutral,
+  hua,
+  resolveProfile,
+  mergeProfileOverrides,
+  MotionProfileProvider,
+  useMotionProfile,
+} from './profiles'
+
+export type {
+  MotionProfile,
+  MotionProfileBase,
+  MotionProfileEntrance,
+  MotionProfileStagger,
+  MotionProfileInteraction,
+  MotionProfileSpring,
+  ReducedMotionStrategy,
+  BuiltInProfileName,
+  MotionProfileProviderProps,
+  DeepPartial,
+} from './profiles'
+
+// ========================================
 // 기본 이징 함수들 (Core 패키지 범위)
 // ========================================
 

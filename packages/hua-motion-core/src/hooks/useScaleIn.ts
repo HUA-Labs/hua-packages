@@ -1,18 +1,20 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { ScaleOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useScaleIn<T extends MotionElement = HTMLDivElement>(
   options: ScaleOptions = {}
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
     initialScale = 0,
     targetScale = 1,
-    duration = 700,
+    duration = profile.base.duration,
     delay = 0,
     autoStart = true,
-    easing = 'ease-out',
-    threshold = 0.1,
-    triggerOnce = true,
+    easing = profile.base.easing,
+    threshold = profile.base.threshold,
+    triggerOnce = profile.base.triggerOnce,
     onComplete,
     onStart,
     onStop,

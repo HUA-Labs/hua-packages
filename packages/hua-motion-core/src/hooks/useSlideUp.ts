@@ -1,18 +1,20 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { SlideOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useSlideUp<T extends MotionElement = HTMLDivElement>(
   options: SlideOptions = {}
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
     delay = 0,
-    duration = 700,
-    threshold = 0.1,
-    triggerOnce = true,
-    easing = 'ease-out',
+    duration = profile.base.duration,
+    threshold = profile.base.threshold,
+    triggerOnce = profile.base.triggerOnce,
+    easing = profile.entrance.slide.easing,
     autoStart = true,
     direction = 'up',
-    distance = 50,
+    distance = profile.entrance.slide.distance,
     onComplete,
     onStart,
     onStop,

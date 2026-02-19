@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { SpringOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 interface SpringMotionOptions extends SpringOptions {
   /** 시작 값 */
@@ -16,14 +17,15 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
   value: number
   velocity: number
 } {
+  const profile = useMotionProfile()
   const {
     from,
     to,
-    mass = 1,
-    stiffness = 100,
-    damping = 10,
-    restDelta = 0.01,
-    restSpeed = 0.01,
+    mass = profile.spring.mass,
+    stiffness = profile.spring.stiffness,
+    damping = profile.spring.damping,
+    restDelta = profile.spring.restDelta,
+    restSpeed = profile.spring.restSpeed,
     onComplete,
     enabled = true,
     autoStart = false

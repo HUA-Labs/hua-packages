@@ -1,16 +1,18 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { ScrollRevealOptions, BaseMotionReturn, MotionElement } from '../types'
+import { useMotionProfile } from '../profiles/MotionProfileContext'
 
 export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
   options: ScrollRevealOptions = {}
 ): BaseMotionReturn<T> {
+  const profile = useMotionProfile()
   const {
-    threshold = 0.1,
+    threshold = profile.base.threshold,
     rootMargin = '0px',
-    triggerOnce = true,
+    triggerOnce = profile.base.triggerOnce,
     delay = 0,
-    duration = 700,
-    easing = 'ease-out',
+    duration = profile.base.duration,
+    easing = profile.base.easing,
     motionType = 'fadeIn',
     onComplete,
     onStart,
@@ -55,6 +57,10 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
     }
   }, [observerCallback, threshold, rootMargin])
 
+  // 프로필에서 거리/스케일 값 가져오기
+  const slideDistance = profile.entrance.slide.distance
+  const scaleFrom = profile.entrance.scale.from
+
   // 모션 스타일 생성 - duration/easing을 옵션에서 사용
   const style = useMemo(() => {
     const baseTransition = `all ${duration}ms ${easing}`
@@ -69,25 +75,25 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
         case 'slideUp':
           return {
             opacity: 0,
-            transform: 'translateY(32px)',
+            transform: `translateY(${slideDistance}px)`,
             transition: baseTransition
           }
         case 'slideLeft':
           return {
             opacity: 0,
-            transform: 'translateX(-32px)',
+            transform: `translateX(-${slideDistance}px)`,
             transition: baseTransition
           }
         case 'slideRight':
           return {
             opacity: 0,
-            transform: 'translateX(32px)',
+            transform: `translateX(${slideDistance}px)`,
             transition: baseTransition
           }
         case 'scaleIn':
           return {
             opacity: 0,
-            transform: 'scale(0.95)',
+            transform: `scale(${scaleFrom})`,
             transition: baseTransition
           }
         case 'bounceIn':
@@ -110,7 +116,7 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
       transform: 'none',
       transition: baseTransition
     }
-  }, [isVisible, motionType, duration, easing])
+  }, [isVisible, motionType, duration, easing, slideDistance, scaleFrom])
 
   const start = useCallback(() => {
     setIsAnimating(true)
