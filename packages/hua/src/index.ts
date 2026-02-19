@@ -161,17 +161,100 @@ export type { ColorPickerProps } from '@hua-labs/ui/form'
 export type { BreadcrumbProps, BreadcrumbItemProps, BreadcrumbItemData } from '@hua-labs/ui/navigation'
 export type { CodeBlockProps } from '@hua-labs/ui/data'
 
-// Re-export Motion hooks
-export * from '@hua-labs/motion-core'
+// Re-export Motion hooks (named exports to avoid CJS export * warnings with Turbopack)
+export {
+  // Core engine
+  MotionEngine, motionEngine,
+  TransitionEffects, transitionEffects,
+  PerformanceOptimizer, performanceOptimizer,
+  // 3-tier abstraction
+  useSimplePageMotion, usePageMotions, useSmartMotion, useUnifiedMotion,
+  // Basic motion hooks
+  useFadeIn, useSlideUp, useSlideLeft, useSlideRight, useSlideDown,
+  useScaleIn, useBounceIn, usePulse, useSpringMotion, useGradient,
+  // Interaction hooks
+  useHoverMotion, useClickToggle, useFocusToggle,
+  // Scroll hooks
+  useScrollReveal, useScrollProgress,
+  // Utility hooks
+  useMotionState, useRepeat, useToggleMotion,
+  // Note: useInView, useMouse, useReducedMotion, useWindowSize are already exported from @hua-labs/ui
+  // Gesture hooks
+  useGesture, useGestureMotion,
+  // Advanced interaction hooks
+  useTypewriter, useCustomCursor, useMagneticCursor, useSmoothScroll, useElementProgress,
+  // Stagger
+  useStagger,
+  // Presets
+  MOTION_PRESETS, PAGE_MOTIONS, mergeWithPreset, getPagePreset, getMotionPreset,
+  // Easing
+  linear, easeIn, easeOut, easeInOut,
+  easeInQuad, easeOutQuad, easeInOutQuad,
+  getEasing, applyEasing, safeApplyEasing, isValidEasing,
+  getAvailableEasings, isEasingFunction, easingPresets, getPresetEasing,
+  // Components
+  Motion,
+} from '@hua-labs/motion-core'
+export type {
+  MotionFrame, MotionOptions, Motion as MotionInstance,
+  TransitionType, TransitionOptions,
+  PerformanceOptimizerMetrics, OptimizationConfig,
+  UseUnifiedMotionOptions, MotionEffects,
+  TypewriterOptions, TypewriterReturn,
+  CustomCursorOptions, CustomCursorReturn,
+  MagneticCursorOptions, MagneticCursorReturn,
+  SmoothScrollOptions, SmoothScrollReturn,
+  ElementProgressOptions, ElementProgressReturn,
+  UseStaggerOptions, UseStaggerReturn,
+  EasingFunction, EasingType,
+  MotionProps,
+  PageType, MotionType, EntranceType,
+  PageMotionElement, PageMotionsConfig, MotionState, PageMotionRef,
+  BaseMotionOptions, BaseMotionReturn, MotionElement,
+  MotionPreset, PresetConfig,
+  SpringConfig, GestureConfig, OrchestrationConfig,
+  FadeInOptions, SlideOptions, ScaleOptions, BounceOptions,
+  PulseOptions, SpringOptions, GestureOptions,
+  ScrollRevealOptions, ScrollRevealMotionType, GradientOptions,
+  ToggleMotionOptions, RepeatOptions, HoverMotionOptions, InteractionReturn,
+  PerformanceMetrics, MotionConfig,
+  MotionDirection, MotionEasing, MotionTrigger,
+  MotionCallback, MotionProgressCallback, MotionStateCallback,
+} from '@hua-labs/motion-core'
 
-// Re-export i18n core
-export * from '@hua-labs/i18n-core'
+// Re-export i18n core (named exports)
+export {
+  createCoreI18n, CoreProvider,
+  createLanguageProvider, createNamespaceProvider, createCustomLoaderProvider,
+  useTranslation, useLanguageChange, useI18n,
+  I18nProvider,
+  Translator, ssrTranslate, serverTranslate,
+} from '@hua-labs/i18n-core'
+export type {
+  I18nConfig, I18nContextType, TranslationParams,
+  TypedTranslationKeys, ResolveStringKey, ResolveArrayKey,
+  ResolvePluralKey, PluralValue, PluralCategory,
+} from '@hua-labs/i18n-core'
 
-// Re-export i18n Zustand adapter
-export * from '@hua-labs/i18n-core-zustand'
+// Re-export i18n Zustand adapter (named exports)
+export {
+  createZustandI18n, useZustandI18n,
+} from '@hua-labs/i18n-core-zustand'
+export type {
+  SupportedLanguage, ZustandLanguageStore, ZustandI18nAdapter, ZustandI18nConfig,
+} from '@hua-labs/i18n-core-zustand'
 
-// Re-export state management
-export * from '@hua-labs/state'
+// Re-export state management (named exports)
+export {
+  createHuaStore, isStoreRehydrated, onStoreRehydrated, markStoreRehydrated,
+  createI18nStore,
+} from '@hua-labs/state'
+export type {
+  StoreCreator, StoreConfig, HuaStore, BaseStoreState,
+  UseBoundStore, StoreApi,
+  I18nStoreState, I18nStoreConfig,
+  UseStoreHook,
+} from '@hua-labs/state'
 
 // Re-export Pro features (advanced motion hooks)
 // Note: Pro package is dist-only (source not included in npm)
