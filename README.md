@@ -42,19 +42,15 @@ pnpm add @hua-labs/hua
 | Package | Description |
 |---------|-------------|
 | [`hua-i18n-core`](./packages/hua-i18n-core) | SSR 지원, zero-flicker 다국어 시스템 |
-| [`hua-i18n-loaders`](./packages/hua-i18n-loaders) | 번역 파일 로더 (JSON, YAML, API) |
-| [`hua-i18n-formatters`](./packages/hua-i18n-formatters) | 날짜, 숫자, 상대시간 포매터 |
-| [`hua-i18n-advanced`](./packages/hua-i18n-advanced) | 복수형, 성별, 컨텍스트 처리 |
-| [`hua-i18n-ai`](./packages/hua-i18n-ai) | AI 기반 자동 번역 |
-| [`hua-i18n-debug`](./packages/hua-i18n-debug) | 개발용 디버그 도구 |
+| [`hua-i18n-core-zustand`](./packages/hua-i18n-core-zustand) | Zustand 상태 관리 어댑터 |
+| [`hua-i18n-loaders`](./packages/hua-i18n-loaders) | 번역 파일 로더 및 캐싱 |
+| [`hua-i18n-formatters`](./packages/hua-i18n-formatters) | 날짜, 숫자, 통화 포매터 |
 
 ### Motion (애니메이션)
 
 | Package | Description |
 |---------|-------------|
 | [`hua-motion-core`](./packages/hua-motion-core) | 제로 의존성 애니메이션 훅 |
-| [`hua-motion`](./packages/hua-motion) | 프리셋 애니메이션 |
-| [`hua-motion-advanced`](./packages/hua-motion-advanced) | 스크롤, 제스처, 시퀀스 |
 
 ### Utilities
 
@@ -63,6 +59,7 @@ pnpm add @hua-labs/hua
 | [`hua-state`](./packages/hua-state) | 상태 관리 유틸리티 (Zustand 기반) |
 | [`hua-hooks`](./packages/hua-hooks) | 공용 React 훅 |
 | [`hua-utils`](./packages/hua-utils) | 공용 유틸리티 함수 |
+| [`eslint-plugin-i18n`](./packages/eslint-plugin-i18n) | i18n 타입 세이프티 ESLint 플러그인 |
 
 ## Tech Stack
 
@@ -91,8 +88,8 @@ hua-platform/
 ├── packages/
 │   ├── hua/             # 통합 프레임워크 (@hua-labs/hua)
 │   ├── hua-ui/             # UI 컴포넌트 (@hua-labs/ui)
-│   ├── hua-i18n-*/         # i18n 패키지 (core, loaders, formatters, ...)
-│   ├── hua-motion-*/       # Motion 패키지 (core, presets, advanced)
+│   ├── hua-i18n-*/         # i18n 패키지 (core, zustand, loaders, formatters)
+│   ├── hua-motion-core/    # 애니메이션 훅
 │   ├── hua-state/          # 상태 관리
 │   └── hua-utils/          # 유틸리티
 ├── docs/
