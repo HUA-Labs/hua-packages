@@ -47,6 +47,7 @@
     "lint-staged": "^16.2.7",
     "node-gyp": "^12.2.0",
     "playwright": "^1.58.2",
+    "subset-font": "^2.4.0",
     "tailwindcss": "4.1.18",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",

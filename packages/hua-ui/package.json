@@ -11,6 +11,11 @@
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.mjs",
+      "default": "./dist/theme.mjs"
+    },
     "./advanced": {
       "types": "./dist/advanced.d.ts",
       "import": "./dist/advanced.mjs",
