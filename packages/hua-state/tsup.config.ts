@@ -5,7 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'integrations/i18n': 'src/integrations/i18n.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   clean: true,
   sourcemap: true,

@@ -7,7 +7,7 @@ export default defineConfig({
     'number/index': 'src/number/index.ts',
     'currency/index': 'src/currency/index.ts',
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   clean: true,
   sourcemap: true,
