@@ -54,24 +54,14 @@ const shared = {
   },
 };
 
-export default defineConfig([
-  {
-    ...shared,
-    dts: {
-      compilerOptions: {
-        incremental: false,
-      },
+export default defineConfig({
+  ...shared,
+  dts: {
+    compilerOptions: {
+      incremental: false,
     },
-    format: ['esm'],
-    splitting: true,
-    outDir: 'dist',
   },
-  {
-    ...shared,
-    dts: false,
-    format: ['cjs'],
-    splitting: false,
-    outDir: 'dist',
-    clean: false,
-  },
-]);
+  format: ['esm'],
+  splitting: true,
+  outDir: 'dist',
+});

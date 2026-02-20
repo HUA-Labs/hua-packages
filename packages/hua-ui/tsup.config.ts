@@ -34,8 +34,6 @@ async function addUseClientDirective() {
   const distDir = join(import.meta.dirname, 'dist');
   const files = await readdir(distDir);
   // Only add "use client" to ESM entry points (.mjs)
-  // CJS files (.js) must NOT have "use client" — Turbopack treats CJS+use-client
-  // as ESM client modules, causing "exports is not defined" at runtime
   const esmFiles = files.filter(f => f.endsWith('.mjs'));
 
   for (const file of esmFiles) {
@@ -61,16 +59,6 @@ export default defineConfig([
     outDir: 'dist',
     clean: true,
   },
-  // Core CJS (without iconsax)
-  {
-    ...shared,
-    entry: coreEntry,
-    dts: false,
-    format: ['cjs'],
-    splitting: false,
-    outDir: 'dist',
-    clean: false,
-  },
   // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {
     ...shared,
@@ -85,17 +73,7 @@ export default defineConfig([
     outDir: 'dist',
     clean: false,
   },
-  // Iconsax Essential CJS
-  {
-    ...shared,
-    entry: { iconsax: 'src/iconsax.ts' },
-    dts: false,
-    format: ['cjs'],
-    splitting: false,
-    outDir: 'dist',
-    clean: false,
-  },
-  // Iconsax Extended ESM (all icons - for gallery/admin use)
+  // Iconsax Extended ESM (all icons - for gallery/admin use) — last build, adds "use client"
   {
     ...shared,
     entry: { 'iconsax-extended': 'src/iconsax-extended.ts' },
@@ -105,16 +83,6 @@ export default defineConfig([
       },
     },
     format: ['esm'],
-    splitting: false,
-    outDir: 'dist',
-    clean: false,
-  },
-  // Iconsax Extended CJS (last build - adds "use client" to all files)
-  {
-    ...shared,
-    entry: { 'iconsax-extended': 'src/iconsax-extended.ts' },
-    dts: false,
-    format: ['cjs'],
     splitting: false,
     outDir: 'dist',
     clean: false,
