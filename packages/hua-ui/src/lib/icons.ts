@@ -12,140 +12,137 @@
  * 새로운 아이콘이 필요하면 동적 fallback이 자동으로 처리합니다.
  */
 
-import {
-  // Navigation
-  House,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  List as ListIcon,
-  X,
-  MagnifyingGlass,
-  Gear,
-  ArrowSquareOut,
-  CaretLeft,
-  CaretRight,
-  CaretDown,
-  CaretUp,
+// Navigation
+import { House } from '@phosphor-icons/react/dist/ssr/House'
+import { ArrowLeft } from '@phosphor-icons/react/dist/ssr/ArrowLeft'
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr/ArrowRight'
+import { ArrowUp } from '@phosphor-icons/react/dist/ssr/ArrowUp'
+import { ArrowDown } from '@phosphor-icons/react/dist/ssr/ArrowDown'
+import { List } from '@phosphor-icons/react/dist/ssr/List'
+import { X } from '@phosphor-icons/react/dist/ssr/X'
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass'
+import { Gear } from '@phosphor-icons/react/dist/ssr/Gear'
+import { ArrowSquareOut } from '@phosphor-icons/react/dist/ssr/ArrowSquareOut'
+import { CaretLeft } from '@phosphor-icons/react/dist/ssr/CaretLeft'
+import { CaretRight } from '@phosphor-icons/react/dist/ssr/CaretRight'
+import { CaretDown } from '@phosphor-icons/react/dist/ssr/CaretDown'
+import { CaretUp } from '@phosphor-icons/react/dist/ssr/CaretUp'
 
-  // Actions
-  Pencil,
-  Trash,
-  Plus,
-  Minus,
-  Download,
-  Upload,
-  ArrowClockwise,
-  FloppyDisk,
-  Copy,
+// Actions
+import { Pencil } from '@phosphor-icons/react/dist/ssr/Pencil'
+import { Trash } from '@phosphor-icons/react/dist/ssr/Trash'
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus'
+import { Minus } from '@phosphor-icons/react/dist/ssr/Minus'
+import { Download } from '@phosphor-icons/react/dist/ssr/Download'
+import { Upload } from '@phosphor-icons/react/dist/ssr/Upload'
+import { ArrowClockwise } from '@phosphor-icons/react/dist/ssr/ArrowClockwise'
+import { FloppyDisk } from '@phosphor-icons/react/dist/ssr/FloppyDisk'
+import { Copy } from '@phosphor-icons/react/dist/ssr/Copy'
 
-  // Text Formatting (Markdown Toolbar)
-  TextB,
-  TextItalic,
-  TextStrikethrough,
-  TextHOne,
-  Link,
-  Code,
-  FileCode,
-  Quotes,
-  List,
-  ListNumbers,
+// Text Formatting (Markdown Toolbar)
+import { TextB } from '@phosphor-icons/react/dist/ssr/TextB'
+import { TextItalic } from '@phosphor-icons/react/dist/ssr/TextItalic'
+import { TextStrikethrough } from '@phosphor-icons/react/dist/ssr/TextStrikethrough'
+import { TextHOne } from '@phosphor-icons/react/dist/ssr/TextHOne'
+import { Link } from '@phosphor-icons/react/dist/ssr/Link'
+import { Code } from '@phosphor-icons/react/dist/ssr/Code'
+import { FileCode } from '@phosphor-icons/react/dist/ssr/FileCode'
+import { Quotes } from '@phosphor-icons/react/dist/ssr/Quotes'
+import { ListNumbers } from '@phosphor-icons/react/dist/ssr/ListNumbers'
 
-  // Status & Feedback
-  SpinnerGap,
-  CheckCircle,
-  XCircle,
-  WarningCircle,
-  Info,
-  Check,
-  Circle,
-  Question,
+// Status & Feedback
+import { SpinnerGap } from '@phosphor-icons/react/dist/ssr/SpinnerGap'
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle'
+import { XCircle } from '@phosphor-icons/react/dist/ssr/XCircle'
+import { WarningCircle } from '@phosphor-icons/react/dist/ssr/WarningCircle'
+import { Info } from '@phosphor-icons/react/dist/ssr/Info'
+import { Check } from '@phosphor-icons/react/dist/ssr/Check'
+import { Circle } from '@phosphor-icons/react/dist/ssr/Circle'
+import { Question } from '@phosphor-icons/react/dist/ssr/Question'
 
-  // User & Auth
-  User,
-  Users,
-  UserPlus,
-  SignIn,
-  SignOut,
-  Eye,
-  EyeSlash,
+// User & Auth
+import { User } from '@phosphor-icons/react/dist/ssr/User'
+import { Users } from '@phosphor-icons/react/dist/ssr/Users'
+import { UserPlus } from '@phosphor-icons/react/dist/ssr/UserPlus'
+import { SignIn } from '@phosphor-icons/react/dist/ssr/SignIn'
+import { SignOut } from '@phosphor-icons/react/dist/ssr/SignOut'
+import { Eye } from '@phosphor-icons/react/dist/ssr/Eye'
+import { EyeSlash } from '@phosphor-icons/react/dist/ssr/EyeSlash'
 
-  // Data & Analytics
-  ChartBar,
-  TrendUp,
-  Pulse,
-  Database,
-  Lightning,
+// Data & Analytics
+import { ChartBar } from '@phosphor-icons/react/dist/ssr/ChartBar'
+import { TrendUp } from '@phosphor-icons/react/dist/ssr/TrendUp'
+import { Pulse } from '@phosphor-icons/react/dist/ssr/Pulse'
+import { Database } from '@phosphor-icons/react/dist/ssr/Database'
+import { Lightning } from '@phosphor-icons/react/dist/ssr/Lightning'
 
-  // Files & Content
-  FileText,
-  File,
-  Folder,
-  Book,
-  BookOpen,
+// Files & Content
+import { FileText } from '@phosphor-icons/react/dist/ssr/FileText'
+import { File } from '@phosphor-icons/react/dist/ssr/File'
+import { Folder } from '@phosphor-icons/react/dist/ssr/Folder'
+import { Book } from '@phosphor-icons/react/dist/ssr/Book'
+import { BookOpen } from '@phosphor-icons/react/dist/ssr/BookOpen'
 
-  // Communication
-  Envelope,
-  ChatCircle,
-  Phone,
+// Communication
+import { Envelope } from '@phosphor-icons/react/dist/ssr/Envelope'
+import { ChatCircle } from '@phosphor-icons/react/dist/ssr/ChatCircle'
+import { Phone } from '@phosphor-icons/react/dist/ssr/Phone'
 
-  // Media
-  Image,
-  Video,
-  Camera,
+// Media
+import { Image } from '@phosphor-icons/react/dist/ssr/Image'
+import { Video } from '@phosphor-icons/react/dist/ssr/Video'
+import { Camera } from '@phosphor-icons/react/dist/ssr/Camera'
 
-  // Emotions
-  Smiley,
-  SmileySad,
-  SmileyMeh,
+// Emotions
+import { Smiley } from '@phosphor-icons/react/dist/ssr/Smiley'
+import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad'
+import { SmileyMeh } from '@phosphor-icons/react/dist/ssr/SmileyMeh'
 
-  // Security
-  Lock,
-  LockOpen,
-  Shield,
-  Wallet,
-  Key,
+// Security
+import { Lock } from '@phosphor-icons/react/dist/ssr/Lock'
+import { LockOpen } from '@phosphor-icons/react/dist/ssr/LockOpen'
+import { Shield } from '@phosphor-icons/react/dist/ssr/Shield'
+import { Wallet } from '@phosphor-icons/react/dist/ssr/Wallet'
+import { Key } from '@phosphor-icons/react/dist/ssr/Key'
 
-  // Time & Date
-  Clock,
-  Calendar,
-  CalendarPlus,
+// Time & Date
+import { Clock } from '@phosphor-icons/react/dist/ssr/Clock'
+import { Calendar } from '@phosphor-icons/react/dist/ssr/Calendar'
+import { CalendarPlus } from '@phosphor-icons/react/dist/ssr/CalendarPlus'
 
-  // UI Elements
-  Bell,
-  Heart,
-  Star,
-  Bookmark,
-  Share,
+// UI Elements
+import { Bell } from '@phosphor-icons/react/dist/ssr/Bell'
+import { Heart } from '@phosphor-icons/react/dist/ssr/Heart'
+import { Star } from '@phosphor-icons/react/dist/ssr/Star'
+import { Bookmark } from '@phosphor-icons/react/dist/ssr/Bookmark'
+import { Share } from '@phosphor-icons/react/dist/ssr/Share'
 
-  // Theme
-  Monitor,
-  Sun,
-  Moon,
+// Theme
+import { Monitor } from '@phosphor-icons/react/dist/ssr/Monitor'
+import { Sun } from '@phosphor-icons/react/dist/ssr/Sun'
+import { Moon } from '@phosphor-icons/react/dist/ssr/Moon'
 
-  // Additional
-  Lightbulb,
-  Brain,
-  Flag,
-  Square,
-  Sparkle,
-  Globe,
-  DeviceMobile,
-  Ticket,
-  Clipboard,
-  WifiHigh,
-  WifiSlash,
-  Cpu,
-  MaskHappy,
-  Rocket,
+// Additional
+import { Lightbulb } from '@phosphor-icons/react/dist/ssr/Lightbulb'
+import { Brain } from '@phosphor-icons/react/dist/ssr/Brain'
+import { Flag } from '@phosphor-icons/react/dist/ssr/Flag'
+import { Square } from '@phosphor-icons/react/dist/ssr/Square'
+import { Sparkle } from '@phosphor-icons/react/dist/ssr/Sparkle'
+import { Globe } from '@phosphor-icons/react/dist/ssr/Globe'
+import { DeviceMobile } from '@phosphor-icons/react/dist/ssr/DeviceMobile'
+import { Ticket } from '@phosphor-icons/react/dist/ssr/Ticket'
+import { Clipboard } from '@phosphor-icons/react/dist/ssr/Clipboard'
+import { WifiHigh } from '@phosphor-icons/react/dist/ssr/WifiHigh'
+import { WifiSlash } from '@phosphor-icons/react/dist/ssr/WifiSlash'
+import { Cpu } from '@phosphor-icons/react/dist/ssr/Cpu'
+import { MaskHappy } from '@phosphor-icons/react/dist/ssr/MaskHappy'
+import { Rocket } from '@phosphor-icons/react/dist/ssr/Rocket'
 
-  // Admin
-  Layout,
-  Megaphone,
-  Stack,
-  Prohibit,
-} from '@phosphor-icons/react/dist/ssr'
+// Admin
+import { Layout } from '@phosphor-icons/react/dist/ssr/Layout'
+import { Megaphone } from '@phosphor-icons/react/dist/ssr/Megaphone'
+import { Stack } from '@phosphor-icons/react/dist/ssr/Stack'
+import { Prohibit } from '@phosphor-icons/react/dist/ssr/Prohibit'
 
 // 핵심 아이콘 객체 (키는 기존과 동일, 값만 Phosphor로 교체)
 export const icons = {
@@ -155,7 +152,7 @@ export const icons = {
   arrowRight: ArrowRight,
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
-  menu: ListIcon,
+  menu: List,
   close: X,
   search: MagnifyingGlass,
   settings: Gear,
