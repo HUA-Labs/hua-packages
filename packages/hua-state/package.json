@@ -2,21 +2,19 @@
   "name": "@hua-labs/state",
   "version": "1.0.2",
   "description": "HUA State - Unified state management for hua framework with SSR support and integrations",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./integrations/i18n": {
       "types": "./dist/integrations/i18n.d.ts",
       "import": "./dist/integrations/i18n.mjs",
-      "require": "./dist/integrations/i18n.js",
-      "default": "./dist/integrations/i18n.js"
+      "default": "./dist/integrations/i18n.mjs"
     }
   },
   "files": [
