@@ -2,7 +2,7 @@
   "name": "@hua-labs/ui",
   "version": "2.1.1",
   "description": "HUA Labs - Modern React UI Component Library - Beautiful, accessible, and customizable components for React applications",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -204,9 +204,7 @@
   "sideEffects": [
     "./src/styles/*.css",
     "./dist/iconsax.mjs",
-    "./dist/iconsax.js",
-    "./dist/iconsax-extended.mjs",
-    "./dist/iconsax-extended.js"
+    "./dist/iconsax-extended.mjs"
   ],
   "engines": {
     "node": ">=20.0.0"
