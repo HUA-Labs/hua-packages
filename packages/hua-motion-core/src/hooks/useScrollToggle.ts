@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { BaseMotionOptions, BaseMotionReturn, MotionElement } from '../types'
+import { subscribeScroll } from '../utils/sharedScroll'
 
 export interface ScrollToggleOptions extends BaseMotionOptions {
   showScale?: number
@@ -41,9 +42,17 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [lastScrollY, setLastScrollY] = useState(0)
 
-  // 스크롤 이벤트 핸들러
+  // refs for values read inside the stable handleScroll — avoids re-registration on every scroll
+  const isVisibleRef = useRef(false)
+  const lastScrollYRef = useRef(0)
+
+  // keep isVisibleRef in sync with state
+  useEffect(() => {
+    isVisibleRef.current = isVisible
+  }, [isVisible])
+
+  // stable callback — depends only on option values (not on isVisible / lastScrollY state)
   const handleScroll = useCallback(() => {
     if (!ref.current) return
 
@@ -51,9 +60,8 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
     const rect = ref.current.getBoundingClientRect()
     const threshold = window.innerHeight * scrollThreshold
 
-    // 스크롤 방향 확인
-    const isScrollingDown = currentScrollY > lastScrollY
-    const isScrollingUp = currentScrollY < lastScrollY
+    const isScrollingDown = currentScrollY > lastScrollYRef.current
+    const isScrollingUp = currentScrollY < lastScrollYRef.current
 
     let shouldToggle = false
 
@@ -65,7 +73,8 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
       shouldToggle = rect.top <= threshold
     }
 
-    if (shouldToggle && !isVisible) {
+    if (shouldToggle && !isVisibleRef.current) {
+      isVisibleRef.current = true
       setIsVisible(true)
       setIsAnimating(true)
       setProgress(0)
@@ -76,7 +85,8 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
         setProgress(1)
         onComplete?.()
       }, duration)
-    } else if (!shouldToggle && isVisible) {
+    } else if (!shouldToggle && isVisibleRef.current) {
+      isVisibleRef.current = false
       setIsVisible(false)
       setIsAnimating(true)
       setProgress(1)
@@ -87,22 +97,19 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
       }, duration)
     }
 
-    setLastScrollY(currentScrollY)
-  }, [isVisible, lastScrollY, scrollDirection, scrollThreshold, duration, onStart, onComplete])
+    lastScrollYRef.current = currentScrollY
+  }, [scrollDirection, scrollThreshold, duration, onStart, onComplete])
 
-  // 스크롤 이벤트 리스너 설정
+  // subscribe to the shared scroll listener
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // 초기 상태 확인
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return subscribeScroll(handleScroll)
   }, [handleScroll])
 
   // 모션 시작 함수 (프로그래매틱 제어용)
   const start = useCallback(() => {
-    if (!isVisible) {
+    if (!isVisibleRef.current) {
+      isVisibleRef.current = true
       setIsVisible(true)
       setIsAnimating(true)
       setProgress(0)
@@ -114,7 +121,7 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
         onComplete?.()
       }, duration)
     }
-  }, [isVisible, duration, onStart, onComplete])
+  }, [duration, onStart, onComplete])
 
   // 모션 중단 함수
   const stop = useCallback(() => {
@@ -124,6 +131,7 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
 
   // 모션 리셋 함수
   const reset = useCallback(() => {
+    isVisibleRef.current = false
     setIsVisible(false)
     setIsAnimating(false)
     setProgress(0)
@@ -137,10 +145,10 @@ export function useScrollToggle<T extends MotionElement = HTMLDivElement>(
 
   // 모션 재개 함수
   const resume = useCallback(() => {
-    if (isVisible) {
+    if (isVisibleRef.current) {
       setIsAnimating(true)
     }
-  }, [isVisible])
+  }, [])
 
   // 스타일 계산
   const style: React.CSSProperties = {

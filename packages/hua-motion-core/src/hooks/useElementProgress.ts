@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { subscribeScroll } from '../utils/sharedScroll'
 
 export interface ElementProgressOptions {
   /** 요소가 뷰포트 아래에서 시작되는 위치 (0 = 하단, 1 = 상단) @default 0 */
@@ -24,6 +25,9 @@ export interface ElementProgressReturn<T extends HTMLElement = HTMLElement> {
  * useScrollProgress의 확장판. 페이지 전체가 아니라
  * 특정 요소가 뷰포트를 통과하는 진행률을 추적합니다.
  *
+ * 공유 스크롤 리스너(subscribeScroll)를 사용해 N개 인스턴스도
+ * 단 하나의 scroll/resize 이벤트 + rAF 배칭으로 처리됩니다.
+ *
  * @example
  * ```tsx
  * const { ref, progress, isInView } = useElementProgress<HTMLDivElement>()
@@ -42,6 +46,10 @@ export function useElementProgress<T extends HTMLElement = HTMLElement>(
   const ref = useRef<T>(null)
   const [progress, setProgress] = useState(0)
   const [isInView, setIsInView] = useState(false)
+
+  // Refs to avoid stale closure comparisons and skip redundant setState calls
+  const progressRef = useRef(0)
+  const isInViewRef = useRef(false)
 
   useEffect(() => {
     const el = ref.current
@@ -65,19 +73,26 @@ export function useElementProgress<T extends HTMLElement = HTMLElement>(
       const raw = range > 0 ? (trackStart - elementTop) / range : 0
 
       const clamped = clamp ? Math.max(0, Math.min(1, raw)) : raw
-      setProgress(clamped)
-      setIsInView(elementBottom > 0 && elementTop < vh)
+
+      // Only update progress state when change exceeds threshold (avoids excessive renders)
+      if (Math.abs(clamped - progressRef.current) > 0.005) {
+        progressRef.current = clamped
+        setProgress(clamped)
+      }
+
+      // Only update isInView state when it actually changes
+      const nowInView = elementBottom > 0 && elementTop < vh
+      if (nowInView !== isInViewRef.current) {
+        isInViewRef.current = nowInView
+        setIsInView(nowInView)
+      }
     }
 
+    // Run once immediately for initial state
     calculate()
 
-    window.addEventListener('scroll', calculate, { passive: true })
-    window.addEventListener('resize', calculate, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', calculate)
-      window.removeEventListener('resize', calculate)
-    }
+    // Subscribe to shared scroll/resize listener (rAF-batched)
+    return subscribeScroll(calculate)
   }, [start, end, clamp])
 
   return { ref, progress, isInView }
