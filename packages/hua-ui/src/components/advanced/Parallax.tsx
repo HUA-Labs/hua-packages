@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { merge } from "../../lib/utils";
 
 /**
@@ -12,6 +12,7 @@ import { merge } from "../../lib/utils";
  * @property {boolean} [scale=false] - 스케일 효과 추가 / Add scale effect
  * @property {boolean} [opacity=false] - 투명도 효과 추가 / Add opacity effect
  * @property {boolean} [rotate=false] - 회전 효과 추가 / Add rotation effect
+ * @property {boolean} [disableOnMobile=false] - 모바일(768px 미만)에서 자동 비활성화
  */
 export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
   speed?: number;
@@ -22,6 +23,43 @@ export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
   opacity?: boolean;
   rotate?: boolean;
   rotateDirection?: "cw" | "ccw";
+  disableOnMobile?: boolean;
+}
+
+/* ────────────────────────────────────────
+   Shared scroll listener — 모든 Parallax가
+   하나의 scroll/resize 리스너를 공유
+   ──────────────────────────────────────── */
+type ScrollCallback = () => void;
+const subscribers = new Set<ScrollCallback>();
+let listening = false;
+let rafId = 0;
+
+function tick() {
+  subscribers.forEach((cb) => cb());
+}
+
+function onScroll() {
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(tick);
+}
+
+function subscribe(cb: ScrollCallback) {
+  subscribers.add(cb);
+  if (!listening && subscribers.size > 0) {
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    listening = true;
+  }
+  return () => {
+    subscribers.delete(cb);
+    if (listening && subscribers.size === 0) {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(rafId);
+      listening = false;
+    }
+  };
 }
 
 /**
@@ -30,20 +68,21 @@ export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
  * 스크롤에 반응하여 패럴렉스 효과를 제공하는 컴포넌트입니다.
  * 다양한 방향과 속도, 추가 효과(스케일, 투명도, 회전)를 지원합니다.
  *
- * Component that provides parallax effect in response to scrolling.
- * Supports various directions, speeds, and additional effects (scale, opacity, rotation).
+ * 성능 최적화:
+ * - 모든 인스턴스가 하나의 scroll/resize 리스너 공유
+ * - IntersectionObserver로 뷰포트 밖 요소 업데이트 건너뛰기
+ * - ref 기반 직접 DOM 조작 (React 리렌더 없음)
  *
  * @component
  * @example
- * // 기본 사용 / Basic usage
  * <Parallax speed={0.3}>
  *   <img src="/background.jpg" alt="background" />
  * </Parallax>
  *
  * @example
- * // 다양한 효과 / With effects
- * <Parallax speed={0.5} scale opacity direction="up">
- *   <div className="h-screen bg-gradient-to-b from-indigo-500 to-purple-600" />
+ * // 모바일에서 비활성화
+ * <Parallax speed={0.5} disableOnMobile>
+ *   <div className="decorative-blob" />
  * </Parallax>
  */
 const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
@@ -56,42 +95,56 @@ const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
       offset = 0,
       disabled = false,
       scale = false,
-      opacity = false,
+      opacity: opacityEffect = false,
       rotate = false,
       rotateDirection = "cw",
+      disableOnMobile = false,
       style,
       ...props
     },
     ref
   ) => {
     const innerRef = useRef<HTMLDivElement>(null);
-    const [transform, setTransform] = useState({
-      x: 0,
-      y: 0,
-      scale: 1,
-      opacity: 1,
-      rotate: 0,
-    });
+    const isVisibleRef = useRef(true);
+    const isMobileRef = useRef(false);
 
     // Check for reduced motion preference
     const prefersReducedMotion = useReducedMotion();
 
+    // Mobile detection
+    useEffect(() => {
+      if (!disableOnMobile) return;
+      const mq = window.matchMedia("(max-width: 767px)");
+      isMobileRef.current = mq.matches;
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        isMobileRef.current = e.matches;
+        // 모바일 전환 시 transform 초기화
+        if (e.matches && innerRef.current) {
+          innerRef.current.style.transform = "";
+          innerRef.current.style.opacity = "";
+        }
+      };
+
+      mq.addEventListener("change", handleChange);
+      return () => mq.removeEventListener("change", handleChange);
+    }, [disableOnMobile]);
+
     const updateTransform = useCallback(() => {
       if (disabled || prefersReducedMotion) return;
+      if (disableOnMobile && isMobileRef.current) return;
+      if (!isVisibleRef.current) return;
 
       const element = innerRef.current;
       if (!element) return;
 
       const rect = element.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const windowWidth = window.innerWidth;
 
-      // Calculate how far through the viewport the element is
       const elementCenter = rect.top + rect.height / 2;
       const viewportCenter = windowHeight / 2;
       const progress = (viewportCenter - elementCenter) / windowHeight;
 
-      // Calculate movement based on direction
       const movement = progress * speed * 100 + offset;
 
       let x = 0;
@@ -112,43 +165,51 @@ const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
           break;
       }
 
-      // Calculate additional effects
       const scaleValue = scale ? 1 + Math.abs(progress) * 0.1 : 1;
-      const opacityValue = opacity ? Math.max(0.3, 1 - Math.abs(progress) * 0.5) : 1;
+      const opacityValue = opacityEffect ? Math.max(0.3, 1 - Math.abs(progress) * 0.5) : 1;
       const rotateValue = rotate
         ? progress * 10 * (rotateDirection === "cw" ? 1 : -1)
         : 0;
 
-      setTransform({ x, y, scale: scaleValue, opacity: opacityValue, rotate: rotateValue });
-    }, [disabled, prefersReducedMotion, speed, direction, offset, scale, opacity, rotate, rotateDirection]);
+      // 직접 DOM 조작 — React 리렌더 없음
+      element.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scaleValue}) rotate(${rotateValue}deg)`;
+      if (opacityEffect) {
+        element.style.opacity = String(opacityValue);
+      }
+    }, [disabled, prefersReducedMotion, speed, direction, offset, scale, opacityEffect, rotate, rotateDirection, disableOnMobile]);
 
+    // IntersectionObserver — 뷰포트 밖이면 업데이트 건너뛰기
+    useEffect(() => {
+      if (disabled || prefersReducedMotion) return;
+      const element = innerRef.current;
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisibleRef.current = entry.isIntersecting;
+        },
+        { rootMargin: "100px" }
+      );
+
+      observer.observe(element);
+      return () => observer.disconnect();
+    }, [disabled, prefersReducedMotion]);
+
+    // 공유 scroll 리스너 구독
     useEffect(() => {
       if (disabled || prefersReducedMotion) return;
 
       // Initial calculation
       updateTransform();
 
-      // Listen to scroll events
-      const handleScroll = () => {
-        requestAnimationFrame(updateTransform);
-      };
-
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      window.addEventListener("resize", handleScroll, { passive: true });
-
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("resize", handleScroll);
-      };
+      return subscribe(updateTransform);
     }, [updateTransform, disabled, prefersReducedMotion]);
+
+    const isActive = !disabled && !prefersReducedMotion;
 
     const combinedStyle: React.CSSProperties = {
       ...style,
-      transform: disabled || prefersReducedMotion
-        ? undefined
-        : `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale}) rotate(${transform.rotate}deg)`,
-      opacity: disabled || prefersReducedMotion ? 1 : transform.opacity,
-      willChange: disabled || prefersReducedMotion ? undefined : "transform, opacity",
+      willChange: isActive ? "transform, opacity" : undefined,
     };
 
     return (
@@ -168,21 +229,21 @@ Parallax.displayName = "Parallax";
 
 // Hook to check for reduced motion preference
 function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const matchRef = useRef(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    matchRef.current = mediaQuery.matches;
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
+      matchRef.current = e.matches;
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
-  return prefersReducedMotion;
+  return matchRef.current;
 }
 
 // Utility to merge refs
