@@ -153,6 +153,7 @@ export const icons = {
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
   menu: List,
+  x: X,
   close: X,
   search: MagnifyingGlass,
   settings: Gear,
