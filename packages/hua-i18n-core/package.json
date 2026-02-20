@@ -2,7 +2,7 @@
   "name": "@hua-labs/i18n-core",
   "version": "2.0.5",
   "description": "HUA Labs - Core i18n functionality with SSR/CSR support and state management integration",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
@@ -13,12 +13,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./server": {
       "types": "./dist/server.d.ts",
       "import": "./dist/server.mjs",
-      "require": "./dist/server.js"
+      "default": "./dist/server.mjs"
     }
   },
   "scripts": {
