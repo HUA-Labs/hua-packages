@@ -47,4 +47,7 @@ export * from '@hua-labs/ui/data'
 export * from '@hua-labs/ui/interactive'
 export * from '@hua-labs/ui/navigation'
 
+// advanced — 메인 index와 중복되는 ComponentLayout 제외
+export { InfoCard } from '@hua-labs/ui/advanced'
+
 // feedback — 전부 메인 index에 이미 포함 (Toast, Alert, LoadingSpinner, Tooltip)
