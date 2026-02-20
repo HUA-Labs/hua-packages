@@ -2,7 +2,7 @@
   "name": "@hua-labs/i18n-core-zustand",
   "version": "2.0.5",
   "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
@@ -13,7 +13,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "default": "./dist/index.mjs"
     }
   },
   "scripts": {

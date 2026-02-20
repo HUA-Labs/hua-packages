@@ -2,7 +2,7 @@
   "name": "@hua-labs/i18n-formatters",
   "version": "2.0.5",
   "description": "HUA Labs - Date, Number, and Currency formatting utilities for i18n",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
@@ -13,22 +13,22 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./date": {
       "types": "./dist/date/index.d.ts",
       "import": "./dist/date/index.mjs",
-      "require": "./dist/date/index.js"
+      "default": "./dist/date/index.mjs"
     },
     "./number": {
       "types": "./dist/number/index.d.ts",
       "import": "./dist/number/index.mjs",
-      "require": "./dist/number/index.js"
+      "default": "./dist/number/index.mjs"
     },
     "./currency": {
       "types": "./dist/currency/index.d.ts",
       "import": "./dist/currency/index.mjs",
-      "require": "./dist/currency/index.js"
+      "default": "./dist/currency/index.mjs"
     }
   },
   "scripts": {
