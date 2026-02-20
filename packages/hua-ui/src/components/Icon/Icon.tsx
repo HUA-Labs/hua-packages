@@ -2,7 +2,7 @@ import React from 'react'
 import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
-import { getIconFromProvider, getIconsaxResolver, initPhosphorIcons, initLucideIcons, getIconNameForProvider } from '../../lib/icon-providers'
+import { getIconFromProvider, getIconsaxResolver, getIconNameForProvider } from '../../lib/icon-providers'
 import { normalizeIconName } from '../../lib/normalize-icon-name'
 import { useIconContext, type IconSet } from './IconProvider'
 import { type PhosphorWeight } from './icon-store'
@@ -84,20 +84,10 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   const iconsaxVariant = config.iconsaxVariant ?? 'line'
 
   const [isClient, setIsClient] = React.useState(false)
-  const [providerReady, setProviderReady] = React.useState(false)
 
   React.useEffect(() => {
     setIsClient(true)
-
-    // Provider별 lazy load 초기화
-    if (iconSet === 'lucide') {
-      initLucideIcons().then(() => setProviderReady(true))
-    } else if (iconSet === 'phosphor') {
-      initPhosphorIcons().then(() => setProviderReady(true))
-    } else {
-      setProviderReady(true)
-    }
-  }, [iconSet])
+  }, [])
 
   // 통합 정규화
   const resolvedIcon = React.useMemo(() => {
@@ -150,10 +140,8 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   if (iconSet === 'phosphor') {
     // 1. icons.ts에서 먼저 찾기 (Phosphor 아이콘이 기본, 정적 import)
     ResolvedIcon = (icons[iconName as IconName] || null) as IconComponentType | null
-    // 2. 없으면 동적으로 Phosphor namespace에서 가져오기 (fallback, providerReady 필요)
-    if (!ResolvedIcon && providerReady) {
-      ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
-    }
+    // 2. 정적 맵에 없으면 null (fallback UI "?" 표시)
+    // getIconFromProvider는 iconsax 전용, phosphor는 정적 맵만 사용
   } else if (iconSet === 'iconsax') {
     ResolvedIcon = iconsaxIcon as IconComponentType | null
     if (!ResolvedIcon) {
