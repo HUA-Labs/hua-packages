@@ -4,6 +4,7 @@ import { join } from 'path';
 
 const coreEntry = {
   index: 'src/index.ts',
+  theme: 'src/theme.ts',
   advanced: 'src/advanced.ts',
   'advanced-dashboard': 'src/advanced/dashboard.ts',
   'advanced-motion': 'src/advanced/motion.ts',

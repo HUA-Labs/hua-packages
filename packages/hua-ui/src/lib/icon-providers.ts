@@ -232,40 +232,26 @@ export const PROJECT_ICONS = {
 } as const
 
 /**
- * Initialize Phosphor Icons (lazy load for fallback/dynamic lookup)
- * icons.ts의 개별 import와 별개로, PROJECT_ICONS fallback용
+ * Initialize Phosphor Icons
+ *
+ * 이전: import('@phosphor-icons/react') barrel import → Turbopack이 전체 라이브러리(4.6MB) 번들
+ * 이후: no-op. icons.ts의 84개 정적 import로 충분. fallback 불필요.
+ *
+ * 정적 맵에 없는 아이콘은 "?" fallback UI 표시.
+ * 추가 아이콘 필요 시 icons.ts에 subpath import 추가.
  */
 export async function initPhosphorIcons() {
-  if (typeof window === 'undefined') return null
-
-  if (!PhosphorIcons) {
-    try {
-      const phosphorModule = await import('@phosphor-icons/react')
-      PhosphorIcons = phosphorModule
-    } catch {
-      console.warn('Phosphor Icons not available. Install @phosphor-icons/react to use.')
-      return null
-    }
-  }
-  return PhosphorIcons
+  return null
 }
 
 /**
- * Initialize Lucide Icons (lazy load)
+ * Initialize Lucide Icons
+ *
+ * 이전: import('lucide-react') barrel import → 전체 Lucide 번들
+ * 이후: no-op. Lucide provider는 deprecated.
  */
 export async function initLucideIcons() {
-  if (typeof window === 'undefined') return null
-
-  if (!LucideIcons) {
-    try {
-      const lucideModule = await import('lucide-react')
-      LucideIcons = lucideModule
-    } catch {
-      console.warn('Lucide Icons not available. Install lucide-react to use lucide provider.')
-      return null
-    }
-  }
-  return LucideIcons
+  return null
 }
 
 /**
