@@ -5,29 +5,21 @@
  *
  * 1. Phosphor Icons (https://phosphoricons.com) - default
  *    - Official package: @phosphor-icons/react (MIT License)
- *    - icons.ts에서 정적 import (SSR-safe /dist/ssr)
+ *    - icons.ts에서 정적 subpath import (SSR-safe /dist/ssr)
  *    - PROJECT_ICONS 매핑으로 통합 이름 지원
- *    - 폴백: initPhosphorIcons()로 동적 namespace 조회
+ *    - 정적 맵에 없는 아이콘은 "?" fallback UI 표시
  *
- * 2. Lucide Icons (https://lucide.dev) - deprecated, backward compat
- *    - initLucideIcons() 호출 시에만 로드 / Lazy loaded on demand
- *    - 향후 제거 예정 / Will be removed in future
- *
- * 3. Iconsax Icons (https://iconsax.io) - separate entry
+ * 2. Iconsax Icons (https://iconsax.io) - separate entry
  *    - '@hua-labs/ui/iconsax'에서 import 시 자동 등록
  *    - 코어 번들에 포함되지 않음 / Not in core bundle
  *    - registerIconsaxResolver()로 lazy 연결
+ *
+ * Note: Lucide provider는 deprecated → 제거됨.
+ * Note: 동적 barrel import (import('@phosphor-icons/react'))는 Turbopack에서
+ *       전체 라이브러리(4.6MB)를 번들하므로 사용 금지.
  */
 
 import { toPascalCase } from './case-utils'
-
-// Phosphor Icons - lazy loaded (전체 namespace import 방지, createContext SSR 이슈)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let PhosphorIcons: any = null
-
-// Lucide Icons - lazy loaded (하위호환, deprecated)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let LucideIcons: any = null
 
 // Iconsax resolver - registered lazily when iconsax entry is loaded
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,128 +224,26 @@ export const PROJECT_ICONS = {
 } as const
 
 /**
- * Initialize Phosphor Icons
+ * Get icon from provider (iconsax only)
  *
- * 이전: import('@phosphor-icons/react') barrel import → Turbopack이 전체 라이브러리(4.6MB) 번들
- * 이후: no-op. icons.ts의 84개 정적 import로 충분. fallback 불필요.
- *
- * 정적 맵에 없는 아이콘은 "?" fallback UI 표시.
- * 추가 아이콘 필요 시 icons.ts에 subpath import 추가.
- */
-export async function initPhosphorIcons() {
-  return null
-}
-
-/**
- * Initialize Lucide Icons
- *
- * 이전: import('lucide-react') barrel import → 전체 Lucide 번들
- * 이후: no-op. Lucide provider는 deprecated.
- */
-export async function initLucideIcons() {
-  return null
-}
-
-/**
- * Get icon from provider
- * Only resolves icons that are in PROJECT_ICONS for optimal bundle size
- *
- * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 / Icon provider
- * @returns 아이콘 컴포넌트 또는 null / Icon component or null
+ * Phosphor/Lucide는 정적 맵(icons.ts)으로 해결. 이 함수는 iconsax fallback용.
  */
 export function getIconFromProvider(
   iconName: string,
   provider: IconProvider = 'phosphor'
 ): React.ComponentType<Record<string, unknown>> | null {
-  // Check if icon is in project icon list
+  if (provider !== 'iconsax' || !iconsaxResolver) return null
+
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
+  const iconsaxName = iconMapping
+    ? (iconMapping as Record<string, string | undefined>)['iconsax'] || toPascalCase(iconName)
+    : toPascalCase(iconName)
 
-  if (!iconMapping) {
-    // Fallback to direct lookup for backward compatibility
-    return getIconDirect(iconName, provider)
-  }
-
-  const mappedName = (iconMapping as Record<string, string | undefined>)[provider]
-
-  switch (provider) {
-    case 'phosphor':
-      if (!mappedName || !PhosphorIcons) return null
-      return PhosphorIcons?.[mappedName] || null
-
-    case 'lucide':
-      if (!mappedName || !LucideIcons) {
-        return null
-      }
-      return LucideIcons?.[mappedName] || null
-
-    case 'iconsax': {
-      if (!iconsaxResolver) return null
-      const iconsaxName = mappedName || toPascalCase(iconName)
-      return iconsaxResolver(iconsaxName) || null
-    }
-
-    default:
-      return null
-  }
-}
-
-/**
- * Direct icon lookup (fallback for icons not in PROJECT_ICONS)
- *
- * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 / Icon provider
- * @returns 아이콘 컴포넌트 또는 null / Icon component or null
- */
-function getIconDirect(
-  iconName: string,
-  provider: IconProvider
-): React.ComponentType<Record<string, unknown>> | null {
-  switch (provider) {
-    case 'phosphor': {
-      if (!PhosphorIcons) return null
-      const phosphorName1 = iconName.charAt(0).toUpperCase() + iconName.slice(1)
-      const phosphorName2 = iconName
-        .split(/(?=[A-Z])/)
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join('')
-      return PhosphorIcons?.[phosphorName1] ||
-        PhosphorIcons?.[phosphorName2] ||
-        PhosphorIcons?.[iconName] ||
-        null
-    }
-
-    case 'lucide': {
-      if (!LucideIcons) {
-        return null
-      }
-      const lucideName = iconName.charAt(0).toUpperCase() + iconName.slice(1)
-      const camelCaseName = iconName.replace(/([A-Z])/g, (match) =>
-        match === iconName[0] ? match.toLowerCase() : match
-      )
-      return LucideIcons?.[lucideName] ||
-        LucideIcons?.[iconName] ||
-        LucideIcons?.[camelCaseName] ||
-        null
-    }
-
-    case 'iconsax': {
-      if (!iconsaxResolver) return null
-      const iconsaxName = toPascalCase(iconName)
-      return iconsaxResolver(iconsaxName) || null
-    }
-
-    default:
-      return null
-  }
+  return iconsaxResolver(iconsaxName) || null
 }
 
 /**
  * Get icon name for provider
- *
- * @param iconName - 아이콘 이름 / Icon name
- * @param provider - 아이콘 프로바이더 / Icon provider
- * @returns 프로바이더별 아이콘 이름 / Icon name for provider
  */
 export function getIconNameForProvider(
   iconName: string,
