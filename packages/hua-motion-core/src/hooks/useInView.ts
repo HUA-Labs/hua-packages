@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { InViewOptions, InViewReturn } from '../types'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 /**
  * useInView - 요소의 뷰포트 가시성 감지 훅
@@ -57,16 +58,11 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(
     const element = ref.current
     if (!element) return
 
-    const observer = new IntersectionObserver(handleIntersect, {
-      threshold,
-      rootMargin
-    })
-
-    observer.observe(element)
-
-    return () => {
-      observer.disconnect()
-    }
+    return observeElement(
+      element,
+      (entry) => handleIntersect([entry]),
+      { threshold, rootMargin }
+    )
   }, [threshold, rootMargin, handleIntersect])
 
   return {
