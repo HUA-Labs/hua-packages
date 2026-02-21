@@ -9,63 +9,63 @@ import type { Color } from "../../lib/types/common";
  */
 const colorSteps: Record<Color, { empty: string; s1: string; s2: string; s3: string; today: string }> = {
   cyan: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-cyan-200 dark:bg-cyan-800",
     s2: "bg-cyan-400 dark:bg-cyan-600",
     s3: "bg-cyan-600 dark:bg-cyan-400",
     today: "border-2 border-cyan-400 dark:border-cyan-300",
   },
   blue: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-blue-200 dark:bg-blue-800",
     s2: "bg-blue-400 dark:bg-blue-600",
     s3: "bg-blue-600 dark:bg-blue-400",
     today: "border-2 border-blue-400 dark:border-blue-300",
   },
   green: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-green-200 dark:bg-green-800",
     s2: "bg-green-400 dark:bg-green-600",
     s3: "bg-green-600 dark:bg-green-400",
     today: "border-2 border-green-400 dark:border-green-300",
   },
   purple: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-purple-200 dark:bg-purple-800",
     s2: "bg-purple-400 dark:bg-purple-600",
     s3: "bg-purple-600 dark:bg-purple-400",
     today: "border-2 border-purple-400 dark:border-purple-300",
   },
   orange: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-orange-200 dark:bg-orange-800",
     s2: "bg-orange-400 dark:bg-orange-600",
     s3: "bg-orange-600 dark:bg-orange-400",
     today: "border-2 border-orange-400 dark:border-orange-300",
   },
   red: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-red-200 dark:bg-red-800",
     s2: "bg-red-400 dark:bg-red-600",
     s3: "bg-red-600 dark:bg-red-400",
     today: "border-2 border-red-400 dark:border-red-300",
   },
   indigo: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-indigo-200 dark:bg-indigo-800",
     s2: "bg-indigo-400 dark:bg-indigo-600",
     s3: "bg-indigo-600 dark:bg-indigo-400",
     today: "border-2 border-indigo-400 dark:border-indigo-300",
   },
   pink: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-pink-200 dark:bg-pink-800",
     s2: "bg-pink-400 dark:bg-pink-600",
     s3: "bg-pink-600 dark:bg-pink-400",
     today: "border-2 border-pink-400 dark:border-pink-300",
   },
   gray: {
-    empty: "bg-gray-100 dark:bg-gray-700/40",
+    empty: "bg-foreground/[0.06]",
     s1: "bg-gray-200 dark:bg-gray-700",
     s2: "bg-gray-400 dark:bg-gray-500",
     s3: "bg-gray-600 dark:bg-gray-400",
@@ -191,15 +191,15 @@ export function YearlyHeatmap({
   const totalDays = useMemo(() => Object.values(data).filter((v) => v > 0).length, [data]);
 
   return (
-    <div className={merge("bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg", className)} {...props}>
+    <div className={merge("bg-card rounded-xl p-4", className)} {...props}>
       {/* 헤더 */}
       {(labels.title || labels.totalDays) && (
         <div className="flex items-center justify-between mb-3">
           {labels.title && (
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{labels.title}</h3>
+            <h3 className="text-sm font-semibold text-foreground">{labels.title}</h3>
           )}
           {labels.totalDays && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">{labels.totalDays}</span>
+            <span className="text-xs text-muted-foreground">{labels.totalDays}</span>
           )}
         </div>
       )}
@@ -213,7 +213,7 @@ export function YearlyHeatmap({
             return (
               <div key={wi} className="flex-1 min-w-[10px]">
                 {ml && (
-                  <span className="text-[9px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                  <span className="text-[9px] text-muted-foreground whitespace-nowrap">
                     {ml.label}
                   </span>
                 )}
@@ -239,7 +239,7 @@ export function YearlyHeatmap({
       </div>
 
       {/* 범례 */}
-      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-gray-400 dark:text-gray-500">
+      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-muted-foreground">
         <span>{labels.less || "Less"}</span>
         <div className={`w-3 h-3 rounded-sm ${steps.empty}`} />
         <div className={`w-3 h-3 rounded-sm ${steps.s1}`} />
