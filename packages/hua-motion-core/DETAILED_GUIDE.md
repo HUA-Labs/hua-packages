@@ -33,7 +33,6 @@ The core engine uses a frame-based animation system:
 ```tsx
 // Internal architecture (simplified)
 MotionEngine {
-  - PerformanceOptimizer: Manages RAF and GPU acceleration
   - TransitionEffects: Handles easing and interpolation
   - MotionStateManager: Tracks animation lifecycle
 }
