@@ -385,6 +385,282 @@ const page = usePageMotions({
 
 ---
 
+### Interaction Hooks (Advanced)
+
+#### useButtonEffect
+
+Multi-type button interaction effects with scale, ripple, glow, shake, bounce, and slide.
+
+```tsx
+import { useButtonEffect } from '@hua-labs/motion-core';
+
+const button = useButtonEffect({
+  type: 'scale',
+  scaleAmount: 0.95,
+  hoverScale: 1.05,
+  duration: 200
+});
+
+<button ref={button.ref} style={button.style}>
+  Click me
+</button>
+```
+
+**Options:**
+- `type?: 'scale' | 'ripple' | 'glow' | 'shake' | 'bounce' | 'slide' | 'custom'` - Effect type (default: `'scale'`)
+- `scaleAmount?: number` - Press scale for scale type (default: 0.95)
+- `rippleColor?: string` - Ripple color (default: `'rgba(255,255,255,0.6)'`)
+- `glowColor?: string` - Glow color (default: `'#3b82f6'`)
+- `shakeAmount?: number` - Shake distance in px (default: 5)
+- `bounceHeight?: number` - Bounce height in px (default: 10)
+- `slideDistance?: number` - Slide distance in px (default: 5)
+- `slideDirection?: 'left' | 'right' | 'up' | 'down'` (default: `'down'`)
+- `hoverScale?: number` - Scale on hover (default: 1.05)
+- `disabled?: boolean` - Disable interactions (default: false)
+- `disabledOpacity?: number` (default: 0.5)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` (standard)
+- `buttonType: string` - Current effect type
+- `isPressed: boolean` - Press state
+- `isHovered: boolean` - Hover state
+- `isFocused: boolean` - Focus state
+- `pressButton: () => void` - Trigger press
+- `releaseButton: () => void` - Release press
+- `setButtonState: (state) => void` - Set button state programmatically
+
+---
+
+#### useVisibilityToggle
+
+Programmatic show/hide/toggle with scale and opacity transitions.
+
+```tsx
+import { useVisibilityToggle } from '@hua-labs/motion-core';
+
+const panel = useVisibilityToggle({
+  showScale: 1,
+  hideScale: 0.8,
+  hideOpacity: 0,
+  duration: 300
+});
+
+<button onClick={panel.toggle}>Toggle</button>
+<div ref={panel.ref} style={panel.style}>Content</div>
+```
+
+**Options:**
+- `showScale?: number` (default: 1)
+- `showOpacity?: number` (default: 1)
+- `showTranslateY?: number` (default: 0)
+- `hideScale?: number` (default: 0.8)
+- `hideOpacity?: number` (default: 0)
+- `hideTranslateY?: number` (default: 20)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` (standard)
+- `toggle: () => void` - Toggle visibility
+- `show: () => void` - Show element
+- `hide: () => void` - Hide element
+
+---
+
+### Scroll Hooks (Advanced)
+
+#### useScrollToggle
+
+Show/hide elements based on scroll direction with shared scroll listener.
+
+```tsx
+import { useScrollToggle } from '@hua-labs/motion-core';
+
+const header = useScrollToggle({
+  scrollDirection: 'down',
+  scrollThreshold: 0.1,
+  showScale: 1,
+  hideTranslateY: -100
+});
+
+<header ref={header.ref} style={header.style}>
+  Navigation
+</header>
+```
+
+**Options:**
+- `scrollDirection?: 'up' | 'down' | 'both'` - Trigger direction (default: `'both'`)
+- `scrollThreshold?: number` - Viewport fraction threshold (default: 0.1)
+- `showScale?: number` (default: 1)
+- `showOpacity?: number` (default: 1)
+- `hideScale?: number` (default: 0.8)
+- `hideOpacity?: number` (default: 0)
+- `hideTranslateY?: number` (default: 20)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` `pause` `resume` (standard)
+
+---
+
+### Layout Motion Hooks
+
+#### useCardList
+
+Staggered entrance animation for card grids with IntersectionObserver auto-trigger.
+
+```tsx
+import { useCardList } from '@hua-labs/motion-core';
+
+const grid = useCardList({
+  gridColumns: 3,
+  gridGap: 20,
+  staggerDelay: 100
+});
+
+<div ref={grid.ref} style={grid.style}>
+  {items.map((item, i) => (
+    <div key={item.id} data-card style={grid.cardStyles[i]}>
+      {item.content}
+    </div>
+  ))}
+</div>
+```
+
+**Options:**
+- `gridColumns?: number` - Grid columns (default: 3)
+- `gridGap?: number` - Gap in px (default: 20)
+- `staggerDelay?: number` - Delay between cards in ms (default: 100)
+- `initialScale?: number` (default: 0.8)
+- `initialOpacity?: number` (default: 0)
+- `initialTranslateY?: number` (default: 30)
+- `cardScale?: number` - Visible scale (default: 1)
+- `cardOpacity?: number` - Visible opacity (default: 1)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` (standard)
+- `cardStyles: CSSProperties[]` - Per-card animated styles
+- `staggerDelay: number`
+- `gridColumns: number`
+- `gridGap: number`
+
+---
+
+#### useLoadingSpinner
+
+Multi-type loading spinner with rotate, pulse, bounce, wave, dots, and bars animations.
+
+```tsx
+import { useLoadingSpinner } from '@hua-labs/motion-core';
+
+const spinner = useLoadingSpinner({
+  type: 'rotate',
+  size: 40,
+  color: '#3b82f6',
+  thickness: 4
+});
+
+<div ref={spinner.ref} style={spinner.style} />
+```
+
+**Options:**
+- `type?: 'rotate' | 'pulse' | 'bounce' | 'wave' | 'dots' | 'bars' | 'custom'` (default: `'rotate'`)
+- `color?: string` (default: `'#3b82f6'`)
+- `size?: number` - Size in px (default: 40)
+- `thickness?: number` - Border/bar thickness (default: 4)
+- `autoStart?: boolean` (default: true)
+- `infinite?: boolean` (default: true)
+- `rotationSpeed?: number` (default: 1)
+- `pulseSpeed?: number` (default: 1)
+- `bounceHeight?: number` (default: 20)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` (standard)
+- `isLoading: boolean`
+- `spinnerType: string`
+- `startLoading: () => void`
+- `stopLoading: () => void`
+- `setLoadingState: (loading: boolean) => void`
+
+---
+
+#### useNavigation
+
+Menu animation with stagger entrance and active item management.
+
+```tsx
+import { useNavigation } from '@hua-labs/motion-core';
+
+const nav = useNavigation({
+  type: 'slide',
+  slideDirection: 'left',
+  itemCount: 5,
+  staggerDelay: 50
+});
+
+<nav ref={nav.ref} style={nav.style}>
+  {nav.itemStyles.map((style, i) => (
+    <a key={i} style={style} onClick={() => nav.setActiveItem(i)}>
+      Item {i + 1}
+    </a>
+  ))}
+</nav>
+<button onClick={nav.toggleMenu}>Menu</button>
+```
+
+**Options:**
+- `type?: 'slide' | 'fade' | 'scale' | 'rotate' | 'custom'` (default: `'slide'`)
+- `slideDirection?: 'left' | 'right' | 'up' | 'down'` (default: `'left'`)
+- `itemCount?: number` (default: 5)
+- `staggerDelay?: number` (default: 50)
+- `activeScale?: number` (default: 1.05)
+- `hoverScale?: number` (default: 1.1)
+- `autoStart?: boolean` (default: false)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` (standard)
+- `isOpen: boolean`
+- `activeIndex: number`
+- `itemStyles: CSSProperties[]`
+- `openMenu: () => void`
+- `closeMenu: () => void`
+- `toggleMenu: () => void`
+- `setActiveItem: (index: number) => void`
+- `goToNext: () => void`
+- `goToPrevious: () => void`
+
+---
+
+#### useSkeleton
+
+Wave/pulse skeleton loading placeholder with CSS keyframe animations.
+
+```tsx
+import { useSkeleton } from '@hua-labs/motion-core';
+
+const skeleton = useSkeleton({
+  height: 20,
+  width: '100%',
+  wave: true,
+  borderRadius: 4
+});
+
+<div ref={skeleton.ref} style={skeleton.style} />
+```
+
+**Options:**
+- `wave?: boolean` - Enable wave shimmer (default: true)
+- `pulse?: boolean` - Enable pulse effect (default: false)
+- `height?: number` - Height in px (default: 20)
+- `width?: number | string` (default: `'100%'`)
+- `borderRadius?: number` (default: 4)
+- `backgroundColor?: string` (default: `'#f0f0f0'`)
+- `highlightColor?: string` (default: `'#e0e0e0'`)
+- `motionSpeed?: number` - Animation cycle in ms (default: 1500)
+- `autoStart?: boolean` (default: true)
+
+**Returns:**
+- `ref` `style` `start` `stop` `reset` `pause` `resume` (standard)
+
+---
+
 ## Advanced Usage
 
 ### Combining Multiple Animations
