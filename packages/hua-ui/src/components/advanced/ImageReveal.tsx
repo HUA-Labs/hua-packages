@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 export interface ImageRevealProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -132,20 +133,6 @@ function getClipPath(direction: string, progress: number): string {
     default:
       return `inset(0 ${100 - progress * 100}% 0 0)`;
   }
-}
-
-function useReducedMotion(): boolean {
-  const [prefersReduced, setPrefersReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  return prefersReduced;
 }
 
 function mergeRefs<T>(

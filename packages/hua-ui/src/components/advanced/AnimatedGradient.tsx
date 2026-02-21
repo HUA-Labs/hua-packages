@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
  * AnimatedGradient 컴포넌트의 props / AnimatedGradient component props
@@ -204,24 +205,5 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
 );
 
 AnimatedGradient.displayName = "AnimatedGradient";
-
-// Hook to check for reduced motion preference
-function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  return prefersReducedMotion;
-}
 
 export { AnimatedGradient };

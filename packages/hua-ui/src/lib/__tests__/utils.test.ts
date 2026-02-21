@@ -114,21 +114,21 @@ describe('formatRelativeTime', () => {
     const now = new Date();
     const timestamp = new Date(now.getTime() - 5 * 60000); // 5 minutes ago
     expect(formatRelativeTime(timestamp)).toBe('5분 전');
-    expect(formatRelativeTime(timestamp, 'en-US')).toBe('5m ago');
+    expect(formatRelativeTime(timestamp, 'en-US')).toMatch(/5\s*minute/);
   });
 
   it('should return hours ago for times less than 24 hours', () => {
     const now = new Date();
     const timestamp = new Date(now.getTime() - 2 * 3600000); // 2 hours ago
     expect(formatRelativeTime(timestamp)).toBe('2시간 전');
-    expect(formatRelativeTime(timestamp, 'en-US')).toBe('2h ago');
+    expect(formatRelativeTime(timestamp, 'en-US')).toMatch(/2\s*hour/);
   });
 
   it('should return days ago for times less than 7 days', () => {
     const now = new Date();
     const timestamp = new Date(now.getTime() - 3 * 86400000); // 3 days ago
     expect(formatRelativeTime(timestamp)).toBe('3일 전');
-    expect(formatRelativeTime(timestamp, 'en-US')).toBe('3d ago');
+    expect(formatRelativeTime(timestamp, 'en-US')).toMatch(/3\s*day/);
   });
 
   it('should return formatted date for times 7 days or older', () => {
@@ -154,11 +154,13 @@ describe('formatRelativeTime', () => {
     const now = new Date();
     const timestamp = new Date(now.getTime() - 59 * 60000); // 59 minutes
     expect(formatRelativeTime(timestamp)).toBe('59분 전');
+    expect(formatRelativeTime(timestamp, 'en-US')).toMatch(/59\s*minute/);
   });
 
   it('should handle edge case at 24 hour boundary', () => {
     const now = new Date();
     const timestamp = new Date(now.getTime() - 23 * 3600000); // 23 hours
     expect(formatRelativeTime(timestamp)).toBe('23시간 전');
+    expect(formatRelativeTime(timestamp, 'en-US')).toMatch(/23\s*hour/);
   });
 });

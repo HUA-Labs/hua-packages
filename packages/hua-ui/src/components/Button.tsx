@@ -4,6 +4,7 @@ import React from "react";
 import { merge } from "../lib/utils";
 import { buttonVariants, gradientPresets } from "./Button.variants";
 import { Slot } from "../lib/Slot";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 /**
  * 버튼 스타일 변형 / Button style variant
@@ -77,20 +78,6 @@ type NativeButtonProps = CommonProps &
 export type ButtonProps = AnchorProps | NativeButtonProps;
 
 type AnchorOrButton = HTMLAnchorElement | HTMLButtonElement;
-
-const isBrowser = typeof window !== "undefined";
-function useReducedMotion() {
-  const [reduce, setReduce] = React.useState(false);
-  React.useEffect(() => {
-    if (!isBrowser || !("matchMedia" in window)) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduce(!!mq.matches);
-    onChange();
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-  return reduce;
-}
 
 /**
  * Button 컴포넌트 / Button component
