@@ -60,14 +60,22 @@ function createProviders(config: HuaConfig) {
     </IconProvider>
   ))
 
-  // 4. I18nProvider (via createZustandI18n)
-  providers.push(({ children }) => {
-    const i18n = createZustandI18n({ ... })
-    return <i18n.Provider>{children}</i18n.Provider>
-  })
+  // 4. I18nProvider (via createI18nStore + createZustandI18n)
+  if (config.i18n) {
+    const i18nStore = config.i18n.languageStore ?? createI18nStore({
+      defaultLanguage: config.i18n.defaultLanguage,
+      supportedLanguages: config.i18n.supportedLanguages,
+      persist: config.state?.persist ?? true,
+      ssr: config.state?.ssr ?? true,
+    })
+    const I18nProvider = createZustandI18n(i18nStore, { ... })
+    providers.push(I18nProvider)
+  }
 
   // reduceRight for proper nesting (last = innermost)
-  return providers.reduceRight((acc, Provider) => <Provider>{acc}</Provider>, children)
+  return function CombinedProvider({ children }) {
+    return providers.reduceRight((acc, Provider) => <Provider>{acc}</Provider>, children)
+  }
 }
 ```
 
@@ -77,10 +85,9 @@ HuaProvider = UnifiedProviders + extras:
 
 ```tsx
 function HuaProvider({ children, config }) {
-  const resolvedConfig = config || getConfig()
   return (
-    <UnifiedProviders config={resolvedConfig}>
-      <ThemeInjector branding={resolvedConfig.branding} />
+    <UnifiedProviders config={config}>
+      <ThemeInjector branding={config?.branding} />
       <LanguageTransitionWrapper>{children}</LanguageTransitionWrapper>
     </UnifiedProviders>
   )
@@ -115,19 +122,6 @@ function App({ children }) {
       </IconProvider>
     </BrandingProvider>
   )
-}
-```
-
-## Language Mapping
-
-UnifiedProviders internally maps language codes to i18n-core format:
-
-```typescript
-const LANGUAGE_MAP = {
-  'ko': { name: 'Korean', nativeName: '한국어' },
-  'en': { name: 'English', nativeName: 'English' },
-  'ja': { name: 'Japanese', nativeName: '日本語' },
-  'zh': { name: 'Chinese', nativeName: '中文' },
 }
 ```
 
