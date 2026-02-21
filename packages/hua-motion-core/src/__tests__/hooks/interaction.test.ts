@@ -541,4 +541,88 @@ describe('useButtonEffect', () => {
     const { result } = renderHook(() => useButtonEffect({ disabled: true }))
     expect(result.current.style.cursor).toBe('not-allowed')
   })
+
+  it('onStart callback called on pressButton (shake type)', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useButtonEffect({ type: 'shake', onStart }))
+    act(() => { result.current.pressButton() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('onReset callback called on reset', () => {
+    const onReset = vi.fn()
+    const { result } = renderHook(() => useButtonEffect({ onReset }))
+    act(() => { result.current.reset() })
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('onStop callback called on stop', () => {
+    const onStop = vi.fn()
+    const { result } = renderHook(() => useButtonEffect({ onStop }))
+    act(() => { result.current.stop() })
+    expect(onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('pressButton twice does not change state if already pressed', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.pressButton() })
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+  })
+
+  it('setButtonState(disabled) resets all interaction states', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.setButtonState('hover') })
+    act(() => { result.current.setButtonState('active') })
+    act(() => { result.current.setButtonState('disabled') })
+    expect(result.current.isHovered).toBe(false)
+    expect(result.current.isPressed).toBe(false)
+    expect(result.current.isFocused).toBe(false)
+  })
+
+  it('style has position:relative and overflow:hidden', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    expect(result.current.style.position).toBe('relative')
+    expect(result.current.style.overflow).toBe('hidden')
+  })
+
+  it('shake type: pressButton triggers shake animation', () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useButtonEffect({ type: 'shake' }))
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+    expect(result.current.isAnimating).toBe(true)
+    vi.useRealTimers()
+  })
+
+  it('bounce type: pressButton triggers bounce animation', () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useButtonEffect({ type: 'bounce' }))
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+    expect(result.current.isAnimating).toBe(true)
+    vi.useRealTimers()
+  })
+
+  it('slide type: pressButton triggers slide animation', () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useButtonEffect({ type: 'slide' }))
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+    expect(result.current.isAnimating).toBe(true)
+    vi.useRealTimers()
+  })
+
+  it('start() sets isVisible=true', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.start() })
+    expect(result.current.isVisible).toBe(true)
+  })
+
+  it('pause() stops animating', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.start() })
+    act(() => { result.current.pause() })
+    expect(result.current.isAnimating).toBe(false)
+  })
 })
