@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { BaseMotionOptions, BaseMotionReturn, MotionElement } from '../types'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 export interface CardListOptions extends BaseMotionOptions {
   staggerDelay?: number
@@ -49,7 +50,6 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
   const [isAnimating, setIsAnimating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [cardCount, setCardCount] = useState(0)
-  const observerRef = useRef<IntersectionObserver | null>(null)
   const startRef = useRef<() => void>(() => {})
 
   // 카드 개수 계산
@@ -131,28 +131,14 @@ export function useCardList<T extends MotionElement = HTMLDivElement>(
     }
   }, [isVisible, isAnimating, start])
 
-  // Intersection Observer 설정
+  // Intersection Observer 설정 (공유 observer pool 사용)
   useEffect(() => {
     if (!ref.current) return
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            startRef.current()
-          }
-        })
-      },
+    return observeElement(
+      ref.current,
+      (entry) => { if (entry.isIntersecting) startRef.current() },
       { threshold: 0.1 }
     )
-
-    observerRef.current.observe(ref.current)
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-      }
-    }
   }, [])
 
   // 그리드 스타일

@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo, type CSSProperties, type RefObject } from 'react'
 import type { ScrollRevealMotionType } from '../types'
 import { useMotionProfile } from '../profiles/MotionProfileContext'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 export interface UseStaggerOptions {
   /** 자식 아이템 개수 */
@@ -77,24 +78,12 @@ export function useStagger(options: UseStaggerOptions): UseStaggerReturn {
 
   useEffect(() => {
     if (!containerRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true)
-            observer.disconnect()
-          }
-        })
-      },
-      { threshold }
+    return observeElement(
+      containerRef.current,
+      (entry) => { if (entry.isIntersecting) setIsVisible(true) },
+      { threshold },
+      true // once — 첫 intersection 후 자동 정리
     )
-
-    observer.observe(containerRef.current)
-
-    return () => {
-      observer.disconnect()
-    }
   }, [threshold])
 
   const slideDistance = profile.entrance.slide.distance
