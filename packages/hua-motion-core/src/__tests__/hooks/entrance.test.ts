@@ -19,25 +19,25 @@ import { useBounceIn } from '../../hooks/useBounceIn'
 describe('useFadeIn', () => {
   it('returns correct initial state', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false }))
-    // autoStart=false triggers start() via useEffect, so already visible
-    expect(result.current.isVisible).toBe(true)
-    expect(result.current.progress).toBe(1)
+    // autoStart=false: stays at initial state, no automatic start
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.progress).toBe(0)
     expect(result.current.ref).toBeDefined()
     expect(result.current.isAnimating).toBe(false)
   })
 
   it('has correct initial style with default opacity', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false }))
-    // autoStart=false triggers start(), so opacity is targetOpacity (1)
-    expect(result.current.style.opacity).toBe(1)
+    // autoStart=false: stays at initial opacity (0)
+    expect(result.current.style.opacity).toBe(0)
     expect(result.current.style.transition).toContain('opacity')
     expect(result.current.style.transition).toContain('700ms')
   })
 
   it('has correct initial style with custom initialOpacity', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false, initialOpacity: 0.5, targetOpacity: 0.8 }))
-    // autoStart=false triggers start(), so opacity is targetOpacity
-    expect(result.current.style.opacity).toBe(0.8)
+    // autoStart=false: stays at initialOpacity
+    expect(result.current.style.opacity).toBe(0.5)
   })
 
   it('style has correct targetOpacity when visible', () => {
@@ -101,9 +101,9 @@ describe('useFadeIn', () => {
 
   it('does not create IntersectionObserver when autoStart is false', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false }))
-    // With autoStart=false, start() is called immediately via useEffect
-    expect(result.current.isVisible).toBe(true)
-    expect(result.current.progress).toBe(1)
+    // autoStart=false: no observer, stays at initial state until manual start()
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.progress).toBe(0)
   })
 
   it('onComplete callback is called when animation finishes', () => {
@@ -115,17 +115,16 @@ describe('useFadeIn', () => {
 
   it('progress is 0 initially, 1 after start', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false }))
-    // autoStart=false triggers start() immediately, so progress is already 1
-    expect(result.current.progress).toBe(1)
-    // Calling start again should not change (already started)
+    // autoStart=false: stays at 0 until manual start
+    expect(result.current.progress).toBe(0)
     act(() => { result.current.start() })
     expect(result.current.progress).toBe(1)
   })
 
   it('style changes after start', () => {
     const { result } = renderHook(() => useFadeIn({ autoStart: false, initialOpacity: 0, targetOpacity: 1 }))
-    // autoStart=false triggers start() immediately, so opacity is targetOpacity
-    expect(result.current.style.opacity).toBe(1)
+    // autoStart=false: stays at initialOpacity
+    expect(result.current.style.opacity).toBe(0)
     act(() => { result.current.start() })
     expect(result.current.style.opacity).toBe(1)
   })
@@ -138,9 +137,9 @@ describe('useFadeIn', () => {
 describe('useSlideUp', () => {
   it('initial style has correct translateY with default distance', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
-    expect(result.current.style.opacity).toBe(1)
+    // autoStart=false: stays at initial offset position
+    expect(result.current.style.transform).toBe('translateY(32px)')
+    expect(result.current.style.opacity).toBe(0)
   })
 
   it('when visible, transform is translateY(0)', () => {
@@ -152,8 +151,8 @@ describe('useSlideUp', () => {
 
   it('custom distance option changes initial offset', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false, distance: 100 }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateY(100px)')
   })
 
   it('style includes transition for both opacity and transform', () => {
@@ -164,26 +163,26 @@ describe('useSlideUp', () => {
 
   it('direction up moves from bottom (positive Y)', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false, direction: 'up' }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateY(32px)')
   })
 
   it('direction down moves from top (negative Y)', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false, direction: 'down' }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateY(-32px)')
   })
 
   it('direction left moves from right (positive X)', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false, direction: 'left' }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateX(32px)')
   })
 
   it('direction right moves from left (negative X)', () => {
     const { result } = renderHook(() => useSlideUp({ autoStart: false, direction: 'right' }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateX(-32px)')
   })
 
   it('reset() resets transform and opacity', () => {
@@ -209,14 +208,14 @@ describe('useSlideUp', () => {
 describe('useSlideDown', () => {
   it('wraps useSlideUp with direction="down"', () => {
     const { result } = renderHook(() => useSlideDown({ autoStart: false }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
+    // autoStart=false: stays at initial offset (down = negative Y)
+    expect(result.current.style.transform).toBe('translateY(-32px)')
   })
 
   it('returns correct initial transform', () => {
     const { result } = renderHook(() => useSlideDown({ autoStart: false, distance: 100 }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateY(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateY(-100px)')
   })
 })
 
@@ -227,14 +226,14 @@ describe('useSlideDown', () => {
 describe('useSlideLeft', () => {
   it('wraps useSlideUp with direction="left"', () => {
     const { result } = renderHook(() => useSlideLeft({ autoStart: false }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset (left = positive X)
+    expect(result.current.style.transform).toBe('translateX(32px)')
   })
 
   it('returns correct initial transform', () => {
     const { result } = renderHook(() => useSlideLeft({ autoStart: false, distance: 100 }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateX(100px)')
   })
 })
 
@@ -245,14 +244,14 @@ describe('useSlideLeft', () => {
 describe('useSlideRight', () => {
   it('wraps useSlideUp with direction="right"', () => {
     const { result } = renderHook(() => useSlideRight({ autoStart: false }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset (right = negative X)
+    expect(result.current.style.transform).toBe('translateX(-32px)')
   })
 
   it('returns correct initial transform', () => {
     const { result } = renderHook(() => useSlideRight({ autoStart: false, distance: 100 }))
-    // autoStart=false triggers start(), so already at final position
-    expect(result.current.style.transform).toBe('translateX(0)')
+    // autoStart=false: stays at initial offset
+    expect(result.current.style.transform).toBe('translateX(-100px)')
   })
 })
 
