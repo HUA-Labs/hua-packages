@@ -67,7 +67,7 @@ import { Button, Card, Input, Modal } from '@hua-labs/hua/ui'
 import { useTranslation, useLanguageChange } from '@hua-labs/hua/i18n'
 
 // @hua-labs/hua/motion — motion-core re-export
-import { useFadeIn, useSlideUp, AnimatePresence } from '@hua-labs/hua/motion'
+import { useFadeIn, useSlideUp, useScrollReveal } from '@hua-labs/hua/motion'
 
 // @hua-labs/hua/state — State package re-export
 import { createHuaStore } from '@hua-labs/hua/state'
@@ -87,8 +87,15 @@ import { useCurrencyFormatter, useDateFormatter } from '@hua-labs/hua/formatters
 // @hua-labs/hua/presets — Preset definitions
 import { productPreset, marketingPreset } from '@hua-labs/hua/presets'
 
-// @hua-labs/hua/pro — Pro license features (future)
-import { /* pro features */ } from '@hua-labs/hua/pro'
+// @hua-labs/hua/pro — Pro advanced motion hooks and premium features
+import {
+  useAutoSlide, useAutoScale, useAutoFade, useAutoPlay,
+  useMotionOrchestra, useOrchestration, useSequence,
+  useLayoutMotion, useKeyboardToggle, useScrollDirection,
+  useStickyToggle, useVisibilityToggle, useInteractive,
+  usePerformanceMonitor, useLanguageAwareMotion, useGameLoop,
+  PRO_VERSION,
+} from '@hua-labs/hua/pro'
 ```
 
 ## Choosing the Right Import
