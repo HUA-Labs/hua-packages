@@ -10,7 +10,6 @@
 export {
   MotionEngine, motionEngine,
   TransitionEffects, transitionEffects,
-  PerformanceOptimizer, performanceOptimizer,
   useSimplePageMotion, usePageMotions, useSmartMotion, useUnifiedMotion,
   useFadeIn, useSlideUp, useSlideLeft, useSlideRight, useSlideDown,
   useScaleIn, useBounceIn, usePulse, useSpringMotion, useGradient,
@@ -33,7 +32,6 @@ export {
 export type {
   MotionFrame, MotionOptions, Motion as MotionInstance,
   TransitionType, TransitionOptions,
-  PerformanceOptimizerMetrics, OptimizationConfig,
   UseUnifiedMotionOptions, MotionEffects,
   TypewriterOptions, TypewriterReturn,
   CustomCursorOptions, CustomCursorReturn,
