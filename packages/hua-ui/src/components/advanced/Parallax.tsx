@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useCallback } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
  * Parallax 컴포넌트의 props / Parallax component props
@@ -226,25 +227,6 @@ const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
 );
 
 Parallax.displayName = "Parallax";
-
-// Hook to check for reduced motion preference
-function useReducedMotion(): boolean {
-  const matchRef = useRef(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    matchRef.current = mediaQuery.matches;
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      matchRef.current = e.matches;
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  return matchRef.current;
-}
 
 // Utility to merge refs
 function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {

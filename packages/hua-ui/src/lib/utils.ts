@@ -72,11 +72,24 @@ export function formatRelativeTime(timestamp: Date | string, locale = "ko-KR"): 
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return locale === "ko-KR" ? "방금 전" : "just now";
-  if (minutes < 60) return locale === "ko-KR" ? `${minutes}분 전` : `${minutes}m ago`;
-  if (hours < 24) return locale === "ko-KR" ? `${hours}시간 전` : `${hours}h ago`;
-  if (days < 7) return locale === "ko-KR" ? `${days}일 전` : `${days}d ago`;
-  return date.toLocaleDateString(locale);
+  // 7일 이상은 절대 날짜
+  if (days >= 7) return date.toLocaleDateString(locale);
+
+  // 1분 미만 — 하드코딩 폴백 유지 (후방 호환)
+  if (minutes < 1) return locale.startsWith("ko") ? "방금 전" : "just now";
+
+  // Intl.RelativeTimeFormat 사용, 미지원 환경은 하드코딩 폴백
+  try {
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "always" });
+    if (minutes < 60) return rtf.format(-minutes, "minute");
+    if (hours < 24) return rtf.format(-hours, "hour");
+    return rtf.format(-days, "day");
+  } catch {
+    // Intl 미지원 환경 폴백 — 기존 하드코딩 문자열
+    if (minutes < 60) return locale.startsWith("ko") ? `${minutes}분 전` : `${minutes}m ago`;
+    if (hours < 24) return locale.startsWith("ko") ? `${hours}시간 전` : `${hours}h ago`;
+    return locale.startsWith("ko") ? `${days}일 전` : `${days}d ago`;
+  }
 }
 
 /**

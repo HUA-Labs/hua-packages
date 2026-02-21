@@ -3,6 +3,7 @@
 import React from "react";
 import { merge } from "../lib/utils";
 import { Button, type ButtonProps } from "./Button";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 /** Action 전용 옵션(버튼 공통 옵션은 ButtonProps에서 상속) */
 type ActionKind =
@@ -47,18 +48,6 @@ type ButtonEl = HTMLButtonElement;
 type AnchorOrButton = AnchorEl | ButtonEl;
 
 const isBrowser = typeof window !== "undefined";
-function useReducedMotion() {
-  const [reduce, setReduce] = React.useState(false);
-  React.useEffect(() => {
-    if (!isBrowser || !("matchMedia" in window)) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduce(!!mq.matches);
-    onChange();
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-  return reduce;
-}
 
 /**
  * Action 컴포넌트 / Action component
