@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { SpringOptions, BaseMotionReturn, MotionElement } from '../types'
 import { useMotionProfile } from '../profiles/MotionProfileContext'
+import { calculateSpring } from '../utils/springPhysics'
 
 interface SpringMotionOptions extends SpringOptions {
   /** 시작 값 */
@@ -28,7 +29,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     restSpeed = profile.spring.restSpeed,
     onComplete,
     enabled = true,
-    autoStart = false
+    autoStart = true
   } = options
 
   const ref = useRef<T>(null)
@@ -43,29 +44,8 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
   const motionRef = useRef<number | null>(null)
   const lastTimeRef = useRef<number>(0)
 
-  // 스프링 물리 계산
-  const calculateSpring = useCallback((currentValue: number, currentVelocity: number, targetValue: number, deltaTime: number) => {
-    // 스프링 힘 계산 (Hooke's Law)
-    const displacement = currentValue - targetValue
-    const springForce = -stiffness * displacement
-
-    // 댐핑 힘 계산
-    const dampingForce = -damping * currentVelocity
-
-    // 총 힘
-    const totalForce = springForce + dampingForce
-
-    // 가속도 (F = ma)
-    const acceleration = totalForce / mass
-
-    // 새로운 속도
-    const newVelocity = currentVelocity + acceleration * deltaTime
-
-    // 새로운 위치
-    const newValue = currentValue + newVelocity * deltaTime
-
-    return { value: newValue, velocity: newVelocity }
-  }, [mass, stiffness, damping])
+  // 스프링 설정 메모이제이션
+  const springConfig = useMemo(() => ({ stiffness, damping, mass }), [stiffness, damping, mass])
 
   // 모션 루프
   const animate = useCallback((currentTime: number) => {
@@ -78,7 +58,8 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
       springState.value,
       springState.velocity,
       to,
-      deltaTime
+      deltaTime,
+      springConfig
     )
 
     // 진행률 계산
@@ -107,7 +88,7 @@ export function useSpringMotion<T extends MotionElement = HTMLDivElement>(
     })
 
     motionRef.current = requestAnimationFrame(animate)
-  }, [enabled, springState.isAnimating, to, from, restDelta, restSpeed, onComplete, calculateSpring])
+  }, [enabled, springState.isAnimating, to, from, restDelta, restSpeed, onComplete, springConfig])
 
   // 모션 시작
   const start = useCallback(() => {

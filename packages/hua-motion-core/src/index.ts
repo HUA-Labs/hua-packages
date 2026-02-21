@@ -23,13 +23,6 @@ export {
   type TransitionOptions
 } from './core/TransitionEffects'
 
-// PerformanceOptimizer - 성능 최적화
-export {
-  PerformanceOptimizer,
-  performanceOptimizer,
-  type PerformanceOptimizerMetrics,
-  type OptimizationConfig
-} from './core/PerformanceOptimizer'
 
 // ========================================
 // 3단계 추상화 (Core 패키지 핵심)
@@ -155,10 +148,14 @@ export {
   type EasingFunction, type EasingType
 } from './utils/easing'
 
-export { 
-  getEasing, applyEasing, safeApplyEasing, isValidEasing, 
-  getAvailableEasings, isEasingFunction, easingPresets, getPresetEasing 
+export {
+  getEasing, applyEasing, safeApplyEasing, isValidEasing,
+  getAvailableEasings, isEasingFunction, easingPresets, getPresetEasing
 } from './utils/easing'
+
+// 스프링 물리 계산 (순수 함수)
+export { calculateSpring } from './utils/springPhysics'
+export type { SpringConfig as SpringPhysicsConfig, SpringResult } from './utils/springPhysics'
 
 // ========================================
 // 기본 타입들 (Core 패키지 범위)

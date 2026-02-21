@@ -166,7 +166,6 @@ export {
   // Core engine
   MotionEngine, motionEngine,
   TransitionEffects, transitionEffects,
-  PerformanceOptimizer, performanceOptimizer,
   // 3-tier abstraction
   useSimplePageMotion, usePageMotions, useSmartMotion, useUnifiedMotion,
   // Basic motion hooks
@@ -198,7 +197,6 @@ export {
 export type {
   MotionFrame, MotionOptions, Motion as MotionInstance,
   TransitionType, TransitionOptions,
-  PerformanceOptimizerMetrics, OptimizationConfig,
   UseUnifiedMotionOptions, MotionEffects,
   TypewriterOptions, TypewriterReturn,
   CustomCursorOptions, CustomCursorReturn,

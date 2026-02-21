@@ -123,13 +123,6 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
     }
   }, [autoStart, threshold, triggerOnce, nodeReady])
 
-  // 자동 시작이 비활성화된 경우 수동 시작
-  useEffect(() => {
-    if (!autoStart) {
-      start()
-    }
-  }, [autoStart, start])
-
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
