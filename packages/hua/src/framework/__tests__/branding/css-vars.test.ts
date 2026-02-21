@@ -3,19 +3,19 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { generateCSSVariables, generateCSSVariablesObject } from '../../branding/css-vars';
-import type { HuaUxConfig } from '../../types';
+import { generateCSSVariables, generateCSSVariablesObject, isValidCSSColor } from '../../branding/css-vars';
+import type { HuaConfig } from '../../types';
 
 describe('generateCSSVariables', () => {
   it('should generate empty string for empty branding', () => {
-    const branding = {} as NonNullable<HuaUxConfig['branding']>;
+    const branding = {} as NonNullable<HuaConfig['branding']>;
     const result = generateCSSVariables(branding);
 
     expect(result).toBe('');
   });
 
   it('should generate color variables', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       colors: {
         primary: '#3B82F6',
         secondary: '#8B5CF6',
@@ -30,7 +30,7 @@ describe('generateCSSVariables', () => {
   });
 
   it('should generate typography variables', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       typography: {
         fontFamily: ['Inter', 'sans-serif'],
         fontSize: {
@@ -48,7 +48,7 @@ describe('generateCSSVariables', () => {
   });
 
   it('should generate custom variables', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       customVariables: {
         'spacing-unit': '8px',
         'border-radius': '4px',
@@ -62,7 +62,7 @@ describe('generateCSSVariables', () => {
   });
 
   it('should generate all variable types together', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       colors: {
         primary: '#3B82F6',
       },
@@ -82,7 +82,7 @@ describe('generateCSSVariables', () => {
   });
 
   it('should format output correctly', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       colors: {
         primary: '#3B82F6',
       },
@@ -97,14 +97,14 @@ describe('generateCSSVariables', () => {
 
 describe('generateCSSVariablesObject', () => {
   it('should generate empty object for empty branding', () => {
-    const branding = {} as NonNullable<HuaUxConfig['branding']>;
+    const branding = {} as NonNullable<HuaConfig['branding']>;
     const result = generateCSSVariablesObject(branding);
 
     expect(result).toEqual({});
   });
 
   it('should generate color variables as object', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       colors: {
         primary: '#3B82F6',
         secondary: '#8B5CF6',
@@ -118,7 +118,7 @@ describe('generateCSSVariablesObject', () => {
   });
 
   it('should generate typography variables as object', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       typography: {
         fontFamily: ['Inter', 'sans-serif'],
         fontSize: {
@@ -134,7 +134,7 @@ describe('generateCSSVariablesObject', () => {
   });
 
   it('should generate custom variables as object', () => {
-    const branding: NonNullable<HuaUxConfig['branding']> = {
+    const branding: NonNullable<HuaConfig['branding']> = {
       customVariables: {
         'spacing-unit': '8px',
       },
