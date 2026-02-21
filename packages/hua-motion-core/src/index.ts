@@ -91,6 +91,29 @@ export { useGestureMotion } from './hooks/useGestureMotion'
 // 고급 인터랙션 훅들 (Phase E)
 // ========================================
 
+export { useButtonEffect } from './hooks/useButtonEffect'
+export type { ButtonEffectOptions } from './hooks/useButtonEffect'
+
+export { useVisibilityToggle } from './hooks/useVisibilityToggle'
+export type { VisibilityToggleOptions } from './hooks/useVisibilityToggle'
+
+// 스크롤 기반
+export { useScrollToggle } from './hooks/useScrollToggle'
+export type { ScrollToggleOptions } from './hooks/useScrollToggle'
+
+// 레이아웃 모션 (카드, 스켈레톤, 스피너, 네비게이션)
+export { useCardList } from './hooks/useCardList'
+export type { CardListOptions } from './hooks/useCardList'
+
+export { useLoadingSpinner } from './hooks/useLoadingSpinner'
+export type { LoadingSpinnerOptions } from './hooks/useLoadingSpinner'
+
+export { useNavigation } from './hooks/useNavigation'
+export type { NavigationOptions } from './hooks/useNavigation'
+
+export { useSkeleton } from './hooks/useSkeleton'
+export type { SkeletonOptions } from './hooks/useSkeleton'
+
 export { useTypewriter } from './hooks/useTypewriter'
 export type { TypewriterOptions, TypewriterReturn } from './hooks/useTypewriter'
 

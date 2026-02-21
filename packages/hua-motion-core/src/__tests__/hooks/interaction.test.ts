@@ -9,6 +9,7 @@ import { useClickToggle } from '../../hooks/useClickToggle'
 import { useFocusToggle } from '../../hooks/useFocusToggle'
 import { useToggleMotion } from '../../hooks/useToggleMotion'
 import { useVisibilityToggle } from '../../hooks/useVisibilityToggle'
+import { useButtonEffect } from '../../hooks/useButtonEffect'
 
 // ========================================
 // useHoverMotion Tests (~12)
@@ -444,5 +445,100 @@ describe('useVisibilityToggle', () => {
   it('includes transition CSS', () => {
     const { result } = renderHook(() => useVisibilityToggle({ duration: 300 }))
     expect(result.current.style.transition).toContain('300ms')
+  })
+})
+
+// ========================================
+// useButtonEffect Tests (~12)
+// ========================================
+
+describe('useButtonEffect', () => {
+  it('returns correct initial state', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.isAnimating).toBe(false)
+    expect(result.current.isPressed).toBe(false)
+    expect(result.current.isHovered).toBe(false)
+    expect(result.current.isFocused).toBe(false)
+    expect(result.current.ref).toBeDefined()
+  })
+
+  it('buttonType defaults to scale', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    expect(result.current.buttonType).toBe('scale')
+  })
+
+  it('custom type option', () => {
+    const { result } = renderHook(() => useButtonEffect({ type: 'ripple' }))
+    expect(result.current.buttonType).toBe('ripple')
+  })
+
+  it('pressButton() sets isPressed=true', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+  })
+
+  it('releaseButton() sets isPressed=false', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(true)
+    act(() => { result.current.releaseButton() })
+    expect(result.current.isPressed).toBe(false)
+  })
+
+  it('disabled=true prevents pressButton', () => {
+    const { result } = renderHook(() => useButtonEffect({ disabled: true }))
+    act(() => { result.current.pressButton() })
+    expect(result.current.isPressed).toBe(false)
+  })
+
+  it('disabled=true sets opacity to disabledOpacity', () => {
+    const { result } = renderHook(() => useButtonEffect({ disabled: true, disabledOpacity: 0.5 }))
+    expect(result.current.style.opacity).toBe(0.5)
+  })
+
+  it('setButtonState(hover) sets isHovered=true', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.setButtonState('hover') })
+    expect(result.current.isHovered).toBe(true)
+  })
+
+  it('setButtonState(focus) sets isFocused=true', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.setButtonState('focus') })
+    expect(result.current.isFocused).toBe(true)
+  })
+
+  it('setButtonState(idle) resets all states', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.setButtonState('hover') })
+    act(() => { result.current.setButtonState('idle') })
+    expect(result.current.isHovered).toBe(false)
+    expect(result.current.isPressed).toBe(false)
+    expect(result.current.isFocused).toBe(false)
+  })
+
+  it('reset() restores all values', () => {
+    const { result } = renderHook(() => useButtonEffect())
+    act(() => { result.current.pressButton() })
+    act(() => { result.current.setButtonState('hover') })
+    act(() => { result.current.reset() })
+    expect(result.current.isPressed).toBe(false)
+    expect(result.current.isHovered).toBe(false)
+    expect(result.current.isFocused).toBe(false)
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.progress).toBe(0)
+  })
+
+  it('style includes transition and cursor', () => {
+    const { result } = renderHook(() => useButtonEffect({ duration: 200 }))
+    expect(result.current.style.transition).toContain('200ms')
+    expect(result.current.style.cursor).toBe('pointer')
+  })
+
+  it('disabled cursor is not-allowed', () => {
+    const { result } = renderHook(() => useButtonEffect({ disabled: true }))
+    expect(result.current.style.cursor).toBe('not-allowed')
   })
 })
