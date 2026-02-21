@@ -98,12 +98,13 @@ import { Smiley } from '@phosphor-icons/react/dist/ssr/Smiley'
 import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad'
 import { SmileyMeh } from '@phosphor-icons/react/dist/ssr/SmileyMeh'
 
-// Security
+// Security & Finance
 import { Lock } from '@phosphor-icons/react/dist/ssr/Lock'
 import { LockOpen } from '@phosphor-icons/react/dist/ssr/LockOpen'
 import { Shield } from '@phosphor-icons/react/dist/ssr/Shield'
 import { Wallet } from '@phosphor-icons/react/dist/ssr/Wallet'
 import { Key } from '@phosphor-icons/react/dist/ssr/Key'
+import { CurrencyDollar } from '@phosphor-icons/react/dist/ssr/CurrencyDollar'
 
 // Time & Date
 import { Clock } from '@phosphor-icons/react/dist/ssr/Clock'
@@ -230,6 +231,9 @@ export const icons = {
   shield: Shield,
   wallet: Wallet,
   key: Key,
+  dollar: CurrencyDollar,
+  dollarSign: CurrencyDollar,
+  currency: CurrencyDollar,
 
   // Time & Date
   clock: Clock,
