@@ -290,6 +290,125 @@ describe('calculateSpring', () => {
     })
   })
 
+  // ========================================
+  // Edge Cases
+  // ========================================
+
+  describe('edge cases', () => {
+    it('zero mass → Infinity acceleration (division by zero)', () => {
+      const zeroMass = { stiffness: 170, damping: 26, mass: 0 }
+      const result = calculateSpring(0, 0, 100, dt, zeroMass)
+
+      // F/0 = Infinity → velocity/value become Infinity
+      expect(result.velocity).toBe(Infinity)
+      expect(result.value).toBe(Infinity)
+    })
+
+    it('negative mass → inverted acceleration direction', () => {
+      const negMass = { stiffness: 170, damping: 26, mass: -1 }
+      const result = calculateSpring(0, 0, 100, dt, negMass)
+
+      // Negative mass flips force direction → moves away from target
+      expect(result.value).toBeLessThan(0)
+      expect(result.velocity).toBeLessThan(0)
+    })
+
+    it('zero damping → undamped oscillation (no energy loss)', () => {
+      const undamped = { stiffness: 170, damping: 0, mass: 1 }
+
+      // Simulate full cycle — should overshoot and come back
+      let val = 0, vel = 0, maxVal = 0
+      for (let i = 0; i < 600; i++) {
+        const r = calculateSpring(val, vel, 100, dt, undamped)
+        val = r.value; vel = r.velocity
+        maxVal = Math.max(maxVal, val)
+      }
+
+      // Undamped spring overshoots past target
+      expect(maxVal).toBeGreaterThan(100)
+
+      // After many steps, should NOT have settled (still oscillating)
+      // Check velocity is still non-negligible
+      expect(Math.abs(vel)).toBeGreaterThan(0.1)
+    })
+
+    it('negative damping → energy injection (diverges)', () => {
+      const negDamp = { stiffness: 170, damping: -10, mass: 1 }
+
+      let val = 0, vel = 0
+      for (let i = 0; i < 300; i++) {
+        const r = calculateSpring(val, vel, 100, dt, negDamp)
+        val = r.value; vel = r.velocity
+      }
+
+      // Negative damping adds energy → amplitude grows unbounded
+      expect(Math.abs(val)).toBeGreaterThan(200)
+    })
+
+    it('very large deltaTime → numerical instability', () => {
+      // 1 second timestep (way beyond intended 16ms frame)
+      const result = calculateSpring(0, 0, 100, 1.0, defaultConfig)
+
+      // With dt=1s, semi-implicit Euler overshoots massively
+      // stiffness=170, displacement=-100 → force=17000 → vel=17000 → val=17000
+      expect(Math.abs(result.value)).toBeGreaterThan(1000)
+    })
+
+    it('very small deltaTime → near-zero movement', () => {
+      const tinyDt = 1e-10
+      const result = calculateSpring(0, 0, 100, tinyDt, defaultConfig)
+
+      // Almost no movement with tiny timestep
+      expect(result.value).toBeCloseTo(0, 5)
+      expect(result.velocity).toBeCloseTo(0, 2)
+    })
+
+    it('zero deltaTime → no change', () => {
+      const result = calculateSpring(50, 10, 100, 0, defaultConfig)
+
+      expect(result.value).toBe(50)
+      expect(result.velocity).toBe(10)
+    })
+
+    it('zero stiffness → no restoring force, only damping', () => {
+      const noSpring = { stiffness: 0, damping: 26, mass: 1 }
+
+      // With initial velocity, damping slows it down but no pull toward target
+      const result = calculateSpring(0, 100, 50, dt, noSpring)
+
+      // Velocity decreases due to damping
+      expect(result.velocity).toBeLessThan(100)
+      expect(result.velocity).toBeGreaterThan(0)
+
+      // Position moves in velocity direction, not toward target
+      expect(result.value).toBeGreaterThan(0)
+    })
+
+    it('very large displacement → proportionally large force', () => {
+      const result = calculateSpring(0, 0, 1e6, dt, defaultConfig)
+      const smallResult = calculateSpring(0, 0, 100, dt, defaultConfig)
+
+      // Force scales linearly with displacement
+      // velocity ratio should match displacement ratio
+      expect(result.velocity / smallResult.velocity).toBeCloseTo(1e6 / 100, 0)
+    })
+
+    it('existing velocity opposing spring direction', () => {
+      // At 0, target 100, but velocity is -50 (moving away)
+      const result = calculateSpring(0, -50, 100, dt, defaultConfig)
+
+      // Spring force pulls toward 100, but initial velocity pulls away
+      // After one step, velocity should be less negative (spring fighting back)
+      expect(result.velocity).toBeGreaterThan(-50)
+    })
+
+    it('NaN input propagates to output', () => {
+      const result = calculateSpring(NaN, 0, 100, dt, defaultConfig)
+      expect(result.value).toBeNaN()
+      expect(result.velocity).toBeNaN()
+    })
+  })
+
   describe('enabled option', () => {
     it('should respect enabled=false', () => {
       const { result } = renderHook(() => useSpringMotion({ from: 0, to: 100, enabled: false, autoStart: true }))
