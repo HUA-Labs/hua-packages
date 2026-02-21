@@ -288,8 +288,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           contentClassName="p-0"
         >
           <div
-            className="rounded-lg"
-            style={{ backgroundColor: 'var(--color-popover, #111827)' }}
+            className="rounded-lg bg-popover"
           >
             <div className="p-4">
               {/* 헤더 */}

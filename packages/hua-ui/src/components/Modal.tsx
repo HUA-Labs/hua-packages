@@ -47,6 +47,30 @@ export interface ModalProps {
   className?: string
 }
 
+// 모달 닫기 버튼 컴포넌트 (title 유무에 따라 위치만 다름)
+function ModalCloseButton({
+  onClick,
+  className,
+}: {
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={merge(
+        "p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20",
+        className
+      )}
+      aria-label="닫기"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  );
+}
+
 // Ref 병합 유틸리티
 function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
   return React.useCallback(
@@ -230,15 +254,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
               <h2 id={titleId} className="text-xl font-semibold text-foreground flex-1 min-w-0">{title}</h2>
               {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
               {_closable && (
-                <button
-                  onClick={onClose}
-                  className="flex-shrink-0 p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20"
-                  aria-label="닫기"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <ModalCloseButton onClick={onClose} className="flex-shrink-0" />
               )}
             </div>
             {/* 설명 - 아래 줄 */}
@@ -250,15 +266,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
         {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
         {!title && _closable && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20"
-            aria-label="닫기"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <ModalCloseButton onClick={onClose} className="absolute top-4 right-4" />
         )}
         
         {/* 모달 내용 */}

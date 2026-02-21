@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
  * Carousel 컴포넌트의 props / Carousel component props
@@ -501,25 +502,6 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 );
 
 Carousel.displayName = "Carousel";
-
-// Hook to check for reduced motion preference
-function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  return prefersReducedMotion;
-}
 
 // Simple icon components
 function ChevronLeft({ className }: { className?: string }) {
