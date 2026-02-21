@@ -182,6 +182,10 @@ export {
   useGesture, useGestureMotion,
   // Advanced interaction hooks
   useTypewriter, useCustomCursor, useMagneticCursor, useSmoothScroll, useElementProgress,
+  // Advanced interaction / scroll / layout motion (motion-core)
+  useButtonEffect, useScrollToggle,
+  // Note: useVisibilityToggle is exported from @hua-labs/pro, not re-exported here from motion-core
+  useCardList, useLoadingSpinner, useNavigation, useSkeleton,
   // Stagger
   useStagger,
   // Presets
@@ -203,6 +207,12 @@ export type {
   MagneticCursorOptions, MagneticCursorReturn,
   SmoothScrollOptions, SmoothScrollReturn,
   ElementProgressOptions, ElementProgressReturn,
+  ButtonEffectOptions,
+  ScrollToggleOptions,
+  CardListOptions,
+  LoadingSpinnerOptions,
+  NavigationOptions,
+  SkeletonOptions,
   UseStaggerOptions, UseStaggerReturn,
   EasingFunction, EasingType,
   MotionProps,
