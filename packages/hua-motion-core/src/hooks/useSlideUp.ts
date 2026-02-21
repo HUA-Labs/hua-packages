@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { SlideOptions, BaseMotionReturn, MotionElement } from '../types'
 import { useMotionProfile } from '../profiles/MotionProfileContext'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 export function useSlideUp<T extends MotionElement = HTMLDivElement>(
   options: SlideOptions = {}
@@ -26,7 +27,6 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
   const [isAnimating, setIsAnimating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [nodeReady, setNodeReady] = useState(false)
-  const observerRef = useRef<IntersectionObserver | null>(null)
   const timeoutRef = useRef<number | null>(null)
   const startRef = useRef<() => void>(() => {})
 
@@ -107,31 +107,15 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
     onReset?.()
   }, [stop, onReset])
 
-  // Intersection Observer 설정
+  // Intersection Observer 설정 (공유 observer pool 사용)
   useEffect(() => {
     if (!ref.current || !autoStart) return
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            startRef.current()
-            if (triggerOnce) {
-              observerRef.current?.disconnect()
-            }
-          }
-        })
-      },
-      { threshold }
+    return observeElement(
+      ref.current,
+      (entry) => { if (entry.isIntersecting) startRef.current() },
+      { threshold },
+      triggerOnce
     )
-
-    observerRef.current.observe(ref.current)
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-      }
-    }
   }, [autoStart, threshold, triggerOnce, nodeReady])
 
   // 컴포넌트 언마운트 시 정리

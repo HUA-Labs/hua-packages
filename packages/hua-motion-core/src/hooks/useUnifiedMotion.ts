@@ -8,6 +8,7 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { BaseMotionReturn, MotionElement, EntranceType, BaseMotionOptions } from '../types'
 import { useMotionProfile } from '../profiles/MotionProfileContext'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 export interface MotionEffects {
   fade?: boolean | { targetOpacity?: number }
@@ -156,7 +157,6 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [progress, setProgress] = useState(0)
-  const observerRef = useRef<IntersectionObserver | null>(null)
   const timeoutRef = useRef<number | null>(null)
   const startRef = useRef<() => void>(() => {})
 
@@ -192,29 +192,15 @@ export function useUnifiedMotion<T extends MotionElement = HTMLDivElement>(
     onReset?.()
   }, [stop, onReset])
 
-  // IntersectionObserver로 자동 시작
+  // IntersectionObserver로 자동 시작 (공유 observer pool 사용)
   useEffect(() => {
     if (!ref.current || !autoStart) return
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            startRef.current()
-            if (triggerOnce) {
-              observerRef.current?.disconnect()
-            }
-          }
-        })
-      },
-      { threshold }
+    return observeElement(
+      ref.current,
+      (entry) => { if (entry.isIntersecting) startRef.current() },
+      { threshold },
+      triggerOnce
     )
-
-    observerRef.current.observe(ref.current)
-
-    return () => {
-      observerRef.current?.disconnect()
-    }
   }, [autoStart, threshold, triggerOnce])
 
   useEffect(() => {

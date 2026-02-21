@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { ScrollRevealOptions, BaseMotionReturn, MotionElement } from '../types'
 import { useMotionProfile } from '../profiles/MotionProfileContext'
+import { observeElement } from '../utils/sharedIntersectionObserver'
 
 export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
   options: ScrollRevealOptions = {}
@@ -45,16 +46,11 @@ export function useScrollReveal<T extends MotionElement = HTMLDivElement>(
   useEffect(() => {
     if (!ref.current) return
 
-    const observer = new IntersectionObserver(observerCallback, {
-      threshold,
-      rootMargin
-    })
-
-    observer.observe(ref.current)
-
-    return () => {
-      observer.disconnect()
-    }
+    return observeElement(
+      ref.current,
+      (entry) => observerCallback([entry]),
+      { threshold, rootMargin }
+    )
   }, [observerCallback, threshold, rootMargin])
 
   // 프로필에서 거리/스케일 값 가져오기
