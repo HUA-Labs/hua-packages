@@ -75,6 +75,36 @@ describe('useCardList', () => {
     act(() => { result.current.stop() })
     expect(result.current.isAnimating).toBe(false)
   })
+
+  it('onStart callback called on start', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useCardList({ onStart }))
+    act(() => { result.current.start() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('onStop callback called on stop', () => {
+    const onStop = vi.fn()
+    const { result } = renderHook(() => useCardList({ onStop }))
+    act(() => { result.current.start() })
+    act(() => { result.current.stop() })
+    expect(onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('onReset callback called on reset', () => {
+    const onReset = vi.fn()
+    const { result } = renderHook(() => useCardList({ onReset }))
+    act(() => { result.current.reset() })
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('calling start twice does not restart if already animating', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useCardList({ onStart }))
+    act(() => { result.current.start() })
+    act(() => { result.current.start() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
 })
 
 // ========================================
@@ -154,6 +184,77 @@ describe('useLoadingSpinner', () => {
     expect(result.current.rotationAngle).toBe(0)
     expect(result.current.pulseScale).toBe(1)
     expect(result.current.bounceOffset).toBe(0)
+  })
+
+  it('onStart callback called on startLoading', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useLoadingSpinner({ autoStart: false, onStart }))
+    act(() => { result.current.startLoading() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('onStop callback called on stopLoading', () => {
+    const onStop = vi.fn()
+    const { result } = renderHook(() => useLoadingSpinner({ autoStart: false, onStop }))
+    act(() => { result.current.startLoading() })
+    act(() => { result.current.stopLoading() })
+    expect(onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('onReset callback called on reset', () => {
+    const onReset = vi.fn()
+    const { result } = renderHook(() => useLoadingSpinner({ autoStart: false, onReset }))
+    act(() => { result.current.reset() })
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('startLoading twice does not restart if already loading', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useLoadingSpinner({ autoStart: false, onStart }))
+    act(() => { result.current.startLoading() })
+    act(() => { result.current.startLoading() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('rotate type: style has border and borderRadius', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'rotate', autoStart: false }))
+    expect(result.current.style.borderRadius).toBe('50%')
+  })
+
+  it('pulse type: style has backgroundColor and borderRadius', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'pulse', autoStart: false }))
+    expect(result.current.style.borderRadius).toBe('50%')
+    expect(result.current.style.backgroundColor).toBe('#3b82f6')
+  })
+
+  it('bounce type: style has backgroundColor', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'bounce', autoStart: false }))
+    expect(result.current.style.backgroundColor).toBe('#3b82f6')
+  })
+
+  it('wave type: style has display flex', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'wave', autoStart: false }))
+    expect(result.current.style.display).toBe('flex')
+  })
+
+  it('dots type: style has display flex', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'dots', autoStart: false }))
+    expect(result.current.style.display).toBe('flex')
+  })
+
+  it('bars type: style has display flex', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'bars', autoStart: false }))
+    expect(result.current.style.display).toBe('flex')
+  })
+
+  it('custom color reflected in rotate style', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'rotate', color: '#ff0000', autoStart: false }))
+    expect(result.current.style.borderTop).toContain('#ff0000')
+  })
+
+  it('custom thickness reflected in style', () => {
+    const { result } = renderHook(() => useLoadingSpinner({ type: 'rotate', thickness: 8, autoStart: false }))
+    expect(result.current.style.borderTop).toContain('8px')
   })
 })
 
@@ -253,6 +354,66 @@ describe('useNavigation', () => {
     expect(result.current.isVisible).toBe(false)
     expect(result.current.progress).toBe(0)
   })
+
+  it('onStart callback called on openMenu', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useNavigation({ onStart }))
+    act(() => { result.current.openMenu() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('onStop callback called on stop', () => {
+    const onStop = vi.fn()
+    const { result } = renderHook(() => useNavigation({ onStop }))
+    act(() => { result.current.stop() })
+    expect(onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('onReset callback called on reset', () => {
+    const onReset = vi.fn()
+    const { result } = renderHook(() => useNavigation({ onReset }))
+    act(() => { result.current.reset() })
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('openMenu twice does not restart if already open', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useNavigation({ onStart }))
+    act(() => { result.current.openMenu() })
+    act(() => { result.current.openMenu() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('closeMenu when not open does nothing', () => {
+    const { result } = renderHook(() => useNavigation())
+    act(() => { result.current.closeMenu() })
+    expect(result.current.isOpen).toBe(false)
+  })
+
+  it('setActiveItem with out-of-bounds index does nothing', () => {
+    const { result } = renderHook(() => useNavigation({ itemCount: 3 }))
+    act(() => { result.current.setActiveItem(5) })
+    expect(result.current.activeIndex).toBe(0) // unchanged
+  })
+
+  it('setActiveItem with negative index does nothing', () => {
+    const { result } = renderHook(() => useNavigation({ itemCount: 3 }))
+    act(() => { result.current.setActiveItem(-1) })
+    expect(result.current.activeIndex).toBe(0) // unchanged
+  })
+
+  it('rotate type: style has rotate transform when closed', () => {
+    const { result } = renderHook(() => useNavigation({ type: 'rotate' }))
+    expect(result.current.style.transform).toBe('rotate(180deg)')
+  })
+
+  it('custom staggerDelay affects item transition', () => {
+    const { result } = renderHook(() => useNavigation({ staggerDelay: 100, itemCount: 3 }))
+    act(() => { result.current.openMenu() })
+    // Each item should have different transition delay
+    const delays = result.current.itemStyles.map(s => s.transition)
+    expect(delays[0]).not.toBe(delays[1])
+  })
 })
 
 // ========================================
@@ -315,5 +476,62 @@ describe('useSkeleton', () => {
     expect(result.current.isVisible).toBe(false)
     expect(result.current.isAnimating).toBe(false)
     expect(result.current.progress).toBe(0)
+  })
+
+  it('onStart callback called on start', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useSkeleton({ autoStart: false, onStart }))
+    act(() => { result.current.start() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('onStop callback called on stop', () => {
+    const onStop = vi.fn()
+    const { result } = renderHook(() => useSkeleton({ autoStart: false, onStop }))
+    act(() => { result.current.start() })
+    act(() => { result.current.stop() })
+    expect(onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('onReset callback called on reset', () => {
+    const onReset = vi.fn()
+    const { result } = renderHook(() => useSkeleton({ autoStart: false, onReset }))
+    act(() => { result.current.start() })
+    act(() => { result.current.reset() })
+    expect(onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('start twice does not restart if already animating', () => {
+    const onStart = vi.fn()
+    const { result } = renderHook(() => useSkeleton({ autoStart: false, onStart }))
+    act(() => { result.current.start() })
+    act(() => { result.current.start() })
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
+
+  it('default wave=true sets background gradient when animating', () => {
+    const { result } = renderHook(() => useSkeleton({ autoStart: true, wave: true }))
+    expect(result.current.style.background).toContain('linear-gradient')
+  })
+
+  it('pulse=true sets animation when animating', () => {
+    const { result } = renderHook(() => useSkeleton({ autoStart: true, wave: false, pulse: true }))
+    expect(result.current.style.animation).toContain('skeleton-pulse')
+  })
+
+  it('style has position relative and overflow hidden', () => {
+    const { result } = renderHook(() => useSkeleton({ autoStart: false }))
+    expect(result.current.style.position).toBe('relative')
+    expect(result.current.style.overflow).toBe('hidden')
+  })
+
+  it('default height is 20px', () => {
+    const { result } = renderHook(() => useSkeleton({ autoStart: false }))
+    expect(result.current.style.height).toBe('20px')
+  })
+
+  it('default width is 100%', () => {
+    const { result } = renderHook(() => useSkeleton({ autoStart: false }))
+    expect(result.current.style.width).toBe('100%')
   })
 })
