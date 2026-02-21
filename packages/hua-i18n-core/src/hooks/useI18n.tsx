@@ -15,16 +15,42 @@ import { getDefaultTranslations } from '../utils/default-translations';
 const I18nContext = createContext<I18nContextType | null>(null);
 
 /**
+ * 초기 언어를 결정하는 헬퍼 함수
+ * 우선순위: config.defaultLanguage > navigator.language 매칭 > supportedLanguages[0]
+ * config.defaultLanguage가 명시적으로 제공되지 않은 경우에만 navigator.language 감지 동작
+ */
+function resolveInitialLanguage(
+  config: I18nConfig & { autoLanguageSync?: boolean }
+): string {
+  // 1. config.defaultLanguage가 명시적으로 제공된 경우 우선 사용
+  if (config.defaultLanguage) {
+    return config.defaultLanguage;
+  }
+
+  // 2. navigator.language 매칭 (SSR 환경에서는 navigator가 없으므로 체크 필요)
+  if (typeof window !== 'undefined' && navigator?.language) {
+    const browserLang = navigator.language.slice(0, 2).toLowerCase();
+    const supportedCodes = config.supportedLanguages?.map(l => l.code) ?? [];
+    if (supportedCodes.includes(browserLang)) {
+      return browserLang;
+    }
+  }
+
+  // 3. 첫 번째 지원 언어로 폴백
+  return config.supportedLanguages?.[0]?.code ?? 'ko';
+}
+
+/**
  * I18n Provider 컴포넌트
  */
-export function I18nProvider({ 
-  config, 
-  children 
-}: { 
-  config: I18nConfig & { autoLanguageSync?: boolean }; 
-  children: React.ReactNode; 
+export function I18nProvider({
+  config,
+  children
+}: {
+  config: I18nConfig & { autoLanguageSync?: boolean };
+  children: React.ReactNode;
 }) {
-  const [currentLanguage, setCurrentLanguageState] = useState(config.defaultLanguage);
+  const [currentLanguage, setCurrentLanguageState] = useState(() => resolveInitialLanguage(config));
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<TranslationError | null>(null);
@@ -524,8 +550,7 @@ export function I18nProvider({
     supportedLanguages: config.supportedLanguages,
     debug,
     isInitialized,
-    translationVersion,
-  }), [currentLanguage, setLanguage, t, tPlural, tArray, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized, translationVersion]);
+  }), [currentLanguage, setLanguage, t, tPlural, tArray, tAsync, tSync, getRawValue, isLoading, error, config.supportedLanguages, debug, isInitialized]);
 
   return (
     <I18nContext.Provider value={value}>
