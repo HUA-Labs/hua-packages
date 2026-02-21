@@ -201,7 +201,10 @@ export function flushRAF() {
 }
 
 // ─── Cleanup between tests ───
+import { _resetObserverPool } from '../utils/sharedIntersectionObserver'
+
 afterEach(() => {
+  _resetObserverPool()
   intersectionObserverInstances.length = 0
   rafCallbacks.clear()
   rafId = 0
