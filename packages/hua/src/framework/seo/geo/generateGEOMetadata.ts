@@ -68,11 +68,11 @@ const log = createLogger('hua:seo:geo');
  *     'privacy',
  *   ],
  *   codeRepository: 'https://github.com/hua-labs/hua',
- *   documentationUrl: 'https://github.com/HUA-Labs/HUA-Labs-public', // TODO: Update when domain is available
+ *   documentationUrl: 'https://docs.hua-labs.dev',
  *   license: 'MIT',
  *   author: {
  *     name: 'hua-labs',
- *     url: 'https://github.com/HUA-Labs/HUA-Labs-public', // TODO: Update when domain is available
+ *     url: 'https://hua-labs.dev',
  *   },
  * });
  * ```
