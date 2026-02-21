@@ -1,0 +1,260 @@
+---
+title: Icon Names & Aliases
+description: AllIconName type, categorized icon list, alias system, normalizeIconName
+category: icon-system
+related:
+  - ./01-overview.mdx
+  - ./03-icon-provider-config.mdx
+  - ./04-special-icons.mdx
+---
+
+# Icon Names & Aliases
+
+## Type System
+
+```typescript
+// 96 statically imported icons
+type IconName = keyof typeof icons
+// e.g.: 'home' | 'arrowLeft' | 'settings' | 'user' | ...
+
+// 125 provider-mapped icons (PROJECT_ICONS keys)
+type ProjectIconName = keyof typeof PROJECT_ICONS
+
+// Full icon name = IconName + ProjectIconName
+type AllIconName = IconName | ProjectIconName
+```
+
+## Icons by Category
+
+### Navigation (13)
+`home`, `arrowLeft`, `arrowRight`, `arrowUp`, `arrowDown`, `menu`, `close`, `search`, `settings`, `externalLink`, `chevronLeft`, `chevronRight`, `chevronDown`, `chevronUp`
+
+### Actions (9)
+`edit`, `delete`, `add`, `remove`, `download`, `upload`, `refresh`, `save`, `copy`
+
+### Status (9)
+`loader`, `success`, `error`, `alertCircle`, `warning`, `info`, `check`, `circle`, `helpCircle`
+
+### User (7)
+`user`, `users`, `userPlus`, `logIn`, `logOut`, `eye`, `eyeOff`
+
+### Data (6)
+`chart`, `barChart`, `trendingUp`, `activity`, `database`, `zap`
+
+### Files (5)
+`fileText`, `file`, `folder`, `book`, `bookOpen`
+
+### Communication (3)
+`mail`, `message`, `phone`
+
+### Media (3)
+`image`, `video`, `camera`
+
+### Emotions (3)
+`smile`, `frown`, `meh`
+
+### Security (5)
+`lock`, `unlock`, `shield`, `wallet`, `key`
+
+### Time (3)
+`clock`, `calendar`, `calendarPlus`
+
+### UI (5)
+`bell`, `heart`, `star`, `bookmark`, `share`
+
+### Theme (3)
+`monitor`, `sun`, `moon`
+
+### Additional
+`lightbulb`, `brain`, `flag`, `square`, `sparkle`, `sparkles`, `globe`, `smartphone`, `deviceMobile`, `floppyDisk`, `ticket`, `clipboard`, `wifi`, `wifiOff`, `cpu`, `mask`, `rocket`
+
+### Markdown
+`bold`, `italic`, `strikethrough`, `heading`, `link`, `code`, `fileCode`, `quote`, `list`, `listOrdered`, `minus`
+
+## Alias System
+
+174 aliases are defined. Useful when AI agents look up icons by natural language.
+
+### Key Alias Mappings
+
+**Navigation:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `back`, `prev`, `previous` | `arrowLeft` |
+| `forward`, `next` | `arrowRight` |
+| `up` | `arrowUp` |
+| `down` | `arrowDown` |
+| `cancel`, `x` | `close` |
+
+**Actions:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `trash`, `remove` | `delete` |
+| `plus`, `create`, `new` | `add` |
+| `pencil`, `write`, `modify` | `edit` |
+| `done`, `complete`, `tick` | `check` |
+| `duplicate`, `clone` | `copy` |
+
+**User:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `person`, `account`, `profile` | `user` |
+| `people`, `group`, `team` | `users` |
+| `signin` | `logIn` |
+| `signout` | `logOut` |
+
+**Status:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `spinner`, `loading`, `wait` | `loader` |
+| `danger`, `critical`, `alert` | `error` |
+| `caution`, `attention` | `warning` |
+| `help`, `question` | `helpCircle` |
+
+**Security:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `show`, `view`, `visible` | `eye` |
+| `hide`, `hidden`, `invisible` | `eyeOff` |
+| `secure`, `locked` | `lock` |
+| `unsecure`, `unlocked` | `unlock` |
+
+**Theme:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `light`, `day` | `sun` |
+| `dark`, `night` | `moon` |
+| `desktop`, `computer` | `monitor` |
+
+**AI/Data:**
+| Alias | → Canonical Name |
+|-------|-----------------|
+| `ai`, `intelligence`, `think` | `brain` |
+| `idea`, `bulb`, `hint` | `lightbulb` |
+| `flash`, `bolt`, `electricity` | `zap` |
+| `launch`, `deploy` | `rocket` |
+
+**kebab-case → camelCase:**
+All canonical names are camelCase, but kebab-case aliases are also supported:
+- `arrow-left` → `arrowLeft`
+- `chevron-right` → `chevronRight`
+- `file-text` → `fileText`
+- `bar-chart` → `barChart`
+
+## normalizeIconName
+
+Utility for normalizing icon names:
+
+```typescript
+function normalizeIconName(iconName: string): NormalizeResult
+
+interface NormalizeResult {
+  normalized: string     // camelCase canonical name
+  wasAlias: boolean      // whether it was an alias
+  originalAlias?: string // original alias (if it was an alias)
+}
+```
+
+**Conversion rules:**
+1. Look up alias in `ICON_ALIASES`
+2. kebab-case → camelCase
+3. snake_case → camelCase
+4. PascalCase → camelCase
+
+```typescript
+normalizeIconName('back')
+// { normalized: 'arrowLeft', wasAlias: true, originalAlias: 'back' }
+
+normalizeIconName('arrow-left')
+// { normalized: 'arrowLeft', wasAlias: true, originalAlias: 'arrow-left' }
+
+normalizeIconName('ArrowLeft')
+// { normalized: 'arrowLeft', wasAlias: false }
+
+normalizeIconName('arrowLeft')
+// { normalized: 'arrowLeft', wasAlias: false }
+```
+
+## Per-Provider Name Mapping (PROJECT_ICONS)
+
+125 canonical icons are mapped to each provider's actual component name:
+
+```typescript
+const PROJECT_ICONS = {
+  'home':        { lucide: 'Home',        phosphor: 'House',       iconsax: 'Home2' },
+  'arrowLeft':   { lucide: 'ArrowLeft',   phosphor: 'ArrowLeft',   iconsax: 'ArrowLeft' },
+  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft',   iconsax: 'ArrowLeft2' },
+  'search':      { lucide: 'Search',      phosphor: 'MagnifyingGlass', iconsax: 'SearchNormal1' },
+  'settings':    { lucide: 'Settings',    phosphor: 'GearSix',     iconsax: 'Setting2' },
+  'user':        { lucide: 'User',        phosphor: 'User',        iconsax: 'User' },
+  'delete':      { lucide: 'Trash2',      phosphor: 'Trash',       iconsax: 'Trash' },
+  'loader':      { lucide: 'Loader2',     phosphor: 'Spinner' },
+  // ... 117 more
+}
+```
+
+> **Important**: Even for the same canonical name, the actual name differs across providers. When you use `<Icon name="home" />`, the system automatically resolves the correct provider-specific name.
+
+## getProviderIconName
+
+Converts a normalized name to the provider's PascalCase name:
+
+```typescript
+function getProviderIconName(normalizedName: string, provider: IconSet): string
+
+getProviderIconName('arrowLeft', 'phosphor')  // 'ArrowLeft'
+getProviderIconName('home', 'phosphor')       // 'House'
+getProviderIconName('home', 'lucide')         // 'Home'
+```
+
+## Alias Utilities
+
+```typescript
+// alias → canonical name
+resolveIconAlias('back')        // 'arrowLeft'
+resolveIconAlias('arrowLeft')   // 'arrowLeft' (returned as-is if not an alias)
+
+// canonical name → all matching aliases
+getIconAliases('arrowLeft')     // ['back', 'prev', 'previous', 'arrow-left']
+```
+
+## Examples
+
+### 1. Finding icons by natural language
+
+```tsx
+// Any of these will render the same icon:
+<Icon name="back" />
+<Icon name="prev" />
+<Icon name="previous" />
+<Icon name="arrowLeft" />
+<Icon name="arrow-left" />
+```
+
+### 2. Programmatic icon name usage
+
+```tsx
+const iconName = normalizeIconName(userInput).normalized
+<Icon name={iconName as AllIconName} />
+```
+
+### 3. Rendering icons by category
+
+```tsx
+import { iconCategories } from '@hua-labs/ui'
+
+// iconCategories = { navigation: ['home', 'arrowLeft', ...], actions: [...], ... }
+Object.entries(iconCategories).map(([category, icons]) => (
+  <div key={category}>
+    <h3>{category}</h3>
+    {icons.map(name => <Icon key={name} name={name} />)}
+  </div>
+))
+```
+
+## Constraints & Gotchas
+
+- The `AllIconName` type is the union of 96 statically imported icons + 125 PROJECT_ICONS keys. Iconsax-only icon names may not be included in this type.
+- Aliases are case-insensitive, but canonical names are always camelCase.
+- `normalizeIconName` is a synchronous function. It is safe to use in real-time search/filtering.
+- Icons not found in PROJECT_ICONS are looked up directly from the provider's lazy-load namespace. In this case, the canonical name is converted to PascalCase for the lookup.
