@@ -16,7 +16,6 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "create-hua",
-    "@hua-labs/encryption",
     "@hua-labs/security",
     "@hua-labs/docs-engine",
     "@hua-labs/ui-dashboard",

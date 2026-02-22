@@ -25,7 +25,9 @@ function defineConfig(config: Partial<HuaConfig>): HuaConfig
 4. Run `validateConfig()`
 5. Initialize license (`initLicense`)
 6. Initialize plugins (`registerPlugin` + `plugin.init()`)
-7. Cache the result
+7. Return the validated config (stateless — does not cache)
+
+> **Note**: `defineConfig` is stateless and does not cache. Only `getConfig()` caches. Assign the return value to a variable and pass it to `HuaProvider` explicitly.
 
 ```typescript
 // hua.config.ts
@@ -138,8 +140,9 @@ afterEach(() => { resetConfig() })
 
 ## Constraints & Gotchas
 
-- Call `defineConfig` **once**. Multiple calls overwrite the cache with the last result.
-- Calling `getConfig()` without `defineConfig` returns product preset defaults — no error thrown.
+- `defineConfig` is stateless — it does not write to any cache. Assign the return value and pass it explicitly.
+- `getConfig()` is what caches. It returns the last value set via `setConfig()`, or falls back to product preset defaults.
+- Calling `getConfig()` without `setConfig` (or without `UnifiedProviders` which calls it internally) returns product preset defaults — no error thrown.
 - Without a `preset` field, product preset is applied by default.
 - Plugin `init()` runs synchronously inside `defineConfig`. Async init needs separate handling.
 - `setConfig` and `resetConfig` are for testing only. Runtime config changes after provider initialization won't take effect.
