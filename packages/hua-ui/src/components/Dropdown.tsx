@@ -14,7 +14,7 @@ import { merge } from "../lib/utils"
  * @property {"start" | "center" | "end"} [align="start"] - Dropdown 정렬 / Dropdown alignment
  * @property {number} [offset=8] - 트리거와 Dropdown 사이 간격 (px) / Spacing between trigger and dropdown (px)
  * @property {boolean} [disabled=false] - Dropdown 비활성화 여부 / Disable dropdown
- * @property {boolean} [showArrow=true] - 화살표 표시 여부 / Show arrow
+ * @property {boolean} [showArrow=false] - 화살표 표시 여부 / Show arrow
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
 export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -76,11 +76,10 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     align = "start",
     offset = 8,
     disabled = false,
-    showArrow = true,
+    showArrow = false,
     ...props 
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
-    const [coords, setCoords] = React.useState({ x: 0, y: 0 })
     const triggerRef = React.useRef<HTMLDivElement>(null)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
     const isControlled = controlledOpen !== undefined
@@ -98,85 +97,6 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     const handleTriggerClick = () => {
       handleOpenChange(!isOpen)
     }
-
-    const updatePosition = React.useCallback(() => {
-      if (!triggerRef.current || !dropdownRef.current) return
-
-      const triggerRect = triggerRef.current.getBoundingClientRect()
-      const dropdownRect = dropdownRef.current.getBoundingClientRect()
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      let x = 0
-      let y = 0
-
-      // 기본 위치 계산
-      switch (placement) {
-        case "top":
-          x = triggerRect.left
-          y = triggerRect.top - offset
-          break
-        case "bottom":
-          x = triggerRect.left
-          y = triggerRect.bottom + offset
-          break
-        case "left":
-          x = triggerRect.left - offset
-          y = triggerRect.top
-          break
-        case "right":
-          x = triggerRect.right + offset
-          y = triggerRect.top
-          break
-      }
-
-      // 정렬 조정
-      switch (align) {
-        case "center":
-          if (placement === "top" || placement === "bottom") {
-            x = triggerRect.left + triggerRect.width / 2 - dropdownRect.width / 2
-          } else {
-            y = triggerRect.top + triggerRect.height / 2 - dropdownRect.height / 2
-          }
-          break
-        case "end":
-          if (placement === "top" || placement === "bottom") {
-            x = triggerRect.right - dropdownRect.width
-          } else {
-            y = triggerRect.bottom - dropdownRect.height
-          }
-          break
-        case "start":
-        default:
-          // 기본값은 이미 start 정렬
-          break
-      }
-
-      // 뷰포트 경계 확인 및 조정
-      if (x < 8) x = 8 // 8px 여백
-      if (x + dropdownRect.width > viewportWidth - 8) {
-        x = viewportWidth - dropdownRect.width - 8 // 8px 여백
-      }
-      if (y < 8) y = 8 // 8px 여백
-      if (y + dropdownRect.height > viewportHeight - 8) {
-        y = viewportHeight - dropdownRect.height - 8 // 8px 여백
-      }
-
-      setCoords({ x, y })
-    }, [placement, align, offset])
-
-    React.useEffect(() => {
-      if (isOpen) {
-        updatePosition()
-        window.addEventListener('resize', updatePosition)
-        window.addEventListener('scroll', updatePosition)
-        
-        return () => {
-          window.removeEventListener('resize', updatePosition)
-          window.removeEventListener('scroll', updatePosition)
-        }
-      }
-    }, [isOpen, updatePosition])
 
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -201,30 +121,15 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     const getPlacementClasses = () => {
       switch (placement) {
         case "top":
-          return "bottom-full left-0 mb-2" // 8px 간격
+          return "bottom-full left-0 mb-1"
         case "bottom":
-          return "top-full left-0 mt-2" // 8px 간격
+          return "top-full left-0 mt-1"
         case "left":
-          return "right-full top-0 mr-2" // 8px 간격
+          return "right-full top-0 mr-1"
         case "right":
-          return "left-full top-0 ml-2" // 8px 간격
+          return "left-full top-0 ml-1"
         default:
-          return "top-full left-0 mt-2"
-      }
-    }
-
-    const getArrowClasses = () => {
-      switch (placement) {
-        case "top":
-          return "top-full left-4 -translate-x-1/2 border-t-gray-100 dark:border-t-gray-800"
-        case "bottom":
-          return "bottom-full left-4 -translate-x-1/2 border-b-gray-100 dark:border-b-gray-800"
-        case "left":
-          return "left-full top-4 -translate-y-1/2 border-l-gray-100 dark:border-l-gray-800"
-        case "right":
-          return "right-full top-4 -translate-y-1/2 border-r-gray-100 dark:border-r-gray-800"
-        default:
-          return "bottom-full left-4 -translate-x-1/2 border-b-gray-100 dark:border-b-gray-800"
+          return "top-full left-0 mt-1"
       }
     }
 
@@ -240,34 +145,16 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
         </div>
 
         {/* 드롭다운 */}
-        {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
         {isOpen && (
           <div
             ref={dropdownRef}
             className={merge(
-              "absolute z-50 bg-[var(--dropdown-bg)] rounded-lg shadow-xl backdrop-blur-sm",
-              "min-w-[200px] py-2",
+              "absolute z-50 bg-[var(--dropdown-bg)] rounded-lg shadow-lg border border-border",
+              "min-w-full w-max py-1",
               getPlacementClasses()
             )}
-            style={{
-              transform: `translate(${coords.x}px, ${coords.y}px)`,
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-            }}
           >
-            {/* 화살표 */}
-            {showArrow && (
-              <div
-                className={merge(
-                  "absolute w-0 h-0 border-4 border-transparent",
-                  getArrowClasses()
-                )}
-              />
-            )}
-            
-            {/* 내용 */}
-            <div className="relative z-10">
-              {children}
-            </div>
+            {children}
           </div>
         )}
       </div>
@@ -306,7 +193,7 @@ const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProps>(
       <button
         ref={ref}
         className={merge(
-          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-muted", // 16px, 12px 패딩
+          "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-muted",
           getVariantClasses(),
           className
         )}
