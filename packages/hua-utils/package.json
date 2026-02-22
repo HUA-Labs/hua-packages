@@ -25,7 +25,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "clsx": "^2.0.0",
+    "clsx": "^2.1.1",
     "tailwind-merge": "^3.4.1"
   },
   "devDependencies": {
