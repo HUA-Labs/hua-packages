@@ -48,15 +48,15 @@ hua is a **meta-framework** that unifies individual packages into a single integ
 
 ## Re-export Strategy
 
-The main entry (`@hua-labs/hua`) re-exports everything from all sub-packages:
+The main entry (`@hua-labs/hua`) uses **named exports** from all sub-packages. `export *` is avoided to prevent naming conflicts and Turbopack CJS warnings:
 
 ```typescript
-// Main index.ts structure
-export * from '@hua-labs/ui'
-export * from '@hua-labs/motion-core'
-export * from '@hua-labs/i18n-core'
-export * from '@hua-labs/i18n-core-zustand'
-export * from '@hua-labs/state'
+// Main index.ts structure — named exports only
+export { Button as UIButton, Action, Input, Modal, ... } from '@hua-labs/ui'
+export { useFadeIn, useSlideUp, useScrollReveal, Motion, ... } from '@hua-labs/motion-core'
+export { createCoreI18n, useTranslation, I18nProvider, ... } from '@hua-labs/i18n-core'
+export { createZustandI18n, useZustandI18n, ... } from '@hua-labs/i18n-core-zustand'
+export { createHuaStore, createI18nStore, ... } from '@hua-labs/state'
 // ... other packages
 ```
 

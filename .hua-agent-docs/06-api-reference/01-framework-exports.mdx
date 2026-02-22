@@ -94,10 +94,12 @@ related:
 | Export | Description |
 |--------|------|
 | `useMotion` | Unified motion hook (motion-core wrapper) |
+| `useUnifiedMotion` | Alias for `useMotion` |
 | `useFadeIn` | Fade-in motion |
 | `useSlideUp` | Slide-up motion |
 | `useSlideLeft` | Slide-left motion |
 | `useSlideRight` | Slide-right motion |
+| `useSlideDown` | Slide-down motion |
 | `useScaleIn` | Scale-in motion |
 | `useBounceIn` | Bounce-in motion |
 | `usePulse` | Pulse motion |
@@ -129,31 +131,33 @@ related:
 | `HuaProviderProps` | HuaProvider props type |
 | `HuaPageProps` | HuaPage props type |
 | `LicenseInfo` | License info type |
+| `LicenseType` | License type |
+| `LicenseFeature` | License feature type |
+| `LicenseCheckResult` | License check result type |
 | `HuaPlugin` | Plugin interface |
 | `GEOConfig` | GEO config type |
+| `GEOMetadata` | GEO metadata output type |
+| `StructuredData` | Schema.org structured data type |
+| `SoftwareApplicationType` | `'WebApplication' \| 'MobileApplication' \| ...` |
+| `SoftwareCategory` | Software category enum type |
+| `ProgrammingLanguage` | Programming language enum type |
 | `SEOConfig` | SEO config type |
+| `I18nMiddlewareConfig` | i18n middleware config type |
 
 ### GEO
+
+> Note: Only the functions listed here are exported from `framework/shared`. Functions like `metaToObject`, `openGraphToObject`, `generateCodeLD`, `generateVideoLD`, `generateOrganizationLD`, `validateJsonLd`, `formatValidationResult`, and `GEO_PRESETS` are available in the internal `geo/index.ts` but are NOT re-exported from `framework/shared`.
 
 | Export | Description |
 |--------|------|
 | `generateGEOMetadata` | Generate AI search optimization metadata |
-| `metaToObject` | Convert meta array to object |
-| `openGraphToObject` | Convert OG array to object |
 | `renderJSONLD` | Render JSON-LD (XSS safe) |
 | `createAIContext` | Generate AI context string |
 | `generateSoftwareApplicationLD` | SoftwareApplication JSON-LD |
 | `generateFAQPageLD` | FAQ page JSON-LD |
-| `generateHowToLD` | HowTo JSON-LD |
-| `generateCodeLD` | Code JSON-LD |
 | `generateTechArticleLD` | TechArticle JSON-LD |
-| `generateVideoLD` | Video JSON-LD |
-| `generateOrganizationLD` | Organization JSON-LD |
-| `validateJsonLd` | Validate JSON-LD |
-| `validateGEOMetadata` | Validate GEO metadata array |
-| `formatValidationResult` | Format validation result |
-| `GEO_PRESETS` | GEO preset constants |
-| `generatePageMetadata` | Generate page metadata |
+| `generateHowToLD` | HowTo JSON-LD |
+| `generatePageMetadata` | Generate Next.js page metadata |
 
 ### Branding Utilities
 
