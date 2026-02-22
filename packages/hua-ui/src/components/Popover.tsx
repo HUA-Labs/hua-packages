@@ -182,6 +182,8 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
           ref={triggerRef}
           onClick={handleTriggerClick}
           className={merge(fullWidth ? "block w-full" : "inline-block", "cursor-pointer")}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
         >
           {trigger}
         </div>
@@ -190,6 +192,7 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
         {isOpen && (
           <div
             ref={popoverRef}
+            role="dialog"
             className={merge(
               "bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-4 min-w-[200px]",
               getPositionClasses(),
