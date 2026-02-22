@@ -5,8 +5,7 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*",
-    "tools/*"
+    "packages/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
@@ -18,10 +17,6 @@
     "clean": "turbo run clean",
     "generate:pr": "tsx scripts/generate-pr.ts",
     "generate:devlog": "tsx scripts/generate-devlog.ts",
-    "generate:ai-context": "tsx scripts/generate-ai-context.ts",
-    "generate:review-checklist": "tsx scripts/generate-review-checklist.ts",
-    "update:docs": "tsx scripts/update-docs.ts",
-    "update:docs:check": "tsx scripts/update-docs.ts --check-only",
     "generate:docs": "tsx scripts/generate-docs.ts",
     "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
     "changeset": "changeset",
@@ -56,7 +51,8 @@
     "typescript-eslint": "^8.56.0",
     "vitest": "^4.0.18",
     "yaml": "^2.8.2",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "pnpm": "^10.29.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -74,7 +70,6 @@
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "2.1.44",
-    "pnpm": "^10.29.3",
     "pretendard": "^1.3.9"
   },
   "pnpm": {
