@@ -111,7 +111,9 @@ function generateTypeFile(namespaces: Record<string, NamespaceKeys>): string {
   let interfaceBody = '';
   for (const ns of nsNames) {
     const { strings, arrays, plurals } = namespaces[ns];
-    interfaceBody += `  ${ns}: {\n`;
+    // 하이픈 포함 시 따옴표 필요 (e.g., 'docs-cards')
+    const nsKey = /[^a-zA-Z0-9_$]/.test(ns) ? `'${ns}'` : ns;
+    interfaceBody += `  ${nsKey}: {\n`;
     interfaceBody += `    strings: ${buildUnion(strings)};\n`;
     interfaceBody += `    arrays: ${buildUnion(arrays)};\n`;
     interfaceBody += `    plurals: ${buildUnion(plurals)};\n`;
