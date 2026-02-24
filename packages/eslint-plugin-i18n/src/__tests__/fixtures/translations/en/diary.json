@@ -1,0 +1,10 @@
+{
+  "title": "Today's Diary",
+  "save_button": "Save",
+  "mood": {
+    "happy": "Happy",
+    "sad": "Sad",
+    "angry": "Angry"
+  },
+  "placeholder": "How was your day?"
+}

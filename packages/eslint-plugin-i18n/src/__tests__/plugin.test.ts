@@ -8,7 +8,7 @@ describe('eslint-plugin-i18n', () => {
   it('should export plugin with all rules', () => {
     expect(plugin).toBeDefined();
     expect(plugin.rules).toBeDefined();
-    expect(Object.keys(plugin.rules)).toHaveLength(4);
+    expect(Object.keys(plugin.rules)).toHaveLength(6);
   });
 
   it('should export no-missing-key rule', () => {
@@ -39,6 +39,21 @@ describe('eslint-plugin-i18n', () => {
     expect(plugin.rules['no-unused-key']!.create).toBeTypeOf('function');
   });
 
+  it('should export no-unlocalized-field rule', () => {
+    expect(plugin.rules['no-unlocalized-field']).toBeDefined();
+    expect(plugin.rules['no-unlocalized-field']!.meta).toBeDefined();
+    expect(plugin.rules['no-unlocalized-field']!.meta!.type).toBe('suggestion');
+    expect(plugin.rules['no-unlocalized-field']!.create).toBeTypeOf('function');
+  });
+
+  it('should export prefer-common-key rule', () => {
+    expect(plugin.rules['prefer-common-key']).toBeDefined();
+    expect(plugin.rules['prefer-common-key']!.meta).toBeDefined();
+    expect(plugin.rules['prefer-common-key']!.meta!.type).toBe('suggestion');
+    expect(plugin.rules['prefer-common-key']!.meta!.hasSuggestions).toBe(true);
+    expect(plugin.rules['prefer-common-key']!.create).toBeTypeOf('function');
+  });
+
   it('should export recommended config', () => {
     expect(plugin.configs).toBeDefined();
     expect(plugin.configs.recommended).toBeDefined();
@@ -51,6 +66,8 @@ describe('eslint-plugin-i18n', () => {
     expect(recommended.rules['@hua-labs/i18n/no-raw-text']).toBe('warn');
     expect(recommended.rules['@hua-labs/i18n/no-dynamic-key']).toBe('warn');
     expect(recommended.rules['@hua-labs/i18n/no-unused-key']).toBe('off');
+    expect(recommended.rules['@hua-labs/i18n/no-unlocalized-field']).toBe('off');
+    expect(recommended.rules['@hua-labs/i18n/prefer-common-key']).toBe('off');
   });
 
   it('should have proper rule meta schemas', () => {
@@ -73,5 +90,13 @@ describe('eslint-plugin-i18n', () => {
     expect(missingKeySchema).toBeDefined();
     expect(Array.isArray(missingKeySchema)).toBe(true);
     expect((missingKeySchema as any)[0].properties).toHaveProperty('keysFile');
+
+    // no-unlocalized-field schema
+    const unlocalizedFieldSchema = plugin.rules['no-unlocalized-field']!.meta!.schema;
+    expect(unlocalizedFieldSchema).toBeDefined();
+    expect(Array.isArray(unlocalizedFieldSchema)).toBe(true);
+    expect((unlocalizedFieldSchema as any)[0].properties).toHaveProperty('fields');
+    expect((unlocalizedFieldSchema as any)[0].properties).toHaveProperty('pattern');
+    expect((unlocalizedFieldSchema as any)[0].properties).toHaveProperty('ignoreParentProperties');
   });
 });
