@@ -8,5 +8,7 @@ export const recommended = {
     '@hua-labs/i18n/no-raw-text': 'warn',
     '@hua-labs/i18n/no-dynamic-key': 'warn',
     '@hua-labs/i18n/no-unused-key': 'off',
+    '@hua-labs/i18n/no-unlocalized-field': 'off',
+    '@hua-labs/i18n/prefer-common-key': 'off',
   },
 };

@@ -5,6 +5,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "i18n-lint": "./dist/cli/index.js"
+  },
   "files": [
     "dist"
   ],

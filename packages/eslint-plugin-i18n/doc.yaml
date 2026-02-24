@@ -1,13 +1,16 @@
-overview: "ESLint plugin for i18n type safety — catch missing keys, hardcoded text, and dynamic key patterns at lint time."
+overview: "ESLint plugin for i18n type safety — catch missing keys (with did-you-mean), hardcoded text (with key suggestions), dynamic key patterns, unlocalized fields, and common key consolidation. Includes i18n-lint CLI for project-wide analysis."
 
 features:
-  - "no-missing-key — Detect t() keys not found in generated types"
-  - "no-raw-text — Catch CJK hardcoded text in JSX (Korean, Japanese, Chinese)"
+  - "no-missing-key — Detect t() keys not found in generated types + did-you-mean suggestions (up to 3)"
+  - "no-raw-text — Catch CJK hardcoded text in JSX + reverse-lookup key suggestions via translationsDir + ignorePattern"
   - "no-dynamic-key — Warn on non-literal arguments to t() / tArray()"
-  - "no-unused-key — Placeholder rule for unused translation key detection"
+  - "no-unlocalized-field — Detect description/label/value fields with literal strings instead of i18n keys"
+  - "prefer-common-key — Suggest common namespace keys when same value exists there"
+  - "no-unused-key — Placeholder rule for unused translation key detection (CLI recommended)"
+  - "i18n-lint CLI — unused-keys, common-report, missing-translations commands"
 
 quickStart: |
-  // eslint.config.js (flat config)
+  // eslint.config.mjs (flat config)
   import i18nPlugin from '@hua-labs/eslint-plugin-i18n';
 
   export default [
@@ -15,12 +18,26 @@ quickStart: |
       plugins: { i18n: i18nPlugin },
       rules: {
         'i18n/no-missing-key': ['error', {
-          generatedKeysPath: './types/i18n-types.generated.ts'
+          keysFile: './types/i18n-types.generated.ts'
         }],
         'i18n/no-raw-text': ['warn', {
-          allowedTerms: ['HUA', 'Sum']
+          translationsDir: './lib/translations',
         }],
         'i18n/no-dynamic-key': 'warn',
+        'i18n/prefer-common-key': ['warn', {
+          translationsDir: './lib/translations',
+        }],
+      },
+    },
+    // Metadata files — ensure description/label/value use i18n keys
+    {
+      files: ['registry/**/*.ts'],
+      plugins: { i18n: i18nPlugin },
+      rules: {
+        'i18n/no-unlocalized-field': ['warn', {
+          fields: ['description', 'label', 'value'],
+          ignoreParentProperties: ['codeExamples'],
+        }],
       },
     },
   ];
@@ -29,3 +46,4 @@ codeBlockLang: js
 
 related:
   - "i18n-core"
+  - "i18n-core-zustand"

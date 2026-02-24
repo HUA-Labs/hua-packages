@@ -1,0 +1,15 @@
+{
+  "welcome": "환영합니다",
+  "goodbye": "안녕히 가세요",
+  "actions": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "confirm": "확인"
+  },
+  "labels": {
+    "name": "이름",
+    "email": "이메일"
+  }
+}

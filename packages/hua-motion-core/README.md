@@ -1,6 +1,6 @@
 # @hua-labs/motion-core
 
-A collection of 40+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible.
+A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
@@ -10,7 +10,7 @@ A collection of 40+ React animation hooks built on a ref-based engine. Direct DO
 
 ## Features
 
-- **40+ animation hooks — Fade, slide, scale, scroll, interactions, gestures**
+- **35+ animation hooks — Fade, slide, scale, scroll, interactions, gestures**
 - **Zero dependencies — Pure JavaScript motion engine**
 - **Ref-based — Direct DOM manipulation for consistent performance**
 - **SSR compatible — Works with Next.js, Remix, and SSR frameworks**
@@ -75,13 +75,6 @@ function Hero() {
 | `useWindowSize` | hook | Responsive window size tracking |
 | `useGesture` | hook | Multi-gesture handler (drag, swipe, pinch) |
 | `useGestureMotion` | hook | Gesture-driven motion animation |
-| `useButtonEffect` | hook | Button press/hover effects (scale, ripple, glow, shake, bounce, slide) |
-| `useVisibilityToggle` | hook | Explicit show/hide/toggle visibility control |
-| `useScrollToggle` | hook | Scroll direction-based show/hide toggle |
-| `useCardList` | hook | Card grid stagger entrance animation |
-| `useLoadingSpinner` | hook | Loading spinner with 6 animation types |
-| `useNavigation` | hook | Navigation menu stagger + active item management |
-| `useSkeleton` | hook | Skeleton loading placeholder (wave/pulse) |
 | `easeInOut` | function | Smooth ease-in-out curve |
 | `getEasing` | function | Get easing function by name |
 

@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 // Test the regex patterns directly
 describe('no-raw-text patterns', () => {
   const CJK_PATTERN = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF\u3400-\u4DBF]/;
-  const DEFAULT_ALLOW_PATTERN = /^[\s\d\W]*$/;
+  const DEFAULT_ALLOW_PATTERN = /^[\s\d\p{P}\p{S}]*$/u;
 
   it('should match Korean text', () => {
     expect(CJK_PATTERN.test('안녕하세요')).toBe(true);
@@ -30,7 +30,19 @@ describe('no-raw-text patterns', () => {
     expect(DEFAULT_ALLOW_PATTERN.test('   ')).toBe(true);
   });
 
+  it('should allow symbols and punctuation', () => {
+    expect(DEFAULT_ALLOW_PATTERN.test('→')).toBe(true);
+    expect(DEFAULT_ALLOW_PATTERN.test('100%')).toBe(true);
+    expect(DEFAULT_ALLOW_PATTERN.test('$1,234.56')).toBe(true);
+  });
+
   it('should not allow text with letters', () => {
     expect(DEFAULT_ALLOW_PATTERN.test('Hello')).toBe(false);
+  });
+
+  it('should not allow CJK text (the old \\W bug)', () => {
+    expect(DEFAULT_ALLOW_PATTERN.test('한글')).toBe(false);
+    expect(DEFAULT_ALLOW_PATTERN.test('漢字')).toBe(false);
+    expect(DEFAULT_ALLOW_PATTERN.test('ひらがな')).toBe(false);
   });
 });

@@ -1,22 +1,23 @@
 "use client"
 
 import React from "react"
+import {
+  useFloating,
+  autoUpdate,
+  offset as offsetMiddleware,
+  flip,
+  shift,
+  arrow as arrowMiddleware,
+  useClick,
+  useDismiss,
+  useRole,
+  useInteractions,
+  FloatingPortal,
+  FloatingArrow,
+  type Placement,
+} from "@floating-ui/react"
 import { merge } from "../lib/utils"
 
-/**
- * Dropdown 컴포넌트의 props / Dropdown component props
- * @typedef {Object} DropdownProps
- * @property {React.ReactNode} trigger - Dropdown을 열기 위한 트리거 요소 / Trigger element to open dropdown
- * @property {React.ReactNode} children - Dropdown 내용 / Dropdown content
- * @property {boolean} [open] - 제어 모드에서 열림/닫힘 상태 / Open/close state in controlled mode
- * @property {(open: boolean) => void} [onOpenChange] - 상태 변경 콜백 / State change callback
- * @property {"top" | "bottom" | "left" | "right"} [placement="bottom"] - Dropdown 표시 위치 / Dropdown display position
- * @property {"start" | "center" | "end"} [align="start"] - Dropdown 정렬 / Dropdown alignment
- * @property {number} [offset=8] - 트리거와 Dropdown 사이 간격 (px) / Spacing between trigger and dropdown (px)
- * @property {boolean} [disabled=false] - Dropdown 비활성화 여부 / Disable dropdown
- * @property {boolean} [showArrow=false] - 화살표 표시 여부 / Show arrow
- * @extends {React.HTMLAttributes<HTMLDivElement>}
- */
 export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   trigger: React.ReactNode
   children: React.ReactNode
@@ -29,45 +30,19 @@ export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   showArrow?: boolean
 }
 
-/**
- * Dropdown 컴포넌트 / Dropdown component
- * 
- * 트리거 요소를 클릭하면 표시되는 드롭다운 메뉴 컴포넌트입니다.
- * 외부 클릭 시 자동으로 닫히며, 뷰포트 경계를 자동으로 감지하여 위치를 조정합니다.
- * 
- * Dropdown menu component that appears when the trigger element is clicked.
- * Automatically closes on outside click and adjusts position by detecting viewport boundaries.
- * 
- * @component
- * @example
- * // 기본 사용 / Basic usage
- * <Dropdown trigger={<Button>메뉴</Button>}>
- *   <Menu>
- *     <MenuItem>항목 1</MenuItem>
- *     <MenuItem>항목 2</MenuItem>
- *   </Menu>
- * </Dropdown>
- * 
- * @example
- * // 제어 모드, 화살표 없음 / Controlled mode, no arrow
- * const [open, setOpen] = useState(false)
- * <Dropdown 
- *   open={open}
- *   onOpenChange={setOpen}
- *   trigger={<Button>제어 모드</Button>}
- *   placement="top"
- *   showArrow={false}
- * >
- *   <div className="p-4">내용</div>
- * </Dropdown>
- * 
- * @param {DropdownProps} props - Dropdown 컴포넌트의 props / Dropdown component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} Dropdown 컴포넌트 / Dropdown component
- */
+function resolveFloatingPlacement(
+  placement: "top" | "bottom" | "left" | "right",
+  align: "start" | "center" | "end"
+): Placement {
+  if (align === "center") return placement
+  return `${placement}-${align}`
+}
+
+const ARROW_SIZE = 8
+
 const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
-  ({ 
-    className, 
+  ({
+    className,
     trigger,
     children,
     open: controlledOpen,
@@ -77,85 +52,86 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     offset = 8,
     disabled = false,
     showArrow = false,
-    ...props 
+    ...props
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
-    const triggerRef = React.useRef<HTMLDivElement>(null)
-    const dropdownRef = React.useRef<HTMLDivElement>(null)
+    const arrowRef = React.useRef<SVGSVGElement>(null)
+
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
 
     const handleOpenChange = React.useCallback((newOpen: boolean) => {
-      if (disabled) return
-
+      if (disabled && newOpen) return
       if (!isControlled) {
         setInternalOpen(newOpen)
       }
       onOpenChange?.(newOpen)
     }, [disabled, isControlled, onOpenChange])
 
-    const handleTriggerClick = () => {
-      handleOpenChange(!isOpen)
+    const floatingPlacement = resolveFloatingPlacement(placement, align)
+
+    const middleware = [
+      offsetMiddleware(offset),
+      flip(),
+      shift({ padding: 8 }),
+    ]
+    if (showArrow) {
+      middleware.push(arrowMiddleware({ element: arrowRef, padding: 8 }))
     }
 
-    React.useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          triggerRef.current &&
-          dropdownRef.current &&
-          !triggerRef.current.contains(event.target as Node) &&
-          !dropdownRef.current.contains(event.target as Node)
-        ) {
-          handleOpenChange(false)
-        }
-      }
+    const { refs, floatingStyles, context } = useFloating({
+      open: isOpen,
+      onOpenChange: handleOpenChange,
+      placement: floatingPlacement,
+      middleware,
+      whileElementsMounted: autoUpdate,
+    })
 
-      if (isOpen) {
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => {
-          document.removeEventListener('mousedown', handleClickOutside)
-        }
-      }
-    }, [isOpen, handleOpenChange])
+    const click = useClick(context)
+    const dismiss = useDismiss(context)
+    const role = useRole(context, { role: "menu" })
 
-    const getPlacementClasses = () => {
-      switch (placement) {
-        case "top":
-          return "bottom-full left-0 mb-1"
-        case "bottom":
-          return "top-full left-0 mt-1"
-        case "left":
-          return "right-full top-0 mr-1"
-        case "right":
-          return "left-full top-0 ml-1"
-        default:
-          return "top-full left-0 mt-1"
-      }
-    }
+    const { getReferenceProps, getFloatingProps } = useInteractions([
+      click,
+      dismiss,
+      role,
+    ])
 
     return (
-      <div ref={ref} className={merge("relative", className)} {...props}>
-        {/* 트리거 */}
+      <div ref={ref} className={merge("relative inline-block", className)} {...props}>
+        {/* Trigger */}
         <div
-          ref={triggerRef}
-          onClick={handleTriggerClick}
+          ref={refs.setReference}
           className="inline-block cursor-pointer"
+          {...getReferenceProps()}
         >
           {trigger}
         </div>
 
-        {/* 드롭다운 */}
+        {/* Dropdown via Portal */}
         {isOpen && (
-          <div
-            ref={dropdownRef}
-            className={merge(
-              "absolute z-50 bg-[var(--dropdown-bg)] rounded-lg shadow-lg border border-border",
-              "min-w-full w-max py-1",
-              getPlacementClasses()
-            )}
-          >
-            {children}
-          </div>
+          <FloatingPortal>
+            <div
+              ref={refs.setFloating}
+              style={floatingStyles}
+              className={merge(
+                "z-50 bg-[var(--dropdown-bg,_#fff)] dark:bg-[var(--dropdown-bg,_rgb(31,41,55))] rounded-lg shadow-lg border border-border",
+                "min-w-[var(--reference-width)] w-max py-1"
+              )}
+              {...getFloatingProps()}
+            >
+              {showArrow && (
+                <FloatingArrow
+                  ref={arrowRef}
+                  context={context}
+                  width={ARROW_SIZE * 2}
+                  height={ARROW_SIZE}
+                  className="fill-[var(--dropdown-bg,_#fff)] dark:fill-[var(--dropdown-bg,_rgb(31,41,55))] [&>path:first-of-type]:stroke-border"
+                />
+              )}
+              {children}
+            </div>
+          </FloatingPortal>
         )}
       </div>
     )
@@ -163,20 +139,20 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
 )
 Dropdown.displayName = "Dropdown"
 
-// 드롭다운 아이템 컴포넌트들
+// Sub-components (unchanged)
 export interface DropdownItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode
   variant?: "default" | "destructive" | "disabled"
 }
 
 const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProps>(
-  ({ 
-    className, 
+  ({
+    className,
     icon,
     variant = "default",
     children,
     disabled,
-    ...props 
+    ...props
   }, ref) => {
     const getVariantClasses = () => {
       switch (variant) {
@@ -218,7 +194,7 @@ const DropdownSeparator = React.forwardRef<HTMLDivElement, DropdownSeparatorProp
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("h-px bg-border my-2", className)} // 8px 여백
+      className={merge("h-px bg-border my-2", className)}
       {...props}
     />
   )
@@ -231,7 +207,7 @@ const DropdownLabel = React.forwardRef<HTMLDivElement, DropdownLabelProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide", className)} // 16px, 8px 패딩
+      className={merge("px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide", className)}
       {...props}
     >
       {children}
@@ -240,12 +216,11 @@ const DropdownLabel = React.forwardRef<HTMLDivElement, DropdownLabelProps>(
 )
 DropdownLabel.displayName = "DropdownLabel"
 
-// 편의 컴포넌트들
 const DropdownMenu = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("py-1", className)} // 4px 패딩
+      className={merge("py-1", className)}
       {...props}
     >
       {children}
@@ -258,7 +233,7 @@ const DropdownGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("space-y-1", className)} // 4px 간격
+      className={merge("space-y-1", className)}
       {...props}
     >
       {children}
@@ -267,4 +242,4 @@ const DropdownGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 )
 DropdownGroup.displayName = "DropdownGroup"
 
-export { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel, DropdownMenu, DropdownGroup } 
+export { Dropdown, DropdownItem, DropdownSeparator, DropdownLabel, DropdownMenu, DropdownGroup }

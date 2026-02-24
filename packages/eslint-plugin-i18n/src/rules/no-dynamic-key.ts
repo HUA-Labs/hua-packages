@@ -41,7 +41,14 @@ const rule: Rule.RuleModule = {
   create(context) {
     const options = context.options[0] || {};
     const functionNames = options.functionNames || ['t', 'tArray'];
-    const allowPatterns = (options.allowPatterns || []).map((p: string) => new RegExp(p));
+    const allowPatterns: RegExp[] = [];
+    for (const p of options.allowPatterns || []) {
+      try {
+        allowPatterns.push(new RegExp(p));
+      } catch {
+        // invalid regex pattern — silently skip
+      }
+    }
 
     function isAllowedTemplate(node: { type: string; quasis?: Array<{ value: { raw: string } }> }): boolean {
       if (node.type !== 'TemplateLiteral' || !node.quasis || allowPatterns.length === 0) {

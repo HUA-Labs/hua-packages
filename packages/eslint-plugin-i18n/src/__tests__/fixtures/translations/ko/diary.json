@@ -1,0 +1,10 @@
+{
+  "title": "오늘의 일기",
+  "save_button": "저장",
+  "mood": {
+    "happy": "행복",
+    "sad": "슬픔",
+    "angry": "분노"
+  },
+  "placeholder": "오늘 하루는 어땠나요?"
+}
