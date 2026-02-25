@@ -1,5 +1,11 @@
 # @hua-labs/i18n-core
 
+## 2.1.0
+
+### Minor Changes
+
+- Add browser locale auto-detection for automatic language matching
+
 ## 2.0.5
 
 ### Patch Changes

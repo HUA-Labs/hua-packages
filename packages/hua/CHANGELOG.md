@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Add CSS color validation utility, fix SEO hardcoding, ESM-only migration
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @hua-labs/ui@3.0.0
+  - @hua-labs/hooks@1.1.3
+  - @hua-labs/state@1.0.3
+  - @hua-labs/utils@1.1.3
+  - @hua-labs/i18n-core@2.1.0
+  - @hua-labs/motion-core@2.3.0
+  - @hua-labs/i18n-core-zustand@2.1.0
+  - @hua-labs/i18n-formatters@2.1.0
+  - @hua-labs/i18n-loaders@2.1.0
+
 ## 1.0.3
 
 ### Patch Changes
