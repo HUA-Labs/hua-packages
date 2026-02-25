@@ -1,5 +1,11 @@
 # @hua-labs/state
 
+## 1.0.3
+
+### Patch Changes
+
+- Maintenance: fix sanitize double-escape issue, framework rename cleanup, internal dependency updates
+
 ## 1.0.2
 
 ### Patch Changes

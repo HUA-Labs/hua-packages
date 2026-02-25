@@ -1,5 +1,11 @@
 # @hua-labs/motion-core
 
+## 2.3.0
+
+### Minor Changes
+
+- Batch IntersectionObserver instances via shared pool, export 7 previously hidden hooks, add motion profile system with hua/neutral presets, shared scroll listener with rAF batching
+
 ## 2.2.3
 
 ### Patch Changes
