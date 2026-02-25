@@ -69,3 +69,13 @@ export const TAILWIND_VERSION = '^4.1.13';
  * Phosphor Icons version
  */
 export const PHOSPHOR_ICONS_VERSION = '^2.1.10';
+
+/**
+ * clsx version (used in lib/utils.ts cn() helper)
+ */
+export const CLSX_VERSION = '^2.1.1';
+
+/**
+ * tailwind-merge version (used in lib/utils.ts cn() helper)
+ */
+export const TAILWIND_MERGE_VERSION = '^3.5.0';
