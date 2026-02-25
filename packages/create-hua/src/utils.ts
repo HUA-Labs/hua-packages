@@ -9,7 +9,7 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { HUA_VERSION } from './version';
+import { HUA_VERSION, UI_VERSION } from './version';
 import {
   MIN_NODE_VERSION,
   AI_CONTEXT_FILES,
@@ -45,6 +45,8 @@ import {
   POSTCSS_VERSION,
   TAILWIND_VERSION,
   PHOSPHOR_ICONS_VERSION,
+  CLSX_VERSION,
+  TAILWIND_MERGE_VERSION,
 } from './constants/versions';
 
 // Resolve template directory
@@ -274,6 +276,40 @@ function getHuaVersion(): string {
 }
 
 /**
+ * Get @hua-labs/ui version — mirrors getHuaVersion() logic
+ */
+function getUiVersion(): string {
+  if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
+    return 'workspace:*';
+  }
+
+  try {
+    const createHuaRoot = path.resolve(__dirname, '..');
+    const uiPackageJson = path.join(createHuaRoot, '../hua-ui/package.json');
+
+    if (fs.pathExistsSync(uiPackageJson)) {
+      const uiPackage = fs.readJSONSync(uiPackageJson);
+      if (uiPackage.version) {
+        let currentDir = process.cwd();
+        for (let i = 0; i < 10; i++) {
+          if (fs.pathExistsSync(path.join(currentDir, 'pnpm-workspace.yaml'))) {
+            return 'workspace:*';
+          }
+          const parentDir = path.dirname(currentDir);
+          if (parentDir === currentDir) break;
+          currentDir = parentDir;
+        }
+        return `^${uiPackage.version}`;
+      }
+    }
+  } catch {
+    // Cannot read sibling package, continue to fallback
+  }
+
+  return UI_VERSION;
+}
+
+/**
  * Detect monorepo context by looking for workspace markers in parent directories
  */
 async function detectMonorepoContext(projectPath: string): Promise<MonorepoContext> {
@@ -367,18 +403,21 @@ export async function generatePackageJson(
     version: '0.1.0',
     private: true,
     scripts: {
-      dev: 'next dev --webpack',
-      build: 'next build',
+      dev: 'next dev',
+      build: 'next build --webpack',
       start: 'next start',
       lint: "next lint",
       'lint:fix': 'next lint --fix',
     },
     dependencies: {
       '@hua-labs/hua': getHuaVersion(),
+      '@hua-labs/ui': getUiVersion(),
       '@phosphor-icons/react': PHOSPHOR_ICONS_VERSION,
+      clsx: CLSX_VERSION,
       next: NEXTJS_VERSION,
       react: REACT_VERSION,
       'react-dom': REACT_DOM_VERSION,
+      'tailwind-merge': TAILWIND_MERGE_VERSION,
       zustand: ZUSTAND_VERSION,
     },
     devDependencies: {
