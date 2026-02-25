@@ -1,5 +1,16 @@
 # @hua-labs/ui
 
+## 2.2.0
+
+### Minor Changes
+
+- Rewrite Dropdown with @floating-ui/react: Portal rendering, ARIA listbox, flip/shift/offset positioning, keyboard navigation, full i18n migration
+
+### Patch Changes
+
+- Updated dependencies
+  - @hua-labs/motion-core@2.3.0
+
 ## 2.1.1
 
 ### Patch Changes

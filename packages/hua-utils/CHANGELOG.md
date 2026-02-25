@@ -1,5 +1,11 @@
 # @hua-labs/utils
 
+## 1.1.3
+
+### Patch Changes
+
+- Maintenance: fix sanitize double-escape issue, framework rename cleanup, internal dependency updates
+
 ## 1.1.2
 
 ### Patch Changes
