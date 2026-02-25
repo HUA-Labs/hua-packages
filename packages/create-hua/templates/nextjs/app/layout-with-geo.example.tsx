@@ -76,14 +76,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   // 동적 언어 설정 (middleware에서 설정한 헤더 사용)
   // Dynamic language setting (use header set by middleware)
-  const headersList = headers();
+  const headersList = await headers();
   const language = headersList.get('x-language') || 'ko'; // 기본값: 'ko'
 
   return (
