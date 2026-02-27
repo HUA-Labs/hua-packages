@@ -200,15 +200,9 @@ export function useMotionState(options: MotionStateOptions = {}): MotionStateRet
     setProgress(clampedProgress)
     
     // 경과 시간 계산
-    let targetElapsed = 0
-    if (currentDirection === 'reverse') {
-      targetElapsed = ((100 - clampedProgress) / 100) * duration
-    } else if (currentDirection === 'alternate') {
-      // alternate의 경우 복잡하므로 단순화
-      targetElapsed = (clampedProgress / 100) * duration
-    } else {
-      targetElapsed = (clampedProgress / 100) * duration
-    }
+    const targetElapsed = currentDirection === 'reverse'
+      ? ((100 - clampedProgress) / 100) * duration
+      : (clampedProgress / 100) * duration
     
     setElapsed(targetElapsed)
     
