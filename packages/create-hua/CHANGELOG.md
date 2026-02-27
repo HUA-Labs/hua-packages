@@ -1,5 +1,11 @@
 # create-hua
 
+## 1.3.1
+
+### Patch Changes
+
+- f632e6a: Upgrade default page template to interactive landing page with bento grid showcase, animated stats, glassmorphism cards, scroll-driven motion, and typed CLI demo
+
 ## 1.3.0
 
 ### Minor Changes
