@@ -198,6 +198,19 @@ export { Motion } from './components'
 export type { MotionProps } from './components'
 
 // ========================================
+// 경량 모션 훅 (active 기반 트리거)
+// ========================================
+
+export { useCountUp } from './hooks/useCountUp'
+export type { CountUpOptions, CountUpReturn } from './hooks/useCountUp'
+
+export { useClipReveal } from './hooks/useClipReveal'
+export type { ClipRevealOptions, ClipRevealReturn } from './hooks/useClipReveal'
+
+export { useBlurIn } from './hooks/useBlurIn'
+export type { BlurInOptions, BlurInReturn } from './hooks/useBlurIn'
+
+// ========================================
 // Stagger 훅
 // ========================================
 
