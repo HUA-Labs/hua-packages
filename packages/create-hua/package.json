@@ -50,12 +50,12 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git"
+    "url": "https://github.com/HUA-Labs/hua-packages.git"
   },
   "bugs": {
-    "url": "https://github.com/HUA-Labs/HUA-Labs-public/issues"
+    "url": "https://github.com/HUA-Labs/hua-packages/issues"
   },
-  "homepage": "https://github.com/HUA-Labs/HUA-Labs-public#readme",
+  "homepage": "https://github.com/HUA-Labs/hua-packages#readme",
   "engines": {
     "node": ">=22.0.0"
   },

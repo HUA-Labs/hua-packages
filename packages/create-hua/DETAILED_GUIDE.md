@@ -1265,9 +1265,9 @@ npx @hua-labs/create-hua doctor my-app
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/CONTRIBUTING.md).
+Contributions are welcome! Please read our [Contributing Guide](https://github.com/HUA-Labs/hua-packages/blob/main/CONTRIBUTING.md).
 
-기여를 환영합니다! [기여 가이드](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/CONTRIBUTING.md)를 읽어주세요.
+기여를 환영합니다! [기여 가이드](https://github.com/HUA-Labs/hua-packages/blob/main/CONTRIBUTING.md)를 읽어주세요.
 
 ## License
 

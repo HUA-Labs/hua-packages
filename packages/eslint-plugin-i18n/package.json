@@ -54,7 +54,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git",
+    "url": "https://github.com/HUA-Labs/hua-packages.git",
     "directory": "packages/eslint-plugin-i18n"
   }
 }
