@@ -1,21 +1,13 @@
 packages:
-  - apps/*
   - packages/*
 
 ignoredBuiltDependencies:
-  - '@prisma/client'
   - '@scarf/scarf'
   - '@tree-sitter-grammars/tree-sitter-yaml'
-  - bcrypt
   - core-js-pure
   - esbuild
   - tree-sitter
   - tree-sitter-json
-
-onlyBuiltDependencies:
-  - '@prisma/client'
-  - '@prisma/engines'
-  - prisma
 
 patchedDependencies:
   '@phosphor-icons/react@2.1.10': patches/@phosphor-icons__react@2.1.10.patch
