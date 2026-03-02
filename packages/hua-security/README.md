@@ -4,7 +4,7 @@ Unified security toolkit with Free/Pro tiers. Free tier provides encryption (AES
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/security.svg)](https://www.npmjs.com/package/@hua-labs/security)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/security.svg)](https://www.npmjs.com/package/@hua-labs/security)
-[![license](https://img.shields.io/npm/l/@hua-labs/security.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/@hua-labs/security.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 
 ## Features

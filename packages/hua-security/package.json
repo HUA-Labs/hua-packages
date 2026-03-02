@@ -78,7 +78,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/HUA-Labs/HUA-Labs-public.git",
+    "url": "https://github.com/HUA-Labs/hua-packages.git",
     "directory": "packages/hua-security"
   },
   "publishConfig": {

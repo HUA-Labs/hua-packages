@@ -4,7 +4,7 @@ A comprehensive utility library for the hua ecosystem. Includes class name mergi
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
-[![license](https://img.shields.io/npm/l/@hua-labs/utils.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/@hua-labs/utils.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
