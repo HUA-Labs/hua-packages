@@ -135,7 +135,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
 
   // Provider에 따라 아이콘 가져오기
   type IconComponentType = React.ComponentType<PhosphorIconProps | React.SVGProps<SVGSVGElement> | Record<string, unknown>>
-  let ResolvedIcon: IconComponentType | null = null
+  let ResolvedIcon: IconComponentType | null
 
   if (iconSet === 'phosphor') {
     // 1. icons.ts에서 먼저 찾기 (Phosphor 아이콘이 기본, 정적 import)
