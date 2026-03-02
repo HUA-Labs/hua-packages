@@ -70,7 +70,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 const PACKAGES_DIR = join(ROOT, 'packages');
-const AI_DOCS_DIR = join(ROOT, 'apps', 'hua-docs', 'public', 'ai-docs');
+const AI_DOCS_DIR = join(ROOT, 'docs', 'ai-docs');
 const TEMPLATES_DIR = join(ROOT, 'scripts', 'templates');
 
 // ─── Export Parser ───────────────────────────────────────────────────

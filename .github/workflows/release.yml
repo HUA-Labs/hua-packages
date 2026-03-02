@@ -42,7 +42,6 @@ jobs:
             --filter @hua-labs/i18n-core-zustand \
             --filter @hua-labs/i18n-formatters \
             --filter @hua-labs/i18n-loaders \
-            --filter @hua-labs/eslint-plugin-i18n \
             --filter @hua-labs/ui \
             --filter @hua-labs/hua
 

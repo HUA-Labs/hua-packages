@@ -3,8 +3,15 @@
   "globalDependencies": [
     "**/.env.*local"
   ],
-  "globalPassThroughEnv": ["PATH", "NODE"],
-  "globalEnv": ["DATABASE_URL", "NODE_ENV", "DIRECT_URL"],
+  "globalPassThroughEnv": [
+    "PATH",
+    "NODE"
+  ],
+  "globalEnv": [
+    "DATABASE_URL",
+    "NODE_ENV",
+    "DIRECT_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
@@ -65,43 +72,63 @@
     },
     "@hua-labs/ui#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/ui-dashboard#build": {
-      "dependsOn": ["@hua-labs/ui#build"],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/utils#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-core-zustand#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-loaders#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-formatters#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/hooks#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/state#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     }
   }
 }
