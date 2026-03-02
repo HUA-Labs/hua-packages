@@ -61,11 +61,6 @@
       "import": "./dist/state/index.mjs",
       "default": "./dist/state/index.mjs"
     },
-    "./pro": {
-      "types": "./dist/pro/index.d.mts",
-      "import": "./dist/pro/index.mjs",
-      "default": "./dist/pro/index.mjs"
-    },
     "./formatters": {
       "types": "./dist/formatters/index.d.mts",
       "import": "./dist/formatters/index.mjs",
@@ -115,9 +110,6 @@
     "@hua-labs/ui": "workspace:*",
     "@hua-labs/utils": "workspace:*",
     "@phosphor-icons/react": "^2.1.10"
-  },
-  "optionalDependencies": {
-    "@hua-labs/pro": "workspace:*"
   },
   "peerDependencies": {
     "next": ">=13.0.0",

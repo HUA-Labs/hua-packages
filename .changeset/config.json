@@ -14,14 +14,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@hua-labs/security",
-    "@hua-labs/docs-engine",
-    "@hua-labs/ui-dashboard",
-    "my-app",
-    "hue",
-    "my-docs",
-    "my-site",
-    "@hua-labs/eslint-plugin-i18n"
-  ]
+  "ignore": []
 }
