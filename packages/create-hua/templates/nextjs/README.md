@@ -405,10 +405,10 @@ export default defineConfig({
 
 ## 더 알아보기 / Learn More
 
-- [hua 공식 문서 / Official Documentation](https://github.com/HUA-Labs/HUA-Labs-public)
-- [UI 컴포넌트 가이드 / UI Components Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-ui)
-- [Motion 훅 가이드 / Motion Hooks Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-motion-core)
-- [i18n 가이드 / i18n Guide](https://github.com/HUA-Labs/HUA-Labs-public/tree/main/packages/hua-i18n-core)
+- [hua 공식 문서 / Official Documentation](https://github.com/HUA-Labs/hua-packages)
+- [UI 컴포넌트 가이드 / UI Components Guide](https://github.com/HUA-Labs/hua-packages/tree/main/packages/hua-ui)
+- [Motion 훅 가이드 / Motion Hooks Guide](https://github.com/HUA-Labs/hua-packages/tree/main/packages/hua-motion-core)
+- [i18n 가이드 / i18n Guide](https://github.com/HUA-Labs/hua-packages/tree/main/packages/hua-i18n-core)
 
 ## 개발 팁 / Development Tips
 

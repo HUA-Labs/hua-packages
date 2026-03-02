@@ -43,7 +43,7 @@ main().catch((error: Error & { code?: string }) => {
     console.error(`   1. ${isEn ? 'Check Node.js version' : 'Node.js 버전 확인'}: node --version (>=22.0.0)`);
     console.error(`   2. ${isEn ? 'Check folder permissions' : '폴더 권한 확인'}`);
     console.error(`   3. ${isEn ? 'Check disk space' : '디스크 공간 확인'}`);
-    console.error('   4. GitHub Issues: https://github.com/HUA-Labs/HUA-Labs-public/issues');
+    console.error('   4. GitHub Issues: https://github.com/HUA-Labs/hua-packages/issues');
   }
 
   process.exit(1);
