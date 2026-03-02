@@ -85,7 +85,7 @@ pnpm test             # Run tests
 - [HUA Docs](https://docs.hua-labs.com) — Framework documentation
 - [HUA Labs](https://hua-labs.com) — Official site
 - [npm: @hua-labs/hua](https://www.npmjs.com/package/@hua-labs/hua)
-- [GitHub Issues](https://github.com/HUA-Labs/HUA-Labs-public/issues)
+- [GitHub Issues](https://github.com/HUA-Labs/hua-packages/issues)
 
 ## License
 

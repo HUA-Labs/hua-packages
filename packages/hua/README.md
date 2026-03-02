@@ -4,7 +4,7 @@ Batteries-included framework for React product teams. Unifies UI components, ani
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/hua.svg)](https://www.npmjs.com/package/@hua-labs/hua)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/hua.svg)](https://www.npmjs.com/package/@hua-labs/hua)
-[![license](https://img.shields.io/npm/l/@hua-labs/hua.svg)](https://github.com/HUA-Labs/HUA-Labs-public/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/@hua-labs/hua.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 
