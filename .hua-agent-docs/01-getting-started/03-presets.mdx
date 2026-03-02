@@ -9,7 +9,7 @@ related:
 
 # Presets
 
-hua ships with two built-in presets. A preset configures motion, spacing, i18n, and icon defaults in one shot.
+hua ships with three built-in presets. A preset configures motion, spacing, i18n, and icon defaults in one shot.
 
 ## Vibe Mode vs Developer Mode
 
@@ -19,6 +19,7 @@ Two ways to specify a preset:
 // Vibe mode — single string, simple setup
 defineConfig({ preset: 'product' })
 defineConfig({ preset: 'marketing' })
+defineConfig({ preset: 'minimal' })
 
 // Developer mode — preset-based with granular overrides
 defineConfig({
@@ -30,57 +31,57 @@ defineConfig({
 })
 ```
 
-## product vs marketing Comparison
+## Preset Comparison
 
 ### Motion
 
-| Element | product | marketing |
-|---------|---------|-----------|
-| hero.entrance | fadeIn | fadeIn |
-| hero.delay | 100ms | 300ms |
-| hero.duration | 400ms | 1000ms |
-| hero.hover / click | false / false | false / false |
-| title.entrance | slideUp | slideUp |
-| title.delay | 150ms | 500ms |
-| title.duration | 350ms | 800ms |
-| button.entrance | scaleIn | scaleIn |
-| button.delay | 200ms | 700ms |
-| button.duration | 200ms | 400ms |
-| button.hover / click | true / true | true / true |
-| card.entrance | slideUp | slideUp |
-| card.delay | 100ms | 600ms |
-| card.duration | 300ms | 600ms |
-| card.hover / click | true / false | true / false |
-| text.entrance | fadeIn | fadeIn |
-| text.delay | 50ms | 400ms |
-| text.duration | 300ms | 700ms |
-| image (marketing only) | — | scaleIn, 500ms delay, 800ms dur |
+| Element | product | marketing | minimal |
+|---------|---------|-----------|---------|
+| hero.entrance | fadeIn | fadeIn | fadeIn |
+| hero.delay | 100ms | 300ms | 0ms |
+| hero.duration | 400ms | 1000ms | 200ms |
+| hero.hover / click | false / false | false / false | false / false |
+| title.entrance | slideUp | slideUp | fadeIn |
+| title.delay | 150ms | 500ms | 0ms |
+| title.duration | 350ms | 800ms | 150ms |
+| button.entrance | scaleIn | scaleIn | fadeIn |
+| button.delay | 200ms | 700ms | 0ms |
+| button.duration | 200ms | 400ms | 150ms |
+| button.hover / click | true / true | true / true | true / true |
+| card.entrance | slideUp | slideUp | fadeIn |
+| card.delay | 100ms | 600ms | 0ms |
+| card.duration | 300ms | 600ms | 200ms |
+| card.hover / click | true / false | true / false | false / false |
+| text.entrance | fadeIn | fadeIn | fadeIn |
+| text.delay | 50ms | 400ms | 0ms |
+| text.duration | 300ms | 700ms | 150ms |
+| image (marketing only) | — | scaleIn, 500ms delay, 800ms dur | — |
 
-**Summary**: product = fast, restrained motion. marketing = dramatic, sequential motion.
+**Summary**: product = fast, restrained. marketing = dramatic, sequential. minimal = fadeIn only, near-instant.
 
 ### Spacing
 
-| Property | product | marketing |
-|----------|---------|-----------|
-| default | md | xl |
-| section | lg | xl |
-| component | sm | md |
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| default | md | xl | md |
+| section | lg | xl | md |
+| component | sm | md | sm |
 
 ### i18n
 
-| Property | product | marketing |
-|----------|---------|-----------|
-| defaultLanguage | ko | ko |
-| supportedLanguages | ['ko', 'en'] | ['ko', 'en'] |
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| defaultLanguage | ko | ko | ko |
+| supportedLanguages | ['ko', 'en'] | ['ko', 'en'] | ['ko', 'en'] |
 
 ### Icons
 
-| Property | product | marketing |
-|----------|---------|-----------|
-| set | phosphor | phosphor |
-| weight | regular | bold |
-| size | 20 | 24 |
-| color | currentColor | currentColor |
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| set | phosphor | phosphor | phosphor |
+| weight | regular | bold | regular |
+| size | 20 | 24 | 20 |
+| color | currentColor | currentColor | currentColor |
 
 ## Custom Presets
 
@@ -103,13 +104,29 @@ export default defineConfig({
 })
 ```
 
+### Per-Component Motion Overrides
+
+Override individual component roles on top of a preset:
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: {
+    components: {
+      card: { entrance: 'fadeIn', duration: 500 },  // override card motion
+      hero: { hover: true },                         // add hover to hero
+    },
+  },
+})
+```
+
 ### Merge Priority
 
 ```
-1. Built-in preset (product/marketing)
+1. Built-in preset (product/marketing/minimal)
    -> Developer mode overrides merged
 2. Preset + motion/spacing overrides
-   -> User config merged
+   -> motion.components per-role shallow merge
 3. Final HuaConfig (user config always wins)
 ```
 
@@ -139,18 +156,28 @@ export default defineConfig({
 })
 ```
 
-### 3. Minimal setup (no motion)
+### 3. Minimal preset (near-zero motion)
 
 ```typescript
 export default defineConfig({
-  preset: { type: 'product', motion: { duration: 0 } },
-  motion: { enableAnimations: false }
+  preset: 'minimal',
+})
+```
+
+### 4. Disable all motion completely
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: { enableAnimations: false },
 })
 ```
 
 ## Constraints & Gotchas
 
-- `preset` only accepts `'product'` or `'marketing'`. Other values cause a validateConfig error.
+- `preset` accepts `'product'`, `'marketing'`, or `'minimal'`. Other values cause a validateConfig error.
 - Calling defineConfig without a preset defaults to the product preset.
-- `motion.style` field (`'smooth'`, `'dramatic'`, `'minimal'`) maps internally to `motion.defaultPreset` (`smooth/minimal -> product`, `dramatic -> marketing`).
+- `motion.style` field (`'smooth'`, `'dramatic'`, `'minimal'`) maps internally to `motion.defaultPreset` (`smooth` → `product`, `dramatic` → `marketing`, `minimal` → `minimal`).
+- `motion.components` does shallow merge per role — only specify fields you want to override.
 - Developer mode `motion`/`spacing` overrides apply at the preset level. User config `motion`/`icons` etc. merge as a separate layer.
+- `minimal` preset uses fadeIn-only with 0ms delay and 150-200ms duration. Good for accessibility-first apps or utility dashboards.

@@ -13,7 +13,10 @@ import { getConfig } from '../config';
 import { createZustandI18n, type ZustandLanguageStore } from '@hua-labs/i18n-core-zustand';
 import { createI18nStore, type UseBoundStore, type StoreApi } from '@hua-labs/state';
 import { BrandingProvider } from '../branding/context';
-import { IconProvider, ToastProvider } from '@hua-labs/ui';
+import { IconProvider, ToastProvider, MotionConfigProvider } from '@hua-labs/ui';
+import { productPreset } from '../../presets/product';
+import { marketingPreset } from '../../presets/marketing';
+import { minimalPreset } from '../../presets/minimal';
 
 /**
  * Create providers based on configuration
@@ -71,6 +74,29 @@ function createProviders(config: HuaConfig) {
       </IconProvider>
     )
   });
+
+  // Motion Config Provider
+  const presetMap = { product: productPreset, marketing: marketingPreset, minimal: minimalPreset } as const;
+  const presetName = config.motion?.defaultPreset || 'product';
+  const preset = presetMap[presetName] || productPreset;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseComponents: Record<string, any> = { ...preset.motion };
+
+  // User per-component overrides (shallow merge per role)
+  if (config.motion?.components) {
+    for (const [role, overrides] of Object.entries(config.motion.components)) {
+      baseComponents[role] = { ...baseComponents[role], ...overrides };
+    }
+  }
+
+  providers.push(({ children }) => (
+    <MotionConfigProvider value={{
+      enableAnimations: config.motion?.enableAnimations !== false,
+      components: baseComponents,
+    }}>
+      {children}
+    </MotionConfigProvider>
+  ));
 
   // i18n Provider
   if (config.i18n) {
