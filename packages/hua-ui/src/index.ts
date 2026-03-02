@@ -83,6 +83,8 @@ export { IconProvider, useIconContext } from './components/Icon';
 export type { IconProviderProps } from './components/Icon';
 export type { IconSet, PhosphorWeight, IconConfig } from './components/Icon';
 export { defaultIconConfig, getDefaultStrokeWidth } from './components/Icon';
+// Icon resolver registration (for apps that need lucide/iconsax support)
+export { registerLucideResolver } from './lib/icon-providers';
 // Iconsax: import from '@hua-labs/ui/iconsax' instead
 
 // ── Utilities ───────────────────────────────────────────────
@@ -125,6 +127,10 @@ export { EASING_FUNCTIONS, DURATIONS, COMPONENT_MOTION_DEFAULTS, CSS_MOTION_VARS
 // ── Common Types ────────────────────────────────────────────
 export type { Color, Size, BaseVariant, ExtendedVariant } from './lib/types/common';
 
+// ── Motion Config Context ─────────────────────────────────────
+export { MotionConfigProvider, useMotionConfig, useComponentMotion } from './context/MotionConfigContext';
+export type { ComponentMotionConfig, MotionConfigContextValue } from './context/MotionConfigContext';
+
 // ── Hooks ───────────────────────────────────────────────────
 export {
   useInView,
@@ -132,6 +138,7 @@ export {
   useMouse,
   useReducedMotion,
   useWindowSize,
+  useAnimatedEntrance,
 } from './hooks';
 export type {
   UseInViewOptions,
@@ -142,4 +149,6 @@ export type {
   UseMouseReturn,
   UseWindowSizeOptions,
   UseWindowSizeReturn,
+  UseAnimatedEntranceOptions,
+  UseAnimatedEntranceReturn,
 } from './hooks';

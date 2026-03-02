@@ -2,7 +2,7 @@ import React from 'react'
 import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
 import { merge, mergeMap } from '../../lib/utils'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
-import { getIconFromProvider, getIconsaxResolver, getIconNameForProvider } from '../../lib/icon-providers'
+import { getIconFromProvider, getIconsaxResolver, getLucideResolver, getIconNameForProvider } from '../../lib/icon-providers'
 import { normalizeIconName } from '../../lib/normalize-icon-name'
 import { useIconContext, type IconSet } from './IconProvider'
 import { type PhosphorWeight } from './icon-store'
@@ -147,8 +147,9 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     if (!ResolvedIcon) {
       ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
     }
+  } else if (iconSet === 'lucide') {
+    ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
   } else {
-    // Lucide나 다른 provider
     ResolvedIcon = getIconFromProvider(iconName, iconSet) as IconComponentType | null
   }
 
@@ -158,6 +159,13 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
         console.warn(
           `Icon "${iconName}" — iconsax resolver not registered. ` +
           `Use HuaProvider with icons.set='iconsax', or add: import '@hua-labs/ui/iconsax'`
+        )
+      }
+    } else if (iconSet === 'lucide' && !getLucideResolver()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          `Icon "${iconName}" — lucide resolver not registered. ` +
+          `Add: import '@hua-labs/ui/lucide'`
         )
       }
     } else {

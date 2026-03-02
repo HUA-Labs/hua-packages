@@ -14,3 +14,6 @@ export { useReducedMotion } from "./useReducedMotion";
 
 export { useWindowSize } from "./useWindowSize";
 export type { UseWindowSizeOptions, UseWindowSizeReturn } from "./useWindowSize";
+
+export { useAnimatedEntrance } from "./useAnimatedEntrance";
+export type { UseAnimatedEntranceOptions, UseAnimatedEntranceReturn } from "./useAnimatedEntrance";

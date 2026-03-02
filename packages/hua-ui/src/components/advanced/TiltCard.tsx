@@ -2,6 +2,8 @@
 
 import React, { useRef, useState, useCallback } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+import { useMotionConfig } from "../../context/MotionConfigContext";
 
 /**
  * TiltCard 컴포넌트의 props / TiltCard component props
@@ -64,9 +66,13 @@ const TiltCard = React.forwardRef<HTMLDivElement, TiltCardProps>(
     });
     const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
     const [isHovered, setIsHovered] = useState(false);
+    const prefersReducedMotion = useReducedMotion();
+    const { enableAnimations } = useMotionConfig();
+    const motionDisabled = prefersReducedMotion || !enableAnimations;
 
     const handleMouseMove = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
+        if (motionDisabled) return;
         if (!cardRef.current) return;
 
         const rect = cardRef.current.getBoundingClientRect();
@@ -91,7 +97,7 @@ const TiltCard = React.forwardRef<HTMLDivElement, TiltCardProps>(
         const glareY = ((e.clientY - rect.top) / rect.height) * 100;
         setGlarePosition({ x: glareX, y: glareY });
       },
-      [maxTilt, scale]
+      [maxTilt, scale, motionDisabled]
     );
 
     const handleMouseEnter = () => {

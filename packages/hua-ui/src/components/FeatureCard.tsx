@@ -2,6 +2,8 @@
 
 import React from "react"
 import { merge } from "../lib/utils"
+import { composeRefs } from "../lib/Slot"
+import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance"
 import { Icon } from "./Icon"
 import type { AllIconName } from "../lib/icon-names"
 
@@ -34,6 +36,8 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
   hover?: "scale" | "glow" | "slide" | "none"
   gradient?: "blue" | "purple" | "green" | "orange" | "pink" | "custom"
   customGradient?: string
+  /** Enable preset entrance animation (reads from MotionConfigContext) */
+  animated?: boolean
 }
 
 /**
@@ -70,18 +74,21 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} FeatureCard 컴포넌트 / FeatureCard component
  */
 const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
-  ({ 
-    className, 
-    icon, 
-    title, 
-    description, 
-    variant = "default", 
+  ({
+    className,
+    icon,
+    title,
+    description,
+    variant = "default",
     size = "md",
     hover = "scale",
     gradient = "blue",
     customGradient,
-    ...props 
+    animated,
+    style,
+    ...props
   }, ref) => {
+    const entrance = useAnimatedEntrance<HTMLDivElement>({ role: "card", enabled: animated })
     const sizeClasses = {
       sm: "p-4",
       md: "p-6",
@@ -106,14 +113,16 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
 
     return (
       <div
-        ref={ref}
+        ref={composeRefs(ref, entrance.ref)}
         className={merge(
           "rounded-2xl shadow-lg transition-all duration-300 flex flex-col items-center text-center",
           sizeClasses[size],
           variantClasses[variant],
           hoverClasses[hover],
+          entrance.className,
           className
         )}
+        style={{ ...entrance.style, ...style }}
         {...props}
       >
         {icon && (

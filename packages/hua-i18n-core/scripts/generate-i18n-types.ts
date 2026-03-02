@@ -8,6 +8,12 @@
  *   pnpm tsx scripts/generate-i18n-types.ts \
  *     --translations-dir apps/my-app/app/lib/translations/ko \
  *     --output apps/my-app/types/i18n-types.generated.ts
+ *
+ *   # docs-*.json → docs 네임스페이스로 머지 (런타임 API 병합 구조 반영)
+ *   pnpm tsx scripts/generate-i18n-types.ts \
+ *     --translations-dir apps/my-docs/lib/translations/ko \
+ *     --output apps/my-docs/types/i18n-types.generated.ts \
+ *     --merge-prefix docs
  */
 
 import * as fs from 'fs';
@@ -16,25 +22,29 @@ import * as path from 'path';
 // ---------------------------------------------------------------------------
 // CLI args
 // ---------------------------------------------------------------------------
-function parseArgs(): { translationsDir: string; output: string } {
+function parseArgs(): { translationsDir: string; output: string; mergePrefixes: string[] } {
   const args = process.argv.slice(2);
   let translationsDir = '';
   let output = '';
+  const mergePrefixes: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--translations-dir' && args[i + 1]) {
       translationsDir = args[++i];
     } else if (args[i] === '--output' && args[i + 1]) {
       output = args[++i];
+    } else if (args[i] === '--merge-prefix' && args[i + 1]) {
+      // e.g. --merge-prefix docs → merge docs-*.json keys into docs namespace
+      mergePrefixes.push(args[++i]);
     }
   }
 
   if (!translationsDir || !output) {
-    console.error('Usage: generate-i18n-types.ts --translations-dir <path> --output <path>');
+    console.error('Usage: generate-i18n-types.ts --translations-dir <path> --output <path> [--merge-prefix <prefix>]');
     process.exit(1);
   }
 
-  return { translationsDir: path.resolve(translationsDir), output: path.resolve(output) };
+  return { translationsDir: path.resolve(translationsDir), output: path.resolve(output), mergePrefixes };
 }
 
 // ---------------------------------------------------------------------------
@@ -167,8 +177,55 @@ export type TranslationNamespaceName = ${nsNames.map((n) => `'${n}'`).join(' | '
 // ---------------------------------------------------------------------------
 // main
 // ---------------------------------------------------------------------------
+/**
+ * --merge-prefix 처리: {prefix}-* 네임스페이스 키들을 {prefix} 네임스페이스에 머지
+ *
+ * 런타임에서 docs-*.json → docs 네임스페이스로 병합되는 구조를 타입에 반영.
+ * 개별 docs-* 네임스페이스는 제거되고 docs에 통합됨.
+ */
+function applyMergePrefixes(
+  namespaces: Record<string, NamespaceKeys>,
+  prefixes: string[]
+): void {
+  for (const prefix of prefixes) {
+    // 기존 prefix 네임스페이스 (e.g. docs) 확보
+    if (!namespaces[prefix]) {
+      namespaces[prefix] = { strings: [], arrays: [], plurals: [] };
+    }
+
+    const target = namespaces[prefix];
+    const toDelete: string[] = [];
+
+    for (const ns of Object.keys(namespaces)) {
+      if (ns === prefix) continue;
+      if (!ns.startsWith(`${prefix}-`)) continue;
+
+      // 키를 머지
+      const source = namespaces[ns];
+      target.strings.push(...source.strings);
+      target.arrays.push(...source.arrays);
+      target.plurals.push(...source.plurals);
+      toDelete.push(ns);
+    }
+
+    // 개별 네임스페이스 제거
+    for (const ns of toDelete) {
+      delete namespaces[ns];
+    }
+
+    // 중복 제거 (docs.json fallback과 docs-*.json에 같은 키 있을 수 있음)
+    target.strings = [...new Set(target.strings)];
+    target.arrays = [...new Set(target.arrays)];
+    target.plurals = [...new Set(target.plurals)];
+
+    if (toDelete.length > 0) {
+      console.log(`   Merged ${toDelete.length} ${prefix}-* namespaces into '${prefix}'`);
+    }
+  }
+}
+
 function main() {
-  const { translationsDir, output } = parseArgs();
+  const { translationsDir, output, mergePrefixes } = parseArgs();
 
   if (!fs.existsSync(translationsDir)) {
     console.error(`❌ Translations directory not found: ${translationsDir}`);
@@ -189,6 +246,11 @@ function main() {
     const filePath = path.join(translationsDir, file);
     const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     namespaces[ns] = collectKeys(content);
+  }
+
+  // --merge-prefix 적용
+  if (mergePrefixes.length > 0) {
+    applyMergePrefixes(namespaces, mergePrefixes);
   }
 
   const typeContent = generateTypeFile(namespaces);

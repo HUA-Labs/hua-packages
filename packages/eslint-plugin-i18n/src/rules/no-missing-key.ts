@@ -27,14 +27,14 @@ function loadKeys(keysFilePath: string): Set<string> | null {
   const keys = new Set<string>();
 
   // 방법 1: 직접 'namespace:key.path' 리터럴 추출 (my-app 스타일)
-  const directMatches = content.matchAll(/'([a-zA-Z_-]+:[a-zA-Z0-9_.]+)'/g);
+  const directMatches = content.matchAll(/'([a-zA-Z0-9_-]+:[a-zA-Z0-9_.]+)'/g);
   for (const match of directMatches) {
     keys.add(match[1]);
   }
 
   // 방법 2: I18nKeys 인터페이스에서 namespace별 키 추출 후 조합
   // 패턴: `namespace: { strings: 'key1' | 'key2' | ...; ... }`
-  const nsBlockRegex = /['"]?([a-zA-Z_-]+)['"]?\s*:\s*\{[^}]*strings\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
+  const nsBlockRegex = /['"]?([a-zA-Z0-9_-]+)['"]?\s*:\s*\{[^}]*strings\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
   let nsMatch;
   while ((nsMatch = nsBlockRegex.exec(content)) !== null) {
     const namespace = nsMatch[1];
@@ -48,7 +48,7 @@ function loadKeys(keysFilePath: string): Set<string> | null {
   }
 
   // 방법 2b: arrays 키도 추출
-  const nsArrayRegex = /['"]?([a-zA-Z_-]+)['"]?\s*:\s*\{[^}]*arrays\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
+  const nsArrayRegex = /['"]?([a-zA-Z0-9_-]+)['"]?\s*:\s*\{[^}]*arrays\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
   let arrMatch;
   while ((arrMatch = nsArrayRegex.exec(content)) !== null) {
     const namespace = arrMatch[1];

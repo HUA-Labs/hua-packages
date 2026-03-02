@@ -134,6 +134,9 @@ export {
 // When branding is not configured, they work exactly like the original components
 export { BrandedButton as Button, BrandedCard as Card } from './framework'
 
+// Preset Motion Hook (convenience re-export from framework)
+export { usePresetMotion } from './framework'
+
 // Re-export types — from atomic core
 export type { ButtonProps } from '@hua-labs/ui'
 export type { CardProps, CardHeaderProps, CardTitleProps, CardDescriptionProps, CardContentProps, CardFooterProps } from '@hua-labs/ui'
