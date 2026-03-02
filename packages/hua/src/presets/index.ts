@@ -6,3 +6,4 @@
 
 export * from './product'
 export * from './marketing'
+export * from './minimal'

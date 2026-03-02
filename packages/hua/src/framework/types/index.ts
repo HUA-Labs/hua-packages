@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 /**
  * Preset name
  */
-export type PresetName = 'product' | 'marketing';
+export type PresetName = 'product' | 'marketing' | 'minimal';
 
 /**
  * Preset configuration (개발자 모드 / Developer mode)
@@ -301,24 +301,49 @@ export interface HuaConfig {
      * @note `style`이 설정되면 자동으로 매핑됩니다.
      * @note Automatically mapped when `style` is set.
      */
-    defaultPreset?: 'product' | 'marketing';
-    
+    defaultPreset?: PresetName;
+
     /**
      * Enable animations globally / 전역 애니메이션 활성화 여부
-     * 
+     *
      * false로 설정하면 모든 애니메이션 비활성화 / Set to false to disable all animations
      */
     enableAnimations?: boolean;
-    
+
     /**
      * Animation duration in milliseconds (개발자용) / 애니메이션 지속 시간 (밀리초, 개발자용)
      */
     duration?: number;
-    
+
     /**
      * Animation easing function (개발자용) / 애니메이션 이징 함수 (개발자용)
      */
     easing?: string;
+
+    /**
+     * Per-component motion overrides / 컴포넌트별 모션 오버라이드
+     *
+     * Preset의 기본 모션 설정을 컴포넌트 역할(role)별로 부분 오버라이드합니다.
+     * Partially override preset motion defaults per component role.
+     *
+     * @example
+     * ```ts
+     * motion: {
+     *   defaultPreset: 'product',
+     *   components: {
+     *     card: { entrance: 'fadeIn', duration: 500 },
+     *     hero: { hover: true },
+     *   },
+     * }
+     * ```
+     */
+    components?: Record<string, {
+      entrance?: string;
+      delay?: number;
+      duration?: number;
+      hover?: boolean;
+      click?: boolean;
+    }>;
   };
 
   /**

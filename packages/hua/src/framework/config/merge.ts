@@ -7,6 +7,7 @@
 import type { HuaConfig, Preset, PresetName } from '../types';
 import { productPreset } from '../../presets/product';
 import { marketingPreset } from '../../presets/marketing';
+import { minimalPreset } from '../../presets/minimal';
 
 /**
  * Preset 맵
@@ -14,6 +15,7 @@ import { marketingPreset } from '../../presets/marketing';
 const PRESET_MAP: Record<PresetName, any> = {
   product: productPreset,
   marketing: marketingPreset,
+  minimal: minimalPreset,
 };
 
 /**
@@ -58,10 +60,13 @@ function deepMerge<T extends Record<string, any>>(
  * 
  * Preset의 구조를 HuaConfig 형식으로 변환합니다.
  */
-function presetToConfig(preset: typeof productPreset | typeof marketingPreset): Partial<HuaConfig> {
+function presetToConfig(preset: typeof productPreset | typeof marketingPreset | typeof minimalPreset): Partial<HuaConfig> {
+  const presetName: PresetName =
+    preset === productPreset ? 'product' :
+    preset === marketingPreset ? 'marketing' : 'minimal';
   return {
     motion: {
-      defaultPreset: preset === productPreset ? 'product' : 'marketing',
+      defaultPreset: presetName,
       enableAnimations: true,
     },
     i18n: {
