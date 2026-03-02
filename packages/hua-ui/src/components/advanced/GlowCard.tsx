@@ -2,6 +2,8 @@
 
 import React, { useRef, useState, useCallback } from "react";
 import { merge } from "../../lib/utils";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+import { useMotionConfig } from "../../context/MotionConfigContext";
 
 /**
  * GlowCard 컴포넌트의 props / GlowCard component props
@@ -53,9 +55,13 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
     const cardRef = useRef<HTMLDivElement>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isHovered, setIsHovered] = useState(false);
+    const prefersReducedMotion = useReducedMotion();
+    const { enableAnimations } = useMotionConfig();
+    const motionDisabled = prefersReducedMotion || !enableAnimations;
 
     const handleMouseMove = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
+        if (motionDisabled) return;
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
         setMousePosition({
@@ -63,7 +69,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
           y: e.clientY - rect.top,
         });
       },
-      []
+      [motionDisabled]
     );
 
     const glowStyle: React.CSSProperties = {

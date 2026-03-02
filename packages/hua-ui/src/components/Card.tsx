@@ -3,6 +3,8 @@
 import React from "react"
 import { cva } from "class-variance-authority"
 import { merge } from "../lib/utils"
+import { composeRefs } from "../lib/Slot"
+import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance"
 
 export const cardVariants = cva(
   "rounded-lg",
@@ -41,6 +43,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   shadow?: "none" | "sm" | "md" | "lg"
   padding?: "none" | "sm" | "md" | "lg"
   hoverable?: boolean
+  /** Enable preset entrance animation (reads from MotionConfigContext) */
+  animated?: boolean
 }
 
 /**
@@ -55,15 +59,19 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
  * </Card>
  */
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", shadow, padding = "none", hoverable, ...props }, ref) => {
+  ({ className, variant = "default", shadow, padding = "none", hoverable, animated, style, ...props }, ref) => {
+    const entrance = useAnimatedEntrance<HTMLDivElement>({ role: "card", enabled: animated })
+
     return (
       <div
-        ref={ref}
+        ref={composeRefs(ref, entrance.ref)}
         className={merge(
           cardVariants({ variant, shadow, padding }),
           hoverable && "transition-shadow hover:shadow-lg cursor-pointer",
+          entrance.className,
           className
         )}
+        style={{ ...entrance.style, ...style }}
         {...props}
       />
     )

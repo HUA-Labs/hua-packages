@@ -77,6 +77,9 @@ export type {
   SuspenseWrapperProps,
 } from './loading';
 
+// Preset Motion Hook
+export { usePresetMotion } from './hooks/usePresetMotion';
+
 // Motion Hooks (Core)
 export { useMotion, useMotion as useUnifiedMotion } from './hooks/useMotion';
 export type { MotionType, UseMotionOptions } from './hooks/useMotion';

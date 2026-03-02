@@ -14,31 +14,64 @@
  *    - 코어 번들에 포함되지 않음 / Not in core bundle
  *    - registerIconsaxResolver()로 lazy 연결
  *
- * Note: Lucide provider는 deprecated → 제거됨.
+ * 3. Lucide Icons (https://lucide.dev) - separate entry
+ *    - '@hua-labs/ui/lucide'에서 import 시 자동 등록
+ *    - 코어 번들에 포함되지 않음 / Not in core bundle
+ *    - registerLucideResolver()로 lazy 연결
  * Note: 동적 barrel import (import('@phosphor-icons/react'))는 Turbopack에서
  *       전체 라이브러리(4.6MB)를 번들하므로 사용 금지.
  */
 
 import { toPascalCase } from './case-utils'
 
-// Iconsax resolver - registered lazily when iconsax entry is loaded
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let iconsaxResolver: ((name: string, variant?: string) => any) | null = null
+// ── Global Resolver Registry ────────────────────────────────────
+// globalThis 기반 레지스트리: 별도 번들(iconsax.mjs, index.mjs)간
+// 모듈 인스턴스가 분리되어도 동일한 resolver에 접근 가능.
+const REGISTRY_KEY = '__hua_icon_resolvers__'
+
+interface IconResolverRegistry {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lucide: ((name: string) => any) | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  iconsax: ((name: string, variant?: string) => any) | null
+}
+
+function getRegistry(): IconResolverRegistry {
+  const g = globalThis as unknown as Record<string, IconResolverRegistry>
+  if (!g[REGISTRY_KEY]) {
+    g[REGISTRY_KEY] = { lucide: null, iconsax: null }
+  }
+  return g[REGISTRY_KEY]
+}
+
+/**
+ * Register lucide resolver (called from app-level setup).
+ */
+export function registerLucideResolver(resolver: IconResolverRegistry['lucide']) {
+  getRegistry().lucide = resolver
+}
+
+/**
+ * Get registered lucide resolver
+ */
+export function getLucideResolver() {
+  return getRegistry().lucide
+}
 
 /**
  * Register iconsax resolver (called from iconsax entry point).
  * Allows the core Icon component to resolve iconsax icons
  * without statically importing the iconsax bundle.
  */
-export function registerIconsaxResolver(resolver: typeof iconsaxResolver) {
-  iconsaxResolver = resolver
+export function registerIconsaxResolver(resolver: IconResolverRegistry['iconsax']) {
+  getRegistry().iconsax = resolver
 }
 
 /**
  * Get registered iconsax resolver
  */
 export function getIconsaxResolver() {
-  return iconsaxResolver
+  return getRegistry().iconsax
 }
 
 // Icon Provider Type
@@ -232,14 +265,25 @@ export function getIconFromProvider(
   iconName: string,
   provider: IconProvider = 'phosphor'
 ): React.ComponentType<Record<string, unknown>> | null {
-  if (provider !== 'iconsax' || !iconsaxResolver) return null
+  const registry = getRegistry()
+
+  if (provider === 'lucide') {
+    if (!registry.lucide) return null
+    const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
+    const lucideName = iconMapping
+      ? (iconMapping as Record<string, string | undefined>)['lucide'] || toPascalCase(iconName)
+      : toPascalCase(iconName)
+    return registry.lucide(lucideName) || null
+  }
+
+  if (provider !== 'iconsax' || !registry.iconsax) return null
 
   const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
   const iconsaxName = iconMapping
     ? (iconMapping as Record<string, string | undefined>)['iconsax'] || toPascalCase(iconName)
     : toPascalCase(iconName)
 
-  return iconsaxResolver(iconsaxName) || null
+  return registry.iconsax(iconsaxName) || null
 }
 
 /**
