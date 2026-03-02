@@ -1,0 +1,147 @@
+---
+title: i18n Packages
+description: "i18n-core, i18n-core-zustand, i18n-loaders, i18n-formatters — all accessed via @hua-labs/hua/* paths"
+category: packages
+related:
+  - ./01-package-map.mdx
+  - ../03-config/01-define-config.mdx
+---
+
+# i18n Packages
+
+4 packages consolidated into 3 import paths: `@hua-labs/hua/i18n`, `/loaders`, `/formatters`.
+
+> **Important**: Translation key separator is `:` (colon), NOT `.` (dot).
+> `t('namespace:key')` — e.g., `t('common:save')`
+
+---
+
+## @hua-labs/hua/i18n (14 exports)
+
+Merges `i18n-core` (12) + `i18n-core-zustand` (2).
+
+### Hooks
+
+| Export | Description |
+|--------|-------------|
+| `useTranslation` | Returns `t()` function. Most commonly used hook |
+| `useI18n` | Full i18n context (language, setLanguage, t) |
+| `useLanguageChange` | Language change handler hook |
+| `useZustandI18n` | Zustand-based i18n store hook |
+
+### Providers
+
+| Export | Description |
+|--------|-------------|
+| `I18nProvider` | Default i18n Provider (React context) |
+| `CoreProvider` | Core Provider (internal) |
+| `createLanguageProvider` | Language Provider factory |
+| `createNamespaceProvider` | Namespace Provider factory |
+| `createCustomLoaderProvider` | Custom loader Provider factory |
+
+### Functions
+
+| Export | Description |
+|--------|-------------|
+| `createCoreI18n` | Create i18n instance |
+| `createZustandI18n` | Create Zustand-based i18n instance |
+| `serverTranslate` | Server-side translation function |
+| `ssrTranslate` | SSR translation function |
+| `Translator` | Translator class |
+
+### Server Subpath
+
+`@hua-labs/i18n-core/server` (3 exports) — server-only:
+
+```typescript
+import { Translator, serverTranslate, ssrTranslate } from '@hua-labs/i18n-core/server'
+```
+
+### Common Usage Patterns
+
+```typescript
+// Client component
+import { useTranslation } from '@hua-labs/hua/i18n'
+
+function MyComponent() {
+  const { t } = useTranslation()
+  return <h1>{t('common:welcome')}</h1>
+}
+```
+
+```typescript
+// Server component (SSR)
+import { getSSRTranslations } from '@hua-labs/hua/framework/server'
+
+export default async function Page() {
+  const { t } = await getSSRTranslations('ko', ['common'])
+  return <h1>{t('common:welcome')}</h1>
+}
+```
+
+---
+
+## @hua-labs/hua/loaders (4 exports)
+
+Translation file loading strategies.
+
+| Export | Description |
+|--------|-------------|
+| `createApiTranslationLoader` | Create API-based translation loader |
+| `preloadNamespaces` | Preload namespaces |
+| `warmFallbackLanguages` | Warm up fallback languages |
+| `withDefaultTranslations` | Wrap with default translations |
+
+```typescript
+import { createApiTranslationLoader, preloadNamespaces } from '@hua-labs/hua/loaders'
+```
+
+---
+
+## @hua-labs/hua/formatters (20 exports)
+
+Date, number, and currency formatting. Locale-aware.
+
+### Hooks
+
+| Export | Description |
+|--------|-------------|
+| `useCurrencyFormatter` | Currency formatting hook |
+| `useDateFormatter` | Date formatting hook |
+| `useNumberFormatter` | Number formatting hook |
+
+### Date/Time Functions
+
+| Export | Description |
+|--------|-------------|
+| `formatDate` | Format date |
+| `formatDateTime` | Format date + time |
+| `formatRelativeTime` | Relative time ("3 minutes ago") |
+| `getKoreanDate` | Get Date object in KST |
+| `getKoreanDateString` | Get date string in KST |
+| `applyTimezoneOffset` | Apply timezone offset |
+| `convertToTimezone` | Convert between timezones |
+| `parseDateAsTimezone` | Parse date in a timezone |
+
+### Number/Currency Functions
+
+| Export | Description |
+|--------|-------------|
+| `formatNumber` | Format number (locale-aware) |
+| `formatCurrency` | Format currency (₩, $, ¥) |
+| `formatPercent` | Format percentage |
+| `formatCompact` | Compact format ("1.2K") |
+| `getDefaultCurrency` | Default currency per language |
+| `getCurrencyDecimals` | Decimal places per currency |
+
+### Constants
+
+| Export | Description |
+|--------|-------------|
+| `KST_OFFSET` | KST UTC+9 offset (ms) |
+| `LANGUAGE_TO_CURRENCY` | Language → currency mapping |
+| `CURRENCY_DECIMALS` | Decimal config per currency |
+
+```typescript
+import { useCurrencyFormatter, formatRelativeTime, getKoreanDate } from '@hua-labs/hua/formatters'
+```

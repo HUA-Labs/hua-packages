@@ -1,0 +1,142 @@
+---
+title: State, Hooks & Utils
+description: "state, hooks, utils packages — use via @hua-labs/hua/state, /hooks, /utils"
+category: packages
+related:
+  - ./01-package-map.mdx
+---
+
+# State, Hooks & Utils
+
+Three smaller utility packages in one document.
+
+---
+
+## @hua-labs/hua/state (5 exports)
+
+Zustand-based store utilities.
+
+| Export | Description |
+|--------|-------------|
+| `createHuaStore` | Create HUA store (built-in persist + devtools) |
+| `createI18nStore` | Create i18n-specific store |
+| `isStoreRehydrated` | Check store rehydration status |
+| `markStoreRehydrated` | Mark store as rehydrated |
+| `onStoreRehydrated` | Rehydration completion callback |
+
+```typescript
+import { createHuaStore } from '@hua-labs/hua/state'
+
+const useAppStore = createHuaStore('app', (set) => ({
+  count: 0,
+  increment: () => set((s) => ({ count: s.count + 1 })),
+}))
+```
+
+---
+
+## @hua-labs/hua/hooks (3 exports)
+
+Common React hooks.
+
+| Export | Description |
+|--------|-------------|
+| `useAutoScroll` | Auto-scroll on content addition (chat UIs, etc.) |
+| `useLoading` | Loading state management (isLoading, startLoading, stopLoading) |
+| `usePerformanceMonitor` | Render performance monitoring |
+
+```typescript
+import { useAutoScroll, useLoading } from '@hua-labs/hua/hooks'
+```
+
+---
+
+## @hua-labs/hua/utils (34 exports)
+
+Pure utility functions. Works on both server and client.
+
+### String Transforms
+
+| Export | Description |
+|--------|-------------|
+| `capitalize` | Capitalize first letter |
+| `titleCase` | Title Case conversion |
+| `toCamelCase` | camelCase conversion |
+| `toKebabCase` | kebab-case conversion |
+| `toPascalCase` | PascalCase conversion |
+| `toSnakeCase` | snake_case conversion |
+| `slugify` | URL slug conversion |
+| `truncate` | Truncate string |
+
+### Formatting
+
+| Export | Description |
+|--------|-------------|
+| `formatDate` | Format date |
+| `formatNumber` | Format number |
+| `formatFileSize` | Format file size ("1.2 MB") |
+| `formatTimeAgo` | Relative time ("3 min ago") |
+
+### ID Generation
+
+| Export | Description |
+|--------|-------------|
+| `generateId` | Generate short ID |
+| `generateUUID` | Generate UUID v4 |
+
+### Validation
+
+| Export | Description |
+|--------|-------------|
+| `validateEmail` | Email validation |
+| `validatePassword` | Password validation |
+| `validatePhoneNumber` | Phone number validation |
+| `validateUrl` | URL validation |
+| `validateStringLength` | String length validation |
+| `validateNumberRange` | Number range validation |
+
+### Sanitization (Security)
+
+| Export | Description |
+|--------|-------------|
+| `sanitizeInput` | Sanitize user input (strip tags, block dangerous patterns) |
+| `sanitizeEmail` | Sanitize email |
+| `sanitizeName` | Sanitize name |
+| `sanitizeTitle` | Sanitize title |
+| `escapeHtml` | HTML escape (for email body only) |
+| `maskEmailForLog` | Mask email for logging |
+
+> **Note**: `sanitizeInput` does NOT convert HTML entities (React handles XSS automatically).
+> It only strips tags and blocks dangerous patterns.
+
+### Function Utilities
+
+| Export | Description |
+|--------|-------------|
+| `debounce` | Debounce |
+| `throttle` | Throttle |
+| `delay` | Promise delay |
+| `memoize` | Memoization |
+| `retry` | Retry wrapper |
+
+### CSS
+
+| Export | Description |
+|--------|-------------|
+| `cn` | Class name merge (clsx + tailwind-merge) |
+
+### Logger (hua-only additions)
+
+| Export | Description |
+|--------|-------------|
+| `createLogger` | Create namespaced logger |
+| `logger` | Default logger instance |
+
+> `createLogger` and `logger` are only available in `@hua-labs/hua/utils`, not in `@hua-labs/utils` directly.
+
+```typescript
+import { cn, sanitizeInput, debounce, generateUUID } from '@hua-labs/hua/utils'
+import { createLogger } from '@hua-labs/hua/utils'
+
+const log = createLogger('my-module')
+```

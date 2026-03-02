@@ -1,0 +1,141 @@
+---
+title: Motion Package
+description: "motion-core 74 exports — use via @hua-labs/hua/motion"
+category: packages
+related:
+  - ./01-package-map.mdx
+  - ../06-api-reference/03-motion-hooks.mdx
+---
+
+# Motion Package
+
+`@hua-labs/motion-core` → `@hua-labs/hua/motion` (72 exports re-exported)
+
+> CSS-first motion system. Minimal JS runtime cost, automatic `prefers-reduced-motion` support.
+
+---
+
+## Core Motion Hooks (Most Used)
+
+| Hook | Description | Returns |
+|------|-------------|---------|
+| `useFadeIn` | Fade in | `{ ref, style }` |
+| `useSlideUp` | Slide up from below | `{ ref, style }` |
+| `useSlideDown` | Slide down from above | `{ ref, style }` |
+| `useSlideLeft` | Slide in from right | `{ ref, style }` |
+| `useSlideRight` | Slide in from left | `{ ref, style }` |
+| `useScaleIn` | Scale in | `{ ref, style }` |
+| `useBounceIn` | Bounce in | `{ ref, style }` |
+| `usePulse` | Repeating pulse | `{ ref, style }` |
+
+```typescript
+import { useFadeIn, useSlideUp } from '@hua-labs/hua/motion'
+
+function Card() {
+  const fadeIn = useFadeIn()
+  return <div ref={fadeIn.ref} style={fadeIn.style}>Hello</div>
+}
+```
+
+## Scroll & Viewport
+
+| Hook | Description |
+|------|-------------|
+| `useScrollReveal` | Reveal animation on scroll |
+| `useScrollProgress` | Scroll progress (0~1) |
+| `useScrollToggle` | Toggle based on scroll direction |
+| `useInView` | Viewport intersection detection |
+| `useElementProgress` | Per-element scroll progress |
+
+## Interaction Hooks
+
+| Hook | Description |
+|------|-------------|
+| `useHoverMotion` | Motion on hover |
+| `useClickToggle` | Click toggle motion |
+| `useFocusToggle` | Focus toggle motion |
+| `useGesture` | Gesture detection |
+| `useGestureMotion` | Gesture-driven motion |
+| `useButtonEffect` | Button interaction effect |
+| `useMagneticCursor` | Magnetic cursor effect |
+| `useCustomCursor` | Custom cursor |
+
+## Animation Utilities
+
+| Hook | Description |
+|------|-------------|
+| `useSpringMotion` | Spring physics motion |
+| `useGradient` | Gradient animation |
+| `useTypewriter` | Typewriter effect |
+| `useStagger` | Staggered entrance animation |
+| `useRepeat` | Repeating motion |
+| `useToggleMotion` | Toggle motion |
+| `useLoadingSpinner` | Loading spinner motion |
+| `useSkeleton` | Skeleton motion |
+
+## State & Profile
+
+| Hook | Description |
+|------|-------------|
+| `useMotionState` | Motion state management |
+| `useMotionProfile` | Motion profile (reduced, minimal, full) |
+| `useReducedMotion` | Detect `prefers-reduced-motion` |
+| `useUnifiedMotion` | Unified motion hook (preset-based) |
+| `useSmartMotion` | Performance-based auto motion selection |
+
+## Navigation & Page
+
+| Hook | Description |
+|------|-------------|
+| `usePageMotions` | Page transition motions |
+| `useSimplePageMotion` | Simple page motion |
+| `useNavigation` | Navigation motion |
+| `useSmoothScroll` | Smooth scroll |
+
+## Sensor Hooks
+
+| Hook | Description |
+|------|-------------|
+| `useMouse` | Mouse position tracking |
+| `useWindowSize` | Window size |
+| `useVisibilityToggle` | Document visibility |
+
+## Components & Providers
+
+| Export | Description |
+|--------|-------------|
+| `Motion` | Motion wrapper component |
+| `MotionProfileProvider` | Motion profile Provider |
+| `MotionEngine` | Motion engine class |
+| `motionEngine` | Motion engine singleton |
+
+## Easing Functions
+
+| Export | Description |
+|--------|-------------|
+| `linear` | Linear |
+| `easeIn` / `easeOut` / `easeInOut` | Basic easing |
+| `easeInQuad` / `easeOutQuad` / `easeInOutQuad` | Quadratic easing |
+| `easingPresets` | Easing preset object |
+| `getEasing` / `getPresetEasing` | Easing lookup |
+| `applyEasing` / `safeApplyEasing` | Apply easing |
+| `isEasingFunction` / `isValidEasing` | Easing validation |
+| `getAvailableEasings` | List available easings |
+
+## Presets & Transitions
+
+| Export | Description |
+|--------|-------------|
+| `MOTION_PRESETS` | Motion preset constants |
+| `PAGE_MOTIONS` | Page motion presets |
+| `TransitionEffects` / `transitionEffects` | Transition effects |
+| `getMotionPreset` / `getPagePreset` | Preset lookup |
+| `mergeWithPreset` / `mergeProfileOverrides` | Preset merging |
+| `resolveProfile` | Profile resolution |
+
+## Namespace
+
+| Export | Description |
+|--------|-------------|
+| `hua` | hua namespace (motion utility bundle) |
+| `neutral` | Neutral motion preset |
