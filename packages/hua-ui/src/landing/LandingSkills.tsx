@@ -67,7 +67,7 @@ export function LandingSkills({
   // Marquee variant
   if (variant === 'marquee') {
     return (
-      <Section header={header} className={className} {...rest}>
+      <Section header={header} dot={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
             <div key={i} className="w-40 shrink-0 flex items-center gap-3 px-4 py-2">
@@ -83,7 +83,7 @@ export function LandingSkills({
   // Grid variant
   if (variant === 'grid') {
     return (
-      <Section header={header} className={className} {...rest}>
+      <Section header={header} dot={className} {...rest}>
         <div
           ref={stagger?.containerRef}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -110,7 +110,7 @@ export function LandingSkills({
 
   // Bars variant
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <div ref={stagger?.containerRef} className="space-y-6 max-w-3xl mx-auto">
         {items.map((item, i) => {
           const level = item.level ?? 100

@@ -166,7 +166,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             isUser ? "flex-row-reverse space-x-reverse" : "flex-row"
           )}>
             {showAvatar && (
-              <Avatar className="w-8 h-8 flex-shrink-0">
+              <Avatar dot="w-8 h-8 flex-shrink-0">
                 <AvatarImage
                   src={isUser ? user.avatar : assistant.avatar}
                   alt={isUser ? user.name : assistant.name}
@@ -213,9 +213,9 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   <span>{formatTime(message.timestamp)}</span>
                 )}
                 {showEmotion && message.emotion && (
-                  <Badge 
-                    variant="secondary" 
-                    className={merge("text-xs", getEmotionColor(message.emotion))}
+                  <Badge
+                    variant="secondary"
+                    dot={merge("text-xs", getEmotionColor(message.emotion))}
                   >
                     {message.emotion}
                   </Badge>
@@ -238,7 +238,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           {...props}
         >
           {showAvatar && (
-            <Avatar className="w-6 h-6 flex-shrink-0">
+            <Avatar dot="w-6 h-6 flex-shrink-0">
               <AvatarImage
                 src={isUser ? user.avatar : assistant.avatar}
                 alt={isUser ? user.name : assistant.name}
@@ -264,15 +264,15 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 </span>
               )}
               {showEmotion && message.emotion && (
-                <Badge 
-                  variant="secondary" 
-                  className={merge("text-xs", getEmotionColor(message.emotion))}
+                <Badge
+                  variant="secondary"
+                  dot={merge("text-xs", getEmotionColor(message.emotion))}
                 >
                   {message.emotion}
                 </Badge>
               )}
             </div>
-            
+
             <div className="text-sm">
               {message.isTyping ? (
                 <div className="flex space-x-1">
@@ -300,7 +300,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
         {...props}
       >
         {showAvatar && (
-          <Avatar className="w-10 h-10 flex-shrink-0">
+          <Avatar dot="w-10 h-10 flex-shrink-0">
             <AvatarImage
               src={isUser ? user.avatar : assistant.avatar}
               alt={isUser ? user.name : assistant.name}
@@ -326,20 +326,20 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               </span>
             )}
             {showEmotion && message.emotion && (
-              <Badge 
-                variant="secondary" 
-                className={merge("text-xs", getEmotionColor(message.emotion))}
+              <Badge
+                variant="secondary"
+                dot={merge("text-xs", getEmotionColor(message.emotion))}
               >
                 {message.emotion}
               </Badge>
             )}
           </div>
-          
-          <Card className={merge(
+
+          <Card dot={merge(
             "inline-block",
             isUser ? "bg-primary text-primary-foreground" : "bg-muted"
           )}>
-            <CardContent className="p-3">
+            <CardContent dot="p-3">
               {message.isTyping ? (
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-current rounded-full animate-bounce" />

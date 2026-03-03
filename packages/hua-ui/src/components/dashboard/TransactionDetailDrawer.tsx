@@ -286,7 +286,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
           <div className="flex items-center gap-3">
             <p className="text-lg font-semibold text-slate-900 dark:text-white">{transaction?.id ?? "—"}</p>
             {statusStyle && (
-              <Badge className={merge("font-medium px-3 py-1 text-xs rounded-full", statusStyle.badge)}>
+              <Badge dot={merge("font-medium px-3 py-1 text-xs rounded-full", statusStyle.badge)}>
                 {statusStyle.label}
               </Badge>
             )}

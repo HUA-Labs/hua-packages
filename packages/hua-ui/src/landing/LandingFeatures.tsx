@@ -116,7 +116,7 @@ export function LandingFeatures({
       header={header}
       spacing="lg"
       {...sectionProps}
-      className={merge(className)}
+      dot={merge(className)}
       {...rest}
     >
       <div

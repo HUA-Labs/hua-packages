@@ -1,43 +1,49 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const containerVariants = cva(
-  "w-full",
-  {
-    variants: {
-      size: {
-        sm: "max-w-2xl",
-        md: "max-w-4xl",
-        lg: "max-w-6xl",
-        xl: "max-w-7xl",
-        full: "max-w-full",
-      },
-      padding: {
-        none: "",
-        sm: "px-3 sm:px-4 py-6 sm:py-8",
-        md: "px-4 sm:px-6 py-8 sm:py-12",
-        lg: "px-4 sm:px-6 lg:px-8 py-10 sm:py-16",
-        xl: "px-6 sm:px-8 lg:px-12 py-12 sm:py-20",
-      },
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const containerVariants = dotVariants({
+  base: "w-full",
+  variants: {
+    size: {
+      sm: "max-w-2xl",
+      md: "max-w-4xl",
+      lg: "max-w-6xl",
+      xl: "max-w-7xl",
+      full: "max-w-full",
     },
-    defaultVariants: {
-      size: "lg",
-      padding: "md",
+    padding: {
+      none: "",
+      sm: "px-4 py-8",
+      md: "px-6 py-12",
+      lg: "px-8 py-16",
+      xl: "px-12 py-20",
     },
-  }
-)
+  },
+  defaultVariants: {
+    size: "lg",
+    padding: "md",
+  },
+})
+
+const CENTERED_STYLE: React.CSSProperties = {
+  marginLeft: 'auto',
+  marginRight: 'auto',
+}
 
 /**
  * Container 컴포넌트의 props
  */
-export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   size?: "sm" | "md" | "lg" | "xl" | "full"
   padding?: "none" | "sm" | "md" | "lg" | "xl"
   centered?: boolean
   fluid?: boolean
+  dot?: string
 }
 
 /**
@@ -53,22 +59,32 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
   ({
-    className,
+    dot: dotProp,
     size = "lg",
     padding = "md",
     centered = true,
     fluid = false,
+    style,
     ...props
   }, ref) => {
+    const computedStyle = useMemo(() => {
+      const base = containerVariants({
+        size: fluid ? "full" : size,
+        padding,
+      }) as React.CSSProperties
+      return mergeStyles(
+        base,
+        fluid ? s("max-w-full") : undefined,
+        centered ? CENTERED_STYLE : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [size, padding, centered, fluid, dotProp, style])
+
     return (
       <div
         ref={ref}
-        className={merge(
-          containerVariants({ size: fluid ? undefined : size, padding }),
-          fluid && "max-w-full",
-          centered && "mx-auto",
-          className
-        )}
+        style={computedStyle}
         {...props}
       />
     )
@@ -76,4 +92,4 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
 )
 Container.displayName = "Container"
 
-export { Container } 
+export { Container }

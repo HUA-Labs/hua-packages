@@ -262,7 +262,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             aria-autocomplete="list"
             aria-expanded={isOpen}
             aria-controls="autocomplete-list"
-            className={merge(sizeClasses[size], "pr-10")}
+            dot={merge(sizeClasses[size], "pr-10")}
           />
           
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">

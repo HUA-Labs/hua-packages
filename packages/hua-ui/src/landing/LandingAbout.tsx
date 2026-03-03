@@ -55,7 +55,7 @@ export function LandingAbout({
   }
 
   return (
-    <Section className={className} {...rest}>
+    <Section dot={className} {...rest}>
       <Container size="lg" padding="none" centered>
         <div
           ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
@@ -69,7 +69,7 @@ export function LandingAbout({
                 size="lg"
                 src={avatar}
                 alt={name}
-                className="w-32 h-32 md:w-40 md:h-40"
+                dot="w-32 h-32 md:w-40 md:h-40"
               />
             </div>
           )}

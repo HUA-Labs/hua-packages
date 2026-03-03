@@ -42,7 +42,7 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
 
   return (
     <CardComponent
-      className="bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl overflow-hidden group hover:shadow-lg transition-shadow"
+      dot="bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl overflow-hidden group hover:shadow-lg transition-shadow"
       style={style}
     >
       {item.image && (
@@ -147,7 +147,7 @@ export function LandingProjects({
     : undefined
 
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       {/* Tag Filter */}
       {filter && allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8 justify-center">

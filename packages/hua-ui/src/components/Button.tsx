@@ -1,89 +1,78 @@
-"use client";
+"use client"
 
-import React from "react";
-import { merge } from "../lib/utils";
-import { buttonVariants, gradientPresets } from "./Button.variants";
-import { Slot } from "../lib/Slot";
-import { useReducedMotion } from "../hooks/useReducedMotion";
+import React, { useState, useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import { Slot } from "../lib/Slot"
+import { useReducedMotion } from "../hooks/useReducedMotion"
+import {
+  buttonVariantStyles,
+  VARIANT_EXTRAS,
+  VARIANT_HOVER,
+  HOVER_TRANSITIONS,
+  HOVER_STYLES,
+  ACTIVE_STYLES,
+  DISABLED_STYLES,
+  gradientPresets,
+  getFocusRing,
+  type HoverEffect,
+} from "./Button.variants"
 
-/**
- * 버튼 스타일 변형 / Button style variant
- */
 type Variant =
   | "default" | "destructive" | "outline" | "secondary"
-  | "ghost" | "link" | "gradient" | "neon" | "glass";
+  | "ghost" | "link" | "gradient" | "neon" | "glass"
 
-/**
- * 버튼 크기 / Button size
- */
-type Size = "sm" | "md" | "lg" | "xl" | "icon";
+type Size = "sm" | "md" | "lg" | "xl" | "icon"
+type Rounded = "sm" | "md" | "lg" | "full"
+type Shadow = "none" | "sm" | "md" | "lg" | "xl"
+type GradientName = "blue" | "purple" | "green" | "orange" | "pink" | "custom"
 
-/**
- * 버튼 모서리 둥글기 / Button border radius
- */
-type Rounded = "sm" | "md" | "lg" | "full";
-
-/**
- * 버튼 그림자 / Button shadow
- */
-type Shadow = "none" | "sm" | "md" | "lg" | "xl";
-
-/**
- * 버튼 호버 효과 / Button hover effect
- * "springy"가 HUA-UI 시그니처 - 공 튕기듯 미세한 반동
- */
-type Hover = "springy" | "scale" | "glow" | "slide" | "none";
-
-/**
- * 그라디언트 색상 이름 / Gradient color name
- */
-type GradientName = "blue" | "purple" | "green" | "orange" | "pink" | "custom";
-
-/**
- * Button 컴포넌트의 공통 props / Common props for Button component
- */
 type CommonProps = {
-  variant?: Variant;
-  size?: Size;
-  loading?: boolean;
-  icon?: React.ReactNode;
-  iconPosition?: "left" | "right";
-  gradient?: GradientName;
-  customGradient?: string;
-  rounded?: Rounded;
-  shadow?: Shadow;
-  hover?: Hover;
-  fullWidth?: boolean;
-  iconOnly?: boolean;
-  "aria-label"?: string;
-  className?: string;
-  disabled?: boolean;
-  asChild?: boolean;
-};
+  variant?: Variant
+  size?: Size
+  loading?: boolean
+  icon?: React.ReactNode
+  iconPosition?: "left" | "right"
+  gradient?: GradientName
+  customGradient?: string
+  rounded?: Rounded
+  shadow?: Shadow
+  hover?: HoverEffect
+  fullWidth?: boolean
+  iconOnly?: boolean
+  "aria-label"?: string
+  dot?: string
+  disabled?: boolean
+  asChild?: boolean
+}
 
 type AnchorProps = CommonProps &
-  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "className"> & {
-    href: string;
-  };
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'className'> & {
+    href: string
+  }
 
 type NativeButtonProps = CommonProps &
-  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className" | "type"> & {
-    href?: undefined;
-  };
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'type'> & {
+    href?: undefined
+  }
+
+export type ButtonProps = AnchorProps | NativeButtonProps
+
+type AnchorOrButton = HTMLAnchorElement | HTMLButtonElement
+
+const SR_ONLY: React.CSSProperties = {
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  padding: 0,
+  margin: '-1px',
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  borderWidth: 0,
+}
 
 /**
- * Button 컴포넌트의 props 타입 / Button component props type
- * href가 제공되면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
- */
-export type ButtonProps = AnchorProps | NativeButtonProps;
-
-type AnchorOrButton = HTMLAnchorElement | HTMLButtonElement;
-
-/**
- * Button 컴포넌트 / Button component
- *
- * 다양한 스타일과 크기를 지원하는 범용 버튼 컴포넌트입니다.
- * href prop을 제공하면 앵커 태그로, 그렇지 않으면 버튼 태그로 렌더링됩니다.
+ * Button 컴포넌트
  *
  * @example
  * <Button onClick={() => console.log('클릭')}>클릭하세요</Button>
@@ -105,119 +94,187 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(function Butto
     hover = "springy",
     fullWidth,
     iconOnly,
-    className,
+    dot: dotProp,
     children,
     disabled,
     asChild = false,
+    style,
     ...rest
   },
   ref
 ) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotion()
+  const effectiveHover: HoverEffect = reduced ? 'none' : hover
+  const isDisabled = !!disabled || loading
 
-  // gradient variant: 커스텀 그라디언트 클래스 처리
-  const gradientClass =
-    variant === "gradient"
-      ? customGradient
-        ? `bg-gradient-to-r ${customGradient}`
-        : `bg-gradient-to-r ${gradientPresets[gradient] || gradientPresets.blue}`
-      : undefined;
+  const [isHovered, setIsHovered] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
 
-  const base = merge(
-    buttonVariants({
-      variant,
-      size,
-      rounded,
-      shadow,
-      hover: reduced ? "none" : hover,
+  const baseStyle = useMemo(() => {
+    const variantBase = buttonVariantStyles({
+      variant, size, rounded, shadow,
       fullWidth: fullWidth ?? false,
-    }),
-    gradientClass,
-    className
-  );
+    })
+
+    const extras = VARIANT_EXTRAS[variant]
+
+    const gradientStyle: React.CSSProperties | undefined =
+      variant === 'gradient'
+        ? { backgroundImage: customGradient || gradientPresets[gradient] || gradientPresets.blue }
+        : undefined
+
+    const transitionStyle: React.CSSProperties = {
+      transition: HOVER_TRANSITIONS[effectiveHover],
+    }
+
+    const gpuHint: React.CSSProperties | undefined =
+      (effectiveHover === 'springy' || effectiveHover === 'scale' || effectiveHover === 'slide')
+        ? { willChange: 'transform' }
+        : undefined
+
+    return mergeStyles(
+      variantBase as React.CSSProperties,
+      extras,
+      gradientStyle,
+      transitionStyle,
+      gpuHint,
+      resolveDot(dotProp),
+      style,
+    )
+  }, [variant, size, rounded, shadow, fullWidth, gradient, customGradient, effectiveHover, dotProp, style])
+
+  const computedStyle = useMemo(() => {
+    if (isDisabled) return mergeStyles(baseStyle, DISABLED_STYLES)
+
+    let result = baseStyle
+
+    if (isFocused) {
+      result = mergeStyles(result, getFocusRing(variant))
+    }
+
+    if (isActive) {
+      result = mergeStyles(result, VARIANT_HOVER[variant], ACTIVE_STYLES[effectiveHover])
+    } else if (isHovered) {
+      result = mergeStyles(result, VARIANT_HOVER[variant], HOVER_STYLES[effectiveHover])
+    }
+
+    return result
+  }, [baseStyle, isDisabled, isHovered, isActive, isFocused, variant, effectiveHover])
+
+  const handleMouseEnter = () => { if (!isDisabled) setIsHovered(true) }
+  const handleMouseLeave = () => { setIsHovered(false); setIsActive(false) }
+  const handleMouseDown = () => { if (!isDisabled) setIsActive(true) }
+  const handleMouseUp = () => setIsActive(false)
 
   const Spinner = (
-    <span role="status" aria-live="polite" className="-ml-1 mr-2 inline-flex">
-      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    <span role="status" aria-live="polite" style={{ marginLeft: '-4px', marginRight: '8px', display: 'inline-flex' }}>
+      <svg style={{ animation: 'spin 1s linear infinite', height: '16px', width: '16px' }} viewBox="0 0 24 24" fill="none">
+        <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
       </svg>
-      <span className="sr-only">로딩 중</span>
+      <span style={SR_ONLY}>로딩 중</span>
     </span>
-  );
+  )
 
   const content = (
     <>
       {loading && Spinner}
-      {!loading && icon && iconPosition === "left" && <span className="mr-2">{icon}</span>}
+      {!loading && icon && iconPosition === "left" && <span style={{ marginRight: '8px' }}>{icon}</span>}
       {children}
-      {!loading && icon && iconPosition === "right" && <span className="ml-2">{icon}</span>}
+      {!loading && icon && iconPosition === "right" && <span style={{ marginLeft: '8px' }}>{icon}</span>}
     </>
-  );
+  )
 
   if (iconOnly && !("aria-label" in rest) && process.env.NODE_ENV !== "production") {
-    console.warn("[Button] iconOnly 사용 시 aria-label을 제공하세요.");
+    console.warn("[Button] iconOnly 사용 시 aria-label을 제공하세요.")
   }
 
-  // asChild 모드: Slot을 사용하여 자식 요소에 props 병합
+  // asChild: Slot을 사용하여 자식 요소에 props 병합
   if (asChild) {
-    const slotProps = {
-      className: base,
-      ref,
-      disabled: disabled || loading,
-      "aria-busy": loading || undefined,
-      "aria-disabled": (disabled || loading) || undefined,
-      ...rest,
-    };
-    return <Slot {...slotProps}>{children}</Slot>;
+    return (
+      <Slot
+        ref={ref}
+        aria-busy={loading || undefined}
+        aria-disabled={isDisabled || undefined}
+        {...rest}
+        style={computedStyle}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      >
+        {children}
+      </Slot>
+    )
   }
 
   // 앵커 모드
   if ("href" in rest && rest.href) {
-    const { onClick, target, rel, href, "aria-label": _ariaLabel, className: anchorClassName, ...anchorProps } = rest as AnchorProps;
-    const isDisabled = !!disabled || loading;
+    const {
+      onClick, target, rel, href,
+      onFocus: onFocusProp, onBlur: onBlurProp,
+      ...anchorProps
+    } = rest as AnchorProps
 
     const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
-      if (isDisabled) { e.preventDefault(); e.stopPropagation(); return; }
-      onClick?.(e);
-    };
+      if (isDisabled) { e.preventDefault(); e.stopPropagation(); return }
+      onClick?.(e)
+    }
 
     return (
       <a
+        {...anchorProps}
         ref={ref as React.Ref<HTMLAnchorElement>}
         href={href}
-        className={merge(base, anchorClassName)}
+        style={computedStyle}
         onClick={handleAnchorClick}
         aria-busy={loading || undefined}
         aria-disabled={isDisabled || undefined}
         tabIndex={isDisabled ? -1 : anchorProps.tabIndex}
         target={target}
         rel={target === "_blank" ? rel ?? "noopener noreferrer" : rel}
-        {...anchorProps}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onFocus={(e) => { setIsFocused(true); onFocusProp?.(e) }}
+        onBlur={(e) => { setIsFocused(false); onBlurProp?.(e) }}
       >
         {content}
       </a>
-    );
+    )
   }
 
   // 버튼 모드
-  const { className: buttonClassName, ...btnProps } = rest as NativeButtonProps;
-  const isDisabled = !!disabled || loading;
+  const {
+    onFocus: onFocusProp, onBlur: onBlurProp,
+    ...btnProps
+  } = rest as NativeButtonProps
+
   return (
     <button
+      {...btnProps}
       ref={ref as React.Ref<HTMLButtonElement>}
-      className={merge(base, buttonClassName)}
+      style={computedStyle}
       type="button"
       disabled={isDisabled}
       aria-busy={loading || undefined}
       aria-disabled={isDisabled || undefined}
-      {...btnProps}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onFocus={(e) => { setIsFocused(true); onFocusProp?.(e) }}
+      onBlur={(e) => { setIsFocused(false); onBlurProp?.(e) }}
     >
       {content}
     </button>
-  );
-});
+  )
+})
 
-ButtonInner.displayName = "Button";
+ButtonInner.displayName = "Button"
 
-export const Button = ButtonInner;
+export const Button = ButtonInner

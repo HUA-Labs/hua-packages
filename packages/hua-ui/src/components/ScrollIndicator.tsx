@@ -145,7 +145,7 @@ const ScrollIndicator = React.forwardRef<HTMLDivElement, ScrollIndicatorProps>((
         onClick={scrollToTarget}
         variant="ghost"
         size="sm"
-        className={merge(
+        dot={merge(
           'flex flex-col items-center space-y-2 transition-all duration-300',
           sizeClasses[size],
           variantClasses[variant],

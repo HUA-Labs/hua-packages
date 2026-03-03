@@ -159,7 +159,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         size="sm"
         onClick={action.onClick}
         disabled={action.disabled || loading}
-        className={merge('flex-1 sm:flex-initial', action.className)}
+        dot={merge('flex-1 sm:flex-initial', action.className)}
       >
         {action.icon && <Icon name={action.icon} className="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />}
         <span className="hidden sm:inline">{action.label}</span>
@@ -189,7 +189,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 variant="outline"
                 size="sm"
                 onClick={onToggleSelectAll}
-                className="flex-1 sm:flex-initial min-w-[100px]"
+                dot="flex-1 sm:flex-initial min-w-[100px]"
               >
                 <Icon name={selectedCount === totalCount ? "square" : "check"} className="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
                 <span className="hidden sm:inline">{selectedCount === totalCount ? '전체 해제' : '전체 선택'}</span>
@@ -210,7 +210,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 variant="outline"
                 size="sm"
                 onClick={onCancelSelect}
-                className="flex-1 sm:flex-initial min-w-[80px]"
+                dot="flex-1 sm:flex-initial min-w-[80px]"
               >
                 취소
               </Button>
@@ -225,7 +225,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 size="sm"
                 onClick={onToggleSelectMode}
                 disabled={totalCount === 0}
-                className="flex-1 sm:flex-initial min-w-[80px] sm:min-w-[auto] px-2 sm:px-3"
+                dot="flex-1 sm:flex-initial min-w-[80px] sm:min-w-[auto] px-2 sm:px-3"
                 title={totalCount === 0 ? "항목이 없습니다" : "여러 항목 선택"}
               >
                 <Icon name="check" className="h-4 w-4 sm:h-3.5 sm:w-3.5" />

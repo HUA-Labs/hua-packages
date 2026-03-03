@@ -81,7 +81,7 @@ const isBrowser = typeof window !== "undefined";
 export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
   (
     {
-      className,
+      dot,
       children,
       actionType = "primary",
       feedback = "ripple",
@@ -241,9 +241,9 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/60",
           loading && "cursor-wait opacity-80",
           iconOnly && "justify-center",
-          className
+          dot
         ),
-      [className, loading, iconOnly]
+      [dot, loading, iconOnly]
     );
 
     /** 분기 1) href가 있으면 앵커 브랜치 */
@@ -260,7 +260,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
         <Button
           ref={ref as React.Ref<AnchorEl>}
           href={href}
-          className={cls}
+          dot={cls}
           style={styleVars}
           onClick={handleClick}
           aria-busy={loading || undefined}
@@ -288,7 +288,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
     return (
       <Button
         ref={ref as React.Ref<ButtonEl>}
-        className={cls}
+        dot={cls}
         style={styleVars}
         onClick={handleClick}
         disabled={disabled}

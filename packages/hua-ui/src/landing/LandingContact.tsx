@@ -57,7 +57,7 @@ export function LandingContact({
     : undefined
 
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <Container size="md" padding="none" centered>
         <div
           ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}

@@ -94,7 +94,7 @@ export function LandingLogoCloud({
   const header = title ? { title, subtitle: undefined } : undefined
 
   return (
-    <Section header={header} spacing="sm" className={merge("py-12 sm:py-16", className)} {...rest}>
+    <Section header={header} spacing="sm" dot={merge("py-12 sm:py-16", className)} {...rest}>
       <div
         ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
         style={scrollReveal?.style ?? fallbackStyle}

@@ -1,32 +1,41 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const linkVariants = cva(
-  "transition-colors duration-200",
-  {
-    variants: {
-      variant: {
-        default: "text-foreground hover:text-muted-foreground",
-        primary: "text-primary hover:text-primary/80",
-        secondary: "text-muted-foreground hover:text-foreground",
-        ghost: "text-muted-foreground hover:text-foreground",
-        underline: "text-primary hover:text-primary/80 underline hover:no-underline",
-      },
-      size: {
-        sm: "text-sm",
-        md: "text-base",
-        lg: "text-lg",
-      },
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const linkVariants = dotVariants({
+  base: "",
+  variants: {
+    variant: {
+      default: "text-[var(--color-foreground)]",
+      primary: "text-[var(--color-primary)]",
+      secondary: "text-[var(--color-muted-foreground)]",
+      ghost: "text-[var(--color-muted-foreground)]",
+      underline: "text-[var(--color-primary)] underline",
     },
-    defaultVariants: {
-      variant: "default",
-      size: "md",
+    size: {
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "md",
+  },
+})
+
+/** Hover color overrides per variant */
+const VARIANT_HOVER: Record<string, React.CSSProperties> = {
+  default: { color: 'var(--color-muted-foreground)' },
+  primary: { opacity: 0.8 },
+  secondary: { color: 'var(--color-foreground)' },
+  ghost: { color: 'var(--color-foreground)' },
+  underline: { opacity: 0.8, textDecoration: 'none' },
+}
 
 /**
  * Link 컴포넌트의 props / Link component props
@@ -37,7 +46,8 @@ export interface LinkProps {
   variant?: "default" | "primary" | "secondary" | "ghost" | "underline"
   size?: "sm" | "md" | "lg"
   external?: boolean
-  className?: string
+  dot?: string
+  style?: React.CSSProperties
   onClick?: () => void
 }
 
@@ -55,21 +65,35 @@ export interface LinkProps {
 export function Link({
   href,
   children,
-  className,
+  dot: dotProp,
   variant = "default",
   size = "md",
   external = false,
-  onClick
+  style,
+  onClick,
 }: LinkProps) {
+  const [isHovered, setIsHovered] = useState(false)
+
+  const computedStyle = useMemo(() => {
+    const base = linkVariants({ variant, size }) as React.CSSProperties
+    const transitionStyle: React.CSSProperties = {
+      transition: 'color 200ms ease-out, opacity 200ms ease-out, text-decoration 200ms ease-out',
+    }
+    const hoverStyle = isHovered ? VARIANT_HOVER[variant] : undefined
+    return mergeStyles(base, transitionStyle, hoverStyle, resolveDot(dotProp), style)
+  }, [variant, size, isHovered, dotProp, style])
+
   return (
     <a
       href={href}
-      className={merge(linkVariants({ variant, size }), className)}
+      style={computedStyle}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
     </a>
   )
-} 
+}

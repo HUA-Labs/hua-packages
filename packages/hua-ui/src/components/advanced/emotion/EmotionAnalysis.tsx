@@ -173,7 +173,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
               <span className="text-sm font-medium">키워드:</span>
               <div className="flex flex-wrap gap-1 mt-1">
                 {keywords.map((keyword) => (
-                  <Badge key={keyword} variant="secondary" className="text-xs">
+                  <Badge key={keyword} variant="secondary" dot="text-xs">
                     {keyword}
                   </Badge>
                 ))}
@@ -188,11 +188,11 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
       return (
         <Card
           ref={ref}
-          className={merge("", className)}
+          dot={merge("", className)}
           {...props}
         >
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle dot="flex items-center">
               <span className="text-2xl mr-2">✨</span>
               AI 분석
             </CardTitle>
@@ -200,7 +200,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
               감정 분석 결과
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent dot="space-y-4">
             {primaryEmotion && (
               <div className="space-y-3">
                 <div className="text-sm">
@@ -249,7 +249,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
                 <span className="font-medium">키워드:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {keywords.map((keyword) => (
-                    <Badge key={keyword} variant="secondary" className="text-xs">
+                    <Badge key={keyword} variant="secondary" dot="text-xs">
                       {keyword}
                     </Badge>
                   ))}
@@ -364,7 +364,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             <h3 className="text-lg font-semibold">감정 키워드</h3>
             <div className="flex flex-wrap gap-2">
               {keywords.map((keyword) => (
-                <Badge key={keyword} variant="outline" className="text-sm">
+                <Badge key={keyword} variant="outline" dot="text-sm">
                   {keyword}
                 </Badge>
               ))}

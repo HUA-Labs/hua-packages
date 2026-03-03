@@ -92,7 +92,7 @@ export function LandingExperience({
     : undefined
 
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <div ref={stagger?.containerRef} className="max-w-3xl mx-auto">
         {items.map((item, i) => (
           <ExperienceItem

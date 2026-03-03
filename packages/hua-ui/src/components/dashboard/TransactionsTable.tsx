@@ -244,7 +244,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const config = STATUS_STYLES[status] || STATUS_STYLES.pending;
     const label = statusLabels?.[status] ?? config.label;
     return (
-      <Badge className={merge("font-medium px-3 py-1 rounded-full text-xs", config.badge)}>
+      <Badge dot={merge("font-medium px-3 py-1 rounded-full text-xs", config.badge)}>
         {label}
       </Badge>
     );
@@ -363,7 +363,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
               {isLoading && (
                 <TableRow>
                   <TableCell colSpan={columnList.length}>
-                    <SkeletonTable className="py-4" />
+                    <SkeletonTable dot="py-4" />
                   </TableCell>
                 </TableRow>
               )}

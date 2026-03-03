@@ -33,7 +33,6 @@ export { Container } from './components/Container';
 export type { ContainerProps } from './components/Container';
 export { Section } from './components/Section';
 export type { SectionProps, SectionHeaderConfig } from './components/Section';
-export { sectionVariants } from './components/Section';
 export { Grid } from './components/Grid';
 export { Stack } from './components/Stack';
 export { Divider } from './components/Divider';

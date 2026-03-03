@@ -156,7 +156,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, idx) => (
-              <Skeleton key={idx} className="h-20 rounded-2xl" />
+              <Skeleton key={idx} dot="h-20 rounded-2xl" />
             ))}
           </div>
         ) : !hasItems ? (
@@ -205,7 +205,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-slate-900 dark:text-white">{merchant.name}</p>
                         {merchant.status && (
-                          <Badge className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-100">
+                          <Badge dot="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-100">
                             {merchant.status}
                           </Badge>
                         )}

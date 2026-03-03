@@ -98,7 +98,7 @@ export function LandingMetrics({
     : undefined
 
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <div
         ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
         style={scrollReveal?.style ?? fallbackStyle}
