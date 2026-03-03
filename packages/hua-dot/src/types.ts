@@ -71,6 +71,7 @@ export interface DotUserConfig {
     borderRadius?: Record<string, string>;
     fontSize?: Record<string, string>;
     fontWeight?: Record<string, string | number>;
+    fontFamily?: Record<string, string>;
     lineHeight?: Record<string, string>;
     letterSpacing?: Record<string, string>;
     zIndex?: Record<string, string | number>;
@@ -125,6 +126,7 @@ export interface ResolvedTokens {
   borderRadius: Record<string, string>;
   fontSize: Record<string, string>;
   fontWeight: Record<string, string | number>;
+  fontFamily: Record<string, string>;
   lineHeight: Record<string, string>;
   letterSpacing: Record<string, string>;
   zIndex: Record<string, string | number>;

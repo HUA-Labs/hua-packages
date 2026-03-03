@@ -33,8 +33,8 @@ const shared = {
 async function addUseClientDirective() {
   const distDir = join(import.meta.dirname, 'dist');
   const files = await readdir(distDir);
-  // Only add "use client" to ESM entry points (.mjs)
-  const esmFiles = files.filter(f => f.endsWith('.mjs'));
+  // Only add "use client" to ESM entry points (.mjs), excluding native (RN doesn't use "use client")
+  const esmFiles = files.filter(f => f.endsWith('.mjs') && f !== 'native.mjs');
 
   for (const file of esmFiles) {
     const filePath = join(distDir, file);
@@ -58,6 +58,21 @@ export default defineConfig([
     splitting: true,
     outDir: 'dist',
     clean: true,
+  },
+  // Native primitives (React Native — no "use client")
+  {
+    ...shared,
+    entry: { native: 'src/native/index.ts' },
+    dts: {
+      compilerOptions: {
+        incremental: false,
+      },
+    },
+    format: ['esm'],
+    splitting: false,
+    outDir: 'dist',
+    clean: false,
+    external: [...shared.external, 'react-native', '@hua-labs/dot', '@hua-labs/dot/native'],
   },
   // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {

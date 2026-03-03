@@ -29,9 +29,14 @@ export function resolveTypography(prefix: string, value: string, config: DotConf
       return resolveColor('text', value, config);
     }
     case 'font': {
+      // Priority: fontWeight > fontFamily
       const weight = config.tokens.fontWeight[value];
       if (weight !== undefined) {
         return { fontWeight: weight };
+      }
+      const family = config.tokens.fontFamily[value];
+      if (family !== undefined) {
+        return { fontFamily: family };
       }
       return {};
     }

@@ -4,19 +4,19 @@
   "description": "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "react-native": {
-        "types": "./dist/native.d.ts",
+        "types": "./dist/native.d.mts",
         "import": "./dist/native.mjs"
       },
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
     "./native": {
-      "types": "./dist/native.d.ts",
+      "types": "./dist/native.d.mts",
       "import": "./dist/native.mjs",
       "default": "./dist/native.mjs"
     }

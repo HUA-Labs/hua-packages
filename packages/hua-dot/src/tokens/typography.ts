@@ -53,6 +53,13 @@ export const LETTER_SPACINGS: Record<string, string> = {
   'widest': '0.1em',
 } as const;
 
+/** Font family stacks */
+export const FONT_FAMILIES: Record<string, string> = {
+  'sans': 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+  'serif': 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+  'mono': 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+} as const;
+
 /** Text alignment values */
 export const TEXT_ALIGNS: Record<string, string> = {
   'left': 'left',
