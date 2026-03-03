@@ -69,6 +69,30 @@ export const MAX_WIDTH_KEYWORDS: Record<string, string> = {
   'screen-2xl': '1536px',
 } as const;
 
+/** Inset keyword values (for top/right/bottom/left/inset) */
+export const INSET_KEYWORDS: Record<string, string> = {
+  'auto': 'auto',
+  'full': '100%',
+  '1/2': '50%',
+  '1/3': '33.333333%',
+  '2/3': '66.666667%',
+  '1/4': '25%',
+  '3/4': '75%',
+} as const;
+
+/** Maps inset prefix to CSS properties */
+export const INSET_PROP_MAP: Record<string, readonly string[]> = {
+  'top': ['top'],
+  'right': ['right'],
+  'bottom': ['bottom'],
+  'left': ['left'],
+  'inset': ['top', 'right', 'bottom', 'left'],
+  'inset-x': ['left', 'right'],
+  'inset-y': ['top', 'bottom'],
+  'start': ['insetInlineStart'],
+  'end': ['insetInlineEnd'],
+} as const;
+
 /** Maps sizing prefix to CSS property */
 export const SIZE_PROP_MAP: Record<string, string> = {
   'w': 'width',

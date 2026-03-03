@@ -1,18 +1,19 @@
-import type { StyleObject } from '../types';
-import { COLORS, SPECIAL_COLORS, COLOR_PROP_MAP } from '../tokens/colors';
+import type { StyleObject, DotConfig, ResolvedTokens } from '../types';
+import { COLOR_PROP_MAP } from '../tokens/colors';
 
 /**
  * Look up a color value from palette or special colors.
  *
  * @example
- * lookupColor('primary-500') → '#3b82f6'
- * lookupColor('white')       → '#ffffff'
- * lookupColor('gray-100')    → '#f3f4f6'
+ * lookupColor('primary-500', colors) → '#3b82f6'
+ * lookupColor('white', colors)       → '#ffffff'
+ * lookupColor('gray-100', colors)    → '#f3f4f6'
  */
-export function lookupColor(value: string): string | undefined {
-  // Check special colors first (white, black, transparent, current)
-  if (SPECIAL_COLORS[value]) {
-    return SPECIAL_COLORS[value];
+export function lookupColor(value: string, colors: ResolvedTokens['colors']): string | undefined {
+  // Check special/flat colors first (white, black, transparent, current)
+  const flat = colors[value];
+  if (typeof flat === 'string') {
+    return flat;
   }
 
   // Split color name and shade: 'primary-500' → ['primary', '500']
@@ -22,8 +23,8 @@ export function lookupColor(value: string): string | undefined {
   const colorName = value.slice(0, lastDash);
   const shade = value.slice(lastDash + 1);
 
-  const palette = COLORS[colorName];
-  if (!palette) return undefined;
+  const palette = colors[colorName];
+  if (!palette || typeof palette === 'string') return undefined;
 
   return palette[shade];
 }
@@ -31,11 +32,11 @@ export function lookupColor(value: string): string | undefined {
 /**
  * Resolve color tokens: bg-primary-500 → { backgroundColor: '#3b82f6' }
  */
-export function resolveColor(prefix: string, value: string): StyleObject {
+export function resolveColor(prefix: string, value: string, config: DotConfig): StyleObject {
   const prop = COLOR_PROP_MAP[prefix];
   if (!prop) return {};
 
-  const hex = lookupColor(value);
+  const hex = lookupColor(value, config.tokens.colors);
   if (!hex) return {};
 
   return { [prop]: hex };

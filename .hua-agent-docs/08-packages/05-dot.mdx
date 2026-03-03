@@ -37,21 +37,31 @@ import { dot } from '@hua-labs/hua/dot'
 const style = dot('p-4 rounded-lg bg-primary-500 text-white')
 // { padding: '16px', borderRadius: '8px', backgroundColor: '#3b82f6', color: '#ffffff' }
 
-// RN → StyleSheet-compatible object
-const style = dot('p-4 rounded-lg bg-primary-500 text-white')
-// { padding: 16, borderRadius: 8, backgroundColor: '#3b82f6', color: '#ffffff' }
+// Transform accumulation (여러 transform → 하나의 문자열)
+dot('rotate-45 scale-110 translate-x-4')
+// { transform: 'rotate(45deg) scale(1.1) translateX(16px)' }
+
+// Negative values
+dot('-m-4 -translate-x-2')
+// { margin: '-16px', transform: 'translateX(-8px)' }
 ```
 
-**Variant 지원:**
+**Variant 지원 (구현 완료):**
 
 ```typescript
 // dark mode
-dot('bg-white dark:bg-gray-900')
+dot('bg-white dark:bg-gray-900', { dark: true })
+// { backgroundColor: '#111827' }
 
-// responsive (web only)
-dot('w-full md:w-1/2 lg:w-1/3')
+// responsive — mobile-first cascade
+dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
+// { padding: '48px' }  (base 4 → md 8 → lg 12)
 
-// state (event-based)
+// dark + responsive 조합
+dot('bg-white dark:bg-gray-900 dark:md:bg-gray-800', { dark: true, breakpoint: 'md' })
+// { backgroundColor: '#1f2937' }
+
+// state (향후 구현 예정)
 dot('bg-primary-500 hover:bg-primary-600')
 ```
 
@@ -60,16 +70,24 @@ dot('bg-primary-500 hover:bg-primary-600')
 ```typescript
 import { createDotConfig } from '@hua-labs/hua/dot'
 
-const config = createDotConfig({
-  colors: {
-    brand: { 500: '#6630E6', 600: '#5525C0' },
+createDotConfig({
+  theme: {
+    colors: {
+      brand: { 500: '#6630E6', 600: '#5525C0' },
+    },
+    spacing: {
+      '18': '72px',
+    },
+    borderRadius: {
+      pill: '999px',
+    },
+    gridCols: {
+      '16': 'repeat(16, minmax(0, 1fr))',
+    },
   },
-  spacing: {
-    18: '72px',
-  },
-  borderRadius: {
-    pill: '999px',
-  },
+  cache: true,
+  cacheSize: 500,
+  strictMode: false,
 })
 ```
 
@@ -113,7 +131,7 @@ import { dot } from '@hua-labs/dot'
 
 | Category | Examples | Phase | Token Count |
 |----------|----------|-------|-------------|
-| **Spacing** | `p-4`, `mx-auto`, `gap-2`, `mt-1` | 1 | ~37 |
+| **Spacing** | `p-4`, `mx-auto`, `gap-2`, `-m-4` | 1 | ~37 |
 | **Color** | `bg-primary-500`, `text-gray-300`, `border-red-400` | 1 | ~84 |
 | **Typography** | `text-sm`, `font-bold`, `leading-tight`, `tracking-wide` | 1 | ~38 |
 | **Layout** | `flex`, `grid`, `block`, `hidden`, `items-center` | 1 | ~45 |
@@ -122,20 +140,21 @@ import { dot } from '@hua-labs/dot'
 | **Z-index** | `z-0`, `z-10`, `z-50` | 1 | 7 |
 | **Shadow** | `shadow-sm`, `shadow-lg`, `shadow-none` | 2 | 8 |
 | **Opacity** | `opacity-0`, `opacity-50`, `opacity-100` | 2 | 15 |
-| **Transform** | `rotate-45`, `scale-110`, `translate-x-4` | 2 | ~51 |
+| **Transform** | `rotate-45`, `scale-110`, `-translate-x-4` (누적됨) | 2 | ~51 |
 | **Transition** | `transition-all`, `duration-200`, `ease-in-out` | 2 | ~30 |
 | **Animation** | `animate-spin`, `animate-pulse`, `animate-bounce` | 2 | ~20 |
-| **Backdrop** | `backdrop-blur-md`, `backdrop-brightness-110` | 2 | ~14 |
+| **Backdrop** | `backdrop-blur-md` | 2 | ~14 |
 | **dark:** | `dark:bg-gray-900`, `dark:text-white` | 2 | variant |
-| **Responsive** | `sm:flex`, `md:grid-cols-2`, `lg:w-1/3` | 3 | variant |
-| **State** | `hover:bg-primary-600`, `focus:ring-2` | 3 | variant |
-| **Positioning** | `top-0`, `left-4`, `inset-0`, `absolute` | 3 | ~346 |
-| **Grid** | `grid-cols-3`, `col-span-6`, `row-start-1` | 3 | ~112 |
-| **Interactivity** | `cursor-pointer`, `select-none`, `resize` | 3 | ~76 |
+| **Positioning** | `top-0`, `left-4`, `inset-0`, `inset-x-4`, `start-4` | 3 | ~75 |
+| **Grid** | `grid-cols-3`, `col-span-6`, `row-start-1`, `grid-flow-row` | 3 | ~75 |
+| **Responsive** | `sm:flex`, `md:p-8`, `lg:grid-cols-3`, `dark:md:bg-gray-800` | 3 | variant |
+| **Negative** | `-m-4`, `-top-2`, `-translate-x-4`, `-rotate-45` | 3 | modifier |
+| State | `hover:bg-primary-600`, `focus:ring-2` | 향후 | 미구현 |
+| Interactivity | `cursor-pointer`, `select-none`, `resize` | 향후 | 미구현 |
 
 **Phase 1**: ~249 tokens — hua-ui 실사용 기준 80% 커버
-**Phase 2**: ~138 tokens + variant 시스템
-**Phase 3**: ~534+ tokens — 포지셔닝, 그리드 고급, 인터렉션
+**Phase 2**: ~138 tokens + dark variant (249 tests, 7.5KB gzip)
+**Phase 3**: positioning + grid + negative + responsive (**387 tests, 9KB gzip**)
 
 ---
 

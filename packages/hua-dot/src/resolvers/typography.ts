@@ -1,11 +1,5 @@
-import type { StyleObject } from '../types';
-import {
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  LINE_HEIGHTS,
-  LETTER_SPACINGS,
-  TEXT_ALIGNS,
-} from '../tokens/typography';
+import type { StyleObject, DotConfig } from '../types';
+import { TEXT_ALIGNS } from '../tokens/typography';
 import { lookupColor } from './color';
 
 /**
@@ -14,45 +8,46 @@ import { lookupColor } from './color';
  * Handles `text-` ambiguity: textAlign > fontSize > color fallthrough
  *
  * @example
- * resolveTypography('text', 'center')  → { textAlign: 'center' }
- * resolveTypography('text', 'sm')      → { fontSize: '14px' }
- * resolveTypography('text', 'red-500') → { color: '#ef4444' }
- * resolveTypography('font', 'bold')    → { fontWeight: '700' }
- * resolveTypography('leading', 'tight') → { lineHeight: '1.25' }
- * resolveTypography('tracking', 'wide') → { letterSpacing: '0.025em' }
+ * resolveTypography('text', 'center', config)  → { textAlign: 'center' }
+ * resolveTypography('text', 'sm', config)      → { fontSize: '14px' }
+ * resolveTypography('text', 'red-500', config) → { color: '#ef4444' }
+ * resolveTypography('font', 'bold', config)    → { fontWeight: '700' }
+ * resolveTypography('leading', 'tight', config) → { lineHeight: '1.25' }
+ * resolveTypography('tracking', 'wide', config) → { letterSpacing: '0.025em' }
  */
-export function resolveTypography(prefix: string, value: string): StyleObject {
+export function resolveTypography(prefix: string, value: string, config: DotConfig): StyleObject {
   switch (prefix) {
     case 'text': {
       // Priority: textAlign > fontSize > color (fallthrough to resolver router)
       if (TEXT_ALIGNS[value]) {
         return { textAlign: TEXT_ALIGNS[value] };
       }
-      if (FONT_SIZES[value]) {
-        return { fontSize: FONT_SIZES[value] };
+      if (config.tokens.fontSize[value]) {
+        return { fontSize: config.tokens.fontSize[value] };
       }
       // Color fallthrough: text-red-500, text-white, etc.
-      const hex = lookupColor(value);
+      const hex = lookupColor(value, config.tokens.colors);
       if (hex) {
         return { color: hex };
       }
       return {};
     }
     case 'font': {
-      if (FONT_WEIGHTS[value]) {
-        return { fontWeight: FONT_WEIGHTS[value] };
+      const weight = config.tokens.fontWeight[value];
+      if (weight !== undefined) {
+        return { fontWeight: weight };
       }
       return {};
     }
     case 'leading': {
-      if (LINE_HEIGHTS[value]) {
-        return { lineHeight: LINE_HEIGHTS[value] };
+      if (config.tokens.lineHeight[value]) {
+        return { lineHeight: config.tokens.lineHeight[value] };
       }
       return {};
     }
     case 'tracking': {
-      if (LETTER_SPACINGS[value]) {
-        return { letterSpacing: LETTER_SPACINGS[value] };
+      if (config.tokens.letterSpacing[value]) {
+        return { letterSpacing: config.tokens.letterSpacing[value] };
       }
       return {};
     }

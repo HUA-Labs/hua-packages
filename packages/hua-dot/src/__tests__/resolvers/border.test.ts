@@ -1,44 +1,46 @@
 import { describe, it, expect } from 'vitest';
 import { resolveBorder, resolveBorderStyle, resolveBorderRadius } from '../../resolvers/border';
+import { resolveConfig } from '../../config';
+const config = resolveConfig();
 
 describe('resolveBorder', () => {
   it('resolves bare border (default 1px)', () => {
-    expect(resolveBorder('border', '')).toEqual({ borderWidth: '1px' });
+    expect(resolveBorder('border', '', config)).toEqual({ borderWidth: '1px' });
   });
 
   it('resolves border widths', () => {
-    expect(resolveBorder('border', '0')).toEqual({ borderWidth: '0px' });
-    expect(resolveBorder('border', '2')).toEqual({ borderWidth: '2px' });
-    expect(resolveBorder('border', '4')).toEqual({ borderWidth: '4px' });
-    expect(resolveBorder('border', '8')).toEqual({ borderWidth: '8px' });
+    expect(resolveBorder('border', '0', config)).toEqual({ borderWidth: '0px' });
+    expect(resolveBorder('border', '2', config)).toEqual({ borderWidth: '2px' });
+    expect(resolveBorder('border', '4', config)).toEqual({ borderWidth: '4px' });
+    expect(resolveBorder('border', '8', config)).toEqual({ borderWidth: '8px' });
   });
 
   it('resolves directional border widths', () => {
-    expect(resolveBorder('border-t', '')).toEqual({ borderTopWidth: '1px' });
-    expect(resolveBorder('border-t', '2')).toEqual({ borderTopWidth: '2px' });
-    expect(resolveBorder('border-r', '4')).toEqual({ borderRightWidth: '4px' });
-    expect(resolveBorder('border-b', '')).toEqual({ borderBottomWidth: '1px' });
-    expect(resolveBorder('border-l', '2')).toEqual({ borderLeftWidth: '2px' });
+    expect(resolveBorder('border-t', '', config)).toEqual({ borderTopWidth: '1px' });
+    expect(resolveBorder('border-t', '2', config)).toEqual({ borderTopWidth: '2px' });
+    expect(resolveBorder('border-r', '4', config)).toEqual({ borderRightWidth: '4px' });
+    expect(resolveBorder('border-b', '', config)).toEqual({ borderBottomWidth: '1px' });
+    expect(resolveBorder('border-l', '2', config)).toEqual({ borderLeftWidth: '2px' });
   });
 
   it('resolves axis border widths', () => {
-    expect(resolveBorder('border-x', '2')).toEqual({
+    expect(resolveBorder('border-x', '2', config)).toEqual({
       borderLeftWidth: '2px',
       borderRightWidth: '2px',
     });
-    expect(resolveBorder('border-y', '')).toEqual({
+    expect(resolveBorder('border-y', '', config)).toEqual({
       borderTopWidth: '1px',
       borderBottomWidth: '1px',
     });
   });
 
   it('resolves border color (fallthrough)', () => {
-    expect(resolveBorder('border', 'red-500')).toEqual({ borderColor: '#ef4444' });
-    expect(resolveBorder('border', 'gray-300')).toEqual({ borderColor: '#d1d5db' });
+    expect(resolveBorder('border', 'red-500', config)).toEqual({ borderColor: '#ef4444' });
+    expect(resolveBorder('border', 'gray-300', config)).toEqual({ borderColor: '#d1d5db' });
   });
 
   it('returns empty for unknown border value', () => {
-    expect(resolveBorder('border', 'nonexistent')).toEqual({});
+    expect(resolveBorder('border', 'nonexistent', config)).toEqual({});
   });
 });
 
@@ -58,46 +60,46 @@ describe('resolveBorderStyle', () => {
 
 describe('resolveBorderRadius', () => {
   it('resolves bare rounded (default 4px)', () => {
-    expect(resolveBorderRadius('rounded', '')).toEqual({ borderRadius: '4px' });
+    expect(resolveBorderRadius('rounded', '', config)).toEqual({ borderRadius: '4px' });
   });
 
   it('resolves border radius sizes', () => {
-    expect(resolveBorderRadius('rounded', 'none')).toEqual({ borderRadius: '0px' });
-    expect(resolveBorderRadius('rounded', 'sm')).toEqual({ borderRadius: '2px' });
-    expect(resolveBorderRadius('rounded', 'md')).toEqual({ borderRadius: '6px' });
-    expect(resolveBorderRadius('rounded', 'lg')).toEqual({ borderRadius: '8px' });
-    expect(resolveBorderRadius('rounded', 'xl')).toEqual({ borderRadius: '12px' });
-    expect(resolveBorderRadius('rounded', '2xl')).toEqual({ borderRadius: '16px' });
-    expect(resolveBorderRadius('rounded', 'full')).toEqual({ borderRadius: '9999px' });
+    expect(resolveBorderRadius('rounded', 'none', config)).toEqual({ borderRadius: '0px' });
+    expect(resolveBorderRadius('rounded', 'sm', config)).toEqual({ borderRadius: '2px' });
+    expect(resolveBorderRadius('rounded', 'md', config)).toEqual({ borderRadius: '6px' });
+    expect(resolveBorderRadius('rounded', 'lg', config)).toEqual({ borderRadius: '8px' });
+    expect(resolveBorderRadius('rounded', 'xl', config)).toEqual({ borderRadius: '12px' });
+    expect(resolveBorderRadius('rounded', '2xl', config)).toEqual({ borderRadius: '16px' });
+    expect(resolveBorderRadius('rounded', 'full', config)).toEqual({ borderRadius: '9999px' });
   });
 
   it('resolves directional border radius', () => {
-    expect(resolveBorderRadius('rounded-t', 'lg')).toEqual({
+    expect(resolveBorderRadius('rounded-t', 'lg', config)).toEqual({
       borderTopLeftRadius: '8px',
       borderTopRightRadius: '8px',
     });
-    expect(resolveBorderRadius('rounded-b', 'lg')).toEqual({
+    expect(resolveBorderRadius('rounded-b', 'lg', config)).toEqual({
       borderBottomLeftRadius: '8px',
       borderBottomRightRadius: '8px',
     });
-    expect(resolveBorderRadius('rounded-l', 'md')).toEqual({
+    expect(resolveBorderRadius('rounded-l', 'md', config)).toEqual({
       borderTopLeftRadius: '6px',
       borderBottomLeftRadius: '6px',
     });
-    expect(resolveBorderRadius('rounded-r', 'xl')).toEqual({
+    expect(resolveBorderRadius('rounded-r', 'xl', config)).toEqual({
       borderTopRightRadius: '12px',
       borderBottomRightRadius: '12px',
     });
   });
 
   it('resolves corner-specific border radius', () => {
-    expect(resolveBorderRadius('rounded-tl', 'lg')).toEqual({ borderTopLeftRadius: '8px' });
-    expect(resolveBorderRadius('rounded-tr', 'md')).toEqual({ borderTopRightRadius: '6px' });
-    expect(resolveBorderRadius('rounded-bl', 'xl')).toEqual({ borderBottomLeftRadius: '12px' });
-    expect(resolveBorderRadius('rounded-br', 'full')).toEqual({ borderBottomRightRadius: '9999px' });
+    expect(resolveBorderRadius('rounded-tl', 'lg', config)).toEqual({ borderTopLeftRadius: '8px' });
+    expect(resolveBorderRadius('rounded-tr', 'md', config)).toEqual({ borderTopRightRadius: '6px' });
+    expect(resolveBorderRadius('rounded-bl', 'xl', config)).toEqual({ borderBottomLeftRadius: '12px' });
+    expect(resolveBorderRadius('rounded-br', 'full', config)).toEqual({ borderBottomRightRadius: '9999px' });
   });
 
   it('returns empty for unknown radius value', () => {
-    expect(resolveBorderRadius('rounded', 'nonexistent')).toEqual({});
+    expect(resolveBorderRadius('rounded', 'nonexistent', config)).toEqual({});
   });
 });

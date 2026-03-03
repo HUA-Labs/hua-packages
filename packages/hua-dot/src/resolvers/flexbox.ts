@@ -1,4 +1,4 @@
-import type { StyleObject } from '../types';
+import type { StyleObject, DotConfig } from '../types';
 import {
   FLEX_DIRECTION,
   FLEX_WRAP,
@@ -46,14 +46,14 @@ export function resolveFlexboxStandalone(value: string): StyleObject {
 /**
  * Resolve flex prefix tokens: flex-1 → { flex: '1 1 0%' }
  */
-export function resolveFlexbox(prefix: string, value: string): StyleObject {
-  if (prefix === 'flex') {
+export function resolveFlexbox(_prefix: string, value: string, _config: DotConfig): StyleObject {
+  if (_prefix === 'flex') {
     if (FLEX_VALUES[value]) {
       return { flex: FLEX_VALUES[value] };
     }
     return {};
   }
-  if (prefix === 'order') {
+  if (_prefix === 'order') {
     if (ORDER_VALUES[value]) {
       return { order: ORDER_VALUES[value] };
     }

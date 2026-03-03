@@ -8,13 +8,22 @@ export interface DotToken {
   value: string;
   /** Original raw input string */
   raw: string;
+  /** Whether this is a negative value token (e.g., -m-4, -top-2) */
+  negative: boolean;
 }
 
 /** Platform-agnostic style object (Web CSSProperties compatible) */
 export type StyleObject = Record<string, string | number>;
 
-/** Resolver function signature */
-export type ResolverFn = (prefix: string, value: string) => StyleObject;
+/** Resolver function signature — receives config for token lookups */
+export type ResolverFn = (prefix: string, value: string, config: DotConfig) => StyleObject;
+
+/** Options for dot() call */
+export interface DotOptions {
+  dark?: boolean;
+  /** Active breakpoint for responsive variants (e.g., 'md', 'lg'). Mobile-first cascade. */
+  breakpoint?: string;
+}
 
 /** User-provided config for customizing tokens */
 export interface DotUserConfig {
@@ -27,6 +36,18 @@ export interface DotUserConfig {
     lineHeight?: Record<string, string>;
     letterSpacing?: Record<string, string>;
     zIndex?: Record<string, string | number>;
+    shadows?: Record<string, string>;
+    opacity?: Record<string, string>;
+    rotate?: Record<string, string>;
+    scale?: Record<string, string>;
+    skew?: Record<string, string>;
+    transitionProperty?: Record<string, string>;
+    duration?: Record<string, string>;
+    timing?: Record<string, string>;
+    animation?: Record<string, string>;
+    backdropBlur?: Record<string, string>;
+    gridCols?: Record<string, string>;
+    gridRows?: Record<string, string>;
   };
   cache?: boolean;
   cacheSize?: number;
@@ -51,4 +72,16 @@ export interface ResolvedTokens {
   lineHeight: Record<string, string>;
   letterSpacing: Record<string, string>;
   zIndex: Record<string, string | number>;
+  shadows: Record<string, string>;
+  opacity: Record<string, string>;
+  rotate: Record<string, string>;
+  scale: Record<string, string>;
+  skew: Record<string, string>;
+  transitionProperty: Record<string, string>;
+  duration: Record<string, string>;
+  timing: Record<string, string>;
+  animation: Record<string, string>;
+  backdropBlur: Record<string, string>;
+  gridCols: Record<string, string>;
+  gridRows: Record<string, string>;
 }

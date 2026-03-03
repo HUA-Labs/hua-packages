@@ -141,7 +141,7 @@ describe('dot() integration', () => {
     });
   });
 
-  it('skips variant tokens in Phase 1', () => {
+  it('applies base tokens and ignores dark: tokens in light mode', () => {
     const result = dot('bg-white dark:bg-gray-900 p-4');
     expect(result).toEqual({
       backgroundColor: '#ffffff',
@@ -340,19 +340,57 @@ describe('dot() integration', () => {
       expect(dot('order-none')).toEqual({ order: '0' });
     });
 
-    it('handles negative-looking tokens gracefully (unsupported)', () => {
-      // Negative values not supported in Phase 1, should not crash
-      expect(dot('-m-4')).toEqual({});
-      expect(dot('-top-2')).toEqual({});
+    it('resolves negative margin', () => {
+      expect(dot('-m-4')).toEqual({ margin: '-16px' });
+      expect(dot('-mt-2')).toEqual({ marginTop: '-8px' });
+      expect(dot('-mx-auto')).toEqual({ marginLeft: 'auto', marginRight: 'auto' });
     });
 
-    it('handles multiple variants stacked (skipped in Phase 1)', () => {
+    it('resolves negative positioning', () => {
+      expect(dot('-top-2')).toEqual({ top: '-8px' });
+      expect(dot('-left-4')).toEqual({ left: '-16px' });
+      expect(dot('-inset-x-2')).toEqual({ left: '-8px', right: '-8px' });
+    });
+
+    it('resolves negative translate', () => {
+      expect(dot('-translate-x-4')).toEqual({ transform: 'translateX(-16px)' });
+      expect(dot('-translate-y-8')).toEqual({ transform: 'translateY(-32px)' });
+    });
+
+    it('does not negate zero values', () => {
+      expect(dot('-m-0')).toEqual({ margin: '0px' });
+      expect(dot('-top-0')).toEqual({ top: '0px' });
+    });
+
+    it('negates percentage values', () => {
+      expect(dot('-top-1/2')).toEqual({ top: '-50%' });
+      expect(dot('-left-full')).toEqual({ left: '-100%' });
+    });
+
+    it('does not negate auto keyword', () => {
+      expect(dot('-top-auto')).toEqual({ top: 'auto' });
+    });
+
+    it('combines negative with other tokens', () => {
+      const result = dot('absolute -top-2 -left-4 p-4');
+      expect(result).toEqual({
+        position: 'absolute',
+        top: '-8px',
+        left: '-16px',
+        padding: '16px',
+      });
+    });
+
+    it('handles multiple variants stacked (only dark: supported)', () => {
+      // Multi-variant tokens still skipped
       const result = dot('dark:hover:md:bg-blue-500 p-4');
       expect(result).toEqual({ padding: '16px' });
     });
 
-    it('handles only variant tokens (all skipped)', () => {
+    it('handles mixed variant tokens', () => {
+      // dark: tokens resolved only in dark mode, hover: still skipped
       expect(dot('dark:bg-white hover:text-blue-500')).toEqual({});
+      expect(dot('dark:bg-white hover:text-blue-500', { dark: true })).toEqual({ backgroundColor: '#ffffff' });
     });
 
     it('handles cache disabled via config', () => {
@@ -362,6 +400,658 @@ describe('dot() integration', () => {
       // With cache disabled, these should be different references but same value
       expect(result1).not.toBe(result2);
       expect(result1).toEqual(result2);
+    });
+  });
+
+  describe('custom tokens (Phase 2)', () => {
+    it('resolves custom spacing token', () => {
+      createDotConfig({ theme: { spacing: { '18': '72px' } } });
+      expect(dot('p-18')).toEqual({ padding: '72px' });
+    });
+
+    it('resolves custom color palette', () => {
+      createDotConfig({ theme: { colors: { brand: { '500': '#6630E6' } } } });
+      expect(dot('bg-brand-500')).toEqual({ backgroundColor: '#6630E6' });
+    });
+
+    it('overrides existing token', () => {
+      createDotConfig({ theme: { colors: { primary: { '500': '#00ffff' } } } });
+      expect(dot('bg-primary-500')).toEqual({ backgroundColor: '#00ffff' });
+    });
+
+    it('preserves default tokens alongside custom ones', () => {
+      createDotConfig({ theme: { spacing: { '18': '72px' } } });
+      expect(dot('p-4')).toEqual({ padding: '16px' }); // default still works
+      expect(dot('p-18')).toEqual({ padding: '72px' }); // custom works
+    });
+  });
+
+  describe('strictMode (Phase 2)', () => {
+    it('throws on unknown token when enabled', () => {
+      createDotConfig({ strictMode: true });
+      expect(() => dot('banana-split')).toThrow('[dot] Unknown token: "banana-split"');
+    });
+
+    it('throws on unknown standalone token when enabled', () => {
+      createDotConfig({ strictMode: true });
+      expect(() => dot('xyzzy')).toThrow('[dot] Unknown token');
+    });
+
+    it('does not throw on valid tokens', () => {
+      createDotConfig({ strictMode: true });
+      expect(() => dot('p-4 flex bg-primary-500')).not.toThrow();
+    });
+
+    it('returns empty for unknown token when disabled (default)', () => {
+      createDotConfig({ strictMode: false });
+      expect(dot('banana-split')).toEqual({});
+    });
+  });
+
+  describe('dark: variant (Phase 2)', () => {
+    it('ignores dark tokens in light mode (default)', () => {
+      const result = dot('bg-white dark:bg-gray-900');
+      expect(result).toEqual({ backgroundColor: '#ffffff' });
+    });
+
+    it('applies dark overrides in dark mode', () => {
+      const result = dot('bg-white dark:bg-gray-900', { dark: true });
+      expect(result).toEqual({ backgroundColor: '#111827' });
+    });
+
+    it('handles dark-only tokens', () => {
+      const result = dot('dark:text-white', { dark: true });
+      expect(result).toEqual({ color: '#ffffff' });
+    });
+
+    it('dark-only tokens ignored in light mode', () => {
+      const result = dot('dark:text-white');
+      expect(result).toEqual({});
+    });
+
+    it('dark overrides only affected properties', () => {
+      const result = dot('p-4 bg-white dark:bg-gray-900', { dark: true });
+      expect(result).toEqual({ padding: '16px', backgroundColor: '#111827' });
+    });
+
+    it('dark tokens without dark context returns base only', () => {
+      const result = dot('p-4 dark:bg-gray-900');
+      expect(result).toEqual({ padding: '16px' });
+    });
+
+    it('caches dark and light results separately', () => {
+      const light = dot('bg-white dark:bg-gray-900');
+      const dark = dot('bg-white dark:bg-gray-900', { dark: true });
+      expect(light).toEqual({ backgroundColor: '#ffffff' });
+      expect(dark).toEqual({ backgroundColor: '#111827' });
+      expect(light).not.toEqual(dark);
+    });
+  });
+
+  describe('new resolvers (Phase 2)', () => {
+    it('resolves shadow', () => {
+      expect(dot('shadow')).toHaveProperty('boxShadow');
+      expect(dot('shadow-lg')).toHaveProperty('boxShadow');
+      expect(dot('shadow-none')).toEqual({ boxShadow: 'none' });
+    });
+
+    it('resolves opacity', () => {
+      expect(dot('opacity-50')).toEqual({ opacity: '0.5' });
+      expect(dot('opacity-0')).toEqual({ opacity: '0' });
+      expect(dot('opacity-100')).toEqual({ opacity: '1' });
+    });
+
+    it('resolves rotate', () => {
+      expect(dot('rotate-45')).toEqual({ transform: 'rotate(45deg)' });
+      expect(dot('rotate-180')).toEqual({ transform: 'rotate(180deg)' });
+    });
+
+    it('resolves scale', () => {
+      expect(dot('scale-110')).toEqual({ transform: 'scale(1.1)' });
+      expect(dot('scale-0')).toEqual({ transform: 'scale(0)' });
+    });
+
+    it('resolves translate', () => {
+      expect(dot('translate-x-4')).toEqual({ transform: 'translateX(16px)' });
+      expect(dot('translate-y-8')).toEqual({ transform: 'translateY(32px)' });
+    });
+
+    it('resolves skew', () => {
+      expect(dot('skew-x-6')).toEqual({ transform: 'skewX(6deg)' });
+      expect(dot('skew-y-12')).toEqual({ transform: 'skewY(12deg)' });
+    });
+
+    it('resolves transition properties', () => {
+      expect(dot('transition-all')).toEqual({ transitionProperty: 'all' });
+      expect(dot('transition-none')).toEqual({ transitionProperty: 'none' });
+      expect(dot('transition')).toHaveProperty('transitionProperty');
+    });
+
+    it('resolves duration', () => {
+      expect(dot('duration-200')).toEqual({ transitionDuration: '200ms' });
+      expect(dot('duration-0')).toEqual({ transitionDuration: '0s' });
+    });
+
+    it('resolves ease', () => {
+      expect(dot('ease-linear')).toEqual({ transitionTimingFunction: 'linear' });
+      expect(dot('ease-in-out')).toHaveProperty('transitionTimingFunction');
+    });
+
+    it('resolves delay', () => {
+      expect(dot('delay-100')).toEqual({ transitionDelay: '100ms' });
+    });
+
+    it('resolves animation', () => {
+      expect(dot('animate-spin')).toHaveProperty('animation');
+      expect(dot('animate-none')).toEqual({ animation: 'none' });
+    });
+
+    it('resolves backdrop-blur', () => {
+      expect(dot('backdrop-blur')).toEqual({ backdropFilter: 'blur(8px)' });
+      expect(dot('backdrop-blur-md')).toEqual({ backdropFilter: 'blur(12px)' });
+      expect(dot('backdrop-blur-none')).toEqual({ backdropFilter: 'blur(0)' });
+    });
+
+    it('handles complex Phase 2 utility string', () => {
+      const result = dot('shadow-lg opacity-50 rotate-45 duration-200 animate-spin backdrop-blur-md');
+      expect(result).toHaveProperty('boxShadow');
+      expect(result).toHaveProperty('opacity', '0.5');
+      expect(result).toHaveProperty('transform', 'rotate(45deg)');
+      expect(result).toHaveProperty('transitionDuration', '200ms');
+      expect(result).toHaveProperty('animation');
+      expect(result).toHaveProperty('backdropFilter', 'blur(12px)');
+    });
+
+    it('accumulates multiple transforms', () => {
+      expect(dot('rotate-45 scale-110')).toEqual({
+        transform: 'rotate(45deg) scale(1.1)',
+      });
+    });
+
+    it('accumulates three transforms', () => {
+      expect(dot('rotate-45 scale-110 translate-x-4')).toEqual({
+        transform: 'rotate(45deg) scale(1.1) translateX(16px)',
+      });
+    });
+
+    it('accumulates directional transforms', () => {
+      expect(dot('scale-x-75 scale-y-125')).toEqual({
+        transform: 'scaleX(.75) scaleY(1.25)',
+      });
+    });
+
+    it('accumulates translate + skew', () => {
+      expect(dot('translate-x-4 translate-y-8 skew-x-6')).toEqual({
+        transform: 'translateX(16px) translateY(32px) skewX(6deg)',
+      });
+    });
+
+    it('single transform still works normally', () => {
+      expect(dot('rotate-90')).toEqual({ transform: 'rotate(90deg)' });
+    });
+
+    it('transform accumulation with other properties', () => {
+      const result = dot('p-4 rotate-45 scale-110 opacity-50');
+      expect(result).toEqual({
+        padding: '16px',
+        transform: 'rotate(45deg) scale(1.1)',
+        opacity: '0.5',
+      });
+    });
+
+    it('dark: variant with accumulated transforms', () => {
+      const result = dot('rotate-45 dark:scale-110', { dark: true });
+      // dark override replaces, not accumulates (separate layer)
+      expect(result).toEqual({
+        transform: 'scale(1.1)',
+      });
+    });
+  });
+
+  describe('positioning (Phase 3a)', () => {
+    it('resolves basic position offsets', () => {
+      expect(dot('top-0')).toEqual({ top: '0px' });
+      expect(dot('right-4')).toEqual({ right: '16px' });
+      expect(dot('bottom-8')).toEqual({ bottom: '32px' });
+      expect(dot('left-2')).toEqual({ left: '8px' });
+    });
+
+    it('resolves inset shorthand', () => {
+      expect(dot('inset-0')).toEqual({
+        top: '0px', right: '0px', bottom: '0px', left: '0px',
+      });
+      expect(dot('inset-4')).toEqual({
+        top: '16px', right: '16px', bottom: '16px', left: '16px',
+      });
+    });
+
+    it('resolves inset-x and inset-y', () => {
+      expect(dot('inset-x-0')).toEqual({ left: '0px', right: '0px' });
+      expect(dot('inset-y-4')).toEqual({ top: '16px', bottom: '16px' });
+    });
+
+    it('resolves positioning keywords', () => {
+      expect(dot('top-auto')).toEqual({ top: 'auto' });
+      expect(dot('top-full')).toEqual({ top: '100%' });
+      expect(dot('left-1/2')).toEqual({ left: '50%' });
+      expect(dot('right-1/3')).toEqual({ right: '33.333333%' });
+    });
+
+    it('resolves logical properties', () => {
+      expect(dot('start-4')).toEqual({ insetInlineStart: '16px' });
+      expect(dot('end-0')).toEqual({ insetInlineEnd: '0px' });
+    });
+
+    it('combines positioning with position type', () => {
+      const result = dot('absolute inset-0');
+      expect(result).toEqual({
+        position: 'absolute',
+        top: '0px', right: '0px', bottom: '0px', left: '0px',
+      });
+    });
+
+    it('handles absolute + directional offsets', () => {
+      const result = dot('fixed top-0 left-0 right-0');
+      expect(result).toEqual({
+        position: 'fixed',
+        top: '0px', left: '0px', right: '0px',
+      });
+    });
+
+    it('handles sticky header pattern', () => {
+      const result = dot('sticky top-0 z-50');
+      expect(result).toEqual({
+        position: 'sticky',
+        top: '0px',
+        zIndex: '50',
+      });
+    });
+
+    it('handles centering pattern', () => {
+      const result = dot('absolute top-1/2 left-1/2');
+      expect(result).toEqual({
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+      });
+    });
+
+    it('ignores unknown positioning values', () => {
+      expect(dot('top-999')).toEqual({});
+      expect(dot('left-banana')).toEqual({});
+    });
+
+    it('last-wins for conflicting position offsets', () => {
+      const result = dot('top-4 top-8');
+      expect(result).toEqual({ top: '32px' });
+    });
+
+    it('inset then override specific side', () => {
+      const result = dot('inset-0 top-4');
+      expect(result).toEqual({
+        top: '16px', right: '0px', bottom: '0px', left: '0px',
+      });
+    });
+
+    it('handles dark: variant on positioning', () => {
+      const result = dot('top-4 dark:top-8', { dark: true });
+      expect(result).toEqual({ top: '32px' });
+    });
+  });
+
+  describe('grid (Phase 3a)', () => {
+    it('resolves grid-cols', () => {
+      expect(dot('grid-cols-3')).toEqual({
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+      });
+      expect(dot('grid-cols-12')).toEqual({
+        gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+      });
+      expect(dot('grid-cols-none')).toEqual({
+        gridTemplateColumns: 'none',
+      });
+    });
+
+    it('resolves grid-rows', () => {
+      expect(dot('grid-rows-3')).toEqual({
+        gridTemplateRows: 'repeat(3, minmax(0, 1fr))',
+      });
+      expect(dot('grid-rows-none')).toEqual({
+        gridTemplateRows: 'none',
+      });
+    });
+
+    it('resolves col-span', () => {
+      expect(dot('col-span-2')).toEqual({ gridColumn: 'span 2 / span 2' });
+      expect(dot('col-span-full')).toEqual({ gridColumn: '1 / -1' });
+      expect(dot('col-span-auto')).toEqual({ gridColumn: 'auto' });
+    });
+
+    it('resolves row-span', () => {
+      expect(dot('row-span-3')).toEqual({ gridRow: 'span 3 / span 3' });
+      expect(dot('row-span-full')).toEqual({ gridRow: '1 / -1' });
+    });
+
+    it('resolves col-start/end', () => {
+      expect(dot('col-start-1')).toEqual({ gridColumnStart: '1' });
+      expect(dot('col-end-4')).toEqual({ gridColumnEnd: '4' });
+      expect(dot('col-start-auto')).toEqual({ gridColumnStart: 'auto' });
+    });
+
+    it('resolves row-start/end', () => {
+      expect(dot('row-start-2')).toEqual({ gridRowStart: '2' });
+      expect(dot('row-end-5')).toEqual({ gridRowEnd: '5' });
+    });
+
+    it('resolves auto-cols/auto-rows', () => {
+      expect(dot('auto-cols-fr')).toEqual({ gridAutoColumns: 'minmax(0, 1fr)' });
+      expect(dot('auto-rows-min')).toEqual({ gridAutoRows: 'min-content' });
+    });
+
+    it('resolves grid-flow standalone', () => {
+      expect(dot('grid-flow-row')).toEqual({ gridAutoFlow: 'row' });
+      expect(dot('grid-flow-col')).toEqual({ gridAutoFlow: 'column' });
+      expect(dot('grid-flow-dense')).toEqual({ gridAutoFlow: 'dense' });
+      expect(dot('grid-flow-row-dense')).toEqual({ gridAutoFlow: 'row dense' });
+      expect(dot('grid-flow-col-dense')).toEqual({ gridAutoFlow: 'column dense' });
+    });
+
+    it('handles full grid layout pattern', () => {
+      const result = dot('grid grid-cols-3 gap-4');
+      expect(result).toEqual({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: '16px',
+      });
+    });
+
+    it('handles grid item spanning', () => {
+      const result = dot('col-span-2 row-span-3');
+      expect(result).toEqual({
+        gridColumn: 'span 2 / span 2',
+        gridRow: 'span 3 / span 3',
+      });
+    });
+
+    it('handles grid item placement', () => {
+      const result = dot('col-start-2 col-end-5 row-start-1 row-end-3');
+      expect(result).toEqual({
+        gridColumnStart: '2',
+        gridColumnEnd: '5',
+        gridRowStart: '1',
+        gridRowEnd: '3',
+      });
+    });
+
+    it('handles complex grid layout', () => {
+      const result = dot('grid grid-cols-12 gap-4 grid-flow-row-dense');
+      expect(result).toEqual({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+        gap: '16px',
+        gridAutoFlow: 'row dense',
+      });
+    });
+
+    it('handles dashboard layout pattern', () => {
+      const result = dot('grid grid-cols-4 grid-rows-3 gap-6');
+      expect(result).toEqual({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gridTemplateRows: 'repeat(3, minmax(0, 1fr))',
+        gap: '24px',
+      });
+    });
+
+    it('ignores unknown grid values', () => {
+      expect(dot('grid-cols-99')).toEqual({});
+      expect(dot('col-span-13')).toEqual({});
+      expect(dot('row-start-0')).toEqual({});
+      expect(dot('auto-cols-banana')).toEqual({});
+    });
+
+    it('handles custom gridCols config', () => {
+      createDotConfig({ theme: { gridCols: { '16': 'repeat(16, minmax(0, 1fr))' } } });
+      expect(dot('grid-cols-16')).toEqual({
+        gridTemplateColumns: 'repeat(16, minmax(0, 1fr))',
+      });
+      // default still works
+      expect(dot('grid-cols-3')).toEqual({
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+      });
+    });
+
+    it('handles dark: variant on grid tokens', () => {
+      const result = dot('grid-cols-2 dark:grid-cols-4', { dark: true });
+      expect(result).toEqual({
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+      });
+    });
+
+    it('handles subgrid', () => {
+      expect(dot('grid-cols-subgrid')).toEqual({ gridTemplateColumns: 'subgrid' });
+      expect(dot('grid-rows-subgrid')).toEqual({ gridTemplateRows: 'subgrid' });
+    });
+  });
+
+  describe('Phase 3a combined patterns', () => {
+    it('handles modal overlay pattern', () => {
+      const result = dot('fixed inset-0 bg-black opacity-50 z-50');
+      expect(result).toEqual({
+        position: 'fixed',
+        top: '0px', right: '0px', bottom: '0px', left: '0px',
+        backgroundColor: '#000000',
+        opacity: '0.5',
+        zIndex: '50',
+      });
+    });
+
+    it('handles tooltip pattern', () => {
+      const result = dot('absolute bottom-full left-1/2 mb-2');
+      expect(result).toEqual({
+        position: 'absolute',
+        bottom: '100%',
+        left: '50%',
+        marginBottom: '8px',
+      });
+    });
+
+    it('handles grid card layout', () => {
+      const result = dot('grid grid-cols-3 gap-4 p-6');
+      expect(result).toEqual({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: '16px',
+        padding: '24px',
+      });
+    });
+
+    it('handles grid item with positioning', () => {
+      const result = dot('relative col-span-2 row-span-2 p-4');
+      expect(result).toEqual({
+        position: 'relative',
+        gridColumn: 'span 2 / span 2',
+        gridRow: 'span 2 / span 2',
+        padding: '16px',
+      });
+    });
+
+    it('handles notification badge pattern', () => {
+      const result = dot('absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5');
+      expect(result).toEqual({
+        position: 'absolute',
+        top: '0px',
+        right: '0px',
+        backgroundColor: '#ef4444',
+        color: '#ffffff',
+        borderRadius: '9999px',
+        width: '20px',
+        height: '20px',
+      });
+    });
+
+    it('strictMode throws for unknown grid/positioning values', () => {
+      createDotConfig({ strictMode: true });
+      expect(() => dot('top-999')).toThrow('[dot] Unknown token');
+      expect(() => dot('grid-cols-99')).toThrow('[dot] Unknown token');
+      expect(() => dot('col-span-13')).toThrow('[dot] Unknown token');
+    });
+
+    it('strictMode does not throw on valid Phase 3a tokens', () => {
+      createDotConfig({ strictMode: true });
+      expect(() => dot('top-4 inset-0 grid-cols-3 col-span-2 grid-flow-row')).not.toThrow();
+    });
+  });
+
+  describe('responsive variants', () => {
+    it('ignores responsive tokens without breakpoint context', () => {
+      expect(dot('p-4 md:p-8')).toEqual({ padding: '16px' });
+      expect(dot('md:p-8')).toEqual({});
+    });
+
+    it('applies responsive overrides at matching breakpoint', () => {
+      expect(dot('p-4 md:p-8', { breakpoint: 'md' })).toEqual({ padding: '32px' });
+    });
+
+    it('cascades lower breakpoints (mobile-first)', () => {
+      // At lg: sm and md should also apply
+      const result = dot('p-4 sm:p-6 md:p-8 lg:p-12', { breakpoint: 'lg' });
+      expect(result).toEqual({ padding: '48px' }); // lg wins (last cascade)
+    });
+
+    it('does not apply higher breakpoints', () => {
+      // At sm: md and lg should NOT apply
+      const result = dot('p-4 sm:p-6 md:p-8 lg:p-12', { breakpoint: 'sm' });
+      expect(result).toEqual({ padding: '24px' }); // sm wins
+    });
+
+    it('base only when no breakpoint option', () => {
+      const result = dot('p-4 sm:p-6 md:p-8');
+      expect(result).toEqual({ padding: '16px' });
+    });
+
+    it('handles all breakpoint levels', () => {
+      expect(dot('sm:p-2', { breakpoint: 'sm' })).toEqual({ padding: '8px' });
+      expect(dot('md:p-4', { breakpoint: 'md' })).toEqual({ padding: '16px' });
+      expect(dot('lg:p-6', { breakpoint: 'lg' })).toEqual({ padding: '24px' });
+      expect(dot('xl:p-8', { breakpoint: 'xl' })).toEqual({ padding: '32px' });
+      expect(dot('2xl:p-12', { breakpoint: '2xl' })).toEqual({ padding: '48px' });
+    });
+
+    it('responsive with different properties', () => {
+      const result = dot('p-4 md:p-8 hidden md:flex', { breakpoint: 'md' });
+      expect(result).toEqual({
+        padding: '32px',
+        display: 'flex',
+      });
+    });
+
+    it('responsive with non-overridden base properties', () => {
+      const result = dot('p-4 bg-white md:p-8', { breakpoint: 'md' });
+      expect(result).toEqual({
+        padding: '32px',
+        backgroundColor: '#ffffff',
+      });
+    });
+
+    it('dark + responsive combined', () => {
+      const result = dot('p-4 md:p-8 dark:bg-gray-900', { breakpoint: 'md', dark: true });
+      expect(result).toEqual({
+        padding: '32px',
+        backgroundColor: '#111827',
+      });
+    });
+
+    it('dark:md: multi-variant', () => {
+      const result = dot('bg-white dark:bg-gray-800 dark:md:bg-gray-900', {
+        breakpoint: 'md',
+        dark: true,
+      });
+      expect(result).toEqual({ backgroundColor: '#111827' });
+    });
+
+    it('dark:md: without dark mode ignores dark tokens', () => {
+      const result = dot('bg-white dark:md:bg-gray-900', { breakpoint: 'md' });
+      expect(result).toEqual({ backgroundColor: '#ffffff' });
+    });
+
+    it('dark:md: without breakpoint ignores responsive tokens', () => {
+      const result = dot('bg-white dark:md:bg-gray-900', { dark: true });
+      expect(result).toEqual({ backgroundColor: '#ffffff' });
+    });
+
+    it('responsive cascade order is correct regardless of input order', () => {
+      // lg:p-12 appears before sm:p-6 in input, but sm should cascade before lg
+      const result = dot('p-4 lg:p-12 sm:p-6', { breakpoint: 'lg' });
+      expect(result).toEqual({ padding: '48px' }); // lg wins
+    });
+
+    it('partial cascade: sm has value, md does not', () => {
+      const result = dot('p-4 sm:p-6 lg:p-12', { breakpoint: 'md' });
+      // At md: base(p-4) → sm(p-6) applied, md nothing, lg skipped
+      expect(result).toEqual({ padding: '24px' });
+    });
+
+    it('responsive grid layout', () => {
+      const result = dot('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4', {
+        breakpoint: 'lg',
+      });
+      expect(result).toEqual({
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: '16px',
+      });
+    });
+
+    it('responsive positioning', () => {
+      const result = dot('relative md:absolute md:top-0 md:left-0', { breakpoint: 'md' });
+      expect(result).toEqual({
+        position: 'absolute',
+        top: '0px',
+        left: '0px',
+      });
+    });
+
+    it('responsive hidden/flex pattern', () => {
+      expect(dot('hidden md:flex', { breakpoint: 'sm' })).toEqual({ display: 'none' });
+      expect(dot('hidden md:flex', { breakpoint: 'md' })).toEqual({ display: 'flex' });
+      expect(dot('hidden md:flex', { breakpoint: 'lg' })).toEqual({ display: 'flex' });
+    });
+
+    it('caches responsive results separately', () => {
+      const base = dot('p-4 md:p-8');
+      const md = dot('p-4 md:p-8', { breakpoint: 'md' });
+      expect(base).toEqual({ padding: '16px' });
+      expect(md).toEqual({ padding: '32px' });
+      expect(base).not.toBe(md);
+    });
+
+    it('hover: variant still skipped', () => {
+      const result = dot('p-4 hover:p-8 md:p-6', { breakpoint: 'md' });
+      expect(result).toEqual({ padding: '24px' });
+    });
+
+    it('unknown breakpoint returns base only', () => {
+      const result = dot('p-4 md:p-8', { breakpoint: 'xxl' as string });
+      expect(result).toEqual({ padding: '16px' });
+    });
+
+    it('responsive with negative values', () => {
+      const result = dot('-mt-4 md:-mt-8', { breakpoint: 'md' });
+      expect(result).toEqual({ marginTop: '-32px' });
+    });
+
+    it('full responsive card pattern', () => {
+      const result = dot(
+        'p-4 md:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6',
+        { breakpoint: 'lg' },
+      );
+      expect(result).toEqual({
+        padding: '32px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: '24px',
+      });
     });
   });
 });
