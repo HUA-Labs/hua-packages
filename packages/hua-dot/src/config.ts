@@ -12,6 +12,7 @@ import { ANIMATION } from './tokens/animations';
 import { BACKDROP_BLUR } from './tokens/backdrop';
 import { GRID_COLS, GRID_ROWS } from './tokens/grid';
 import { RING_WIDTHS, RING_OFFSETS } from './tokens/rings';
+import { BREAKPOINT_ORDER } from './tokens/breakpoints';
 
 /** Default token set built from hua-css data */
 const DEFAULT_TOKENS: ResolvedTokens = {
@@ -80,12 +81,21 @@ export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
     ? deepMerge(DEFAULT_TOKENS, theme as Partial<ResolvedTokens>)
     : { ...DEFAULT_TOKENS };
 
+  const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
+  const breakpointOrder = userConfig?.breakpoints ?? [...BREAKPOINT_ORDER];
+  const breakpointSet = new Set<string>(breakpointOrder);
+
   return {
     tokens,
     cache: userConfig?.cache ?? true,
     cacheSize: userConfig?.cacheSize ?? 500,
     strictMode: userConfig?.strictMode ?? false,
+    warnUnknown: userConfig?.warnUnknown ?? isDev,
     runtime: userConfig?.runtime ?? 'web',
+    breakpointOrder,
+    breakpointSet,
+    remBase: userConfig?.remBase ?? 16,
   };
 }
 

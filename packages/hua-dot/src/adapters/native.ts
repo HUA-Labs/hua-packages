@@ -36,6 +36,11 @@ const SKIP_PROPS = new Set([
   'resize',
   'whiteSpace',
   'textOverflow',
+  'WebkitBoxOrient',
+  'clip',
+  'visibility',
+  'filter',
+  'mixBlendMode',
 ]);
 
 /** Properties whose px/number values should be converted to plain numbers */
@@ -133,7 +138,7 @@ const PASSTHROUGH_PROPS = new Set([
  * - `'auto'` → `'auto'` (preserved)
  * - `'100vh'` / `'100vw'` → `undefined` (skip)
  */
-export function toNumeric(value: string | number): string | number | undefined {
+export function toNumeric(value: string | number, remBase = 16): string | number | undefined {
   if (typeof value === 'number') return value;
   const trimmed = value.trim();
 
@@ -153,9 +158,9 @@ export function toNumeric(value: string | number): string | number | undefined {
     return parseFloat(trimmed);
   }
 
-  // rem/em — approximate: ×16
+  // rem/em — multiply by remBase (default 16)
   if (trimmed.endsWith('rem') || trimmed.endsWith('em')) {
-    return parseFloat(trimmed) * 16;
+    return parseFloat(trimmed) * remBase;
   }
 
   // Pure number string
@@ -303,6 +308,31 @@ function parseRgbColor(str: string): { hex: string; opacity: number } {
 }
 
 // ---------------------------------------------------------------------------
+// Dev warnings for dropped properties
+// ---------------------------------------------------------------------------
+
+export interface AdaptNativeOptions {
+  remBase?: number;
+  /** When true, emit console.warn for dropped CSS properties (once per property per session) */
+  warnDropped?: boolean;
+}
+
+/** Set of property names already warned about (session-scoped dedup) */
+const _warnedProps = new Set<string>();
+
+/** Reset warning dedup set — for testing only */
+export function _resetNativeWarnings(): void {
+  _warnedProps.clear();
+}
+
+function warnOnce(prop: string, reason?: string): void {
+  if (_warnedProps.has(prop)) return;
+  _warnedProps.add(prop);
+  const suffix = reason ? ` (${reason})` : '';
+  console.warn(`[dot/native] Dropped: "${prop}"${suffix}`);
+}
+
+// ---------------------------------------------------------------------------
 // Main adapter
 // ---------------------------------------------------------------------------
 
@@ -310,19 +340,35 @@ function parseRgbColor(str: string): { hex: string; opacity: number } {
  * Convert a web CSS style object into a React Native StyleSheet-compatible object.
  *
  * This is a pure post-processing function — no side effects, no Dimensions API.
- * Unsupported properties are silently dropped.
+ * Unsupported properties are silently dropped (with optional dev warnings).
  */
-export function adaptNative(webStyle: StyleObject): RNStyleObject {
+export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions): RNStyleObject {
+  const remBase = options?.remBase ?? 16;
+  const warn = options?.warnDropped === true;
   const result: RNStyleObject = {};
 
   for (const [key, value] of Object.entries(webStyle)) {
     // Skip unsupported
-    if (SKIP_PROPS.has(key)) continue;
+    if (SKIP_PROPS.has(key)) {
+      if (warn) warnOnce(key);
+      continue;
+    }
 
-    // Display — only flex/none
+    // Display — only flex/none (skip -webkit-box from line-clamp)
     if (key === 'display') {
       if (value === 'flex' || value === 'none') {
         result[key] = value;
+      } else if (warn) {
+        warnOnce(`display:${String(value)}`, `unsupported display value "${String(value)}"`);
+      }
+      continue;
+    }
+
+    // WebkitLineClamp → RN numberOfLines
+    if (key === 'WebkitLineClamp') {
+      const num = typeof value === 'number' ? value : parseInt(String(value), 10);
+      if (!isNaN(num) && num > 0) {
+        result['numberOfLines'] = num;
       }
       continue;
     }
@@ -361,7 +407,7 @@ export function adaptNative(webStyle: StyleObject): RNStyleObject {
 
     // Numeric conversion (px → number)
     if (NUMERIC_PROPS.has(key)) {
-      const converted = toNumeric(value);
+      const converted = toNumeric(value, remBase);
       if (converted !== undefined) {
         result[key] = converted;
       }

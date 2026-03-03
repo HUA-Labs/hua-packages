@@ -3,7 +3,6 @@ import { parse } from './parser';
 import { resolveToken } from './resolver';
 import { DotCache } from './cache';
 import { resolveConfig } from './config';
-import { BREAKPOINT_ORDER, BREAKPOINT_SET } from './tokens/breakpoints';
 import { adaptNative } from './adapters/native';
 
 /** Merge resolved styles, accumulating transform values instead of overwriting */
@@ -17,13 +16,26 @@ function mergeStyle(target: StyleObject, source: StyleObject): void {
   }
 }
 
+/** Append !important to all values in a style object */
+function applyImportant(style: StyleObject): StyleObject {
+  const result: StyleObject = {};
+  for (const [key, value] of Object.entries(style)) {
+    result[key] = typeof value === 'string' && !value.endsWith('!important')
+      ? `${value} !important`
+      : typeof value === 'number'
+        ? `${value} !important`
+        : value;
+  }
+  return result;
+}
+
 /** Supported state variants for dotMap() */
 const STATE_VARIANT_SET = new Set<string>([
   'hover', 'focus', 'active', 'focus-visible', 'focus-within', 'disabled',
 ]);
 
 /** Categorize a token's variants into dark, breakpoint, state, and unsupported */
-function categorizeVariants(variants: string[]): {
+function categorizeVariants(variants: string[], breakpointSet: Set<string>): {
   dark: boolean;
   breakpoint: string | null;
   state: string | null;
@@ -35,7 +47,7 @@ function categorizeVariants(variants: string[]): {
   let unsupported = false;
   for (const v of variants) {
     if (v === 'dark') dark = true;
-    else if (BREAKPOINT_SET.has(v)) breakpoint = v;
+    else if (breakpointSet.has(v)) breakpoint = v;
     else if (STATE_VARIANT_SET.has(v)) state = v;
     else unsupported = true;
   }
@@ -66,8 +78,9 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
   const isNative = target === 'native';
+  const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
-    ? BREAKPOINT_ORDER.indexOf(activeBreakpoint as typeof BREAKPOINT_ORDER[number])
+    ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Layer 1: Full input cache hit (cache key encodes full context including target)
@@ -87,7 +100,7 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
   const darkBpLayers: Record<string, StyleObject> = {};
 
   for (const token of tokens) {
-    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants);
+    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants, currentConfig.breakpointSet);
 
     // Skip unsupported and state variants (dot() returns flat styles; use dotMap() for states)
     if (unsupported || state) continue;
@@ -98,14 +111,16 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
     // Skip responsive tokens when no active breakpoint or below active
     if (breakpoint) {
       if (activeBpIndex === -1) continue;
-      const tokenBpIndex = BREAKPOINT_ORDER.indexOf(breakpoint as typeof BREAKPOINT_ORDER[number]);
+      const tokenBpIndex = bpOrder.indexOf(breakpoint);
       if (tokenBpIndex === -1 || tokenBpIndex > activeBpIndex) continue;
     }
 
-    // Strip variants from raw for resolution
-    const rawUtility = token.raw.includes(':')
+    // Strip variants and !important from raw for resolution
+    let rawUtility = token.raw.includes(':')
       ? token.raw.slice(token.raw.lastIndexOf(':') + 1)
       : token.raw;
+    if (rawUtility.startsWith('!')) rawUtility = rawUtility.slice(1);
+
     const resolveTarget = { ...token, variants: [], raw: rawUtility };
 
     // Resolve (with token cache)
@@ -121,6 +136,11 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
       }
     } else {
       resolved = resolveToken(resolveTarget, currentConfig);
+    }
+
+    // Apply !important if flagged
+    if (token.important) {
+      resolved = applyImportant(resolved);
     }
 
     // Route to the correct layer
@@ -143,7 +163,7 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
 
   if (activeBpIndex >= 0) {
     for (let i = 0; i <= activeBpIndex; i++) {
-      const bp = BREAKPOINT_ORDER[i];
+      const bp = bpOrder[i];
       if (bpLayers[bp]) Object.assign(result, bpLayers[bp]);
     }
   }
@@ -152,14 +172,14 @@ export function dot(input: string, options?: DotOptions): StyleObject | RNStyleO
     Object.assign(result, darkBase);
     if (activeBpIndex >= 0) {
       for (let i = 0; i <= activeBpIndex; i++) {
-        const bp = BREAKPOINT_ORDER[i];
+        const bp = bpOrder[i];
         if (darkBpLayers[bp]) Object.assign(result, darkBpLayers[bp]);
       }
     }
   }
 
   // Apply native adapter if targeting RN
-  const finalResult = isNative ? adaptNative(result) : result;
+  const finalResult = isNative ? adaptNative(result, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : result;
 
   // Layer 1: Cache the full result
   if (currentConfig.cache) {
@@ -220,8 +240,9 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
   const isNative = target === 'native';
+  const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
-    ? BREAKPOINT_ORDER.indexOf(activeBreakpoint as typeof BREAKPOINT_ORDER[number])
+    ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Cache key with map prefix
@@ -245,20 +266,22 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
   const stateLayers: Record<string, StyleObject> = {};
 
   for (const token of tokens) {
-    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants);
+    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants, currentConfig.breakpointSet);
 
     if (unsupported) continue;
     if (dark && !isDark) continue;
 
     if (breakpoint) {
       if (activeBpIndex === -1) continue;
-      const tokenBpIndex = BREAKPOINT_ORDER.indexOf(breakpoint as typeof BREAKPOINT_ORDER[number]);
+      const tokenBpIndex = bpOrder.indexOf(breakpoint);
       if (tokenBpIndex === -1 || tokenBpIndex > activeBpIndex) continue;
     }
 
-    const rawUtility = token.raw.includes(':')
+    let rawUtility = token.raw.includes(':')
       ? token.raw.slice(token.raw.lastIndexOf(':') + 1)
       : token.raw;
+    if (rawUtility.startsWith('!')) rawUtility = rawUtility.slice(1);
+
     const resolveTarget = { ...token, variants: [], raw: rawUtility };
 
     let resolved: StyleObject;
@@ -273,6 +296,11 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
       }
     } else {
       resolved = resolveToken(resolveTarget, currentConfig);
+    }
+
+    // Apply !important if flagged
+    if (token.important) {
+      resolved = applyImportant(resolved);
     }
 
     // Route: state variants go to state buckets, rest same as dot()
@@ -296,7 +324,7 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
   const baseResult: StyleObject = { ...base };
   if (activeBpIndex >= 0) {
     for (let i = 0; i <= activeBpIndex; i++) {
-      const bp = BREAKPOINT_ORDER[i];
+      const bp = bpOrder[i];
       if (bpLayers[bp]) Object.assign(baseResult, bpLayers[bp]);
     }
   }
@@ -304,7 +332,7 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
     Object.assign(baseResult, darkBase);
     if (activeBpIndex >= 0) {
       for (let i = 0; i <= activeBpIndex; i++) {
-        const bp = BREAKPOINT_ORDER[i];
+        const bp = bpOrder[i];
         if (darkBpLayers[bp]) Object.assign(baseResult, darkBpLayers[bp]);
       }
     }
@@ -312,12 +340,12 @@ export function dotMap(input: string, options?: DotOptions): DotStyleMap {
 
   // Build result
   const result: DotStyleMap = {
-    base: isNative ? adaptNative(baseResult) : baseResult,
+    base: isNative ? adaptNative(baseResult, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : baseResult,
   };
 
   for (const [stateKey, stateStyle] of Object.entries(stateLayers)) {
     if (Object.keys(stateStyle).length > 0) {
-      result[stateKey as DotState] = isNative ? adaptNative(stateStyle) : stateStyle;
+      result[stateKey as DotState] = isNative ? adaptNative(stateStyle, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : stateStyle;
     }
   }
 
@@ -348,7 +376,8 @@ export type {
 } from './types';
 
 // Re-export adapters for direct usage
-export { adaptNative } from './adapters/native';
+export { adaptNative, _resetNativeWarnings } from './adapters/native';
+export type { AdaptNativeOptions } from './adapters/native';
 export { adaptWeb } from './adapters/web';
 
 // Re-export cx utility

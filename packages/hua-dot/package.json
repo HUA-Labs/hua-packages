@@ -7,9 +7,18 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "react-native": {
+        "types": "./dist/native.d.ts",
+        "import": "./dist/native.mjs"
+      },
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
+    },
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "import": "./dist/native.mjs",
+      "default": "./dist/native.mjs"
     }
   },
   "files": [

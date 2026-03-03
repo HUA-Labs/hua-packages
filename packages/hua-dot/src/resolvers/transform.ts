@@ -1,4 +1,5 @@
 import type { StyleObject, DotConfig } from '../types';
+import { TRANSFORM_ORIGIN } from '../tokens/transforms';
 
 /**
  * Resolve transform tokens:
@@ -66,6 +67,13 @@ export function resolveTransform(prefix: string, value: string, config: DotConfi
       const deg = config.tokens.skew[value];
       if (deg !== undefined) {
         return { transform: `skewY(${deg})` };
+      }
+      return {};
+    }
+    case 'origin': {
+      const origin = TRANSFORM_ORIGIN[value];
+      if (origin !== undefined) {
+        return { transformOrigin: origin };
       }
       return {};
     }

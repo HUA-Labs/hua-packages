@@ -91,7 +91,6 @@ export default function RootLayout({ children }) {
 
 The main entry (`@hua-labs/hua`) exports everything flat for convenience. Use subpath imports for tree-shaking.
 
-
 ## Configuration Presets
 
 | Preset | Use Case | Includes |
@@ -104,7 +103,6 @@ The main entry (`@hua-labs/hua`) exports everything flat for convenience. Use su
 // Minimal config — preset handles defaults
 export default defineConfig({ preset: 'product' });
 ```
-
 
 ## Related Packages
 

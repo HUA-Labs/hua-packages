@@ -21,7 +21,6 @@ Interactive scaffolding CLI for creating Next.js + hua projects. Generates a pre
 pnpm add @hua-labs/create-hua
 ```
 
-
 ## Quick Start
 
 ```bash
@@ -37,7 +36,6 @@ pnpm dev
 | Export | Type | Description |
 |--------|------|-------------|
 | `createProject` | function | Scaffold a new Next.js + hua project with interactive prompts |
-
 
 ## Related Packages
 
