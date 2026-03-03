@@ -85,7 +85,6 @@ function App() {
 | `cn` | function | Tailwind-safe class name merging (clsx + tailwind-merge) |
 | `Slot` | component | Polymorphic slot for asChild pattern |
 
-
 ## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)

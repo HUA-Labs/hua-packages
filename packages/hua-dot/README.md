@@ -29,6 +29,9 @@ Cross-platform style engine that converts utility strings to Web CSSProperties /
 - **Responsive variants — sm:/md:/lg:/xl:/2xl: mobile-first cascade**
 - **Negative values — -m-4, -top-2, -translate-x-4**
 - **React Native adapter — dot('p-4', { target: 'native' }) → { padding: 16 }**
+- **RN native subpath — import { dot } from '@hua-labs/dot/native' (auto target: 'native')**
+- **RN conditional export — Metro resolves 'react-native' condition automatically**
+- **RN dropped property warnings — dev console.warn for unsupported CSS props (transition, grid, cursor, etc.)**
 - **RN transform — CSS transform string → RN transform array**
 - **RN shadow — boxShadow → shadowColor/Offset/Opacity/Radius/elevation**
 - **Interactivity — cursor-*, select-*, resize-*, pointer-events-***
@@ -48,7 +51,6 @@ Cross-platform style engine that converts utility strings to Web CSSProperties /
 pnpm add @hua-labs/dot
 ```
 
-
 ## Quick Start
 
 ```tsx
@@ -58,9 +60,13 @@ import { dot, dotMap, createDotConfig } from '@hua-labs/dot';
 const style = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
 // { padding: '16px', display: 'flex', alignItems: 'center', ... }
 
-// React Native target
+// React Native target (explicit)
 dot('p-4 rounded-lg shadow-lg rotate-45', { target: 'native' });
 // { padding: 16, borderRadius: 8, shadowColor: '#000000', ..., transform: [{ rotate: '45deg' }] }
+
+// React Native via native subpath (auto target)
+// import { dot } from '@hua-labs/dot/native';
+// dot('p-4 rounded-lg') → { padding: 16, borderRadius: 8 }
 
 // Dark mode
 dot('bg-white dark:bg-gray-900', { dark: true });
@@ -111,8 +117,11 @@ dot('bg-brand-500 p-18');
 
 | Export | Type | Description |
 |--------|------|-------------|
-| `adaptNative` | function | Convert web CSSProperties to RN StyleSheet format. Pure function, exported for direct usage. |
+| `adaptNative` | function | Convert web CSSProperties to RN StyleSheet format. Supports warnDropped option for dev warnings on unsupported properties. |
+| `_resetNativeWarnings` | function | Reset native adapter warning dedup set. For testing only. |
 | `adaptWeb` | function |  |
+| `dotCx` | function |  |
+| `dotVariants` | function |  |
 | `StyleObject` | type |  |
 | `DotToken` | type |  |
 | `DotUserConfig` | type |  |
@@ -127,11 +136,16 @@ dot('bg-brand-500 p-18');
 | `RNStyleValue` | type |  |
 | `RNTransformEntry` | type |  |
 | `RNShadowOffset` | type |  |
+| `AdaptNativeOptions` | type |  |
+| `VariantProps` | type |  |
+| `DotVariantsConfig` | type |  |
+| `DotVariantsFn` | type |  |
+| `CompoundVariant` | type |  |
+| `VariantShape` | type |  |
 | `dot` | function | Convert utility string to flat style object. Options: { dark?: boolean, breakpoint?: string, target?: 'web' | 'native' } |
 | `createDotConfig` | function | Set global token configuration with deep merge. Accepts theme overrides, runtime target, cache settings, strictMode. |
 | `clearDotCache` | function | Clear both input and token caches. Call after config changes or for memory management. |
 | `dotMap` | function | Convert utility string to style map with state variants. Returns { base, hover?, focus?, active?, 'focus-visible'?, 'focus-within'?, disabled? } |
-
 
 ## Related Packages
 

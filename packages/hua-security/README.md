@@ -98,7 +98,6 @@ const res = await distributed.checkRateLimit('user-123', '1.2.3.4', RATE_LIMIT_P
 | `KeyInfo` | type |  |
 | `KeyManagerConfig` | type |  |
 
-
 ## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)

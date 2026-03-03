@@ -28,6 +28,8 @@ export interface DotToken {
   raw: string;
   /** Whether this is a negative value token (e.g., -m-4, -top-2) */
   negative: boolean;
+  /** Whether this token has the !important modifier (e.g., !p-4) */
+  important: boolean;
 }
 
 /** Platform-agnostic style object (Web CSSProperties compatible) */
@@ -90,6 +92,12 @@ export interface DotUserConfig {
   cache?: boolean;
   cacheSize?: number;
   strictMode?: boolean;
+  /** Warn on unknown tokens in dev mode. Defaults to true when NODE_ENV=development. */
+  warnUnknown?: boolean;
+  /** Custom breakpoint names in mobile-first order. Defaults to ['sm','md','lg','xl','2xl']. */
+  breakpoints?: string[];
+  /** Base pixel value for rem/em conversion in native adapter. Defaults to 16. */
+  remBase?: number;
 }
 
 /** Internal resolved config */
@@ -98,8 +106,16 @@ export interface DotConfig {
   cache: boolean;
   cacheSize: number;
   strictMode: boolean;
+  /** Warn on unknown tokens via console.warn. Defaults to true in dev mode. */
+  warnUnknown: boolean;
   /** Default target platform */
   runtime: DotTarget;
+  /** Breakpoint names in mobile-first order */
+  breakpointOrder: string[];
+  /** Set of breakpoint names for quick lookup */
+  breakpointSet: Set<string>;
+  /** Base pixel value for rem/em conversion in native adapter */
+  remBase: number;
 }
 
 /** Fully resolved token set (defaults + user overrides) */

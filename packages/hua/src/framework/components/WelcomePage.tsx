@@ -149,7 +149,7 @@ export function WelcomePage({
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
                 {projectName}
               </h1>
-              <Badge variant="secondary" className="text-xs font-mono">
+              <Badge variant="secondary" dot="text-xs font-mono">
                 alpha
               </Badge>
             </div>
@@ -206,8 +206,8 @@ export function WelcomePage({
               {features.map((feature, index) => (
                 <Card
                   key={index}
-                  className="p-4 text-center hover:bg-secondary/50 transition-colors cursor-default border-border animate-fadeIn"
-                  style={{ animationDelay: `${300 + index * 100}ms`, animationFillMode: 'both' }}
+                  dot="p-4 text-center border-border"
+                  style={{ animationDelay: `${300 + index * 100}ms`, animationFillMode: 'both', cursor: 'default' }}
                 >
                   <div className="text-2xl mb-2">{feature.icon}</div>
                   <h3 className="font-semibold text-sm">{feature.title}</h3>
@@ -231,7 +231,7 @@ export function WelcomePage({
                   className="group animate-slideUp"
                   style={{ animationDelay: `${500 + index * 100}ms`, animationFillMode: 'both' }}
                 >
-                  <Card className="p-5 h-full hover:bg-secondary/50 transition-all hover:border-primary/50 border-border">
+                  <Card dot="p-5 h-full border-border">
                     <div className="flex items-start gap-3">
                       <div className="text-muted-foreground group-hover:text-primary transition-colors">
                         {link.icon}

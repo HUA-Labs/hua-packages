@@ -48,6 +48,12 @@ const STANDALONE_TOKENS = new Set<string>([
   'overflow-scroll',
   'overflow-visible',
   'truncate',
+  // visibility
+  'visible',
+  'invisible',
+  // accessibility
+  'sr-only',
+  'not-sr-only',
   // grid flow
   ...Object.keys(GRID_FLOW),
   // interactivity
@@ -109,6 +115,10 @@ const MULTI_SEGMENT_PREFIXES = [
   'inset-y',
   // Phase 4: ring
   'ring-offset',
+  // Phase 5: filter
+  'hue-rotate',
+  'drop-shadow',
+  'mix-blend',
   // Phase 3a: grid (longest first)
   'grid-cols',
   'grid-rows',
@@ -144,6 +154,12 @@ function parseToken(raw: string): DotToken {
   let utility = parts.pop()!;
   const variants = parts;
 
+  // Detect !important modifier: !p-4, hover:!bg-red-500
+  const important = utility.length > 1 && utility[0] === '!';
+  if (important) {
+    utility = utility.slice(1);
+  }
+
   // Detect negative prefix: -m-4, -top-2, -translate-x-4
   // Must start with '-' followed by a letter (not '--' or '-' alone)
   const negative = utility.length > 1 && utility[0] === '-' && /[a-z]/i.test(utility[1]);
@@ -153,12 +169,12 @@ function parseToken(raw: string): DotToken {
 
   // Check standalone tokens first (standalone tokens cannot be negative)
   if (STANDALONE_TOKENS.has(utility)) {
-    return { variants, prefix: '', value: utility, raw, negative: false };
+    return { variants, prefix: '', value: utility, raw, negative: false, important };
   }
 
   // Split into prefix and value
   const { prefix, value } = splitUtility(utility);
-  return { variants, prefix, value, raw, negative };
+  return { variants, prefix, value, raw, negative, important };
 }
 
 /**

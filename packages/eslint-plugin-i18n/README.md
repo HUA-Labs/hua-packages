@@ -67,7 +67,6 @@ export default [
 | Export | Type | Description |
 |--------|------|-------------|
 
-
 ## Related Packages
 
 - [`@hua-labs/i18n-core`](https://www.npmjs.com/package/@hua-labs/i18n-core)

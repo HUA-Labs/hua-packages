@@ -11,7 +11,7 @@
 'use client';
 
 import React from 'react';
-import { Card, merge, type CardProps } from '@hua-labs/ui';
+import { Card, type CardProps } from '@hua-labs/ui';
 import { useBranding } from '../branding/context';
 
 /**
@@ -54,22 +54,16 @@ import { useBranding } from '../branding/context';
  * ```
  */
 export const BrandedCard = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ variant = 'default', className, ...props }, ref) => {
+  ({ variant = 'default', style, ...props }, ref) => {
     const branding = useBranding();
 
-    // Branding 색상이 있으면 Tailwind arbitrary values 사용
-    // Use Tailwind arbitrary values if branding colors exist
-    let brandingClasses = '';
+    let brandingStyle: React.CSSProperties | undefined;
 
     if (branding?.colors) {
       if (variant === 'outline' && branding.colors.accent) {
-        // Accent 색상을 테두리로 사용
-        // Use accent color as border
-        brandingClasses = 'border-[var(--color-accent)]';
+        brandingStyle = { borderColor: 'var(--color-accent)' };
       } else if (variant === 'default' && branding.colors.primary) {
-        // Primary 색상의 약간의 tint를 배경에 적용
-        // Apply slight tint of primary color to background
-        brandingClasses = 'bg-[var(--color-primary)]/5';
+        brandingStyle = { backgroundColor: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' };
       }
     }
 
@@ -77,7 +71,7 @@ export const BrandedCard = React.forwardRef<HTMLDivElement, CardProps>(
       <Card
         ref={ref}
         variant={variant}
-        className={merge(brandingClasses, className)}
+        style={brandingStyle ? { ...brandingStyle, ...style } : style}
         {...props}
       />
     );

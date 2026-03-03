@@ -93,6 +93,13 @@ export const INSET_PROP_MAP: Record<string, readonly string[]> = {
   'end': ['insetInlineEnd'],
 } as const;
 
+/** Aspect-ratio values */
+export const ASPECT_RATIO: Record<string, string> = {
+  'auto': 'auto',
+  'square': '1 / 1',
+  'video': '16 / 9',
+} as const;
+
 /** Maps sizing prefix to CSS property */
 export const SIZE_PROP_MAP: Record<string, string> = {
   'w': 'width',

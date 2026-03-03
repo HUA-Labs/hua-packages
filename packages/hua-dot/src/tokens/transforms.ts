@@ -25,6 +25,19 @@ export const SCALE: Record<string, string> = {
   '150': '1.5',
 } as const;
 
+/** Transform-origin values */
+export const TRANSFORM_ORIGIN: Record<string, string> = {
+  'center': 'center',
+  'top': 'top',
+  'top-right': 'top right',
+  'right': 'right',
+  'bottom-right': 'bottom right',
+  'bottom': 'bottom',
+  'bottom-left': 'bottom left',
+  'left': 'left',
+  'top-left': 'top left',
+} as const;
+
 /** Skew values (degrees) */
 export const SKEW: Record<string, string> = {
   '0': '0deg',

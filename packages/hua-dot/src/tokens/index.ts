@@ -15,6 +15,7 @@ export {
   SIZE_PROP_MAP,
   INSET_KEYWORDS,
   INSET_PROP_MAP,
+  ASPECT_RATIO,
 } from './layout';
 export {
   GRID_COLS,
@@ -48,10 +49,22 @@ export {
 export { Z_INDEX } from './z-index';
 export { SHADOWS } from './shadows';
 export { OPACITY } from './opacity';
-export { ROTATE, SCALE, SKEW } from './transforms';
+export { ROTATE, SCALE, SKEW, TRANSFORM_ORIGIN } from './transforms';
 export { TRANSITION_PROPERTY, DURATION, TIMING } from './transitions';
 export { ANIMATION } from './animations';
 export { BREAKPOINT_ORDER, BREAKPOINT_SET } from './breakpoints';
 export { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE } from './interactivity';
 export { RING_WIDTHS, RING_OFFSETS, RING_DEFAULT_COLOR, buildRingShadow } from './rings';
 export { BACKDROP_BLUR, BACKDROP_BRIGHTNESS, BACKDROP_CONTRAST, BACKDROP_SATURATE } from './backdrop';
+export {
+  BLUR,
+  BRIGHTNESS,
+  CONTRAST,
+  SATURATE,
+  GRAYSCALE,
+  SEPIA,
+  INVERT,
+  HUE_ROTATE,
+  DROP_SHADOW,
+  MIX_BLEND,
+} from './filter';

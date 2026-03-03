@@ -5,6 +5,7 @@ import {
   SIZE_KEYWORDS,
   MAX_WIDTH_KEYWORDS,
   SIZE_PROP_MAP,
+  ASPECT_RATIO,
 } from '../tokens/layout';
 import { GRID_FLOW } from '../tokens/grid';
 import { parseArbitrary } from './utils';
@@ -38,9 +39,59 @@ export function resolveLayout(value: string): StyleObject {
     };
   }
 
+  // Visibility
+  if (value === 'visible') return { visibility: 'visible' };
+  if (value === 'invisible') return { visibility: 'hidden' };
+
+  // Accessibility: sr-only / not-sr-only
+  if (value === 'sr-only') {
+    return {
+      position: 'absolute',
+      width: '1px',
+      height: '1px',
+      padding: '0',
+      margin: '-1px',
+      overflow: 'hidden',
+      clip: 'rect(0, 0, 0, 0)',
+      whiteSpace: 'nowrap',
+      borderWidth: '0',
+    };
+  }
+  if (value === 'not-sr-only') {
+    return {
+      position: 'static',
+      width: 'auto',
+      height: 'auto',
+      padding: '0',
+      margin: '0',
+      overflow: 'visible',
+      clip: 'auto',
+      whiteSpace: 'normal',
+      borderWidth: '0',
+    };
+  }
+
   // Grid flow standalone
   if (GRID_FLOW[value]) {
     return { gridAutoFlow: GRID_FLOW[value] };
+  }
+
+  return {};
+}
+
+/**
+ * Resolve aspect-ratio tokens: aspect-auto, aspect-square, aspect-video, aspect-[4/3]
+ */
+export function resolveAspectRatio(_prefix: string, value: string, _config: DotConfig): StyleObject {
+  // Arbitrary value: aspect-[4/3]
+  const arbitrary = parseArbitrary(value);
+  if (arbitrary !== undefined) {
+    return { aspectRatio: arbitrary };
+  }
+
+  const ratio = ASPECT_RATIO[value];
+  if (ratio) {
+    return { aspectRatio: ratio };
   }
 
   return {};

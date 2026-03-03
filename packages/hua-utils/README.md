@@ -82,7 +82,6 @@ sanitizeInput('<script>alert("xss")</script>'); // safe string
 | `escapeHtml` | function |  |
 | `maskEmailForLog` | function |  |
 
-
 ## Related Packages
 
 - [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)

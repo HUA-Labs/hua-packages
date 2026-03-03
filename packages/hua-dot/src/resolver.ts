@@ -2,7 +2,7 @@ import type { DotToken, StyleObject, ResolverFn, DotConfig } from './types';
 import { resolveSpacing } from './resolvers/spacing';
 import { resolveColor } from './resolvers/color';
 import { resolveTypography } from './resolvers/typography';
-import { resolveLayout, resolveSizing } from './resolvers/layout';
+import { resolveLayout, resolveSizing, resolveAspectRatio } from './resolvers/layout';
 import { resolveBorder, resolveBorderStyle, resolveBorderRadius } from './resolvers/border';
 import { resolveFlexbox, resolveFlexboxStandalone } from './resolvers/flexbox';
 import { resolveZIndex } from './resolvers/z-index';
@@ -17,6 +17,7 @@ import { resolveGrid } from './resolvers/grid';
 import { resolveInteractivity } from './resolvers/interactivity';
 import { resolveRing, resolveRingOffset } from './resolvers/ring';
 import { resolveLineClamp } from './resolvers/line-clamp';
+import { resolveFilter, resolveMixBlend } from './resolvers/filter';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -58,6 +59,9 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   'min-h': resolveSizing,
   'max-w': resolveSizing,
   'max-h': resolveSizing,
+
+  // aspect-ratio
+  aspect: resolveAspectRatio,
 
   // border width (border- handles width > color ambiguity internally)
   border: resolveBorder,
@@ -101,6 +105,7 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   'translate-y': resolveTransform,
   'skew-x': resolveTransform,
   'skew-y': resolveTransform,
+  origin: resolveTransform,
 
   // Phase 2: transition
   transition: resolveTransition,
@@ -146,6 +151,20 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
 
   // Phase 4: line-clamp
   'line-clamp': resolveLineClamp,
+
+  // Phase 5: element filter
+  blur: resolveFilter,
+  brightness: resolveFilter,
+  contrast: resolveFilter,
+  saturate: resolveFilter,
+  grayscale: resolveFilter,
+  sepia: resolveFilter,
+  invert: resolveFilter,
+  'hue-rotate': resolveFilter,
+  'drop-shadow': resolveFilter,
+
+  // Phase 5: mix-blend-mode
+  'mix-blend': resolveMixBlend,
 };
 
 /** Negate a CSS value: '16px' → '-16px', 'translateX(16px)' → 'translateX(-16px)' */
@@ -207,6 +226,9 @@ export function resolveToken(token: DotToken, config: DotConfig): StyleObject {
     if (config.strictMode) {
       throw new Error(`[dot] Unknown token: "${token.raw}"`);
     }
+    if (config.warnUnknown) {
+      console.warn(`[dot] Unknown token: "${token.raw}"`);
+    }
     return {};
   }
 
@@ -227,11 +249,17 @@ export function resolveToken(token: DotToken, config: DotConfig): StyleObject {
     if (config.strictMode) {
       throw new Error(`[dot] Unknown token: "${token.raw}"`);
     }
+    if (config.warnUnknown) {
+      console.warn(`[dot] Unknown token: "${token.raw}"`);
+    }
     return {};
   }
 
   if (config.strictMode) {
     throw new Error(`[dot] Unknown token: "${token.raw}"`);
+  }
+  if (config.warnUnknown) {
+    console.warn(`[dot] Unknown token: "${token.raw}"`);
   }
   return {};
 }
