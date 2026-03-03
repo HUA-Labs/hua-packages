@@ -53,3 +53,4 @@ export { TRANSITION_PROPERTY, DURATION, TIMING } from './transitions';
 export { ANIMATION } from './animations';
 export { BACKDROP_BLUR } from './backdrop';
 export { BREAKPOINT_ORDER, BREAKPOINT_SET } from './breakpoints';
+export { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS } from './interactivity';

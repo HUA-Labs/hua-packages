@@ -1,16 +1,19 @@
-import type { StyleObject } from './types';
+import type { StyleObject, RNStyleObject } from './types';
+
+/** Cached output can be either web or native style */
+type CachedOutput = StyleObject | RNStyleObject;
 
 /**
  * 2-layer FIFO cache for dot() style resolution.
  *
- * Layer 1 (input cache): Full input string → merged StyleObject.
+ * Layer 1 (input cache): Full input string → merged StyleObject or RNStyleObject.
  *   Skips both parsing and resolving on cache hit.
  *
- * Layer 2 (token cache): Individual token string → StyleObject.
+ * Layer 2 (token cache): Individual token string → StyleObject (always web format).
  *   Skips resolving but still requires parsing.
  */
 export class DotCache {
-  private inputCache: Map<string, StyleObject>;
+  private inputCache: Map<string, CachedOutput>;
   private tokenCache: Map<string, StyleObject>;
   private inputMaxSize: number;
   private tokenMaxSize: number;
@@ -23,7 +26,7 @@ export class DotCache {
   }
 
   /** Layer 1: Look up full input string */
-  getInput(input: string): StyleObject | undefined {
+  getInput(input: string): CachedOutput | undefined {
     return this.inputCache.get(input);
   }
 
@@ -33,7 +36,7 @@ export class DotCache {
   }
 
   /** Store full input result in Layer 1 */
-  setInput(input: string, result: StyleObject): void {
+  setInput(input: string, result: CachedOutput): void {
     if (this.inputCache.size >= this.inputMaxSize) {
       // FIFO eviction: delete oldest entry
       const firstKey = this.inputCache.keys().next().value;

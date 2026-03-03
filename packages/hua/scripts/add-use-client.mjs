@@ -27,6 +27,7 @@ const distDir = join(__dirname, '..', 'dist');
 const clientFiles = [
   'index.mjs',
   'framework/index.mjs',
+  'dot/react.mjs',
 ];
 
 const USE_CLIENT = '"use client";\n';

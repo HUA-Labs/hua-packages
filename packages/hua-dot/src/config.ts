@@ -82,6 +82,7 @@ export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
     cache: userConfig?.cache ?? true,
     cacheSize: userConfig?.cacheSize ?? 500,
     strictMode: userConfig?.strictMode ?? false,
+    runtime: userConfig?.runtime ?? 'web',
   };
 }
 

@@ -90,6 +90,11 @@
       "types": "./dist/dot/index.d.mts",
       "import": "./dist/dot/index.mjs",
       "default": "./dist/dot/index.mjs"
+    },
+    "./dot/react": {
+      "types": "./dist/dot/react.d.mts",
+      "import": "./dist/dot/react.mjs",
+      "default": "./dist/dot/react.mjs"
     }
   },
   "files": [
