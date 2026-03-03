@@ -18,6 +18,7 @@ const entry = {
   'utils/index': 'src/utils/index.ts',
   'hooks/index': 'src/hooks/index.ts',
   'loaders/index': 'src/loaders/index.ts',
+  'dot/index': 'src/dot/index.ts',
 };
 
 const shared = {
@@ -42,6 +43,7 @@ const shared = {
     '@hua-labs/state',
     // '@hua-labs/pro' — intentionally NOT external: bundled into hua dist (source-private strategy)
     '@hua-labs/utils',
+    '@hua-labs/dot',
     '@hua-labs/hooks',
     '@hua-labs/i18n-loaders',
     // Icon libraries

@@ -85,6 +85,11 @@
       "types": "./dist/loaders/index.d.mts",
       "import": "./dist/loaders/index.mjs",
       "default": "./dist/loaders/index.mjs"
+    },
+    "./dot": {
+      "types": "./dist/dot/index.d.mts",
+      "import": "./dist/dot/index.mjs",
+      "default": "./dist/dot/index.mjs"
     }
   },
   "files": [
@@ -113,6 +118,7 @@
     "@hua-labs/motion-core": "workspace:*",
     "@hua-labs/state": "workspace:*",
     "@hua-labs/ui": "workspace:*",
+    "@hua-labs/dot": "workspace:*",
     "@hua-labs/utils": "workspace:*",
     "@phosphor-icons/react": "^2.1.10"
   },
