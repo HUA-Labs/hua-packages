@@ -7,9 +7,19 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "react-native": {
+        "types": "./dist/native.d.ts",
+        "import": "./dist/native.mjs",
+        "default": "./dist/native.mjs"
+      },
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
+    },
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "import": "./dist/native.mjs",
+      "default": "./dist/native.mjs"
     },
     "./theme": {
       "types": "./dist/theme.d.ts",
@@ -163,7 +173,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hua-labs/motion-core": ">=2.2.3",
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "react-dom": ">=19.0.0",
+    "react-native": ">=0.73.0"
   },
   "peerDependenciesMeta": {
     "@dnd-kit/core": {
@@ -176,6 +187,12 @@
       "optional": true
     },
     "@hua-labs/motion-core": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-native": {
       "optional": true
     }
   },

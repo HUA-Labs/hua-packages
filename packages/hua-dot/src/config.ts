@@ -1,7 +1,7 @@
 import type { DotUserConfig, DotConfig, ResolvedTokens } from './types';
 import { SPACING } from './tokens/spacing';
 import { COLORS, SPECIAL_COLORS } from './tokens/colors';
-import { FONT_SIZES, FONT_WEIGHTS, LINE_HEIGHTS, LETTER_SPACINGS } from './tokens/typography';
+import { FONT_SIZES, FONT_WEIGHTS, FONT_FAMILIES, LINE_HEIGHTS, LETTER_SPACINGS } from './tokens/typography';
 import { BORDER_RADIUS } from './tokens/borders';
 import { Z_INDEX } from './tokens/z-index';
 import { SHADOWS } from './tokens/shadows';
@@ -23,6 +23,7 @@ const DEFAULT_TOKENS: ResolvedTokens = {
   borderRadius: { ...BORDER_RADIUS },
   fontSize: { ...FONT_SIZES },
   fontWeight: { ...FONT_WEIGHTS },
+  fontFamily: { ...FONT_FAMILIES },
   lineHeight: { ...LINE_HEIGHTS },
   letterSpacing: { ...LETTER_SPACINGS },
   zIndex: { ...Z_INDEX },

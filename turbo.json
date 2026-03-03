@@ -102,6 +102,19 @@
     "@hua-labs/state#build": {
       "dependsOn": [],
       "outputs": ["dist/**"]
+    },
+    "sum-companion#build": {
+      "dependsOn": ["@hua-labs/dot#build"],
+      "outputs": []
+    },
+    "sum-companion#dev": {
+      "dependsOn": ["@hua-labs/dot#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "sum-companion#type-check": {
+      "dependsOn": ["@hua-labs/dot#build"],
+      "outputs": []
     }
   }
 }
