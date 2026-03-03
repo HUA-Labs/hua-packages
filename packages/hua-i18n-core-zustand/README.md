@@ -22,7 +22,7 @@ Type-safe adapter for integrating Zustand state management with @hua-labs/i18n-c
 pnpm add @hua-labs/i18n-core-zustand
 ```
 
-> Peer dependencies: zustand ^4.0.0 || ^5.0.0, react >=19.0.0
+> Peer dependencies: react >=19.0.0, zustand ^4.0.0 || ^5.0.0
 
 ## Quick Start
 
