@@ -1,10 +1,10 @@
-# create-hua
+# @hua-labs/create-hua
 
 Interactive scaffolding CLI for creating Next.js + hua projects. Generates a pre-wired project with UI, motion, i18n, state, and AI context files.
 
-[![npm version](https://img.shields.io/npm/v/create-hua.svg)](https://www.npmjs.com/package/create-hua)
-[![npm downloads](https://img.shields.io/npm/dm/create-hua.svg)](https://www.npmjs.com/package/create-hua)
-[![license](https://img.shields.io/npm/l/create-hua.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@hua-labs/create-hua.svg)](https://www.npmjs.com/package/@hua-labs/create-hua)
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/create-hua.svg)](https://www.npmjs.com/package/@hua-labs/create-hua)
+[![license](https://img.shields.io/npm/l/@hua-labs/create-hua.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 
 ## Features
@@ -18,7 +18,7 @@ Interactive scaffolding CLI for creating Next.js + hua projects. Generates a pre
 ## Installation
 
 ```bash
-npx create-hua my-app
+pnpm add @hua-labs/create-hua
 ```
 
 
