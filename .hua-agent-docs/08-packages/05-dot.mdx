@@ -1,0 +1,259 @@
+---
+title: Dot Style Engine
+description: "크로스플랫폼 스타일 엔진 — 유틸리티 문자열 → Web CSSProperties / RN StyleSheet"
+category: packages
+related:
+  - ./01-package-map.mdx
+  - ./03-motion.mdx
+  - ../../docs/areas/architecture/dot-style-engine.md
+  - ../../docs/areas/bm-template/07-ecosystem-roadmap.md
+---
+
+# Dot Style Engine
+
+`@hua-labs/dot` → `@hua-labs/hua/dot` (re-export)
+
+> 점(dot) → 선 → 면 → UI. Tailwind 문법 영감, Tailwind 의존 제거. 웹+RN 동시 지원.
+
+---
+
+## Why dot?
+
+- **hua-ui가 Tailwind에 묶여 있음** — RN 갈 수 없음
+- **dot은 유틸리티 문자열을 런타임에 스타일 객체로 변환** — 플랫폼 무관
+- **hua-css 전처리기에서 검증된 토큰 시스템** (18개 config, 1,100+ 토큰) 을 TS로 재구축
+- dot이 있으면: hua-ui → hua-native, hue → 크로스플랫폼 SDUI
+
+---
+
+## Core API
+
+### `dot()` — 유틸리티 문자열 → 스타일 객체
+
+```typescript
+import { dot } from '@hua-labs/hua/dot'
+
+// Web → CSSProperties
+const style = dot('p-4 rounded-lg bg-primary-500 text-white')
+// { padding: '16px', borderRadius: '8px', backgroundColor: '#3b82f6', color: '#ffffff' }
+
+// RN → StyleSheet-compatible object
+const style = dot('p-4 rounded-lg bg-primary-500 text-white')
+// { padding: 16, borderRadius: 8, backgroundColor: '#3b82f6', color: '#ffffff' }
+```
+
+**Variant 지원:**
+
+```typescript
+// dark mode
+dot('bg-white dark:bg-gray-900')
+
+// responsive (web only)
+dot('w-full md:w-1/2 lg:w-1/3')
+
+// state (event-based)
+dot('bg-primary-500 hover:bg-primary-600')
+```
+
+### `createDotConfig()` — 커스텀 토큰 설정
+
+```typescript
+import { createDotConfig } from '@hua-labs/hua/dot'
+
+const config = createDotConfig({
+  colors: {
+    brand: { 500: '#6630E6', 600: '#5525C0' },
+  },
+  spacing: {
+    18: '72px',
+  },
+  borderRadius: {
+    pill: '999px',
+  },
+})
+```
+
+### `hua.config.ts` 통합
+
+```typescript
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
+
+export default defineConfig({
+  dot: {
+    // 디자인 토큰 커스터마이징
+    theme: {
+      colors: {
+        primary: { 500: '#71D9FF' },  // my-app cyan
+      },
+    },
+    // 런타임 설정
+    runtime: 'web',        // 'web' | 'native'
+    cache: true,           // 토큰 캐시 활성화
+    strictMode: false,     // 알 수 없는 토큰 에러 발생 여부
+  },
+})
+```
+
+---
+
+## Import Patterns
+
+```typescript
+// GOOD: hua re-export path
+import { dot, createDotConfig } from '@hua-labs/hua/dot'
+
+// BAD: direct package import
+import { dot } from '@hua-labs/dot'
+```
+
+---
+
+## Token Categories
+
+| Category | Examples | Phase | Token Count |
+|----------|----------|-------|-------------|
+| **Spacing** | `p-4`, `mx-auto`, `gap-2`, `mt-1` | 1 | ~37 |
+| **Color** | `bg-primary-500`, `text-gray-300`, `border-red-400` | 1 | ~84 |
+| **Typography** | `text-sm`, `font-bold`, `leading-tight`, `tracking-wide` | 1 | ~38 |
+| **Layout** | `flex`, `grid`, `block`, `hidden`, `items-center` | 1 | ~45 |
+| **Sizing** | `w-full`, `h-12`, `max-w-md`, `min-h-screen` | 1 | ~20 |
+| **Border** | `rounded-lg`, `border`, `border-dashed` | 1 | ~18 |
+| **Z-index** | `z-0`, `z-10`, `z-50` | 1 | 7 |
+| **Shadow** | `shadow-sm`, `shadow-lg`, `shadow-none` | 2 | 8 |
+| **Opacity** | `opacity-0`, `opacity-50`, `opacity-100` | 2 | 15 |
+| **Transform** | `rotate-45`, `scale-110`, `translate-x-4` | 2 | ~51 |
+| **Transition** | `transition-all`, `duration-200`, `ease-in-out` | 2 | ~30 |
+| **Animation** | `animate-spin`, `animate-pulse`, `animate-bounce` | 2 | ~20 |
+| **Backdrop** | `backdrop-blur-md`, `backdrop-brightness-110` | 2 | ~14 |
+| **dark:** | `dark:bg-gray-900`, `dark:text-white` | 2 | variant |
+| **Responsive** | `sm:flex`, `md:grid-cols-2`, `lg:w-1/3` | 3 | variant |
+| **State** | `hover:bg-primary-600`, `focus:ring-2` | 3 | variant |
+| **Positioning** | `top-0`, `left-4`, `inset-0`, `absolute` | 3 | ~346 |
+| **Grid** | `grid-cols-3`, `col-span-6`, `row-start-1` | 3 | ~112 |
+| **Interactivity** | `cursor-pointer`, `select-none`, `resize` | 3 | ~76 |
+
+**Phase 1**: ~249 tokens — hua-ui 실사용 기준 80% 커버
+**Phase 2**: ~138 tokens + variant 시스템
+**Phase 3**: ~534+ tokens — 포지셔닝, 그리드 고급, 인터렉션
+
+---
+
+## Runtime Output
+
+### Web (CSSProperties)
+
+```typescript
+dot('p-4 flex items-center bg-blue-500')
+// → {
+//     padding: '16px',
+//     display: 'flex',
+//     alignItems: 'center',
+//     backgroundColor: '#3b82f6'
+//   }
+```
+
+### React Native (StyleSheet-compatible)
+
+```typescript
+dot('p-4 flex items-center bg-blue-500')
+// → {
+//     padding: 16,              // number (RN requirement)
+//     display: 'flex',
+//     alignItems: 'center',
+//     backgroundColor: '#3b82f6'
+//   }
+```
+
+**Key differences:**
+- Web: string values (`'16px'`), kebab-case CSS properties internally
+- RN: number values (`16`), no `px` suffix, camelCase only
+- Variant handling differs: Web uses media queries/CSS pseudo-classes, RN uses ThemeContext/event listeners
+
+---
+
+## Architecture Overview
+
+```
+dot('p-4 rounded-lg bg-primary-500 dark:bg-gray-900')
+  │
+  ▼
+┌──────────┐     ┌──────────┐     ┌──────────────┐
+│  Parser  │ ──▶ │ Resolver │ ──▶ │   Runtime    │
+│ (tokenize│     │ (AST →   │     │ web.ts  → CSSProperties
+│  + AST)  │     │  values) │     │ native.ts → StyleSheet
+└──────────┘     └──────────┘     └──────────────┘
+                       │
+                 ┌─────┴─────┐
+                 │  Variants │
+                 │ dark.ts   │
+                 │ responsive│
+                 │ state.ts  │
+                 └───────────┘
+```
+
+Full architecture: [dot-style-engine.md](../../docs/areas/architecture/dot-style-engine.md)
+
+---
+
+## Relationship to hua-css
+
+dot은 EBSe 프로젝트의 `hua-css` 전처리기에서 발전:
+
+| Aspect | hua-css (legacy) | dot (new) |
+|--------|-----------------|-----------|
+| Language | JavaScript | TypeScript |
+| Config | 18 JSON files | TS const + `hua.config.ts` |
+| Pipeline | File I/O (CSS → CSS) | In-memory (string → object) |
+| Runtime | Build-time only | Build-time + Runtime |
+| Platform | Web only | Web + React Native |
+| Cache | LRU (1000 entries) | WeakMap + LRU hybrid |
+
+**재활용 대상:**
+- 토큰 데이터 (colors, spacing, typography 등) → TS const로 변환
+- Converter 패턴 매칭 로직 → Resolver 함수로 정리
+- Breakpoint 정의 (sm/md/lg/xl/2xl) → 그대로 사용
+- Gradient 방향 매핑 → 그대로 사용
+
+---
+
+## Anti-patterns
+
+```typescript
+// BAD: Tailwind className을 dot에 그대로 사용
+dot('hover:bg-blue-500/20')  // ❌ opacity modifier 미지원
+
+// BAD: arbitrary values
+dot('w-[calc(100%-32px)]')   // ❌ arbitrary values 미지원
+
+// GOOD: 정의된 토큰만 사용
+dot('w-full p-4 bg-primary-500')  // ✅
+
+// GOOD: 커스텀 값은 config에서 정의
+const config = createDotConfig({
+  spacing: { 18: '72px' }
+})
+dot('p-18')  // ✅ config에서 정의한 토큰
+```
+
+---
+
+## Ecosystem Position
+
+```
+                  @hua-labs/dot
+                  (style engine)
+                 │      │      │
+     ┌───────────┘      │      └───────────┐
+     ▼                  ▼                  ▼
+@hua-labs/ui      @hua-labs/hua-native   hua_dot (Dart)
+  (web)               (RN)              (Flutter, Phase 4)
+     │                  │                  │
+     └────────┐    ┌────┘    ┌─────────────┘
+              ▼    ▼         ▼
+           hue SDUI Renderer
+     (JSON → 웹/앱/Flutter 동시 렌더링)
+```
+
+> Flutter의 위젯 트리는 JSON 선언적 조립과 1:1 대응 → SDUI에 구조적으로 최적화된 타겟.
+> Phase 4에서 dot JSON 스타일 프로토콜 → Dart 파서로 브릿지.

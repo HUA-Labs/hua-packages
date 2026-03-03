@@ -1,0 +1,38 @@
+overview: "Cross-platform style engine that converts utility strings to Web CSSProperties objects. Inspired by Tailwind syntax, zero dependencies, framework-agnostic."
+
+features:
+  - "dot() — utility string to CSSProperties conversion"
+  - "Spacing — p/m/gap with directional variants (px, py, pt, pr, pb, pl, mx, my, mt, mr, mb, ml)"
+  - "Colors — bg/text/border with 11 palettes × 10 shades + special colors"
+  - "Typography — font-size, font-weight, line-height, letter-spacing, text-align"
+  - "Layout — display, position, width, height, min/max sizing"
+  - "Border — width, style, radius with directional variants"
+  - "Flexbox — direction, wrap, align, justify, flex, order"
+  - "Z-index — 7 predefined layers"
+  - "2-layer cache — input-level + token-level FIFO caching"
+  - "Custom config — createDotConfig() for token overrides"
+
+quickStart: |
+  import { dot } from '@hua-labs/dot';
+
+  const style = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
+  // {
+  //   padding: '16px',
+  //   display: 'flex',
+  //   alignItems: 'center',
+  //   backgroundColor: '#3b82f6',
+  //   color: '#ffffff',
+  //   borderRadius: '8px'
+  // }
+
+related:
+  - "hua"
+  - "ui"
+
+apiNotes:
+  dot:
+    description: "Convert utility string to CSSProperties object"
+  createDotConfig:
+    description: "Create custom token configuration with deep merge"
+  clearDotCache:
+    description: "Clear both input and token caches"
