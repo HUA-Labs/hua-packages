@@ -13,7 +13,19 @@ export {
   SIZE_KEYWORDS,
   MAX_WIDTH_KEYWORDS,
   SIZE_PROP_MAP,
+  INSET_KEYWORDS,
+  INSET_PROP_MAP,
 } from './layout';
+export {
+  GRID_COLS,
+  GRID_ROWS,
+  COL_SPAN,
+  ROW_SPAN,
+  COL_START_END,
+  ROW_START_END,
+  AUTO_TRACK,
+  GRID_FLOW,
+} from './grid';
 export {
   BORDER_WIDTHS,
   BORDER_STYLES,
@@ -34,3 +46,10 @@ export {
   ORDER_VALUES,
 } from './flexbox';
 export { Z_INDEX } from './z-index';
+export { SHADOWS } from './shadows';
+export { OPACITY } from './opacity';
+export { ROTATE, SCALE, SKEW } from './transforms';
+export { TRANSITION_PROPERTY, DURATION, TIMING } from './transitions';
+export { ANIMATION } from './animations';
+export { BACKDROP_BLUR } from './backdrop';
+export { BREAKPOINT_ORDER, BREAKPOINT_SET } from './breakpoints';

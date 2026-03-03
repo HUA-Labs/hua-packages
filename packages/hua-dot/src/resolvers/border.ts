@@ -1,8 +1,7 @@
-import type { StyleObject } from '../types';
+import type { StyleObject, DotConfig } from '../types';
 import {
   BORDER_WIDTHS,
   BORDER_STYLES,
-  BORDER_RADIUS,
   BORDER_WIDTH_PROP_MAP,
   BORDER_RADIUS_PROP_MAP,
 } from '../tokens/borders';
@@ -14,12 +13,12 @@ import { lookupColor } from './color';
  * Handles `border-` ambiguity: borderWidth > borderColor
  *
  * @example
- * resolveBorder('border', '')     → { borderWidth: '1px' }   (bare prefix)
- * resolveBorder('border', '2')    → { borderWidth: '2px' }
- * resolveBorder('border-t', '4')  → { borderTopWidth: '4px' }
- * resolveBorder('border', 'red-500') → { borderColor: '#ef4444' }
+ * resolveBorder('border', '', config)     → { borderWidth: '1px' }   (bare prefix)
+ * resolveBorder('border', '2', config)    → { borderWidth: '2px' }
+ * resolveBorder('border-t', '4', config)  → { borderTopWidth: '4px' }
+ * resolveBorder('border', 'red-500', config) → { borderColor: '#ef4444' }
  */
-export function resolveBorder(prefix: string, value: string): StyleObject {
+export function resolveBorder(prefix: string, value: string, config: DotConfig): StyleObject {
   // Border width (including bare prefix)
   const widthProps = BORDER_WIDTH_PROP_MAP[prefix];
   if (widthProps) {
@@ -34,7 +33,7 @@ export function resolveBorder(prefix: string, value: string): StyleObject {
 
     // Color fallthrough (only for 'border' prefix)
     if (prefix === 'border') {
-      const hex = lookupColor(value);
+      const hex = lookupColor(value, config.tokens.colors);
       if (hex) {
         return { borderColor: hex };
       }
@@ -58,18 +57,19 @@ export function resolveBorderStyle(value: string): StyleObject {
  * Resolve border-radius tokens.
  *
  * @example
- * resolveBorderRadius('rounded', '')     → { borderRadius: '4px' }   (bare prefix)
- * resolveBorderRadius('rounded', 'lg')   → { borderRadius: '8px' }
- * resolveBorderRadius('rounded-tl', 'lg') → { borderTopLeftRadius: '8px' }
+ * resolveBorderRadius('rounded', '', config)     → { borderRadius: '4px' }   (bare prefix)
+ * resolveBorderRadius('rounded', 'lg', config)   → { borderRadius: '8px' }
+ * resolveBorderRadius('rounded-tl', 'lg', config) → { borderTopLeftRadius: '8px' }
  */
-export function resolveBorderRadius(prefix: string, value: string): StyleObject {
+export function resolveBorderRadius(prefix: string, value: string, config: DotConfig): StyleObject {
   const props = BORDER_RADIUS_PROP_MAP[prefix];
   if (!props) return {};
 
-  if (value in BORDER_RADIUS) {
+  const cssValue = config.tokens.borderRadius[value];
+  if (cssValue !== undefined) {
     const result: StyleObject = {};
     for (const prop of props) {
-      result[prop] = BORDER_RADIUS[value as keyof typeof BORDER_RADIUS];
+      result[prop] = cssValue;
     }
     return result;
   }

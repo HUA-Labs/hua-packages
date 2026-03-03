@@ -1,4 +1,4 @@
-import type { StyleObject } from '../types';
+import type { StyleObject, DotConfig } from '../types';
 import {
   DISPLAY,
   POSITION,
@@ -6,7 +6,7 @@ import {
   MAX_WIDTH_KEYWORDS,
   SIZE_PROP_MAP,
 } from '../tokens/layout';
-import { SPACING } from '../tokens/spacing';
+import { GRID_FLOW } from '../tokens/grid';
 
 /**
  * Resolve standalone layout tokens: flex → { display: 'flex' }, absolute → { position: 'absolute' }
@@ -37,6 +37,11 @@ export function resolveLayout(value: string): StyleObject {
     };
   }
 
+  // Grid flow standalone
+  if (GRID_FLOW[value]) {
+    return { gridAutoFlow: GRID_FLOW[value] };
+  }
+
   return {};
 }
 
@@ -45,7 +50,7 @@ export function resolveLayout(value: string): StyleObject {
  *
  * Resolution order: keyword > spacing scale > max-width keywords (for max-w only)
  */
-export function resolveSizing(prefix: string, value: string): StyleObject {
+export function resolveSizing(prefix: string, value: string, config: DotConfig): StyleObject {
   const prop = SIZE_PROP_MAP[prefix];
   if (!prop) return {};
 
@@ -64,8 +69,9 @@ export function resolveSizing(prefix: string, value: string): StyleObject {
   }
 
   // Spacing scale: w-4 → '16px', h-8 → '32px'
-  if (SPACING[value as keyof typeof SPACING]) {
-    return { [prop]: SPACING[value as keyof typeof SPACING] };
+  const spacingVal = config.tokens.spacing[value];
+  if (spacingVal) {
+    return { [prop]: spacingVal };
   }
 
   return {};

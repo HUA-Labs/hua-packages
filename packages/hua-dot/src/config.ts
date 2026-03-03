@@ -4,6 +4,13 @@ import { COLORS, SPECIAL_COLORS } from './tokens/colors';
 import { FONT_SIZES, FONT_WEIGHTS, LINE_HEIGHTS, LETTER_SPACINGS } from './tokens/typography';
 import { BORDER_RADIUS } from './tokens/borders';
 import { Z_INDEX } from './tokens/z-index';
+import { SHADOWS } from './tokens/shadows';
+import { OPACITY } from './tokens/opacity';
+import { ROTATE, SCALE, SKEW } from './tokens/transforms';
+import { TRANSITION_PROPERTY, DURATION, TIMING } from './tokens/transitions';
+import { ANIMATION } from './tokens/animations';
+import { BACKDROP_BLUR } from './tokens/backdrop';
+import { GRID_COLS, GRID_ROWS } from './tokens/grid';
 
 /** Default token set built from hua-css data */
 const DEFAULT_TOKENS: ResolvedTokens = {
@@ -17,6 +24,18 @@ const DEFAULT_TOKENS: ResolvedTokens = {
   lineHeight: { ...LINE_HEIGHTS },
   letterSpacing: { ...LETTER_SPACINGS },
   zIndex: { ...Z_INDEX },
+  shadows: { ...SHADOWS },
+  opacity: { ...OPACITY },
+  rotate: { ...ROTATE },
+  scale: { ...SCALE },
+  skew: { ...SKEW },
+  transitionProperty: { ...TRANSITION_PROPERTY },
+  duration: { ...DURATION },
+  timing: { ...TIMING },
+  animation: { ...ANIMATION },
+  backdropBlur: { ...BACKDROP_BLUR },
+  gridCols: { ...GRID_COLS },
+  gridRows: { ...GRID_ROWS },
 };
 
 /**

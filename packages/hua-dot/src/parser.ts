@@ -10,6 +10,7 @@ import {
   ALIGN_CONTENT,
   FLEX_GROW,
   FLEX_SHRINK,
+  GRID_FLOW,
 } from './tokens';
 
 /**
@@ -41,6 +42,8 @@ const STANDALONE_TOKENS = new Set<string>([
   'overflow-scroll',
   'overflow-visible',
   'truncate',
+  // grid flow
+  ...Object.keys(GRID_FLOW),
 ]);
 
 /**
@@ -48,6 +51,8 @@ const STANDALONE_TOKENS = new Set<string>([
  * Sorted longest-first for correct matching.
  */
 const MULTI_SEGMENT_PREFIXES = [
+  // backdrop (longest first)
+  'backdrop-blur',
   // border radius directional
   'rounded-tl',
   'rounded-tr',
@@ -72,6 +77,27 @@ const MULTI_SEGMENT_PREFIXES = [
   // gap
   'gap-x',
   'gap-y',
+  // transform
+  'translate-x',
+  'translate-y',
+  'scale-x',
+  'scale-y',
+  'skew-x',
+  'skew-y',
+  // Phase 3a: positioning
+  'inset-x',
+  'inset-y',
+  // Phase 3a: grid (longest first)
+  'grid-cols',
+  'grid-rows',
+  'col-span',
+  'col-start',
+  'col-end',
+  'row-span',
+  'row-start',
+  'row-end',
+  'auto-cols',
+  'auto-rows',
 ] as const;
 
 /**
@@ -93,17 +119,24 @@ export function parse(input: string): DotToken[] {
 function parseToken(raw: string): DotToken {
   // Split variant prefixes (dark:, md:, hover:, etc.)
   const parts = raw.split(':');
-  const utility = parts.pop()!;
+  let utility = parts.pop()!;
   const variants = parts;
 
-  // Check standalone tokens first
+  // Detect negative prefix: -m-4, -top-2, -translate-x-4
+  // Must start with '-' followed by a letter (not '--' or '-' alone)
+  const negative = utility.length > 1 && utility[0] === '-' && /[a-z]/i.test(utility[1]);
+  if (negative) {
+    utility = utility.slice(1);
+  }
+
+  // Check standalone tokens first (standalone tokens cannot be negative)
   if (STANDALONE_TOKENS.has(utility)) {
-    return { variants, prefix: '', value: utility, raw };
+    return { variants, prefix: '', value: utility, raw, negative: false };
   }
 
   // Split into prefix and value
   const { prefix, value } = splitUtility(utility);
-  return { variants, prefix, value, raw };
+  return { variants, prefix, value, raw, negative };
 }
 
 /**
