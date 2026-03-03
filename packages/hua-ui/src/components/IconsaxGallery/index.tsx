@@ -192,7 +192,7 @@ export function IconsaxGallery({
                 placeholder="Search icons..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm"
+                dot="max-w-sm"
               />
               {showCount && (
                 <p className="text-sm text-muted-foreground mt-2">
@@ -214,7 +214,7 @@ export function IconsaxGallery({
 
       {/* Gallery Grid */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent dot="p-6">
           <div className={gridClass} style={gridStyle}>
             {filteredIcons.map((name) => {
               const originalIndex = ICONSAX_ICON_NAMES.indexOf(name)

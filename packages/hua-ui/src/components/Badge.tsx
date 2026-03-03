@@ -1,20 +1,22 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const badgeVariantStyles = dotVariants(
   {
+    base: "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
     variants: {
       variant: {
-        default: "bg-[var(--badge-default-bg)] text-[var(--badge-default-text)] hover:opacity-80",
-        secondary: "bg-[var(--badge-secondary-bg)] text-[var(--badge-secondary-text)] hover:opacity-80",
-        destructive: "bg-[var(--badge-destructive-bg)] text-slate-50 hover:opacity-80",
-        error: "bg-[var(--badge-destructive-bg)] text-slate-50 hover:opacity-80",
-        outline: "bg-transparent text-[var(--badge-outline-text)] border border-[var(--badge-outline-border)] hover:bg-[var(--badge-outline-hover-bg)]",
-        glass: "bg-[var(--badge-glass-bg)] backdrop-blur-sm border border-[var(--badge-glass-border)] text-[var(--badge-glass-text)] hover:opacity-80",
+        default: "bg-[var(--badge-default-bg)] text-[var(--badge-default-text)]",
+        secondary: "bg-[var(--badge-secondary-bg)] text-[var(--badge-secondary-text)]",
+        destructive: "bg-[var(--badge-destructive-bg)] text-slate-50",
+        error: "bg-[var(--badge-destructive-bg)] text-slate-50",
+        outline: "bg-transparent text-[var(--badge-outline-text)] border border-[var(--badge-outline-border)]",
+        glass: "bg-[var(--badge-glass-bg)] border border-[var(--badge-glass-border)] text-[var(--badge-glass-text)]",
       },
     },
     defaultVariants: {
@@ -23,29 +25,67 @@ export const badgeVariants = cva(
   }
 )
 
-/**
- * Badge 컴포넌트의 props / Badge component props
- */
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "destructive" | "error" | "outline" | "glass"
+/** Variant-specific hover overrides */
+const VARIANT_HOVER: Record<string, React.CSSProperties> = {
+  default: { opacity: 0.8 },
+  secondary: { opacity: 0.8 },
+  destructive: { opacity: 0.8 },
+  error: { opacity: 0.8 },
+  outline: { backgroundColor: 'var(--badge-outline-hover-bg)' },
+  glass: { opacity: 0.8 },
+}
+
+/** Glass variant extras (backdrop-blur) */
+const GLASS_EXTRAS: React.CSSProperties = {
+  backdropFilter: 'blur(4px)',
+  WebkitBackdropFilter: 'blur(4px)',
 }
 
 /**
- * Badge 컴포넌트 / Badge component
+ * Badge component props
+ */
+export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  variant?: "default" | "secondary" | "destructive" | "error" | "outline" | "glass"
+  dot?: string
+  style?: React.CSSProperties
+}
+
+/**
+ * Badge component
  *
- * 상태나 카테고리를 표시하는 작은 배지 컴포넌트입니다.
+ * A small badge component for displaying status or category.
  *
  * @example
  * <Badge>New</Badge>
- * <Badge variant="destructive">완료</Badge>
- * <Badge variant="outline">대기</Badge>
+ * <Badge variant="destructive">Done</Badge>
+ * <Badge variant="outline">Pending</Badge>
  */
 const Badge = React.memo(React.forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className, variant = "default", ...props }, ref) => {
+  ({ dot: dotProp, variant = "default", style, ...props }, ref) => {
+    const [isHovered, setIsHovered] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
+
+    const computedStyle = useMemo(() => {
+      const base = badgeVariantStyles({ variant }) as React.CSSProperties
+      return mergeStyles(
+        base,
+        { transition: 'all 200ms ease-in-out' },
+        variant === "glass" ? GLASS_EXTRAS : undefined,
+        isHovered ? VARIANT_HOVER[variant] : undefined,
+        isFocused ? { outline: 'none', boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)' } : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, isHovered, isFocused, dotProp, style])
+
     return (
       <div
         ref={ref}
-        className={merge(badgeVariants({ variant }), className)}
+        style={computedStyle}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         {...props}
       />
     )

@@ -1,11 +1,14 @@
 "use client"
 
-import React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Container, type ContainerProps } from "./Container"
 
-export const sectionVariants = cva("relative w-full", {
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const sectionVariantStyles = dotVariants({
+  base: "relative w-full",
   variants: {
     spacing: {
       none: "",
@@ -16,9 +19,9 @@ export const sectionVariants = cva("relative w-full", {
     },
     background: {
       none: "",
-      muted: "bg-muted/30",
-      accent: "bg-accent/5",
-      primary: "bg-primary/5",
+      muted: "bg-[var(--color-muted)]/30",
+      accent: "bg-[var(--color-accent)]/5",
+      primary: "bg-[var(--color-primary)]/5",
     },
   },
   defaultVariants: { spacing: "lg", background: "none" },
@@ -35,8 +38,7 @@ export interface SectionHeaderConfig {
 }
 
 export interface SectionProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof sectionVariants> {
+  extends Omit<React.HTMLAttributes<HTMLElement>, 'className'> {
   /** Container 사이즈 @default 'lg' */
   container?: ContainerProps['size']
   /** Container 패딩 @default 'none' */
@@ -45,6 +47,10 @@ export interface SectionProps
   header?: SectionHeaderConfig
   /** 풀위드 모드 (Container 없이 직접) */
   fullWidth?: boolean
+  spacing?: "none" | "sm" | "md" | "lg" | "xl"
+  background?: "none" | "muted" | "accent" | "primary"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const sectionLineStyle: React.CSSProperties = {
@@ -58,25 +64,37 @@ const sectionLineStyle: React.CSSProperties = {
 function SectionHeader({ config }: { config: SectionHeaderConfig }) {
   const isCenter = config.align !== 'left'
 
+  const wrapperStyle = useMemo(() => mergeStyles(
+    s("mb-16"),
+    isCenter ? { textAlign: 'center' as const } : undefined,
+  ), [isCenter])
+
+  const decoratorStyle = useMemo(() => mergeStyles(
+    sectionLineStyle,
+    isCenter ? { marginLeft: 'auto', marginRight: 'auto' } : undefined,
+  ), [isCenter])
+
   return (
-    <div className={merge("mb-16", isCenter && "text-center")}>
+    <div style={wrapperStyle}>
       {config.decorator !== false && (
         <div
-          style={sectionLineStyle}
-          className={merge(isCenter && "mx-auto")}
+          style={decoratorStyle}
           aria-hidden="true"
         />
       )}
-      <h2 className="text-3xl md:text-5xl font-extrabold mb-4">
+      <h2 style={s("text-3xl md:text-5xl font-extrabold mb-4")}>
         {config.title}
       </h2>
       {config.subtitle && (
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p style={mergeStyles(
+          s("text-lg max-w-2xl mx-auto"),
+          { color: 'var(--color-muted-foreground)' },
+        )}>
           {config.subtitle}
         </p>
       )}
       {config.action && (
-        <div className="mt-6">{config.action}</div>
+        <div style={s("mt-6")}>{config.action}</div>
       )}
     </div>
   )
@@ -99,16 +117,27 @@ function SectionHeader({ config }: { config: SectionHeaderConfig }) {
  */
 const Section = React.forwardRef<HTMLElement, SectionProps>(
   ({
-    className,
+    dot: dotProp,
     spacing,
     background,
     container = "lg",
     containerPadding = "none",
     header,
     fullWidth = false,
+    style,
     children,
     ...props
   }, ref) => {
+    const computedStyle = useMemo(() => {
+      const base = sectionVariantStyles({ spacing, background }) as React.CSSProperties
+      return mergeStyles(
+        base,
+        s("px-6"),
+        resolveDot(dotProp),
+        style,
+      )
+    }, [spacing, background, dotProp, style])
+
     const content = (
       <>
         {header && <SectionHeader config={header} />}
@@ -119,11 +148,7 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
     return (
       <section
         ref={ref}
-        className={merge(
-          sectionVariants({ spacing, background }),
-          "px-6",
-          className
-        )}
+        style={computedStyle}
         {...props}
       >
         {fullWidth ? content : (

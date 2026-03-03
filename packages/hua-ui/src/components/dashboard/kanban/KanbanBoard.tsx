@@ -380,10 +380,10 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
               className="flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-xl p-3"
               style={{ minWidth: columnMinWidth, maxWidth: columnMaxWidth }}
             >
-              <Skeleton variant="text" className="h-8 mb-3" />
+              <Skeleton variant="text" dot="h-8 mb-3" />
               <div className="space-y-2">
                 {getColumnCards(column.id).slice(0, 3).map((card) => (
-                  <Skeleton key={card.id} variant="rounded" className="h-20" />
+                  <Skeleton key={card.id} variant="rounded" dot="h-20" />
                 ))}
               </div>
             </div>

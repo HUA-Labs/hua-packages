@@ -84,7 +84,7 @@ export function LandingHero({
       )}
 
       {/* Content */}
-      <Container size="lg" padding="none" centered className="relative z-10 px-6">
+      <Container size="lg" padding="none" centered dot="relative z-10 px-6">
         <div style={contentStyle} className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
             {title}

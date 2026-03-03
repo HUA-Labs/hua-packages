@@ -56,12 +56,12 @@ export function LandingShowcase({
     : undefined
 
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <div ref={stagger?.containerRef} className="space-y-16 sm:space-y-24">
         {items.map((item, i) => {
           const isEven = i % 2 === 0
           return (
-            <Container key={i} size="lg" padding="none" className="px-4">
+            <Container key={i} size="lg" padding="none" dot="px-4">
               <div
                 className={merge(
                   "flex flex-col gap-8 items-center",

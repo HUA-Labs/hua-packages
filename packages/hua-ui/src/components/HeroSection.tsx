@@ -329,7 +329,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
                     href={currentContent.primaryAction.href}
                     size={size === "xl" || size === "full" ? "lg" : "md"}
                     hover="scale"
-                    className="inline-flex items-center gap-2"
+                    dot="inline-flex items-center gap-2"
                   >
                     {currentContent.primaryAction.icon}
                     {currentContent.primaryAction.label}
@@ -342,7 +342,7 @@ const HeroSection = React.forwardRef<HTMLElement, HeroSectionProps>(
                     variant="outline"
                     size={size === "xl" || size === "full" ? "lg" : "md"}
                     hover="scale"
-                    className="inline-flex items-center gap-2"
+                    dot="inline-flex items-center gap-2"
                   >
                     {currentContent.secondaryAction.icon}
                     {currentContent.secondaryAction.label}

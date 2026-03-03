@@ -1,15 +1,17 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const labelVariants = cva(
-  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const labelVariantStyles = dotVariants(
   {
+    base: "text-sm font-medium leading-none",
     variants: {
       variant: {
-        default: "text-foreground",
+        default: "text-[var(--color-foreground)]",
         glass: "text-white",
       },
     },
@@ -19,51 +21,77 @@ export const labelVariants = cva(
   }
 )
 
+/** Disabled style per variant */
+const DISABLED_STYLE: Record<string, React.CSSProperties> = {
+  default: { color: 'var(--color-muted-foreground)', cursor: 'not-allowed' },
+  glass: { color: 'rgba(255, 255, 255, 0.5)', cursor: 'not-allowed' },
+}
+
+/** Error style per variant */
+const ERROR_STYLE: Record<string, React.CSSProperties> = {
+  default: { color: 'var(--color-destructive)' },
+  glass: { color: '#f87171' },
+}
+
 /**
- * Label 컴포넌트의 props / Label component props
+ * Label component props
  */
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+export interface LabelProps extends Omit<React.LabelHTMLAttributes<HTMLLabelElement>, 'className'> {
   required?: boolean
   error?: boolean
   disabled?: boolean
   variant?: "default" | "glass"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * Label 컴포넌트 / Label component
+ * Label component
  *
- * 폼 필드의 레이블을 표시하는 컴포넌트입니다.
+ * A component for displaying form field labels.
  *
  * @example
- * <Label htmlFor="email">이메일</Label>
- * <Label required htmlFor="name">이름</Label>
- * <Label error htmlFor="password">비밀번호</Label>
+ * <Label htmlFor="email">Email</Label>
+ * <Label required htmlFor="name">Name</Label>
+ * <Label error htmlFor="password">Password</Label>
  */
 const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({
-    className,
     children,
     required = false,
     error = false,
     disabled = false,
     variant = "default",
+    dot: dotProp,
+    style,
     ...props
   }, ref) => {
+    const computedStyle = useMemo(() => {
+      const base = labelVariantStyles({ variant }) as React.CSSProperties
+      return mergeStyles(
+        base,
+        error ? ERROR_STYLE[variant] : undefined,
+        disabled ? DISABLED_STYLE[variant] : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, error, disabled, dotProp, style])
+
+    const requiredStarStyle = useMemo(() =>
+      s(variant === "glass" ? "text-red-400 ml-1" : "text-[var(--color-destructive)] ml-1"),
+      [variant]
+    )
+
     return (
       <label
         ref={ref}
-        className={merge(
-          labelVariants({ variant }),
-          error && (variant === "glass" ? "text-red-400" : "text-destructive"),
-          disabled && (variant === "glass" ? "text-white/50" : "text-muted-foreground"),
-          className
-        )}
+        style={computedStyle}
         aria-required={required ? true : undefined}
         {...props}
       >
         {children}
         {required && (
-          <span className={variant === "glass" ? "text-red-400 ml-1" : "text-destructive ml-1"} aria-label="필수 필드">*</span>
+          <span style={requiredStarStyle} aria-label="required field">*</span>
         )}
       </label>
     )
@@ -71,4 +99,4 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
 )
 Label.displayName = "Label"
 
-export { Label } 
+export { Label }

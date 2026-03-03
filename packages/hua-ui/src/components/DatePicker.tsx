@@ -392,7 +392,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   variant="outline"
                   size="sm"
                   onClick={handleToday}
-                  className="w-full"
+                  dot="w-full"
                 >
                   {todayText}
                 </Button>

@@ -1,62 +1,90 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { dotVariants } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Card, CardProps } from "./Card"
+import type { CSSProperties } from "react"
 
-export const panelStyleVariants = cva(
-  "transition-all duration-300",
-  {
-    variants: {
-      style: {
-        default: "bg-card text-card-foreground border border-border",
-        solid: "bg-card text-card-foreground border border-border",
-        glass: "bg-white/60 dark:bg-white/10 backdrop-blur-md border border-border/50 dark:border-white/20",
-        outline: "bg-transparent border border-border",
-        elevated: "bg-card text-card-foreground shadow-lg border border-border",
-        neon: "bg-muted/50 dark:bg-background border border-cyan-300/30 dark:border-cyan-400/30 shadow-lg shadow-cyan-200/20 dark:shadow-cyan-400/20",
-        holographic: "bg-gradient-to-br from-white/20 via-purple-500/20 to-cyan-500/20 backdrop-blur-sm border border-white/30",
-        cyberpunk: "bg-card dark:bg-background border-2 border-pink-400 dark:border-pink-500 shadow-lg shadow-pink-300/30 dark:shadow-pink-500/30",
-        minimal: "bg-card dark:bg-background border border-border shadow-sm",
-        luxury: "bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-950 dark:to-yellow-950 border border-amber-200 dark:border-amber-800 shadow-xl",
-      },
-      effect: {
-        none: "",
-        glow: "shadow-2xl shadow-primary/20 dark:shadow-primary/20",
-        shadow: "shadow-xl",
-        gradient: "bg-gradient-to-r from-primary/10 via-purple-500/10 to-cyan-500/10",
-        animated: "animate-pulse",
-      },
-      padding: {
-        none: "p-0",
-        small: "p-3",
-        sm: "p-3",
-        medium: "p-6",
-        md: "p-6",
-        large: "p-8",
-        lg: "p-8",
-        xl: "p-12",
-        custom: "",
-      },
-      rounded: {
-        none: "rounded-none",
-        sm: "rounded-sm",
-        md: "rounded-md",
-        lg: "rounded-lg",
-        xl: "rounded-xl",
-        full: "rounded-full",
-        custom: "",
-      },
+const panelVariantStyles = dotVariants({
+  base: '',
+  variants: {
+    padding: {
+      none: 'p-0',
+      small: 'p-3',
+      sm: 'p-3',
+      medium: 'p-6',
+      md: 'p-6',
+      large: 'p-8',
+      lg: 'p-8',
+      xl: 'p-12',
+      custom: '',
     },
-    defaultVariants: {
-      style: "default",
-      effect: "none",
-      padding: "md",
-      rounded: "lg",
+    rounded: {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      full: 'rounded-full',
+      custom: '',
     },
-  }
-)
+  },
+  defaultVariants: {
+    padding: 'md',
+    rounded: 'lg',
+  },
+})
+
+const STYLE_BASE: Record<string, CSSProperties> = {
+  default: { backgroundColor: 'var(--color-card)', color: 'var(--color-card-foreground)', border: '1px solid var(--color-border)' },
+  solid: { backgroundColor: 'var(--color-card)', color: 'var(--color-card-foreground)', border: '1px solid var(--color-border)' },
+  glass: {
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid color-mix(in srgb, var(--color-border) 50%, transparent)',
+  },
+  outline: { backgroundColor: 'transparent', border: '1px solid var(--color-border)' },
+  elevated: {
+    backgroundColor: 'var(--color-card)', color: 'var(--color-card-foreground)',
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    border: '1px solid var(--color-border)',
+  },
+  neon: {
+    backgroundColor: 'color-mix(in srgb, var(--color-muted) 50%, transparent)',
+    border: '1px solid rgba(103, 232, 249, 0.3)',
+    boxShadow: '0 10px 15px -3px rgba(103, 232, 249, 0.2)',
+  },
+  holographic: {
+    background: 'linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(168,85,247,0.2), rgba(6,182,212,0.2))',
+    backdropFilter: 'blur(4px)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+  },
+  cyberpunk: {
+    backgroundColor: 'var(--color-card)',
+    border: '2px solid #f472b6',
+    boxShadow: '0 10px 15px -3px rgba(244, 114, 182, 0.3)',
+  },
+  minimal: {
+    backgroundColor: 'var(--color-card)',
+    border: '1px solid var(--color-border)',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  },
+  luxury: {
+    background: 'linear-gradient(to bottom right, #fffbeb, #fef3c7)',
+    border: '1px solid #fbbf24',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  },
+}
+
+const EFFECT_STYLE: Record<string, CSSProperties> = {
+  none: {},
+  glow: { boxShadow: '0 25px 50px -12px color-mix(in srgb, var(--color-primary) 20%, transparent)' },
+  shadow: { boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' },
+  gradient: { backgroundImage: 'linear-gradient(to right, color-mix(in srgb, var(--color-primary) 10%, transparent), rgba(168,85,247,0.1), rgba(6,182,212,0.1))' },
+  animated: { animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' },
+}
 
 /**
  * Panel 컴포넌트의 props / Panel component props
@@ -105,7 +133,7 @@ export interface PanelProps extends Omit<CardProps, 'variant' | 'style' | 'paddi
  */
 const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
   ({
-    className,
+    dot,
     style = "default",
     effect = "none",
     transparency = 1,
@@ -134,8 +162,10 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
     ...cardProps
   }, ref): React.ReactElement => {
 
+    const [isHovered, setIsHovered] = useState(false)
+
     // 패턴 배경 생성
-    const patternBackground = React.useMemo(() => {
+    const patternBackground = useMemo(() => {
       switch (patternType) {
         case "dots":
           return "radial-gradient(circle, #000 1px, transparent 1px)"
@@ -151,9 +181,11 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
     }, [patternType])
 
     // 배경 스타일 생성
-    const backgroundStyles = React.useMemo((): React.CSSProperties => {
-      const styles: React.CSSProperties = {
-        opacity: transparency,
+    const backgroundStyles = useMemo((): CSSProperties => {
+      const styles: CSSProperties = {}
+
+      if (transparency !== 1) {
+        styles.opacity = transparency
       }
 
       if (blurIntensity > 0) {
@@ -193,50 +225,44 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
       return styles
     }, [transparency, blurIntensity, borderOpacity, shadowOpacity, glowIntensity, glowColor, background, gradientColors, patternBackground, backgroundImage])
 
-    // 호버 효과 클래스 생성
-    const hoverClasses = React.useMemo(() => {
-      if (!interactive) return ""
+    // 호버 효과
+    const hoverStyle = useMemo((): CSSProperties => {
+      if (!interactive || !isHovered) return {}
+      const s: CSSProperties = {}
+      const transforms: string[] = []
+      if (hoverScale !== 1) transforms.push(`scale(${hoverScale})`)
+      if (hoverRotate !== 0) transforms.push(`rotate(${hoverRotate}deg)`)
+      if (transforms.length) s.transform = transforms.join(' ')
+      if (hoverGlow) s.boxShadow = '0 25px 50px -12px rgba(6, 182, 212, 0.3)'
+      return s
+    }, [interactive, isHovered, hoverScale, hoverRotate, hoverGlow])
 
-      const classes = []
+    // 최종 스타일 합산
+    const computedStyle = useMemo(() => mergeStyles(
+      { transition: 'all 300ms' },
+      panelVariantStyles({
+        padding: customPadding ? 'custom' : padding,
+        rounded: customRounded ? 'custom' : rounded,
+      }) as CSSProperties,
+      STYLE_BASE[style],
+      EFFECT_STYLE[effect],
+      customPadding ? { padding: customPadding } : undefined,
+      customRounded ? { borderRadius: customRounded } : undefined,
+      hoverStyle,
+      backgroundStyles,
+      resolveDot(dot),
+    ), [style, effect, padding, customPadding, rounded, customRounded, hoverStyle, backgroundStyles, dot])
 
-      if (hoverScale !== 1) {
-        classes.push(`hover:scale-${hoverScale}`)
-      }
-
-      if (hoverRotate !== 0) {
-        classes.push(`hover:rotate-${hoverRotate}`)
-      }
-
-      if (hoverGlow) {
-        classes.push("hover:shadow-2xl hover:shadow-cyan-500/30")
-      }
-
-      return classes.join(" ")
-    }, [interactive, hoverScale, hoverRotate, hoverGlow])
-
-    // Panel 전용 클래스들
-    const panelClasses = React.useMemo(() => merge(
-      "panel-component",
-      `panel-${style}`,
-      `panel-effect-${effect}`,
-      panelStyleVariants({
-        style,
-        effect,
-        padding: customPadding ? "custom" : padding,
-        rounded: customRounded ? "custom" : rounded,
-      }),
-      customPadding,
-      customRounded,
-      hoverClasses,
-      className
-    ), [style, effect, padding, customPadding, rounded, customRounded, hoverClasses, className])
-    
     return (
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         {/* 비디오 배경 */}
         {background === "video" && backgroundVideo && (
           <video
-            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover', borderRadius: '8px',
+            }}
             autoPlay
             muted
             loop
@@ -245,27 +271,28 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
             <source src={backgroundVideo} type="video/mp4" />
           </video>
         )}
-        
+
         {/* 파티클 효과 */}
         {particleEffect && (
-          <div className="absolute inset-0 pointer-events-none">
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             {/* 파티클 효과 렌더링 */}
           </div>
         )}
-        
+
         {/* 메인 Panel */}
         <Card
           ref={ref}
-          className={panelClasses}
-          style={backgroundStyles}
+          style={computedStyle}
+          onMouseEnter={interactive ? () => setIsHovered(true) : undefined}
+          onMouseLeave={interactive ? () => setIsHovered(false) : undefined}
           {...cardProps}
         >
           {children}
         </Card>
-        
+
         {/* 애니메이션 효과 */}
         {animationEffect && (
-          <div className="absolute inset-0 pointer-events-none">
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             {/* 애니메이션 효과 렌더링 */}
           </div>
         )}
@@ -276,4 +303,4 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
 
 Panel.displayName = "Panel"
 
-export { Panel } 
+export { Panel }

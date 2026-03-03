@@ -214,10 +214,10 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
               {dateRange && (
                 <Dropdown
                   trigger={
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2"
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      dot="gap-2"
                       aria-label={`날짜 범위 선택: ${dateRange.display || "날짜 범위"}`}
                     >
                       <Icon name="calendar" className="h-4 w-4" />
@@ -246,7 +246,7 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  dot="gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                   onClick={onRefresh}
                   aria-label="데이터 새로고침"
                 >

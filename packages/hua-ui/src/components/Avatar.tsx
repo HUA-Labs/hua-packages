@@ -1,12 +1,14 @@
 "use client"
 
-import React, { useState } from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const avatarVariants = cva(
-  "relative flex shrink-0 overflow-hidden rounded-full",
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const avatarVariantStyles = dotVariants(
   {
+    base: "relative flex shrink-0 overflow-hidden rounded-full",
     variants: {
       size: {
         sm: "w-8 h-8 text-xs",
@@ -15,7 +17,7 @@ export const avatarVariants = cva(
       },
       variant: {
         default: "",
-        glass: "ring-1 ring-white/30 backdrop-blur-sm",
+        glass: "backdrop-blur-sm",
       },
     },
     defaultVariants: {
@@ -25,19 +27,33 @@ export const avatarVariants = cva(
   }
 )
 
+/** Glass variant ring effect — not expressible in dot utilities */
+const GLASS_EXTRAS: React.CSSProperties = {
+  boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.3)',
+}
+
 /**
  * Avatar 컴포넌트의 props / Avatar component props
  */
-export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AvatarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   size?: "sm" | "md" | "lg"
   variant?: "default" | "glass"
   src?: string
   alt?: string
   fallbackText?: string
+  dot?: string
+  style?: React.CSSProperties
 }
 
-export interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
-export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface AvatarImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
+
+export interface AvatarFallbackProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 /**
  * Avatar 컴포넌트 / Avatar component
@@ -50,7 +66,7 @@ export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement
  * <Avatar variant="glass" size="lg" src="/user.jpg" alt="사용자" />
  */
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, size = "md", variant = "default", src, alt, fallbackText, children, ...props }, ref) => {
+  ({ dot: dotProp, size = "md", variant = "default", src, alt, fallbackText, style, children, ...props }, ref) => {
     const [imgError, setImgError] = useState(false)
 
     const getFallbackContent = () => {
@@ -62,10 +78,20 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 
     const showImage = src && !imgError
 
+    const computedStyle = useMemo(() => {
+      const base = avatarVariantStyles({ size, variant }) as React.CSSProperties
+      return mergeStyles(
+        base,
+        variant === "glass" ? GLASS_EXTRAS : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [size, variant, dotProp, style])
+
     return (
       <div
         ref={ref}
-        className={merge(avatarVariants({ size, variant }), className)}
+        style={computedStyle}
         {...props}
       >
         {showImage ? (
@@ -86,28 +112,46 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 Avatar.displayName = "Avatar"
 
 const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
-  ({ className, ...props }, ref) => (
-    <img
-      ref={ref}
-      className={merge("aspect-square h-full w-full object-cover object-center", className)}
-      {...props}
-    />
-  )
+  ({ dot: dotProp, style, ...props }, ref) => {
+    const computedStyle = useMemo(() => mergeStyles(
+      s("h-full w-full"),
+      { aspectRatio: '1', objectFit: 'cover', objectPosition: 'center' },
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, style])
+
+    return (
+      <img
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      />
+    )
+  }
 )
 AvatarImage.displayName = "AvatarImage"
 
 const AvatarFallback = React.forwardRef<HTMLDivElement, AvatarFallbackProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge(
-        "flex h-full w-full items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold",
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ dot: dotProp, style, ...props }, ref) => {
+    const computedStyle = useMemo(() => mergeStyles(
+      s("flex h-full w-full items-center justify-center rounded-full font-semibold"),
+      {
+        backgroundColor: 'var(--color-primary)',
+        color: 'var(--color-primary-foreground)',
+      },
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, style])
+
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      />
+    )
+  }
 )
 AvatarFallback.displayName = "AvatarFallback"
 
-export { Avatar, AvatarImage, AvatarFallback } 
+export { Avatar, AvatarImage, AvatarFallback }

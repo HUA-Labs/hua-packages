@@ -101,7 +101,7 @@ export function LandingCTA({
         />
       )}
 
-      <Container size="md" padding="none" centered className="relative z-10 px-6">
+      <Container size="md" padding="none" centered dot="relative z-10 px-6">
         <div
           ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
           style={scrollReveal?.style ?? fallbackStyle}

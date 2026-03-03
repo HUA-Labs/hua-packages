@@ -239,7 +239,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
                 variant="outline"
                 onClick={onClose}
                 disabled={loading}
-                className="px-6 py-3" // 24px, 12px 패딩
+                dot="px-6 py-3" // 24px, 12px 패딩
               >
                 {cancelText}
               </Button>
@@ -248,7 +248,7 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
               variant="default"
               onClick={onConfirm}
               disabled={isDisabled}
-              className={merge(
+              dot={merge(
                 "px-6 py-3", // 24px, 12px 패딩
                 config.buttonColor
               )}

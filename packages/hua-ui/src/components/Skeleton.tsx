@@ -1,12 +1,14 @@
 "use client"
 
-import React from "react"
-import { cva } from "class-variance-authority"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { dotVariants, dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export const skeletonVariants = cva(
-  "block",
+const s = (input: string) => dotFn(input) as React.CSSProperties
+
+export const skeletonVariantStyles = dotVariants(
   {
+    base: "block",
     variants: {
       variant: {
         text: "rounded w-full h-4",
@@ -15,9 +17,9 @@ export const skeletonVariants = cva(
         rectangular: "rounded-none w-full h-[200px]",
       },
       animation: {
-        pulse: "animate-pulse bg-muted",
-        wave: "bg-muted",
-        shimmer: "bg-muted",
+        pulse: "",
+        wave: "",
+        shimmer: "",
       },
     },
     defaultVariants: {
@@ -27,21 +29,35 @@ export const skeletonVariants = cva(
   }
 )
 
+/** Pulse animation style (uses CSS animation) */
+const PULSE_STYLE: React.CSSProperties = {
+  backgroundColor: 'var(--color-muted)',
+  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+}
+
+/** Wave/shimmer gradient animation style */
+const SHIMMER_STYLE: React.CSSProperties = {
+  background: "linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.2) 50%, hsl(var(--muted)) 100%)",
+  backgroundSize: "200% 100%",
+  animation: "shimmer 1.5s ease-in-out infinite",
+}
+
 /**
- * Skeleton 컴포넌트의 props
+ * Skeleton component props
  */
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   variant?: "text" | "circular" | "rectangular" | "rounded"
   width?: string | number
   height?: string | number
   animation?: "pulse" | "wave" | "shimmer"
-  className?: string
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * Skeleton 컴포넌트 / Skeleton component
+ * Skeleton component
  *
- * 로딩 중 콘텐츠의 플레이스홀더를 표시하는 스켈레톤 컴포넌트입니다.
+ * A skeleton component for displaying loading placeholders.
  *
  * @example
  * <Skeleton />
@@ -50,23 +66,26 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({
-    className,
     variant = "text",
     width,
     height,
     animation = "pulse",
+    dot: dotProp,
+    style,
     ...props
   }, ref) => {
-    const getAnimationStyle = (): React.CSSProperties => {
-      if (animation === "wave" || animation === "shimmer") {
-        return {
-          background: "linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.2) 50%, hsl(var(--muted)) 100%)",
-          backgroundSize: "200% 100%",
-          animation: "shimmer 1.5s ease-in-out infinite",
-        }
-      }
-      return {}
-    }
+    const computedStyle = useMemo(() => {
+      const base = skeletonVariantStyles({ variant, animation }) as React.CSSProperties
+      const animStyle = animation === "pulse" ? PULSE_STYLE : SHIMMER_STYLE
+      return mergeStyles(
+        base,
+        animStyle,
+        width != null ? { width: typeof width === "number" ? `${width}px` : width } : undefined,
+        height != null ? { height: typeof height === "number" ? `${height}px` : height } : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, animation, width, height, dotProp, style])
 
     return (
       <>
@@ -80,15 +99,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         )}
         <div
           ref={ref}
-          className={merge(
-            skeletonVariants({ variant, animation }),
-            className
-          )}
-          style={{
-            ...(width != null ? { width: typeof width === "number" ? `${width}px` : width } : {}),
-            ...(height != null ? { height: typeof height === "number" ? `${height}px` : height } : {}),
-            ...getAnimationStyle(),
-          }}
+          style={computedStyle}
           {...props}
         />
       </>
@@ -97,162 +108,187 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
 )
 Skeleton.displayName = "Skeleton"
 
-// 편의 컴포넌트들
+// Convenience components
 export const SkeletonText = React.forwardRef<HTMLDivElement, Omit<SkeletonProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Skeleton ref={ref} variant="text" className={className} {...props} />
+  ({ dot: dotProp, ...props }, ref) => (
+    <Skeleton ref={ref} variant="text" dot={dotProp} {...props} />
   )
 )
 SkeletonText.displayName = "SkeletonText"
 
 export const SkeletonCircle = React.forwardRef<HTMLDivElement, Omit<SkeletonProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Skeleton ref={ref} variant="circular" className={className} {...props} />
+  ({ dot: dotProp, ...props }, ref) => (
+    <Skeleton ref={ref} variant="circular" dot={dotProp} {...props} />
   )
 )
 SkeletonCircle.displayName = "SkeletonCircle"
 
 export const SkeletonRectangle = React.forwardRef<HTMLDivElement, Omit<SkeletonProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Skeleton ref={ref} variant="rectangular" className={className} {...props} />
+  ({ dot: dotProp, ...props }, ref) => (
+    <Skeleton ref={ref} variant="rectangular" dot={dotProp} {...props} />
   )
 )
 SkeletonRectangle.displayName = "SkeletonRectangle"
 
 export const SkeletonRounded = React.forwardRef<HTMLDivElement, Omit<SkeletonProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Skeleton ref={ref} variant="rounded" className={className} {...props} />
+  ({ dot: dotProp, ...props }, ref) => (
+    <Skeleton ref={ref} variant="rounded" dot={dotProp} {...props} />
   )
 )
 SkeletonRounded.displayName = "SkeletonRounded"
 
-// 복합 스켈레톤 컴포넌트들
-export const SkeletonCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-4 p-6", className)} // 16px 간격, 24px 패딩
-      {...props}
-    >
-      <div className="flex items-center space-x-4"> {/* 16px 간격 */}
-        <SkeletonCircle className="w-12 h-12" /> {/* 48px 크기 */}
-        <div className="space-y-2 flex-1"> {/* 8px 간격 */}
-          <SkeletonText className="h-4 w-3/4" /> {/* 16px 높이, 75% 너비 */}
-          <SkeletonText className="h-3 w-1/2" /> {/* 12px 높이, 50% 너비 */}
+// Composite skeleton components
+export const SkeletonCard = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      s("p-6"),
+      { display: 'flex', flexDirection: 'column' as const, gap: '16px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <SkeletonCircle style={{ width: '48px', height: '48px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+            <SkeletonText style={{ height: '16px', width: '75%' }} />
+            <SkeletonText style={{ height: '12px', width: '50%' }} />
+          </div>
+        </div>
+        <SkeletonRounded style={{ width: '100%', height: '128px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <SkeletonText style={{ height: '16px', width: '100%' }} />
+          <SkeletonText style={{ height: '16px', width: '83.333%' }} />
+          <SkeletonText style={{ height: '16px', width: '66.667%' }} />
         </div>
       </div>
-      <SkeletonRounded className="w-full h-32" /> {/* 128px 높이 */}
-      <div className="space-y-2"> {/* 8px 간격 */}
-        <SkeletonText className="h-4 w-full" />
-        <SkeletonText className="h-4 w-5/6" />
-        <SkeletonText className="h-4 w-4/6" />
-      </div>
-    </div>
-  )
+    )
+  }
 )
 SkeletonCard.displayName = "SkeletonCard"
 
-export const SkeletonAvatar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("flex items-center space-x-4", className)} // 16px 간격
-      {...props}
-    >
-      <SkeletonCircle className="w-12 h-12" /> {/* 48px 크기 */}
-      <div className="space-y-2 flex-1"> {/* 8px 간격 */}
-        <SkeletonText className="h-4 w-3/4" />
-        <SkeletonText className="h-3 w-1/2" />
+export const SkeletonAvatar = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      { display: 'flex', alignItems: 'center', gap: '16px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        <SkeletonCircle style={{ width: '48px', height: '48px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+          <SkeletonText style={{ height: '16px', width: '75%' }} />
+          <SkeletonText style={{ height: '12px', width: '50%' }} />
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 )
 SkeletonAvatar.displayName = "SkeletonAvatar"
 
-export const SkeletonImage = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-2", className)} // 8px 간격
-      {...props}
-    >
-      <SkeletonRounded className="w-full h-48" /> {/* 192px 높이 */}
-      <SkeletonText className="h-4 w-1/2" />
-    </div>
-  )
+export const SkeletonImage = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        <SkeletonRounded style={{ width: '100%', height: '192px' }} />
+        <SkeletonText style={{ height: '16px', width: '50%' }} />
+      </div>
+    )
+  }
 )
 SkeletonImage.displayName = "SkeletonImage"
 
-export const SkeletonUserProfile = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-4", className)} // 16px 간격
-      {...props}
-    >
-      <div className="flex items-center space-x-4"> {/* 16px 간격 */}
-        <SkeletonCircle className="w-16 h-16" /> {/* 64px 크기 */}
-        <div className="space-y-2 flex-1"> {/* 8px 간격 */}
-          <SkeletonText className="h-5 w-1/2" />
-          <SkeletonText className="h-3 w-1/3" />
+export const SkeletonUserProfile = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      { display: 'flex', flexDirection: 'column' as const, gap: '16px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <SkeletonCircle style={{ width: '64px', height: '64px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+            <SkeletonText style={{ height: '20px', width: '50%' }} />
+            <SkeletonText style={{ height: '12px', width: '33.333%' }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <SkeletonText style={{ height: '16px', width: '100%' }} />
+          <SkeletonText style={{ height: '16px', width: '83.333%' }} />
         </div>
       </div>
-      <div className="space-y-2"> {/* 8px 간격 */}
-        <SkeletonText className="h-4 w-full" />
-        <SkeletonText className="h-4 w-5/6" />
-      </div>
-    </div>
-  )
+    )
+  }
 )
 SkeletonUserProfile.displayName = "SkeletonUserProfile"
 
-export const SkeletonList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-4", className)} // 16px 간격
-      {...props}
-    >
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className="flex items-center space-x-4"> {/* 16px 간격 */}
-          <SkeletonCircle className="w-10 h-10" /> {/* 40px 크기 */}
-          <div className="space-y-2 flex-1"> {/* 8px 간격 */}
-            <SkeletonText className="h-4 w-3/4" />
-            <SkeletonText className="h-3 w-1/2" />
+export const SkeletonList = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      { display: 'flex', flexDirection: 'column' as const, gap: '16px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <SkeletonCircle style={{ width: '40px', height: '40px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+              <SkeletonText style={{ height: '16px', width: '75%' }} />
+              <SkeletonText style={{ height: '12px', width: '50%' }} />
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  )
+        ))}
+      </div>
+    )
+  }
 )
 SkeletonList.displayName = "SkeletonList"
 
-export const SkeletonTable = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-4", className)} // 16px 간격
-      {...props}
-    >
-      {/* 헤더 */}
-      <div className="flex space-x-4"> {/* 16px 간격 */}
-        <SkeletonText className="h-4 w-1/4" />
-        <SkeletonText className="h-4 w-1/4" />
-        <SkeletonText className="h-4 w-1/4" />
-        <SkeletonText className="h-4 w-1/4" />
-      </div>
-      {/* 행들 */}
-      {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="flex space-x-4"> {/* 16px 간격 */}
-          <SkeletonText className="h-4 w-1/4" />
-          <SkeletonText className="h-4 w-1/4" />
-          <SkeletonText className="h-4 w-1/4" />
-          <SkeletonText className="h-4 w-1/4" />
+export const SkeletonTable = React.forwardRef<HTMLDivElement, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> & { dot?: string; style?: React.CSSProperties }>(
+  ({ dot: dotProp, style: styleProp, ...props }, ref) => {
+    const containerStyle = useMemo(() => mergeStyles(
+      { display: 'flex', flexDirection: 'column' as const, gap: '16px' },
+      resolveDot(dotProp),
+      styleProp,
+    ), [dotProp, styleProp])
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        {/* Header */}
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <SkeletonText style={{ height: '16px', width: '25%' }} />
+          <SkeletonText style={{ height: '16px', width: '25%' }} />
+          <SkeletonText style={{ height: '16px', width: '25%' }} />
+          <SkeletonText style={{ height: '16px', width: '25%' }} />
         </div>
-      ))}
-    </div>
-  )
+        {/* Rows */}
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} style={{ display: 'flex', gap: '16px' }}>
+            <SkeletonText style={{ height: '16px', width: '25%' }} />
+            <SkeletonText style={{ height: '16px', width: '25%' }} />
+            <SkeletonText style={{ height: '16px', width: '25%' }} />
+            <SkeletonText style={{ height: '16px', width: '25%' }} />
+          </div>
+        ))}
+      </div>
+    )
+  }
 )
 SkeletonTable.displayName = "SkeletonTable"
 
-export { Skeleton } 
+export { Skeleton }

@@ -95,7 +95,7 @@ export function LandingTestimonials({
 
   if (variant === 'marquee') {
     return (
-      <Section header={header} className={className} {...rest}>
+      <Section header={header} dot={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
             <div key={i} className="w-80 shrink-0">
@@ -109,7 +109,7 @@ export function LandingTestimonials({
 
   if (variant === 'carousel') {
     return (
-      <Section header={header} className={className} {...rest}>
+      <Section header={header} dot={className} {...rest}>
         <Carousel
           autoPlay={autoPlay}
           interval={interval}
@@ -132,7 +132,7 @@ export function LandingTestimonials({
   // grid variant
   const cols = colsProp ?? (items.length <= 2 ? 2 : 3) as 2 | 3
   return (
-    <Section header={header} className={className} {...rest}>
+    <Section header={header} dot={className} {...rest}>
       <div
         ref={stagger?.containerRef}
         className={merge("grid gap-6", gridColsMap[cols])}

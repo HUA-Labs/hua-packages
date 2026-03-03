@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { clsx } from "clsx";
 
 /**
  * Slot 컴포넌트
@@ -65,7 +64,7 @@ function mergeClassName(
   childClassName?: string
 ): string | undefined {
   if (!slotClassName && !childClassName) return undefined;
-  return clsx(slotClassName, childClassName);
+  return [slotClassName, childClassName].filter(Boolean).join(' ');
 }
 
 /**
