@@ -1,29 +1,54 @@
-overview: "Cross-platform style engine that converts utility strings to Web CSSProperties objects. Inspired by Tailwind syntax, zero dependencies, framework-agnostic."
+overview: "Cross-platform style engine that converts utility strings to Web CSSProperties objects. Tailwind-inspired syntax, zero dependencies, framework-agnostic. 387 tests, 9KB gzip."
 
 features:
-  - "dot() — utility string to CSSProperties conversion"
+  - "dot() — utility string to CSSProperties with dark/responsive options"
   - "Spacing — p/m/gap with directional variants (px, py, pt, pr, pb, pl, mx, my, mt, mr, mb, ml)"
   - "Colors — bg/text/border with 11 palettes × 10 shades + special colors"
   - "Typography — font-size, font-weight, line-height, letter-spacing, text-align"
   - "Layout — display, position, width, height, min/max sizing"
   - "Border — width, style, radius with directional variants"
-  - "Flexbox — direction, wrap, align, justify, flex, order"
+  - "Flexbox — direction, wrap, align, justify, flex, grow, shrink, order"
   - "Z-index — 7 predefined layers"
+  - "Shadow — sm, md, lg, xl, 2xl, inner, none"
+  - "Opacity — 0-100 scale (16 values)"
+  - "Transform — rotate, scale, scale-x/y, translate-x/y, skew-x/y with accumulation"
+  - "Transition — property, duration, timing, delay"
+  - "Animation — spin, ping, pulse, bounce"
+  - "Backdrop — blur filters"
+  - "Positioning — top/right/bottom/left/inset/inset-x/inset-y/start/end"
+  - "Grid — grid-cols/rows, col/row-span, col/row-start/end, auto-cols/rows, grid-flow"
+  - "dark: variant — conditional dark mode styles via DotOptions"
+  - "Responsive variants — sm:/md:/lg:/xl:/2xl: mobile-first cascade"
+  - "Negative values — -m-4, -top-2, -translate-x-4"
   - "2-layer cache — input-level + token-level FIFO caching"
-  - "Custom config — createDotConfig() for token overrides"
+  - "Custom config — createDotConfig() for token overrides (colors, spacing, borderRadius, fontSize, etc.)"
+  - "strictMode — throws on unknown tokens"
 
 quickStart: |
-  import { dot } from '@hua-labs/dot';
+  import { dot, createDotConfig } from '@hua-labs/dot';
 
+  // Basic usage
   const style = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
-  // {
-  //   padding: '16px',
-  //   display: 'flex',
-  //   alignItems: 'center',
-  //   backgroundColor: '#3b82f6',
-  //   color: '#ffffff',
-  //   borderRadius: '8px'
-  // }
+  // { padding: '16px', display: 'flex', alignItems: 'center', ... }
+
+  // Dark mode
+  dot('bg-white dark:bg-gray-900', { dark: true });
+  // { backgroundColor: '#111827' }
+
+  // Responsive (mobile-first cascade)
+  dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' });
+  // { padding: '48px' }
+
+  // Negative values + transform accumulation
+  dot('-m-4 rotate-45 scale-110');
+  // { margin: '-16px', transform: 'rotate(45deg) scale(1.1)' }
+
+  // Custom tokens
+  createDotConfig({
+    theme: { colors: { brand: { 500: '#6630E6' } }, spacing: { '18': '72px' } },
+  });
+  dot('bg-brand-500 p-18');
+  // { backgroundColor: '#6630E6', padding: '72px' }
 
 related:
   - "hua"
@@ -31,8 +56,8 @@ related:
 
 apiNotes:
   dot:
-    description: "Convert utility string to CSSProperties object"
+    description: "Convert utility string to CSSProperties object. Options: { dark?: boolean, breakpoint?: string }"
   createDotConfig:
-    description: "Create custom token configuration with deep merge"
+    description: "Set global token configuration with deep merge. Accepts theme overrides, cache settings, strictMode."
   clearDotCache:
-    description: "Clear both input and token caches"
+    description: "Clear both input and token caches. Call after config changes or for memory management."
