@@ -1,3 +1,21 @@
+/** Target platform for style output */
+export type DotTarget = 'web' | 'native';
+
+/** Single RN transform entry, e.g. { translateX: 16 } or { rotate: '45deg' } */
+export type RNTransformEntry = Record<string, string | number>;
+
+/** RN shadowOffset shape */
+export interface RNShadowOffset {
+  width: number;
+  height: number;
+}
+
+/** Possible value types in an RN StyleSheet object */
+export type RNStyleValue = string | number | RNTransformEntry[] | RNShadowOffset;
+
+/** React Native StyleSheet-compatible style object */
+export type RNStyleObject = Record<string, RNStyleValue>;
+
 /** Parsed representation of a single utility token */
 export interface DotToken {
   /** Variant prefixes like 'dark', 'md', 'hover' (Phase 2+) */
@@ -15,6 +33,20 @@ export interface DotToken {
 /** Platform-agnostic style object (Web CSSProperties compatible) */
 export type StyleObject = Record<string, string | number>;
 
+/** Supported state variant names */
+export type DotState = 'hover' | 'focus' | 'active' | 'focus-visible' | 'focus-within' | 'disabled';
+
+/** Style map with base styles + optional state-variant styles */
+export interface DotStyleMap {
+  base: StyleObject | RNStyleObject;
+  hover?: StyleObject | RNStyleObject;
+  focus?: StyleObject | RNStyleObject;
+  active?: StyleObject | RNStyleObject;
+  'focus-visible'?: StyleObject | RNStyleObject;
+  'focus-within'?: StyleObject | RNStyleObject;
+  disabled?: StyleObject | RNStyleObject;
+}
+
 /** Resolver function signature — receives config for token lookups */
 export type ResolverFn = (prefix: string, value: string, config: DotConfig) => StyleObject;
 
@@ -23,10 +55,14 @@ export interface DotOptions {
   dark?: boolean;
   /** Active breakpoint for responsive variants (e.g., 'md', 'lg'). Mobile-first cascade. */
   breakpoint?: string;
+  /** Target platform. Overrides config-level runtime setting per call. */
+  target?: DotTarget;
 }
 
 /** User-provided config for customizing tokens */
 export interface DotUserConfig {
+  /** Default target platform. 'web' if omitted. */
+  runtime?: DotTarget;
   theme?: {
     colors?: Record<string, Record<string, string> | string>;
     spacing?: Record<string, string>;
@@ -60,6 +96,8 @@ export interface DotConfig {
   cache: boolean;
   cacheSize: number;
   strictMode: boolean;
+  /** Default target platform */
+  runtime: DotTarget;
 }
 
 /** Fully resolved token set (defaults + user overrides) */

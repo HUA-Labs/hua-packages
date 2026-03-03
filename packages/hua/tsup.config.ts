@@ -19,6 +19,7 @@ const entry = {
   'hooks/index': 'src/hooks/index.ts',
   'loaders/index': 'src/loaders/index.ts',
   'dot/index': 'src/dot/index.ts',
+  'dot/react': 'src/dot/react.ts',
 };
 
 const shared = {

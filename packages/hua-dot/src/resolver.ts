@@ -14,6 +14,7 @@ import { resolveAnimation } from './resolvers/animation';
 import { resolveBackdrop } from './resolvers/backdrop';
 import { resolvePositioning } from './resolvers/positioning';
 import { resolveGrid } from './resolvers/grid';
+import { resolveInteractivity } from './resolvers/interactivity';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -184,6 +185,10 @@ export function resolveToken(token: DotToken, config: DotConfig): StyleObject {
     // Layout standalone (display, position, text-transform, overflow)
     const layoutResult = resolveLayout(value);
     if (Object.keys(layoutResult).length > 0) return layoutResult;
+
+    // Interactivity standalone (cursor, select, resize, pointer-events)
+    const interactivityResult = resolveInteractivity(value);
+    if (Object.keys(interactivityResult).length > 0) return interactivityResult;
 
     if (config.strictMode) {
       throw new Error(`[dot] Unknown token: "${token.raw}"`);

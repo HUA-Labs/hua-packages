@@ -11,6 +11,10 @@ import {
   FLEX_GROW,
   FLEX_SHRINK,
   GRID_FLOW,
+  CURSOR,
+  USER_SELECT,
+  RESIZE,
+  POINTER_EVENTS,
 } from './tokens';
 
 /**
@@ -44,6 +48,11 @@ const STANDALONE_TOKENS = new Set<string>([
   'truncate',
   // grid flow
   ...Object.keys(GRID_FLOW),
+  // interactivity
+  ...Object.keys(CURSOR),
+  ...Object.keys(USER_SELECT),
+  ...Object.keys(RESIZE),
+  ...Object.keys(POINTER_EVENTS),
 ]);
 
 /**
