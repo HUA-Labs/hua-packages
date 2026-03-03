@@ -40,3 +40,19 @@ export const POINTER_EVENTS: Record<string, string> = {
   'pointer-events-none': 'none',
   'pointer-events-auto': 'auto',
 } as const;
+
+/** Appearance values */
+export const APPEARANCE: Record<string, string> = {
+  'appearance-none': 'none',
+  'appearance-auto': 'auto',
+} as const;
+
+/** Whitespace values */
+export const WHITESPACE: Record<string, string> = {
+  'whitespace-normal': 'normal',
+  'whitespace-nowrap': 'nowrap',
+  'whitespace-pre': 'pre',
+  'whitespace-pre-line': 'pre-line',
+  'whitespace-pre-wrap': 'pre-wrap',
+  'whitespace-break-spaces': 'break-spaces',
+} as const;

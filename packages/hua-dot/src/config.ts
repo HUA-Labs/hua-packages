@@ -11,6 +11,7 @@ import { TRANSITION_PROPERTY, DURATION, TIMING } from './tokens/transitions';
 import { ANIMATION } from './tokens/animations';
 import { BACKDROP_BLUR } from './tokens/backdrop';
 import { GRID_COLS, GRID_ROWS } from './tokens/grid';
+import { RING_WIDTHS, RING_OFFSETS } from './tokens/rings';
 
 /** Default token set built from hua-css data */
 const DEFAULT_TOKENS: ResolvedTokens = {
@@ -36,6 +37,8 @@ const DEFAULT_TOKENS: ResolvedTokens = {
   backdropBlur: { ...BACKDROP_BLUR },
   gridCols: { ...GRID_COLS },
   gridRows: { ...GRID_ROWS },
+  ringWidths: { ...RING_WIDTHS },
+  ringOffsets: { ...RING_OFFSETS },
 };
 
 /**

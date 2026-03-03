@@ -1,6 +1,6 @@
 # @hua-labs/dot
 
-Cross-platform style engine that converts utility strings to Web CSSProperties / React Native StyleSheet objects. Tailwind-inspired syntax, zero dependencies, framework-agnostic. 530 tests, 10.6KB gzip.
+Cross-platform style engine that converts utility strings to Web CSSProperties / React Native StyleSheet objects. Tailwind-inspired syntax, zero dependencies, framework-agnostic. 603 tests.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)
@@ -33,6 +33,11 @@ Cross-platform style engine that converts utility strings to Web CSSProperties /
 - **RN shadow — boxShadow → shadowColor/Offset/Opacity/Radius/elevation**
 - **Interactivity — cursor-*, select-*, resize-*, pointer-events-***
 - **State variants — dotMap('hover:bg-gray-100') → { base, hover, focus, active, ... }**
+- **Arbitrary values — w-[300px], bg-[#ff0000], p-[2rem], shadow-[0_4px_6px_rgba(0,0,0,0.1)]**
+- **Opacity modifier — bg-primary-500/50, text-gray-900/80, border-red-500/25**
+- **Ring — ring-2, ring-blue-500, ring-offset-2 for focus ring styling**
+- **Space — space-x-4, space-y-4 mapped to columnGap/rowGap**
+- **Line clamp — line-clamp-3 for text truncation**
 - **2-layer cache — input-level + token-level FIFO caching**
 - **Custom config — createDotConfig() for token overrides (colors, spacing, borderRadius, fontSize, etc.)**
 - **strictMode — throws on unknown tokens**
@@ -72,6 +77,22 @@ dotMap('bg-white hover:bg-gray-100 focus:bg-gray-200');
 // Interactivity
 dot('cursor-pointer select-none pointer-events-auto');
 // { cursor: 'pointer', userSelect: 'none', pointerEvents: 'auto' }
+
+// Arbitrary values
+dot('w-[300px] bg-[#ff0000] p-[2rem]');
+// { width: '300px', backgroundColor: '#ff0000', padding: '2rem' }
+
+// Opacity modifier
+dot('bg-primary-500/50 text-gray-900/80');
+// { backgroundColor: 'rgb(59 130 246 / 0.5)', color: 'rgb(17 24 39 / 0.8)' }
+
+// Ring (focus ring styling)
+dotMap('ring-2 focus:ring-blue-500');
+// { base: { boxShadow: '0 0 0 2px #3b82f6' }, focus: { boxShadow: '0 0 0 3px #3b82f6' } }
+
+// Space + line-clamp
+dot('flex flex-col space-y-4 line-clamp-3');
+// { display: 'flex', flexDirection: 'column', rowGap: '16px', overflow: 'hidden', ... }
 
 // Negative values + transform accumulation
 dot('-m-4 rotate-45 scale-110');

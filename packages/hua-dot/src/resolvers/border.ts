@@ -5,7 +5,8 @@ import {
   BORDER_WIDTH_PROP_MAP,
   BORDER_RADIUS_PROP_MAP,
 } from '../tokens/borders';
-import { lookupColor } from './color';
+import { resolveColor } from './color';
+import { parseArbitrary } from './utils';
 
 /**
  * Resolve border tokens.
@@ -19,6 +20,20 @@ import { lookupColor } from './color';
  * resolveBorder('border', 'red-500', config) → { borderColor: '#ef4444' }
  */
 export function resolveBorder(prefix: string, value: string, config: DotConfig): StyleObject {
+  // Arbitrary value: border-[3px], border-t-[2px]
+  const arbitrary = parseArbitrary(value);
+  if (arbitrary !== undefined) {
+    const widthProps = BORDER_WIDTH_PROP_MAP[prefix];
+    if (widthProps) {
+      const result: StyleObject = {};
+      for (const prop of widthProps) {
+        result[prop] = arbitrary;
+      }
+      return result;
+    }
+    return {};
+  }
+
   // Border width (including bare prefix)
   const widthProps = BORDER_WIDTH_PROP_MAP[prefix];
   if (widthProps) {
@@ -31,12 +46,9 @@ export function resolveBorder(prefix: string, value: string, config: DotConfig):
       return result;
     }
 
-    // Color fallthrough (only for 'border' prefix)
+    // Color fallthrough (only for 'border' prefix) — delegates to resolveColor for opacity support
     if (prefix === 'border') {
-      const hex = lookupColor(value, config.tokens.colors);
-      if (hex) {
-        return { borderColor: hex };
-      }
+      return resolveColor('border', value, config);
     }
   }
 

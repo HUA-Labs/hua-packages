@@ -7,6 +7,7 @@ import {
   SIZE_PROP_MAP,
 } from '../tokens/layout';
 import { GRID_FLOW } from '../tokens/grid';
+import { parseArbitrary } from './utils';
 
 /**
  * Resolve standalone layout tokens: flex → { display: 'flex' }, absolute → { position: 'absolute' }
@@ -53,6 +54,10 @@ export function resolveLayout(value: string): StyleObject {
 export function resolveSizing(prefix: string, value: string, config: DotConfig): StyleObject {
   const prop = SIZE_PROP_MAP[prefix];
   if (!prop) return {};
+
+  // Arbitrary value: w-[300px], h-[50vh]
+  const arbitrary = parseArbitrary(value);
+  if (arbitrary !== undefined) return { [prop]: arbitrary };
 
   // Keywords: full, screen, auto, fractions, etc.
   if (SIZE_KEYWORDS[value]) {

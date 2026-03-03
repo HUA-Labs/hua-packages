@@ -350,3 +350,12 @@ export type {
 // Re-export adapters for direct usage
 export { adaptNative } from './adapters/native';
 export { adaptWeb } from './adapters/web';
+
+// Re-export cx utility
+export { dotCx } from './cx';
+
+// Re-export variants (CVA replacement) — inject dot function to avoid circular import
+import { _setDotFn, dotVariants } from './variants';
+_setDotFn(dot as (input: string, options?: DotOptions) => StyleObject);
+export { dotVariants };
+export type { VariantProps, DotVariantsConfig, DotVariantsFn, CompoundVariant, VariantShape } from './variants';

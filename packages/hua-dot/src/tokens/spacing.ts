@@ -57,4 +57,6 @@ export const SPACING_PROP_MAP: Record<string, readonly string[]> = {
   'gap': ['gap'],
   'gap-x': ['columnGap'],
   'gap-y': ['rowGap'],
+  'space-x': ['columnGap'],
+  'space-y': ['rowGap'],
 } as const;
