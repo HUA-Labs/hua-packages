@@ -1,6 +1,6 @@
 import type { StyleObject, DotConfig } from '../types';
 import { TEXT_ALIGNS } from '../tokens/typography';
-import { lookupColor } from './color';
+import { resolveColor } from './color';
 
 /**
  * Resolve typography tokens.
@@ -25,12 +25,8 @@ export function resolveTypography(prefix: string, value: string, config: DotConf
       if (config.tokens.fontSize[value]) {
         return { fontSize: config.tokens.fontSize[value] };
       }
-      // Color fallthrough: text-red-500, text-white, etc.
-      const hex = lookupColor(value, config.tokens.colors);
-      if (hex) {
-        return { color: hex };
-      }
-      return {};
+      // Color fallthrough: text-red-500, text-white, text-red-500/50, text-[#ff0000]
+      return resolveColor('text', value, config);
     }
     case 'font': {
       const weight = config.tokens.fontWeight[value];

@@ -15,6 +15,8 @@ import {
   USER_SELECT,
   RESIZE,
   POINTER_EVENTS,
+  APPEARANCE,
+  WHITESPACE,
 } from './tokens';
 
 /**
@@ -53,6 +55,8 @@ const STANDALONE_TOKENS = new Set<string>([
   ...Object.keys(USER_SELECT),
   ...Object.keys(RESIZE),
   ...Object.keys(POINTER_EVENTS),
+  ...Object.keys(APPEARANCE),
+  ...Object.keys(WHITESPACE),
 ]);
 
 /**
@@ -61,6 +65,9 @@ const STANDALONE_TOKENS = new Set<string>([
  */
 const MULTI_SEGMENT_PREFIXES = [
   // backdrop (longest first)
+  'backdrop-brightness',
+  'backdrop-contrast',
+  'backdrop-saturate',
   'backdrop-blur',
   // border radius directional
   'rounded-tl',
@@ -83,9 +90,13 @@ const MULTI_SEGMENT_PREFIXES = [
   'min-h',
   'max-w',
   'max-h',
-  // gap
+  // gap / space
   'gap-x',
   'gap-y',
+  'space-x',
+  'space-y',
+  // Phase 4: line-clamp
+  'line-clamp',
   // transform
   'translate-x',
   'translate-y',
@@ -96,6 +107,8 @@ const MULTI_SEGMENT_PREFIXES = [
   // Phase 3a: positioning
   'inset-x',
   'inset-y',
+  // Phase 4: ring
+  'ring-offset',
   // Phase 3a: grid (longest first)
   'grid-cols',
   'grid-rows',

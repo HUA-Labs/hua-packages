@@ -84,6 +84,8 @@ export interface DotUserConfig {
     backdropBlur?: Record<string, string>;
     gridCols?: Record<string, string>;
     gridRows?: Record<string, string>;
+    ringWidths?: Record<string, string>;
+    ringOffsets?: Record<string, string>;
   };
   cache?: boolean;
   cacheSize?: number;
@@ -122,4 +124,6 @@ export interface ResolvedTokens {
   backdropBlur: Record<string, string>;
   gridCols: Record<string, string>;
   gridRows: Record<string, string>;
+  ringWidths: Record<string, string>;
+  ringOffsets: Record<string, string>;
 }

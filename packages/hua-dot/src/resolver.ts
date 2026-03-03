@@ -15,6 +15,8 @@ import { resolveBackdrop } from './resolvers/backdrop';
 import { resolvePositioning } from './resolvers/positioning';
 import { resolveGrid } from './resolvers/grid';
 import { resolveInteractivity } from './resolvers/interactivity';
+import { resolveRing, resolveRingOffset } from './resolvers/ring';
+import { resolveLineClamp } from './resolvers/line-clamp';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -37,6 +39,8 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   gap: resolveSpacing,
   'gap-x': resolveSpacing,
   'gap-y': resolveSpacing,
+  'space-x': resolveSpacing,
+  'space-y': resolveSpacing,
 
   // color
   bg: resolveColor,
@@ -109,6 +113,9 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
 
   // Phase 2: backdrop
   'backdrop-blur': resolveBackdrop,
+  'backdrop-brightness': resolveBackdrop,
+  'backdrop-contrast': resolveBackdrop,
+  'backdrop-saturate': resolveBackdrop,
 
   // Phase 3a: positioning
   top: resolvePositioning,
@@ -132,6 +139,13 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   'row-end': resolveGrid,
   'auto-cols': resolveGrid,
   'auto-rows': resolveGrid,
+
+  // Phase 4: ring
+  ring: resolveRing,
+  'ring-offset': resolveRingOffset,
+
+  // Phase 4: line-clamp
+  'line-clamp': resolveLineClamp,
 };
 
 /** Negate a CSS value: '16px' → '-16px', 'translateX(16px)' → 'translateX(-16px)' */
