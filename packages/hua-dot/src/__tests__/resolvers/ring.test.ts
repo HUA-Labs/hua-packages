@@ -4,22 +4,22 @@ import { dot, dotMap } from '../../index';
 describe('ring utilities', () => {
   describe('ring width', () => {
     it('ring (bare) → 3px default', () => {
-      expect(dot('ring')).toEqual({ boxShadow: '0 0 0 3px #3b82f6' });
+      expect(dot('ring')).toEqual({ boxShadow: '0 0 0 3px var(--color-ring)' });
     });
     it('ring-0', () => {
-      expect(dot('ring-0')).toEqual({ boxShadow: '0 0 0 0px #3b82f6' });
+      expect(dot('ring-0')).toEqual({ boxShadow: '0 0 0 0px var(--color-ring)' });
     });
     it('ring-1', () => {
-      expect(dot('ring-1')).toEqual({ boxShadow: '0 0 0 1px #3b82f6' });
+      expect(dot('ring-1')).toEqual({ boxShadow: '0 0 0 1px var(--color-ring)' });
     });
     it('ring-2', () => {
-      expect(dot('ring-2')).toEqual({ boxShadow: '0 0 0 2px #3b82f6' });
+      expect(dot('ring-2')).toEqual({ boxShadow: '0 0 0 2px var(--color-ring)' });
     });
     it('ring-4', () => {
-      expect(dot('ring-4')).toEqual({ boxShadow: '0 0 0 4px #3b82f6' });
+      expect(dot('ring-4')).toEqual({ boxShadow: '0 0 0 4px var(--color-ring)' });
     });
     it('ring-8', () => {
-      expect(dot('ring-8')).toEqual({ boxShadow: '0 0 0 8px #3b82f6' });
+      expect(dot('ring-8')).toEqual({ boxShadow: '0 0 0 8px var(--color-ring)' });
     });
   });
 
@@ -40,7 +40,7 @@ describe('ring utilities', () => {
 
   describe('ring arbitrary', () => {
     it('ring-[5px]', () => {
-      expect(dot('ring-[5px]')).toEqual({ boxShadow: '0 0 0 5px #3b82f6' });
+      expect(dot('ring-[5px]')).toEqual({ boxShadow: '0 0 0 5px var(--color-ring)' });
     });
   });
 
@@ -67,7 +67,7 @@ describe('ring utilities', () => {
     });
     it('ring-2 ring-offset-2', () => {
       expect(dot('ring-2 ring-offset-2')).toEqual({
-        boxShadow: '0 0 0 2px #3b82f6',
+        boxShadow: '0 0 0 2px var(--color-ring)',
         outlineOffset: '2px',
       });
     });
@@ -77,7 +77,7 @@ describe('ring utilities', () => {
     it('focus:ring-2', () => {
       const result = dotMap('focus:ring-2');
       expect(result.base).toEqual({});
-      expect(result.focus).toEqual({ boxShadow: '0 0 0 2px #3b82f6' });
+      expect(result.focus).toEqual({ boxShadow: '0 0 0 2px var(--color-ring)' });
     });
     it('focus-visible:ring-2 focus-visible:ring-blue-500', () => {
       const result = dotMap('focus-visible:ring-2 focus-visible:ring-blue-500');

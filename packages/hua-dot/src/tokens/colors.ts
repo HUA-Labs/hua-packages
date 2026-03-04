@@ -141,6 +141,27 @@ export const SPECIAL_COLORS: Record<string, string> = {
   'current': 'currentColor',
 } as const;
 
+/** CSS variable-based semantic colors (Tailwind v4 @theme compatible) */
+export const SEMANTIC_COLORS: Record<string, string> = {
+  'background': 'var(--color-background)',
+  'foreground': 'var(--color-foreground)',
+  'card': 'var(--color-card)',
+  'card-foreground': 'var(--color-card-foreground)',
+  'popover': 'var(--color-popover)',
+  'popover-foreground': 'var(--color-popover-foreground)',
+  'primary-foreground': 'var(--color-primary-foreground)',
+  'secondary-foreground': 'var(--color-secondary-foreground)',
+  'muted': 'var(--color-muted)',
+  'muted-foreground': 'var(--color-muted-foreground)',
+  'accent': 'var(--color-accent)',
+  'accent-foreground': 'var(--color-accent-foreground)',
+  'destructive': 'var(--color-destructive)',
+  'destructive-foreground': 'var(--color-destructive-foreground)',
+  'border': 'var(--color-border)',
+  'input': 'var(--color-input)',
+  'ring': 'var(--color-ring)',
+} as const;
+
 /** Maps color prefix to CSS property */
 export const COLOR_PROP_MAP: Record<string, string> = {
   'bg': 'backgroundColor',
