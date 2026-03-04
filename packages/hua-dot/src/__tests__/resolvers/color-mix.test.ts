@@ -75,10 +75,10 @@ describe('CSS variable opacity (color-mix fallback)', () => {
 });
 
 describe('ring semantic color', () => {
-  it('uses default ring color when not configured', () => {
+  it('uses default ring color (semantic CSS var)', () => {
     createDotConfig();
     const result = dot('ring-2');
-    expect(result.boxShadow).toContain('#3b82f6');
+    expect(result.boxShadow).toContain('var(--color-ring)');
   });
 
   it('uses configured ring color', () => {

@@ -15,7 +15,7 @@ import { parseArbitrary } from './utils';
  * resolveRing('ring', '2', config)        → { boxShadow: '0 0 0 2px #3b82f6' }
  * resolveRing('ring', 'blue-500', config) → { boxShadow: '0 0 0 3px #3b82f6' }
  */
-export function resolveRing(prefix: string, value: string, config: DotConfig): StyleObject {
+export function resolveRing(_prefix: string, value: string, config: DotConfig): StyleObject {
   // Resolve default ring color from config (e.g., createDotConfig({ theme: { colors: { ring: 'var(--color-ring)' } } }))
   const configRingColor = lookupColor('ring', config.tokens.colors);
   const defaultColor = configRingColor ?? RING_DEFAULT_COLOR;
@@ -47,7 +47,7 @@ export function resolveRing(prefix: string, value: string, config: DotConfig): S
  * @example
  * resolveRingOffset('ring-offset', '2', config) → { outlineOffset: '2px' }
  */
-export function resolveRingOffset(prefix: string, value: string, config: DotConfig): StyleObject {
+export function resolveRingOffset(_prefix: string, value: string, _config: DotConfig): StyleObject {
   // Arbitrary value: ring-offset-[3px]
   const arbitrary = parseArbitrary(value);
   if (arbitrary !== undefined) {

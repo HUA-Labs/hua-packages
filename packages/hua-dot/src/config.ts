@@ -1,6 +1,6 @@
 import type { DotUserConfig, DotConfig, ResolvedTokens } from './types';
 import { SPACING } from './tokens/spacing';
-import { COLORS, SPECIAL_COLORS } from './tokens/colors';
+import { COLORS, SPECIAL_COLORS, SEMANTIC_COLORS } from './tokens/colors';
 import { FONT_SIZES, FONT_WEIGHTS, FONT_FAMILIES, LINE_HEIGHTS, LETTER_SPACINGS } from './tokens/typography';
 import { BORDER_RADIUS } from './tokens/borders';
 import { Z_INDEX } from './tokens/z-index';
@@ -18,7 +18,7 @@ import { BREAKPOINT_ORDER } from './tokens/breakpoints';
 const DEFAULT_TOKENS: ResolvedTokens = {
   colors: { ...COLORS, ...Object.fromEntries(
     Object.entries(SPECIAL_COLORS).map(([k, v]) => [k, v])
-  )},
+  ), ...SEMANTIC_COLORS},
   spacing: { ...SPACING },
   borderRadius: { ...BORDER_RADIUS },
   fontSize: { ...FONT_SIZES },

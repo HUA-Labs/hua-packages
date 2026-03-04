@@ -1,5 +1,5 @@
 export { SPACING, SPACING_PROP_MAP } from './spacing';
-export { COLORS, SPECIAL_COLORS, COLOR_PROP_MAP } from './colors';
+export { COLORS, SPECIAL_COLORS, SEMANTIC_COLORS, COLOR_PROP_MAP } from './colors';
 export {
   FONT_SIZES,
   FONT_WEIGHTS,
