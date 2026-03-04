@@ -13,10 +13,18 @@ import type {
   SDUIRendererProps,
   SDUIContext,
   SDUIAction,
-  SDUICondition,
   SDUIComponentRegistry,
+  SDUIConstraints,
 } from "./types";
 import { defaultRegistry } from "./registry";
+import {
+  evaluateCondition,
+  resolveProps,
+  resolveTextBindings,
+  resolveDotString,
+  iterateEach,
+  setByPath,
+} from "./core";
 
 // SDUI Context
 const SDUIContextInternal = createContext<SDUIContext | null>(null);
@@ -33,108 +41,53 @@ export function useSDUI(): SDUIContext {
 }
 
 /**
- * 데이터 경로로 값 가져오기
- * 예: "user.profile.name" → data.user.profile.name
+ * Scoped data provider for each iteration
  */
-function getByPath(obj: Record<string, unknown>, path: string): unknown {
-  return path.split(".").reduce((acc: unknown, key) => {
-    if (acc && typeof acc === "object" && key in acc) {
-      return (acc as Record<string, unknown>)[key];
-    }
-    return undefined;
-  }, obj);
+function ScopedDataProvider({
+  data,
+  children,
+}: {
+  data: Record<string, unknown>;
+  children: React.ReactNode;
+}) {
+  const parentCtx = useSDUI();
+  const scopedCtx = useMemo(
+    () => ({ ...parentCtx, data }),
+    [parentCtx, data]
+  );
+  return (
+    <SDUIContextInternal.Provider value={scopedCtx}>
+      {children}
+    </SDUIContextInternal.Provider>
+  );
 }
 
 /**
- * 데이터 경로로 값 설정하기
+ * constraints → HTML 속성 매핑
  */
-function setByPath(
-  obj: Record<string, unknown>,
-  path: string,
-  value: unknown
-): Record<string, unknown> {
-  const keys = path.split(".");
-  const result = { ...obj };
-  let current: Record<string, unknown> = result;
+function resolveConstraints(
+  constraints: SDUIConstraints
+): { attrs: Record<string, unknown>; style: React.CSSProperties } {
+  const attrs: Record<string, unknown> = {};
+  const style: React.CSSProperties = {};
 
-  for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i];
-    current[key] = { ...(current[key] as Record<string, unknown> || {}) };
-    current = current[key] as Record<string, unknown>;
+  if (constraints.role) attrs.role = constraints.role;
+  if (constraints.label) attrs["aria-label"] = constraints.label;
+  if (constraints.level !== undefined) attrs["aria-level"] = constraints.level;
+  if (constraints.hidden !== undefined) attrs["aria-hidden"] = constraints.hidden;
+
+  if (constraints.minTapTarget !== undefined) {
+    style.minWidth = constraints.minTapTarget;
+    style.minHeight = constraints.minTapTarget;
+  }
+  if (constraints.truncate !== undefined) {
+    style.overflow = "hidden";
+    style.display = "-webkit-box";
+    style.WebkitLineClamp = constraints.truncate;
+    style.WebkitBoxOrient = "vertical";
   }
 
-  current[keys[keys.length - 1]] = value;
-  return result;
-}
-
-/**
- * 조건 평가
- */
-function evaluateCondition(
-  condition: SDUICondition,
-  data: Record<string, unknown>
-): boolean {
-  const value = getByPath(data, condition.path);
-
-  switch (condition.operator) {
-    case "eq":
-      return value === condition.value;
-    case "neq":
-      return value !== condition.value;
-    case "gt":
-      return typeof value === "number" && value > (condition.value as number);
-    case "lt":
-      return typeof value === "number" && value < (condition.value as number);
-    case "gte":
-      return typeof value === "number" && value >= (condition.value as number);
-    case "lte":
-      return typeof value === "number" && value <= (condition.value as number);
-    case "exists":
-      return value !== undefined && value !== null;
-    case "notExists":
-      return value === undefined || value === null;
-    default:
-      return true;
-  }
-}
-
-/**
- * Props에서 데이터 바인딩 처리
- * {{ path }} 형식을 실제 데이터로 치환
- */
-function resolveProps(
-  props: Record<string, unknown>,
-  data: Record<string, unknown>
-): Record<string, unknown> {
-  const resolved: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(props)) {
-    if (typeof value === "string") {
-      // {{ path }} 패턴 처리
-      const bindingMatch = value.match(/^\{\{\s*(.+?)\s*\}\}$/);
-      if (bindingMatch) {
-        resolved[key] = getByPath(data, bindingMatch[1]);
-      } else {
-        // 문자열 내 부분 바인딩: "Hello, {{ user.name }}!"
-        resolved[key] = value.replace(/\{\{\s*(.+?)\s*\}\}/g, (_, path) => {
-          const val = getByPath(data, path);
-          return val !== undefined ? String(val) : "";
-        });
-      }
-    } else if (Array.isArray(value)) {
-      resolved[key] = value.map((item) =>
-        typeof item === "object" && item !== null
-          ? resolveProps(item as Record<string, unknown>, data)
-          : item
-      );
-    } else if (typeof value === "object" && value !== null) {
-      resolved[key] = resolveProps(value as Record<string, unknown>, data);
-    } else {
-      resolved[key] = value;
-    }
-  }
-
-  return resolved;
+  return { attrs, style };
 }
 
 /**
@@ -153,12 +106,37 @@ function NodeRenderer({ node, registry }: NodeRendererProps) {
     return null;
   }
 
+  // each 처리: 배열 반복 렌더링
+  if (node.each) {
+    const iterations = iterateEach(node.each, data);
+    if (iterations.length === 0) return null;
+
+    return (
+      <>
+        {iterations.map(({ scopedData, key }) => (
+          <ScopedDataProvider key={key} data={scopedData}>
+            <NodeRendererInner node={node} registry={registry} />
+          </ScopedDataProvider>
+        ))}
+      </>
+    );
+  }
+
+  return <NodeRendererInner node={node} registry={registry} />;
+}
+
+/**
+ * 내부 노드 렌더러 (each 처리 이후)
+ */
+function NodeRendererInner({ node, registry }: NodeRendererProps) {
+  const { data, handleAction } = useSDUI();
+
   // 컴포넌트 찾기
   const Component = registry[node.type];
   if (!Component) {
     console.warn(`[SDUI] Unknown component type: ${node.type}`);
     return (
-      <div className="p-4 border border-destructive/50 bg-destructive/10 rounded text-sm text-destructive">
+      <div style={{ padding: 16, border: "1px solid #ef4444", borderRadius: 4, fontSize: 14, color: "#ef4444", backgroundColor: "rgba(239,68,68,0.1)" }}>
         Unknown component: {node.type}
       </div>
     );
@@ -166,6 +144,20 @@ function NodeRenderer({ node, registry }: NodeRendererProps) {
 
   // Props 처리
   const resolvedProps = node.props ? resolveProps(node.props, data) : {};
+
+  // dot 처리: 바인딩 resolve 후 props에 주입
+  if (node.dot) {
+    resolvedProps.dot = resolveDotString(node.dot, data);
+  }
+
+  // constraints → aria-* + style 매핑
+  if (node.constraints) {
+    const { attrs, style: constraintStyle } = resolveConstraints(node.constraints);
+    Object.assign(resolvedProps, attrs);
+    if (Object.keys(constraintStyle).length > 0) {
+      resolvedProps.style = { ...(resolvedProps.style as React.CSSProperties || {}), ...constraintStyle };
+    }
+  }
 
   // 이벤트 핸들러 처리
   const eventProps: Record<string, unknown> = {};
@@ -185,11 +177,7 @@ function NodeRenderer({ node, registry }: NodeRendererProps) {
   let children: React.ReactNode = null;
   if (node.children) {
     if (typeof node.children === "string") {
-      // 문자열 바인딩 처리
-      children = node.children.replace(/\{\{\s*(.+?)\s*\}\}/g, (_, path) => {
-        const val = getByPath(data, path);
-        return val !== undefined ? String(val) : "";
-      });
+      children = resolveTextBindings(node.children, data);
     } else if (Array.isArray(node.children)) {
       children = node.children.map((child, index) => (
         <NodeRenderer
@@ -316,9 +304,9 @@ export function SDUIFromJSON({
     return <SDUIRenderer schema={schema} {...props} />;
   } catch (error) {
     return (
-      <div className="p-4 border border-destructive bg-destructive/10 rounded">
-        <p className="font-semibold text-destructive">SDUI Parse Error</p>
-        <pre className="text-sm mt-2 text-destructive/80">
+      <div style={{ padding: 16, border: "1px solid #ef4444", borderRadius: 4, backgroundColor: "rgba(239,68,68,0.1)" }}>
+        <p style={{ fontWeight: 600, color: "#ef4444" }}>SDUI Parse Error</p>
+        <pre style={{ fontSize: 14, marginTop: 8, color: "rgba(239,68,68,0.8)" }}>
           {(error as Error).message}
         </pre>
       </div>

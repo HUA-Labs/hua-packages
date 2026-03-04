@@ -20,6 +20,46 @@ export interface SDUINode {
   when?: SDUICondition;
   /** 이벤트 핸들러 */
   on?: SDUIEventHandlers;
+  /** Cross-platform styling via dot engine */
+  dot?: string;
+  /** Array iteration: render children per item */
+  each?: SDUIEachBinding;
+  /** Accessibility constraints */
+  constraints?: SDUIConstraints;
+}
+
+/**
+ * 배열 반복 바인딩
+ */
+export interface SDUIEachBinding {
+  /** Data path to array (예: "emotions", "report.entries") */
+  of: string;
+  /** Item variable name (default: "item") */
+  as?: string;
+  /** Index variable name (default: "index") */
+  indexAs?: string;
+  /** Item key path for stable React keys (예: "id", "name"). Falls back to index. */
+  key?: string;
+}
+
+/**
+ * 접근성 제약 조건
+ */
+export interface SDUIConstraints {
+  /** Semantic role */
+  role?: 'button' | 'link' | 'heading' | 'img' | 'list' | 'listitem'
+       | 'region' | 'navigation' | 'main' | 'alert' | 'status' | 'dialog'
+       | 'tab' | 'tabpanel' | 'tablist' | 'none';
+  /** Accessible label */
+  label?: string;
+  /** Heading level (1-6) */
+  level?: number;
+  /** Hidden from a11y tree */
+  hidden?: boolean;
+  /** Minimum tap target size in px (web: min-width/min-height, native: hitSlop) */
+  minTapTarget?: number;
+  /** Max lines before truncation (web: line-clamp, native: numberOfLines) */
+  truncate?: number;
 }
 
 /**
@@ -57,6 +97,8 @@ export interface SDUIAction {
  * 페이지 스키마 (전체 페이지 정의)
  */
 export interface SDUIPageSchema {
+  /** 스키마 버전 (미지정 = v1 호환) */
+  schemaVersion?: number;
   /** 페이지 ID */
   id: string;
   /** 페이지 제목 */

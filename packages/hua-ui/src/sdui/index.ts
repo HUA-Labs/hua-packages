@@ -33,7 +33,21 @@ export type {
   SDUIContext,
   SDUIRendererProps,
   SDUIComponentRegistry,
+  SDUIEachBinding,
+  SDUIConstraints,
 } from "./types";
+
+// Core (platform-agnostic utilities)
+export {
+  getByPath,
+  setByPath,
+  evaluateCondition,
+  resolveProps,
+  resolveTextBindings,
+  resolveDotString,
+  iterateEach,
+} from "./core";
+export type { EachIterationItem } from "./core";
 
 // Registry
 export { defaultRegistry, extendRegistry, hasComponent } from "./registry";
