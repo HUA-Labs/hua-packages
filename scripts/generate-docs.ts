@@ -225,19 +225,20 @@ function loadPackageData(dirName: string): PackageData | null {
 
 function compileTemplate(name: string): HandlebarsTemplateDelegate {
   const tplPath = join(TEMPLATES_DIR, name);
-  const tplSource = readFileSync(tplPath, 'utf-8');
+  // Normalize to LF for consistent Handlebars output across platforms (Windows CRLF breaks standalone block removal)
+  const tplSource = readFileSync(tplPath, 'utf-8').replace(/\r\n/g, '\n');
   return Handlebars.compile(tplSource, { noEscape: true });
 }
 
 function generateReadme(data: PackageData): string {
   const template = compileTemplate('readme.hbs');
-  // 끝 줄바꿈 정리
-  return template(data).replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  // Normalize CRLF→LF first so \n{3,} collapse works correctly on Windows
+  return template(data).replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
 
 function generateAiYaml(data: PackageData): string {
   const template = compileTemplate('ai-yaml.hbs');
-  return template(data).replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  return template(data).replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
 
 // ─── AI-docs filename mapping ────────────────────────────────────────
@@ -319,11 +320,14 @@ function validate(packageFilter?: string): { valid: number; drifted: string[] } 
 
     let hasDrift = false;
 
+    // Normalize line endings for cross-platform comparison
+    const norm = (s: string) => s.replace(/\r\n/g, '\n');
+
     // Check README
     const readmePath = join(PACKAGES_DIR, dirName, 'README.md');
     if (existsSync(readmePath)) {
-      const current = readFileSync(readmePath, 'utf-8');
-      const expected = generateReadme(data);
+      const current = norm(readFileSync(readmePath, 'utf-8'));
+      const expected = norm(generateReadme(data));
       if (current !== expected) {
         drifted.push(`${dirName}/README.md`);
         hasDrift = true;
@@ -336,8 +340,8 @@ function validate(packageFilter?: string): { valid: number; drifted: string[] } 
     // Check ai.yaml
     const aiYamlPath = join(AI_DOCS_DIR, aiYamlFilename(dirName));
     if (existsSync(aiYamlPath)) {
-      const current = readFileSync(aiYamlPath, 'utf-8');
-      const expected = generateAiYaml(data);
+      const current = norm(readFileSync(aiYamlPath, 'utf-8'));
+      const expected = norm(generateAiYaml(data));
       if (current !== expected) {
         drifted.push(`${aiYamlFilename(dirName)}`);
         hasDrift = true;

@@ -15,13 +15,15 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@hua-labs/security",
     "@hua-labs/docs-engine",
+    "@hua-labs/pro",
+    "@hua-labs/security",
     "@hua-labs/ui-dashboard",
-    "my-app",
-    "hue",
     "my-docs",
     "my-site",
-    "@hua-labs/eslint-plugin-i18n"
+    "hue",
+    "slides",
+    "sum-companion",
+    "my-app"
   ]
 }

@@ -6,6 +6,9 @@ on:
       - main
     types: [opened, synchronize, reopened]
 
+env:
+  NODE_VERSION: '22'
+
 jobs:
   type-check:
     runs-on: ubuntu-latest
@@ -18,35 +21,41 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: Install build tools for native modules
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3
 
-      - name: Clean node_modules to avoid stale symlinks
-        run: rm -rf node_modules
-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts=false
+        run: |
+          rm -rf node_modules
+          pnpm install --frozen-lockfile --ignore-scripts=false
 
-      - name: Build packages (topological order via turbo)
+      - name: Build packages
         run: pnpm build --filter "@hua-labs/*"
 
       - name: Type check
         run: |
-          pnpm --filter=my-app \
-               --filter=@hua-labs/ui \
-               --filter=@hua-labs/utils \
-               --filter=@hua-labs/i18n-core \
-               --filter=@hua-labs/i18n-core-zustand \
-               --filter=@hua-labs/i18n-loaders \
-               --filter=@hua-labs/i18n-formatters \
-               --filter=@hua-labs/motion-core \
-               --filter=@hua-labs/hooks \
-               --filter=@hua-labs/state \
-               --filter=@hua-labs/hua \
+          pnpm --filter my-app \
+               --filter @hua-labs/ui \
+               --filter @hua-labs/ui-dashboard \
+               --filter @hua-labs/utils \
+               --filter @hua-labs/dot \
+               --filter @hua-labs/i18n-core \
+               --filter @hua-labs/i18n-core-zustand \
+               --filter @hua-labs/i18n-loaders \
+               --filter @hua-labs/i18n-formatters \
+               --filter @hua-labs/motion-core \
+               --filter @hua-labs/hooks \
+               --filter @hua-labs/state \
+               --filter @hua-labs/hua \
+               --filter @hua-labs/docs-engine \
+               --filter @hua-labs/security \
+               --filter @hua-labs/pro \
+               --filter create-hua \
                run type-check
 
   lint:
@@ -60,27 +69,94 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: Install build tools for native modules
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3
 
-      - name: Clean node_modules to avoid stale symlinks
-        run: rm -rf node_modules
-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts=false
+        run: |
+          rm -rf node_modules
+          pnpm install --frozen-lockfile --ignore-scripts=false
+
+      - name: Build packages
+        run: pnpm build --filter "@hua-labs/*"
 
       - name: Lint
         run: |
-          pnpm --filter=my-app \
-               --filter=@hua-labs/ui \
-               --filter=@hua-labs/utils \
-               --filter=@hua-labs/i18n-core \
-               --filter=@hua-labs/i18n-core-zustand \
-               --filter=@hua-labs/i18n-loaders \
-               --filter=@hua-labs/motion-core \
-               --filter=@hua-labs/hooks \
+          pnpm --filter my-app \
+               --filter @hua-labs/ui \
+               --filter @hua-labs/utils \
+               --filter @hua-labs/i18n-core \
+               --filter @hua-labs/i18n-core-zustand \
+               --filter @hua-labs/i18n-loaders \
+               --filter @hua-labs/motion-core \
+               --filter @hua-labs/hooks \
+               --filter @hua-labs/state \
+               --filter @hua-labs/hua \
                run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install build tools for native modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3
+
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules
+          pnpm install --frozen-lockfile --ignore-scripts=false
+
+      - name: Build packages
+        run: pnpm build --filter "@hua-labs/*"
+
+      - name: Test
+        run: |
+          pnpm --filter @hua-labs/dot \
+               --filter @hua-labs/i18n-core \
+               --filter @hua-labs/i18n-core-zustand \
+               --filter @hua-labs/i18n-formatters \
+               --filter @hua-labs/i18n-loaders \
+               --filter @hua-labs/hooks \
+               --filter @hua-labs/utils \
+               --filter @hua-labs/eslint-plugin-i18n \
+               --filter create-hua \
+               run test
+
+  doc-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules
+          pnpm install --frozen-lockfile --ignore-scripts=false
+
+      - name: Validate docs are in sync
+        run: pnpm generate:docs:validate
