@@ -3,6 +3,7 @@
 import React from "react"
 import { createPortal } from "react-dom"
 import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Modal 컴포넌트의 props / Modal component props
@@ -45,6 +46,8 @@ export interface ModalProps {
   centered?: boolean
   /** 모달 컨테이너 추가 CSS 클래스 / Additional CSS class for modal container */
   className?: string
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 // 모달 닫기 버튼 컴포넌트 (title 유무에 따라 위치만 다름)
@@ -136,6 +139,7 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   ({
   className,
+  dot: dotProp,
   isOpen,
   onClose,
   children,
@@ -148,6 +152,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   backdropClassName,
   centered = true
   }, ref) => {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const _closable = closable ?? true
   const modalRef = React.useRef<HTMLDivElement>(null)
     const combinedRef = useCombinedRefs(ref, modalRef)
@@ -212,6 +217,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         "fixed inset-0 z-50 overflow-y-auto",
         className
       )}
+      style={dotStyle}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"

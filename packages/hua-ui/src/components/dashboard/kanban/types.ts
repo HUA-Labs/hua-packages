@@ -184,6 +184,8 @@ export interface KanbanColumnProps extends Omit<React.HTMLAttributes<HTMLDivElem
   cards: KanbanCard[];
   /** 컬럼 인덱스 */
   index: number;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**

@@ -15,6 +15,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "../lib/utils";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 export interface ColorPickerProps {
   /** 현재 색상 값 (HEX 또는 'transparent') */
@@ -23,6 +24,8 @@ export interface ColorPickerProps {
   onChange: (color: string) => void;
   /** 추가 클래스명 */
   className?: string;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
   /** 비활성화 여부 */
   disabled?: boolean;
 }
@@ -367,7 +370,8 @@ function CustomTab({
  * 탭 기반 컬러 피커로 Tailwind CSS 프리셋과 커스텀 HSL 피커를 제공합니다.
  */
 export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
-  ({ value, onChange, className, disabled = false }, ref) => {
+  ({ value, onChange, className, dot: dotProp, disabled = false }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [activeTab, setActiveTab] = useState<TabType>("tailwind");
 
     // HSL 상태
@@ -435,7 +439,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     const currentColor = hslToHex(h, s, l);
 
     return (
-      <div ref={ref} className={cn("space-y-2", className)}>
+      <div ref={ref} className={cn("space-y-2", className)} style={dotStyle}>
         {/* 탭 헤더 */}
         <div className="flex gap-1 p-0.5 bg-muted/50 rounded-md">
           <button

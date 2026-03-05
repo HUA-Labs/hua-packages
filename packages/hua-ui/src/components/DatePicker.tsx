@@ -5,6 +5,7 @@ import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { Popover } from "./Popover"
 import { Button } from "./Button"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * DatePicker 컴포넌트의 props / DatePicker component props
@@ -36,6 +37,8 @@ export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   className?: string
   /** 표시할 날짜 배열 (점으로 표시) / Dates to mark with a dot */
   markedDates?: Date[]
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 const sizeClasses = {
@@ -110,10 +113,12 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       size = "md",
       className,
       markedDates,
+      dot: dotProp,
       ...props
     },
     ref
   ) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [isOpen, setIsOpen] = React.useState(false)
     const [currentMonth, setCurrentMonth] = React.useState(value ? new Date(value.getFullYear(), value.getMonth()) : new Date())
     const [hoveredDate, setHoveredDate] = React.useState<Date | null>(null)
@@ -277,7 +282,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     )
 
     return (
-      <div ref={ref} className={merge("relative", className)} {...props}>
+      <div ref={ref} className={merge("relative", className)} style={dotStyle} {...props}>
         <Popover
           open={isOpen}
           onOpenChange={setIsOpen}

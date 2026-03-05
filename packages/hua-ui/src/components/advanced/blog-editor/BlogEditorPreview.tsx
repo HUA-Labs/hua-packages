@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../../../lib/utils'
+import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { useBlogEditor } from './BlogEditorContext'
 import { parseMarkdown } from './utils/markdown'
 

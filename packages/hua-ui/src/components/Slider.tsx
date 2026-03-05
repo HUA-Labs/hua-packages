@@ -2,6 +2,7 @@
 
 import React from "react"
 import { merge } from "../lib/utils"
+import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * Slider 컴포넌트의 props

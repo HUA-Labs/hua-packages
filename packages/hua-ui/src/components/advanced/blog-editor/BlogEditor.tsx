@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react'
 import { merge } from '../../../lib/utils'
+import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { BlogEditorProvider, useBlogEditor } from './BlogEditorContext'
 import { BlogEditorHeader, type BlogEditorHeaderProps } from './BlogEditorHeader'
 import { BlogEditorMetadata, type BlogEditorMetadataProps } from './BlogEditorMetadata'
@@ -31,6 +32,8 @@ interface BlogEditorRootProps {
   maxWidth?: string
   /** 추가 CSS 클래스 / Additional CSS classes */
   className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
   /** 자식 요소 / Children */
   children?: React.ReactNode
 }
@@ -47,8 +50,10 @@ function BlogEditorRoot({
   translateHint,
   maxWidth = 'max-w-4xl',
   className,
+  dot: dotProp,
   children,
 }: BlogEditorRootProps) {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const { showPreview, error, variant, features } = useBlogEditor()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 

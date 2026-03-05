@@ -2,6 +2,7 @@
 
 import React from "react";
 import { merge } from "../lib/utils";
+import { resolveDot } from "../hooks/useDotMap";
 
 /**
  * FormControl 컴포넌트의 props / FormControl component props
@@ -25,6 +26,8 @@ export interface FormControlProps {
   suppressBrowserValidation?: boolean;
   className?: string;
   children: React.ReactNode;
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string;
 }
 
 /**

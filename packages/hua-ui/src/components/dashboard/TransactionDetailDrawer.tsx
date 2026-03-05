@@ -6,6 +6,7 @@ import { Badge } from "../Badge";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { DashboardEmptyState } from "./EmptyState";
 import type { TransactionStatus } from "./TransactionsTable";
 
@@ -152,6 +153,7 @@ export interface TransactionDetailDrawerProps {
   defaultCurrency?: string;
   emptyState?: React.ReactNode;
   className?: string;
+  dot?: string;
 }
 
 const formatAmount = (amount?: number, currency?: string, locale = "ko-KR") => {
@@ -266,6 +268,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   defaultCurrency = "KRW",
   emptyState,
   className,
+  dot: dotProp,
 }) => {
   const statusStyle = transaction && STATUS_STYLES[transaction.status];
 
@@ -274,6 +277,7 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
       isOpen={open}
       onClose={onClose}
       className={className}
+      dot={dotProp}
     >
       <DrawerHeader onClose={onClose}>
         <div className="space-y-1">

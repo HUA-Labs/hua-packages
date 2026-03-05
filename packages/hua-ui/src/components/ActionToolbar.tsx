@@ -5,6 +5,7 @@ import { Button } from './Button';
 import { Icon } from './Icon';
 import type { IconName } from '../lib/icons';
 import { merge } from '../lib/utils';
+import { mergeStyles, resolveDot } from '../hooks/useDotMap';
 
 /**
  * ActionButton 인터페이스
@@ -67,6 +68,8 @@ export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement>
   onCancelSelect?: () => void;
   /** 로딩 상태 */
   loading?: boolean;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**
@@ -134,10 +137,12 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
       onCancelSelect,
       loading = false,
       className,
+      dot: dotProp,
       ...props
     },
     ref
   ) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const getBadgeColor = useCallback((color?: string) => {
       switch (color) {
         case 'red':
@@ -179,6 +184,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
           'mb-4 bg-background rounded-lg shadow-sm border border-border p-3 sm:p-4',
           className
         )}
+        style={dotStyle}
         {...props}
       >
         {isSelectMode ? (
