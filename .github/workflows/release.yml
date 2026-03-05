@@ -27,24 +27,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Build publishable packages
-        run: |
-          pnpm build \
-            --filter @hua-labs/utils \
-            --filter @hua-labs/hooks \
-            --filter @hua-labs/state \
-            --filter @hua-labs/motion-core \
-            --filter @hua-labs/i18n-core \
-            --filter @hua-labs/i18n-core-zustand \
-            --filter @hua-labs/i18n-formatters \
-            --filter @hua-labs/i18n-loaders \
-            --filter @hua-labs/eslint-plugin-i18n \
-            --filter @hua-labs/ui \
-            --filter @hua-labs/hua
+        run: pnpm build --filter "@hua-labs/*"
 
       - name: Create .npmrc for npm token
         run: |

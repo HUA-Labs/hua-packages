@@ -23,7 +23,7 @@ Accessible, TypeScript-first component library for React applications. Provides 
 pnpm add @hua-labs/ui
 ```
 
-> Peer dependencies: @dnd-kit/core ^6.3.1, @dnd-kit/sortable ^10.0.0, @dnd-kit/utilities ^3.2.2, @hua-labs/motion-core >=2.2.3, react >=19.0.0, react-dom >=19.0.0
+> Peer dependencies: @dnd-kit/core ^6.3.1, @dnd-kit/sortable ^10.0.0, @dnd-kit/utilities ^3.2.2, @hua-labs/motion-core >=2.2.3, react >=19.0.0, react-dom >=19.0.0, react-native >=0.73.0
 
 ## Quick Start
 
