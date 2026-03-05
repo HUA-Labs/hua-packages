@@ -2,6 +2,7 @@
 
 import React from "react"
 import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * ScrollArea 컴포넌트의 props / ScrollArea component props
@@ -19,6 +20,8 @@ interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "vertical" | "horizontal" | "both"
   scrollHideDelay?: number
   type?: "auto" | "always" | "scroll" | "hover"
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -48,14 +51,16 @@ interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
  * @returns {JSX.Element} ScrollArea 컴포넌트 / ScrollArea component
  */
 const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
-  ({ 
-    children, 
-    className, 
+  ({
+    children,
+    className,
+    dot: dotProp,
     orientation = "vertical",
     scrollHideDelay = 600,
     type = "hover",
-    ...props 
+    ...props
   }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [showScrollbar, setShowScrollbar] = React.useState(false)
     const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
@@ -101,6 +106,7 @@ const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
           showScrollbar ? "scrollbar-visible" : "scrollbar-hidden",
           className
         )}
+        style={dotStyle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}

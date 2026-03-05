@@ -4,6 +4,7 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Breadcrumb 항목 타입 / Breadcrumb item type
@@ -34,6 +35,8 @@ export interface BreadcrumbProps extends React.HTMLAttributes<HTMLDivElement> {
   homeLabel?: string
   separator?: React.ReactNode
   variant?: 'default' | 'subtle' | 'transparent' | 'glass'
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -81,17 +84,19 @@ export interface BreadcrumbItemProps {
  * @returns {JSX.Element} Breadcrumb 컴포넌트 / Breadcrumb component
  */
 const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
-  ({ 
-    className, 
-    children, 
+  ({
+    className,
+    children,
     items,
     maxItems,
     showHomeIcon,
     homeLabel = "Home",
-    separator = <Icon name="chevronRight" className="w-3 h-3 text-muted-foreground flex-shrink-0" />, 
-    variant = 'default', 
-    ...props 
+    separator = <Icon name="chevronRight" className="w-3 h-3 text-muted-foreground flex-shrink-0" />,
+    variant = 'default',
+    dot: dotProp,
+    ...props
   }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const variantStyles = {
       default: "inline-flex items-center text-sm w-fit",
       subtle: "inline-flex items-center text-xs bg-background/40 backdrop-blur-md rounded-md px-3 py-2 border border-border/30 w-fit shadow-sm",
@@ -161,6 +166,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
         ref={ref}
         aria-label="Breadcrumb"
         className={merge(variantStyles[variant], className)}
+        style={dotStyle}
         {...props}
       >
         <ol className="inline-flex items-center">

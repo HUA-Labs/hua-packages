@@ -3,6 +3,7 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Drawer 컴포넌트의 props / Drawer component props
@@ -41,6 +42,8 @@ interface DrawerProps {
   closeOnEscape?: boolean
   /** 닫기 버튼 표시 여부 / Show close button */
   closable?: boolean
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -86,6 +89,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
     onClose,
     children,
     className,
+    dot: dotProp,
     side = "right",
     size = "md",
     showBackdrop = true,
@@ -95,6 +99,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
     closable = true,
     ...props
   }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const _isOpen = isOpen ?? false
     const handleClose = () => {
       onClose?.()
@@ -189,6 +194,7 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
             transformClasses[side],
             className
           )}
+          style={dotStyle}
           {...props}
         >
           {children}

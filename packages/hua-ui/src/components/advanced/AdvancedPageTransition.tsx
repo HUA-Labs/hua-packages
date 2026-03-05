@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { merge } from '../../lib/utils'
+import { mergeStyles, resolveDot } from '../../hooks/useDotMap'
 
 export type TransitionType = 
   | 'fade' 
@@ -28,6 +29,7 @@ export type TransitionEasing =
 export interface AdvancedPageTransitionProps {
   children: React.ReactNode
   className?: string
+  dot?: string
   type?: TransitionType
   duration?: number
   easing?: TransitionEasing
@@ -42,6 +44,7 @@ export interface AdvancedPageTransitionProps {
 export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedPageTransitionProps>(({
   children,
   className,
+  dot: dotProp,
   type = 'fade',
   duration = 500,
   easing = 'smooth',
@@ -52,6 +55,7 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
   showProgress = false,
   progressClassName
 }, ref) => {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [isVisible, setIsVisible] = useState(false)
   const [progress, setProgress] = useState(0)
   const [_isTransitioning, setIsTransitioning] = useState(false)
@@ -233,17 +237,20 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
           'transition-all duration-500 ease-out',
           className
         )}
-        style={{
-          ...transitionStyles,
-          transitionDuration: `${duration}ms`,
-          transitionTimingFunction: easing === 'smooth' 
-            ? 'cubic-bezier(0.4, 0, 0.2, 1)'
-            : easing === 'bounce'
-            ? 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-            : easing === 'elastic'
-            ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-            : easing
-        }}
+        style={mergeStyles(
+          {
+            ...transitionStyles,
+            transitionDuration: `${duration}ms`,
+            transitionTimingFunction: easing === 'smooth'
+              ? 'cubic-bezier(0.4, 0, 0.2, 1)'
+              : easing === 'bounce'
+              ? 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+              : easing === 'elastic'
+              ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+              : easing
+          },
+          dotStyle
+        )}
       >
         {children}
       </div>

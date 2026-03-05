@@ -5,6 +5,7 @@ import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { IconName } from "../lib/icons"
 import { useScrollToggle } from "../hooks/useScrollToggle"
+import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * ScrollToTop 컴포넌트의 props / ScrollToTop component props
@@ -26,6 +27,8 @@ export interface ScrollToTopProps extends React.HTMLAttributes<HTMLButtonElement
   size?: "sm" | "md" | "lg"
   variant?: "default" | "primary" | "secondary" | "outline" | "ghost"
   showOnMount?: boolean
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -54,16 +57,18 @@ export interface ScrollToTopProps extends React.HTMLAttributes<HTMLButtonElement
  * @param {ScrollToTopProps} props - ScrollToTop 컴포넌트의 props / ScrollToTop component props
  * @returns {JSX.Element} ScrollToTop 컴포넌트 / ScrollToTop component
  */
-const ScrollToTop = ({ 
-  className, 
-  threshold = 400, 
-  smooth = true, 
+const ScrollToTop = ({
+  className,
+  threshold = 400,
+  smooth = true,
   icon = "arrowUp",
   size = "md",
   variant = "default",
   showOnMount = false,
-  ...props 
+  dot: dotProp,
+  ...props
 }: ScrollToTopProps) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     // HUA Motion의 useScrollToggle 훅 사용
     const { isVisible, scrollToTop, mounted: _mounted } = useScrollToggle({
       threshold,
@@ -96,13 +101,14 @@ const ScrollToTop = ({
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-ring/50",
           "transform hover:scale-105 active:scale-95",
           // 페이드 애니메이션
-          isVisible 
-            ? "opacity-100 translate-y-0 pointer-events-auto" 
+          isVisible
+            ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 translate-y-4 pointer-events-none",
           className,
           sizeClasses[size],
           variantClasses[variant]
         )}
+        style={dotStyle}
         aria-label="Scroll to top"
         {...props}
       >

@@ -1,6 +1,7 @@
 import React from 'react'
 import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
 import { merge, mergeMap } from '../../lib/utils'
+import { mergeStyles, resolveDot } from '../../hooks/useDotMap'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
 import { getIconFromProvider, getIconsaxResolver, getLucideResolver, getIconNameForProvider } from '../../lib/icon-providers'
 import { normalizeIconName } from '../../lib/normalize-icon-name'
@@ -18,6 +19,8 @@ export interface IconProps {
   size?: number | string
   /** 추가 CSS 클래스 / Additional CSS classes */
   className?: string
+  /** dot 스타일 유틸리티 문자열 / Dot style utility string */
+  dot?: string
   /** 감정 아이콘 타입 / Emotion icon type */
   emotion?: keyof typeof emotionIcons
   /** 상태 아이콘 타입 / Status icon type */
@@ -62,6 +65,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   name,
   size,
   className,
+  dot: dotProp,
   emotion,
   status,
   provider,
@@ -121,11 +125,13 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     'text-destructive': variant === 'error',
   })
 
+  const dotStyle = React.useMemo(() => dotProp ? resolveDot(dotProp) : undefined, [dotProp])
+
   // 서버사이드에서는 빈 span 반환
   if (!isClient) {
     return (
       <span
-        style={{ width: iconSize, height: iconSize }}
+        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
         className={merge(variantClasses, className)}
         aria-hidden={ariaHidden !== undefined ? ariaHidden : true}
         aria-label={ariaLabel}
@@ -179,7 +185,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
           variantClasses,
           className
         )}
-        style={{ width: iconSize, height: iconSize }}
+        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
         aria-label={ariaLabel || `아이콘을 찾을 수 없음: ${iconName}`}
         title={`Icon not found: ${iconName}`}
       >
@@ -240,7 +246,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
         variantClasses,
         className
       )}
-      style={{ width: iconSize, height: iconSize }}
+      style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
       {...accessibilityProps}
     >
       {ResolvedIcon && React.createElement(ResolvedIcon, {
@@ -259,6 +265,7 @@ const MemoizedIcon = React.memo(IconComponent, (prevProps, nextProps) => {
     prevProps.name === nextProps.name &&
     prevProps.size === nextProps.size &&
     prevProps.className === nextProps.className &&
+    prevProps.dot === nextProps.dot &&
     prevProps.emotion === nextProps.emotion &&
     prevProps.status === nextProps.status &&
     prevProps.provider === nextProps.provider &&

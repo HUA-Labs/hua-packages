@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useMemo } from "react"
 import { highlight } from "sugar-high"
 import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * CodeBlock 컴포넌트 Props
@@ -24,6 +25,8 @@ export interface CodeBlockProps {
   copySuccessMessage?: string
   /** 추가 className */
   className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
   /** 최대 높이 (스크롤) */
   maxHeight?: string | number
   /** 테마 (기본: dark) */
@@ -71,9 +74,11 @@ export function CodeBlock({
   onCopy,
   copySuccessMessage: _copySuccessMessage = "Copied!",
   className,
+  dot: dotProp,
   maxHeight,
   theme = "dark",
 }: CodeBlockProps) {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(async () => {
@@ -109,6 +114,7 @@ export function CodeBlock({
           : "bg-muted/50 border border-border",
         className
       )}
+      style={dotStyle}
     >
       {/* 헤더 - 항상 표시 */}
       <div className={merge(

@@ -4,6 +4,7 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { Input } from "./Input"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Autocomplete 옵션 인터페이스 / Autocomplete option interface
@@ -56,6 +57,8 @@ export interface AutocompleteProps extends Omit<React.HTMLAttributes<HTMLDivElem
   emptyText?: string
   size?: "sm" | "md" | "lg"
   className?: string
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 const sizeClasses = {
@@ -115,10 +118,12 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       emptyText = "결과가 없습니다",
       size = "md",
       className,
+      dot: dotProp,
       ...props
     },
     ref
   ) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [isOpen, setIsOpen] = React.useState(false)
     const [inputValue, setInputValue] = React.useState("")
     const [filteredOptions, setFilteredOptions] = React.useState<AutocompleteOption[]>(options)
@@ -246,7 +251,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
     }
 
     return (
-      <div ref={ref} className={merge("relative w-full", className)} {...props}>
+      <div ref={ref} className={merge("relative w-full", className)} style={dotStyle} {...props}>
         <div className="relative">
           <Input
             ref={inputRef}

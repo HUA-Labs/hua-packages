@@ -3,6 +3,7 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Accordion 컴포넌트의 props / Accordion component props
@@ -23,6 +24,8 @@ interface AccordionProps {
   value?: string | string[]
   onValueChange?: (value: string | string[]) => void
   collapsible?: boolean
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -72,16 +75,18 @@ interface AccordionProps {
  * @returns {JSX.Element} Accordion 컴포넌트 / Accordion component
  */
 const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-  ({ 
-    children, 
+  ({
+    children,
     className,
+    dot: dotProp,
     type = "single",
     defaultValue,
     value,
     onValueChange,
     collapsible = false,
-    ...props 
+    ...props
   }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [openItems, setOpenItems] = React.useState<string[]>(
       value ? (Array.isArray(value) ? value : [value]) : 
       defaultValue ? (Array.isArray(defaultValue) ? defaultValue : [defaultValue]) : []
@@ -166,6 +171,7 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       <div
         ref={ref}
         className={merge("space-y-2", className)}
+        style={dotStyle}
         onKeyDown={handleKeyDown}
         {...props}
       >

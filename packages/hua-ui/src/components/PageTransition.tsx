@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { merge } from '../lib/utils'
 import { LoadingSpinner } from './LoadingSpinner'
+import { mergeStyles, resolveDot } from '../hooks/useDotMap'
 
 /**
  * PageTransition 컴포넌트의 props / PageTransition component props
@@ -20,6 +21,7 @@ import { LoadingSpinner } from './LoadingSpinner'
 export interface PageTransitionProps {
   children: React.ReactNode
   className?: string
+  dot?: string
   duration?: number
   variant?: 'fade' | 'slide' | 'scale' | 'flip'
   loadingVariant?: 'default' | 'dots' | 'bars' | 'ring' | 'ripple'
@@ -62,6 +64,7 @@ export interface PageTransitionProps {
 export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(({
   children,
   className,
+  dot: dotProp,
   duration = 300,
   variant = 'fade',
   loadingVariant = 'ripple',
@@ -70,6 +73,7 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   onTransitionStart,
   onTransitionEnd
 }, ref) => {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [isLoading, setIsLoading] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -124,7 +128,7 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
         transitionClasses[variant],
         className
       )}
-      style={{ transitionDuration: `${duration}ms` }}
+      style={mergeStyles({ transitionDuration: `${duration}ms` }, dotStyle)}
     >
       {children}
     </div>

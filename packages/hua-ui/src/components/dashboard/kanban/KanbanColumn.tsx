@@ -5,6 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { merge } from "../../../lib/utils";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { useKanban } from "./KanbanContext";
 import { KanbanColumnHeader } from "./KanbanColumnHeader";
 import { KanbanCard } from "./KanbanCard";
@@ -46,7 +47,7 @@ function useColumnKeyframes() {
  * 카드는 SortableContext로 감싸서 세로 정렬을 지원합니다.
  */
 export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
-  ({ column, cards, index, className, style, ...props }, ref) => {
+  ({ column, cards, index, className, style, dot: dotProp, ...props }, ref) => {
     // Inject keyframes
     useColumnKeyframes();
 
@@ -75,13 +76,17 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
 
     // Sortable styles with entrance animation
     // Keep dragged column in place (with low opacity) so dnd-kit sorting works correctly
-    const sortableStyle: React.CSSProperties = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-      animation: isDragging ? "none" : "kanban-column-enter 0.25s ease-out both",
-      animationDelay: isDragging ? "0ms" : `${index * 50}ms`,
-      ...style,
-    };
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
+    const sortableStyle: React.CSSProperties = mergeStyles(
+      {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        animation: isDragging ? "none" : "kanban-column-enter 0.25s ease-out both",
+        animationDelay: isDragging ? "0ms" : `${index * 50}ms`,
+      },
+      style,
+      dotStyle
+    );
 
     // WIP limit check
     const isAtLimit = column.limit !== undefined && cards.length >= column.limit;

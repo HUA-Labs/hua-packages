@@ -3,6 +3,7 @@
 import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * BottomSheet 컴포넌트의 props / BottomSheet component props
@@ -47,6 +48,8 @@ interface BottomSheetProps {
   snapPoints?: number[]
   /** 기본 스냅 포인트 (퍼센트) / Default snap point (percentage) */
   defaultSnap?: number
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -94,6 +97,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     onClose,
     children,
     className,
+    dot: dotProp,
     height = "md",
     showBackdrop = true,
     backdropClassName,
@@ -105,6 +109,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     defaultSnap = 50,
     ...props
   }, ref) => {
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const _isOpen = isOpen ?? false
     const handleClose = () => {
       onClose?.()
@@ -215,13 +220,13 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
             isAnimating ? (_isOpen ? "translate-y-0" : "translate-y-full") : "",
             className
           )}
-          style={{
+          style={mergeStyles({
             // height prop이 "full"일 때만 퍼센트 높이 사용 (스냅 포인트)
             // 그 외에는 heightClasses의 고정 높이 사용
             height: height === "full" ? `${currentHeight}%` : undefined,
             maxHeight: height !== "full" ? undefined : "100%",
             transform: isDragging ? `translateY(${currentY - startY}px)` : undefined
-          }}
+          }, dotStyle)}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}

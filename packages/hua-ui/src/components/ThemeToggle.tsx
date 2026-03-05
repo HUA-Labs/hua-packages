@@ -4,6 +4,7 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { useTheme } from "./ThemeProvider"
+import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * ThemeToggle 컴포넌트의 props / ThemeToggle component props

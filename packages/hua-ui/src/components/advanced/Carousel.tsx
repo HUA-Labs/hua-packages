@@ -3,6 +3,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { merge } from "../../lib/utils";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 /**
  * Carousel 컴포넌트의 props / Carousel component props
@@ -22,6 +23,7 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
  */
 export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   children: React.ReactNode[];
+  dot?: string;
   autoPlay?: boolean;
   interval?: number;
   loop?: boolean;
@@ -73,6 +75,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       playPausePosition = "right",
       className,
       style,
+      dot: dotProp,
       ...props
     },
     ref
@@ -466,6 +469,8 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       );
     };
 
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
+
     return (
       <div
         ref={ref}
@@ -474,7 +479,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           arrowPosition === "outside" && "px-16",
           className
         )}
-        style={style}
+        style={mergeStyles(style, dotStyle)}
         {...props}
       >
         <div

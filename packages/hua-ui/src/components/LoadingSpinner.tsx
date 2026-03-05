@@ -2,6 +2,7 @@
 
 import React from "react"
 import { merge } from "../lib/utils"
+import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * LoadingSpinner 컴포넌트의 props / LoadingSpinner component props
@@ -18,6 +19,8 @@ export interface LoadingSpinnerProps {
   text?: string
   color?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"
   className?: string
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -51,13 +54,15 @@ export interface LoadingSpinnerProps {
  * @param {LoadingSpinnerProps} props - LoadingSpinner 컴포넌트의 props / LoadingSpinner component props
  * @returns {JSX.Element} LoadingSpinner 컴포넌트 / LoadingSpinner component
  */
-export function LoadingSpinner({ 
-  className, 
-  size = "md", 
-  variant = "default", 
-  text, 
-  color = "default" 
+export function LoadingSpinner({
+  className,
+  size = "md",
+  variant = "default",
+  text,
+  color = "default",
+  dot: dotProp,
 }: LoadingSpinnerProps) {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const sizeClasses = {
     sm: "w-6 h-6", // 24px - 더 넉넉한 크기
     md: "w-8 h-8", // 32px - 더 넉넉한 크기
@@ -147,7 +152,7 @@ export function LoadingSpinner({
   }
 
   return (
-    <div className={merge("flex flex-col items-center justify-center", className)}>
+    <div className={merge("flex flex-col items-center justify-center", className)} style={dotStyle}>
       <div className={merge(sizeClasses[size], "text-muted-foreground")}>
         {renderSpinner()}
       </div>

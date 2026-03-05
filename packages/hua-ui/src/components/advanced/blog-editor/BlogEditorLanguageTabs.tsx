@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../../../lib/utils'
+import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
 

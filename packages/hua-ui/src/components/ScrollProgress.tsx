@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { merge } from '../lib/utils'
+import { mergeStyles, resolveDot } from '../hooks/useDotMap'
 
 /**
  * ScrollProgress 컴포넌트의 props / ScrollProgress component props
@@ -20,6 +21,8 @@ export interface ScrollProgressProps {
   position?: 'top' | 'bottom'
   animated?: boolean
   showPercentage?: boolean
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
 }
 
 /**
@@ -56,8 +59,10 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   position = 'top',
   animated: _animated = true,
   showPercentage = false,
+  dot: dotProp,
   ...props
 }, ref) => {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -101,7 +106,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
         positionClasses[position],
         className
       )}
-      style={{ height: `${height}px` }}
+      style={mergeStyles({ height: `${height}px` }, dotStyle)}
       {...props}
     >
       {/* 배경 바 */}

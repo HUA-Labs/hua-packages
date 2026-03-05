@@ -2,6 +2,7 @@
 
 import React from "react";
 import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import {
   Table,
   TableBody,
@@ -120,6 +121,7 @@ export interface TransactionsTableProps {
   locale?: string;
   defaultCurrency?: string;
   className?: string;
+  dot?: string;
   footer?: React.ReactNode;
   rowActionLabel?: (row: TransactionRow) => string;
   rowActionHint?: string;
@@ -221,10 +223,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   locale = "ko-KR",
   defaultCurrency = "KRW",
   className,
+  dot: dotProp,
   footer,
   rowActionLabel,
   rowActionHint,
 }) => {
+  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const columnList = columns.length > 0 ? columns : DEFAULT_COLUMNS;
   const hasRows = rows.length > 0;
   const tableId = React.useId();
@@ -328,7 +332,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
 
   return (
-    <div className={merge("rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900", className)}>
+    <div className={merge("rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900", className)} style={dotStyle}>
       {filters && (
         <div className="border-b border-slate-100 dark:border-slate-800 px-4 sm:px-6 py-4">{filters}</div>
       )}

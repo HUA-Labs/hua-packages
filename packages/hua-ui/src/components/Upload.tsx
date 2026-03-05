@@ -4,6 +4,7 @@ import React from "react"
 import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
+import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * 업로드된 파일 정보 인터페이스 / Uploaded file information interface
