@@ -4,11 +4,16 @@
  * SDUI Component Registry
  *
  * 컴포넌트 타입 문자열 → 실제 React 컴포넌트 매핑
+ * dot 기반 cross-platform 스타일링
  */
 
 import React, { useState } from "react";
 import type { SDUIComponentRegistry } from "./types";
-import { cn } from "../lib/utils";
+import { resolveDot, mergeStyles } from "../hooks/useDotMap";
+
+// hua-ui primitives (dot 지원)
+import { Box as PrimitiveBox } from "../components/Box";
+import { Text as PrimitiveText } from "../components/Text";
 
 // 기본 컴포넌트들
 import { Button } from "../components/Button";
@@ -42,154 +47,63 @@ import {
 } from "../components/Accordion";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/Tabs";
 
-// 레이아웃 프리미티브
-const Box: React.FC<React.HTMLAttributes<HTMLDivElement> & {
-  justify?: "start" | "center" | "end" | "between";
-  align?: "start" | "center" | "end" | "stretch";
-  // 커스텀 스타일 props (DOM에 직접 전달하지 않음)
-  backgroundColor?: string;
-  padding?: string | number;
-  margin?: string | number;
-  borderRadius?: string | number;
-  border?: string;
-}> = ({
-  children,
-  justify,
-  align,
-  className = "",
-  style,
-  // 커스텀 props 분리 (DOM에 전달 X)
-  backgroundColor,
-  padding,
-  margin,
-  borderRadius,
-  border,
-  ...props
-}) => {
-  // 커스텀 props를 style 객체로 병합
-  const customStyle: React.CSSProperties = {
-    ...style,
-    ...(backgroundColor && { backgroundColor }),
-    ...(padding !== undefined && { padding: typeof padding === 'number' ? `${padding}px` : padding }),
-    ...(margin !== undefined && { margin: typeof margin === 'number' ? `${margin}px` : margin }),
-    ...(borderRadius !== undefined && { borderRadius: typeof borderRadius === 'number' ? `${borderRadius}px` : borderRadius }),
-    ...(border && { border }),
-  };
+// ── Helpers ──────────────────────────────────────────────
 
-  return (
-    <div
-      className={cn(
-        (justify || align) && "flex",
-        justify && justifyMap[justify],
-        align && alignMap[align],
-        className
-      )}
-      style={Object.keys(customStyle).length > 0 ? customStyle : undefined}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+/** dot 토큰 조합 (falsy 자동 필터) */
+function buildDot(...parts: (string | false | undefined | null)[]): string {
+  return parts.filter(Boolean).join(" ");
+}
 
-// Spacer - 공백용 void 컴포넌트
-const Spacer: React.FC<{ size?: number; className?: string }> = ({ size = 16, className = "" }) => (
-  <div className={className} style={{ width: size, height: size, flexShrink: 0 }} />
-);
-
-// 정렬 매핑
-const justifyMap = {
+const justifyDot: Record<string, string> = {
   start: "justify-start",
   center: "justify-center",
   end: "justify-end",
   between: "justify-between",
 };
-const alignMap = {
+const alignDot: Record<string, string> = {
   start: "items-start",
   center: "items-center",
   end: "items-end",
   stretch: "items-stretch",
 };
-
-const Flex: React.FC<React.HTMLAttributes<HTMLDivElement> & {
-  direction?: "row" | "column";
-  gap?: number;
-  justify?: "start" | "center" | "end" | "between";
-  align?: "start" | "center" | "end" | "stretch";
-  backgroundColor?: string;
-  padding?: string | number;
-}> = ({
-  children,
-  direction = "row",
-  gap = 0,
-  justify = "start",
-  align = "stretch",
-  className = "",
-  style,
-  backgroundColor,
-  padding,
-  ...props
-}) => {
-  const customStyle: React.CSSProperties = {
-    gap: `${gap * 4}px`,
-    ...style,
-    ...(backgroundColor && { backgroundColor }),
-    ...(padding !== undefined && { padding: typeof padding === 'number' ? `${padding}px` : padding }),
-  };
-
-  return (
-    <div
-      className={`flex ${direction === "column" ? "flex-col" : "flex-row"} ${justifyMap[justify]} ${alignMap[align]} ${className}`}
-      style={customStyle}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-const Grid: React.FC<React.HTMLAttributes<HTMLDivElement> & {
-  cols?: number;
-  gap?: number;
-  backgroundColor?: string;
-  padding?: string | number;
-}> = ({
-  children,
-  cols = 1,
-  gap = 4,
-  className = "",
-  style,
-  backgroundColor,
-  padding,
-  ...props
-}) => {
-  const customStyle: React.CSSProperties = {
-    gridTemplateColumns: `repeat(${cols}, 1fr)`,
-    gap: `${gap * 4}px`,
-    ...style,
-    ...(backgroundColor && { backgroundColor }),
-    ...(padding !== undefined && { padding: typeof padding === 'number' ? `${padding}px` : padding }),
-  };
-
-  return (
-    <div
-      className={`grid ${className}`}
-      style={customStyle}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-
-// 텍스트 정렬 매핑
-const textAlignMap = {
+const textAlignDot: Record<string, string> = {
   left: "text-left",
   center: "text-center",
   right: "text-right",
 };
 
-// 타이포그래피 스타일 props 타입
+/** 임의값 style props → CSSProperties */
+function buildCustomStyle(
+  base: React.CSSProperties | undefined,
+  overrides: {
+    backgroundColor?: string;
+    padding?: string | number;
+    margin?: string | number;
+    borderRadius?: string | number;
+    border?: string;
+  },
+): React.CSSProperties | undefined {
+  const s: React.CSSProperties = {
+    ...base,
+    ...(overrides.backgroundColor && { backgroundColor: overrides.backgroundColor }),
+    ...(overrides.padding !== undefined && {
+      padding: typeof overrides.padding === "number" ? `${overrides.padding}px` : overrides.padding,
+    }),
+    ...(overrides.margin !== undefined && {
+      margin: typeof overrides.margin === "number" ? `${overrides.margin}px` : overrides.margin,
+    }),
+    ...(overrides.borderRadius !== undefined && {
+      borderRadius:
+        typeof overrides.borderRadius === "number"
+          ? `${overrides.borderRadius}px`
+          : overrides.borderRadius,
+    }),
+    ...(overrides.border && { border: overrides.border }),
+  };
+  return Object.keys(s).length > 0 ? s : undefined;
+}
+
+/** 타이포그래피 style props */
 interface TypographyStyleProps {
   fontSize?: string;
   lineHeight?: string;
@@ -197,179 +111,355 @@ interface TypographyStyleProps {
   letterSpacing?: string;
 }
 
-// 타이포그래피 스타일 props를 style 객체로 변환
-function getTypographyStyle(props: TypographyStyleProps): React.CSSProperties {
-  const style: React.CSSProperties = {};
-  if (props.fontSize) style.fontSize = props.fontSize;
-  if (props.lineHeight) style.lineHeight = props.lineHeight;
-  if (props.fontWeight) style.fontWeight = props.fontWeight;
-  if (props.letterSpacing) style.letterSpacing = props.letterSpacing;
-  return style;
+function buildTypoStyle(
+  base: React.CSSProperties | undefined,
+  t: TypographyStyleProps,
+): React.CSSProperties | undefined {
+  const extra: React.CSSProperties = {};
+  if (t.fontSize) extra.fontSize = t.fontSize;
+  if (t.lineHeight) extra.lineHeight = t.lineHeight;
+  if (t.fontWeight) extra.fontWeight = t.fontWeight;
+  if (t.letterSpacing) extra.letterSpacing = t.letterSpacing;
+  if (Object.keys(extra).length === 0) return base;
+  return base ? { ...base, ...extra } : extra;
 }
 
-const Text: React.FC<React.HTMLAttributes<HTMLParagraphElement> & {
-  variant?: "body" | "muted" | "lead";
-  align?: "left" | "center" | "right";
-} & TypographyStyleProps> = ({
+// ── Layout ──────────────────────────────────────────────
+
+const Box: React.FC<{
+  justify?: "start" | "center" | "end" | "between";
+  align?: "start" | "center" | "end" | "stretch";
+  backgroundColor?: string;
+  padding?: string | number;
+  margin?: string | number;
+  borderRadius?: string | number;
+  border?: string;
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}> = ({
+  children,
+  justify,
+  align,
+  style,
+  backgroundColor,
+  padding,
+  margin,
+  borderRadius,
+  border,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveBox
+    dot={buildDot(
+      (justify || align) && "flex",
+      justify && justifyDot[justify],
+      align && alignDot[align],
+      dotProp,
+    )}
+    style={buildCustomStyle(style, { backgroundColor, padding, margin, borderRadius, border })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveBox>
+);
+
+const Spacer: React.FC<{ size?: number; dot?: string }> = ({ size = 16, dot: dotProp }) => (
+  <PrimitiveBox dot={buildDot("shrink-0", dotProp)} style={{ width: size, height: size }} />
+);
+
+const Flex: React.FC<{
+  direction?: "row" | "column";
+  gap?: number;
+  justify?: "start" | "center" | "end" | "between";
+  align?: "start" | "center" | "end" | "stretch";
+  backgroundColor?: string;
+  padding?: string | number;
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}> = ({
+  children,
+  direction = "row",
+  gap = 0,
+  justify = "start",
+  align = "stretch",
+  style,
+  backgroundColor,
+  padding,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveBox
+    dot={buildDot(
+      "flex",
+      direction === "column" && "flex-col",
+      gap > 0 && `gap-${gap}`,
+      justifyDot[justify],
+      alignDot[align],
+      dotProp,
+    )}
+    style={buildCustomStyle(style, { backgroundColor, padding })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveBox>
+);
+
+const Grid: React.FC<{
+  cols?: number;
+  gap?: number;
+  backgroundColor?: string;
+  padding?: string | number;
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}> = ({
+  children,
+  cols = 1,
+  gap = 4,
+  style,
+  backgroundColor,
+  padding,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveBox
+    dot={buildDot("grid", `grid-cols-${cols}`, gap > 0 && `gap-${gap}`, dotProp)}
+    style={buildCustomStyle(style, { backgroundColor, padding })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveBox>
+);
+
+const Section: React.FC<{
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}> = ({ children, dot: dotProp, ...rest }) => (
+  <PrimitiveBox as="section" dot={buildDot("py-10", dotProp)} {...rest}>
+    {children}
+  </PrimitiveBox>
+);
+
+const Divider: React.FC<{
+  dot?: string;
+  style?: React.CSSProperties;
+}> = ({ dot: dotProp, style, ...rest }) => (
+  <hr style={mergeStyles(resolveDot(buildDot("border-border", dotProp)), style)} {...rest} />
+);
+
+// ── Typography ──────────────────────────────────────────
+
+const variantDotMap: Record<string, string> = {
+  body: "text-foreground",
+  muted: "text-muted-foreground text-sm",
+  lead: "text-xl text-muted-foreground",
+};
+
+const Text: React.FC<
+  {
+    variant?: "body" | "muted" | "lead";
+    align?: "left" | "center" | "right";
+    dot?: string;
+    style?: React.CSSProperties;
+    children?: React.ReactNode;
+  } & TypographyStyleProps
+> = ({
   children,
   variant = "body",
   align = "center",
-  className = "",
   style,
   fontSize,
   lineHeight,
   fontWeight,
   letterSpacing,
-  ...props
-}) => {
-  const variantClasses = {
-    body: "text-foreground",
-    muted: "text-muted-foreground text-sm",
-    lead: "text-xl text-muted-foreground",
-  };
-  const typoStyle = getTypographyStyle({ fontSize, lineHeight, fontWeight, letterSpacing });
-  const mergedStyle = Object.keys(typoStyle).length > 0 ? { ...style, ...typoStyle } : style;
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveText
+    as="p"
+    dot={buildDot(variantDotMap[variant], textAlignDot[align], dotProp)}
+    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveText>
+);
 
-  return (
-    <p
-      className={`${variantClasses[variant]} ${textAlignMap[align]} ${className}`}
-      style={mergedStyle}
-      {...props}
-    >
-      {children}
-    </p>
-  );
-};
-
-// Heading 컴포넌트들 (정렬 + 타이포그래피 스타일 지원)
-type HeadingProps = React.HTMLAttributes<HTMLHeadingElement> & {
+type HeadingProps = {
   align?: "left" | "center" | "right";
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
 } & TypographyStyleProps;
 
 const H1: React.FC<HeadingProps> = ({
-  children, align = "center", className = "", style,
-  fontSize, lineHeight, fontWeight, letterSpacing,
-  ...props
-}) => {
-  const typoStyle = getTypographyStyle({ fontSize, lineHeight, fontWeight, letterSpacing });
-  const mergedStyle = Object.keys(typoStyle).length > 0 ? { ...style, ...typoStyle } : style;
-  return (
-    <h1 className={`text-4xl md:text-5xl font-bold ${textAlignMap[align]} ${className}`} style={mergedStyle} {...props}>{children}</h1>
-  );
-};
+  children,
+  align = "center",
+  style,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  letterSpacing,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveText
+    as="h1"
+    dot={buildDot("text-4xl font-bold", textAlignDot[align], dotProp)}
+    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveText>
+);
 
 const H2: React.FC<HeadingProps> = ({
-  children, align = "center", className = "", style,
-  fontSize, lineHeight, fontWeight, letterSpacing,
-  ...props
-}) => {
-  const typoStyle = getTypographyStyle({ fontSize, lineHeight, fontWeight, letterSpacing });
-  const mergedStyle = Object.keys(typoStyle).length > 0 ? { ...style, ...typoStyle } : style;
-  return (
-    <h2 className={`text-3xl md:text-4xl font-bold ${textAlignMap[align]} ${className}`} style={mergedStyle} {...props}>{children}</h2>
-  );
-};
+  children,
+  align = "center",
+  style,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  letterSpacing,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveText
+    as="h2"
+    dot={buildDot("text-3xl font-bold", textAlignDot[align], dotProp)}
+    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveText>
+);
 
 const H3: React.FC<HeadingProps> = ({
-  children, align = "center", className = "", style,
-  fontSize, lineHeight, fontWeight, letterSpacing,
-  ...props
-}) => {
-  const typoStyle = getTypographyStyle({ fontSize, lineHeight, fontWeight, letterSpacing });
-  const mergedStyle = Object.keys(typoStyle).length > 0 ? { ...style, ...typoStyle } : style;
-  return (
-    <h3 className={`text-2xl md:text-3xl font-semibold ${textAlignMap[align]} ${className}`} style={mergedStyle} {...props}>{children}</h3>
-  );
-};
+  children,
+  align = "center",
+  style,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  letterSpacing,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveText
+    as="h3"
+    dot={buildDot("text-2xl font-semibold", textAlignDot[align], dotProp)}
+    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveText>
+);
 
 const H4: React.FC<HeadingProps> = ({
-  children, align = "center", className = "", style,
-  fontSize, lineHeight, fontWeight, letterSpacing,
-  ...props
-}) => {
-  const typoStyle = getTypographyStyle({ fontSize, lineHeight, fontWeight, letterSpacing });
-  const mergedStyle = Object.keys(typoStyle).length > 0 ? { ...style, ...typoStyle } : style;
-  return (
-    <h4 className={`text-xl md:text-2xl font-semibold ${textAlignMap[align]} ${className}`} style={mergedStyle} {...props}>{children}</h4>
-  );
-};
-
-const Link: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = ({
   children,
-  href = "#",
-  className = "",
-  ...props
-}) => {
-  // 절대 경로 처리: http/https로 시작하지 않으면 그대로, 시작하면 외부 링크
-  const isExternal = href.startsWith("http://") || href.startsWith("https://");
+  align = "center",
+  style,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  letterSpacing,
+  dot: dotProp,
+  ...rest
+}) => (
+  <PrimitiveText
+    as="h4"
+    dot={buildDot("text-xl font-semibold", textAlignDot[align], dotProp)}
+    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    {...rest}
+  >
+    {children}
+  </PrimitiveText>
+);
 
+const Link: React.FC<{
+  href?: string;
+  target?: string;
+  rel?: string;
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}> = ({ children, href = "#", dot: dotProp, style, ...rest }) => {
+  const isExternal = href.startsWith("http://") || href.startsWith("https://");
   return (
     <a
       href={href}
-      className={`text-primary hover:underline ${className}`}
+      style={mergeStyles(resolveDot(buildDot("text-primary", dotProp)), style)}
       {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      {...props}
+      {...rest}
     >
       {children}
     </a>
   );
 };
 
-const Image: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({ className = "", alt = "", ...props }) => (
-  <img className={`max-w-full h-auto ${className}`} alt={alt} {...props} />
+const Image: React.FC<{
+  src?: string;
+  alt?: string;
+  width?: number | string;
+  height?: number | string;
+  dot?: string;
+  style?: React.CSSProperties;
+}> = ({ alt = "", dot: dotProp, style, ...rest }) => (
+  <img
+    alt={alt}
+    style={mergeStyles({ maxWidth: "100%", height: "auto" }, resolveDot(dotProp), style)}
+    {...rest}
+  />
 );
 
-// SDUI용 Icon 래퍼 (name을 string으로 받음)
-const SDUIIcon: React.FC<{ name?: string; size?: number; className?: string }> = ({
+// SDUI용 Icon 래퍼
+const SDUIIcon: React.FC<{ name?: string; size?: number }> = ({
   name = "star",
   size = 24,
-  className = "",
-}) => <Icon name={name as IconName} size={size} className={className} />;
+}) => <Icon name={name as IconName} size={size} />;
 
-const Section: React.FC<React.HTMLAttributes<HTMLElement>> = ({
-  children,
-  className = "",
-  ...props
-}) => (
-  <section className={`py-10 ${className}`} {...props}>
-    {children}
-  </section>
-);
+// ── Advanced ────────────────────────────────────────────
 
-const Divider: React.FC<React.HTMLAttributes<HTMLHRElement>> = ({ className = "", ...props }) => (
-  <hr className={`border-border ${className}`} {...props} />
-);
-
-// Header - 네비게이션 헤더 (GNB)
-const Header: React.FC<React.HTMLAttributes<HTMLElement> & {
+const Header: React.FC<{
   sticky?: boolean;
   transparent?: boolean;
   blur?: boolean;
   overlay?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
 }> = ({
   children,
   sticky = true,
   transparent = false,
   blur = true,
   overlay = false,
-  className = "",
-  ...props
+  dot: dotProp,
+  style,
+  ...rest
 }) => (
-  <header
-    className={cn(
+  <PrimitiveBox
+    as="header"
+    dot={buildDot(
       "w-full px-4 py-3 z-50",
-      overlay ? "absolute top-0 left-0 right-0" : sticky && "sticky top-0",
+      overlay
+        ? "absolute top-0 left-0 right-0"
+        : sticky
+          ? "sticky top-0"
+          : undefined,
       transparent ? "bg-transparent" : "bg-background/80",
       blur && !transparent && "backdrop-blur-md",
       !transparent && "border-b border-border",
-      className
+      dotProp,
     )}
-    {...props}
+    style={style}
+    {...rest}
   >
-    <div className="max-w-7xl mx-auto">
-      {children}
-    </div>
-  </header>
+    <PrimitiveBox dot="max-w-7xl mx-auto">{children}</PrimitiveBox>
+  </PrimitiveBox>
 );
 
 /**
@@ -440,7 +530,6 @@ const SDUITextarea: React.FC<TextareaProps> = ({ defaultValue = "", onChange, re
 
 /**
  * SDUI용 간단한 Accordion - 데이터 기반
- * items 배열로 아코디언 생성
  */
 interface SimpleAccordionItem {
   title: string;
@@ -453,20 +542,17 @@ const SDUIAccordion: React.FC<{
   type?: "single" | "multiple";
   collapsible?: boolean;
   defaultValue?: string;
-  className?: string;
 }> = ({
   items = [],
   type = "single",
   collapsible = true,
   defaultValue,
-  className = "",
 }) => {
   return (
     <Accordion
       type={type}
       collapsible={collapsible}
       defaultValue={defaultValue}
-      className={className}
     >
       {items.map((item, index) => {
         const value = item.value || `item-${index}`;
@@ -483,7 +569,6 @@ const SDUIAccordion: React.FC<{
 
 /**
  * SDUI용 간단한 Tabs - 데이터 기반
- * tabs 배열로 탭 생성
  */
 interface SimpleTabItem {
   label: string;
@@ -495,12 +580,10 @@ const SDUITabs: React.FC<{
   tabs?: SimpleTabItem[];
   defaultValue?: string;
   variant?: "default" | "pills" | "underline" | "cards";
-  className?: string;
 }> = ({
   tabs = [],
   defaultValue,
   variant = "default",
-  className = "",
 }) => {
   const firstValue = tabs[0]?.value || "tab-0";
 
@@ -508,7 +591,6 @@ const SDUITabs: React.FC<{
     <Tabs
       defaultValue={defaultValue || firstValue}
       variant={variant}
-      className={className}
     >
       <TabsList>
         {tabs.map((tab, index) => {
