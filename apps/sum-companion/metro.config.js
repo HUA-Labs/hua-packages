@@ -27,8 +27,21 @@ const singletons = {
 
 config.resolver.extraNodeModules = singletons;
 
+// Map workspace subpath exports to source files (dist may not exist during dev)
+const subpathAliases = {
+  '@hua-labs/ui/native': path.resolve(monorepoRoot, 'packages/hua-ui/src/native/index.ts'),
+  '@hua-labs/dot/native': path.resolve(monorepoRoot, 'packages/hua-dot/src/native.ts'),
+};
+
 const originalResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Resolve workspace subpath aliases to source
+  if (subpathAliases[moduleName]) {
+    return {
+      type: 'sourceFile',
+      filePath: subpathAliases[moduleName],
+    };
+  }
   // If the module is a singleton, resolve it to the canonical path
   if (singletons[moduleName]) {
     return {

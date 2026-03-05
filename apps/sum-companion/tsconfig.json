@@ -2,9 +2,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "skipLibCheck": true,
     "paths": {
       "@hua-labs/dot": ["../../packages/hua-dot/src/index.ts"],
-      "@hua-labs/dot/*": ["../../packages/hua-dot/src/*"]
+      "@hua-labs/dot/*": ["../../packages/hua-dot/src/*"],
+      "@hua-labs/ui/native": ["./types/hua-ui-native.d.ts"]
     }
   },
   "include": [
