@@ -15,6 +15,22 @@ const DEFAULT_SERVER_URL = 'https://sumdiary.com';
 let cachedToken: string | null = null;
 let cachedServerUrl: string | null = null;
 
+// --- 401 Auto-Logout ---
+// AuthProvider registers a callback; apiFetch fires it on 401 (once).
+let onUnauthorized: (() => void) | null = null;
+let unauthorizedFired = false;
+
+export function setOnUnauthorized(callback: (() => void) | null): void {
+  onUnauthorized = callback;
+  unauthorizedFired = false;
+}
+
+function fireUnauthorized(): void {
+  if (unauthorizedFired || !onUnauthorized) return;
+  unauthorizedFired = true;
+  onUnauthorized();
+}
+
 // --- Token Management ---
 
 export async function getToken(): Promise<string | null> {
@@ -94,6 +110,9 @@ export async function apiFetch<T>(
     const data = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        fireUnauthorized();
+      }
       return {
         data: null,
         error: data.message || data.error || `Error ${response.status}`,

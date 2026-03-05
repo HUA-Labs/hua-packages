@@ -8,7 +8,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import { apiFetch, getToken, setToken, clearToken, getServerUrl, setServerUrl } from './api';
+import { Alert } from 'react-native';
+import { apiFetch, getToken, setToken, clearToken, getServerUrl, setServerUrl, setOnUnauthorized } from './api';
 import type { UserInfo } from './types';
 
 // Ensure browser auth session completes properly
@@ -113,7 +114,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await clearToken();
     setIsAuthenticated(false);
     setUser(null);
+    // Reset 401 guard so next session can trigger it again
+    setOnUnauthorized(null);
   }, []);
+
+  // Register 401 auto-logout: fires once per session, shows alert
+  useEffect(() => {
+    setOnUnauthorized(() => {
+      Alert.alert('세션 만료', '다시 로그인해주세요.', [{ text: '확인' }]);
+      logout();
+    });
+    return () => setOnUnauthorized(null);
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, isLoading, user, loginWithBrowser, logout, checkAuth }}>
