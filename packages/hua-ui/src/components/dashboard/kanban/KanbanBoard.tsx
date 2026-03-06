@@ -18,7 +18,7 @@ import {
   horizontalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { merge } from "../../../lib/utils";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { KanbanProvider } from "./KanbanContext";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanCard } from "./KanbanCard";
@@ -73,11 +73,12 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
       columnMaxWidth = 320,
       // Drag effects
       showDragOverlay = true,
-      dragOverlayClassName,
+      dragOverlayStyle,
       dragRotation = 3,
       dragScale = 1.05,
       // Standard props
-      className,
+      dot,
+      style,
       ...props
     },
     ref
@@ -341,18 +342,39 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     }, [activeId, activeType, columns]);
 
     // Board styles based on variant
-    const boardStyles = useMemo(() => {
-      const baseStyles = "flex gap-4 overflow-x-auto pb-4 min-h-[400px]";
+    const boardBaseStyle = useMemo((): React.CSSProperties => {
+      const base: React.CSSProperties = {
+        display: "flex",
+        gap: "1rem",
+        overflowX: "auto",
+        paddingBottom: "1rem",
+        minHeight: "400px",
+      };
 
       switch (variant) {
         case "gradient":
-          return merge(baseStyles, "p-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800");
+          return {
+            ...base,
+            padding: "1rem",
+            borderRadius: "1rem",
+            background: "linear-gradient(135deg, #f3f4f6, #e5e7eb)",
+          };
         case "outline":
-          return merge(baseStyles, "p-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700");
+          return {
+            ...base,
+            padding: "1rem",
+            borderRadius: "1rem",
+            border: "2px dashed #d1d5db",
+          };
         case "elevated":
-          return merge(baseStyles, "p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/50");
+          return {
+            ...base,
+            padding: "1rem",
+            borderRadius: "1rem",
+            backgroundColor: "rgba(249,250,251,0.5)",
+          };
         default:
-          return baseStyles;
+          return base;
       }
     }, [variant]);
 
@@ -371,17 +393,23 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           ref={ref}
           role="region"
           aria-label="칸반 보드"
-          className={merge(boardStyles, className)}
+          style={mergeStyles(boardBaseStyle, resolveDot(dot), style)}
           {...props}
         >
           {columns.map((column) => (
             <div
               key={column.id}
-              className="flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-xl p-3"
-              style={{ minWidth: columnMinWidth, maxWidth: columnMaxWidth }}
+              style={{
+                flexShrink: 0,
+                backgroundColor: "#f3f4f6",
+                borderRadius: "0.75rem",
+                padding: "0.75rem",
+                minWidth: columnMinWidth,
+                maxWidth: columnMaxWidth,
+              }}
             >
               <Skeleton variant="text" dot="h-8 mb-3" />
-              <div className="space-y-2">
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 {getColumnCards(column.id).slice(0, 3).map((card) => (
                   <Skeleton key={card.id} variant="rounded" dot="h-20" />
                 ))}
@@ -425,9 +453,15 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           {/* Dimmed overlay when dragging column */}
           {showDragOverlay && isDragging && isDraggingColumn && (
             <div
-              className={merge(
-                "fixed inset-0 bg-black/20 dark:bg-black/40 z-40 transition-opacity duration-200",
-                dragOverlayClassName
+              style={mergeStyles(
+                {
+                  position: "fixed",
+                  inset: 0,
+                  backgroundColor: "rgba(0,0,0,0.2)",
+                  zIndex: 40,
+                  transition: "opacity 200ms",
+                },
+                dragOverlayStyle
               )}
               aria-hidden="true"
             />
@@ -437,10 +471,11 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
             ref={ref}
             role="region"
             aria-label="칸반 보드"
-            className={merge(
-              boardStyles,
-              isDragging && "relative z-50",
-              className
+            style={mergeStyles(
+              boardBaseStyle,
+              isDragging ? { position: "relative", zIndex: 50 } : undefined,
+              resolveDot(dot),
+              style
             )}
             {...props}
           >
@@ -480,8 +515,10 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           }}>
             {activeCard && (
               <div
-                style={cardOverlayStyle}
-                className="shadow-2xl"
+                style={{
+                  ...cardOverlayStyle,
+                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+                }}
               >
                 <KanbanCard
                   card={activeCard}
@@ -492,8 +529,9 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
             )}
             {activeColumnData && (
               <div
-                className="opacity-90 shadow-2xl"
                 style={{
+                  opacity: 0.9,
+                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
                   transform: "rotate(1deg)",
                   minWidth: columnMinWidth,
                   maxWidth: columnMaxWidth,

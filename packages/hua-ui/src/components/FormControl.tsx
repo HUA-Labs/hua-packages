@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../lib/utils";
-import { resolveDot } from "../hooks/useDotMap";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * FormControl 컴포넌트의 props / FormControl component props
@@ -24,10 +23,9 @@ export interface FormControlProps {
   htmlFor?: string;
   showErrorIcon?: boolean;
   suppressBrowserValidation?: boolean;
-  className?: string;
-  children: React.ReactNode;
-  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
 }
 
 /**
@@ -64,7 +62,8 @@ function FormControl({
   htmlFor,
   showErrorIcon = true,
   suppressBrowserValidation = true,
-  className,
+  dot: dotProp,
+  style,
   children,
 }: FormControlProps) {
   const hasError = !!error;
@@ -95,19 +94,19 @@ function FormControl({
   });
 
   return (
-    <div className={merge("space-y-2", className)}>
+    <div style={mergeStyles(resolveDot("space-y-2"), resolveDot(dotProp), style)}>
       {/* Label */}
       {label && (
         <label
           htmlFor={htmlFor}
-          className={merge(
-            "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-            hasError && "text-destructive"
+          style={mergeStyles(
+            resolveDot("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"),
+            hasError ? resolveDot("text-destructive") : undefined
           )}
         >
           {label}
           {required && (
-            <span className="text-destructive ml-1" aria-hidden="true">
+            <span style={resolveDot("text-destructive ml-1")} aria-hidden="true">
               *
             </span>
           )}
@@ -116,11 +115,11 @@ function FormControl({
 
       {/* Description */}
       {description && !hasError && (
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p style={resolveDot("text-sm text-muted-foreground")}>{description}</p>
       )}
 
       {/* Input - with :invalid styling support */}
-      <div className="relative [&_input:invalid]:border-destructive/50 [&_select:invalid]:border-destructive/50 [&_textarea:invalid]:border-destructive/50">
+      <div style={resolveDot("relative [&_input:invalid]:border-destructive/50 [&_select:invalid]:border-destructive/50 [&_textarea:invalid]:border-destructive/50")}>
         {enhancedChildren}
       </div>
 
@@ -128,11 +127,11 @@ function FormControl({
       {hasError && (
         <div
           id={htmlFor ? `${htmlFor}-error` : undefined}
-          className="flex items-start gap-2 text-sm text-destructive"
+          style={resolveDot("flex items-start gap-2 text-sm text-destructive")}
           role="alert"
           aria-live="polite"
         >
-          {showErrorIcon && <ErrorIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />}
+          {showErrorIcon && <ErrorIcon style={resolveDot("w-4 h-4 mt-0.5 flex-shrink-0")} />}
           <span>{error}</span>
         </div>
       )}
@@ -303,10 +302,10 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
 }
 
 // Error icon component
-function ErrorIcon({ className }: { className?: string }) {
+function ErrorIcon({ style }: { style?: React.CSSProperties }) {
   return (
     <svg
-      className={className}
+      style={style}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

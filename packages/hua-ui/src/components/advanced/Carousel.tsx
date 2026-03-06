@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef, useState, useCallback, useEffect } from "react";
-import { merge } from "../../lib/utils";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
@@ -21,9 +20,10 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
  * @property {boolean} [showPlayPause=false] - 재생/일시정지 버튼 표시 / Show play/pause button
  * @property {"left" | "right" | "center"} [playPausePosition="right"] - 재생/일시정지 버튼 위치 / Play/pause button position
  */
-export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className'> {
   children: React.ReactNode[];
   dot?: string;
+  style?: React.CSSProperties;
   autoPlay?: boolean;
   interval?: number;
   loop?: boolean;
@@ -73,7 +73,6 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       onSlideChange,
       showPlayPause = false,
       playPausePosition = "right",
-      className,
       style,
       dot: dotProp,
       ...props
@@ -178,16 +177,6 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       setIsManuallyPaused(prev => !prev);
     }, []);
 
-    // Play function
-    const play = useCallback(() => {
-      setIsManuallyPaused(false);
-    }, []);
-
-    // Pause function
-    const pause = useCallback(() => {
-      setIsManuallyPaused(true);
-    }, []);
-
     // Auto play
     useEffect(() => {
       if (!autoPlay || isPaused || isManuallyPaused || prefersReducedMotion) return;
@@ -248,11 +237,12 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           return React.Children.map(children, (child, index) => (
             <div
               key={index}
-              className={merge(
-                "absolute inset-0 w-full h-full",
-                index === actualIndex ? "z-10" : "z-0"
-              )}
               style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: index === actualIndex ? 10 : 0,
                 opacity: index === actualIndex ? 1 : 0,
                 transition: `opacity ${duration}ms ease-in-out`,
               }}
@@ -265,11 +255,12 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           return React.Children.map(children, (child, index) => (
             <div
               key={index}
-              className={merge(
-                "absolute inset-0 w-full h-full",
-                index === actualIndex ? "z-10" : "z-0"
-              )}
               style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: index === actualIndex ? 10 : 0,
                 opacity: index === actualIndex ? 1 : 0,
                 transform: `scale(${index === actualIndex ? 1 : 0.9})`,
                 transition: `opacity ${duration}ms ease-in-out, transform ${duration}ms ease-in-out`,
@@ -287,12 +278,14 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             ? [childArray[childArray.length - 1], ...childArray, childArray[0]]
             : childArray;
 
-          // 각 슬라이드를 fade/scale처럼 absolute로 배치하고 translateX로 위치 조정
           return slides.map((child, index) => (
             <div
               key={index}
-              className="absolute inset-0 w-full h-full"
               style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
                 transform: `translateX(${(index - currentIndex) * 100}%)`,
                 transition: noTransition ? 'none' : `transform ${duration}ms ease-in-out`,
               }}
@@ -312,18 +305,17 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       const isTop = indicatorPosition.includes("top");
       const actualIndex = getActualIndex(currentIndex);
 
-      const indicatorContainerClass = merge(
-        "flex items-center justify-center gap-2",
-        isInside
-          ? merge(
-              "absolute left-1/2 -translate-x-1/2 z-20",
-              isTop ? "top-4" : "bottom-4"
-            )
-          : merge(
-              "mt-4",
-              isTop && "order-first mb-4 mt-0"
-            )
-      );
+      const indicatorContainerStyle: React.CSSProperties = isInside
+        ? {
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 20,
+            ...(isTop ? { top: '1rem' } : { bottom: '1rem' }),
+          }
+        : {
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            marginTop: '1rem',
+            ...(isTop ? { order: -1, marginBottom: '1rem', marginTop: 0 } : {}),
+          }
 
       // Handle indicator click - go to the correct index accounting for loop mode
       const handleIndicatorClick = (index: number) => {
@@ -335,7 +327,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       };
 
       return (
-        <div className={indicatorContainerClass} role="tablist">
+        <div style={indicatorContainerStyle} role="tablist">
           {Array.from({ length: slideCount }, (_, index) => {
             const isActive = index === actualIndex;
 
@@ -345,12 +337,15 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                   <button
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
-                    className={merge(
-                      "h-1 rounded-full transition-all duration-300",
-                      isActive
-                        ? "w-8 bg-white"
-                        : "w-4 bg-white/50 hover:bg-white/70"
-                    )}
+                    style={{
+                      height: '0.25rem',
+                      borderRadius: '9999px',
+                      transition: 'all 300ms',
+                      border: 'none',
+                      cursor: 'pointer',
+                      width: isActive ? '2rem' : '1rem',
+                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.5)',
+                    }}
                     role="tab"
                     aria-selected={isActive}
                     aria-label={`슬라이드 ${index + 1}`}
@@ -362,12 +357,18 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                   <button
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
-                    className={merge(
-                      "w-8 h-8 rounded-full text-sm font-medium transition-all duration-300",
-                      isActive
-                        ? "bg-white text-gray-900"
-                        : "bg-white/30 text-white hover:bg-white/50"
-                    )}
+                    style={{
+                      width: '2rem',
+                      height: '2rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      transition: 'all 300ms',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.3)',
+                      color: isActive ? '#111827' : 'white',
+                    }}
                     role="tab"
                     aria-selected={isActive}
                     aria-label={`슬라이드 ${index + 1}`}
@@ -382,12 +383,16 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                   <button
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
-                    className={merge(
-                      "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                      isActive
-                        ? "bg-white scale-125"
-                        : "bg-white/50 hover:bg-white/70"
-                    )}
+                    style={{
+                      width: '0.625rem',
+                      height: '0.625rem',
+                      borderRadius: '9999px',
+                      transition: 'all 300ms',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.5)',
+                      transform: isActive ? 'scale(1.25)' : 'scale(1)',
+                    }}
                     role="tab"
                     aria-selected={isActive}
                     aria-label={`슬라이드 ${index + 1}`}
@@ -404,23 +409,32 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       if (!showPlayPause || !autoPlay) return null;
 
       const isPlaying = !isManuallyPaused;
-      const positionClasses = {
-        left: "left-4",
-        center: "left-1/2 -translate-x-1/2",
-        right: "right-4"
+      const positionMap: Record<string, React.CSSProperties> = {
+        left: { left: '1rem' },
+        center: { left: '50%', transform: 'translateX(-50%)' },
+        right: { right: '1rem' }
       };
 
       return (
         <button
           onClick={togglePlayPause}
-          className={merge(
-            "absolute bottom-4 z-20",
-            "w-8 h-8 rounded-full flex items-center justify-center",
-            "bg-white/80 hover:bg-white text-gray-800",
-            "transition-all duration-200",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white",
-            positionClasses[playPausePosition]
-          )}
+          style={{
+            position: 'absolute',
+            bottom: '1rem',
+            zIndex: 20,
+            width: '2rem',
+            height: '2rem',
+            borderRadius: '9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255,255,255,0.8)',
+            color: '#1f2937',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 200ms',
+            ...positionMap[playPausePosition],
+          }}
           aria-label={isPlaying ? "일시정지" : "재생"}
         >
           {isPlaying ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
@@ -435,24 +449,33 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       const canGoPrev = loop || currentIndex > 0;
       const canGoNext = loop || currentIndex < slideCount - 1;
 
-      const arrowBaseClass = merge(
-        "absolute top-1/2 -translate-y-1/2 z-20",
-        "w-10 h-10 rounded-full flex items-center justify-center",
-        "bg-white/80 hover:bg-white text-gray-800",
-        "transition-all duration-200",
-        "disabled:opacity-30 disabled:cursor-not-allowed",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
-      );
+      const arrowBaseStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 20,
+        width: '2.5rem',
+        height: '2.5rem',
+        borderRadius: '9999px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        color: '#1f2937',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'all 200ms',
+      };
 
-      const prevPosition = arrowPosition === "outside" ? "-left-14" : "left-4";
-      const nextPosition = arrowPosition === "outside" ? "-right-14" : "right-4";
+      const prevLeft = arrowPosition === "outside" ? '-3.5rem' : '1rem';
+      const nextRight = arrowPosition === "outside" ? '-3.5rem' : '1rem';
 
       return (
         <>
           <button
             onClick={prevSlide}
             disabled={!canGoPrev}
-            className={merge(arrowBaseClass, prevPosition)}
+            style={{ ...arrowBaseStyle, left: prevLeft, opacity: !canGoPrev ? 0.3 : 1, cursor: !canGoPrev ? 'not-allowed' : 'pointer' }}
             aria-label="이전 슬라이드"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -460,7 +483,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           <button
             onClick={nextSlide}
             disabled={!canGoNext}
-            className={merge(arrowBaseClass, nextPosition)}
+            style={{ ...arrowBaseStyle, right: nextRight, opacity: !canGoNext ? 0.3 : 1, cursor: !canGoNext ? 'not-allowed' : 'pointer' }}
             aria-label="다음 슬라이드"
           >
             <ChevronRight className="w-5 h-5" />
@@ -474,17 +497,22 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
     return (
       <div
         ref={ref}
-        className={merge(
-          "flex flex-col w-full h-full",
-          arrowPosition === "outside" && "px-16",
-          className
+        style={mergeStyles(
+          {
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            ...(arrowPosition === "outside" ? { padding: '0 4rem' } : {}),
+          },
+          dotStyle,
+          style
         )}
-        style={mergeStyles(style, dotStyle)}
         {...props}
       >
         <div
           ref={containerRef}
-          className="relative overflow-hidden w-full flex-1"
+          style={{ position: 'relative', overflow: 'hidden', width: '100%', flex: 1 }}
           onMouseEnter={() => pauseOnHover && setIsPaused(true)}
           onMouseLeave={() => pauseOnHover && setIsPaused(false)}
           onTouchStart={handleTouchStart}

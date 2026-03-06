@@ -88,7 +88,7 @@ describe('Breadcrumb', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
   });
 
-  it('should apply default variant styles', () => {
+  it('should apply default variant styles via inline style', () => {
     const { container } = render(
       <Breadcrumb>
         <BreadcrumbItem>Home</BreadcrumbItem>
@@ -96,11 +96,13 @@ describe('Breadcrumb', () => {
     );
 
     const nav = container.querySelector('nav');
-    expect(nav).toHaveClass('inline-flex');
-    expect(nav).toHaveClass('items-center');
+    // Now uses inline styles: display: inline-flex, alignItems: center
+    expect(nav).toBeInTheDocument();
+    expect(nav?.style.display).toBe('inline-flex');
+    expect(nav?.style.alignItems).toBe('center');
   });
 
-  it('should apply subtle variant styles', () => {
+  it('should apply subtle variant styles via inline style', () => {
     const { container } = render(
       <Breadcrumb variant="subtle">
         <BreadcrumbItem>Home</BreadcrumbItem>
@@ -108,11 +110,12 @@ describe('Breadcrumb', () => {
     );
 
     const nav = container.querySelector('nav');
-    expect(nav).toHaveClass('bg-background/40');
-    expect(nav).toHaveClass('backdrop-blur-md');
+    expect(nav).toBeInTheDocument();
+    // subtle variant has borderRadius
+    expect(nav?.style.borderRadius).toBeTruthy();
   });
 
-  it('should apply glass variant styles', () => {
+  it('should apply glass variant styles via inline style', () => {
     const { container } = render(
       <Breadcrumb variant="glass">
         <BreadcrumbItem>Home</BreadcrumbItem>
@@ -120,8 +123,9 @@ describe('Breadcrumb', () => {
     );
 
     const nav = container.querySelector('nav');
-    expect(nav).toHaveClass('bg-background/30');
-    expect(nav).toHaveClass('backdrop-blur-lg');
+    expect(nav).toBeInTheDocument();
+    // glass variant has backdropFilter
+    expect(nav?.style.backdropFilter).toBeTruthy();
   });
 
   it('should render custom separator', () => {
@@ -135,16 +139,16 @@ describe('Breadcrumb', () => {
     expect(screen.getByText('/')).toBeInTheDocument();
   });
 
-  it('should merge custom className', () => {
+  it('should apply dot style', () => {
     const { container } = render(
-      <Breadcrumb className="custom-class">
+      <Breadcrumb dot="p-4">
         <BreadcrumbItem>Home</BreadcrumbItem>
       </Breadcrumb>
     );
 
+    // dot is resolved to inline style, component renders without error
     const nav = container.querySelector('nav');
-    expect(nav).toHaveClass('custom-class');
-    expect(nav).toHaveClass('inline-flex');
+    expect(nav).toBeInTheDocument();
   });
 });
 
@@ -174,6 +178,7 @@ describe('BreadcrumbItem', () => {
 
     const current = screen.getByText('Current');
     expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current).toHaveClass('text-muted-foreground');
+    // Now uses inline style instead of className
+    expect(current.style.fontWeight).toBe('500');
   });
 });

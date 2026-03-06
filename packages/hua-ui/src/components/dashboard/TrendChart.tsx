@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 export type TrendSeriesPalette = "approval" | "settlement" | "custom";
 
@@ -30,9 +30,9 @@ export interface TrendSeries {
  * @property {boolean} [showLegend=true] - 범례 표시 여부 / Show legend
  * @property {boolean} [showDots=true] - 점 표시 여부 / Show dots
  * @property {boolean} [showTooltip=false] - 툴팁 표시 여부 / Show tooltip
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface TrendChartProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TrendChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   series: TrendSeries[];
   categories: string[];
   palette?: TrendSeriesPalette;
@@ -40,6 +40,7 @@ export interface TrendChartProps extends React.HTMLAttributes<HTMLDivElement> {
   showLegend?: boolean;
   showDots?: boolean;
   showTooltip?: boolean;
+  dot?: string;
 }
 
 const PRESET_PALETTES: Record<TrendSeriesPalette, string[]> = {
@@ -50,13 +51,13 @@ const PRESET_PALETTES: Record<TrendSeriesPalette, string[]> = {
 
 /**
  * TrendChart 컴포넌트
- * 
+ *
  * 트렌드 데이터를 선 그래프로 표시하는 컴포넌트입니다.
  * 여러 시리즈를 동시에 표시할 수 있으며, 영역 채우기 옵션을 제공합니다.
- * 
+ *
  * Line chart component that displays trend data.
  * Can display multiple series simultaneously with area fill option.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -68,7 +69,7 @@ const PRESET_PALETTES: Record<TrendSeriesPalette, string[]> = {
  *   categories={["월", "화", "수", "목", "금"]}
  *   palette="approval"
  * />
- * 
+ *
  * @example
  * // 영역 채우기와 커스텀 색상 / Area fill and custom color
  * <TrendChart
@@ -80,7 +81,7 @@ const PRESET_PALETTES: Record<TrendSeriesPalette, string[]> = {
  *   showDots={true}
  *   showTooltip={true}
  * />
- * 
+ *
  * @param {TrendChartProps} props - TrendChart 컴포넌트의 props / TrendChart component props
  * @returns {JSX.Element} TrendChart 컴포넌트 / TrendChart component
  */
@@ -92,7 +93,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({
   showLegend = true,
   showDots = true,
   showTooltip = false,
-  className,
+  dot,
+  style,
   ...props
 }) => {
   const paletteColors = PRESET_PALETTES[palette] || PRESET_PALETTES.approval;
@@ -110,13 +112,19 @@ export const TrendChart: React.FC<TrendChartProps> = ({
     <div
       role="img"
       aria-label={chartLabel}
-      className={merge(
-        "rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4",
-        className
+      style={mergeStyles(
+        {
+          borderRadius: "1rem",
+          border: "1px solid var(--color-border, #f1f5f9)",
+          backgroundColor: "var(--color-card, #ffffff)",
+          padding: "1rem",
+        },
+        resolveDot(dot),
+        style
       )}
       {...props}
     >
-      <div className="relative" style={{ height }}>
+      <div style={{ position: "relative", height }}>
         {series.map((s, index) => {
           const color = s.color || paletteColors[index % paletteColors.length];
           const points = s.data.map((point, i) => ({
@@ -180,9 +188,9 @@ export const TrendChart: React.FC<TrendChartProps> = ({
             </svg>
           );
         })}
-        <div className="absolute inset-x-0 bottom-0 flex text-[10px] text-slate-400">
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", fontSize: "0.625rem", color: "#94a3b8" }}>
           {safeCategories.map((label, _idx) => (
-            <div key={label} className="flex-1 text-center">
+            <div key={label} style={{ flex: 1, textAlign: "center" }}>
               {label}
             </div>
           ))}
@@ -190,31 +198,29 @@ export const TrendChart: React.FC<TrendChartProps> = ({
       </div>
 
       {showLegend && (
-        <div 
-          className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-300"
+        <div
+          style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "1rem", fontSize: "0.875rem", color: "var(--color-muted-foreground, #475569)" }}
           role="list"
           aria-label="차트 범례"
         >
           {series.map((s, index) => {
             const color = s.color || paletteColors[index % paletteColors.length];
             return (
-              <div 
-                key={s.label} 
+              <div
+                key={s.label}
                 role="listitem"
-                className="flex items-center gap-2"
+                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
                 tabIndex={0}
                 aria-label={`${s.label} 시리즈`}
                 onKeyDown={(e) => {
                   // 키보드 네비게이션 지원
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    // 범례 클릭 시 해당 시리즈 강조 등의 기능 추가 가능
                   }
                 }}
               >
                 <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: color }}
+                  style={{ display: "inline-block", height: "0.5rem", width: "0.5rem", borderRadius: "9999px", backgroundColor: color }}
                   aria-hidden="true"
                 />
                 <span>{s.label}</span>
@@ -228,4 +234,3 @@ export const TrendChart: React.FC<TrendChartProps> = ({
 };
 
 TrendChart.displayName = "TrendChart";
-

@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useCallback } from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
@@ -14,8 +13,10 @@ import type { ToolbarItem } from './types'
 export interface BlogEditorToolbarProps {
   /** textarea ref / textarea reference */
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -92,7 +93,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
  * 마크다운 포맷팅 툴바
  */
 const BlogEditorToolbar = React.forwardRef<HTMLDivElement, BlogEditorToolbarProps>(
-  ({ textareaRef, className }, ref) => {
+  ({ textareaRef, dot, style }, ref) => {
     const { labels, activeLanguage, updateMultilingualField, formData, features } = useBlogEditor()
 
     const handleInsert = useCallback(
@@ -129,9 +130,10 @@ const BlogEditorToolbar = React.forwardRef<HTMLDivElement, BlogEditorToolbarProp
     return (
       <div
         ref={ref}
-        className={merge(
-          'flex flex-wrap gap-1 px-4 py-2 border-b border-border bg-muted',
-          className
+        style={mergeStyles(
+          resolveDot('flex flex-wrap gap-1 px-4 py-2 border-b border-border bg-muted'),
+          resolveDot(dot),
+          style
         )}
         role="toolbar"
         aria-label="마크다운 서식"
@@ -141,7 +143,7 @@ const BlogEditorToolbar = React.forwardRef<HTMLDivElement, BlogEditorToolbarProp
             key={item.icon}
             type="button"
             onClick={() => handleInsert(item)}
-            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
+            style={resolveDot('p-2 text-muted-foreground transition-colors rounded')}
             title={`${labels[item.label as keyof typeof labels] || item.label}${item.shortcut ? ` (${item.shortcut})` : ''}`}
             aria-label={labels[item.label as keyof typeof labels] || item.label}
           >

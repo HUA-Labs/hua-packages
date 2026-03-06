@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { useBlogEditor } from './BlogEditorContext'
 import { parseMarkdown } from './utils/markdown'
@@ -12,8 +11,10 @@ import { parseMarkdown } from './utils/markdown'
 export interface BlogEditorPreviewProps {
   /** 커스텀 마크다운 렌더러 / Custom markdown renderer */
   renderMarkdown?: (content: string) => React.ReactNode
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -21,7 +22,7 @@ export interface BlogEditorPreviewProps {
  * 마크다운 미리보기
  */
 const BlogEditorPreview = React.forwardRef<HTMLDivElement, BlogEditorPreviewProps>(
-  ({ renderMarkdown, className }, ref) => {
+  ({ renderMarkdown, dot, style }, ref) => {
     const { formData, activeLanguage, languages, labels } = useBlogEditor()
 
     const primaryLanguage = languages.find((l) => l.isPrimary)?.key || languages[0]?.key
@@ -44,8 +45,8 @@ const BlogEditorPreview = React.forwardRef<HTMLDivElement, BlogEditorPreviewProp
     }, [content, renderMarkdown])
 
     return (
-      <div ref={ref} className={merge('p-6', className)}>
-        <h3 className="text-xl font-bold text-foreground mb-4">
+      <div ref={ref} style={mergeStyles(resolveDot('p-6'), resolveDot(dot), style)}>
+        <h3 style={resolveDot('text-xl font-bold text-foreground mb-4')}>
           {title}
         </h3>
         <div className="prose dark:prose-invert max-w-none">

@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
@@ -9,7 +8,8 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * Accordion 컴포넌트의 props / Accordion component props
  * @typedef {Object} AccordionProps
  * @property {React.ReactNode} children - AccordionItem 컴포넌트들 / AccordionItem components
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @property {"single" | "multiple"} [type="single"] - 단일 또는 다중 아이템 열기 허용 / Allow single or multiple items to be open
  * @property {string | string[]} [defaultValue] - 초기 열린 아이템 값 (비제어 컴포넌트) / Initial open item value (uncontrolled component)
  * @property {string | string[]} [value] - 현재 열린 아이템 값 (제어 컴포넌트) / Current open item value (controlled component)
@@ -18,25 +18,26 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  */
 interface AccordionProps {
   children: React.ReactNode
-  className?: string
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   type?: "single" | "multiple"
   defaultValue?: string | string[]
   value?: string | string[]
   onValueChange?: (value: string | string[]) => void
   collapsible?: boolean
-  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
 }
 
 /**
  * Accordion 컴포넌트 / Accordion component
- * 
+ *
  * 접을 수 있는 콘텐츠 섹션을 제공하는 컴포넌트입니다.
  * 키보드 네비게이션(Arrow keys, Home/End)을 지원하며, ARIA 속성을 자동으로 설정합니다.
- * 
+ *
  * Component that provides collapsible content sections.
  * Supports keyboard navigation (Arrow keys, Home/End) and automatically sets ARIA attributes.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 (단일 열기) / Basic usage (single open)
@@ -50,7 +51,7 @@ interface AccordionProps {
  *     <AccordionContent>내용 2</AccordionContent>
  *   </AccordionItem>
  * </Accordion>
- * 
+ *
  * @example
  * // 다중 열기 / Multiple open
  * <Accordion type="multiple" defaultValue={["item1", "item2"]}>
@@ -59,7 +60,7 @@ interface AccordionProps {
  *     <AccordionContent>내용 1</AccordionContent>
  *   </AccordionItem>
  * </Accordion>
- * 
+ *
  * @example
  * // 제어 컴포넌트 / Controlled component
  * const [openItems, setOpenItems] = useState<string[]>([])
@@ -69,7 +70,7 @@ interface AccordionProps {
  *     <AccordionContent>내용</AccordionContent>
  *   </AccordionItem>
  * </Accordion>
- * 
+ *
  * @param {AccordionProps} props - Accordion 컴포넌트의 props / Accordion component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} Accordion 컴포넌트 / Accordion component
@@ -77,8 +78,8 @@ interface AccordionProps {
 const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
   ({
     children,
-    className,
     dot: dotProp,
+    style,
     type = "single",
     defaultValue,
     value,
@@ -86,9 +87,8 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
     collapsible = false,
     ...props
   }, ref) => {
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [openItems, setOpenItems] = React.useState<string[]>(
-      value ? (Array.isArray(value) ? value : [value]) : 
+      value ? (Array.isArray(value) ? value : [value]) :
       defaultValue ? (Array.isArray(defaultValue) ? defaultValue : [defaultValue]) : []
     )
 
@@ -170,8 +170,7 @@ const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
     return (
       <div
         ref={ref}
-        className={merge("space-y-2", className)}
-        style={dotStyle}
+        style={mergeStyles(resolveDot('space-y-2'), resolveDot(dotProp), style)}
         onKeyDown={handleKeyDown}
         {...props}
       >
@@ -195,7 +194,7 @@ Accordion.displayName = "Accordion"
  * @typedef {Object} AccordionItemProps
  * @property {string} value - 아이템의 고유 값 / Item unique value
  * @property {React.ReactNode} children - AccordionTrigger와 AccordionContent / AccordionTrigger and AccordionContent
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @property {boolean} [disabled=false] - 아이템 비활성화 여부 / Item disabled state
  * @property {string[]} [openItems] - 열린 아이템 목록 (Accordion에서 자동 전달) / Open items list (auto-passed from Accordion)
  * @property {(value: string) => void} [onToggle] - 토글 콜백 (Accordion에서 자동 전달) / Toggle callback (auto-passed from Accordion)
@@ -203,7 +202,8 @@ Accordion.displayName = "Accordion"
 interface AccordionItemProps {
   value: string
   children: React.ReactNode
-  className?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   disabled?: boolean
   openItems?: string[]
   onToggle?: (value: string) => void
@@ -213,21 +213,21 @@ interface AccordionItemProps {
  * AccordionItem 컴포넌트 / AccordionItem component
  * 아코디언의 개별 아이템을 감싸는 컨테이너입니다.
  * Container that wraps an individual accordion item.
- * 
+ *
  * @component
  * @param {AccordionItemProps} props - AccordionItem 컴포넌트의 props / AccordionItem component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} AccordionItem 컴포넌트 / AccordionItem component
  */
 const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
-  ({ 
-    value, 
-    children, 
-    className,
+  ({
+    value,
+    children,
+    style,
     disabled = false,
     openItems = [],
     onToggle,
-    ...props 
+    ...props
   }, ref) => {
     const isOpen = openItems.includes(value)
 
@@ -235,10 +235,10 @@ const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
       <div
         ref={ref}
         data-accordion-item
-        className={merge(
-          "border border-border/50 rounded-lg overflow-hidden",
-          disabled && "opacity-50 pointer-events-none",
-          className
+        style={mergeStyles(
+          resolveDot('border border-border/50 rounded-lg overflow-hidden'),
+          disabled ? resolveDot('opacity-50 pointer-events-none') : undefined,
+          style
         )}
         {...props}
       >
@@ -262,7 +262,8 @@ AccordionItem.displayName = "AccordionItem"
 
 interface AccordionTriggerProps {
   children: React.ReactNode
-  className?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   icon?: React.ReactNode
   iconPosition?: "left" | "right"
   value?: string // Optional: AccordionItem에서 자동으로 전달됨 / Optional: Auto-passed from AccordionItem
@@ -272,25 +273,22 @@ interface AccordionTriggerProps {
 }
 
 const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  ({ 
-    children, 
-    className,
+  ({
+    children,
+    style,
     icon,
     iconPosition = "right",
     value,
     isOpen = false,
     disabled = false,
     onToggle,
-    ...props 
+    ...props
   }, ref) => {
     const defaultIcon = (
-      <Icon 
-        name="chevronDown" 
-        size={20} 
-        className={merge(
-          "transition-transform duration-300 ease-out text-muted-foreground",
-          isOpen && "rotate-180"
-        )} 
+      <Icon
+        name="chevronDown"
+        size={20}
+        dot={`transition-transform duration-300 ease-out text-muted-foreground${isOpen ? ' rotate-180' : ''}`}
       />
     )
 
@@ -307,15 +305,15 @@ const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerPro
         aria-controls={contentId}
         onClick={onToggle}
         disabled={disabled}
-        className={merge(
-          "flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          className
+        style={mergeStyles(
+          resolveDot('flex w-full items-center justify-between px-6 py-4 text-left font-medium transition-all hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'),
+          style
         )}
         {...props}
       >
-        <div className="flex items-center gap-3 flex-1">
+        <div style={resolveDot('flex items-center gap-3 flex-1')}>
           {iconPosition === "left" && (icon || defaultIcon)}
-          <span className="flex-1">{children}</span>
+          <span style={resolveDot('flex-1')}>{children}</span>
         </div>
         {iconPosition === "right" && (icon || defaultIcon)}
       </button>
@@ -328,7 +326,7 @@ AccordionTrigger.displayName = "AccordionTrigger"
  * AccordionTrigger 컴포넌트 / AccordionTrigger component
  * 아코디언 아이템을 열고 닫는 트리거 버튼입니다.
  * Button that opens and closes an accordion item.
- * 
+ *
  * @component
  * @param {AccordionTriggerProps} props - AccordionTrigger 컴포넌트의 props / AccordionTrigger component props
  * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
@@ -339,14 +337,15 @@ AccordionTrigger.displayName = "AccordionTrigger"
  * AccordionContent 컴포넌트의 props
  * @typedef {Object} AccordionContentProps
  * @property {React.ReactNode} children - 콘텐츠
- * @property {string} [className] - 추가 CSS 클래스
+ * @property {React.CSSProperties} [style] - 인라인 스타일
  * @property {boolean} [isOpen] - 열림 상태 (AccordionItem에서 자동 전달)
  * @property {string} [value] - 아이템 값 (AccordionItem에서 자동 전달)
  * @property {string} ['data-accordion-value'] - 아이템 값 (내부 사용)
  */
 interface AccordionContentProps {
   children: React.ReactNode
-  className?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   isOpen?: boolean
   value?: string
   'data-accordion-value'?: string
@@ -356,14 +355,14 @@ interface AccordionContentProps {
  * AccordionContent 컴포넌트 / AccordionContent component
  * 아코디언 아이템의 콘텐츠를 표시합니다.
  * Displays the content of an accordion item.
- * 
+ *
  * @component
  * @param {AccordionContentProps} props - AccordionContent 컴포넌트의 props / AccordionContent component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} AccordionContent 컴포넌트 / AccordionContent component
  */
 const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
-  ({ children, className, isOpen = false, value, 'data-accordion-value': dataValue, ...props }, ref) => {
+  ({ children, style, isOpen = false, value, 'data-accordion-value': dataValue, ...props }, ref) => {
     const [height, setHeight] = React.useState(0)
     const contentRef = React.useRef<HTMLDivElement>(null)
     const itemValue = value || dataValue || 'unknown'
@@ -388,13 +387,12 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
         role="region"
         aria-labelledby={triggerId}
         hidden={!isOpen}
-        className="overflow-hidden transition-all duration-300 ease-out"
-        style={{ height: `${height}px` }}
+        style={mergeStyles(resolveDot('overflow-hidden transition-all duration-300 ease-out'), { height: `${height}px` })}
         {...props}
       >
         <div
           ref={contentRef}
-          className={merge("px-6 pt-2 pb-4", className)}
+          style={mergeStyles(resolveDot('px-6 pt-2 pb-4'), style)}
         >
           {children}
         </div>
@@ -404,4 +402,4 @@ const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>
 )
 AccordionContent.displayName = "AccordionContent"
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } 
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }

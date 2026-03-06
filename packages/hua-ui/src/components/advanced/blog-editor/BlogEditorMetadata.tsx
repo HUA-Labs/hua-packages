@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useCallback, useRef, KeyboardEvent, ChangeEvent } from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
@@ -11,8 +10,10 @@ import { normalizeSlug } from './utils/slug'
  * BlogEditorMetadata Props
  */
 export interface BlogEditorMetadataProps {
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -20,25 +21,36 @@ export interface BlogEditorMetadataProps {
  * 메타데이터 필드 (슬러그, 태그, 커버 이미지, 발행일)
  */
 const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataProps>(
-  ({ className }, ref) => {
+  ({ dot, style }, ref) => {
     const { formData, updateField, features, labels, variant, handleUploadImage, uploading, setSlugManuallyEdited } = useBlogEditor()
     const [tagInput, setTagInput] = useState('')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const containerClasses = merge(
-      'rounded-xl p-6 space-y-4',
+    // variant별 컨테이너 스타일
+    const containerVariantStyle: React.CSSProperties =
       variant === 'glass'
-        ? 'bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-background/20 dark:border-border/50'
+        ? {
+            background: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }
         : variant === 'minimal'
-          ? 'bg-transparent'
-          : 'bg-background',
-      className
+          ? { background: 'transparent' }
+          : {}
+
+    const containerStyle = mergeStyles(
+      resolveDot('rounded-xl p-6 space-y-4'),
+      variant !== 'glass' && variant !== 'minimal' ? resolveDot('bg-background') : undefined,
+      containerVariantStyle,
+      resolveDot(dot),
+      style
     )
 
-    const inputClasses =
+    const inputStyle = resolveDot(
       'w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
+    )
 
-    const labelClasses = 'block text-sm font-medium text-foreground mb-1'
+    const labelStyle = resolveDot('block text-sm font-medium text-foreground mb-1')
 
     // 태그 추가
     const addTag = useCallback((tag: string) => {
@@ -86,18 +98,18 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
     }, [tagInput, formData.tags, addTag, removeTag])
 
     return (
-      <div ref={ref} className={containerClasses}>
-        <h2 className="font-semibold text-foreground">{labels.basicInfo}</h2>
+      <div ref={ref} style={containerStyle}>
+        <h2 style={resolveDot('font-semibold text-foreground')}>{labels.basicInfo}</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', gap: '1rem' }}>
           {/* 슬러그 */}
           {features.enableSlug && (
             <div>
-              <label className={labelClasses}>
+              <label style={labelStyle}>
                 {labels.slug} *
               </label>
-              <div className="flex items-center">
-                <span className="text-muted-foreground mr-1 text-sm">
+              <div style={resolveDot('flex items-center')}>
+                <span style={resolveDot('text-muted-foreground mr-1 text-sm')}>
                   {labels.slugPrefix}
                 </span>
                 <input
@@ -107,7 +119,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                     updateField('slug', normalizeSlug(e.target.value))
                     setSlugManuallyEdited(true)
                   }}
-                  className={merge(inputClasses, 'flex-1')}
+                  style={mergeStyles(inputStyle, { flex: 1 })}
                   placeholder="my-post-slug"
                 />
               </div>
@@ -117,21 +129,21 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
           {/* 태그 */}
           {features.enableTags && (
             <div>
-              <label className={labelClasses}>{labels.tags}</label>
-              <div className={merge(
-                'flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-border rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring focus-within:border-transparent transition-colors'
+              <label style={labelStyle}>{labels.tags}</label>
+              <div style={mergeStyles(
+                resolveDot('flex flex-wrap items-center gap-2 min-h-[42px] px-3 py-2 border border-border rounded-lg bg-background transition-colors'),
               )}>
                 {/* 태그 칩들 */}
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-sm rounded-md"
+                    style={resolveDot('inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-sm rounded-md')}
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="hover:text-primary transition-colors"
+                      style={resolveDot('transition-colors')}
                       aria-label={`${tag} 태그 삭제`}
                     >
                       <Icon name="x" size={14} />
@@ -144,11 +156,11 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                   value={tagInput}
                   onChange={handleTagInputChange}
                   onKeyDown={handleTagKeyDown}
-                  className="flex-1 min-w-[100px] bg-transparent outline-none text-foreground text-sm"
+                  style={mergeStyles(resolveDot('bg-transparent text-foreground text-sm'), { flex: 1, minWidth: '100px', outline: 'none' })}
                   placeholder={formData.tags.length === 0 ? labels.tagsPlaceholder : '태그 추가...'}
                 />
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p style={resolveDot('mt-1 text-xs text-muted-foreground')}>
                 쉼표(,) 또는 Enter로 태그 추가
               </p>
             </div>
@@ -158,20 +170,23 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
         {/* 커버 이미지 */}
         {features.enableCoverImage && (
           <div>
-            <label className={labelClasses}>{labels.coverImage}</label>
-            <div className="space-y-3">
+            <label style={labelStyle}>{labels.coverImage}</label>
+            <div style={resolveDot('space-y-3')}>
               {/* 이미지 미리보기 */}
               {formData.coverImage && (
-                <div className="relative w-full h-40 rounded-lg overflow-hidden bg-muted">
+                <div style={{ position: 'relative', width: '100%', height: '10rem', borderRadius: '0.5rem', overflow: 'hidden', background: 'var(--muted)' }}>
                   <img
                     src={formData.coverImage}
                     alt="커버 이미지 미리보기"
-                    className="w-full h-full object-cover"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <button
                     type="button"
                     onClick={() => updateField('coverImage', '')}
-                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                    style={mergeStyles(
+                      resolveDot('p-1.5 text-white rounded-full transition-colors'),
+                      { position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgb(239,68,68)' }
+                    )}
                     aria-label="이미지 삭제"
                   >
                     <Icon name="x" size={14} />
@@ -180,19 +195,19 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
               )}
 
               {/* URL 입력 + 파일 업로드 */}
-              <div className="flex gap-2">
+              <div style={resolveDot('flex gap-2')}>
                 <input
                   type="text"
                   value={formData.coverImage}
                   onChange={(e) => updateField('coverImage', e.target.value)}
-                  className={merge(inputClasses, 'flex-1')}
+                  style={mergeStyles(inputStyle, { flex: 1 })}
                   placeholder={labels.coverImagePlaceholder}
                 />
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  className="hidden"
+                  style={{ display: 'none' }}
                   onChange={async (e: ChangeEvent<HTMLInputElement>) => {
                     const file = e.target.files?.[0]
                     if (file) {
@@ -209,7 +224,7 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-3 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  style={resolveDot('px-3 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors')}
                   title="이미지 업로드"
                 >
                   {uploading ? (
@@ -224,17 +239,17 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
         )}
 
         {/* 발행일 & 만료일 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', gap: '1rem' }}>
           {features.enablePublishDate && (
             <div>
-              <label className={labelClasses}>{labels.publishDate}</label>
+              <label style={labelStyle}>{labels.publishDate}</label>
               <input
                 type="datetime-local"
                 value={formData.publishedAt ?? ''}
                 onChange={(e) => updateField('publishedAt', e.target.value || null)}
-                className={inputClasses}
+                style={inputStyle}
               />
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p style={resolveDot('mt-1 text-sm text-muted-foreground')}>
                 {labels.publishDateHint}
               </p>
             </div>
@@ -242,14 +257,14 @@ const BlogEditorMetadata = React.forwardRef<HTMLDivElement, BlogEditorMetadataPr
 
           {features.enableExpiresAt && (
             <div>
-              <label className={labelClasses}>{labels.expiresAt}</label>
+              <label style={labelStyle}>{labels.expiresAt}</label>
               <input
                 type="datetime-local"
                 value={formData.expiresAt ?? ''}
                 onChange={(e) => updateField('expiresAt', e.target.value || null)}
-                className={inputClasses}
+                style={inputStyle}
               />
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p style={resolveDot('mt-1 text-sm text-muted-foreground')}>
                 {labels.expiresAtHint}
               </p>
             </div>

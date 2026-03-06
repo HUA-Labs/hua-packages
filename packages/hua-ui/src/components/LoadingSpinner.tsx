@@ -1,8 +1,7 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
-import { resolveDot } from "../hooks/useDotMap"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * LoadingSpinner 컴포넌트의 props / LoadingSpinner component props
@@ -11,58 +10,58 @@ import { resolveDot } from "../hooks/useDotMap"
  * @property {"default" | "dots" | "bars" | "ring" | "ripple"} [variant="default"] - Spinner 애니메이션 타입 / Spinner animation type
  * @property {string} [text] - Spinner 아래 표시할 텍스트 / Text to display below spinner
  * @property {"default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"} [color="default"] - Spinner 색상 / Spinner color
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {string} [dot] - dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style)
+ * @property {React.CSSProperties} [style] - 추가 인라인 스타일 / Additional inline style
  */
 export interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg" | "xl"
   variant?: "default" | "dots" | "bars" | "ring" | "ripple"
   text?: string
   color?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"
-  className?: string
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
+  style?: React.CSSProperties
 }
 
 /**
  * LoadingSpinner 컴포넌트 / LoadingSpinner component
- * 
+ *
  * 로딩 상태를 표시하는 스피너 컴포넌트입니다.
  * 다양한 애니메이션 타입과 크기를 지원합니다.
- * 
+ *
  * Spinner component that displays loading state.
  * Supports various animation types and sizes.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <LoadingSpinner />
- * 
+ *
  * @example
  * // 텍스트와 함께 / With text
- * <LoadingSpinner 
+ * <LoadingSpinner
  *   text="로딩 중..."
  *   size="lg"
  *   color="primary"
  * />
- * 
+ *
  * @example
  * // 다양한 애니메이션 / Various animations
  * <LoadingSpinner variant="dots" />
  * <LoadingSpinner variant="bars" color="success" />
  * <LoadingSpinner variant="ripple" size="xl" />
- * 
+ *
  * @param {LoadingSpinnerProps} props - LoadingSpinner 컴포넌트의 props / LoadingSpinner component props
  * @returns {JSX.Element} LoadingSpinner 컴포넌트 / LoadingSpinner component
  */
 export function LoadingSpinner({
-  className,
   size = "md",
   variant = "default",
   text,
   color = "default",
   dot: dotProp,
+  style,
 }: LoadingSpinnerProps) {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const sizeClasses = {
     sm: "w-6 h-6", // 24px - 더 넉넉한 크기
     md: "w-8 h-8", // 32px - 더 넉넉한 크기
@@ -82,6 +81,8 @@ export function LoadingSpinner({
     glass: "border-white/50 border-t-white/90 dark:border-slate-400/60 dark:border-t-slate-100"
   }
 
+  const borderSizeClass = size === "xl" ? "border-[3px]" : size === "lg" ? "border-[2.5px]" : "border-2"
+
   const renderSpinner = () => {
     switch (variant) {
       case "dots":
@@ -94,10 +95,10 @@ export function LoadingSpinner({
                 40% { opacity: 1; }
               }
             `}</style>
-            <div className="flex space-x-1 items-center">
-              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '200ms' }} />
-              <div className="w-2 h-2 bg-current rounded-full" style={{ animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '400ms' }} />
+            <div style={resolveDot("flex space-x-1 items-center")}>
+              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0ms' }} />
+              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '200ms' }} />
+              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '400ms' }} />
             </div>
           </>
         )
@@ -110,57 +111,57 @@ export function LoadingSpinner({
                 20% { transform: scaleY(1); }
               }
             `}</style>
-            <div className="flex space-x-0.5 h-full items-center">
-              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '0ms' }} />
-              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '100ms' }} />
-              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '200ms' }} />
-              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '300ms' }} />
-              <div className="w-1 h-full bg-current rounded-sm origin-bottom" style={{ animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '400ms' }} />
+            <div style={resolveDot("flex space-x-0.5 h-full items-center")}>
+              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '0ms' }} />
+              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '100ms' }} />
+              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '200ms' }} />
+              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '300ms' }} />
+              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '400ms' }} />
             </div>
           </>
         )
       case "ring":
         return (
-          <div className={merge(
-            "w-full h-full animate-spin rounded-full",
-            size === "xl" ? "border-[3px]" : size === "lg" ? "border-[2.5px]" : "border-2",
-            spinnerColors[color] || spinnerColors.default
+          <div style={mergeStyles(
+            resolveDot("w-full h-full animate-spin rounded-full"),
+            resolveDot(borderSizeClass),
+            resolveDot(spinnerColors[color] || spinnerColors.default)
           )} />
         )
       case "ripple":
         return (
-          <div className="relative w-full h-full">
-            <div className={merge(
-              "absolute inset-0 rounded-full border-2 animate-ping",
-              spinnerColors[color] || spinnerColors.default
+          <div style={resolveDot("relative w-full h-full")}>
+            <div style={mergeStyles(
+              resolveDot("absolute inset-0 rounded-full border-2 animate-ping"),
+              resolveDot(spinnerColors[color] || spinnerColors.default)
             )} />
-            <div className={merge(
-              "w-full h-full rounded-full border-2",
-              spinnerColors[color] || spinnerColors.default
+            <div style={mergeStyles(
+              resolveDot("w-full h-full rounded-full border-2"),
+              resolveDot(spinnerColors[color] || spinnerColors.default)
             )} />
           </div>
         )
       default:
         return (
-          <div className={merge(
-            "w-full h-full animate-spin rounded-full",
-            size === "xl" ? "border-[3px]" : size === "lg" ? "border-[2.5px]" : "border-2",
-            spinnerColors[color] || spinnerColors.default
+          <div style={mergeStyles(
+            resolveDot("w-full h-full animate-spin rounded-full"),
+            resolveDot(borderSizeClass),
+            resolveDot(spinnerColors[color] || spinnerColors.default)
           )} />
         )
     }
   }
 
   return (
-    <div className={merge("flex flex-col items-center justify-center", className)} style={dotStyle}>
-      <div className={merge(sizeClasses[size], "text-muted-foreground")}>
+    <div style={mergeStyles(resolveDot("flex flex-col items-center justify-center"), resolveDot(dotProp), style)}>
+      <div style={mergeStyles(resolveDot(sizeClasses[size]), resolveDot("text-muted-foreground"))}>
         {renderSpinner()}
       </div>
       {text && (
-        <p className="mt-3 text-sm text-muted-foreground text-center">
+        <p style={resolveDot("mt-3 text-sm text-muted-foreground text-center")}>
           {text}
         </p>
       )}
     </div>
   )
-} 
+}

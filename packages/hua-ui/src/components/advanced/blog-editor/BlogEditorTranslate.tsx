@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
@@ -12,8 +11,10 @@ import { useBlogEditor } from './BlogEditorContext'
 export interface BlogEditorTranslateProps {
   /** 힌트 메시지 오버라이드 / Hint message override */
   hint?: string
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -21,7 +22,7 @@ export interface BlogEditorTranslateProps {
  * AI 번역 버튼
  */
 const BlogEditorTranslate = React.forwardRef<HTMLDivElement, BlogEditorTranslateProps>(
-  ({ hint, className }, ref) => {
+  ({ hint, dot, style }, ref) => {
     const {
       labels,
       translating,
@@ -44,12 +45,13 @@ const BlogEditorTranslate = React.forwardRef<HTMLDivElement, BlogEditorTranslate
     return (
       <div
         ref={ref}
-        className={merge(
-          'px-6 py-3 bg-muted border-b border-border flex items-center justify-between',
-          className
+        style={mergeStyles(
+          resolveDot('px-6 py-3 bg-muted border-b border-border flex items-center justify-between'),
+          resolveDot(dot),
+          style
         )}
       >
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div style={resolveDot('flex items-center gap-2 text-sm text-muted-foreground')}>
           <Icon name="sparkles" size={16} />
           <span>{hint || labels.translateHint}</span>
         </div>
@@ -57,11 +59,11 @@ const BlogEditorTranslate = React.forwardRef<HTMLDivElement, BlogEditorTranslate
           type="button"
           onClick={handleTranslate}
           disabled={translating || !canTranslate}
-          className={merge(
-            'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+          style={mergeStyles(
+            resolveDot('inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors'),
             translateSuccess
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-              : 'bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
+              ? resolveDot('bg-green-100 text-green-700')
+              : resolveDot('bg-primary text-white disabled:opacity-50 disabled:cursor-not-allowed')
           )}
         >
           {translating ? (

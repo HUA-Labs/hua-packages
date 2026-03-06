@@ -4,7 +4,6 @@ import React, { useMemo, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { merge } from "../../../lib/utils";
 import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { useKanban } from "./KanbanContext";
 import { KanbanColumnHeader } from "./KanbanColumnHeader";
@@ -41,20 +40,29 @@ function useColumnKeyframes() {
 }
 
 /**
+ * Variant base styles for columns (light mode)
+ */
+const columnVariantStyles: Record<string, React.CSSProperties> = {
+  default: { backgroundColor: "rgba(243,244,246,0.5)" },
+  gradient: { background: "linear-gradient(to bottom, #f3f4f6, #ffffff)" },
+  outline: { backgroundColor: "transparent", border: "2px solid #e5e7eb" },
+  elevated: { backgroundColor: "#ffffff", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)" },
+};
+
+/**
  * KanbanColumn 컴포넌트
  *
  * @dnd-kit의 useSortable을 사용하여 컬럼 재정렬을 지원합니다.
  * 카드는 SortableContext로 감싸서 세로 정렬을 지원합니다.
  */
 export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
-  ({ column, cards, index, className, style, dot: dotProp, ...props }, ref) => {
+  ({ column, cards, index, style, dot: dotProp, ...props }, ref) => {
     // Inject keyframes
     useColumnKeyframes();
 
     const {
       updateColumn,
       deleteColumn,
-      canDropCard,
       variant,
       allowColumnDrag,
       allowAddCard,
@@ -75,8 +83,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
     });
 
     // Sortable styles with entrance animation
-    // Keep dragged column in place (with low opacity) so dnd-kit sorting works correctly
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined;
     const sortableStyle: React.CSSProperties = mergeStyles(
       {
         transform: CSS.Transform.toString(transform),
@@ -90,7 +97,6 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
 
     // WIP limit check
     const isAtLimit = column.limit !== undefined && cards.length >= column.limit;
-    const canDrop = canDropCard(column.id);
 
     // Card IDs for SortableContext
     const cardIds = useMemo(() => cards.map((c) => c.id), [cards]);
@@ -108,28 +114,30 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
       updateColumn(column.id, { collapsed: !column.collapsed });
     };
 
-    // Variant styles
-    const columnStyles = {
-      default: "bg-gray-100 dark:bg-gray-800/50",
-      gradient: "bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-900",
-      outline: "bg-transparent border-2 border-gray-200 dark:border-gray-700",
-      elevated: "bg-white dark:bg-gray-800 shadow-md",
-    };
+    // Variant base style
+    const variantStyle = columnVariantStyles[variant] ?? columnVariantStyles.elevated;
+
+    const columnStyle: React.CSSProperties = mergeStyles(
+      {
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: "0.75rem",
+        transition: "all 300ms ease-out",
+        opacity: isDragging ? 0.4 : 1,
+        ...(column.collapsed
+          ? { width: "4rem", minWidth: "4rem", maxWidth: "4rem" }
+          : { flexShrink: 0 }),
+      },
+      variantStyle,
+      sortableStyle
+    );
 
     return (
       <div
         ref={setNodeRef}
         role="group"
         aria-label={`${column.title} 컬럼`}
-        className={merge(
-          "flex flex-col rounded-xl transition-all duration-300 ease-out",
-          columnStyles[variant],
-          // Show placeholder with low opacity when dragging (DragOverlay shows the actual visual)
-          isDragging && "opacity-40",
-          column.collapsed ? "w-16 min-w-[4rem] max-w-[4rem]" : "flex-shrink-0",
-          className
-        )}
-        style={sortableStyle}
+        style={columnStyle}
         {...props}
       >
         {/* Column Header */}
@@ -142,17 +150,24 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
           dragHandleProps={{
             ...attributes,
             ...listeners,
-            className: merge(
-              "cursor-grab active:cursor-grabbing",
-              !allowColumnDrag && "cursor-default"
-            ),
+            style: {
+              cursor: allowColumnDrag ? "grab" : "default",
+            },
           }}
         />
 
         {/* Cards Container */}
         {!column.collapsed && (
           <div
-            className="flex-1 px-2 pb-2 overflow-y-auto overflow-x-hidden min-h-[100px]"
+            style={{
+              flex: 1,
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+              paddingBottom: "0.5rem",
+              overflowY: "auto",
+              overflowX: "hidden",
+              minHeight: "100px",
+            }}
             role="list"
             aria-label={`${column.title} 카드 목록`}
           >
@@ -168,7 +183,16 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
 
             {/* Empty state */}
             {cards.length === 0 && (
-              <div className="flex items-center justify-center h-20 text-sm text-gray-400 dark:text-gray-500">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "5rem",
+                  fontSize: "0.875rem",
+                  color: "#9ca3af",
+                }}
+              >
                 카드를 드래그하세요
               </div>
             )}
@@ -177,14 +201,23 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
 
         {/* Add Card Button */}
         {!column.collapsed && allowAddCard && !readOnly && !isAtLimit && (
-          <div className="px-2 pb-2">
+          <div style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", paddingBottom: "0.5rem" }}>
             <KanbanAddCard columnId={column.id} />
           </div>
         )}
 
         {/* WIP Limit Warning */}
         {!column.collapsed && isAtLimit && (
-          <div className="px-2 pb-2 text-xs text-center text-amber-600 dark:text-amber-400">
+          <div
+            style={{
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+              paddingBottom: "0.5rem",
+              fontSize: "0.75rem",
+              textAlign: "center",
+              color: "#d97706",
+            }}
+          >
             WIP 제한 도달 ({column.limit}개)
           </div>
         )}

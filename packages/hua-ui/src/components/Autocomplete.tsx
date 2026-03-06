@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { Input } from "./Input"
 import { mergeStyles, resolveDot } from "../hooks/useDotMap"
@@ -39,10 +38,9 @@ export interface AutocompleteOption {
  * @property {(query: string) => AutocompleteOption[] | Promise<AutocompleteOption[]>} [onSearch] - 검색 핸들러 (비동기 지원) / Search handler (async support)
  * @property {React.ReactNode} [emptyText="결과가 없습니다"] - 빈 결과 텍스트 / Empty result text
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
- * @property {string} [className] - 추가 클래스명 / Additional class name
- * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'>}
  */
-export interface AutocompleteProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface AutocompleteProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'> {
   options: AutocompleteOption[]
   value?: string
   onChange?: (value: string, option?: AutocompleteOption) => void
@@ -56,9 +54,10 @@ export interface AutocompleteProps extends Omit<React.HTMLAttributes<HTMLDivElem
   onSearch?: (query: string) => AutocompleteOption[] | Promise<AutocompleteOption[]>
   emptyText?: string
   size?: "sm" | "md" | "lg"
-  className?: string
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
+  /** 추가 인라인 스타일 / Additional inline style */
+  style?: React.CSSProperties
 }
 
 const sizeClasses = {
@@ -69,13 +68,13 @@ const sizeClasses = {
 
 /**
  * Autocomplete 컴포넌트 / Autocomplete component
- * 
+ *
  * 자동완성 입력 컴포넌트입니다.
  * 입력하면서 옵션을 필터링하고 선택할 수 있습니다.
- * 
+ *
  * Autocomplete input component.
  * Filters and selects options as you type.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -86,7 +85,7 @@ const sizeClasses = {
  *   ]}
  *   onChange={(value) => console.log(value)}
  * />
- * 
+ *
  * @example
  * // 비동기 검색 / Async search
  * <Autocomplete
@@ -97,7 +96,7 @@ const sizeClasses = {
  *   }}
  *   loading={isLoading}
  * />
- * 
+ *
  * @param {AutocompleteProps} props - Autocomplete 컴포넌트의 props / Autocomplete component props
  * @returns {JSX.Element} Autocomplete 컴포넌트 / Autocomplete component
  */
@@ -117,19 +116,18 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       onSearch,
       emptyText = "결과가 없습니다",
       size = "md",
-      className,
       dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [isOpen, setIsOpen] = React.useState(false)
     const [inputValue, setInputValue] = React.useState("")
     const [filteredOptions, setFilteredOptions] = React.useState<AutocompleteOption[]>(options)
     const [selectedIndex, setSelectedIndex] = React.useState(-1)
     const [isSearching, setIsSearching] = React.useState(false)
-    
+
     const inputRef = React.useRef<HTMLInputElement>(null)
     const dropdownRef = React.useRef<HTMLDivElement>(null)
 
@@ -181,7 +179,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       setInputValue(newValue)
       setIsOpen(true)
       setSelectedIndex(-1)
-      
+
       if (!newValue && clearable) {
         onChange?.("")
       }
@@ -198,7 +196,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       }
       setIsOpen(false)
       setSelectedIndex(-1)
-      
+
       // 선택된 옵션이 있으면 그 라벨로 복원
       if (selectedOption) {
         setInputValue(selectedOption.label)
@@ -229,7 +227,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault()
-          setSelectedIndex((prev) => 
+          setSelectedIndex((prev) =>
             prev < filteredOptions.length - 1 ? prev + 1 : prev
           )
           break
@@ -251,8 +249,12 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
     }
 
     return (
-      <div ref={ref} className={merge("relative w-full", className)} style={dotStyle} {...props}>
-        <div className="relative">
+      <div
+        ref={ref}
+        style={mergeStyles(resolveDot('relative w-full'), resolveDot(dotProp), style)}
+        {...props}
+      >
+        <div style={resolveDot('relative')}>
           <Input
             ref={inputRef}
             type="text"
@@ -267,12 +269,12 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             aria-autocomplete="list"
             aria-expanded={isOpen}
             aria-controls="autocomplete-list"
-            dot={merge(sizeClasses[size], "pr-10")}
+            dot={`${sizeClasses[size]} pr-10`}
           />
-          
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+
+          <div style={mergeStyles(resolveDot('absolute'), { right: '0.75rem', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '0.25rem' })}>
             {loading || isSearching ? (
-              <Icon 
+              <Icon
                       name="loader"
                 className="h-4 w-4 animate-spin text-muted-foreground"
               />
@@ -280,7 +282,9 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
               <button
                 type="button"
                 onClick={handleClear}
-                className="rounded p-1 hover:bg-muted transition-colors"
+                style={resolveDot('rounded p-1')}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '' }}
                 aria-label="지우기"
               >
                 <Icon name="close" className="h-4 w-4 text-muted-foreground" />
@@ -297,17 +301,20 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             ref={dropdownRef}
             id="autocomplete-list"
             role="listbox"
-            className={merge(
-              "absolute z-50 w-full mt-1 rounded-lg border shadow-lg",
-              "bg-popover text-popover-foreground",
-              "border-border",
-              "overflow-hidden"
+            style={mergeStyles(
+              resolveDot('absolute z-50 w-full mt-1 rounded-lg border overflow-hidden'),
+              {
+                backgroundColor: 'hsl(var(--popover))',
+                color: 'hsl(var(--popover-foreground))',
+                borderColor: 'hsl(var(--border))',
+                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                maxHeight: `${maxHeight}px`,
+              }
             )}
-            style={{ maxHeight: `${maxHeight}px` }}
           >
-            <div className="overflow-y-auto" style={{ maxHeight: `${maxHeight}px` }}>
+            <div style={{ overflowY: 'auto', maxHeight: `${maxHeight}px` }}>
               {filteredOptions.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                <div style={resolveDot('px-4 py-8 text-center text-sm')} className="text-muted-foreground">
                   {emptyText}
                 </div>
               ) : (
@@ -322,33 +329,32 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                       aria-selected={isValueSelected}
                       onClick={() => handleOptionSelect(option)}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      className={merge(
-                        "px-4 py-3 cursor-pointer transition-colors",
-                        "hover:bg-muted",
-                        isSelected && "bg-primary/10",
-                        isValueSelected && "bg-primary/15"
+                      style={mergeStyles(
+                        resolveDot('px-4 py-3 cursor-pointer'),
+                        isSelected ? { backgroundColor: 'hsl(var(--primary) / 0.10)' } : undefined,
+                        isValueSelected ? { backgroundColor: 'hsl(var(--primary) / 0.15)' } : undefined,
                       )}
                     >
-                      <div className="flex items-center gap-3">
+                      <div style={resolveDot('flex items-center gap-3')}>
                         {option.icon && (
-                          <div className="flex-shrink-0 text-muted-foreground">
+                          <div style={resolveDot('flex-shrink-0')} className="text-muted-foreground">
                             {option.icon}
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-foreground">
+                        <div style={resolveDot('flex-1 min-w-0')}>
+                          <div style={resolveDot('flex items-center gap-2')}>
+                            <p style={resolveDot('text-sm font-medium')} className="text-foreground">
                               {option.label}
                             </p>
                             {isValueSelected && (
-                              <Icon 
-                                name="check" 
+                              <Icon
+                                name="check"
                                 className="h-4 w-4 text-primary flex-shrink-0"
                               />
                             )}
                           </div>
                           {option.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5">
+                            <p style={resolveDot('text-xs mt-0.5')} className="text-muted-foreground">
                               {option.description}
                             </p>
                           )}

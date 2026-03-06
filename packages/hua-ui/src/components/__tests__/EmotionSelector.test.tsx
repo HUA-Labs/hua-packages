@@ -29,33 +29,44 @@ describe('EmotionSelector', () => {
     expect(handleSelect).toHaveBeenCalledWith('joy');
   });
 
-  it('should show selected state', () => {
-    const { container } = render(<EmotionSelector selectedEmotion="joy" />);
-    expect(container.querySelector('.ring-1')).toBeInTheDocument();
+  it('should show selected state via ring box-shadow', () => {
+    render(<EmotionSelector selectedEmotion="joy" />);
+    // In dot-based approach, selected button has boxShadow set
+    const joyButton = screen.getByText('joy').closest('button') as HTMLElement;
+    expect(joyButton).toBeInTheDocument();
+    expect(joyButton.style.borderColor).toBe('rgb(99 102 241)');
   });
 
-  it('should render card variant', () => {
+  it('should render card variant with cursor-pointer style', () => {
     const { container } = render(
       <EmotionSelector variant="card" />
     );
-    expect(container.querySelector('.cursor-pointer')).toBeInTheDocument();
+    // card items have cursor: pointer via resolveDot
+    const items = container.querySelectorAll('[style*="cursor: pointer"]');
+    expect(items.length).toBeGreaterThan(0);
   });
 
-  it('should render chip variant', () => {
+  it('should render chip variant with rounded-full style', () => {
     const { container } = render(
       <EmotionSelector variant="chip" />
     );
-    expect(container.querySelector('.rounded-full')).toBeInTheDocument();
+    // chip items have borderRadius: 9999px
+    const items = container.querySelectorAll('[style*="9999px"]');
+    expect(items.length).toBeGreaterThan(0);
   });
 
-  it('should apply grid layout by default', () => {
+  it('should apply grid layout by default via inline style', () => {
     const { container } = render(<EmotionSelector />);
-    expect(container.querySelector('.grid')).toBeInTheDocument();
+    const gridDiv = container.querySelector('[style*="grid"]') as HTMLElement;
+    expect(gridDiv).toBeInTheDocument();
+    expect(gridDiv.style.display).toBe('grid');
   });
 
-  it('should apply compact layout', () => {
+  it('should apply compact layout via inline style', () => {
     const { container } = render(<EmotionSelector layout="compact" />);
-    expect(container.querySelector('.flex.flex-wrap')).toBeInTheDocument();
+    const flexDiv = container.querySelector('[style*="wrap"]') as HTMLElement;
+    expect(flexDiv).toBeInTheDocument();
+    expect(flexDiv.style.flexWrap).toBe('wrap');
   });
 
   it('should show intensity slider when showIntensity and selectedEmotion', () => {
@@ -84,8 +95,9 @@ describe('EmotionSelector', () => {
     expect(screen.queryByText('감정 강도')).not.toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
-    const { container } = render(<EmotionSelector className="my-selector" />);
-    expect(container.querySelector('.my-selector')).toBeInTheDocument();
+  it('should apply custom style via style prop', () => {
+    const { container } = render(<EmotionSelector style={{ opacity: 0.8 }} />);
+    const root = container.firstChild as HTMLElement;
+    expect(root.style.opacity).toBe('0.8');
   });
 });

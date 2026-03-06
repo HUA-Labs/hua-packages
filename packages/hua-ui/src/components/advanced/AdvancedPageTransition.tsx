@@ -1,35 +1,34 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { merge } from '../../lib/utils'
 import { mergeStyles, resolveDot } from '../../hooks/useDotMap'
 
-export type TransitionType = 
-  | 'fade' 
-  | 'slide' 
-  | 'scale' 
-  | 'flip' 
-  | 'morph' 
-  | 'cube' 
-  | 'zoom' 
-  | 'slide-up' 
-  | 'slide-down' 
-  | 'slide-left' 
+export type TransitionType =
+  | 'fade'
+  | 'slide'
+  | 'scale'
+  | 'flip'
+  | 'morph'
+  | 'cube'
+  | 'zoom'
+  | 'slide-up'
+  | 'slide-down'
+  | 'slide-left'
   | 'slide-right'
 
-export type TransitionEasing = 
-  | 'linear' 
-  | 'ease-in' 
-  | 'ease-out' 
-  | 'ease-in-out' 
-  | 'bounce' 
-  | 'elastic' 
+export type TransitionEasing =
+  | 'linear'
+  | 'ease-in'
+  | 'ease-out'
+  | 'ease-in-out'
+  | 'bounce'
+  | 'elastic'
   | 'smooth'
 
 export interface AdvancedPageTransitionProps {
   children: React.ReactNode
-  className?: string
   dot?: string
+  style?: React.CSSProperties
   type?: TransitionType
   duration?: number
   easing?: TransitionEasing
@@ -38,13 +37,14 @@ export interface AdvancedPageTransitionProps {
   onStart?: () => void
   onComplete?: () => void
   showProgress?: boolean
-  progressClassName?: string
+  progressDot?: string
+  progressStyle?: React.CSSProperties
 }
 
 export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedPageTransitionProps>(({
   children,
-  className,
   dot: dotProp,
+  style,
   type = 'fade',
   duration = 500,
   easing = 'smooth',
@@ -53,7 +53,8 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
   onStart,
   onComplete,
   showProgress = false,
-  progressClassName
+  progressDot,
+  progressStyle,
 }, ref) => {
   const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [isVisible, setIsVisible] = useState(false)
@@ -141,67 +142,67 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
           opacity: isVisible ? 1 : 0,
           transform: 'none'
         }
-      
+
       case 'slide':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `translateX(${(1 - progress) * 100}%)`
         }
-      
+
       case 'slide-up':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `translateY(${(1 - progress) * 100}%)`
         }
-      
+
       case 'slide-down':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `translateY(-${(1 - progress) * 100}%)`
         }
-      
+
       case 'slide-left':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `translateX(-${(1 - progress) * 100}%)`
         }
-      
+
       case 'slide-right':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `translateX(${(1 - progress) * 100}%)`
         }
-      
+
       case 'scale':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `scale(${0.8 + progress * 0.2})`
         }
-      
+
       case 'flip':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `perspective(1000px) rotateY(${(1 - progress) * 90}deg)`
         }
-      
+
       case 'morph':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `scale(${0.9 + progress * 0.1}) rotate(${(1 - progress) * 5}deg)`
         }
-      
+
       case 'cube':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `perspective(1000px) rotateX(${(1 - progress) * 90}deg) rotateY(${(1 - progress) * 45}deg)`
         }
-      
+
       case 'zoom':
         return {
           opacity: isVisible ? 1 : 0,
           transform: `scale(${0.5 + progress * 0.5})`
         }
-      
+
       default:
         return {
           opacity: isVisible ? 1 : 0,
@@ -213,33 +214,46 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
   const transitionStyles = getTransitionStyles()
 
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       {showProgress && (
-        <div className={merge(
-          'fixed top-4 right-4 z-50 bg-background rounded-lg px-3 py-2 shadow-lg border',
-          progressClassName
+        <div style={mergeStyles(
+          {
+            position: 'fixed',
+            top: '1rem',
+            right: '1rem',
+            zIndex: 50,
+            backgroundColor: 'hsl(var(--background))',
+            borderRadius: '0.5rem',
+            padding: '0.5rem 0.75rem',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            border: '1px solid hsl(var(--border))',
+          },
+          resolveDot(progressDot),
+          progressStyle
         )}>
-          <div className="text-sm font-medium text-foreground">
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>
             Progress: {Math.round(progress * 100)}%
           </div>
-          <div className="w-24 h-2 bg-muted rounded-full mt-2">
-            <div 
-              className="h-full bg-primary rounded-full transition-all duration-100"
-              style={{ width: `${progress * 100}%` }}
+          <div style={{ width: '6rem', height: '0.5rem', backgroundColor: 'hsl(var(--muted))', borderRadius: '9999px', marginTop: '0.5rem' }}>
+            <div
+              style={{
+                height: '100%',
+                backgroundColor: 'hsl(var(--primary))',
+                borderRadius: '9999px',
+                transition: 'width 100ms',
+                width: `${progress * 100}%`
+              }}
             />
           </div>
         </div>
       )}
-      
+
       <div
         ref={ref}
-        className={merge(
-          'transition-all duration-500 ease-out',
-          className
-        )}
         style={mergeStyles(
           {
             ...transitionStyles,
+            transition: 'all 500ms ease-out',
             transitionDuration: `${duration}ms`,
             transitionTimingFunction: easing === 'smooth'
               ? 'cubic-bezier(0.4, 0, 0.2, 1)'
@@ -249,7 +263,8 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
               ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
               : easing
           },
-          dotStyle
+          dotStyle,
+          style
         )}
       >
         {children}

@@ -47,9 +47,9 @@ export interface ActionButton {
  * @property {() => void} [onToggleSelectAll] - 전체 선택/해제 함수 / Toggle select all function
  * @property {() => void} [onCancelSelect] - 선택 모드 취소 함수 / Cancel select mode function
  * @property {boolean} [loading=false] - 로딩 상태 / Loading state
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ActionToolbarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   /** 선택 모드 활성화 여부 */
   isSelectMode?: boolean;
   /** 전체 항목 개수 */
@@ -70,19 +70,21 @@ export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement>
   loading?: boolean;
   /** dot 유틸리티 스타일 */
   dot?: string;
+  /** 추가 인라인 스타일 */
+  style?: React.CSSProperties;
 }
 
 /**
  * ActionToolbar 컴포넌트 / ActionToolbar component
- * 
+ *
  * 범용 액션 툴바 컴포넌트입니다.
  * 알림, 로그 관리, 대시보드 등에서 재사용 가능한 액션 버튼 영역을 제공합니다.
  * 선택 모드, 일괄 액션, 반응형 레이아웃을 지원합니다.
- * 
+ *
  * Universal action toolbar component.
  * Provides reusable action button area for notifications, log management, dashboard, etc.
  * Supports select mode, batch actions, and responsive layout.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -119,7 +121,7 @@ export interface ActionToolbarProps extends React.HTMLAttributes<HTMLDivElement>
  *   }}
  * />
  * ```
- * 
+ *
  * @param {ActionToolbarProps} props - ActionToolbar 컴포넌트의 props / ActionToolbar component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ActionToolbar 컴포넌트 / ActionToolbar component
@@ -136,13 +138,12 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
       onToggleSelectAll,
       onCancelSelect,
       loading = false,
-      className,
       dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const getBadgeColor = useCallback((color?: string) => {
       switch (color) {
         case 'red':
@@ -180,11 +181,18 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
     return (
       <div
         ref={ref}
-        className={merge(
-          'mb-4 bg-background rounded-lg shadow-sm border border-border p-3 sm:p-4',
-          className
+        style={mergeStyles(
+          {
+            marginBottom: '1rem',
+            backgroundColor: 'hsl(var(--background))',
+            borderRadius: '0.5rem',
+            boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+            border: '1px solid hsl(var(--border))',
+            padding: '0.75rem',
+          },
+          resolveDot(dotProp),
+          style
         )}
-        style={dotStyle}
         {...props}
       >
         {isSelectMode ? (
@@ -202,14 +210,14 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 <span className="sm:hidden">{selectedCount === totalCount ? '해제' : '전체'}</span>
               </Button>
             )}
-            
+
             {/* 선택 모드 액션 버튼들 */}
             {selectModeActions.map((action, index) => (
               <div key={`select-action-${index}`} className={merge('flex-1 sm:flex-initial min-w-[100px]', action.className)}>
                 {renderButton(action, `select-${index}`)}
               </div>
             ))}
-            
+
             {/* 취소 버튼 */}
             {onCancelSelect && (
               <Button
@@ -238,7 +246,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 <span className="hidden sm:inline ml-1.5 sm:ml-2">선택</span>
               </Button>
             )}
-            
+
             {/* 일반 모드 액션 버튼들 */}
             {actions.map((action, index) => (
               <div key={`action-${index}`} className={merge('flex-1 sm:flex-initial min-w-[100px]', action.className)}>
@@ -255,4 +263,3 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
 ActionToolbarComponent.displayName = 'ActionToolbar';
 
 export const ActionToolbar = React.memo(ActionToolbarComponent);
-

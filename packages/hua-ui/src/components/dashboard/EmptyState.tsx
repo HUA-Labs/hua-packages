@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
@@ -16,9 +16,9 @@ import type { IconName } from "../../lib/icons";
  * @property {() => void} [actionOnClick] - 액션 버튼 클릭 핸들러 / Action button click handler
  * @property {"default" | "warning" | "info" | "error" | "success"} [variant="default"] - 스타일 변형 / Style variant
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface DashboardEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DashboardEmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   icon?: IconName | React.ReactNode;
   title: string;
   description?: string;
@@ -27,69 +27,56 @@ export interface DashboardEmptyStateProps extends React.HTMLAttributes<HTMLDivEl
   actionOnClick?: () => void;
   variant?: "default" | "warning" | "info" | "error" | "success";
   size?: "sm" | "md" | "lg";
+  dot?: string;
 }
 
-const variantStyles = {
-  default: {
-    icon: "text-gray-400 dark:text-gray-500",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
-  },
-  warning: {
-    icon: "text-yellow-500 dark:text-yellow-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
-  },
-  info: {
-    icon: "text-indigo-500 dark:text-indigo-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
-  },
-  error: {
-    icon: "text-red-500 dark:text-red-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
-  },
-  success: {
-    icon: "text-green-500 dark:text-green-400",
-    title: "text-gray-900 dark:text-white",
-    description: "text-gray-600 dark:text-gray-400",
-  },
+const variantIconColor = {
+  default: "#9ca3af",
+  warning: "#eab308",
+  info: "#6366f1",
+  error: "#ef4444",
+  success: "#22c55e",
 };
 
-const sizeStyles = {
+const sizeConfig = {
   sm: {
-    container: "py-8",
-    icon: "w-8 h-8 mb-3",
-    title: "text-base",
-    description: "text-sm",
-    button: "text-sm px-4 py-2",
+    paddingY: "2rem",
+    iconSize: "2rem",
+    iconMarginBottom: "0.75rem",
+    titleFontSize: "1rem",
+    descFontSize: "0.875rem",
+    buttonPadding: "0.5rem 1rem",
+    buttonFontSize: "0.875rem",
   },
   md: {
-    container: "py-12",
-    icon: "w-12 h-12 mb-4",
-    title: "text-lg",
-    description: "text-sm",
-    button: "text-sm px-6 py-2",
+    paddingY: "3rem",
+    iconSize: "3rem",
+    iconMarginBottom: "1rem",
+    titleFontSize: "1.125rem",
+    descFontSize: "0.875rem",
+    buttonPadding: "0.5rem 1.5rem",
+    buttonFontSize: "0.875rem",
   },
   lg: {
-    container: "py-16",
-    icon: "w-16 h-16 mb-6",
-    title: "text-xl",
-    description: "text-base",
-    button: "text-base px-8 py-3",
+    paddingY: "4rem",
+    iconSize: "4rem",
+    iconMarginBottom: "1.5rem",
+    titleFontSize: "1.25rem",
+    descFontSize: "1rem",
+    buttonPadding: "0.75rem 2rem",
+    buttonFontSize: "1rem",
   },
 };
 
 /**
  * DashboardEmptyState 컴포넌트
- * 
+ *
  * 대시보드에서 빈 상태를 표시하는 컴포넌트입니다.
  * 데이터가 없을 때 사용자에게 안내 메시지와 액션을 제공합니다.
- * 
+ *
  * Empty state component for dashboards.
  * Displays a message and action when there is no data to show.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -100,7 +87,7 @@ const sizeStyles = {
  *   actionText="데이터 추가"
  *   actionOnClick={handleAdd}
  * />
- * 
+ *
  * @example
  * // 경고 스타일 / Warning style
  * <DashboardEmptyState
@@ -110,7 +97,7 @@ const sizeStyles = {
  *   variant="warning"
  *   size="lg"
  * />
- * 
+ *
  * @param {DashboardEmptyStateProps} props - DashboardEmptyState 컴포넌트의 props / DashboardEmptyState component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} DashboardEmptyState 컴포넌트 / DashboardEmptyState component
@@ -126,36 +113,38 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
       actionOnClick,
       variant = "default",
       size = "md",
-      className,
+      dot,
+      style,
       ...props
     },
     ref
   ) => {
-    const styles = variantStyles[variant];
-    const sizes = sizeStyles[size];
+    const iconColor = variantIconColor[variant];
+    const sizes = sizeConfig[size];
+
+    const buttonStyle: React.CSSProperties = {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "0.5rem",
+      fontWeight: 500,
+      backgroundColor: "var(--color-muted, #f3f4f6)",
+      color: "var(--color-foreground, #374151)",
+      border: "1px solid var(--color-border, #d1d5db)",
+      transition: "background-color 200ms",
+      cursor: "pointer",
+      padding: sizes.buttonPadding,
+      fontSize: sizes.buttonFontSize,
+    };
 
     const actionButton = actionText && (actionHref || actionOnClick) && (
-      <div className="mt-6">
+      <div style={{ marginTop: "1.5rem" }}>
         {actionHref ? (
-          <a
-            href={actionHref}
-            aria-label={actionText}
-            className={merge(
-              "inline-flex items-center justify-center rounded-lg font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 transition-colors duration-200",
-              sizes.button
-            )}
-          >
+          <a href={actionHref} aria-label={actionText} style={buttonStyle}>
             {actionText}
           </a>
         ) : (
-          <button
-            onClick={actionOnClick}
-            aria-label={actionText}
-            className={merge(
-              "inline-flex items-center justify-center rounded-lg font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 transition-colors duration-200",
-              sizes.button
-            )}
-          >
+          <button onClick={actionOnClick} aria-label={actionText} style={buttonStyle}>
             {actionText}
           </button>
         )}
@@ -165,18 +154,22 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
     return (
       <div
         ref={ref}
-        className={merge(
-          "text-center",
-          sizes.container,
-          className
+        style={mergeStyles(
+          {
+            textAlign: "center",
+            paddingTop: sizes.paddingY,
+            paddingBottom: sizes.paddingY,
+          },
+          resolveDot(dot),
+          style
         )}
         {...props}
       >
         {/* 아이콘 */}
         {icon && (
-          <div className={merge("mx-auto", styles.icon)}>
+          <div style={{ margin: "0 auto", width: sizes.iconSize, height: sizes.iconSize, marginBottom: sizes.iconMarginBottom, color: iconColor }}>
             {typeof icon === "string" ? (
-              <Icon name={icon as IconName} className={merge("w-full h-full", styles.icon)} />
+              <Icon name={icon as IconName} className="w-full h-full" style={{ color: iconColor }} />
             ) : (
               icon
             )}
@@ -184,13 +177,13 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
         )}
 
         {/* 제목 */}
-        <h3 className={merge("font-semibold mb-2", styles.title, sizes.title)}>
+        <h3 style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--color-foreground, #111827)", fontSize: sizes.titleFontSize }}>
           {title}
         </h3>
 
         {/* 설명 */}
         {description && (
-          <p className={merge("mb-4", styles.description, sizes.description)}>
+          <p style={{ marginBottom: "1rem", color: "var(--color-muted-foreground, #6b7280)", fontSize: sizes.descFontSize }}>
             {description}
           </p>
         )}
@@ -203,4 +196,3 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
 );
 
 DashboardEmptyState.displayName = "DashboardEmptyState";
-

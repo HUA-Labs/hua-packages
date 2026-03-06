@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { useBlogEditor } from './BlogEditorContext'
 
@@ -9,8 +8,10 @@ import { useBlogEditor } from './BlogEditorContext'
  * BlogEditorContent Props
  */
 export interface BlogEditorContentProps {
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
   /** textarea ref 콜백 / textarea ref callback */
   textareaRef?: React.RefObject<HTMLTextAreaElement | null>
 }
@@ -20,7 +21,7 @@ export interface BlogEditorContentProps {
  * 제목, 요약, 본문 입력 필드
  */
 const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProps>(
-  ({ className, textareaRef }, ref) => {
+  ({ dot, style, textareaRef }, ref) => {
     const {
       formData,
       activeLanguage,
@@ -37,10 +38,11 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
     const isPrimaryLanguage = languages.find((l) => l.isPrimary)?.key === activeLanguage
     const currentLang = languages.find((l) => l.key === activeLanguage)
 
-    const inputClasses =
+    const inputStyle = resolveDot(
       'w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-1 focus:ring-ring focus:border-transparent transition-colors'
+    )
 
-    const labelClasses = 'block text-sm font-medium text-foreground mb-1'
+    const labelStyle = resolveDot('block text-sm font-medium text-foreground mb-1')
 
     const handleTitleChange = (value: string) => {
       updateMultilingualField('title', activeLanguage, value)
@@ -61,15 +63,18 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
     }
 
     return (
-      <div ref={ref} className={merge('p-6 space-y-4', className)}>
+      <div
+        ref={ref}
+        style={mergeStyles(resolveDot('p-6 space-y-4'), resolveDot(dot), style)}
+      >
         {/* 제목 */}
         <div>
-          <label className={labelClasses}>{getLangLabel(labels.titleLabel)}</label>
+          <label style={labelStyle}>{getLangLabel(labels.titleLabel)}</label>
           <input
             type="text"
             value={formData.title[activeLanguage] || ''}
             onChange={(e) => handleTitleChange(e.target.value)}
-            className={inputClasses}
+            style={inputStyle}
             placeholder={labels.titlePlaceholder}
           />
         </div>
@@ -77,12 +82,12 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
         {/* 요약 */}
         {features.enableExcerpt && (
           <div>
-            <label className={labelClasses}>{getLangLabel(labels.excerpt)}</label>
+            <label style={labelStyle}>{getLangLabel(labels.excerpt)}</label>
             <textarea
               value={formData.excerpt[activeLanguage] || ''}
               onChange={(e) => updateMultilingualField('excerpt', activeLanguage, e.target.value)}
               rows={2}
-              className={merge(inputClasses, 'resize-none')}
+              style={mergeStyles(inputStyle, { resize: 'none' })}
               placeholder={labels.excerptPlaceholder}
             />
           </div>
@@ -90,7 +95,7 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
 
         {/* 본문 */}
         <div>
-          <label className={labelClasses}>
+          <label style={labelStyle}>
             {getLangLabel(labels.contentLabel)} (마크다운)
           </label>
           <textarea
@@ -98,7 +103,7 @@ const BlogEditorContent = React.forwardRef<HTMLDivElement, BlogEditorContentProp
             value={formData.content[activeLanguage] || ''}
             onChange={(e) => updateMultilingualField('content', activeLanguage, e.target.value)}
             rows={15}
-            className={merge(inputClasses, 'font-mono text-sm resize-y min-h-[300px]')}
+            style={mergeStyles(inputStyle, { fontFamily: 'monospace', fontSize: '0.875rem', resize: 'vertical', minHeight: '300px' })}
             placeholder={labels.contentPlaceholder}
           />
         </div>

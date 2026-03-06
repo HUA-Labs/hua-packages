@@ -23,7 +23,8 @@ describe('ColorPicker - Tabs', () => {
     render(<ColorPicker value="#3b82f6" onChange={vi.fn()} />);
 
     const tailwindTab = screen.getByText('Tailwind');
-    expect(tailwindTab.className).toContain('bg-background');
+    // Active tab now uses inline style backgroundColor
+    expect(tailwindTab.style.backgroundColor).toBeTruthy();
   });
 
   it('should switch to Custom tab', async () => {
@@ -34,7 +35,8 @@ describe('ColorPicker - Tabs', () => {
     await user.click(screen.getByText('Custom'));
 
     const customTab = screen.getByText('Custom');
-    expect(customTab.className).toContain('bg-background');
+    // After clicking, Custom tab is active and has backgroundColor
+    expect(customTab.style.backgroundColor).toBeTruthy();
   });
 
   it('should display current color preview', () => {
@@ -67,12 +69,13 @@ describe('ColorPicker - Tailwind Tab', () => {
     expect(handleChange).toHaveBeenCalledWith('#fef2f2');
   });
 
-  it('should highlight the current selected color', () => {
+  it('should highlight the current selected color via inline style', () => {
     const { container } = render(<ColorPicker value="#ef4444" onChange={vi.fn()} />);
 
     // #ef4444 is at index 5 in red array, title = red-600
-    const red600 = container.querySelector('button[title="red-600"]');
-    expect(red600?.className).toContain('ring-1');
+    const red600 = container.querySelector('button[title="red-600"]') as HTMLElement;
+    // Now selected state uses outline in inline style
+    expect(red600?.style.outline).toBeTruthy();
   });
 
   it('should render special colors (black, white, transparent)', () => {
@@ -194,7 +197,9 @@ describe('ColorPicker - Custom Tab', () => {
 
     await user.click(screen.getByText('Custom'));
 
-    const slPicker = container.querySelector('.cursor-crosshair');
+    // The SL picker now uses inline style cursor: crosshair instead of class
+    const allDivs = container.querySelectorAll('div');
+    const slPicker = Array.from(allDivs).find(el => el.style.cursor === 'crosshair');
     expect(slPicker).toBeInTheDocument();
   });
 
@@ -206,7 +211,9 @@ describe('ColorPicker - Custom Tab', () => {
     // Switch to custom tab
     fireEvent.click(screen.getByText('Custom'));
 
-    const slPicker = container.querySelector('.cursor-crosshair') as HTMLElement;
+    // Find the SL picker by inline cursor style
+    const allDivs = container.querySelectorAll('div');
+    const slPicker = Array.from(allDivs).find(el => el.style.cursor === 'crosshair') as HTMLElement;
 
     // Simulate mousedown at center of the picker
     fireEvent.mouseDown(slPicker, { clientX: 100, clientY: 56 });

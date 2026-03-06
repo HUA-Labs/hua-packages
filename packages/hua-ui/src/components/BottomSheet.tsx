@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
@@ -11,7 +10,7 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {boolean} open - BottomSheet 열림/닫힘 상태 / BottomSheet open/close state
  * @property {(open: boolean) => void} onOpenChange - 상태 변경 콜백 / State change callback
  * @property {React.ReactNode} children - BottomSheet 내용 / BottomSheet content
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @property {"sm" | "md" | "lg" | "xl" | "full"} [height="md"] - BottomSheet 높이 / BottomSheet height
  * @property {boolean} [showBackdrop=true] - 배경 오버레이 표시 여부 / Show backdrop overlay
  * @property {string} [backdropClassName] - 배경 오버레이 추가 CSS 클래스 / Backdrop overlay additional CSS class
@@ -28,14 +27,16 @@ interface BottomSheetProps {
   onClose?: () => void
   /** BottomSheet 내용 / BottomSheet content */
   children: React.ReactNode
-  /** 추가 CSS 클래스 / Additional CSS class */
-  className?: string
+  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
+  dot?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   /** BottomSheet 높이 / BottomSheet height */
   height?: "sm" | "md" | "lg" | "xl" | "full"
   /** 배경 오버레이 표시 여부 / Show backdrop overlay */
   showBackdrop?: boolean
-  /** 배경 오버레이 추가 CSS 클래스 / Backdrop overlay additional CSS class */
-  backdropClassName?: string
+  /** 배경 오버레이 추가 dot 스트링 / Backdrop overlay additional dot string */
+  backdropDot?: string
   /** 배경 클릭 시 닫기 여부 / Close on backdrop click */
   closeOnBackdropClick?: boolean
   /** ESC 키로 닫기 여부 / Close on ESC key */
@@ -48,46 +49,44 @@ interface BottomSheetProps {
   snapPoints?: number[]
   /** 기본 스냅 포인트 (퍼센트) / Default snap point (percentage) */
   defaultSnap?: number
-  /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
 }
 
 /**
  * BottomSheet 컴포넌트 / BottomSheet component
- * 
+ *
  * 화면 하단에서 올라오는 시트 컴포넌트입니다.
  * 모바일 친화적인 UI를 제공하며, 드래그로 높이를 조절할 수 있습니다.
  * 스냅 포인트를 지원하여 특정 높이에서 멈출 수 있습니다.
- * 
+ *
  * Sheet component that slides up from the bottom of the screen.
  * Provides mobile-friendly UI and allows height adjustment by dragging.
  * Supports snap points to stop at specific heights.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * const [open, setOpen] = useState(false)
- * 
+ *
  * <BottomSheet open={open} onOpenChange={setOpen}>
  *   <BottomSheetHeader>제목</BottomSheetHeader>
  *   <BottomSheetContent>내용</BottomSheetContent>
  * </BottomSheet>
- * 
+ *
  * @example
  * // 커스텀 스냅 포인트 / Custom snap points
- * <BottomSheet 
- *   open={open} 
+ * <BottomSheet
+ *   open={open}
  *   onOpenChange={setOpen}
  *   snapPoints={[30, 60, 90]}
  *   defaultSnap={30}
  * >
  *   <BottomSheetContent>내용</BottomSheetContent>
  * </BottomSheet>
- * 
+ *
  * @param {BottomSheetProps} props - BottomSheet 컴포넌트의 props / BottomSheet component props
  * @param {React.Ref<HTMLDivElement>} ref - BottomSheet 컨테이너 ref / BottomSheet container ref
  * @returns {JSX.Element} BottomSheet 컴포넌트 / BottomSheet component
- * 
+ *
  * @todo 접근성 개선: role="dialog", aria-modal="true" 추가 필요 / Accessibility: Add role="dialog", aria-modal="true"
  * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
  */
@@ -96,11 +95,11 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     isOpen,
     onClose,
     children,
-    className,
     dot: dotProp,
+    style,
     height = "md",
     showBackdrop = true,
-    backdropClassName,
+    backdropDot,
     closeOnBackdropClick = true,
     closeOnEscape = true,
     showDragHandle = true,
@@ -109,7 +108,6 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     defaultSnap = 50,
     ...props
   }, ref) => {
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const _isOpen = isOpen ?? false
     const handleClose = () => {
       onClose?.()
@@ -122,12 +120,12 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     const [startY, setStartY] = React.useState(0)
     const [currentY, setCurrentY] = React.useState(0)
 
-    const heightClasses = {
-      sm: "h-64",
-      md: "h-96",
-      lg: "h-[32rem]",
-      xl: "h-[40rem]",
-      full: "h-full"
+    const heightStyles: Record<string, React.CSSProperties> = {
+      sm: { height: '16rem' },
+      md: { height: '24rem' },
+      lg: { height: '32rem' },
+      xl: { height: '40rem' },
+      full: {}
     }
 
     React.useEffect(() => {
@@ -197,15 +195,25 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
 
     if (!isVisible) return null
 
+    // Backdrop opacity animation
+    const backdropOpacity = isAnimating
+      ? (_isOpen ? 1 : 0)
+      : undefined
+
+    // Sheet transform animation
+    const sheetTransform = isAnimating
+      ? (_isOpen ? 'translateY(0)' : 'translateY(100%)')
+      : undefined
+
     return (
-      <div className="fixed inset-0 z-50">
+      <div style={resolveDot('fixed inset-0 z-50')}>
         {/* Backdrop */}
         {showBackdrop && (
           <div
-            className={merge(
-              "absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
-              isAnimating ? (_isOpen ? "opacity-100" : "opacity-0") : "",
-              backdropClassName
+            style={mergeStyles(
+              resolveDot('absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300'),
+              resolveDot(backdropDot),
+              backdropOpacity !== undefined ? { opacity: backdropOpacity } : undefined
             )}
             onClick={closeOnBackdropClick ? handleClose : undefined}
           />
@@ -214,19 +222,21 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         {/* Bottom Sheet */}
         <div
           ref={ref}
-          className={merge(
-            "absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe",
-            height !== "full" ? heightClasses[height] : "",
-            isAnimating ? (_isOpen ? "translate-y-0" : "translate-y-full") : "",
-            className
+          style={mergeStyles(
+            resolveDot('absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl rounded-t-lg transition-transform duration-300 ease-out pb-safe'),
+            heightStyles[height],
+            {
+              // height prop이 "full"일 때만 퍼센트 높이 사용 (스냅 포인트)
+              // 그 외에는 heightStyles의 고정 높이 사용
+              height: height === "full" ? `${currentHeight}%` : undefined,
+              maxHeight: height !== "full" ? undefined : "100%",
+              transform: isDragging
+                ? `translateY(${currentY - startY}px)`
+                : sheetTransform,
+            },
+            resolveDot(dotProp),
+            style
           )}
-          style={mergeStyles({
-            // height prop이 "full"일 때만 퍼센트 높이 사용 (스냅 포인트)
-            // 그 외에는 heightClasses의 고정 높이 사용
-            height: height === "full" ? `${currentHeight}%` : undefined,
-            maxHeight: height !== "full" ? undefined : "100%",
-            transform: isDragging ? `translateY(${currentY - startY}px)` : undefined
-          }, dotStyle)}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -234,8 +244,8 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         >
           {/* Drag Handle */}
           {showDragHandle && (
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
+            <div style={resolveDot('flex justify-center pt-3 pb-2')}>
+              <div style={resolveDot('w-12 h-1.5 bg-muted-foreground/30 rounded-full')} />
             </div>
           )}
 
@@ -251,13 +261,14 @@ BottomSheet.displayName = "BottomSheet"
  * BottomSheetHeader 컴포넌트의 props / BottomSheetHeader component props
  * @typedef {Object} BottomSheetHeaderProps
  * @property {React.ReactNode} children - 헤더 내용 / Header content
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @property {boolean} [showCloseButton=true] - 닫기 버튼 표시 여부 / Show close button
  * @property {() => void} [onClose] - 닫기 버튼 클릭 콜백 / Close button click callback
  */
 interface BottomSheetHeaderProps {
   children: React.ReactNode
-  className?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   showCloseButton?: boolean
   onClose?: () => void
 }
@@ -266,25 +277,25 @@ interface BottomSheetHeaderProps {
  * BottomSheetHeader 컴포넌트 / BottomSheetHeader component
  * BottomSheet의 헤더 영역을 표시합니다.
  * Displays the header area of a BottomSheet.
- * 
+ *
  * @component
  * @param {BottomSheetHeaderProps} props - BottomSheetHeader 컴포넌트의 props / BottomSheetHeader component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} BottomSheetHeader 컴포넌트 / BottomSheetHeader component
  */
 const BottomSheetHeader = React.forwardRef<HTMLDivElement, BottomSheetHeaderProps>(
-  ({ children, className, showCloseButton = true, onClose, ...props }, ref) => {
+  ({ children, style, showCloseButton = true, onClose, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={merge("flex items-center justify-between px-6 py-4", className)}
+        style={mergeStyles(resolveDot('flex items-center justify-between px-6 py-4'), style)}
         {...props}
       >
-        <div className="flex-1">{children}</div>
+        <div style={resolveDot('flex-1')}>{children}</div>
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            style={resolveDot('p-2 rounded-lg hover:bg-muted transition-colors')}
           >
             <Icon name="close" size={20} />
           </button>
@@ -299,29 +310,30 @@ BottomSheetHeader.displayName = "BottomSheetHeader"
  * BottomSheetContent 컴포넌트의 props / BottomSheetContent component props
  * @typedef {Object} BottomSheetContentProps
  * @property {React.ReactNode} children - 콘텐츠 / Content
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
 interface BottomSheetContentProps {
   children: React.ReactNode
-  className?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
 }
 
 /**
  * BottomSheetContent 컴포넌트 / BottomSheetContent component
  * BottomSheet의 메인 콘텐츠 영역을 표시합니다.
  * Displays the main content area of a BottomSheet.
- * 
+ *
  * @component
  * @param {BottomSheetContentProps} props - BottomSheetContent 컴포넌트의 props / BottomSheetContent component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} BottomSheetContent 컴포넌트 / BottomSheetContent component
  */
 const BottomSheetContent = React.forwardRef<HTMLDivElement, BottomSheetContentProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, style, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={merge("flex-1 px-6 pb-6 overflow-y-auto", className)}
+        style={mergeStyles(resolveDot('flex-1 px-6 pb-6 overflow-y-auto'), style)}
         {...props}
       >
         {children}
@@ -331,4 +343,4 @@ const BottomSheetContent = React.forwardRef<HTMLDivElement, BottomSheetContentPr
 )
 BottomSheetContent.displayName = "BottomSheetContent"
 
-export { BottomSheet, BottomSheetHeader, BottomSheetContent } 
+export { BottomSheet, BottomSheetHeader, BottomSheetContent }

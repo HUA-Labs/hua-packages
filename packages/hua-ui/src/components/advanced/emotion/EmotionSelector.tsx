@@ -3,7 +3,7 @@
 import React from "react"
 import { EmotionButton } from "./EmotionButton"
 import { EmotionMeter } from "./EmotionMeter"
-import { merge } from '../../../lib/utils';
+import { mergeStyles, resolveDot } from '../../../hooks/useDotMap';
 
 /**
  * EmotionSelector 컴포넌트의 props / EmotionSelector component props
@@ -23,7 +23,7 @@ import { merge } from '../../../lib/utils';
  * @property {"button" | "card" | "chip"} [variant="button"] - 감정 표시 스타일 / Emotion display style
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
-interface EmotionSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
+interface EmotionSelectorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   selectedEmotion?: string
   onEmotionSelect?: (emotion: string) => void
   layout?: "grid" | "list" | "compact"
@@ -38,6 +38,8 @@ interface EmotionSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
   }>
   size?: "sm" | "md" | "lg"
   variant?: "button" | "card" | "chip"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const defaultEmotions = [
@@ -85,7 +87,8 @@ const defaultEmotions = [
  */
 const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
   ({
-    className,
+    dot: dotProp,
+    style,
     selectedEmotion,
     onEmotionSelect,
     layout = "grid",
@@ -112,10 +115,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
             isSelected={isSelected}
             size={size}
             onClick={() => handleEmotionClick(emotion.key)}
-            className={merge(
-              "transition-all duration-200",
-              isSelected && "ring-1 ring-offset-2 ring-primary"
-            )}
+            style={isSelected ? { boxShadow: '0 0 0 1px var(--color-primary, rgb(99 102 241))', outlineOffset: '2px' } : undefined}
           >
             {emotion.label}
           </EmotionButton>
@@ -123,24 +123,38 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
       }
 
       if (variant === "card") {
+        const cardStyle: React.CSSProperties = mergeStyles(
+          resolveDot('p-4 rounded-lg cursor-pointer'),
+          {
+            borderWidth: '2px',
+            borderStyle: 'solid',
+            transition: 'all 200ms ease',
+            borderColor: isSelected ? 'var(--color-primary, rgb(99 102 241))' : 'var(--color-border, rgb(229 231 235))',
+            backgroundColor: isSelected ? 'color-mix(in srgb, var(--color-primary, rgb(99 102 241)) 5%, transparent)' : 'transparent',
+          }
+        )
+
+        const iconWrapStyle: React.CSSProperties = mergeStyles(
+          resolveDot('w-8 h-8 rounded-full'),
+          {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: isSelected ? 'var(--color-primary, rgb(99 102 241))' : 'var(--color-muted, rgb(243 244 246))',
+            color: isSelected ? 'var(--color-primary-foreground, rgb(255 255 255))' : undefined,
+          }
+        )
+
         return (
           <div
             key={emotion.key}
-            className={merge(
-              "p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md",
-              isSelected
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
-            )}
+            style={cardStyle}
             onClick={() => handleEmotionClick(emotion.key)}
           >
-            <div className="flex items-center space-x-3">
-              <div className={merge(
-                "w-8 h-8 rounded-full flex items-center justify-center",
-                isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
-              )}>
+            <div style={mergeStyles(resolveDot('flex items-center'), { gap: '0.75rem' })}>
+              <div style={iconWrapStyle}>
                 {emotion.icon && (
-                  <span className="text-lg">
+                  <span style={{ fontSize: '1.125rem' }}>
                     {emotion.icon === "smile" && "😊"}
                     {emotion.icon === "frown" && "😢"}
                     {emotion.icon === "angry" && "😠"}
@@ -151,25 +165,30 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
                   </span>
                 )}
               </div>
-              <span className="font-medium truncate max-w-[120px]">{emotion.label}</span>
+              <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '120px' }}>{emotion.label}</span>
             </div>
           </div>
         )
       }
 
       if (variant === "chip") {
+        const chipStyle: React.CSSProperties = mergeStyles(
+          resolveDot('rounded-full cursor-pointer text-sm font-medium'),
+          {
+            padding: '0.25rem 0.75rem',
+            transition: 'all 200ms ease',
+            backgroundColor: isSelected ? 'var(--color-primary, rgb(99 102 241))' : 'var(--color-muted, rgb(243 244 246))',
+            color: isSelected ? 'var(--color-primary-foreground, rgb(255 255 255))' : undefined,
+          }
+        )
+
         return (
           <div
             key={emotion.key}
-            className={merge(
-              "px-3 py-1 rounded-full cursor-pointer transition-all duration-200 text-sm font-medium",
-              isSelected
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted hover:bg-muted/80"
-            )}
+            style={chipStyle}
             onClick={() => handleEmotionClick(emotion.key)}
           >
-            <span className="truncate max-w-[100px]">{emotion.label}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px', display: 'block' }}>{emotion.label}</span>
           </div>
         )
       }
@@ -177,27 +196,33 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
       return null
     }
 
-    const layoutClasses = {
-      grid: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3",
-      list: "space-y-2",
-      compact: "flex flex-wrap gap-1"
+    const layoutStyles: Record<string, React.CSSProperties> = {
+      grid: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.5rem' },
+      list: { display: 'flex', flexDirection: 'column', gap: '0.5rem' },
+      compact: { display: 'flex', flexWrap: 'wrap', gap: '0.25rem' },
     }
+
+    const containerStyle = mergeStyles(
+      { display: 'flex', flexDirection: 'column', gap: '1rem' },
+      resolveDot(dotProp),
+      style,
+    )
 
     return (
       <div
         ref={ref}
-        className={merge("space-y-4", className)}
+        style={containerStyle}
         {...props}
       >
-        <div className={layoutClasses[layout]}>
+        <div style={layoutStyles[layout]}>
           {emotions.map(renderEmotionItem)}
         </div>
 
         {showIntensity && selectedEmotion && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">감정 강도</span>
-              <span className="text-sm text-muted-foreground">{intensity}%</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={mergeStyles(resolveDot('flex items-center'), { justifyContent: 'space-between' })}>
+              <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>감정 강도</span>
+              <span style={{ fontSize: '0.875rem', color: 'var(--color-muted-foreground, rgb(107 114 128))' }}>{intensity}%</span>
             </div>
             <input
               type="range"
@@ -205,9 +230,9 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
               max="100"
               value={intensity}
               onChange={(e) => onIntensityChange?.(Number(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
+              style={{ width: '100%', height: '0.5rem', borderRadius: '0.5rem', cursor: 'pointer', appearance: 'none', backgroundColor: 'var(--color-muted, rgb(229 231 235))' }}
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--color-muted-foreground, rgb(107 114 128))' }}>
               <span>약함</span>
               <span>보통</span>
               <span>강함</span>
@@ -216,7 +241,7 @@ const EmotionSelector = React.forwardRef<HTMLDivElement, EmotionSelectorProps>(
         )}
 
         {selectedEmotion && showIntensity && (
-          <div className="flex justify-center">
+          <div style={resolveDot('flex justify-center')}>
             <EmotionMeter
               value={intensity}
               size="md"

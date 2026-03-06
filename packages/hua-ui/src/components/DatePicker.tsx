@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
 import { Icon } from "./Icon"
 import { Popover } from "./Popover"
 import { Button } from "./Button"
@@ -20,10 +19,9 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {string} [dateFormat="YYYY-MM-DD"] - 날짜 포맷 / Date format
  * @property {string} [locale="ko-KR"] - 로케일 / Locale
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
- * @property {string} [className] - 추가 클래스명 / Additional class name
- * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'>}
  */
-export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'> {
   value?: Date | null
   onChange?: (date: Date | null) => void
   minDate?: Date
@@ -34,26 +32,27 @@ export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   dateFormat?: string
   locale?: string
   size?: "sm" | "md" | "lg"
-  className?: string
   /** 표시할 날짜 배열 (점으로 표시) / Dates to mark with a dot */
   markedDates?: Date[]
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
+  /** 추가 인라인 스타일 / Additional inline style */
+  style?: React.CSSProperties
 }
 
-const sizeClasses = {
-  sm: "h-8 text-sm px-3",
-  md: "h-10 text-sm px-4",
-  lg: "h-12 text-base px-5",
+const sizeStyles: Record<string, React.CSSProperties> = {
+  sm: { height: '2rem', fontSize: '0.875rem', padding: '0 0.75rem' },
+  md: { height: '2.5rem', fontSize: '0.875rem', padding: '0 1rem' },
+  lg: { height: '3rem', fontSize: '1rem', padding: '0 1.25rem' },
 }
 
 const formatDate = (date: Date | null, format: string = "YYYY-MM-DD", _locale: string = "ko-KR"): string => {
   if (!date) return ""
-  
+
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, "0")
   const day = String(date.getDate()).padStart(2, "0")
-  
+
   return format
     .replace("YYYY", String(year))
     .replace("MM", month)
@@ -70,13 +69,13 @@ const getFirstDayOfMonth = (year: number, month: number): number => {
 
 /**
  * DatePicker 컴포넌트 / DatePicker component
- * 
+ *
  * 날짜를 선택할 수 있는 컴포넌트입니다.
  * 캘린더 팝오버를 통해 직관적으로 날짜를 선택할 수 있습니다.
- * 
+ *
  * Component for selecting dates.
  * Allows intuitive date selection through a calendar popover.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -84,7 +83,7 @@ const getFirstDayOfMonth = (year: number, month: number): number => {
  *   value={selectedDate}
  *   onChange={setSelectedDate}
  * />
- * 
+ *
  * @example
  * // 날짜 범위 제한 / Date range restriction
  * <DatePicker
@@ -94,7 +93,7 @@ const getFirstDayOfMonth = (year: number, month: number): number => {
  *   maxDate={new Date("2024-12-31")}
  *   placeholder="날짜 선택"
  * />
- * 
+ *
  * @param {DatePickerProps} props - DatePicker 컴포넌트의 props / DatePicker component props
  * @returns {JSX.Element} DatePicker 컴포넌트 / DatePicker component
  */
@@ -111,14 +110,13 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       dateFormat = "YYYY-MM-DD",
       locale = "ko-KR",
       size = "md",
-      className,
       markedDates,
       dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [isOpen, setIsOpen] = React.useState(false)
     const [currentMonth, setCurrentMonth] = React.useState(value ? new Date(value.getFullYear(), value.getMonth()) : new Date())
     const [hoveredDate, setHoveredDate] = React.useState<Date | null>(null)
@@ -258,20 +256,31 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       calendarDays.push(new Date(year, month + 1, day))
     }
 
+    const triggerButtonStyle: React.CSSProperties = {
+      display: 'flex',
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderRadius: '0.5rem',
+      border: error ? '1px solid hsl(var(--destructive))' : '1px solid hsl(var(--input))',
+      backgroundColor: 'hsl(var(--background))',
+      textAlign: 'left',
+      fontSize: sizeStyles[size].fontSize,
+      height: sizeStyles[size].height,
+      padding: sizeStyles[size].padding,
+      transition: 'colors 150ms',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.5 : 1,
+    }
+
     const triggerButton = (
       <button
         type="button"
         disabled={disabled}
-        className={merge(
-          "flex w-full items-center justify-between rounded-lg border border-input bg-background px-4 py-2 text-left text-sm transition-colors",
-          "hover:bg-muted focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2",
-          error && "border-destructive focus:ring-destructive",
-          disabled && "cursor-not-allowed opacity-50",
-          sizeClasses[size]
-        )}
+        style={triggerButtonStyle}
         aria-label={displayDate || placeholder}
       >
-        <span className={merge("flex-1", !displayDate && "text-muted-foreground")}>
+        <span style={{ flex: 1, color: displayDate ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))' }}>
           {displayDate || placeholder}
         </span>
         <Icon
@@ -282,7 +291,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     )
 
     return (
-      <div ref={ref} className={merge("relative", className)} style={dotStyle} {...props}>
+      <div ref={ref} style={mergeStyles(resolveDot('relative'), resolveDot(dotProp), style)} {...props}>
         <Popover
           open={isOpen}
           onOpenChange={setIsOpen}
@@ -293,26 +302,30 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           contentStyle={{ padding: 0 }}
         >
           <div
-            className="rounded-lg bg-popover"
+            style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--popover))' }}
           >
-            <div className="p-4">
+            <div style={{ padding: '1rem' }}>
               {/* 헤더 */}
-              <div className="flex items-center justify-between mb-4">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="rounded-lg p-2 hover:bg-muted transition-colors"
+                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={ariaLabels.prevMonth}
                 >
                   <Icon name="chevronLeft" className="h-4 w-4" />
                 </button>
-                <div className="text-lg font-semibold text-foreground">
+                <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>
                   {formatMonth(year, month, locale)}
                 </div>
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="rounded-lg p-2 hover:bg-muted transition-colors"
+                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={ariaLabels.nextMonth}
                 >
                   <Icon name="chevronRight" className="h-4 w-4" />
@@ -320,15 +333,21 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               </div>
 
               {/* 요일 헤더 */}
-              <div className="grid grid-cols-7 gap-1 mb-2">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem', marginBottom: '0.5rem' }}>
                 {weekDays.map((day, index) => (
                   <div
                     key={index}
-                    className={merge(
-                      "text-center text-xs font-medium py-2",
-                      index === 0 && "text-destructive",
-                      index === 6 && "text-primary"
-                    )}
+                    style={{
+                      textAlign: 'center',
+                      fontSize: '0.75rem',
+                      fontWeight: 500,
+                      padding: '0.5rem 0',
+                      color: index === 0
+                        ? 'hsl(var(--destructive))'
+                        : index === 6
+                          ? 'hsl(var(--primary))'
+                          : 'hsl(var(--foreground))',
+                    }}
                   >
                     {day}
                   </div>
@@ -336,7 +355,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               </div>
 
               {/* 캘린더 그리드 */}
-              <div className="grid grid-cols-7 gap-1">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem' }}>
                 {calendarDays.map((date, index) => {
                   if (!date) return <div key={index} />
 
@@ -351,6 +370,21 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                     date.getDate() === hoveredDate.getDate()
 
                   const buttonStyle: React.CSSProperties = {
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '2.25rem',
+                    width: '2.25rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'all 150ms',
+                    border: 'none',
+                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                    outline: 'none',
+                    backgroundColor: 'transparent',
                     ...(!isCurrentMonth && !isSelected ? { opacity: 0.3 } : {}),
                     ...(isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%))', color: '#fff' } : {}),
                     ...(isTodayDate && !isSelected ? {
@@ -368,20 +402,20 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       onClick={() => handleDateSelect(date)}
                       onMouseEnter={() => setHoveredDate(date)}
                       onMouseLeave={() => setHoveredDate(null)}
-                      className="relative flex flex-col items-center justify-center h-9 w-9 rounded-lg text-sm font-medium transition-all focus:outline-none"
                       style={buttonStyle}
                       aria-label={formatDateAriaLabel(date, locale)}
                     >
-                      <span className="relative z-10 leading-none">
+                      <span style={{ position: 'relative', zIndex: 10, lineHeight: 1 }}>
                         {date.getDate()}
                       </span>
                       {isMarked && (
                         <span
-                          className="absolute rounded-full"
                           style={{
+                            position: 'absolute',
                             bottom: '1px',
                             width: '6px',
                             height: '6px',
+                            borderRadius: '9999px',
                             backgroundColor: isSelected ? '#fff' : 'hsl(var(--primary, 187 92% 50%))',
                           }}
                         />
@@ -392,7 +426,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               </div>
 
               {/* 오늘 버튼 */}
-              <div className="mt-4 pt-4 border-t border-border">
+              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid hsl(var(--border))' }}>
                 <Button
                   variant="outline"
                   size="sm"

@@ -1,26 +1,40 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { merge } from "../../../lib/utils";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { Icon } from "../../Icon";
-import { useColorStyles } from "../../../lib/styles/colors";
 import type { Color } from "../../../lib/types/common";
+import type { KanbanColumnHeaderProps } from "./types";
 
 /**
- * Color to dot class mapping
+ * Color dot indicator styles (inline, no Tailwind)
  */
-const colorDotClasses: Record<Color, string> = {
-  blue: "bg-indigo-500",
-  purple: "bg-purple-500",
-  green: "bg-green-500",
-  orange: "bg-orange-500",
-  red: "bg-red-500",
-  indigo: "bg-indigo-500",
-  pink: "bg-pink-500",
-  gray: "bg-gray-500",
-  cyan: "bg-cyan-500",
+const colorDotStyleMap: Record<Color, React.CSSProperties> = {
+  blue: { backgroundColor: "#6366f1" },
+  purple: { backgroundColor: "#a855f7" },
+  green: { backgroundColor: "#22c55e" },
+  orange: { backgroundColor: "#f97316" },
+  red: { backgroundColor: "#ef4444" },
+  indigo: { backgroundColor: "#6366f1" },
+  pink: { backgroundColor: "#ec4899" },
+  gray: { backgroundColor: "#6b7280" },
+  cyan: { backgroundColor: "#06b6d4" },
 };
-import type { KanbanColumnHeaderProps } from "./types";
+
+/**
+ * Badge styles per color (light mode)
+ */
+const colorBadgeStyleMap: Record<Color, React.CSSProperties> = {
+  blue: { backgroundColor: "rgba(239,246,255,0.3)", color: "#1d4ed8" },
+  purple: { backgroundColor: "rgba(250,245,255,0.3)", color: "#7e22ce" },
+  green: { backgroundColor: "rgba(240,253,244,0.3)", color: "#15803d" },
+  orange: { backgroundColor: "rgba(255,247,237,0.3)", color: "#c2410c" },
+  red: { backgroundColor: "rgba(254,242,242,0.3)", color: "#b91c1c" },
+  indigo: { backgroundColor: "rgba(238,242,255,0.3)", color: "#4338ca" },
+  pink: { backgroundColor: "rgba(253,242,248,0.3)", color: "#be185d" },
+  gray: { backgroundColor: "rgba(249,250,251,0.3)", color: "#374151" },
+  cyan: { backgroundColor: "rgba(236,254,255,0.3)", color: "#0e7490" },
+};
 
 /**
  * KanbanColumnHeader 컴포넌트
@@ -28,10 +42,7 @@ import type { KanbanColumnHeaderProps } from "./types";
  * 칸반 컬럼의 헤더를 렌더링합니다.
  * 제목 편집, 삭제, 접기/펼치기 기능을 제공합니다.
  */
-export const KanbanColumnHeader = React.forwardRef<
-  HTMLDivElement,
-  KanbanColumnHeaderProps
->(
+export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnHeaderProps>(
   (
     {
       column,
@@ -40,7 +51,8 @@ export const KanbanColumnHeader = React.forwardRef<
       onDelete,
       onToggleCollapse,
       dragHandleProps,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
@@ -49,7 +61,10 @@ export const KanbanColumnHeader = React.forwardRef<
     const [editTitle, setEditTitle] = useState(column.title);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const colorStyles = useColorStyles(column.color || "gray");
+    const color: Color = column.color || "gray";
+    const dotStyle = colorDotStyleMap[color];
+    const badgeStyle = colorBadgeStyleMap[color];
+    const wipBadgeStyle: React.CSSProperties = { backgroundColor: "#fef3c7", color: "#b45309" };
 
     // Focus input when editing starts
     useEffect(() => {
@@ -89,9 +104,22 @@ export const KanbanColumnHeader = React.forwardRef<
       return (
         <div
           ref={ref}
-          className={merge(
-            "flex flex-col items-center justify-center h-full min-h-[300px] py-4 px-2 rounded-xl",
-            className
+          style={mergeStyles(
+            {
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+              minHeight: "300px",
+              paddingTop: "1rem",
+              paddingBottom: "1rem",
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+              borderRadius: "0.75rem",
+            },
+            resolveDot(dot),
+            style
           )}
           {...props}
         >
@@ -103,20 +131,57 @@ export const KanbanColumnHeader = React.forwardRef<
               onToggleCollapse?.();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex flex-col items-center gap-3 w-full h-full justify-center cursor-pointer hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors rounded-lg p-2"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "0.75rem",
+              width: "100%",
+              height: "100%",
+              justifyContent: "center",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              borderRadius: "0.5rem",
+              padding: "0.5rem",
+              transition: "background-color 150ms",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(229,231,235,0.5)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+            }}
           >
             <Icon
               name="chevronRight"
               size={16}
-              className="text-gray-400"
+              style={{ color: "#9ca3af" }}
             />
             <span
-              className="text-sm font-semibold text-gray-700 dark:text-gray-300 tracking-wide"
-              style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+              style={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.05em",
+                writingMode: "vertical-rl",
+                textOrientation: "mixed",
+              }}
             >
               {column.title}
             </span>
-            <span className={merge("text-xs px-2 py-1 rounded-full font-medium", colorStyles.badge)}>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+                paddingTop: "0.25rem",
+                paddingBottom: "0.25rem",
+                borderRadius: "9999px",
+                fontWeight: 500,
+                ...badgeStyle,
+              }}
+            >
               {cardCount}
             </span>
           </button>
@@ -127,34 +192,66 @@ export const KanbanColumnHeader = React.forwardRef<
     return (
       <div
         ref={ref}
-        className={merge(
-          "flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-700",
-          className
+        style={mergeStyles(
+          {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.5rem",
+            paddingLeft: "0.75rem",
+            paddingRight: "0.75rem",
+            paddingTop: "0.75rem",
+            paddingBottom: "0.75rem",
+            borderBottom: "1px solid #e5e7eb",
+          },
+          resolveDot(dot),
+          style
         )}
         {...props}
       >
         {/* Left: Drag handle + Color indicator + Title */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
           {/* Drag handle */}
           {dragHandleProps && (
             <div
               {...dragHandleProps}
-              className={merge(
-                "flex-shrink-0 p-0.5 -ml-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
-                dragHandleProps?.className
-              )}
+              style={{
+                flexShrink: 0,
+                padding: "0.125rem",
+                marginLeft: "-0.25rem",
+                borderRadius: "0.25rem",
+                cursor: "grab",
+                transition: "background-color 150ms",
+              }}
               title="드래그하여 컬럼 이동"
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = "#e5e7eb";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+              }}
             >
-              <Icon name="moreVertical" size={16} className="text-gray-400" />
+              <Icon name="moreVertical" size={16} style={{ color: "#9ca3af" }} />
             </div>
           )}
 
           {/* Color dot */}
           <div
-            className={merge(
-              "w-3 h-3 rounded-full flex-shrink-0",
-              colorDotClasses[column.color || "gray"]
-            )}
+            style={{
+              width: "0.75rem",
+              height: "0.75rem",
+              borderRadius: "9999px",
+              flexShrink: 0,
+              ...dotStyle,
+            }}
           />
 
           {/* Title */}
@@ -166,15 +263,45 @@ export const KanbanColumnHeader = React.forwardRef<
               onChange={(e) => setEditTitle(e.target.value)}
               onBlur={handleTitleSubmit}
               onKeyDown={handleTitleKeyDown}
-              className="flex-1 min-w-0 px-2 py-1 text-sm font-semibold bg-transparent border border-indigo-500 rounded outline-none text-gray-800 dark:text-white"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+                paddingTop: "0.25rem",
+                paddingBottom: "0.25rem",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                backgroundColor: "transparent",
+                border: "1px solid #6366f1",
+                borderRadius: "0.25rem",
+                outline: "none",
+                color: "#1f2937",
+              }}
             />
           ) : (
             <h3
-              className={merge(
-                "flex-1 min-w-0 text-sm font-semibold truncate text-gray-800 dark:text-white",
-                onTitleChange && "cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400"
-              )}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "#1f2937",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: onTitleChange ? "pointer" : "default",
+                transition: "color 150ms",
+              }}
               onClick={handleTitleClick}
+              onMouseEnter={(e) => {
+                if (onTitleChange) {
+                  (e.currentTarget as HTMLHeadingElement).style.color = "#4f46e5";
+                }
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLHeadingElement).style.color = "#1f2937";
+              }}
             >
               {column.title}
             </h3>
@@ -182,11 +309,16 @@ export const KanbanColumnHeader = React.forwardRef<
 
           {/* Card count badge */}
           <span
-            className={merge(
-              "text-xs px-2 py-0.5 rounded-full flex-shrink-0",
-              colorStyles.badge,
-              column.limit && cardCount >= column.limit && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-            )}
+            style={{
+              fontSize: "0.75rem",
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+              paddingTop: "0.125rem",
+              paddingBottom: "0.125rem",
+              borderRadius: "9999px",
+              flexShrink: 0,
+              ...(column.limit && cardCount >= column.limit ? wipBadgeStyle : badgeStyle),
+            }}
           >
             {cardCount}
             {column.limit && `/${column.limit}`}
@@ -194,7 +326,14 @@ export const KanbanColumnHeader = React.forwardRef<
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.25rem",
+            flexShrink: 0,
+          }}
+        >
           {/* Collapse button */}
           {onToggleCollapse && (
             <button
@@ -205,13 +344,26 @@ export const KanbanColumnHeader = React.forwardRef<
                 onToggleCollapse();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              style={{
+                padding: "0.25rem",
+                borderRadius: "0.25rem",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                transition: "background-color 150ms",
+              }}
               aria-label="컬럼 접기"
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#e5e7eb";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+              }}
             >
               <Icon
                 name="chevronLeft"
                 size={14}
-                className="text-gray-400"
+                style={{ color: "#9ca3af" }}
               />
             </button>
           )}
@@ -226,13 +378,30 @@ export const KanbanColumnHeader = React.forwardRef<
                 onDelete();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors group"
+              style={{
+                padding: "0.25rem",
+                borderRadius: "0.25rem",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                transition: "background-color 150ms",
+              }}
               aria-label="컬럼 삭제"
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#fee2e2";
+                const icon = (e.currentTarget as HTMLButtonElement).querySelector("[data-icon]");
+                if (icon) (icon as HTMLElement).style.color = "#ef4444";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                const icon = (e.currentTarget as HTMLButtonElement).querySelector("[data-icon]");
+                if (icon) (icon as HTMLElement).style.color = "#9ca3af";
+              }}
             >
               <Icon
                 name="delete"
                 size={14}
-                className="text-gray-400 group-hover:text-red-500"
+                style={{ color: "#9ca3af", transition: "color 150ms" }}
               />
             </button>
           )}

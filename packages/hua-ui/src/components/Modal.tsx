@@ -2,7 +2,6 @@
 
 import React from "react"
 import { createPortal } from "react-dom"
-import { merge } from "../lib/utils"
 import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
@@ -17,9 +16,9 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {string} [title] - 모달 제목 / Modal title
  * @property {string} [description] - 모달 설명 / Modal description
  * @property {boolean} [showBackdrop=true] - 배경 오버레이 표시 여부 / Show backdrop overlay
- * @property {string} [backdropClassName] - 배경 오버레이 추가 CSS 클래스 / Additional CSS class for backdrop
+ * @property {string} [backdropDot] - 배경 오버레이 추가 dot 스트링 / Additional dot string for backdrop
  * @property {boolean} [centered=true] - 모달을 화면 중앙에 배치할지 여부 / Center modal on screen
- * @property {string} [className] - 모달 컨테이너 추가 CSS 클래스 / Additional CSS class for modal container
+ * @property {React.CSSProperties} [style] - 모달 컨테이너 인라인 스타일 / Inline style for modal container
  */
 export interface ModalProps {
   /** 모달 열림/닫힘 상태 / Modal open/close state */
@@ -40,34 +39,34 @@ export interface ModalProps {
   description?: string
   /** 배경 오버레이 표시 여부 / Show backdrop overlay */
   showBackdrop?: boolean
-  /** 배경 오버레이 추가 CSS 클래스 / Additional CSS class for backdrop */
-  backdropClassName?: string
+  /** 배경 오버레이 추가 dot 스트링 / Additional dot string for backdrop */
+  backdropDot?: string
   /** 모달을 화면 중앙에 배치할지 여부 / Center modal on screen */
   centered?: boolean
-  /** 모달 컨테이너 추가 CSS 클래스 / Additional CSS class for modal container */
-  className?: string
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
 }
 
 // 모달 닫기 버튼 컴포넌트 (title 유무에 따라 위치만 다름)
 function ModalCloseButton({
   onClick,
-  className,
+  style,
 }: {
   onClick: () => void;
-  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
     <button
       onClick={onClick}
-      className={merge(
-        "p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20",
-        className
+      style={mergeStyles(
+        resolveDot('p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20'),
+        style
       )}
       aria-label="닫기"
     >
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg style={resolveDot('w-5 h-5')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
@@ -94,22 +93,22 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
 
 /**
  * Modal 컴포넌트 / Modal component
- * 
+ *
  * 오버레이와 함께 표시되는 모달 다이얼로그 컴포넌트입니다.
  * ESC 키로 닫기, 오버레이 클릭으로 닫기, 접근성 속성(ARIA)을 지원합니다.
- * 
+ *
  * Modal dialog component displayed with overlay.
  * Supports closing with ESC key, overlay click, and ARIA accessibility attributes.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * const [isOpen, setIsOpen] = useState(false)
- * 
+ *
  * <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
  *   <p>모달 내용</p>
  * </Modal>
- * 
+ *
  * @example
  * // 제목과 설명 포함 / With title and description
  * <Modal
@@ -120,7 +119,7 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
  * >
  *   <Button onClick={handleConfirm}>확인</Button>
  * </Modal>
- * 
+ *
  * @example
  * // 큰 크기 모달 / Large size modal
  * <Modal
@@ -131,15 +130,15 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
  * >
  *   <div>큰 모달 내용</div>
  * </Modal>
- * 
+ *
  * @param {ModalProps} props - Modal 컴포넌트의 props / Modal component props
  * @param {React.Ref<HTMLDivElement>} ref - 모달 컨테이너 ref / Modal container ref
  * @returns {JSX.Element} Modal 컴포넌트 / Modal component
  */
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   ({
-  className,
   dot: dotProp,
+  style,
   isOpen,
   onClose,
   children,
@@ -149,10 +148,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   title,
   description,
   showBackdrop = true,
-  backdropClassName,
+  backdropDot,
   centered = true
   }, ref) => {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const _closable = closable ?? true
   const modalRef = React.useRef<HTMLDivElement>(null)
     const combinedRef = useCombinedRefs(ref, modalRef)
@@ -187,14 +185,14 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
     }
   }
 
-  // 모달 크기 클래스 (max-w 기반, 콘텐츠에 맞게 자연스럽게 축소)
-  const sizeClasses = {
-    sm: "max-w-xs", // 320px
-    md: "max-w-sm", // 384px
-    lg: "max-w-md", // 448px
-    xl: "max-w-lg", // 512px
-    "2xl": "max-w-xl", // 576px
-    "3xl": "max-w-2xl" // 672px
+  // 모달 크기 스타일 (max-w 기반, 콘텐츠에 맞게 자연스럽게 축소)
+  const sizeStyles: Record<string, React.CSSProperties> = {
+    sm: { maxWidth: '20rem' },  // 320px
+    md: { maxWidth: '24rem' },  // 384px
+    lg: { maxWidth: '28rem' },  // 448px
+    xl: { maxWidth: '32rem' },  // 512px
+    "2xl": { maxWidth: '36rem' }, // 576px
+    "3xl": { maxWidth: '42rem' }  // 672px
   }
 
   // 접근성을 위한 ID 생성
@@ -213,11 +211,11 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
   const modalContent = (
     <div
-      className={merge(
-        "fixed inset-0 z-50 overflow-y-auto",
-        className
+      style={mergeStyles(
+        resolveDot('fixed inset-0 z-50 overflow-y-auto'),
+        resolveDot(dotProp),
+        style
       )}
-      style={dotStyle}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
@@ -227,56 +225,56 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       {/* 배경 오버레이 - pointer-events-none으로 클릭이 뒤로 전달됨 */}
       {showBackdrop && (
         <div
-          className={merge(
-            "fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
-            backdropClassName
+          style={mergeStyles(
+            resolveDot('fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300 pointer-events-none'),
+            resolveDot(backdropDot)
           )}
         />
       )}
 
       {/* 센터링 컨테이너 */}
-      <div className={merge(
-        "flex h-full justify-center p-4",
-        centered ? "items-center" : "items-start pt-16"
+      <div style={mergeStyles(
+        resolveDot('flex h-full justify-center p-4'),
+        centered ? resolveDot('items-center') : resolveDot('items-start pt-16')
       )}>
         {/* 모달 컨테이너 */}
         {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
         <div
           ref={combinedRef}
-          className={merge(
-            "relative bg-[var(--modal-bg)] rounded-lg shadow-2xl border border-[var(--modal-border)] transform transition-all duration-300 ease-out",
-            sizeClasses[size]
+          style={mergeStyles(
+            resolveDot('relative bg-[var(--modal-bg)] rounded-lg shadow-2xl border border-[var(--modal-border)] transform transition-all duration-300 ease-out'),
+            sizeStyles[size],
+            {
+              animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+            }
           )}
-          style={{
-            animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-          }}
         >
-        
+
         {/* 헤더 */}
         {title && (
-          <div className="relative z-10 px-6 pt-6 pb-4 border-b border-border/50">
+          <div style={mergeStyles(resolveDot('relative z-10 px-6 pt-6 pb-4 border-b border-border/50'))}>
             {/* 타이틀과 닫기 버튼 - 같은 줄, 양쪽 끝 */}
-            <div className="flex items-center justify-between gap-4 mb-2">
-              <h2 id={titleId} className="text-xl font-semibold text-foreground flex-1 min-w-0">{title}</h2>
+            <div style={resolveDot('flex items-center justify-between gap-4 mb-2')}>
+              <h2 id={titleId} style={resolveDot('text-xl font-semibold text-foreground flex-1 min-w-0')}>{title}</h2>
               {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
               {_closable && (
-                <ModalCloseButton onClick={onClose} className="flex-shrink-0" />
+                <ModalCloseButton onClick={onClose} style={{ flexShrink: 0 }} />
               )}
             </div>
             {/* 설명 - 아래 줄 */}
             {description && (
-              <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
+              <p id={descriptionId} style={resolveDot('text-sm text-muted-foreground')}>{description}</p>
             )}
           </div>
         )}
 
         {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
         {!title && _closable && (
-          <ModalCloseButton onClick={onClose} className="absolute top-4 right-4" />
+          <ModalCloseButton onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem' }} />
         )}
-        
+
         {/* 모달 내용 */}
-        <div className={`relative z-10 ${title ? 'px-6 mb-6' : 'p-6'}`}>
+        <div style={mergeStyles(resolveDot('relative z-10'), title ? resolveDot('px-6 mb-6') : resolveDot('p-6'))}>
           {children}
         </div>
       </div>
@@ -293,4 +291,4 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
   return null
 })
 
-Modal.displayName = "Modal" 
+Modal.displayName = "Modal"

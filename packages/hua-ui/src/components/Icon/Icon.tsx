@@ -21,6 +21,8 @@ export interface IconProps {
   className?: string
   /** dot 스타일 유틸리티 문자열 / Dot style utility string */
   dot?: string
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties
   /** 감정 아이콘 타입 / Emotion icon type */
   emotion?: keyof typeof emotionIcons
   /** 상태 아이콘 타입 / Status icon type */
@@ -66,6 +68,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   size,
   className,
   dot: dotProp,
+  style: styleProp,
   emotion,
   status,
   provider,
@@ -131,7 +134,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   if (!isClient) {
     return (
       <span
-        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
+        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
         className={merge(variantClasses, className)}
         aria-hidden={ariaHidden !== undefined ? ariaHidden : true}
         aria-label={ariaLabel}
@@ -185,7 +188,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
           variantClasses,
           className
         )}
-        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
+        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
         aria-label={ariaLabel || `아이콘을 찾을 수 없음: ${iconName}`}
         title={`Icon not found: ${iconName}`}
       >
@@ -246,7 +249,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
         variantClasses,
         className
       )}
-      style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle)}
+      style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
       {...accessibilityProps}
     >
       {ResolvedIcon && React.createElement(ResolvedIcon, {

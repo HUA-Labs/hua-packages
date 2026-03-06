@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Command 컴포넌트의 props / Command component props
@@ -13,9 +13,9 @@ import { merge } from "../lib/utils"
  * @property {string} [searchValue] - 제어 모드에서 검색 값 / Search value in controlled mode
  * @property {(value: string) => void} [onSearchChange] - 검색 값 변경 콜백 / Search value change callback
  * @property {boolean} [disabled=false] - Command 비활성화 여부 / Disable command
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommandProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   children: React.ReactNode
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -23,19 +23,21 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   searchValue?: string
   onSearchChange?: (value: string) => void
   disabled?: boolean
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
  * Command 컴포넌트 / Command component
- * 
+ *
  * 명령 팔레트(Command Palette) 컴포넌트입니다.
  * Cmd+K (Mac) 또는 Ctrl+K (Windows)로 열 수 있습니다.
  * 키보드 네비게이션(Arrow keys, Enter, Escape)을 지원합니다.
- * 
+ *
  * Command Palette component.
  * Can be opened with Cmd+K (Mac) or Ctrl+K (Windows).
  * Supports keyboard navigation (Arrow keys, Enter, Escape).
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -46,11 +48,11 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
  *     <CommandItem>항목 2</CommandItem>
  *   </CommandList>
  * </Command>
- * 
+ *
  * @example
  * // 제어 모드 / Controlled mode
  * const [open, setOpen] = useState(false)
- * <Command 
+ * <Command
  *   open={open}
  *   onOpenChange={setOpen}
  * >
@@ -60,14 +62,13 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
  *     </CommandGroup>
  *   </CommandList>
  * </Command>
- * 
+ *
  * @param {CommandProps} props - Command 컴포넌트의 props / Command component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} Command 컴포넌트 / Command component
  */
 const Command = React.forwardRef<HTMLDivElement, CommandProps>(
-  ({ 
-    className, 
+  ({
     children,
     open: controlledOpen,
     onOpenChange,
@@ -75,7 +76,9 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
     searchValue: controlledSearchValue,
     onSearchChange,
     disabled = false,
-    ...props 
+    dot: dotProp,
+    style,
+    ...props
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
     const [internalSearchValue, setInternalSearchValue] = React.useState("")
@@ -83,7 +86,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
     const commandRef = React.useRef<HTMLDivElement>(null)
     const inputRef = React.useRef<HTMLInputElement>(null)
     const listRef = React.useRef<HTMLDivElement>(null)
-    
+
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
     const searchValue = controlledSearchValue !== undefined ? controlledSearchValue : internalSearchValue
@@ -165,27 +168,38 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
     }, [selectedIndex])
 
     return (
-      <div ref={ref} className={merge("relative", className)} {...props}>
+      <div ref={ref} style={mergeStyles(resolveDot('relative'), resolveDot(dotProp), style)} {...props}>
         {isOpen && (
           <div
             ref={commandRef}
-            className={merge(
-              "fixed inset-0 z-50 bg-black/50 backdrop-blur-sm", // 50% 투명도
-              "flex items-start justify-center pt-16" // 64px 상단 여백
-            )}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 50,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingTop: '4rem',
+            }}
             onClick={() => handleOpenChange(false)}
           >
             <div
-              className={merge(
-                "w-full max-w-2xl mx-4 bg-popover text-popover-foreground rounded-lg shadow-2xl", // 보더 대신 섀도우
-                "border-0 overflow-hidden" // 보더 제거
-              )}
-              onClick={(e) => e.stopPropagation()}
               style={{
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                width: '100%',
+                maxWidth: '42rem',
+                margin: '0 1rem',
+                backgroundColor: 'hsl(var(--popover))',
+                color: 'hsl(var(--popover-foreground))',
+                borderRadius: '0.5rem',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: 'none',
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-4 border-b border-border"> {/* 16px 패딩 */}
+              <div style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
                 <input
                   ref={inputRef}
                   type="text"
@@ -193,17 +207,21 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                   value={searchValue}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className={merge(
-                    "w-full bg-transparent text-lg font-medium outline-none", // 18px 텍스트
-                    "placeholder:text-muted-foreground",
-                    "text-foreground"
-                  )}
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    fontSize: '1.125rem',
+                    fontWeight: 500,
+                    outline: 'none',
+                    border: 'none',
+                    color: 'hsl(var(--foreground))',
+                  }}
                 />
               </div>
-              
+
               <div
                 ref={listRef}
-                className="max-h-96 overflow-y-auto py-2" // 384px 최대 높이, 8px 패딩
+                style={{ maxHeight: '24rem', overflowY: 'auto', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}
               >
                 {React.Children.map(children, (child, index) => {
                   if (React.isValidElement<CommandItemProps>(child)) {
@@ -234,19 +252,32 @@ Command.displayName = "Command"
 /**
  * CommandInput 컴포넌트의 props / CommandInput component props
  * @typedef {Object} CommandInputProps
- * @extends {React.InputHTMLAttributes<HTMLInputElement>}
+ * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>}
  */
-export interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface CommandInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
-  ({ className, ...props }, ref) => (
+  ({ dot: dotProp, style, ...props }, ref) => (
     <input
       ref={ref}
-      className={merge(
-        "flex h-10 w-full rounded-md bg-transparent px-3 py-2 text-sm outline-none", // 40px 높이, 12px, 8px 패딩
-        "placeholder:text-muted-foreground",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+      style={mergeStyles(
+        {
+          display: 'flex',
+          height: '2.5rem',
+          width: '100%',
+          borderRadius: '0.375rem',
+          backgroundColor: 'transparent',
+          padding: '0.5rem 0.75rem',
+          fontSize: '0.875rem',
+          outline: 'none',
+          border: 'none',
+          color: 'hsl(var(--foreground))',
+        },
+        resolveDot(dotProp),
+        style
       )}
       {...props}
     />
@@ -254,13 +285,20 @@ const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
 )
 CommandInput.displayName = "CommandInput"
 
-export interface CommandListProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CommandListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
-  ({ className, ...props }, ref) => (
+  ({ dot: dotProp, style, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("max-h-96 overflow-y-auto py-2", className)} // 384px 최대 높이, 8px 패딩
+      style={mergeStyles(
+        { maxHeight: '24rem', overflowY: 'auto', paddingTop: '0.5rem', paddingBottom: '0.5rem' },
+        resolveDot(dotProp),
+        style
+      )}
       {...props}
     />
   )
@@ -273,46 +311,59 @@ CommandList.displayName = "CommandList"
  * @property {React.ReactNode} [icon] - 항목 아이콘 / Item icon
  * @property {boolean} [selected=false] - 선택 상태 / Selected state
  * @property {() => void} [onSelect] - 선택 시 콜백 / Selection callback
- * @extends {React.ButtonHTMLAttributes<HTMLButtonElement>}
+ * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>}
  */
-export interface CommandItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface CommandItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   icon?: React.ReactNode
   selected?: boolean
   onSelect?: () => void
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
-  ({ 
-    className, 
+  ({
     icon,
     selected = false,
     onSelect,
     children,
-    ...props 
+    dot: dotProp,
+    style,
+    ...props
   }, ref) => {
     return (
       <button
         ref={ref}
         data-command-item
-        className={merge(
-          "relative flex w-full items-center gap-3 rounded-sm px-4 py-3 text-sm", // 16px, 12px 패딩
-          "text-foreground",
-          "hover:bg-muted",
-          "focus:bg-muted",
-          "focus:outline-none",
-          selected && "bg-muted",
-          "transition-colors",
-          className
+        style={mergeStyles(
+          {
+            position: 'relative',
+            display: 'flex',
+            width: '100%',
+            alignItems: 'center',
+            gap: '0.75rem',
+            borderRadius: '0.125rem',
+            padding: '0.75rem 1rem',
+            fontSize: '0.875rem',
+            color: 'hsl(var(--foreground))',
+            backgroundColor: selected ? 'hsl(var(--muted))' : 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background-color 150ms',
+            textAlign: 'left',
+          },
+          resolveDot(dotProp),
+          style
         )}
         onClick={onSelect}
         {...props}
       >
         {icon && (
-          <div className="flex-shrink-0 w-4 h-4 text-muted-foreground">
+          <div style={{ flexShrink: 0, width: '1rem', height: '1rem', color: 'hsl(var(--muted-foreground))' }}>
             {icon}
           </div>
         )}
-        <span className="flex-1 text-left">{children}</span>
+        <span style={{ flex: 1, textAlign: 'left' }}>{children}</span>
       </button>
     )
   }
@@ -323,21 +374,23 @@ CommandItem.displayName = "CommandItem"
  * CommandGroup 컴포넌트의 props / CommandGroup component props
  * @typedef {Object} CommandGroupProps
  * @property {React.ReactNode} [heading] - 그룹 제목 / Group heading
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommandGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   heading?: React.ReactNode
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
-  ({ className, heading, children, ...props }, ref) => (
-    <div ref={ref} className={merge("py-2", className)} {...props}> {/* 8px 패딩 */}
+  ({ heading, children, dot: dotProp, style, ...props }, ref) => (
+    <div ref={ref} style={mergeStyles({ paddingTop: '0.5rem', paddingBottom: '0.5rem' }, resolveDot(dotProp), style)} {...props}>
       {heading && (
-        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide"> {/* 16px, 8px 패딩 */}
+        <div style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'hsl(var(--muted-foreground))', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {heading}
         </div>
       )}
-      <div className="space-y-1"> {/* 4px 간격 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         {children}
       </div>
     </div>
@@ -348,15 +401,22 @@ CommandGroup.displayName = "CommandGroup"
 /**
  * CommandSeparator 컴포넌트의 props / CommandSeparator component props
  * @typedef {Object} CommandSeparatorProps
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CommandSeparatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>(
-  ({ className, ...props }, ref) => (
+  ({ dot: dotProp, style, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge("h-px bg-border my-2", className)} // 8px 여백
+      style={mergeStyles(
+        { height: '1px', backgroundColor: 'hsl(var(--border))', margin: '0.5rem 0' },
+        resolveDot(dotProp),
+        style
+      )}
       {...props}
     />
   )
@@ -366,17 +426,21 @@ CommandSeparator.displayName = "CommandSeparator"
 /**
  * CommandEmpty 컴포넌트의 props / CommandEmpty component props
  * @typedef {Object} CommandEmptyProps
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandEmptyProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CommandEmptyProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
-  ({ className, children = "결과가 없습니다.", ...props }, ref) => (
+  ({ children = "결과가 없습니다.", dot: dotProp, style, ...props }, ref) => (
     <div
       ref={ref}
-      className={merge(
-        "py-8 text-center text-sm text-muted-foreground", // 32px 패딩
-        className
+      style={mergeStyles(
+        { paddingTop: '2rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' },
+        resolveDot(dotProp),
+        style
       )}
       {...props}
     >
@@ -388,10 +452,10 @@ CommandEmpty.displayName = "CommandEmpty"
 
 // 편의 컴포넌트들
 export const CommandDialog = React.forwardRef<HTMLDivElement, CommandProps>(
-  ({ className, ...props }, ref) => (
-    <Command ref={ref} className={className} {...props} />
+  ({ dot: dotProp, style, ...props }, ref) => (
+    <Command ref={ref} dot={dotProp} style={style} {...props} />
   )
 )
 CommandDialog.displayName = "CommandDialog"
 
-export { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandEmpty } 
+export { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandEmpty }
