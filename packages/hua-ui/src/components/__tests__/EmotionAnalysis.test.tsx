@@ -26,8 +26,8 @@ describe('EmotionAnalysis', () => {
     render(
       <EmotionAnalysis
         emotionDistribution={[
-          { emotion: '기쁨', percentage: 60, color: 'bg-yellow-500' },
-          { emotion: '평온', percentage: 40, color: 'bg-green-500' },
+          { emotion: '기쁨', percentage: 60, color: 'yellow' },
+          { emotion: '평온', percentage: 40, color: 'green' },
         ]}
       />
     );
@@ -50,11 +50,12 @@ describe('EmotionAnalysis', () => {
     expect(screen.getByText('낮음')).toBeInTheDocument();
   });
 
-  it('should render compact layout', () => {
+  it('should render compact layout with flex-column style', () => {
     const { container } = render(
       <EmotionAnalysis primaryEmotion={primaryEmotion} layout="compact" />
     );
-    expect(container.querySelector('.space-y-3')).toBeInTheDocument();
+    const root = container.firstChild as HTMLElement;
+    expect(root.style.flexDirection).toBe('column');
     expect(screen.getByText(/기쁨 \(80%\)/)).toBeInTheDocument();
   });
 
@@ -78,8 +79,9 @@ describe('EmotionAnalysis', () => {
     expect(screen.queryByText('감정 키워드')).not.toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
-    const { container } = render(<EmotionAnalysis className="my-analysis" />);
-    expect(container.querySelector('.my-analysis')).toBeInTheDocument();
+  it('should apply custom style via style prop', () => {
+    const { container } = render(<EmotionAnalysis style={{ opacity: 0.5 }} />);
+    const root = container.firstChild as HTMLElement;
+    expect(root.style.opacity).toBe('0.5');
   });
 });

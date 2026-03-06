@@ -1,17 +1,18 @@
 "use client"
 
 import React from "react"
-import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
 /**
  * Divider 컴포넌트의 props / Divider component props
  */
-export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DividerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   orientation?: "horizontal" | "vertical"
   variant?: "solid" | "dashed" | "dotted" | "gradient" | "glass"
   size?: "sm" | "md" | "lg"
   spacing?: "none" | "sm" | "md" | "lg" | "xl"
   color?: "default" | "muted" | "primary" | "secondary"
+  dot?: string
 }
 
 // Divider는 orientation × variant × color 의 조합이 동적이라 CVA compound variants보다
@@ -90,26 +91,28 @@ function getColorClass(variant: string, color: "default" | "muted" | "primary" |
  */
 const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
   ({
-    className,
     orientation = "horizontal",
     variant = "solid",
     size = "md",
     spacing = "md",
     color = "default",
+    dot: dotProp,
+    style: styleProp,
     ...props
   }, ref) => {
+    const classes = [
+      "flex-shrink-0",
+      ORIENTATION[orientation],
+      getSizeClass(orientation, variant, size),
+      variant === "gradient" ? getVariantClass(orientation, variant) : getColorClass(variant, color),
+      variant !== "gradient" && getVariantClass(orientation, variant),
+      SPACING[orientation][spacing],
+    ].filter(Boolean).join(" ")
+
     return (
       <div
         ref={ref}
-        className={merge(
-          "flex-shrink-0",
-          ORIENTATION[orientation],
-          getSizeClass(orientation, variant, size),
-          variant === "gradient" ? getVariantClass(orientation, variant) : getColorClass(variant, color),
-          variant !== "gradient" && getVariantClass(orientation, variant),
-          SPACING[orientation][spacing],
-          className
-        )}
+        style={mergeStyles(resolveDot(classes), resolveDot(dotProp), styleProp)}
         {...props}
       />
     )
@@ -120,4 +123,4 @@ DividerComponent.displayName = "Divider"
 
 const Divider = React.memo(DividerComponent)
 
-export { Divider } 
+export { Divider }

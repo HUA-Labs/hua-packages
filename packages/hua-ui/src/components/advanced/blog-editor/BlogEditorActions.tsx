@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
@@ -12,8 +11,10 @@ import { useBlogEditor } from './BlogEditorContext'
 export interface BlogEditorActionsProps {
   /** 취소 링크 컴포넌트 / Cancel link component */
   cancelLink?: React.ReactNode
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -21,17 +22,17 @@ export interface BlogEditorActionsProps {
  * 저장/발행/취소 버튼
  */
 const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProps>(
-  ({ cancelLink, className }, ref) => {
+  ({ cancelLink, dot, style }, ref) => {
     const { labels, submitting, handleSave, handleCancel, isEditMode, autoSaveStatus, features } = useBlogEditor()
 
     return (
       <div
         ref={ref}
-        className={merge('flex items-center justify-end gap-3', className)}
+        style={mergeStyles(resolveDot('flex items-center justify-end gap-3'), resolveDot(dot), style)}
       >
         {/* 자동저장 상태 */}
         {features.enableAutoSave && autoSaveStatus !== 'idle' && (
-          <span className="text-sm text-muted-foreground flex items-center gap-1">
+          <span style={resolveDot('text-sm text-muted-foreground flex items-center gap-1')}>
             {autoSaveStatus === 'saving' && (
               <>
                 <Icon name="loader" size={14} spin />
@@ -52,7 +53,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-foreground hover:text-foreground transition-colors"
+            style={resolveDot('px-4 py-2 text-foreground transition-colors')}
           >
             {labels.cancel}
           </button>
@@ -63,7 +64,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
           type="button"
           onClick={() => handleSave(false)}
           disabled={submitting}
-          className="px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          style={resolveDot('px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors')}
         >
           {labels.saveDraft}
         </button>
@@ -73,7 +74,7 @@ const BlogEditorActions = React.forwardRef<HTMLDivElement, BlogEditorActionsProp
           type="button"
           onClick={() => handleSave(true)}
           disabled={submitting}
-          className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 transition-colors"
+          style={resolveDot('px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 transition-colors')}
         >
           {submitting ? (
             <>

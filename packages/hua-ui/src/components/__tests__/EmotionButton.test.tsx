@@ -16,42 +16,42 @@ describe('EmotionButton', () => {
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 
-  it('should apply default size (md)', () => {
+  it('should apply default size (md) via inline style', () => {
     render(<EmotionButton emotion="😊" />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('w-12');
-    expect(button.className).toContain('h-12');
+    expect(button.style.width).toBe('3rem');
+    expect(button.style.height).toBe('3rem');
   });
 
-  it('should apply sm size', () => {
+  it('should apply sm size via inline style', () => {
     render(<EmotionButton emotion="😊" size="sm" />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('w-8');
-    expect(button.className).toContain('h-8');
+    expect(button.style.width).toBe('2rem');
+    expect(button.style.height).toBe('2rem');
   });
 
-  it('should apply lg size', () => {
+  it('should apply lg size via inline style', () => {
     render(<EmotionButton emotion="😊" size="lg" />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('w-16');
-    expect(button.className).toContain('h-16');
+    expect(button.style.width).toBe('4rem');
+    expect(button.style.height).toBe('4rem');
   });
 
-  it('should apply selected style when isSelected', () => {
+  it('should apply selected border color when isSelected', () => {
     render(<EmotionButton emotion="😊" isSelected />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('border-indigo-500');
+    expect(button.style.borderColor).toBe('rgb(99 102 241)');
   });
 
-  it('should apply unselected style by default', () => {
+  it('should apply rounded-full style by default', () => {
     render(<EmotionButton emotion="😊" />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('border-gray-200');
+    expect(button.style.borderRadius).toBe('9999px');
   });
 
   it('should call onClick handler', async () => {
@@ -64,10 +64,11 @@ describe('EmotionButton', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('should apply custom className', () => {
-    render(<EmotionButton emotion="😊" className="custom-btn" />);
+  it('should apply custom style via style prop', () => {
+    render(<EmotionButton emotion="😊" style={{ opacity: 0.5 }} />);
 
-    expect(screen.getByRole('button').className).toContain('custom-btn');
+    const button = screen.getByRole('button');
+    expect(button.style.opacity).toBe('0.5');
   });
 
   it('should be disabled', () => {

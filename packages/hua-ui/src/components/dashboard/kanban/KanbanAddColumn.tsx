@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { merge } from "../../../lib/utils";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { Icon } from "../../Icon";
 import { useKanban } from "./KanbanContext";
 import type { KanbanAddColumnProps } from "./types";
@@ -13,7 +13,7 @@ import type { KanbanAddColumnProps } from "./types";
  * 버튼 클릭 시 입력 폼이 나타나고, Enter로 추가합니다.
  */
 export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnProps>(
-  ({ onAdd, onCancel, placeholder = "컬럼 제목 입력...", className, style, ...props }, ref) => {
+  ({ onAdd, onCancel, placeholder = "컬럼 제목 입력...", dot, style, ...props }, ref) => {
     const { addColumn, variant } = useKanban();
     const [isAdding, setIsAdding] = useState(false);
     const [title, setTitle] = useState("");
@@ -65,25 +65,31 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
       }
     };
 
-    // Variant styles
-    const columnStyles = {
-      default: "bg-gray-100/50 dark:bg-gray-800/30",
-      gradient: "bg-gradient-to-b from-gray-100/50 to-white/50 dark:from-gray-800/30 dark:to-gray-900/30",
-      outline: "border-2 border-dashed border-gray-300 dark:border-gray-600",
-      elevated: "bg-gray-100/50 dark:bg-gray-800/30",
-    };
+    // Variant base styles
+    const variantBaseStyle: React.CSSProperties = (() => {
+      switch (variant) {
+        case "gradient":
+          return { background: "linear-gradient(to bottom, rgba(243,244,246,0.5), rgba(255,255,255,0.5))" };
+        case "outline":
+          return { border: "2px dashed #d1d5db", background: "transparent" };
+        case "elevated":
+        case "default":
+        default:
+          return { backgroundColor: "rgba(243,244,246,0.5)" };
+      }
+    })();
 
     // Adding form
     if (isAdding) {
       return (
         <div
           ref={ref}
-          className={merge(
-            "flex-shrink-0 rounded-xl p-3",
-            columnStyles[variant],
-            className
+          style={mergeStyles(
+            { flexShrink: 0, borderRadius: "0.75rem", padding: "0.75rem" },
+            variantBaseStyle,
+            resolveDot(dot),
+            style
           )}
-          style={style}
           {...props}
         >
           <input
@@ -93,13 +99,44 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 text-gray-800 dark:text-white placeholder-gray-400"
+            style={{
+              width: "100%",
+              paddingLeft: "0.75rem",
+              paddingRight: "0.75rem",
+              paddingTop: "0.5rem",
+              paddingBottom: "0.5rem",
+              fontSize: "0.875rem",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "0.5rem",
+              outline: "none",
+              color: "#1f2937",
+              boxSizing: "border-box",
+            }}
           />
-          <div className="flex items-center justify-end gap-2 mt-3">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              gap: "0.5rem",
+              marginTop: "0.75rem",
+            }}
+          >
             <button
               type="button"
               onClick={handleCancel}
-              className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              style={{
+                paddingLeft: "0.75rem",
+                paddingRight: "0.75rem",
+                paddingTop: "0.375rem",
+                paddingBottom: "0.375rem",
+                fontSize: "0.875rem",
+                color: "#6b7280",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
             >
               취소
             </button>
@@ -107,12 +144,36 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
               type="button"
               onClick={handleSubmit}
               disabled={!title.trim()}
-              className={merge(
-                "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors",
+              style={
                 title.trim()
-                  ? "bg-indigo-500 text-white hover:bg-indigo-600"
-                  : "bg-gray-200 text-gray-400 dark:bg-gray-700 cursor-not-allowed"
-              )}
+                  ? {
+                      paddingLeft: "1rem",
+                      paddingRight: "1rem",
+                      paddingTop: "0.375rem",
+                      paddingBottom: "0.375rem",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      borderRadius: "0.5rem",
+                      backgroundColor: "#6366f1",
+                      color: "#ffffff",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background-color 150ms",
+                    }
+                  : {
+                      paddingLeft: "1rem",
+                      paddingRight: "1rem",
+                      paddingTop: "0.375rem",
+                      paddingBottom: "0.375rem",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      borderRadius: "0.5rem",
+                      backgroundColor: "#e5e7eb",
+                      color: "#9ca3af",
+                      border: "none",
+                      cursor: "not-allowed",
+                    }
+              }
             >
               추가
             </button>
@@ -127,22 +188,42 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
         ref={ref as React.Ref<HTMLButtonElement>}
         type="button"
         onClick={handleStartAdding}
-        className={merge(
-          "group flex-shrink-0 flex flex-col items-center justify-center gap-3 rounded-xl",
-          "border-2 border-dashed border-gray-300 dark:border-gray-600",
-          "hover:border-indigo-400 dark:hover:border-indigo-500",
-          "hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20",
-          "transition-all duration-200",
-          "text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400",
-          className
+        style={mergeStyles(
+          {
+            flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.75rem",
+            borderRadius: "0.75rem",
+            border: "2px dashed #d1d5db",
+            color: "#9ca3af",
+            background: "none",
+            cursor: "pointer",
+            transition: "all 200ms",
+            minHeight: 300,
+          },
+          resolveDot(dot),
+          style
         )}
-        style={{ ...style, minHeight: 300 }}
         {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >
-        <div className="w-12 h-12 rounded-full border-2 border-dashed border-current flex items-center justify-center group-hover:border-solid group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30 transition-all duration-200">
+        <div
+          style={{
+            width: "3rem",
+            height: "3rem",
+            borderRadius: "9999px",
+            border: "2px dashed currentColor",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 200ms",
+          }}
+        >
           <Icon name="add" size={24} />
         </div>
-        <span className="text-sm font-medium">새 컬럼 추가</span>
+        <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>새 컬럼 추가</span>
       </button>
     );
   }

@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { MiniBarChart } from "./MiniBarChart";
-import { useColorStyles } from "../../lib/styles/colors";
-import { createVariantStyles } from "../../lib/styles/variants";
 import type { Color } from "../../lib/types/common";
 
 /**
@@ -26,9 +24,9 @@ import type { Color } from "../../lib/types/common";
  * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color] - 카드 색상 / Card color
  * @property {boolean} [loading] - 로딩 상태 / Loading state
  * @property {boolean} [showChart] - 차트 표시 여부 / Show chart
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MetricCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   title: string;
   value: string | number;
   description?: string;
@@ -44,18 +42,111 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   color?: Color;
   loading?: boolean;
   showChart?: boolean;
+  dot?: string;
 }
 
+// Color token maps for variants
+const colorTokens: Record<Color, {
+  gradientBg: string;
+  defaultBorder: string;
+  defaultBg: string;
+  iconBg: string;
+  iconText: string;
+  badgeBg: string;
+  badgeText: string;
+}> = {
+  blue: {
+    gradientBg: "linear-gradient(135deg, #3b82f6, #2563eb)",
+    defaultBorder: "#bfdbfe",
+    defaultBg: "rgba(239,246,255,0.5)",
+    iconBg: "rgba(219,234,254,0.3)",
+    iconText: "#2563eb",
+    badgeBg: "rgba(239,246,255,0.3)",
+    badgeText: "#1d4ed8",
+  },
+  purple: {
+    gradientBg: "linear-gradient(135deg, #a855f7, #9333ea)",
+    defaultBorder: "#e9d5ff",
+    defaultBg: "rgba(250,245,255,0.5)",
+    iconBg: "rgba(233,213,255,0.3)",
+    iconText: "#9333ea",
+    badgeBg: "rgba(250,245,255,0.3)",
+    badgeText: "#7e22ce",
+  },
+  green: {
+    gradientBg: "linear-gradient(135deg, #22c55e, #16a34a)",
+    defaultBorder: "#bbf7d0",
+    defaultBg: "rgba(240,253,244,0.5)",
+    iconBg: "rgba(187,247,208,0.3)",
+    iconText: "#16a34a",
+    badgeBg: "rgba(240,253,244,0.3)",
+    badgeText: "#15803d",
+  },
+  orange: {
+    gradientBg: "linear-gradient(135deg, #f97316, #ea580c)",
+    defaultBorder: "#fed7aa",
+    defaultBg: "rgba(255,247,237,0.5)",
+    iconBg: "rgba(254,215,170,0.3)",
+    iconText: "#ea580c",
+    badgeBg: "rgba(255,247,237,0.3)",
+    badgeText: "#c2410c",
+  },
+  red: {
+    gradientBg: "linear-gradient(135deg, #ef4444, #dc2626)",
+    defaultBorder: "#fecaca",
+    defaultBg: "rgba(254,242,242,0.5)",
+    iconBg: "rgba(254,202,202,0.3)",
+    iconText: "#dc2626",
+    badgeBg: "rgba(254,242,242,0.3)",
+    badgeText: "#b91c1c",
+  },
+  indigo: {
+    gradientBg: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    defaultBorder: "#c7d2fe",
+    defaultBg: "rgba(238,242,255,0.5)",
+    iconBg: "rgba(199,210,254,0.3)",
+    iconText: "#4f46e5",
+    badgeBg: "rgba(238,242,255,0.3)",
+    badgeText: "#4338ca",
+  },
+  pink: {
+    gradientBg: "linear-gradient(135deg, #ec4899, #db2777)",
+    defaultBorder: "#fbcfe8",
+    defaultBg: "rgba(253,242,248,0.5)",
+    iconBg: "rgba(251,207,232,0.3)",
+    iconText: "#db2777",
+    badgeBg: "rgba(253,242,248,0.3)",
+    badgeText: "#be185d",
+  },
+  gray: {
+    gradientBg: "linear-gradient(135deg, #6b7280, #4b5563)",
+    defaultBorder: "#e5e7eb",
+    defaultBg: "rgba(249,250,251,0.5)",
+    iconBg: "rgba(229,231,235,0.3)",
+    iconText: "#4b5563",
+    badgeBg: "rgba(249,250,251,0.3)",
+    badgeText: "#374151",
+  },
+  cyan: {
+    gradientBg: "linear-gradient(135deg, #06b6d4, #0891b2)",
+    defaultBorder: "#a5f3fc",
+    defaultBg: "rgba(236,254,255,0.5)",
+    iconBg: "rgba(165,243,252,0.3)",
+    iconText: "#0891b2",
+    badgeBg: "rgba(236,254,255,0.3)",
+    badgeText: "#0e7490",
+  },
+};
 
 /**
  * MetricCard 컴포넌트 / MetricCard component
- * 
+ *
  * 메트릭 정보를 표시하는 카드 컴포넌트입니다.
  * StatCard와 유사하지만 차트 데이터를 포함할 수 있습니다.
- * 
+ *
  * Card component that displays metric information.
  * Similar to StatCard but can include chart data.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -65,7 +156,7 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   description="오늘"
  *   icon="eye"
  * />
- * 
+ *
  * @example
  * // 차트 포함 / With chart
  * <MetricCard
@@ -76,7 +167,7 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   showChart
  *   color="blue"
  * />
- * 
+ *
  * @param {MetricCardProps} props - MetricCard 컴포넌트의 props / MetricCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} MetricCard 컴포넌트 / MetricCard component
@@ -95,25 +186,54 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       color = "blue",
       loading = false,
       showChart = false,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
   ) => {
-    // 공통 색상 시스템 사용
-    const colorStyles = useColorStyles(color);
+    const tokens = colorTokens[color] || colorTokens.blue;
     const isGradient = variant === "gradient";
-    const isTextWhite = isGradient;
 
-    // Variant 스타일 생성 (elevated는 rounded-3xl로 커스터마이징)
-    const variantClass = useMemo(() => {
-      const baseClass = createVariantStyles(variant, colorStyles);
-      // elevated variant는 rounded-3xl 사용
-      if (variant === "elevated") {
-        return baseClass.replace("rounded-2xl", "rounded-3xl");
+    const containerStyle = useMemo((): React.CSSProperties => {
+      const base: React.CSSProperties = {
+        padding: "1.5rem",
+        transition: "all 200ms",
+        borderRadius: variant === "elevated" ? "1.5rem" : "1rem",
+        border: "1px solid",
+      };
+
+      switch (variant) {
+        case "gradient":
+          return {
+            ...base,
+            backgroundImage: tokens.gradientBg,
+            borderColor: "transparent",
+            color: "#ffffff",
+          };
+        case "default":
+          return {
+            ...base,
+            borderColor: tokens.defaultBorder,
+            backgroundColor: tokens.defaultBg,
+          };
+        case "outline":
+          return {
+            ...base,
+            borderWidth: "2px",
+            borderColor: tokens.defaultBorder,
+            backgroundColor: "transparent",
+          };
+        case "elevated":
+        default:
+          return {
+            ...base,
+            borderColor: tokens.defaultBorder,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+          };
       }
-      return baseClass;
-    }, [variant, colorStyles]);
+    }, [variant, tokens]);
 
     const formatValue = (val: string | number): string => {
       if (typeof val === "number") {
@@ -125,27 +245,27 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
     return (
       <div
         ref={ref}
-        className={merge(
-          "p-6 transition-all duration-200 hover:shadow-xl",
-          variantClass,
-          className
-        )}
+        style={mergeStyles(containerStyle, resolveDot(dot), style)}
         {...props}
       >
-        <div className="flex items-start justify-between mb-4">
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1rem" }}>
           {/* 아이콘 */}
           {icon && (
-            <div className={merge(
-              "w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0",
-              isGradient ? "bg-white/20" : colorStyles.icon
-            )}>
+            <div style={{
+              width: "3rem",
+              height: "3rem",
+              borderRadius: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              backgroundColor: isGradient ? "rgba(255,255,255,0.2)" : tokens.iconBg,
+            }}>
               {typeof icon === "string" ? (
                 <Icon
                   name={icon as IconName}
-                  className={merge(
-                    "w-6 h-6",
-                    isTextWhite ? "text-white" : ""
-                  )}
+                  className="w-6 h-6"
+                  style={{ color: isGradient ? "#ffffff" : tokens.iconText }}
                 />
               ) : (
                 icon
@@ -155,10 +275,14 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
           {/* 배지 */}
           {title && (
-            <span className={merge(
-              "text-sm px-3 py-1 rounded-full font-medium",
-              isGradient ? "bg-white/20 text-white" : colorStyles.badge
-            )}>
+            <span style={{
+              fontSize: "0.875rem",
+              padding: "0.25rem 0.75rem",
+              borderRadius: "9999px",
+              fontWeight: 500,
+              backgroundColor: isGradient ? "rgba(255,255,255,0.2)" : tokens.badgeBg,
+              color: isGradient ? "#ffffff" : tokens.badgeText,
+            }}>
               {title}
             </span>
           )}
@@ -166,29 +290,32 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
         {/* 값 */}
         {loading ? (
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          <div style={{ height: "2.5rem", backgroundColor: "#e5e7eb", borderRadius: "0.25rem", animation: "pulse 2s infinite", marginBottom: "0.5rem" }} />
         ) : (
-          <h3 className={merge(
-            "text-3xl font-bold mb-1",
-            isTextWhite ? "text-white" : "text-gray-800 dark:text-white"
-          )}>
+          <h3 style={{
+            fontSize: "1.875rem",
+            fontWeight: 700,
+            marginBottom: "0.25rem",
+            color: isGradient ? "#ffffff" : "var(--color-foreground, #1f2937)",
+          }}>
             {formatValue(value)}
           </h3>
         )}
 
         {/* 설명 */}
         {description && (
-          <p className={merge(
-            "text-sm mb-3",
-            isTextWhite ? "text-white/90" : "text-gray-600 dark:text-gray-300"
-          )}>
+          <p style={{
+            fontSize: "0.875rem",
+            marginBottom: "0.75rem",
+            color: isGradient ? "rgba(255,255,255,0.9)" : "var(--color-muted-foreground, #4b5563)",
+          }}>
             {description}
           </p>
         )}
 
         {/* 차트 */}
         {showChart && chartData && chartData.length > 0 && (
-          <div className="mt-4 mb-3">
+          <div style={{ marginTop: "1rem", marginBottom: "0.75rem" }}>
             <MiniBarChart
               data={chartData}
               labels={chartLabels}
@@ -201,21 +328,18 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
         {/* 트렌드 */}
         {trend && !loading && (
-          <div className="mt-3 flex items-center gap-1">
-            <span
-              className={merge(
-                "text-xs font-medium",
-                trend.positive !== false
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-red-600 dark:text-red-400"
-              )}
-            >
+          <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+            <span style={{
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              color: trend.positive !== false ? "#16a34a" : "#dc2626",
+            }}>
               {trend.positive !== false ? "↑" : "↓"} {Math.abs(trend.value)}%
             </span>
-            <span className={merge(
-              "text-xs",
-              isTextWhite ? "text-white/70" : "text-gray-500 dark:text-gray-400"
-            )}>
+            <span style={{
+              fontSize: "0.75rem",
+              color: isGradient ? "rgba(255,255,255,0.7)" : "var(--color-muted-foreground, #6b7280)",
+            }}>
               {trend.label}
             </span>
           </div>
@@ -226,4 +350,3 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 );
 
 MetricCard.displayName = "MetricCard";
-

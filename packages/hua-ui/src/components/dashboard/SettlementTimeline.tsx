@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { DashboardEmptyState } from "./EmptyState";
@@ -41,42 +41,45 @@ export interface SettlementTimelineItem {
  * @property {string} [locale="ko-KR"] - 로케일 / Locale
  * @property {string} [defaultCurrency="KRW"] - 기본 통화 / Default currency
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface SettlementTimelineProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SettlementTimelineProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   items: SettlementTimelineItem[];
   highlightedId?: string;
   locale?: string;
   defaultCurrency?: string;
   emptyState?: React.ReactNode;
+  dot?: string;
 }
 
 const STATUS_CONFIG: Record<
   SettlementTimelineStatus,
-  { dot: string; border: string; text: string; label: string }
+  { dotColor: string; borderColor: string; textColor: string; label: string; shadow?: string }
 > = {
   completed: {
-    dot: "bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]",
-    border: "border-emerald-200 dark:border-emerald-500/40",
-    text: "text-emerald-700 dark:text-emerald-300",
+    dotColor: "#10b981",
+    borderColor: "rgba(167,243,208,1)",
+    textColor: "#047857",
     label: "정산 완료",
+    shadow: "0 0 8px rgba(16,185,129,0.5)",
   },
   processing: {
-    dot: "bg-sky-500 border-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.5)] animate-pulse",
-    border: "border-sky-200 dark:border-sky-500/40",
-    text: "text-sky-700 dark:text-sky-200",
+    dotColor: "#0ea5e9",
+    borderColor: "rgba(186,230,253,1)",
+    textColor: "#0369a1",
     label: "처리 중",
+    shadow: "0 0 8px rgba(14,165,233,0.5)",
   },
   pending: {
-    dot: "bg-amber-400 border-amber-400",
-    border: "border-amber-200 dark:border-amber-500/40",
-    text: "text-amber-700 dark:text-amber-200",
+    dotColor: "#fbbf24",
+    borderColor: "rgba(253,230,138,1)",
+    textColor: "#b45309",
     label: "대기",
   },
   failed: {
-    dot: "bg-rose-500 border-rose-500",
-    border: "border-rose-200 dark:border-rose-500/40",
-    text: "text-rose-700 dark:text-rose-300",
+    dotColor: "#f43f5e",
+    borderColor: "rgba(253,205,211,1)",
+    textColor: "#be123c",
     label: "실패",
   },
 };
@@ -104,13 +107,13 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
 
 /**
  * SettlementTimeline 컴포넌트
- * 
+ *
  * 정산 처리 단계를 타임라인 형태로 표시하는 컴포넌트입니다.
  * 각 단계의 상태, 금액, 날짜를 시각적으로 표시합니다.
- * 
+ *
  * Timeline component that displays settlement processing stages.
  * Visually shows status, amount, and date for each stage.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -133,7 +136,7 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
  *     }
  *   ]}
  * />
- * 
+ *
  * @example
  * // 강조 기능 / Highlight feature
  * <SettlementTimeline
@@ -142,7 +145,7 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
  *   locale="en-US"
  *   defaultCurrency="USD"
  * />
- * 
+ *
  * @param {SettlementTimelineProps} props - SettlementTimeline 컴포넌트의 props / SettlementTimeline component props
  * @returns {JSX.Element} SettlementTimeline 컴포넌트 / SettlementTimeline component
  */
@@ -152,23 +155,30 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
   locale = "ko-KR",
   defaultCurrency = "KRW",
   emptyState,
-  className,
+  dot,
+  style,
   ...props
 }) => {
   const hasItems = items.length > 0;
 
   return (
     <div
-      className={merge(
-        "rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4",
-        className
+      style={mergeStyles(
+        {
+          borderRadius: "1rem",
+          border: "1px solid var(--color-border, #f1f5f9)",
+          backgroundColor: "var(--color-card, rgba(255,255,255,0.5))",
+          padding: "1rem",
+        },
+        resolveDot(dot),
+        style
       )}
       {...props}
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">정산 타임라인</p>
-          <p className="text-xs text-slate-500">처리 단계별 상태와 금액을 확인하세요.</p>
+          <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>정산 타임라인</p>
+          <p style={{ fontSize: "0.75rem", color: "#64748b" }}>처리 단계별 상태와 금액을 확인하세요.</p>
         </div>
       </div>
 
@@ -182,7 +192,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
             />
           )
         : (
-          <ol className="space-y-4" role="list" aria-label="정산 타임라인">
+          <ol style={{ display: "flex", flexDirection: "column", gap: "1rem" }} role="list" aria-label="정산 타임라인">
             {items.map((item, index) => {
               const statusConfig = STATUS_CONFIG[item.status];
               const amount = formatAmount(item.amount, item.currency ?? defaultCurrency, locale);
@@ -193,55 +203,66 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
               const itemLabel = `${item.title}, 상태: ${statusConfig.label}${amount ? `, 금액: ${amount}` : ''}${date ? `, 날짜: ${date}` : ''}`;
 
               return (
-                <li 
-                  key={item.id} 
+                <li
+                  key={item.id}
                   role="listitem"
                   aria-label={itemLabel}
-                  className="relative flex gap-4"
+                  style={{ position: "relative", display: "flex", gap: "1rem" }}
                 >
-                  <div className="flex flex-col items-center">
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <span
-                      className={merge(
-                        "z-10 h-3.5 w-3.5 rounded-full border-2 bg-white shadow",
-                        statusConfig.dot,
-                        isHighlighted && "scale-110"
-                      )}
+                      style={{
+                        zIndex: 10,
+                        height: "0.875rem",
+                        width: "0.875rem",
+                        borderRadius: "9999px",
+                        border: "2px solid",
+                        backgroundColor: statusConfig.dotColor,
+                        borderColor: statusConfig.dotColor,
+                        boxShadow: statusConfig.shadow,
+                        transform: isHighlighted ? "scale(1.1)" : undefined,
+                        flexShrink: 0,
+                      }}
                       aria-label={`${statusConfig.label} 상태`}
                     />
                     {showConnector && (
-                      <span className="mt-1 flex-1 w-px bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
+                      <span style={{ marginTop: "0.25rem", flex: 1, width: "1px", backgroundColor: "var(--color-border, #e2e8f0)" }} aria-hidden="true" />
                     )}
                   </div>
 
                   <div
-                    className={merge(
-                      "flex-1 rounded-xl border p-4",
-                      statusConfig.border,
-                      isHighlighted && "border-2 shadow-sm"
-                    )}
+                    style={{
+                      flex: 1,
+                      borderRadius: "0.75rem",
+                      border: isHighlighted ? "2px solid" : "1px solid",
+                      borderColor: statusConfig.borderColor,
+                      padding: "1rem",
+                      marginBottom: "0.5rem",
+                      boxShadow: isHighlighted ? "0 1px 3px rgba(0,0,0,0.1)" : undefined,
+                    }}
                   >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{item.title}</span>
-                      <span className={merge("text-xs font-medium rounded-full px-2 py-0.5", statusConfig.text)}>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{item.title}</span>
+                      <span style={{ fontSize: "0.75rem", fontWeight: 500, borderRadius: "9999px", padding: "0.125rem 0.5rem", color: statusConfig.textColor }}>
                         {statusConfig.label}
                       </span>
                       {item.meta && (
-                        <span className="text-xs text-slate-500 dark:text-slate-300">{item.meta}</span>
+                        <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{item.meta}</span>
                       )}
                     </div>
                     {item.description && (
-                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{item.description}</p>
+                      <p style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#475569" }}>{item.description}</p>
                     )}
-                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-300">
+                    <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "1rem", fontSize: "0.75rem", color: "#64748b" }}>
                       {amount && (
-                        <div className="flex items-center gap-1 text-sm text-slate-700 dark:text-slate-100">
-                          <Icon name="wallet" className="h-3.5 w-3.5 text-slate-400" />
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", color: "var(--color-foreground, #334155)" }}>
+                          <Icon name="wallet" className="h-3.5 w-3.5" style={{ color: "#94a3b8" }} />
                           {amount}
                         </div>
                       )}
                       {date && (
-                        <div className="flex items-center gap-1">
-                          <Icon name="clock" className="h-3.5 w-3.5 text-slate-400" aria-hidden={true} />
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                          <Icon name="clock" className="h-3.5 w-3.5" style={{ color: "#94a3b8" }} aria-hidden={true} />
                           <time dateTime={item.date instanceof Date ? item.date.toISOString() : typeof item.date === 'string' ? item.date : undefined}>
                             {date}
                           </time>
@@ -259,4 +280,3 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
 };
 
 SettlementTimeline.displayName = "SettlementTimeline";
-

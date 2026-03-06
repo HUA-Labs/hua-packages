@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 /**
  * BarChartData 인터페이스 / BarChartData interface
@@ -31,9 +31,9 @@ export interface BarChartData {
  * @property {"default" | "gradient"} [variant="gradient"] - 차트 스타일 변형 / Chart style variant
  * @property {boolean} [showGrid=true] - 그리드 표시 여부 / Show grid
  * @property {boolean} [showTooltip] - 툴팁 표시 여부 / Show tooltip
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface BarChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   data: BarChartData[];
   title?: string;
   height?: number;
@@ -44,60 +44,62 @@ export interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "gradient";
   showGrid?: boolean;
   showTooltip?: boolean;
+  dot?: string;
 }
 
-const colorSchemes = {
+// Color scheme maps — using explicit hex values to avoid Tailwind class resolution issues
+const colorSchemeValues = {
   blue: {
-    default: "bg-indigo-500",
-    gradient: "from-indigo-500 to-cyan-600",
-    highlight: "from-cyan-600 to-cyan-700",
+    default: "#6366f1",
+    gradient: ["#6366f1", "#0891b2"],
+    highlight: ["#0891b2", "#0e7490"],
   },
   purple: {
-    default: "bg-purple-500",
-    gradient: "from-purple-500 to-purple-600",
-    highlight: "from-purple-600 to-purple-700",
+    default: "#a855f7",
+    gradient: ["#a855f7", "#9333ea"],
+    highlight: ["#9333ea", "#7e22ce"],
   },
   green: {
-    default: "bg-green-500",
-    gradient: "from-green-500 to-green-600",
-    highlight: "from-green-600 to-green-700",
+    default: "#22c55e",
+    gradient: ["#22c55e", "#16a34a"],
+    highlight: ["#16a34a", "#15803d"],
   },
   orange: {
-    default: "bg-orange-500",
-    gradient: "from-orange-500 to-orange-600",
-    highlight: "from-orange-600 to-orange-700",
+    default: "#f97316",
+    gradient: ["#f97316", "#ea580c"],
+    highlight: ["#ea580c", "#c2410c"],
   },
   red: {
-    default: "bg-red-500",
-    gradient: "from-red-500 to-red-600",
-    highlight: "from-red-600 to-red-700",
+    default: "#ef4444",
+    gradient: ["#ef4444", "#dc2626"],
+    highlight: ["#dc2626", "#b91c1c"],
   },
   indigo: {
-    default: "bg-indigo-500",
-    gradient: "from-indigo-500 to-indigo-600",
-    highlight: "from-indigo-600 to-indigo-700",
+    default: "#6366f1",
+    gradient: ["#6366f1", "#4f46e5"],
+    highlight: ["#4f46e5", "#4338ca"],
   },
   pink: {
-    default: "bg-pink-500",
-    gradient: "from-pink-500 to-pink-600",
-    highlight: "from-pink-600 to-pink-700",
+    default: "#ec4899",
+    gradient: ["#ec4899", "#db2777"],
+    highlight: ["#db2777", "#be185d"],
   },
   gray: {
-    default: "bg-gray-500",
-    gradient: "from-gray-500 to-gray-600",
-    highlight: "from-gray-600 to-gray-700",
+    default: "#6b7280",
+    gradient: ["#6b7280", "#4b5563"],
+    highlight: ["#4b5563", "#374151"],
   },
 };
 
 /**
  * BarChart 컴포넌트
- * 
+ *
  * 막대 차트를 표시하는 컴포넌트입니다.
  * 다양한 색상 스킴과 그라디언트 스타일을 지원합니다.
- * 
+ *
  * Bar chart component that displays data in bar format.
  * Supports various color schemes and gradient styles.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -109,7 +111,7 @@ const colorSchemes = {
  *   ]}
  *   title="주간 매출"
  * />
- * 
+ *
  * @example
  * // 커스텀 색상 및 강조 / Custom color and highlight
  * <BarChart
@@ -122,7 +124,7 @@ const colorSchemes = {
  *   variant="gradient"
  *   showTooltip
  * />
- * 
+ *
  * @param {BarChartProps} props - BarChart 컴포넌트의 props / BarChart component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} BarChart 컴포넌트 / BarChart component
@@ -140,27 +142,28 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
       variant = "gradient",
       showGrid = true,
       showTooltip = true,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
   ) => {
-    const colors = colorSchemes[colorScheme];
-    
+    const colors = colorSchemeValues[colorScheme];
+
     // 성능 최적화: max 값 계산을 useMemo로 메모이제이션
     // Performance optimization: Memoize max value calculation with useMemo
     const max = React.useMemo(() => {
       return maxValue || Math.max(...data.map((d) => d.value), 1);
     }, [maxValue, data]);
-    
+
     // 성능 최적화: chartLabel 계산을 useMemo로 메모이제이션
     // Performance optimization: Memoize chartLabel calculation with useMemo
     const chartLabel = React.useMemo(() => {
-      return title 
+      return title
         ? `${title} 차트 - 총 ${data.length}개 항목, 최대값 ${max.toLocaleString()}`
         : `막대 그래프 차트 - 총 ${data.length}개 항목, 최대값 ${max.toLocaleString()}`;
     }, [title, data.length, max]);
-    
+
     const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
     const _chartId = React.useId();
 
@@ -169,92 +172,119 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
         ref={ref}
         role="img"
         aria-label={chartLabel}
-        className={merge(
-          "bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6",
-          className
+        style={mergeStyles(
+          resolveDot("rounded-2xl p-6"),
+          {
+            backgroundColor: "var(--color-background, #ffffff)",
+            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+            border: "1px solid var(--color-border, #e5e7eb)",
+          },
+          resolveDot(dot),
+          style
         )}
         {...props}
       >
         {title && (
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "1rem", color: "var(--color-foreground, #111827)" }}>
             {title}
           </h3>
         )}
 
-        <div className="relative" style={{ height: `${height}px` }} aria-hidden="true">
+        <div style={{ position: "relative", height: `${height}px` }} aria-hidden="true">
           {/* 그리드 라인 */}
           {showGrid && (
-            <div className="absolute inset-0 flex flex-col justify-between">
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
               {[0, 25, 50, 75, 100].map((percent) => (
                 <div
                   key={percent}
-                  className="border-t border-gray-200 dark:border-gray-700 opacity-30"
-                  style={{ marginTop: `${percent === 0 ? 0 : (percent / 100) * height - 1}px` }}
+                  style={{
+                    borderTop: "1px solid var(--color-border, #e5e7eb)",
+                    opacity: 0.3,
+                    marginTop: percent === 0 ? 0 : `${(percent / 100) * height - 1}px`,
+                  }}
                 />
               ))}
             </div>
           )}
 
           {/* 막대 그래프 */}
-          <div className="relative h-full flex items-end justify-between gap-2 px-2">
+          <div style={{ position: "relative", height: "100%", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "0.5rem", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
             {data.map((item, index) => {
               const barHeight = max > 0 ? (item.value / max) * (height - 40) : 0;
               const isHighlighted = item.highlight || hoveredIndex === index;
               const barColor = item.color
                 ? item.color
                 : variant === "gradient"
-                ? `bg-gradient-to-t ${isHighlighted ? colors.highlight : colors.gradient}`
+                ? (isHighlighted ? colors.highlight[0] : colors.gradient[0])
                 : colors.default;
 
               return (
                 <div
                   key={index}
-                  className="flex flex-col items-center flex-1 group relative"
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
                   {/* 툴팁 */}
                   {showTooltip && (
                     <div
-                      className={merge(
-                        "absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10"
-                      )}
+                      style={{
+                        position: "absolute",
+                        bottom: "100%",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        marginBottom: "0.5rem",
+                        padding: "0.25rem 0.5rem",
+                        backgroundColor: "#111827",
+                        color: "#ffffff",
+                        fontSize: "0.75rem",
+                        borderRadius: "0.25rem",
+                        opacity: hoveredIndex === index ? 1 : 0,
+                        transition: "opacity 200ms",
+                        pointerEvents: "none",
+                        whiteSpace: "nowrap",
+                        zIndex: 10,
+                      }}
                     >
                       {item.label}: {item.value.toLocaleString()}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                      <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #111827" }} />
                     </div>
                   )}
 
                   {/* 값 표시 */}
                   {showValues && (
                     <div
-                      className={merge(
-                        "text-xs font-medium mb-1 transition-opacity duration-200",
-                        hoveredIndex === index
-                          ? "opacity-100 text-gray-900 dark:text-white"
-                          : "opacity-0 group-hover:opacity-100 text-gray-600 dark:text-gray-400"
-                      )}
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        marginBottom: "0.25rem",
+                        transition: "opacity 200ms",
+                        opacity: hoveredIndex === index ? 1 : 0,
+                        color: hoveredIndex === index ? "var(--color-foreground, #111827)" : "var(--color-muted-foreground, #6b7280)",
+                      }}
                     >
                       {item.value.toLocaleString()}
                     </div>
                   )}
 
                   {/* 막대 */}
-                  <div className="relative w-full flex-1 flex items-end">
+                  <div style={{ position: "relative", width: "100%", flex: 1, display: "flex", alignItems: "flex-end" }}>
                     <div
-                      className={merge(
-                        "w-full rounded-t-lg transition-all duration-500 ease-out",
-                        barColor,
-                        isHighlighted && "shadow-lg scale-105"
-                      )}
                       style={{
+                        width: "100%",
+                        borderTopLeftRadius: "0.5rem",
+                        borderTopRightRadius: "0.5rem",
+                        transition: "all 500ms ease-out",
+                        backgroundColor: barColor,
                         height: `${Math.max(barHeight, 4)}px`,
                         minHeight: "4px",
+                        boxShadow: isHighlighted ? "0 10px 15px -3px rgba(0,0,0,0.1)" : undefined,
+                        transform: isHighlighted ? "scaleX(1.05)" : undefined,
                       }}
                     >
                       {/* 막대 위 점 */}
                       {item.value > 0 && (
-                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white dark:bg-gray-800 rounded-full shadow-sm"></div>
+                        <div style={{ position: "absolute", top: "-4px", left: "50%", transform: "translateX(-50%)", width: "8px", height: "8px", backgroundColor: "var(--color-background, #ffffff)", borderRadius: "50%", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }} />
                       )}
                     </div>
                   </div>
@@ -262,12 +292,13 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                   {/* 라벨 */}
                   {showLabels && (
                     <div
-                      className={merge(
-                        "text-xs font-medium mt-2 transition-colors duration-200",
-                        isHighlighted
-                          ? "text-purple-600 dark:text-purple-400"
-                          : "text-gray-500 dark:text-gray-400"
-                      )}
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        marginTop: "0.5rem",
+                        transition: "color 200ms",
+                        color: isHighlighted ? "#9333ea" : "var(--color-muted-foreground, #6b7280)",
+                      }}
                     >
                       {item.label}
                     </div>
@@ -280,7 +311,7 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
 
         {/* 하단 통계 */}
         {data.length > 0 && (
-          <div className="mt-4 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-2">
+          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
             <div>
               총: {data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
             </div>
@@ -299,4 +330,3 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
 );
 
 BarChart.displayName = "BarChart";
-

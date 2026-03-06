@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useRef } from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { BlogEditorProvider, useBlogEditor } from './BlogEditorContext'
 import { BlogEditorHeader, type BlogEditorHeaderProps } from './BlogEditorHeader'
@@ -30,10 +29,10 @@ interface BlogEditorRootProps {
   translateHint?: string
   /** 최대 너비 / Max width */
   maxWidth?: string
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
   /** dot 유틸리티 스타일 */
   dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
   /** 자식 요소 / Children */
   children?: React.ReactNode
 }
@@ -49,36 +48,51 @@ function BlogEditorRoot({
   renderMarkdown,
   translateHint,
   maxWidth = 'max-w-4xl',
-  className,
   dot: dotProp,
+  style,
   children,
 }: BlogEditorRootProps) {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const { showPreview, error, variant, features } = useBlogEditor()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const containerClasses = merge(
+  // variant별 컨테이너 스타일
+  const containerVariantStyle: React.CSSProperties =
     variant === 'glass'
-      ? 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800'
-      : variant === 'minimal'
-        ? ''
-        : 'bg-muted'
+      ? {
+          background: 'linear-gradient(to bottom right, rgb(243,244,246), rgb(229,231,235))',
+        }
+      : {}
+
+  const containerStyle = mergeStyles(
+    variant === 'glass' ? containerVariantStyle : variant === 'minimal' ? {} : resolveDot('bg-muted'),
+    resolveDot(dotProp),
+    style
   )
 
-  const contentContainerClasses = merge(
-    'rounded-xl overflow-hidden',
+  // variant별 콘텐츠 컨테이너 스타일
+  const contentContainerStyle: React.CSSProperties =
     variant === 'glass'
-      ? 'bg-white/10 backdrop-blur-sm border border-white/20 dark:bg-slate-800/20 dark:border-slate-700/50'
+      ? {
+          background: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(4px)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          borderRadius: '0.75rem',
+          overflow: 'hidden',
+        }
       : variant === 'minimal'
-        ? 'bg-transparent border border-border'
-        : 'bg-background'
+        ? mergeStyles(resolveDot('rounded-xl overflow-hidden bg-transparent border border-border'))
+        : mergeStyles(resolveDot('rounded-xl overflow-hidden bg-background'))
+
+  const innerStyle = mergeStyles(
+    resolveDot('mx-auto px-4 py-8'),
+    maxWidth ? resolveDot(maxWidth) : undefined
   )
 
   // 커스텀 자식 요소가 있으면 그걸 렌더링
   if (children) {
     return (
-      <div className={merge(containerClasses, className)}>
-        <div className={merge(maxWidth, 'mx-auto px-4 py-8')}>
+      <div style={containerStyle}>
+        <div style={innerStyle}>
           {children}
         </div>
       </div>
@@ -87,24 +101,31 @@ function BlogEditorRoot({
 
   // 기본 레이아웃
   return (
-    <div className={merge(containerClasses, className)}>
-      <div className={merge(maxWidth, 'mx-auto px-4 py-8')}>
+    <div style={containerStyle}>
+      <div style={innerStyle}>
         {/* 헤더 */}
         <BlogEditorHeader onBack={onBack} backLink={backLink} />
 
         {/* 에러 메시지 */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
+          <div style={mergeStyles(
+            resolveDot('mb-6 p-4 border rounded-lg'),
+            {
+              background: 'rgb(254,242,242)',
+              borderColor: 'rgb(254,202,202)',
+              color: 'rgb(220,38,38)',
+            }
+          )}>
             {error}
           </div>
         )}
 
-        <div className="space-y-6">
+        <div style={resolveDot('space-y-6')}>
           {/* 메타데이터 */}
           <BlogEditorMetadata />
 
           {/* 콘텐츠 영역 */}
-          <div className={contentContainerClasses}>
+          <div style={contentContainerStyle}>
             {/* AI 번역 */}
             {features.enableTranslation && (
               <BlogEditorTranslate hint={translateHint} />
@@ -183,7 +204,8 @@ const BlogEditor = React.forwardRef<
       renderMarkdown,
       translateHint,
       maxWidth,
-      className,
+      dot,
+      style,
       children,
 
       // Auto-save
@@ -213,7 +235,8 @@ const BlogEditor = React.forwardRef<
             renderMarkdown={renderMarkdown}
             translateHint={translateHint}
             maxWidth={maxWidth}
-            className={className}
+            dot={dot}
+            style={style}
           >
             {children}
           </BlogEditorRoot>

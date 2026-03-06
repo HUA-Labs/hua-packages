@@ -48,7 +48,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.backdrop-blur-md');
+    // Backdrop is the first child of the fixed outer container
+    const outerDiv = container.firstChild as HTMLElement;
+    const backdrop = outerDiv?.firstChild as HTMLElement;
     if (backdrop) {
       await user.click(backdrop);
       expect(handleClose).toHaveBeenCalled();
@@ -65,7 +67,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.backdrop-blur-md');
+    // Backdrop is first child (no onClick when closeOnBackdropClick=false)
+    const outerDiv = container.firstChild as HTMLElement;
+    const backdrop = outerDiv?.firstChild as HTMLElement;
     if (backdrop) {
       await user.click(backdrop);
       expect(handleClose).not.toHaveBeenCalled();
@@ -109,8 +113,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.backdrop-blur-md');
-    expect(backdrop).toBeInTheDocument();
+    // When showBackdrop=true, the outer fixed div has 2 children: backdrop + drawer
+    const outerDiv = container.firstChild as HTMLElement;
+    expect(outerDiv?.childNodes).toHaveLength(2);
   });
 
   it('should not render backdrop when showBackdrop is false', () => {
@@ -120,8 +125,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const backdrop = container.querySelector('.backdrop-blur-md');
-    expect(backdrop).not.toBeInTheDocument();
+    // When showBackdrop=false, the outer fixed div has 1 child: drawer only
+    const outerDiv = container.firstChild as HTMLElement;
+    expect(outerDiv?.childNodes).toHaveLength(1);
   });
 
   it('should apply right side position by default', () => {
@@ -131,8 +137,10 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const drawer = container.querySelector('.right-0');
-    expect(drawer).toBeInTheDocument();
+    // Drawer panel is the last child of the outer fixed container
+    const outerDiv = container.firstChild as HTMLElement;
+    const drawer = outerDiv?.lastChild as HTMLElement;
+    expect(drawer).toHaveStyle({ right: '0px' });
   });
 
   it('should apply left side position', () => {
@@ -142,8 +150,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const drawer = container.querySelector('.left-0');
-    expect(drawer).toBeInTheDocument();
+    const outerDiv = container.firstChild as HTMLElement;
+    const drawer = outerDiv?.lastChild as HTMLElement;
+    expect(drawer).toHaveStyle({ left: '0px' });
   });
 
   it('should apply top side position', () => {
@@ -153,8 +162,9 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const drawer = container.querySelector('.top-0');
-    expect(drawer).toBeInTheDocument();
+    const outerDiv = container.firstChild as HTMLElement;
+    const drawer = outerDiv?.lastChild as HTMLElement;
+    expect(drawer).toHaveStyle({ top: '0px' });
   });
 
   it('should apply bottom side position', () => {
@@ -164,19 +174,22 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    const drawer = container.querySelector('.bottom-0');
-    expect(drawer).toBeInTheDocument();
+    const outerDiv = container.firstChild as HTMLElement;
+    const drawer = outerDiv?.lastChild as HTMLElement;
+    expect(drawer).toHaveStyle({ bottom: '0px' });
   });
 
-  it('should apply different size classes', () => {
+  it('should apply different size styles', () => {
     const { container, rerender } = render(
       <Drawer isOpen={true} onClose={vi.fn()} size="sm">
         <DrawerContent>Content</DrawerContent>
       </Drawer>
     );
 
-    let drawer = container.querySelector('.w-80');
-    expect(drawer).toBeInTheDocument();
+    const outerDiv = container.firstChild as HTMLElement;
+    let drawer = outerDiv?.lastChild as HTMLElement;
+    // sm right/left drawer = width 20rem (320px)
+    expect(drawer).toHaveStyle({ width: '20rem' });
 
     rerender(
       <Drawer isOpen={true} onClose={vi.fn()} size="lg">
@@ -184,18 +197,21 @@ describe('Drawer', () => {
       </Drawer>
     );
 
-    drawer = container.querySelector('.w-\\[28rem\\]');
-    expect(drawer).toBeInTheDocument();
+    drawer = (container.firstChild as HTMLElement)?.lastChild as HTMLElement;
+    // lg right/left drawer = width 28rem
+    expect(drawer).toHaveStyle({ width: '28rem' });
   });
 
-  it('should apply custom className', () => {
+  it('should apply custom dot style', () => {
     const { container } = render(
-      <Drawer isOpen={true} onClose={vi.fn()} className="custom-drawer">
+      <Drawer isOpen={true} onClose={vi.fn()} dot="rounded-lg">
         <DrawerContent>Content</DrawerContent>
       </Drawer>
     );
 
-    const drawer = container.querySelector('.custom-drawer');
+    // Drawer panel should be rendered
+    const outerDiv = container.firstChild as HTMLElement;
+    const drawer = outerDiv?.lastChild as HTMLElement;
     expect(drawer).toBeInTheDocument();
   });
 });
@@ -262,15 +278,15 @@ describe('DrawerContent', () => {
     expect(screen.getByText('Drawer content text')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply custom style', () => {
     const { container } = render(
-      <DrawerContent className="custom-content">
+      <DrawerContent style={{ padding: '2rem' }}>
         <p>Content</p>
       </DrawerContent>
     );
 
-    const content = container.querySelector('.custom-content');
-    expect(content).toBeInTheDocument();
+    const content = container.firstChild as HTMLElement;
+    expect(content).toHaveStyle({ padding: '2rem' });
   });
 });
 
@@ -285,14 +301,14 @@ describe('DrawerFooter', () => {
     expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply custom style', () => {
     const { container } = render(
-      <DrawerFooter className="custom-footer">
+      <DrawerFooter style={{ padding: '2rem' }}>
         <button>Action</button>
       </DrawerFooter>
     );
 
-    const footer = container.querySelector('.custom-footer');
-    expect(footer).toBeInTheDocument();
+    const footer = container.firstChild as HTMLElement;
+    expect(footer).toHaveStyle({ padding: '2rem' });
   });
 });

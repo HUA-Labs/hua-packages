@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import type { Color } from "../../lib/types/common";
 
 /**
@@ -16,9 +16,9 @@ import type { Color } from "../../lib/types/common";
  * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color="blue"] - 색상
  * @property {boolean} [highlightToday=true] - 오늘 항목 강조 여부
  * @property {number} [todayIndex] - 오늘 인덱스 (기본값: 마지막 항목)
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MiniBarChartProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MiniBarChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   data: number[];
   labels?: string[];
   maxValue?: number;
@@ -28,57 +28,58 @@ export interface MiniBarChartProps extends React.HTMLAttributes<HTMLDivElement> 
   color?: Color;
   highlightToday?: boolean;
   todayIndex?: number;
+  dot?: string;
 }
 
-// 차트 전용 색상 (막대 그래프용 그라데이션)
-const chartColors: Record<Color, { default: string; highlight: string }> = {
+// Chart colors as actual CSS values
+const chartColorValues: Record<Color, { default: string; highlight: string }> = {
   blue: {
-    default: "bg-gradient-to-t from-indigo-500 to-cyan-400",
-    highlight: "bg-gradient-to-t from-cyan-600 to-cyan-500 shadow-lg",
+    default: "#6366f1",
+    highlight: "#0891b2",
   },
   purple: {
-    default: "bg-gradient-to-t from-purple-500 to-purple-400",
-    highlight: "bg-gradient-to-t from-purple-600 to-purple-500 shadow-lg",
+    default: "#a855f7",
+    highlight: "#9333ea",
   },
   green: {
-    default: "bg-gradient-to-t from-green-500 to-green-400",
-    highlight: "bg-gradient-to-t from-green-600 to-green-500 shadow-lg",
+    default: "#22c55e",
+    highlight: "#16a34a",
   },
   orange: {
-    default: "bg-gradient-to-t from-orange-500 to-orange-400",
-    highlight: "bg-gradient-to-t from-orange-600 to-orange-500 shadow-lg",
+    default: "#f97316",
+    highlight: "#ea580c",
   },
   red: {
-    default: "bg-gradient-to-t from-red-500 to-red-400",
-    highlight: "bg-gradient-to-t from-red-600 to-red-500 shadow-lg",
+    default: "#ef4444",
+    highlight: "#dc2626",
   },
   indigo: {
-    default: "bg-gradient-to-t from-indigo-500 to-indigo-400",
-    highlight: "bg-gradient-to-t from-indigo-600 to-indigo-500 shadow-lg",
+    default: "#6366f1",
+    highlight: "#4f46e5",
   },
   pink: {
-    default: "bg-gradient-to-t from-pink-500 to-pink-400",
-    highlight: "bg-gradient-to-t from-pink-600 to-pink-500 shadow-lg",
+    default: "#ec4899",
+    highlight: "#db2777",
   },
   gray: {
-    default: "bg-gradient-to-t from-gray-500 to-gray-400",
-    highlight: "bg-gradient-to-t from-gray-600 to-gray-500 shadow-lg",
+    default: "#6b7280",
+    highlight: "#4b5563",
   },
   cyan: {
-    default: "bg-gradient-to-t from-cyan-500 to-cyan-400",
-    highlight: "bg-gradient-to-t from-cyan-600 to-cyan-500 shadow-lg",
+    default: "#06b6d4",
+    highlight: "#0891b2",
   },
 };
 
 /**
  * MiniBarChart 컴포넌트
- * 
+ *
  * 작은 막대 그래프 차트 컴포넌트입니다.
  * 간단한 데이터 시각화에 적합하며, 오늘 항목 강조 기능을 제공합니다.
- * 
+ *
  * Small bar chart component for simple data visualization.
  * Suitable for compact displays with today's item highlight feature.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -86,7 +87,7 @@ const chartColors: Record<Color, { default: string; highlight: string }> = {
  *   data={[10, 20, 15, 30, 25, 40, 35]}
  *   labels={["월", "화", "수", "목", "금", "토", "일"]}
  * />
- * 
+ *
  * @example
  * // 커스텀 색상과 통계 / Custom color and stats
  * <MiniBarChart
@@ -96,7 +97,7 @@ const chartColors: Record<Color, { default: string; highlight: string }> = {
  *   highlightToday={true}
  *   todayIndex={6}
  * />
- * 
+ *
  * @param {MiniBarChartProps} props - MiniBarChart 컴포넌트의 props / MiniBarChart component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} MiniBarChart 컴포넌트 / MiniBarChart component
@@ -113,12 +114,13 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
       color = "blue",
       highlightToday = true,
       todayIndex,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
   ) => {
-    const colors = chartColors[color];
+    const colors = chartColorValues[color] || chartColorValues.blue;
     const calculatedMax = maxValue || Math.max(...data, 1);
     const fixedMax = Math.max(calculatedMax, 10);
     const todayIdx = todayIndex !== undefined ? todayIndex : data.length - 1;
@@ -137,74 +139,111 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
       ? `미니 막대 그래프 - ${labels.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`
       : `미니 막대 그래프 - ${data.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`;
 
+    const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
+
     return (
       <div
         ref={ref}
         role="img"
         aria-label={chartLabel}
-        className={merge("w-full", className)}
+        style={mergeStyles({ width: "100%" }, resolveDot(dot), style)}
         {...props}
       >
         {/* 그래프 영역 */}
         <div
-          className="flex items-end justify-between gap-2 px-2 relative"
-          style={{ height: `${height + 40}px` }}
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: "0.5rem",
+            paddingLeft: "0.5rem",
+            paddingRight: "0.5rem",
+            position: "relative",
+            height: `${height + 40}px`,
+          }}
         >
           {/* 기준선 */}
-          <div className="absolute inset-x-2 bottom-8 border-t border-gray-200 dark:border-gray-700 opacity-50"></div>
+          <div style={{ position: "absolute", left: "0.5rem", right: "0.5rem", bottom: "2rem", borderTop: "1px solid var(--color-border, #e5e7eb)", opacity: 0.5 }} />
 
           {data.map((value, index) => {
             const isToday = highlightToday && index === todayIdx;
             const barHeight = calculateHeight(value);
             const barColor = isToday ? colors.highlight : colors.default;
+            const isHovered = hoveredIndex === index;
 
             return (
               <div
                 key={index}
-                className="flex flex-col items-center flex-1 group relative"
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
                 {/* 툴팁 */}
                 {showTooltip && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  <div style={{
+                    position: "absolute",
+                    bottom: "100%",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    marginBottom: "0.5rem",
+                    padding: "0.25rem 0.5rem",
+                    backgroundColor: "#111827",
+                    color: "#ffffff",
+                    fontSize: "0.75rem",
+                    borderRadius: "0.25rem",
+                    opacity: isHovered ? 1 : 0,
+                    transition: "opacity 200ms",
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
+                    zIndex: 10,
+                  }}>
                     {value}개
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                    <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #111827" }} />
                   </div>
                 )}
 
                 {/* 값 표시 (호버 시) */}
-                <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div style={{
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "var(--color-foreground, #374151)",
+                  marginBottom: "0.25rem",
+                  opacity: isHovered ? 1 : 0,
+                  transition: "opacity 200ms",
+                }}>
                   {value}
                 </div>
 
                 {/* 막대 */}
-                <div className="relative w-full flex-1 flex items-end">
+                <div style={{ position: "relative", width: "100%", flex: 1, display: "flex", alignItems: "flex-end" }}>
                   <div
-                    className={merge(
-                      "w-full rounded-t-lg transition-all duration-500 ease-out group-hover:scale-105",
-                      barColor
-                    )}
                     style={{
+                      width: "100%",
+                      borderTopLeftRadius: "0.5rem",
+                      borderTopRightRadius: "0.5rem",
+                      transition: "all 500ms ease-out",
+                      backgroundColor: barColor,
                       height: `${barHeight}px`,
                       minHeight: "8px",
+                      transform: isHovered ? "scaleX(1.05)" : undefined,
                     }}
                   >
                     {/* 막대 위 점 */}
                     {value > 0 && (
-                      <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white dark:bg-gray-800 rounded-full shadow-sm"></div>
+                      <div style={{ position: "absolute", top: "-4px", left: "50%", transform: "translateX(-50%)", width: "8px", height: "8px", backgroundColor: "var(--color-background, #ffffff)", borderRadius: "50%", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }} />
                     )}
                   </div>
                 </div>
 
                 {/* 라벨 */}
                 {labels && labels[index] && (
-                  <div
-                    className={merge(
-                      "text-xs font-medium mt-2 transition-colors duration-200",
-                      isToday
-                        ? "text-purple-600 dark:text-purple-400"
-                        : "text-gray-500 dark:text-gray-400"
-                    )}
-                  >
+                  <div style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                    marginTop: "0.5rem",
+                    transition: "color 200ms",
+                    color: isToday ? "#9333ea" : "var(--color-muted-foreground, #6b7280)",
+                  }}>
                     {labels[index]}
                   </div>
                 )}
@@ -215,16 +254,10 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
 
         {/* 통계 정보 */}
         {showStats && (
-          <div className="mt-4 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-2">
-            <div>
-              총: {total}
-            </div>
-            <div>
-              평균: {average}
-            </div>
-            <div>
-              최고: {max}
-            </div>
+          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
+            <div>총: {total}</div>
+            <div>평균: {average}</div>
+            <div>최고: {max}</div>
           </div>
         )}
       </div>
@@ -233,4 +266,3 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
 );
 
 MiniBarChart.displayName = "MiniBarChart";
-

@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { merge } from '../lib/utils'
 import { LoadingSpinner } from './LoadingSpinner'
 import { mergeStyles, resolveDot } from '../hooks/useDotMap'
 
@@ -9,7 +8,6 @@ import { mergeStyles, resolveDot } from '../hooks/useDotMap'
  * PageTransition 컴포넌트의 props / PageTransition component props
  * @typedef {Object} PageTransitionProps
  * @property {React.ReactNode} children - 페이지 내용 / Page content
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
  * @property {number} [duration=300] - 전환 지속 시간 (ms) / Transition duration (ms)
  * @property {'fade' | 'slide' | 'scale' | 'flip'} [variant='fade'] - 전환 애니메이션 타입 / Transition animation type
  * @property {'default' | 'dots' | 'bars' | 'ring' | 'ripple'} [loadingVariant='ripple'] - 로딩 스피너 타입 / Loading spinner type
@@ -20,8 +18,8 @@ import { mergeStyles, resolveDot } from '../hooks/useDotMap'
  */
 export interface PageTransitionProps {
   children: React.ReactNode
-  className?: string
   dot?: string
+  style?: React.CSSProperties
   duration?: number
   variant?: 'fade' | 'slide' | 'scale' | 'flip'
   loadingVariant?: 'default' | 'dots' | 'bars' | 'ring' | 'ripple'
@@ -33,20 +31,20 @@ export interface PageTransitionProps {
 
 /**
  * PageTransition 컴포넌트 / PageTransition component
- * 
+ *
  * 페이지 전환 애니메이션을 제공하는 컴포넌트입니다.
  * 다양한 전환 효과와 로딩 스피너를 지원합니다.
- * 
+ *
  * Component that provides page transition animations.
  * Supports various transition effects and loading spinners.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <PageTransition>
  *   <div>페이지 내용</div>
  * </PageTransition>
- * 
+ *
  * @example
  * // Slide 전환 / Slide transition
  * <PageTransition
@@ -56,15 +54,15 @@ export interface PageTransitionProps {
  * >
  *   <div>페이지 내용</div>
  * </PageTransition>
- * 
+ *
  * @param {PageTransitionProps} props - PageTransition 컴포넌트의 props / PageTransition component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} PageTransition 컴포넌트 / PageTransition component
  */
 export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(({
   children,
-  className,
   dot: dotProp,
+  style,
   duration = 300,
   variant = 'fade',
   loadingVariant = 'ripple',
@@ -73,7 +71,6 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   onTransitionStart,
   onTransitionEnd
 }, ref) => {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [isLoading, setIsLoading] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -90,27 +87,23 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   }, [duration, onTransitionStart, onTransitionEnd])
 
   const transitionClasses = {
-    fade: merge(
-      'transition-opacity duration-300 ease-in-out',
-      isVisible ? 'opacity-100' : 'opacity-0'
-    ),
-    slide: merge(
-      'transition-transform duration-300 ease-in-out',
-      isVisible ? 'translate-x-0' : 'translate-x-full'
-    ),
-    scale: merge(
-      'transition-all duration-300 ease-in-out',
-      isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-    ),
-    flip: merge(
-      'transition-all duration-500 ease-in-out',
-      isVisible ? 'rotate-y-0 opacity-100' : 'rotate-y-90 opacity-0'
-    )
+    fade: isVisible
+      ? 'transition-opacity duration-300 ease-in-out opacity-100'
+      : 'transition-opacity duration-300 ease-in-out opacity-0',
+    slide: isVisible
+      ? 'transition-transform duration-300 ease-in-out translate-x-0'
+      : 'transition-transform duration-300 ease-in-out translate-x-full',
+    scale: isVisible
+      ? 'transition-all duration-300 ease-in-out scale-100 opacity-100'
+      : 'transition-all duration-300 ease-in-out scale-95 opacity-0',
+    flip: isVisible
+      ? 'transition-all duration-500 ease-in-out rotate-y-0 opacity-100'
+      : 'transition-all duration-500 ease-in-out rotate-y-90 opacity-0',
   }
 
   if (isLoading && showLoading) {
     return (
-      <div className={merge('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800', className)}>
+      <div style={resolveDot('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800')}>
         <LoadingSpinner
           size="lg"
           variant={loadingVariant}
@@ -123,12 +116,13 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   return (
     <div
       ref={ref}
-      className={merge(
-        'w-full',
-        transitionClasses[variant],
-        className
+      style={mergeStyles(
+        resolveDot('w-full'),
+        resolveDot(transitionClasses[variant]),
+        { transitionDuration: `${duration}ms` },
+        resolveDot(dotProp),
+        style
       )}
-      style={mergeStyles({ transitionDuration: `${duration}ms` }, dotStyle)}
     >
       {children}
     </div>
@@ -158,4 +152,4 @@ export const FlipTransition = React.forwardRef<HTMLDivElement, Omit<PageTransiti
 FadeTransition.displayName = 'FadeTransition'
 SlideTransition.displayName = 'SlideTransition'
 ScaleTransition.displayName = 'ScaleTransition'
-FlipTransition.displayName = 'FlipTransition' 
+FlipTransition.displayName = 'FlipTransition'

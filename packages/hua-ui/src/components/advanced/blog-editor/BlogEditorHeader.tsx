@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { merge } from '../../../lib/utils'
 import { mergeStyles, resolveDot } from '../../../hooks/useDotMap'
 import { Icon } from '../../Icon'
 import { useBlogEditor } from './BlogEditorContext'
@@ -14,8 +13,10 @@ export interface BlogEditorHeaderProps {
   onBack?: () => void
   /** 뒤로가기 링크 컴포넌트 / Back link component */
   backLink?: React.ReactNode
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 }
 
 /**
@@ -23,21 +24,21 @@ export interface BlogEditorHeaderProps {
  * 에디터 헤더 (제목 + 미리보기 토글)
  */
 const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
-  ({ onBack, backLink, className }, ref) => {
+  ({ onBack, backLink, dot, style }, ref) => {
     const { labels, isEditMode, formData } = useBlogEditor()
 
     return (
       <header
         ref={ref}
-        className={merge('flex items-center justify-between mb-8', className)}
+        style={mergeStyles(resolveDot('flex items-center justify-between mb-8'), resolveDot(dot), style)}
       >
-        <div className="flex items-center gap-4">
+        <div style={resolveDot('flex items-center gap-4')}>
           {backLink || (
             onBack && (
               <button
                 type="button"
                 onClick={onBack}
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                style={resolveDot('p-2 text-muted-foreground transition-colors')}
                 aria-label="뒤로가기"
               >
                 <Icon name="chevronLeft" size={24} />
@@ -45,11 +46,11 @@ const BlogEditorHeader = React.forwardRef<HTMLElement, BlogEditorHeaderProps>(
             )
           )}
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 style={resolveDot('text-2xl font-bold text-foreground')}>
               {isEditMode ? labels.editTitle : labels.pageTitle}
             </h1>
             {isEditMode && formData.slug && (
-              <p className="text-sm text-muted-foreground">
+              <p style={resolveDot('text-sm text-muted-foreground')}>
                 {labels.slugPrefix}{formData.slug}
               </p>
             )}

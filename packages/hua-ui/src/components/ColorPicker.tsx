@@ -14,7 +14,6 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { cn } from "../lib/utils";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 export interface ColorPickerProps {
@@ -22,10 +21,10 @@ export interface ColorPickerProps {
   value: string;
   /** 색상 변경 콜백 */
   onChange: (color: string) => void;
-  /** 추가 클래스명 */
-  className?: string;
   /** dot 유틸리티 스타일 */
   dot?: string;
+  /** 추가 인라인 스타일 */
+  style?: React.CSSProperties;
   /** 비활성화 여부 */
   disabled?: boolean;
 }
@@ -159,11 +158,14 @@ function SaturationLightnessPicker({
   return (
     <div
       ref={boxRef}
-      className={cn(
-        "relative w-full h-28 rounded-md overflow-hidden",
-        disabled ? "opacity-50 cursor-not-allowed" : "cursor-crosshair"
-      )}
       style={{
+        position: 'relative',
+        width: '100%',
+        height: '7rem',
+        borderRadius: '0.375rem',
+        overflow: 'hidden',
+        cursor: disabled ? 'not-allowed' : 'crosshair',
+        opacity: disabled ? 0.5 : 1,
         background: `
           linear-gradient(to top, #000, transparent),
           linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%))
@@ -172,8 +174,15 @@ function SaturationLightnessPicker({
       onMouseDown={handleMouseDown}
     >
       <div
-        className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md pointer-events-none"
         style={{
+          position: 'absolute',
+          width: '1rem',
+          height: '1rem',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '9999px',
+          border: '2px solid white',
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+          pointerEvents: 'none',
           left: `${cursorX}%`,
           top: `${cursorY}%`,
           background: hslToHex(hue, saturation, lightness),
@@ -195,8 +204,9 @@ function HueSlider({
   onChange: (h: number) => void;
   disabled?: boolean;
 }) {
+  // Keep className for complex pseudo-element selectors that can't be done with inline styles
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       <input
         type="range"
         min="0"
@@ -204,7 +214,7 @@ function HueSlider({
         value={hue}
         disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
-        className={cn(
+        className={[
           "w-full h-3 rounded-md appearance-none cursor-pointer",
           "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5",
           "[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white",
@@ -214,8 +224,8 @@ function HueSlider({
           "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white",
           "[&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-current",
           "[&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer",
-          disabled && "opacity-50 cursor-not-allowed"
-        )}
+          disabled ? "opacity-50 cursor-not-allowed" : "",
+        ].filter(Boolean).join(' ')}
         style={{
           background: `linear-gradient(to right,
             hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%),
@@ -241,23 +251,32 @@ function TailwindTab({
   disabled?: boolean;
 }) {
   return (
-    <div className="space-y-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       {/* 팔레트 그리드 */}
-      <div className="space-y-0.5">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
         {Object.entries(TAILWIND_PALETTE).map(([colorName, shades]) => (
-          <div key={colorName} className="flex gap-0.5">
+          <div key={colorName} style={{ display: 'flex', gap: '0.125rem' }}>
             {shades.map((color, idx) => (
               <button
                 key={`${colorName}-${idx}`}
                 type="button"
                 disabled={disabled}
-                className={cn(
-                  "flex-1 aspect-square rounded-[2px] transition-transform",
-                  !disabled && "hover:scale-110 hover:z-10",
-                  currentColor.toLowerCase() === color.toLowerCase() && "ring-1 ring-ring ring-offset-1",
-                  disabled && "opacity-50 cursor-not-allowed"
-                )}
-                style={{ background: color }}
+                style={{
+                  flex: 1,
+                  aspectRatio: '1',
+                  borderRadius: '2px',
+                  border: currentColor.toLowerCase() === color.toLowerCase()
+                    ? '1px solid hsl(var(--ring))'
+                    : 'none',
+                  background: color,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  opacity: disabled ? 0.5 : 1,
+                  outline: currentColor.toLowerCase() === color.toLowerCase()
+                    ? '1px solid hsl(var(--ring))'
+                    : 'none',
+                  outlineOffset: currentColor.toLowerCase() === color.toLowerCase() ? '1px' : '0',
+                  transition: 'transform 150ms',
+                }}
                 onClick={() => onColorSelect(color)}
                 title={`${colorName}-${(idx + 1) * 100}`}
               />
@@ -267,19 +286,22 @@ function TailwindTab({
       </div>
 
       {/* 특수 색상 */}
-      <div className="flex gap-1 pt-1 border-t border-border">
+      <div style={{ display: 'flex', gap: '0.25rem', paddingTop: '0.25rem', borderTop: '1px solid hsl(var(--border))' }}>
         {SPECIAL_COLORS.map((color) => (
           <button
             key={color}
             type="button"
             disabled={disabled}
-            className={cn(
-              "w-6 h-6 rounded-sm border border-border/50 transition-transform",
-              !disabled && "hover:scale-110",
-              currentColor === color && "ring-1 ring-ring ring-offset-1",
-              disabled && "opacity-50 cursor-not-allowed"
-            )}
             style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              borderRadius: '0.125rem',
+              border: '1px solid hsl(var(--border) / 0.5)',
+              outline: currentColor === color ? '1px solid hsl(var(--ring))' : 'none',
+              outlineOffset: currentColor === color ? '1px' : '0',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              opacity: disabled ? 0.5 : 1,
+              transition: 'transform 150ms',
               background: color === "transparent"
                 ? "repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 8px 8px"
                 : color,
@@ -288,7 +310,7 @@ function TailwindTab({
             title={color}
           />
         ))}
-        <span className="flex-1 text-[10px] text-muted-foreground self-center text-right">
+        <span style={{ flex: 1, fontSize: '0.625rem', color: 'hsl(var(--muted-foreground))', alignSelf: 'center', textAlign: 'right' }}>
           Black / White / Transparent
         </span>
       </div>
@@ -317,9 +339,10 @@ function CustomTab({
   disabled?: boolean;
 }) {
   const currentColor = hslToHex(h, s, l);
+  const isInvalid = !isValidColor(hexInput);
 
   return (
-    <div className="space-y-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       {/* Saturation/Lightness 박스 */}
       <SaturationLightnessPicker
         hue={h}
@@ -333,29 +356,42 @@ function CustomTab({
       <HueSlider hue={h} onChange={(newH) => onHslChange(newH, s, l)} disabled={disabled} />
 
       {/* 프리뷰 + HEX 입력 */}
-      <div className="flex gap-2 items-center">
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
         <div
-          className="w-10 h-10 rounded-md border border-border shadow-inner flex-shrink-0"
-          style={{ background: currentColor }}
+          style={{
+            width: '2.5rem',
+            height: '2.5rem',
+            borderRadius: '0.375rem',
+            border: '1px solid hsl(var(--border))',
+            boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
+            flexShrink: 0,
+            background: currentColor,
+          }}
         />
         <input
           type="text"
           value={hexInput}
           onChange={onHexInputChange}
           disabled={disabled}
-          className={cn(
-            "flex-1 px-3 py-2 text-sm rounded-md border bg-background font-mono",
-            "focus:outline-none focus:ring-1 focus:ring-ring",
-            !isValidColor(hexInput) && "border-destructive",
-            disabled && "opacity-50 cursor-not-allowed"
-          )}
+          style={{
+            flex: 1,
+            padding: '0.5rem 0.75rem',
+            fontSize: '0.875rem',
+            borderRadius: '0.375rem',
+            border: isInvalid ? '1px solid hsl(var(--destructive))' : '1px solid hsl(var(--border))',
+            backgroundColor: 'hsl(var(--background))',
+            fontFamily: 'monospace',
+            outline: 'none',
+            opacity: disabled ? 0.5 : 1,
+            cursor: disabled ? 'not-allowed' : 'text',
+          }}
           placeholder="#000000"
           maxLength={7}
         />
       </div>
 
       {/* HSL 값 표시 */}
-      <div className="flex gap-2 text-[10px] text-muted-foreground">
+      <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.625rem', color: 'hsl(var(--muted-foreground))' }}>
         <span>H: {h}°</span>
         <span>S: {s}%</span>
         <span>L: {l}%</span>
@@ -370,7 +406,7 @@ function CustomTab({
  * 탭 기반 컬러 피커로 Tailwind CSS 프리셋과 커스텀 HSL 피커를 제공합니다.
  */
 export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
-  ({ value, onChange, className, dot: dotProp, disabled = false }, ref) => {
+  ({ value, onChange, dot: dotProp, style, disabled = false }, ref) => {
     const dotStyle = dotProp ? resolveDot(dotProp) : undefined
     const [activeTab, setActiveTab] = useState<TabType>("tailwind");
 
@@ -439,20 +475,27 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     const currentColor = hslToHex(h, s, l);
 
     return (
-      <div ref={ref} className={cn("space-y-2", className)} style={dotStyle}>
+      <div ref={ref} style={mergeStyles({ display: 'flex', flexDirection: 'column', gap: '0.5rem' }, dotStyle, style)}>
         {/* 탭 헤더 */}
-        <div className="flex gap-1 p-0.5 bg-muted/50 rounded-md">
+        <div style={{ display: 'flex', gap: '0.25rem', padding: '0.125rem', backgroundColor: 'hsl(var(--muted) / 0.5)', borderRadius: '0.375rem' }}>
           <button
             type="button"
             disabled={disabled}
             onClick={() => setActiveTab("tailwind")}
-            className={cn(
-              "flex-1 px-2 py-1 text-xs font-medium rounded transition-colors",
-              activeTab === "tailwind"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-              disabled && "opacity-50 cursor-not-allowed"
-            )}
+            style={{
+              flex: 1,
+              padding: '0.25rem 0.5rem',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              borderRadius: '0.25rem',
+              border: 'none',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              transition: 'colors 150ms',
+              backgroundColor: activeTab === "tailwind" ? 'hsl(var(--background))' : 'transparent',
+              color: activeTab === "tailwind" ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              boxShadow: activeTab === "tailwind" ? '0 1px 2px 0 rgba(0,0,0,0.05)' : 'none',
+              opacity: disabled ? 0.5 : 1,
+            }}
           >
             Tailwind
           </button>
@@ -460,29 +503,41 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
             type="button"
             disabled={disabled}
             onClick={() => setActiveTab("custom")}
-            className={cn(
-              "flex-1 px-2 py-1 text-xs font-medium rounded transition-colors",
-              activeTab === "custom"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-              disabled && "opacity-50 cursor-not-allowed"
-            )}
+            style={{
+              flex: 1,
+              padding: '0.25rem 0.5rem',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              borderRadius: '0.25rem',
+              border: 'none',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              transition: 'colors 150ms',
+              backgroundColor: activeTab === "custom" ? 'hsl(var(--background))' : 'transparent',
+              color: activeTab === "custom" ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              boxShadow: activeTab === "custom" ? '0 1px 2px 0 rgba(0,0,0,0.05)' : 'none',
+              opacity: disabled ? 0.5 : 1,
+            }}
           >
             Custom
           </button>
         </div>
 
         {/* 현재 색상 미리보기 */}
-        <div className="flex items-center gap-2 px-1">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0 0.25rem' }}>
           <div
-            className="w-6 h-6 rounded border border-border shadow-inner flex-shrink-0"
             style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid hsl(var(--border))',
+              boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
+              flexShrink: 0,
               background: hexInput === "transparent"
                 ? "repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% / 8px 8px"
                 : currentColor,
             }}
           />
-          <span className="text-xs font-mono text-muted-foreground truncate">
+          <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'hsl(var(--muted-foreground))', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {hexInput === "transparent" ? "transparent" : currentColor}
           </span>
         </div>

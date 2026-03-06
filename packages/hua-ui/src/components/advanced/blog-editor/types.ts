@@ -2,6 +2,7 @@
  * BlogEditor 컴포넌트 타입 정의
  * BlogEditor component type definitions
  */
+import type React from 'react'
 
 /**
  * 다국어 필드 타입 / Multilingual field type
@@ -197,8 +198,10 @@ export interface BlogEditorProps {
   // Styling
   /** 스타일 변형 / Style variant */
   variant?: 'default' | 'glass' | 'minimal'
-  /** 추가 CSS 클래스 / Additional CSS classes */
-  className?: string
+  /** dot 유틸리티 스타일 */
+  dot?: string
+  /** 인라인 스타일 */
+  style?: React.CSSProperties
 
   // Auto-save
   /** 자동저장 키 (localStorage) / Auto-save key for localStorage */

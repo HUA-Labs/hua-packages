@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Button } from "../Button";
 import { Dropdown, DropdownItem, DropdownMenu } from "../Dropdown";
 import { Icon } from "../Icon";
@@ -68,10 +68,10 @@ export interface DateRangeConfig {
  * @property {ToolbarAction[]} [actions] - 액션 버튼 배열 / Action buttons array
  * @property {() => void} [onRefresh] - 새로고침 핸들러 / Refresh handler
  * @property {string} [lastUpdated] - 마지막 업데이트 시간 / Last updated time
- * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, "title">}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
 export interface DashboardToolbarProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'className'> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   meta?: React.ReactNode;
@@ -81,14 +81,8 @@ export interface DashboardToolbarProps
   actions?: ToolbarAction[];
   onRefresh?: () => void;
   lastUpdated?: string;
+  dot?: string;
 }
-
-const actionAppearance = {
-  primary: "bg-primary text-white hover:bg-primary/90",
-  secondary:
-    "border border-slate-200 text-slate-800 hover:bg-slate-50 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800",
-  ghost: "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
-};
 
 const ToolbarButton: React.FC<ToolbarAction> = ({
   label,
@@ -110,21 +104,45 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
     </>
   );
 
-  const className = merge(
-    "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-    actionAppearance[appearance]
-  );
+  const baseStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: "0.5rem",
+    paddingLeft: "0.75rem",
+    paddingRight: "0.75rem",
+    paddingTop: "0.5rem",
+    paddingBottom: "0.5rem",
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    transition: "colors 150ms",
+    cursor: "pointer",
+    border: "none",
+    background: "transparent",
+    ...(appearance === "primary" && {
+      backgroundColor: "var(--color-primary, #6366f1)",
+      color: "#ffffff",
+    }),
+    ...(appearance === "secondary" && {
+      border: "1px solid #e2e8f0",
+      color: "#1e293b",
+      backgroundColor: "#ffffff",
+    }),
+    ...(appearance === "ghost" && {
+      color: "#475569",
+    }),
+  };
 
   if (href) {
     return (
-      <a className={className} href={href}>
+      <a style={baseStyle} href={href}>
         {content}
       </a>
     );
   }
 
   return (
-    <button className={className} onClick={onClick} disabled={loading}>
+    <button style={baseStyle} onClick={onClick} disabled={loading}>
       {content}
     </button>
   );
@@ -132,13 +150,13 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
 
 /**
  * DashboardToolbar 컴포넌트
- * 
+ *
  * 대시보드 상단 툴바 컴포넌트입니다.
  * 제목, 설명, 필터, 날짜 범위 선택, 액션 버튼 등을 포함할 수 있습니다.
- * 
+ *
  * Top toolbar component for dashboards.
  * Can include title, description, filters, date range selection, and action buttons.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -151,7 +169,7 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
  *   ]}
  *   onRefresh={handleRefresh}
  * />
- * 
+ *
  * @example
  * // 날짜 범위 포함 / With date range
  * <DashboardToolbar
@@ -167,7 +185,7 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
  *     onCustomRange: handleCustomRange
  *   }}
  * />
- * 
+ *
  * @param {DashboardToolbarProps} props - DashboardToolbar 컴포넌트의 props / DashboardToolbar component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} DashboardToolbar 컴포넌트 / DashboardToolbar component
@@ -184,33 +202,37 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
       actions,
       onRefresh,
       lastUpdated,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
   ) => {
-    const containerClasses = merge(
-      "w-full",
-      variant === "cards"
-        ? "rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
-        : ""
-    );
+    const containerStyle: React.CSSProperties = {
+      width: "100%",
+      ...(variant === "cards" && {
+        borderRadius: "1rem",
+        border: "1px solid rgba(226,232,240,0.7)",
+        backgroundColor: "var(--color-card, #ffffff)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+      }),
+    };
 
     return (
-      <div ref={ref} className={merge(containerClasses, className)} {...props}>
-        <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div ref={ref} style={mergeStyles(containerStyle, resolveDot(dot), style)} {...props}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingLeft: "1.5rem", paddingRight: "1.5rem", paddingTop: "1.25rem", paddingBottom: "1.25rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <div>
               {title && (
-                <div className="text-xl font-semibold text-slate-900 dark:text-slate-50">
+                <div style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>
                   {title}
                 </div>
               )}
               {description && (
-                <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+                <p style={{ fontSize: "0.875rem", color: "var(--color-muted-foreground, #64748b)" }}>{description}</p>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {dateRange && (
                 <Dropdown
                   trigger={
@@ -258,19 +280,19 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
           </div>
 
           {(filters || meta || lastUpdated) && (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "0.75rem" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem", fontSize: "0.875rem", color: "var(--color-foreground, #475569)" }}>
                 {filters}
                 {meta}
               </div>
               {lastUpdated && (
-                <span className="text-xs text-slate-400">업데이트: {lastUpdated}</span>
+                <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>업데이트: {lastUpdated}</span>
               )}
             </div>
           )}
 
           {actions && actions.length > 0 && (
-            <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 dark:border-slate-800 pt-4">
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: "0.5rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "1rem" }}>
               {actions.map((action) => (
                 <ToolbarButton key={action.label} {...action} />
               ))}
@@ -283,4 +305,3 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
 );
 
 DashboardToolbar.displayName = "DashboardToolbar";
-

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { merge } from "../../../lib/utils";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { Icon } from "../../Icon";
 import { useKanban } from "./KanbanContext";
 import type { KanbanAddCardProps } from "./types";
@@ -13,7 +13,7 @@ import type { KanbanAddCardProps } from "./types";
  * 버튼 클릭 시 입력 폼이 나타나고, Enter로 추가합니다.
  */
 export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps>(
-  ({ columnId, onAdd, onCancel, placeholder = "카드 제목 입력...", className, ...props }, ref) => {
+  ({ columnId, onAdd, onCancel, placeholder = "카드 제목 입력...", dot, style, ...props }, ref) => {
     const { addCard } = useKanban();
     const [isAdding, setIsAdding] = useState(false);
     const [title, setTitle] = useState("");
@@ -71,9 +71,16 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
       return (
         <div
           ref={ref}
-          className={merge(
-            "rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 p-2",
-            className
+          style={mergeStyles(
+            {
+              borderRadius: "0.5rem",
+              backgroundColor: "#ffffff",
+              boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
+              border: "1px solid #e5e7eb",
+              padding: "0.5rem",
+            },
+            resolveDot(dot),
+            style
           )}
           {...props}
         >
@@ -92,13 +99,42 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
               }, 150);
             }}
             placeholder={placeholder}
-            className="w-full px-2 py-1.5 text-sm bg-transparent border-none outline-none text-gray-800 dark:text-white placeholder-gray-400"
+            style={{
+              width: "100%",
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+              paddingTop: "0.375rem",
+              paddingBottom: "0.375rem",
+              fontSize: "0.875rem",
+              backgroundColor: "transparent",
+              border: "none",
+              outline: "none",
+              color: "#1f2937",
+            }}
           />
-          <div className="flex items-center justify-end gap-1 mt-2">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              gap: "0.25rem",
+              marginTop: "0.5rem",
+            }}
+          >
             <button
               type="button"
               onClick={handleCancel}
-              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              style={{
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+                paddingTop: "0.25rem",
+                paddingBottom: "0.25rem",
+                fontSize: "0.75rem",
+                color: "#6b7280",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
             >
               취소
             </button>
@@ -106,12 +142,36 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
               type="button"
               onClick={handleSubmit}
               disabled={!title.trim()}
-              className={merge(
-                "px-3 py-1 text-xs font-medium rounded transition-colors",
+              style={
                 title.trim()
-                  ? "bg-indigo-500 text-white hover:bg-indigo-600"
-                  : "bg-gray-200 text-gray-400 dark:bg-gray-700 cursor-not-allowed"
-              )}
+                  ? {
+                      paddingLeft: "0.75rem",
+                      paddingRight: "0.75rem",
+                      paddingTop: "0.25rem",
+                      paddingBottom: "0.25rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      borderRadius: "0.25rem",
+                      backgroundColor: "#6366f1",
+                      color: "#ffffff",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background-color 150ms",
+                    }
+                  : {
+                      paddingLeft: "0.75rem",
+                      paddingRight: "0.75rem",
+                      paddingTop: "0.25rem",
+                      paddingBottom: "0.25rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      borderRadius: "0.25rem",
+                      backgroundColor: "#e5e7eb",
+                      color: "#9ca3af",
+                      border: "none",
+                      cursor: "not-allowed",
+                    }
+              }
             >
               추가
             </button>
@@ -126,9 +186,26 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
         ref={ref as React.Ref<HTMLButtonElement>}
         type="button"
         onClick={handleStartAdding}
-        className={merge(
-          "w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors",
-          className
+        style={mergeStyles(
+          {
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            paddingLeft: "0.75rem",
+            paddingRight: "0.75rem",
+            paddingTop: "0.5rem",
+            paddingBottom: "0.5rem",
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            background: "none",
+            border: "none",
+            borderRadius: "0.5rem",
+            cursor: "pointer",
+            transition: "background-color 150ms, color 150ms",
+          },
+          resolveDot(dot),
+          style
         )}
         {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
 import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import {
   Table,
@@ -98,7 +97,7 @@ export interface TransactionColumnConfig {
  * @property {(row: TransactionRow) => React.ReactNode} [dateFormatter] - 날짜 커스텀 포맷터
  * @property {string} [locale="ko-KR"] - 로케일
  * @property {string} [defaultCurrency="KRW"] - 기본 통화
- * @property {string} [className] - 추가 클래스명
+ * @property {string} [dot] - dot 유틸리티 스트링
  * @property {React.ReactNode} [footer] - 푸터 컴포넌트
  * @property {(row: TransactionRow) => string} [rowActionLabel] - 행 액션 라벨 생성 함수
  * @property {string} [rowActionHint] - 행 액션 힌트 텍스트
@@ -120,37 +119,37 @@ export interface TransactionsTableProps {
   dateFormatter?: (row: TransactionRow) => React.ReactNode;
   locale?: string;
   defaultCurrency?: string;
-  className?: string;
+  style?: React.CSSProperties;
   dot?: string;
   footer?: React.ReactNode;
   rowActionLabel?: (row: TransactionRow) => string;
   rowActionHint?: string;
 }
 
-const STATUS_STYLES: Record<TransactionStatus, { label: string; badge: string }> = {
+const STATUS_STYLES: Record<TransactionStatus, { label: string; badgeStyle: React.CSSProperties }> = {
   approved: {
     label: "승인",
-    badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200",
+    badgeStyle: { backgroundColor: "#d1fae5", color: "#065f46" },
   },
   pending: {
     label: "대기",
-    badge: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-200",
+    badgeStyle: { backgroundColor: "#fef3c7", color: "#92400e" },
   },
   failed: {
     label: "실패",
-    badge: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-200",
+    badgeStyle: { backgroundColor: "#ffe4e6", color: "#9f1239" },
   },
   refunded: {
     label: "환불",
-    badge: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-200",
+    badgeStyle: { backgroundColor: "#e0f2fe", color: "#075985" },
   },
   cancelled: {
     label: "취소",
-    badge: "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-200",
+    badgeStyle: { backgroundColor: "#f1f5f9", color: "#334155" },
   },
   review: {
     label: "검토중",
-    badge: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-200",
+    badgeStyle: { backgroundColor: "#ede9fe", color: "#5b21b6" },
   },
 };
 
@@ -165,13 +164,13 @@ const DEFAULT_COLUMNS: TransactionColumnConfig[] = [
 
 /**
  * TransactionsTable 컴포넌트
- * 
+ *
  * 거래 목록을 테이블 형태로 표시하는 컴포넌트입니다.
  * 정렬, 필터링, 커스텀 렌더링 등을 지원합니다.
- * 
+ *
  * Table component that displays transaction list.
  * Supports sorting, filtering, and custom rendering.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -188,7 +187,7 @@ const DEFAULT_COLUMNS: TransactionColumnConfig[] = [
  *   ]}
  *   onRowClick={(row) => console.log(row)}
  * />
- * 
+ *
  * @example
  * // 커스텀 컬럼과 포맷터 / Custom columns and formatters
  * <TransactionsTable
@@ -202,7 +201,7 @@ const DEFAULT_COLUMNS: TransactionColumnConfig[] = [
  *   statusRenderer={(status) => <CustomBadge status={status} />}
  *   isLoading={loading}
  * />
- * 
+ *
  * @param {TransactionsTableProps} props - TransactionsTable 컴포넌트의 props / TransactionsTable component props
  * @returns {JSX.Element} TransactionsTable 컴포넌트 / TransactionsTable component
  */
@@ -222,13 +221,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   dateFormatter,
   locale = "ko-KR",
   defaultCurrency = "KRW",
-  className,
+  style,
   dot: dotProp,
   footer,
   rowActionLabel,
   rowActionHint,
 }) => {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const columnList = columns.length > 0 ? columns : DEFAULT_COLUMNS;
   const hasRows = rows.length > 0;
   const tableId = React.useId();
@@ -248,9 +246,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const config = STATUS_STYLES[status] || STATUS_STYLES.pending;
     const label = statusLabels?.[status] ?? config.label;
     return (
-      <Badge dot={merge("font-medium px-3 py-1 rounded-full text-xs", config.badge)}>
+      <span style={{ display: "inline-flex", alignItems: "center", fontWeight: 500, padding: "0.25rem 0.75rem", borderRadius: "9999px", fontSize: "0.75rem", ...config.badgeStyle }}>
         {label}
-      </Badge>
+      </span>
     );
   };
 
@@ -259,7 +257,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const currency = row.currency || defaultCurrency;
     try {
       return (
-        <span className="font-semibold text-slate-900 dark:text-slate-100">
+        <span style={{ fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>
           {new Intl.NumberFormat(locale, {
             style: "currency",
             currency,
@@ -289,28 +287,28 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     switch (column.key) {
       case "id":
         return (
-          <div className="flex flex-col">
-            <span className="font-medium text-slate-900 dark:text-slate-100">{row.id}</span>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>{row.id}</span>
             {row.reference && (
-              <span className="text-xs text-slate-500 dark:text-slate-400">{row.reference}</span>
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{row.reference}</span>
             )}
           </div>
         );
       case "merchant":
         return (
-          <div className="flex flex-col">
-            <span className="font-medium text-slate-900 dark:text-slate-100">{row.merchant}</span>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>{row.merchant}</span>
             {row.customer && (
-              <span className="text-xs text-slate-500 dark:text-slate-400">{row.customer}</span>
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{row.customer}</span>
             )}
           </div>
         );
       case "amount":
         return (
-          <div className="flex flex-col items-end">
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             {renderAmount(row)}
             {typeof row.fee === "number" && (
-              <span className="text-xs text-slate-500 dark:text-slate-400">
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
                 수수료 {row.fee.toLocaleString(locale)}
               </span>
             )}
@@ -319,9 +317,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       case "status":
         return renderStatus(row.status, row);
       case "method":
-        return <span className="text-slate-700 dark:text-slate-300">{renderMethod(row)}</span>;
+        return <span style={{ color: "#475569" }}>{renderMethod(row)}</span>;
       case "date":
-        return <span className="text-slate-700 dark:text-slate-300">{renderDate(row)}</span>;
+        return <span style={{ color: "#475569" }}>{renderDate(row)}</span>;
       case "customer":
         return row.customer ?? "-";
       case "fee":
@@ -332,12 +330,20 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   };
 
   return (
-    <div className={merge("rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900", className)} style={dotStyle}>
+    <div style={mergeStyles(
+      {
+        borderRadius: "1rem",
+        border: "1px solid rgba(226,232,240,0.6)",
+        backgroundColor: "var(--color-card, #ffffff)",
+      },
+      resolveDot(dotProp),
+      style
+    )}>
       {filters && (
-        <div className="border-b border-slate-100 dark:border-slate-800 px-4 sm:px-6 py-4">{filters}</div>
+        <div style={{ borderBottom: "1px solid var(--color-border, #f1f5f9)", padding: "1rem 1.5rem" }}>{filters}</div>
       )}
-      <div className="p-4 sm:p-6">
-        <div className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div style={{ padding: "1rem 1.5rem" }}>
+        <div style={{ borderRadius: "0.75rem", border: "1px solid var(--color-border, #f1f5f9)", overflow: "hidden" }}>
           <Table
             role="table"
             aria-label={caption ? (typeof caption === "string" ? caption : "거래 목록 테이블") : "거래 목록 테이블"}
@@ -425,14 +431,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </TableBody>
           </Table>
           {!isLoading && hasRows && footer && (
-            <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+            <div style={{ borderTop: "1px solid var(--color-border, #f1f5f9)", backgroundColor: "var(--color-muted, rgba(248,250,252,0.5))", padding: "0.75rem 1rem", fontSize: "0.875rem", color: "#475569" }}>
               {footer}
             </div>
           )}
         </div>
       </div>
       {rowActionHint && (
-        <p id={rowActionHintId} className="sr-only">
+        <p id={rowActionHintId} style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
           {rowActionHint}
         </p>
       )}
@@ -441,4 +447,3 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
 };
 
 TransactionsTable.displayName = "TransactionsTable";
-

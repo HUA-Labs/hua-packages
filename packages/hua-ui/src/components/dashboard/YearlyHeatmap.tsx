@@ -1,75 +1,81 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import type { Color } from "../../lib/types/common";
 
 /**
- * 색상 단계 매핑 (빈/1/2/3+)
+ * 색상 단계 매핑 — CSS 값 기반
  */
-const colorSteps: Record<Color, { empty: string; s1: string; s2: string; s3: string; today: string }> = {
+const colorSteps: Record<Color, {
+  empty: string;
+  s1: string;
+  s2: string;
+  s3: string;
+  todayBorder: string;
+}> = {
   cyan: {
-    empty: "bg-foreground/10",
-    s1: "bg-cyan-200 dark:bg-cyan-800",
-    s2: "bg-cyan-400 dark:bg-cyan-600",
-    s3: "bg-cyan-600 dark:bg-cyan-400",
-    today: "border-2 border-cyan-400 dark:border-cyan-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#a5f3fc",
+    s2: "#22d3ee",
+    s3: "#0891b2",
+    todayBorder: "#22d3ee",
   },
   blue: {
-    empty: "bg-foreground/10",
-    s1: "bg-blue-200 dark:bg-blue-800",
-    s2: "bg-blue-400 dark:bg-blue-600",
-    s3: "bg-blue-600 dark:bg-blue-400",
-    today: "border-2 border-blue-400 dark:border-blue-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#bfdbfe",
+    s2: "#60a5fa",
+    s3: "#2563eb",
+    todayBorder: "#60a5fa",
   },
   green: {
-    empty: "bg-foreground/10",
-    s1: "bg-green-200 dark:bg-green-800",
-    s2: "bg-green-400 dark:bg-green-600",
-    s3: "bg-green-600 dark:bg-green-400",
-    today: "border-2 border-green-400 dark:border-green-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#bbf7d0",
+    s2: "#4ade80",
+    s3: "#16a34a",
+    todayBorder: "#4ade80",
   },
   purple: {
-    empty: "bg-foreground/10",
-    s1: "bg-purple-200 dark:bg-purple-800",
-    s2: "bg-purple-400 dark:bg-purple-600",
-    s3: "bg-purple-600 dark:bg-purple-400",
-    today: "border-2 border-purple-400 dark:border-purple-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#e9d5ff",
+    s2: "#c084fc",
+    s3: "#9333ea",
+    todayBorder: "#c084fc",
   },
   orange: {
-    empty: "bg-foreground/10",
-    s1: "bg-orange-200 dark:bg-orange-800",
-    s2: "bg-orange-400 dark:bg-orange-600",
-    s3: "bg-orange-600 dark:bg-orange-400",
-    today: "border-2 border-orange-400 dark:border-orange-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#fed7aa",
+    s2: "#fb923c",
+    s3: "#ea580c",
+    todayBorder: "#fb923c",
   },
   red: {
-    empty: "bg-foreground/10",
-    s1: "bg-red-200 dark:bg-red-800",
-    s2: "bg-red-400 dark:bg-red-600",
-    s3: "bg-red-600 dark:bg-red-400",
-    today: "border-2 border-red-400 dark:border-red-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#fecaca",
+    s2: "#f87171",
+    s3: "#dc2626",
+    todayBorder: "#f87171",
   },
   indigo: {
-    empty: "bg-foreground/10",
-    s1: "bg-indigo-200 dark:bg-indigo-800",
-    s2: "bg-indigo-400 dark:bg-indigo-600",
-    s3: "bg-indigo-600 dark:bg-indigo-400",
-    today: "border-2 border-indigo-400 dark:border-indigo-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#c7d2fe",
+    s2: "#818cf8",
+    s3: "#4f46e5",
+    todayBorder: "#818cf8",
   },
   pink: {
-    empty: "bg-foreground/10",
-    s1: "bg-pink-200 dark:bg-pink-800",
-    s2: "bg-pink-400 dark:bg-pink-600",
-    s3: "bg-pink-600 dark:bg-pink-400",
-    today: "border-2 border-pink-400 dark:border-pink-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#fbcfe8",
+    s2: "#f472b6",
+    s3: "#db2777",
+    todayBorder: "#f472b6",
   },
   gray: {
-    empty: "bg-foreground/10",
-    s1: "bg-gray-200 dark:bg-gray-700",
-    s2: "bg-gray-400 dark:bg-gray-500",
-    s3: "bg-gray-600 dark:bg-gray-400",
-    today: "border-2 border-gray-400 dark:border-gray-300",
+    empty: "rgba(0,0,0,0.1)",
+    s1: "#e5e7eb",
+    s2: "#9ca3af",
+    s3: "#4b5563",
+    todayBorder: "#9ca3af",
   },
 };
 
@@ -86,7 +92,7 @@ export interface YearlyHeatmapLabels {
   tooltip?: (dateStr: string, count: number) => string;
 }
 
-export interface YearlyHeatmapProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface YearlyHeatmapProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   /** 날짜별 데이터 (키: "YYYY-MM-DD", 값: count) */
   data: Record<string, number>;
   /** 색상 테마 */
@@ -95,6 +101,8 @@ export interface YearlyHeatmapProps extends React.HTMLAttributes<HTMLDivElement>
   locale?: string;
   /** 텍스트 라벨 */
   labels?: YearlyHeatmapLabels;
+  /** dot 유틸리티 스트링 */
+  dot?: string;
 }
 
 /**
@@ -106,7 +114,8 @@ export function YearlyHeatmap({
   color = "cyan",
   locale = "en-US",
   labels = {},
-  className,
+  dot,
+  style,
   ...props
 }: YearlyHeatmapProps) {
   const steps = colorSteps[color] || colorSteps.cyan;
@@ -166,19 +175,24 @@ export function YearlyHeatmap({
   const getDateKey = (date: Date) =>
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-  const getCellClass = (date: Date | null): string => {
-    if (!date) return "bg-transparent";
+  const getCellStyle = (date: Date | null): React.CSSProperties => {
+    if (!date) return { backgroundColor: "transparent" };
     const count = data[getDateKey(date)] || 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const isToday = date.getTime() === today.getTime();
 
-    let c = steps.empty;
-    if (count === 1) c = steps.s1;
-    else if (count === 2) c = steps.s2;
-    else if (count >= 3) c = steps.s3;
+    let bg = steps.empty;
+    if (count === 1) bg = steps.s1;
+    else if (count === 2) bg = steps.s2;
+    else if (count >= 3) bg = steps.s3;
 
-    return isToday ? `${c} ${steps.today}` : c;
+    return {
+      backgroundColor: bg,
+      ...(isToday && {
+        border: `2px solid ${steps.todayBorder}`,
+      }),
+    };
   };
 
   const getTooltip = (date: Date | null): string => {
@@ -191,29 +205,40 @@ export function YearlyHeatmap({
   const totalDays = useMemo(() => Object.values(data).filter((v) => v > 0).length, [data]);
 
   return (
-    <div className={merge("bg-card rounded-xl p-4", className)} {...props}>
+    <div
+      style={mergeStyles(
+        {
+          backgroundColor: "var(--color-card, #ffffff)",
+          borderRadius: "0.75rem",
+          padding: "1rem",
+        },
+        resolveDot(dot),
+        style
+      )}
+      {...props}
+    >
       {/* 헤더 */}
       {(labels.title || labels.totalDays) && (
-        <div className="flex items-center justify-between mb-3">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
           {labels.title && (
-            <h3 className="text-sm font-semibold text-foreground">{labels.title}</h3>
+            <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #111827)" }}>{labels.title}</h3>
           )}
           {labels.totalDays && (
-            <span className="text-xs text-muted-foreground">{labels.totalDays}</span>
+            <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)" }}>{labels.totalDays}</span>
           )}
         </div>
       )}
 
       {/* 히트맵 */}
-      <div className="w-full overflow-x-auto">
+      <div style={{ width: "100%", overflowX: "auto" }}>
         {/* 월 라벨 */}
-        <div className="flex mb-1 gap-[2px]">
+        <div style={{ display: "flex", marginBottom: "0.25rem", gap: "2px" }}>
           {weeks.map((_, wi) => {
             const ml = monthLabels.find((m) => m.colIndex === wi);
             return (
-              <div key={wi} className="flex-1 min-w-[10px]">
+              <div key={wi} style={{ flex: 1, minWidth: "10px" }}>
                 {ml && (
-                  <span className="text-[9px] text-muted-foreground whitespace-nowrap">
+                  <span style={{ fontSize: "9px", color: "var(--color-muted-foreground, #6b7280)", whiteSpace: "nowrap" }}>
                     {ml.label}
                   </span>
                 )}
@@ -223,13 +248,17 @@ export function YearlyHeatmap({
         </div>
 
         {/* 셀 그리드 */}
-        <div className="flex gap-[2px]">
+        <div style={{ display: "flex", gap: "2px" }}>
           {weeks.map((week, wi) => (
-            <div key={wi} className="flex-1 min-w-[10px] flex flex-col gap-[2px]">
+            <div key={wi} style={{ flex: 1, minWidth: "10px", display: "flex", flexDirection: "column", gap: "2px" }}>
               {week.map((date, di) => (
                 <div
                   key={di}
-                  className={`aspect-square rounded-sm ${getCellClass(date)}`}
+                  style={{
+                    aspectRatio: "1 / 1",
+                    borderRadius: "2px",
+                    ...getCellStyle(date),
+                  }}
                   title={getTooltip(date)}
                 />
               ))}
@@ -239,12 +268,12 @@ export function YearlyHeatmap({
       </div>
 
       {/* 범례 */}
-      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-muted-foreground">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "6px", marginTop: "0.75rem", fontSize: "10px", color: "var(--color-muted-foreground, #6b7280)" }}>
         <span>{labels.less || "Less"}</span>
-        <div className={`w-3 h-3 rounded-sm ${steps.empty}`} />
-        <div className={`w-3 h-3 rounded-sm ${steps.s1}`} />
-        <div className={`w-3 h-3 rounded-sm ${steps.s2}`} />
-        <div className={`w-3 h-3 rounded-sm ${steps.s3}`} />
+        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.empty }} />
+        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s1 }} />
+        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s2 }} />
+        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s3 }} />
         <span>{labels.more || "More"}</span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Badge } from "../Badge";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
@@ -53,9 +53,9 @@ export interface MerchantListItem {
  * @property {(merchant: MerchantListItem) => void} [onMerchantSelect] - 가맹점 선택 핸들러 / Merchant selection handler
  * @property {string} [locale="ko-KR"] - 로케일 / Locale
  * @property {string} [defaultCurrency="KRW"] - 기본 통화 / Default currency
- * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect">}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MerchantListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
+export interface MerchantListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect' | 'className'> {
   items: MerchantListItem[];
   isLoading?: boolean;
   filters?: React.ReactNode;
@@ -63,12 +63,19 @@ export interface MerchantListProps extends Omit<React.HTMLAttributes<HTMLDivElem
   onMerchantSelect?: (merchant: MerchantListItem) => void;
   locale?: string;
   defaultCurrency?: string;
+  dot?: string;
 }
 
-const HEALTH_BADGES: Record<MerchantHealth, string> = {
-  normal: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-100",
-  warning: "bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-100",
-  critical: "bg-rose-50 text-rose-700 dark:bg-rose-500/20 dark:text-rose-100",
+const HEALTH_BADGE_STYLES: Record<MerchantHealth, React.CSSProperties> = {
+  normal: { backgroundColor: "#ecfdf5", color: "#047857" },
+  warning: { backgroundColor: "#fffbeb", color: "#b45309" },
+  critical: { backgroundColor: "#fff1f2", color: "#be123c" },
+};
+
+const HEALTH_LABELS: Record<MerchantHealth, string> = {
+  normal: "정상",
+  warning: "감시",
+  critical: "위험",
 };
 
 const formatPercent = (value?: number) => {
@@ -92,13 +99,13 @@ const formatVolume = (value?: number, currency?: string, locale = "ko-KR") => {
 
 /**
  * MerchantList 컴포넌트
- * 
+ *
  * 가맹점 목록을 표시하는 컴포넌트입니다.
  * 가맹점 정보, 건강 상태, 승인률, 거래량 등을 카드 형태로 표시합니다.
- * 
+ *
  * Component that displays a list of merchants.
  * Shows merchant information, health status, approval rate, and transaction volume in card format.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -115,7 +122,7 @@ const formatVolume = (value?: number, currency?: string, locale = "ko-KR") => {
  *   ]}
  *   onMerchantSelect={(merchant) => console.log(merchant)}
  * />
- * 
+ *
  * @example
  * // 로딩 상태 / Loading state
  * <MerchantList
@@ -123,7 +130,7 @@ const formatVolume = (value?: number, currency?: string, locale = "ko-KR") => {
  *   isLoading={true}
  *   filters={<FilterComponent />}
  * />
- * 
+ *
  * @param {MerchantListProps} props - MerchantList 컴포넌트의 props / MerchantList component props
  * @returns {JSX.Element} MerchantList 컴포넌트 / MerchantList component
  */
@@ -135,26 +142,32 @@ export const MerchantList: React.FC<MerchantListProps> = ({
   onMerchantSelect,
   locale = "ko-KR",
   defaultCurrency = "KRW",
-  className,
+  dot,
+  style,
   ...props
 }) => {
   const hasItems = items.length > 0;
 
   return (
     <div
-      className={merge(
-        "rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50",
-        className
+      style={mergeStyles(
+        {
+          borderRadius: "1rem",
+          border: "1px solid var(--color-border, #f1f5f9)",
+          backgroundColor: "var(--color-card, #ffffff)",
+        },
+        resolveDot(dot),
+        style
       )}
       {...props}
     >
       {filters && (
-        <div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3 md:px-6">{filters}</div>
+        <div style={{ borderBottom: "1px solid var(--color-border, #f1f5f9)", padding: "0.75rem 1.5rem" }}>{filters}</div>
       )}
 
-      <div className="p-4 md:p-6">
+      <div style={{ padding: "1rem 1.5rem" }}>
         {isLoading ? (
-          <div className="space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {[...Array(3)].map((_, idx) => (
               <Skeleton key={idx} dot="h-20 rounded-2xl" />
             ))}
@@ -166,17 +179,18 @@ export const MerchantList: React.FC<MerchantListProps> = ({
               title="가맹점이 없습니다"
               description="검색어를 변경하거나 새로운 가맹점을 온보딩하세요."
               size="sm"
-              className="py-6"
+              style={{ paddingTop: "1.5rem", paddingBottom: "1.5rem" }}
             />
           )
         ) : (
-          <div className="space-y-3" role="list" aria-label="가맹점 목록">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} role="list" aria-label="가맹점 목록">
             {items.map((merchant) => {
               const approval = formatPercent(merchant.approvalRate);
               const volume = formatVolume(merchant.volume, merchant.currency ?? defaultCurrency, locale);
-              const badgeClass = merchant.health ? HEALTH_BADGES[merchant.health] : undefined;
+              const healthBadgeStyle = merchant.health ? HEALTH_BADGE_STYLES[merchant.health] : undefined;
+              const healthLabel = merchant.health ? HEALTH_LABELS[merchant.health] : undefined;
 
-              const merchantLabel = `${merchant.name}${merchant.status ? `, 상태: ${merchant.status}` : ''}${merchant.health ? `, 건강 상태: ${merchant.health === "critical" ? "위험" : merchant.health === "warning" ? "감시" : "정상"}` : ''}${volume ? `, 거래량: ${volume}` : ''}${approval ? `, 승인률: ${approval}` : ''}`;
+              const merchantLabel = `${merchant.name}${merchant.status ? `, 상태: ${merchant.status}` : ''}${merchant.health ? `, 건강 상태: ${healthLabel}` : ''}${volume ? `, 거래량: ${volume}` : ''}${approval ? `, 승인률: ${approval}` : ''}`;
 
               return (
                 <button
@@ -186,14 +200,22 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                   onClick={onMerchantSelect ? () => onMerchantSelect(merchant) : undefined}
                   disabled={!onMerchantSelect}
                   aria-label={onMerchantSelect ? `${merchantLabel} - 클릭하여 상세 정보 보기` : merchantLabel}
-                  className={merge(
-                    "w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/90 dark:bg-slate-900/60 p-4 text-left shadow-sm transition hover:border-slate-200 dark:hover:border-slate-700 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/70",
-                    onMerchantSelect ? "cursor-pointer" : "cursor-default opacity-60"
-                  )}
+                  style={{
+                    width: "100%",
+                    borderRadius: "1rem",
+                    border: "1px solid var(--color-border, #f1f5f9)",
+                    backgroundColor: "var(--color-card, rgba(255,255,255,0.9))",
+                    padding: "1rem",
+                    textAlign: "left",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    transition: "border-color 150ms",
+                    cursor: onMerchantSelect ? "pointer" : "default",
+                    opacity: onMerchantSelect ? 1 : 0.6,
+                  }}
                 >
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem" }}>
                     {merchant.icon && (
-                      <div className="rounded-xl bg-slate-100 dark:bg-slate-800 p-2 text-slate-500">
+                      <div style={{ borderRadius: "0.75rem", backgroundColor: "var(--color-muted, #f1f5f9)", padding: "0.5rem", color: "#64748b" }}>
                         {typeof merchant.icon === "string" ? (
                           <Icon name={merchant.icon as IconName} className="h-5 w-5" />
                         ) : (
@@ -201,45 +223,41 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                         )}
                       </div>
                     )}
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{merchant.name}</p>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+                        <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{merchant.name}</p>
                         {merchant.status && (
                           <Badge dot="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-100">
                             {merchant.status}
                           </Badge>
                         )}
                         {merchant.tag && (
-                          <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500 dark:bg-slate-800/80">
+                          <span style={{ borderRadius: "9999px", backgroundColor: "var(--color-muted, #f8fafc)", padding: "0.125rem 0.5rem", fontSize: "0.6875rem", color: "#64748b" }}>
                             {merchant.tag}
                           </span>
                         )}
-                        {badgeClass && (
-                          <span className={merge("rounded-full px-2 py-0.5 text-[11px] font-medium", badgeClass)}>
-                            {merchant.health === "critical"
-                              ? "위험"
-                              : merchant.health === "warning"
-                              ? "감시"
-                              : "정상"}
+                        {healthBadgeStyle && (
+                          <span style={{ borderRadius: "9999px", padding: "0.125rem 0.5rem", fontSize: "0.6875rem", fontWeight: 500, ...healthBadgeStyle }}>
+                            {healthLabel}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-300">
+                      <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
                         {merchant.category ?? "카테고리 미정"} · {merchant.region ?? "지역 정보 없음"}
                       </div>
                     </div>
-                    <div className="text-right text-sm text-slate-900 dark:text-white">
-                      {volume && <div className="font-semibold">{volume}</div>}
-                      {approval && <div className="text-xs text-slate-500">승인률 {approval}</div>}
+                    <div style={{ textAlign: "right", fontSize: "0.875rem", color: "var(--color-foreground, #0f172a)" }}>
+                      {volume && <div style={{ fontWeight: 600 }}>{volume}</div>}
+                      {approval && <div style={{ fontSize: "0.75rem", color: "#64748b" }}>승인률 {approval}</div>}
                     </div>
                   </div>
 
                   {merchant.metadata && merchant.metadata.length > 0 && (
-                    <div className="mt-3 grid gap-3 text-xs text-slate-500 dark:text-slate-300 sm:grid-cols-2">
+                    <div style={{ marginTop: "0.75rem", display: "grid", gap: "0.75rem", fontSize: "0.75rem", color: "#64748b", gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                       {merchant.metadata.map((meta) => (
-                        <div key={meta.label} className="flex items-center gap-2">
-                          <span className="text-slate-400">{meta.label}</span>
-                          <span className="text-slate-700 dark:text-slate-100">{meta.value}</span>
+                        <div key={meta.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          <span style={{ color: "#94a3b8" }}>{meta.label}</span>
+                          <span style={{ color: "var(--color-foreground, #334155)" }}>{meta.value}</span>
                         </div>
                       ))}
                     </div>
@@ -255,4 +273,3 @@ export const MerchantList: React.FC<MerchantListProps> = ({
 };
 
 MerchantList.displayName = "MerchantList";
-

@@ -1,13 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { merge } from '../lib/utils'
 import { mergeStyles, resolveDot } from '../hooks/useDotMap'
 
 /**
  * ScrollProgress 컴포넌트의 props / ScrollProgress component props
  * @typedef {Object} ScrollProgressProps
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
  * @property {number} [height=2] - 진행률 바 높이 (px) / Progress bar height (px)
  * @property {'default' | 'primary' | 'secondary' | 'gradient'} [color='gradient'] - 진행률 바 색상 / Progress bar color
  * @property {'top' | 'bottom'} [position='top'] - 표시 위치 / Display position
@@ -15,7 +13,6 @@ import { mergeStyles, resolveDot } from '../hooks/useDotMap'
  * @property {boolean} [showPercentage=false] - 퍼센트 표시 여부 / Show percentage
  */
 export interface ScrollProgressProps {
-  className?: string
   height?: number
   color?: 'default' | 'primary' | 'secondary' | 'gradient'
   position?: 'top' | 'bottom'
@@ -23,46 +20,46 @@ export interface ScrollProgressProps {
   showPercentage?: boolean
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
+  style?: React.CSSProperties
 }
 
 /**
  * ScrollProgress 컴포넌트 / ScrollProgress component
- * 
+ *
  * 페이지 스크롤 진행률을 표시하는 컴포넌트입니다.
  * 페이지 상단 또는 하단에 고정되어 표시됩니다.
- * 
+ *
  * Component that displays page scroll progress.
  * Fixed at top or bottom of the page.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <ScrollProgress />
- * 
+ *
  * @example
  * // 하단에 표시, 퍼센트 포함 / Display at bottom with percentage
- * <ScrollProgress 
+ * <ScrollProgress
  *   position="bottom"
  *   color="primary"
  *   showPercentage
  *   height={4}
  * />
- * 
+ *
  * @param {ScrollProgressProps} props - ScrollProgress 컴포넌트의 props / ScrollProgress component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ScrollProgress 컴포넌트 / ScrollProgress component
  */
 const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
-  className,
   height = 2,
   color = 'gradient',
   position = 'top',
   animated: _animated = true,
   showPercentage = false,
   dot: dotProp,
+  style,
   ...props
 }, ref) => {
-  const dotStyle = dotProp ? resolveDot(dotProp) : undefined
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -78,7 +75,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
 
     window.addEventListener('scroll', updateProgress, { passive: true })
     window.addEventListener('resize', updateProgress, { passive: true })
-    
+
     return () => {
       window.removeEventListener('scroll', updateProgress)
       window.removeEventListener('resize', updateProgress)
@@ -101,32 +98,30 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   return (
     <div
       ref={ref}
-      className={merge(
-        'fixed z-50',
-        positionClasses[position],
-        className
+      style={mergeStyles(
+        resolveDot('fixed z-50'),
+        resolveDot(positionClasses[position]),
+        { height: `${height}px` },
+        resolveDot(dotProp),
+        style
       )}
-      style={mergeStyles({ height: `${height}px` }, dotStyle)}
       {...props}
     >
       {/* 배경 바 */}
-      <div className="absolute inset-0 w-full h-full bg-border/30" />
-      
+      <div style={resolveDot('absolute inset-0 w-full h-full bg-border/30')} />
+
       {/* 진행률 바 - absolute로 배경 위에 표시 */}
       <div
-        className={merge(
-          'absolute top-0 left-0 h-full origin-left transition-all duration-100 ease-out',
-          progressColors[color] || progressColors.gradient
+        style={mergeStyles(
+          resolveDot('absolute top-0 left-0 h-full origin-left transition-all duration-100 ease-out'),
+          resolveDot(progressColors[color] || progressColors.gradient),
+          { width: `${progress}%`, transformOrigin: 'left' }
         )}
-        style={{
-          width: `${progress}%`,
-          transformOrigin: 'left'
-        }}
       />
-      
+
       {/* 퍼센트 표시 (선택사항) */}
       {showPercentage && (
-        <div className="absolute top-2 right-2 text-xs text-muted-foreground bg-card px-2 py-1 rounded border border-border">
+        <div style={resolveDot('absolute top-2 right-2 text-xs text-muted-foreground bg-card px-2 py-1 rounded border border-border')}>
           {Math.round(progress)}%
         </div>
       )}
@@ -136,4 +131,4 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
 
 ScrollProgress.displayName = 'ScrollProgress'
 
-export { ScrollProgress } 
+export { ScrollProgress }

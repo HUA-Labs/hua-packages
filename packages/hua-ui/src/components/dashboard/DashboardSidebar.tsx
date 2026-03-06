@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { Tooltip } from "../Tooltip";
@@ -54,9 +54,9 @@ export interface SidebarSection {
  * @property {number} [expandedWidth=264] - 펼침 상태 너비 (px) / Expanded width (px)
  * @property {number} [mobileBreakpoint=1024] - 모바일 브레이크포인트 (px) / Mobile breakpoint (px)
  * @property {string} [overlayBackground] - 모바일 오버레이 배경색 / Mobile overlay background color
- * @extends {React.HTMLAttributes<HTMLElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface DashboardSidebarProps extends React.HTMLAttributes<HTMLElement> {
+export interface DashboardSidebarProps extends Omit<React.HTMLAttributes<HTMLElement>, 'className'> {
   logo?: React.ReactNode;
   productSwitcher?: React.ReactNode;
   sections: SidebarSection[];
@@ -72,9 +72,9 @@ export interface DashboardSidebarProps extends React.HTMLAttributes<HTMLElement>
   variant?: "default" | "transparent";
   /** 토글 버튼 숨기기 / Hide collapse toggle button */
   hideToggle?: boolean;
-  /** 아이템 기본 클래스 오버라이드 / Item base class override */
+  /** 아이템 기본 스타일 오버라이드 / Item base style override */
   itemClassName?: string;
-  /** 활성 아이템 클래스 오버라이드 / Active item class override */
+  /** 활성 아이템 스타일 오버라이드 / Active item style override */
   activeClassName?: string;
   /** 모바일 열림 상태 (제어) / Mobile open state (controlled) */
   isMobileOpen?: boolean;
@@ -82,6 +82,7 @@ export interface DashboardSidebarProps extends React.HTMLAttributes<HTMLElement>
   onMobileOpenChange?: (open: boolean) => void;
   /** 모바일 토글 버튼 숨기기 (외부에서 제어할 때) / Hide mobile toggle button (when controlled externally) */
   hideMobileToggle?: boolean;
+  dot?: string;
 }
 
 const DEFAULT_COLLAPSED = 72;
@@ -89,13 +90,13 @@ const DEFAULT_EXPANDED = 264;
 
 /**
  * DashboardSidebar 컴포넌트
- * 
+ *
  * 대시보드용 사이드바 네비게이션 컴포넌트입니다.
  * 접기/펼치기 기능과 모바일 반응형을 지원하며, 섹션별로 네비게이션 아이템을 구성할 수 있습니다.
- * 
+ *
  * Sidebar navigation component for dashboards.
  * Supports collapse/expand functionality and mobile responsiveness, with section-based navigation items.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -112,7 +113,7 @@ const DEFAULT_EXPANDED = 264;
  *     }
  *   ]}
  * />
- * 
+ *
  * @example
  * // 접힘 상태 제어 / Collapse state control
  * <DashboardSidebar
@@ -122,7 +123,7 @@ const DEFAULT_EXPANDED = 264;
  *   collapsedWidth={80}
  *   expandedWidth={280}
  * />
- * 
+ *
  * @param {DashboardSidebarProps} props - DashboardSidebar 컴포넌트의 props / DashboardSidebar component props
  * @param {React.Ref<HTMLElement>} ref - aside 요소 ref / aside element ref
  * @returns {JSX.Element} DashboardSidebar 컴포넌트 / DashboardSidebar component
@@ -148,7 +149,8 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       isMobileOpen: externalMobileOpen,
       onMobileOpenChange,
       hideMobileToggle = false,
-      className,
+      dot,
+      style,
       ...props
     },
     ref
@@ -179,61 +181,108 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
 
     const widthStyle = collapsed ? collapsedWidth : expandedWidth;
 
+    const sidebarBaseStyle: React.CSSProperties = {
+      display: "flex",
+      height: "100%",
+      flexDirection: "column",
+      overflow: "hidden",
+      paddingLeft: "0.75rem",
+      paddingRight: "0.75rem",
+      paddingTop: "1rem",
+      paddingBottom: "1rem",
+      transition: "width 200ms",
+      width: widthStyle,
+      minWidth: widthStyle,
+      borderRight: variant === "transparent"
+        ? "1px solid rgba(226, 232, 240, 0.4)"
+        : "1px solid rgba(226, 232, 240, 0.6)",
+      backgroundColor: variant === "transparent" ? undefined : "rgba(255, 255, 255, 0.95)",
+      boxShadow: variant === "transparent" ? undefined : "0 1px 3px rgba(0,0,0,0.1)",
+    };
+
     const sidebarContent = (
       <aside
         ref={ref}
         role="navigation"
         aria-label="대시보드 네비게이션"
-        className={merge(
-          "flex h-full flex-col overflow-hidden px-3 py-4 transition-[width] duration-200",
-          variant === "transparent"
-            ? "border-r border-slate-200/40 dark:border-slate-800/60"
-            : "border-r border-slate-200/60 bg-white/95 shadow-sm dark:border-slate-800 dark:bg-slate-950/80 backdrop-blur",
-          className
-        )}
-        style={{ width: widthStyle, minWidth: widthStyle }}
+        style={mergeStyles(sidebarBaseStyle, resolveDot(dot), style)}
         {...props}
       >
-        <div className="mb-6 flex items-center justify-between gap-2 px-1">
-          <div className="flex items-center gap-2">
+        <div style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", paddingLeft: "0.25rem", paddingRight: "0.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {logo}
             {!collapsed && productSwitcher}
           </div>
-          {!hideToggle && <button
-            type="button"
-            onClick={toggleCollapsed}
-            aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
-            aria-expanded={!collapsed}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-          >
-            <Icon name={collapsed ? "chevronRight" : "chevronLeft"} className="h-4 w-4" />
-            <span className="sr-only">사이드바 토글</span>
-          </button>}
+          {!hideToggle && (
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+              aria-expanded={!collapsed}
+              style={{
+                display: "inline-flex",
+                height: "2rem",
+                width: "2rem",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "9999px",
+                border: "1px solid #e2e8f0",
+                color: "#64748b",
+                transition: "colors 200ms",
+                cursor: "pointer",
+                background: "transparent",
+              }}
+            >
+              <Icon name={collapsed ? "chevronRight" : "chevronLeft"} className="h-4 w-4" />
+              <span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>사이드바 토글</span>
+            </button>
+          )}
         </div>
 
-        <div className="flex-1 space-y-6 overflow-y-auto">
+        <div style={{ flex: 1, overflowY: "auto" }}>
           {sections.map((section) => (
-            <div key={section.id} className="space-y-2">
+            <div key={section.id} style={{ marginBottom: "1.5rem" }}>
               {!collapsed && section.label && (
-                <div className="px-3 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500" role="heading" aria-level={2}>
+                <div
+                  style={{ paddingLeft: "0.75rem", paddingRight: "0.75rem", fontSize: "0.75rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8", marginBottom: "0.5rem" }}
+                  role="heading"
+                  aria-level={2}
+                >
                   {section.label}
                 </div>
               )}
-              <nav className="space-y-1" aria-label={section.label || "네비게이션"}>
+              <nav style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }} aria-label={section.label || "네비게이션"}>
                 {section.items.map((item) => {
-                  const defaultActive = "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-100";
-                  const defaultItem = "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800";
-                  const baseClasses = merge(
-                    "group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
-                    item.active
-                      ? (activeClassName || defaultActive)
-                      : (itemClassName || defaultItem)
-                  );
+                  const activeStyle: React.CSSProperties = {
+                    backgroundColor: "#eef2ff",
+                    color: "#4338ca",
+                  };
+                  const defaultItemStyle: React.CSSProperties = {
+                    color: "#475569",
+                  };
+                  const baseStyle: React.CSSProperties = {
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    borderRadius: "0.5rem",
+                    paddingLeft: "0.75rem",
+                    paddingRight: "0.75rem",
+                    paddingTop: "0.5rem",
+                    paddingBottom: "0.5rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    transition: "background-color 150ms",
+                    cursor: "pointer",
+                    border: "none",
+                    textAlign: "left",
+                    background: "transparent",
+                    ...(item.active ? activeStyle : defaultItemStyle),
+                  };
 
                   const content = (
                     <>
                       {item.icon && (
-                        <span className="mr-3">
+                        <span style={{ marginRight: collapsed ? 0 : "0.75rem" }}>
                           {typeof item.icon === "string" ? (
                             <Icon name={item.icon as IconName} className="h-5 w-5" variant="inherit" />
                           ) : (
@@ -243,8 +292,8 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                       )}
                       {!collapsed && (
                         <>
-                          <span className="flex-1 text-left">{item.label}</span>
-                          {item.badge && <span className="text-xs text-slate-400">{item.badge}</span>}
+                          <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
+                          {item.badge && <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{item.badge}</span>}
                         </>
                       )}
                     </>
@@ -258,7 +307,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                     <a
                       key={item.id}
                       href={item.href}
-                      className={baseClasses}
+                      style={baseStyle}
                       aria-current={item.active ? "page" : undefined}
                       onClick={handleItemClick}
                     >
@@ -272,7 +321,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                         item.onClick?.();
                         handleItemClick();
                       }}
-                      className={baseClasses}
+                      style={baseStyle}
                       aria-pressed={item.active}
                     >
                       {content}
@@ -294,13 +343,12 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
           ))}
         </div>
 
-        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
+        <div style={{ marginTop: "1rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
           {footerActions}
-          <div className="mt-2 hidden text-xs text-slate-400 lg:block">
+          <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#94a3b8" }}>
             <span>ⓒ HUA Labs</span>
           </div>
         </div>
-
       </aside>
     );
 
@@ -310,23 +358,52 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
           <>
             {!hideMobileToggle && (
               <button
-                className="fixed top-3 left-3 z-30 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                style={{
+                  position: "fixed",
+                  top: "0.75rem",
+                  left: "0.75rem",
+                  zIndex: 30,
+                  display: "inline-flex",
+                  height: "2.5rem",
+                  width: "2.5rem",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "0.75rem",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                  cursor: "pointer",
+                }}
                 onClick={() => setIsMobileOpen(true)}
               >
                 <Icon name="menu" className="h-5 w-5" />
               </button>
             )}
             {isMobileOpen && (
-              <div className="fixed inset-0 z-40 flex">
+              <div style={{ position: "fixed", inset: 0, zIndex: 40, display: "flex" }}>
                 <div
-                  className="absolute inset-0"
-                  style={{ backgroundColor: overlayBackground }}
+                  style={{ position: "absolute", inset: 0, backgroundColor: overlayBackground }}
                   onClick={() => setIsMobileOpen(false)}
                 />
-                <div className="relative z-50 h-full bg-white dark:bg-slate-950">
+                <div style={{ position: "relative", zIndex: 50, height: "100%", backgroundColor: "#ffffff" }}>
                   {sidebarContent}
                   <button
-                    className="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+                    style={{
+                      position: "absolute",
+                      top: "1rem",
+                      right: "1rem",
+                      display: "inline-flex",
+                      height: "2.5rem",
+                      width: "2.5rem",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "0.75rem",
+                      color: "#64748b",
+                      transition: "background-color 150ms",
+                      cursor: "pointer",
+                      border: "none",
+                      background: "transparent",
+                    }}
                     onClick={() => setIsMobileOpen(false)}
                   >
                     <Icon name="close" className="h-5 w-5" />

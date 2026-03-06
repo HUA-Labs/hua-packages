@@ -111,7 +111,7 @@ export interface KanbanColumnMoveEvent {
 /**
  * KanbanBoard Props 인터페이스
  */
-export interface KanbanBoardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface KanbanBoardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "className"> {
   /** 컬럼 목록 (controlled) */
   columns?: KanbanColumn[];
   /** 카드 목록 (controlled) */
@@ -162,12 +162,14 @@ export interface KanbanBoardProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   columnMaxWidth?: number;
   /** 드래그 시 배경 딤드 효과 표시 */
   showDragOverlay?: boolean;
-  /** 딤드 오버레이 className */
-  dragOverlayClassName?: string;
+  /** 딤드 오버레이 인라인 스타일 */
+  dragOverlayStyle?: React.CSSProperties;
   /** 드래그 중인 카드 회전 각도 (기본: 3) */
   dragRotation?: number;
   /** 드래그 중인 카드 스케일 (기본: 1.05) */
   dragScale?: number;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
   /** 칸반 드래그 시작 콜백 */
   onKanbanDragStart?: (type: "card" | "column", id: string) => void;
   /** 칸반 드래그 종료 콜백 */
@@ -177,7 +179,7 @@ export interface KanbanBoardProps extends Omit<React.HTMLAttributes<HTMLDivEleme
 /**
  * KanbanColumn Props 인터페이스
  */
-export interface KanbanColumnProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "id"> {
+export interface KanbanColumnProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "className"> {
   /** 컬럼 데이터 */
   column: KanbanColumn;
   /** 컬럼 내 카드 목록 */
@@ -191,7 +193,7 @@ export interface KanbanColumnProps extends Omit<React.HTMLAttributes<HTMLDivElem
 /**
  * KanbanColumnHeader Props 인터페이스
  */
-export interface KanbanColumnHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface KanbanColumnHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   /** 컬럼 데이터 */
   column: KanbanColumn;
   /** 카드 수 */
@@ -203,15 +205,15 @@ export interface KanbanColumnHeaderProps extends React.HTMLAttributes<HTMLDivEle
   /** 컬럼 접기/펼치기 콜백 */
   onToggleCollapse?: () => void;
   /** 드래그 핸들 props (제목 영역에 적용) */
-  dragHandleProps?: React.HTMLAttributes<HTMLDivElement> & {
-    className?: string;
-  };
+  dragHandleProps?: Omit<React.HTMLAttributes<HTMLDivElement>, "className">;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**
  * KanbanCard Props 인터페이스
  */
-export interface KanbanCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "id"> {
+export interface KanbanCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "className"> {
   /** 카드 데이터 */
   card: KanbanCard;
   /** 카드 인덱스 */
@@ -220,12 +222,14 @@ export interface KanbanCardProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   isDragging?: boolean;
   /** 드래그 오버 여부 */
   isOver?: boolean;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**
  * KanbanAddCard Props 인터페이스
  */
-export interface KanbanAddCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit"> {
+export interface KanbanAddCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit" | "className"> {
   /** 컬럼 ID */
   columnId: string;
   /** 카드 추가 콜백 */
@@ -234,26 +238,32 @@ export interface KanbanAddCardProps extends Omit<React.HTMLAttributes<HTMLDivEle
   onCancel?: () => void;
   /** 플레이스홀더 텍스트 */
   placeholder?: string;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**
  * KanbanAddColumn Props 인터페이스
  */
-export interface KanbanAddColumnProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit"> {
+export interface KanbanAddColumnProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSubmit" | "className"> {
   /** 컬럼 추가 콜백 */
   onAdd?: (column: Partial<KanbanColumn>) => void;
   /** 취소 콜백 */
   onCancel?: () => void;
   /** 플레이스홀더 텍스트 */
   placeholder?: string;
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
 
 /**
  * KanbanDropIndicator Props 인터페이스
  */
-export interface KanbanDropIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface KanbanDropIndicatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   /** 표시 여부 */
   visible: boolean;
   /** 방향 */
   orientation?: "horizontal" | "vertical";
+  /** dot 유틸리티 스타일 */
+  dot?: string;
 }
