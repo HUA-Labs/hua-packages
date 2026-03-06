@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useMotionConfig } from "../../context/MotionConfigContext";
 
@@ -14,8 +14,10 @@ import { useMotionConfig } from "../../context/MotionConfigContext";
  * @property {boolean} [glare=true] - 글레어 효과 / Glare effect
  * @property {number} [maxGlare=0.3] - 최대 글레어 투명도 / Maximum glare opacity
  * @property {boolean} [reset=true] - 마우스 떠나면 리셋 / Reset on mouse leave
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - inline styles
  */
-export interface TiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TiltCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   maxTilt?: number;
   perspective?: number;
   scale?: number;
@@ -23,6 +25,8 @@ export interface TiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
   glare?: boolean;
   maxGlare?: number;
   reset?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -36,7 +40,7 @@ export interface TiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *
  * @component
  * @example
- * <TiltCard className="bg-white shadow-lg rounded-xl p-6">
+ * <TiltCard dot="bg-white shadow-lg rounded-xl p-6">
  *   <img src="/product.jpg" alt="Product" />
  *   <h3>Premium Product</h3>
  * </TiltCard>
@@ -45,7 +49,7 @@ const TiltCard = React.forwardRef<HTMLDivElement, TiltCardProps>(
   (
     {
       children,
-      className,
+      dot: dotProp,
       maxTilt = 15,
       perspective = 1000,
       scale = 1.02,
@@ -115,12 +119,14 @@ const TiltCard = React.forwardRef<HTMLDivElement, TiltCardProps>(
       }
     };
 
-    const cardStyle: React.CSSProperties = {
-      ...style,
-      perspective: `${perspective}px`,
-    };
+    const cardStyle = useMemo((): React.CSSProperties => mergeStyles(
+      { position: "relative", perspective: `${perspective}px` },
+      resolveDot(dotProp),
+      style,
+    ), [perspective, dotProp, style]);
 
     const innerStyle: React.CSSProperties = {
+      position: "relative",
       transform: `rotateX(${transform.rotateX}deg) rotateY(${transform.rotateY}deg) scale(${transform.scale})`,
       transition: isHovered ? "none" : `transform ${speed}ms ease-out`,
       transformStyle: "preserve-3d",
@@ -146,14 +152,13 @@ const TiltCard = React.forwardRef<HTMLDivElement, TiltCardProps>(
     return (
       <div
         ref={mergeRefs(ref, cardRef)}
-        className={merge("relative", className)}
         style={cardStyle}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
-        <div style={innerStyle} className="relative">
+        <div style={innerStyle}>
           {children}
 
           {/* Glare effect */}

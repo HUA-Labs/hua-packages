@@ -26,12 +26,10 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    // NavigationItem receives onValueChange from parent, but it's not directly passed
-    // The click handler on NavigationItem calls its own onValueChange
     fireEvent.click(screen.getByText('Tab 2'));
   });
 
-  it('should apply pills variant', () => {
+  it('should render pills variant list with background style', () => {
     const { container } = render(
       <Navigation variant="pills">
         <NavigationList>
@@ -39,10 +37,13 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    expect(container.querySelector('.rounded-xl')).toBeInTheDocument();
+    // NavigationList wrapper should have a background-color set (pills uses --color-muted)
+    const list = container.querySelector('div > div') as HTMLElement;
+    expect(list).toBeTruthy();
+    expect(list.style.backgroundColor).toBeTruthy();
   });
 
-  it('should apply underline variant', () => {
+  it('should render underline variant list with border-bottom style', () => {
     const { container } = render(
       <Navigation variant="underline">
         <NavigationList>
@@ -50,10 +51,12 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    expect(container.querySelector('.border-b')).toBeInTheDocument();
+    const list = container.querySelector('div > div') as HTMLElement;
+    expect(list).toBeTruthy();
+    expect(list.style.borderBottom).toBeTruthy();
   });
 
-  it('should apply cards variant', () => {
+  it('should render cards variant list with background style', () => {
     const { container } = render(
       <Navigation variant="cards">
         <NavigationList>
@@ -61,7 +64,9 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    expect(container.querySelector('.bg-muted\\/50')).toBeInTheDocument();
+    const list = container.querySelector('div > div') as HTMLElement;
+    expect(list).toBeTruthy();
+    expect(list.style.backgroundColor).toBeTruthy();
   });
 });
 
@@ -82,11 +87,21 @@ describe('NavigationItem', () => {
     expect(handleChange).toHaveBeenCalledWith('tab2');
   });
 
-  it('should apply active styles', () => {
+  it('should apply active styles with box-shadow', () => {
     const { container } = render(
       <NavigationItem value="test" active>Active</NavigationItem>
     );
-    expect(container.querySelector('.shadow-sm')).toBeInTheDocument();
+    const btn = container.querySelector('button') as HTMLElement;
+    expect(btn).toBeTruthy();
+    expect(btn.style.boxShadow).toBeTruthy();
+  });
+
+  it('should apply background-color for active pills item', () => {
+    const { container } = render(
+      <NavigationItem value="test" variant="pills" active>Active</NavigationItem>
+    );
+    const btn = container.querySelector('button') as HTMLElement;
+    expect(btn.style.backgroundColor).toBeTruthy();
   });
 });
 

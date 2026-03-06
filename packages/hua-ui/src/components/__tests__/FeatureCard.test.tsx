@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { FeatureCard } from '../FeatureCard';
 
 describe('FeatureCard', () => {
@@ -16,13 +16,14 @@ describe('FeatureCard', () => {
     expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Feature');
   });
 
-  it('should render with icon', () => {
+  it('should render with icon wrapper div', () => {
     const { container } = render(
       <FeatureCard icon="star" title="Starred" description="A starred feature" />
     );
 
-    // Icon renders inside a div with mb-4 class
-    expect(container.querySelector('.mb-4')).toBeInTheDocument();
+    // Icon wrapper is the first child div of the card
+    const card = container.firstChild as HTMLElement;
+    expect(card.querySelector('div')).toBeInTheDocument();
   });
 
   it('should render image URL as icon', () => {
@@ -34,58 +35,96 @@ describe('FeatureCard', () => {
     expect(img).toHaveAttribute('src', 'https://example.com/icon.png');
   });
 
-  it('should apply size variants', () => {
-    const { container, rerender } = render(
+  it('should apply size sm padding via inline style', () => {
+    const { container } = render(
       <FeatureCard title="T" description="D" size="sm" />
     );
-    expect(container.querySelector('.p-4')).toBeInTheDocument();
-
-    rerender(<FeatureCard title="T" description="D" size="lg" />);
-    expect(container.querySelector('.p-8')).toBeInTheDocument();
+    const card = container.firstChild as HTMLElement;
+    expect(card.style.padding).toBe('1rem');
   });
 
-  it('should apply default variant', () => {
+  it('should apply size lg padding via inline style', () => {
+    const { container } = render(
+      <FeatureCard title="T" description="D" size="lg" />
+    );
+    const card = container.firstChild as HTMLElement;
+    expect(card.style.padding).toBe('2rem');
+  });
+
+  it('should apply default variant background via inline style', () => {
     const { container } = render(
       <FeatureCard title="T" description="D" />
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('bg-background');
+    // default variant uses CSS variable for background
+    expect(card.style.backgroundColor).toContain('var(--color-background');
   });
 
-  it('should apply gradient variant', () => {
+  it('should apply gradient variant background via inline style', () => {
     const { container } = render(
       <FeatureCard title="T" description="D" variant="gradient" />
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('bg-gradient-to-br');
+    expect(card.style.background).toContain('linear-gradient');
   });
 
-  it('should apply neon variant', () => {
+  it('should apply neon variant border via inline style', () => {
     const { container } = render(
       <FeatureCard title="T" description="D" variant="neon" />
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('border-cyan-400');
+    expect(card.style.border).toContain('rgba(34, 211, 238');
   });
 
-  it('should apply hover effects', () => {
-    const { container, rerender } = render(
+  it('should apply hover scale effect on mouse enter', () => {
+    const { container } = render(
       <FeatureCard title="T" description="D" hover="scale" />
     );
-    expect((container.firstChild as HTMLElement).className).toContain('hover:scale-105');
+    const card = container.firstChild as HTMLElement;
+    expect(card.style.transform).toBe('');
 
-    rerender(<FeatureCard title="T" description="D" hover="none" />);
-    expect((container.firstChild as HTMLElement).className).not.toContain('hover:scale-105');
+    fireEvent.mouseEnter(card);
+    expect(card.style.transform).toBe('scale(1.05)');
+
+    fireEvent.mouseLeave(card);
+    expect(card.style.transform).toBe('');
   });
 
-  it('should apply custom className', () => {
+  it('should not apply hover transform when hover="none"', () => {
     const { container } = render(
-      <FeatureCard title="T" description="D" className="my-card" />
+      <FeatureCard title="T" description="D" hover="none" />
     );
+    const card = container.firstChild as HTMLElement;
 
-    expect(container.querySelector('.my-card')).toBeInTheDocument();
+    fireEvent.mouseEnter(card);
+    expect(card.style.transform).toBe('');
+  });
+
+  it('should forward additional props', () => {
+    const onClick = vi.fn();
+    render(<FeatureCard title="T" description="D" onClick={onClick} data-testid="fc" />);
+
+    fireEvent.click(screen.getByTestId('fc'));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('should apply dot prop styles', () => {
+    const { container } = render(
+      <FeatureCard title="T" description="D" dot="opacity-50" />
+    );
+    const card = container.firstChild as HTMLElement;
+    // dot engine resolves opacity-50 → opacity: 0.5
+    expect(card.style.opacity).toBe('0.5');
+  });
+
+  it('should apply custom gradient via customGradient prop', () => {
+    const { container } = render(
+      <FeatureCard title="T" description="D" variant="gradient" customGradient="linear-gradient(90deg, red, blue)" />
+    );
+    const card = container.firstChild as HTMLElement;
+    expect(card.style.background).toBe('linear-gradient(90deg, red, blue)');
   });
 });

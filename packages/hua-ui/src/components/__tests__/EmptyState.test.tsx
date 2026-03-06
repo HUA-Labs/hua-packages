@@ -39,31 +39,43 @@ describe('EmptyState', () => {
     expect(handleSecondary).toHaveBeenCalledTimes(1);
   });
 
-  it('should apply size variants', () => {
+  it('should apply size variants via inline style', () => {
     const { container, rerender } = render(<EmptyState title="T" size="sm" />);
-    expect(container.querySelector('.py-8')).toBeInTheDocument();
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.style.paddingTop).toBe('2rem');
 
     rerender(<EmptyState title="T" size="lg" />);
-    expect(container.querySelector('.py-16')).toBeInTheDocument();
+    const el2 = container.firstElementChild as HTMLElement;
+    expect(el2.style.paddingTop).toBe('4rem');
   });
 
-  it('should apply variant styles', () => {
+  it('should apply variant container style via CSS variable', () => {
     const { container } = render(<EmptyState title="T" variant="error" />);
-    expect(container.querySelector('.bg-destructive\\/5')).toBeInTheDocument();
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.style.backgroundColor).toContain('var(--empty-state-error-bg)');
   });
 
   it('should show border when bordered', () => {
     const { container } = render(<EmptyState title="T" bordered />);
-    expect(container.querySelector('.border')).toBeInTheDocument();
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.style.border).toContain('1px solid');
   });
 
   it('should render custom icon as ReactNode', () => {
-    render(<EmptyState title="T" icon={<span data-testid="custom-icon">🎯</span>} />);
+    render(<EmptyState title="T" icon={<span data-testid="custom-icon">target</span>} />);
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
-    const { container } = render(<EmptyState title="T" className="my-empty" />);
-    expect(container.querySelector('.my-empty')).toBeInTheDocument();
+  it('should apply dot prop as inline style', () => {
+    const { container } = render(<EmptyState title="T" dot="p-8" />);
+    const el = container.firstElementChild as HTMLElement;
+    // dot prop produces inline style — element should have inline style set
+    expect(el).toHaveAttribute('style');
+  });
+
+  it('should merge explicit style prop', () => {
+    const { container } = render(<EmptyState title="T" style={{ opacity: 0.5 }} />);
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.style.opacity).toBe('0.5');
   });
 });

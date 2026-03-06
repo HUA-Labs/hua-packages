@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useMotionConfig } from "../../context/MotionConfigContext";
 
@@ -12,14 +12,39 @@ import { useMotionConfig } from "../../context/MotionConfigContext";
  * @property {number} [glowOpacity=0.6] - 글로우 투명도 / Glow opacity
  * @property {boolean} [border=true] - 글로우 보더 표시 / Show glow border
  * @property {string} [borderColor] - 보더 색상 (기본: glowColor) / Border color (default: glowColor)
+ * @property {string} [dot] - dot utility string for additional styles
  */
-export interface GlowCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface GlowCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   glowColor?: string;
   glowSize?: number;
   glowOpacity?: number;
   border?: boolean;
   borderColor?: string;
+  dot?: string;
+  style?: React.CSSProperties;
 }
+
+/** Base card styles (replaces Tailwind: relative overflow-hidden rounded-xl bg-card border border-border p-6) */
+const BASE_STYLE: React.CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
+  borderRadius: "0.75rem",
+  backgroundColor: "var(--color-card, var(--card))",
+  border: "1px solid var(--color-border, var(--border))",
+  padding: "1.5rem",
+  transition: "all 300ms ease",
+};
+
+/** Hovered state overrides */
+const HOVERED_STYLE: React.CSSProperties = {
+  borderColor: "transparent",
+};
+
+/** Inner content wrapper (replaces Tailwind: relative z-10) */
+const CONTENT_STYLE: React.CSSProperties = {
+  position: "relative",
+  zIndex: 10,
+};
 
 /**
  * GlowCard 컴포넌트 / GlowCard component
@@ -41,7 +66,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
   (
     {
       children,
-      className,
+      dot: dotProp,
       glowColor = "rgba(120, 119, 198, 0.3)",
       glowSize = 400,
       glowOpacity = 0.6,
@@ -71,6 +96,13 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
       },
       [motionDisabled]
     );
+
+    const cardStyle = useMemo(() => mergeStyles(
+      BASE_STYLE,
+      isHovered ? HOVERED_STYLE : undefined,
+      resolveDot(dotProp),
+      style,
+    ), [isHovered, dotProp, style]);
 
     const glowStyle: React.CSSProperties = {
       position: "absolute",
@@ -107,13 +139,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
     return (
       <div
         ref={mergeRefs(ref, cardRef)}
-        className={merge(
-          "relative overflow-hidden rounded-xl bg-card border border-border p-6",
-          "transition-all duration-300",
-          isHovered && "border-transparent",
-          className
-        )}
-        style={style}
+        style={cardStyle}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -126,7 +152,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
         {border && <div style={borderStyle as React.CSSProperties} aria-hidden="true" />}
 
         {/* Content */}
-        <div className="relative z-10">{children}</div>
+        <div style={CONTENT_STYLE}>{children}</div>
       </div>
     );
   }

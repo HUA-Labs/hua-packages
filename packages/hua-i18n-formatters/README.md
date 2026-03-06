@@ -14,6 +14,7 @@ Locale-aware formatting utilities that integrate with @hua-labs/i18n-core. Provi
 - **Number formatting — Locale-aware grouping, compact notation (1K, 1M), percentages**
 - **Currency formatting — Symbol positioning, decimal control, 6 currencies (KRW, USD, EUR, GBP, JPY, CNY)**
 - **React hooks — useDateFormatter, useNumberFormatter, useCurrencyFormatter**
+- **React Native — Works in Expo and bare RN projects**
 - **Tree-shakeable — Subpath exports for date, number, currency independently**
 
 ## Installation

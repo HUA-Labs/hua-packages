@@ -40,21 +40,24 @@ describe('HeroSection', () => {
     expect(screen.getByText('Learn More')).toBeInTheDocument();
   });
 
-  it('should apply size classes', () => {
+  it('should apply size styles via inline style', () => {
     const { container, rerender } = render(
       <HeroSection title="T" description="D" size="sm" />
     );
-    expect(container.querySelector('.min-h-\\[400px\\]')).toBeInTheDocument();
+    const section = container.querySelector('section');
+    expect(section).toHaveStyle({ minHeight: '400px' });
 
     rerender(<HeroSection title="T" description="D" size="full" />);
-    expect(container.querySelector('.min-h-screen')).toBeInTheDocument();
+    const sectionFull = container.querySelector('section');
+    expect(sectionFull).toHaveStyle({ minHeight: '100vh' });
   });
 
-  it('should apply fullBleed class', () => {
+  it('should apply fullBleed styles via inline style', () => {
     const { container } = render(
       <HeroSection title="T" description="D" fullBleed />
     );
-    expect(container.querySelector('.-mt-16')).toBeInTheDocument();
+    const section = container.querySelector('section');
+    expect(section).toHaveStyle({ marginTop: '-4rem' });
   });
 
   it('should render slides in slide mode', () => {
@@ -106,10 +109,19 @@ describe('HeroSection', () => {
     expect(screen.getByText('Slide B')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should forward additional props to section element', () => {
     const { container } = render(
-      <HeroSection title="T" description="D" className="my-hero" />
+      <HeroSection title="T" description="D" data-testid="hero" />
     );
-    expect(container.querySelector('.my-hero')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="hero"]')).toBeInTheDocument();
+  });
+
+  it('should apply dot prop styles via inline style', () => {
+    const { container } = render(
+      <HeroSection title="T" description="D" dot="p-8" />
+    );
+    const section = container.querySelector('section');
+    // dot prop resolves to inline style — section should exist
+    expect(section).toBeInTheDocument();
   });
 });

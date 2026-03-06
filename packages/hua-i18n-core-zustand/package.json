@@ -2,7 +2,7 @@
   "name": "@hua-labs/i18n-core-zustand",
   "version": "2.1.0",
   "description": "Zustand adapter for @hua-labs/i18n-core - Type-safe state management integration",
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
@@ -11,8 +11,10 @@
   ],
   "exports": {
     ".": {
+      "react-native": "./dist/index.mjs",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
     }
   },

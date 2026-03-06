@@ -343,20 +343,17 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             aria-label={caption ? (typeof caption === "string" ? caption : "거래 목록 테이블") : "거래 목록 테이블"}
           >
             {caption && <TableCaption>{caption}</TableCaption>}
-            <TableHeader className="bg-slate-50/60 dark:bg-slate-900/40">
-              <TableRow className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <TableHeader style={{ backgroundColor: 'var(--color-muted)', opacity: 0.6 }}>
+              <TableRow style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)' }}>
                 {columnList.map((column) => (
                   <TableHead
                     key={column.key}
-                    style={{ width: column.width }}
-                    className={merge(
-                      column.align === "right"
-                        ? "text-right"
-                        : column.align === "center"
-                        ? "text-center"
-                        : "text-left",
-                      "text-xs font-semibold"
-                    )}
+                    style={{
+                      width: column.width,
+                      textAlign: column.align === "right" ? "right" : column.align === "center" ? "center" : "left",
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                    }}
                   >
                     {column.label}
                   </TableHead>
@@ -405,23 +402,19 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                       onClick={onRowClick ? () => onRowClick(row) : undefined}
                       aria-label={rowLabel}
                       aria-describedby={clickable && rowActionHintId ? rowActionHintId : undefined}
-                      className={merge(
-                        "text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/70",
-                        clickable && "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60",
-                        highlightRow?.(row) && "bg-indigo-50/60 dark:bg-indigo-900/20"
-                      )}
+                      style={{
+                        fontSize: '0.875rem',
+                        cursor: clickable ? 'pointer' : undefined,
+                        backgroundColor: highlightRow?.(row) ? 'var(--color-primary-50, rgba(99,102,241,0.06))' : undefined,
+                      }}
                     >
                       {columnList.map((column) => (
                         <TableCell
                           key={column.key}
-                          className={merge(
-                            column.align === "right"
-                              ? "text-right"
-                              : column.align === "center"
-                              ? "text-center"
-                              : "text-left",
-                            "align-middle"
-                          )}
+                          style={{
+                            textAlign: column.align === "right" ? "right" : column.align === "center" ? "center" : "left",
+                            verticalAlign: 'middle',
+                          }}
                         >
                           {renderCell(column, row)}
                         </TableCell>

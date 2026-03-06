@@ -1,22 +1,132 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+
+// ---------------------------------------------------------------------------
+// Static style objects
+// ---------------------------------------------------------------------------
+
+const WRAPPER_STYLE: React.CSSProperties = {
+  position: 'relative',
+}
+
+const TRIGGER_WRAPPER_STYLE: React.CSSProperties = {
+  display: 'inline-block',
+}
+
+const PANEL_BASE_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  zIndex: 50,
+  minWidth: '200px',
+  paddingTop: '0.5rem',
+  paddingBottom: '0.5rem',
+  borderRadius: '0.5rem',
+  backgroundColor: 'var(--context-menu-bg, #fff)',
+  color: 'var(--context-menu-foreground)',
+  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  backdropFilter: 'blur(4px)',
+  WebkitBackdropFilter: 'blur(4px)',
+}
+
+const ITEM_BASE_STYLE: React.CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  paddingLeft: '1rem',
+  paddingRight: '1rem',
+  paddingTop: '0.75rem',
+  paddingBottom: '0.75rem',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  transition: 'background-color 200ms ease-in-out, color 200ms ease-in-out',
+  background: 'none',
+  border: 'none',
+  textAlign: 'left' as const,
+  cursor: 'pointer',
+  outline: 'none',
+  color: 'var(--context-menu-item-default-color)',
+}
+
+const ITEM_VARIANT_STYLE: Record<string, React.CSSProperties> = {
+  default: {
+    color: 'var(--context-menu-item-default-color)',
+  },
+  destructive: {
+    color: 'var(--context-menu-item-destructive-color)',
+  },
+  disabled: {
+    color: 'var(--context-menu-item-muted-color)',
+    cursor: 'not-allowed',
+  },
+}
+
+const ITEM_HOVER_STYLE: Record<string, React.CSSProperties> = {
+  default: {
+    backgroundColor: 'var(--context-menu-item-hover-bg)',
+  },
+  destructive: {
+    backgroundColor: 'var(--context-menu-item-destructive-hover-bg)',
+  },
+  disabled: {},
+}
+
+const ITEM_ICON_WRAPPER_STYLE: React.CSSProperties = {
+  flexShrink: 0,
+  width: '1rem',
+  height: '1rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+const ITEM_LABEL_STYLE: React.CSSProperties = {
+  flex: 1,
+  textAlign: 'left' as const,
+}
+
+const SEPARATOR_STYLE: React.CSSProperties = {
+  height: '1px',
+  backgroundColor: 'var(--context-menu-separator-color)',
+  marginTop: '0.5rem',
+  marginBottom: '0.5rem',
+}
+
+const LABEL_STYLE: React.CSSProperties = {
+  paddingLeft: '1rem',
+  paddingRight: '1rem',
+  paddingTop: '0.5rem',
+  paddingBottom: '0.5rem',
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  color: 'var(--context-menu-label-color)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+}
+
+const GROUP_STYLE: React.CSSProperties = {
+  paddingTop: '0.25rem',
+  paddingBottom: '0.25rem',
+}
+
+// ---------------------------------------------------------------------------
+// ContextMenu
+// ---------------------------------------------------------------------------
 
 /**
- * ContextMenu 컴포넌트의 props / ContextMenu component props
+ * ContextMenu component props
  * @typedef {Object} ContextMenuProps
- * @property {React.ReactNode} children - ContextMenu 내용 / ContextMenu content
- * @property {boolean} [open] - 제어 모드에서 열림/닫힘 상태 / Open/close state in controlled mode
- * @property {(open: boolean) => void} [onOpenChange] - 상태 변경 콜백 / State change callback
- * @property {React.ReactNode} [trigger] - ContextMenu를 열기 위한 트리거 요소 (우클릭 이벤트) / Trigger element to open context menu (right-click event)
- * @property {"top" | "bottom" | "left" | "right"} [placement="bottom"] - ContextMenu 표시 위치 / ContextMenu display position
- * @property {"start" | "center" | "end"} [align="start"] - ContextMenu 정렬 / ContextMenu alignment
- * @property {number} [offset=8] - 트리거와 ContextMenu 사이 간격 (px) / Spacing between trigger and context menu (px)
- * @property {boolean} [disabled=false] - ContextMenu 비활성화 여부 / Disable context menu
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {React.ReactNode} children - ContextMenu content
+ * @property {boolean} [open] - Open/close state in controlled mode
+ * @property {(open: boolean) => void} [onOpenChange] - State change callback
+ * @property {React.ReactNode} [trigger] - Trigger element to open context menu (right-click event)
+ * @property {"top" | "bottom" | "left" | "right"} [placement="bottom"] - ContextMenu display position
+ * @property {"start" | "center" | "end"} [align="start"] - ContextMenu alignment
+ * @property {number} [offset=8] - Spacing between trigger and context menu (px)
+ * @property {boolean} [disabled=false] - Disable context menu
  */
-export interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ContextMenuProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   children: React.ReactNode
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -25,48 +135,40 @@ export interface ContextMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: "start" | "center" | "end"
   offset?: number
   disabled?: boolean
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * ContextMenu 컴포넌트 / ContextMenu component
- * 
- * 우클릭 시 표시되는 컨텍스트 메뉴 컴포넌트입니다.
- * 트리거 요소에 우클릭 이벤트를 자동으로 연결합니다.
- * 
+ * ContextMenu component
+ *
  * Context menu component that appears on right-click.
  * Automatically connects right-click events to the trigger element.
- * 
+ *
  * @component
  * @example
- * // 기본 사용 / Basic usage
- * <ContextMenu trigger={<div>우클릭하세요</div>}>
- *   <div className="p-2">
- *     <button>항목 1</button>
- *     <button>항목 2</button>
- *   </div>
+ * // Basic usage
+ * <ContextMenu trigger={<div>Right-click here</div>}>
+ *   <ContextMenuItem>Item 1</ContextMenuItem>
+ *   <ContextMenuItem>Item 2</ContextMenuItem>
  * </ContextMenu>
- * 
+ *
  * @example
- * // 제어 모드 / Controlled mode
+ * // Controlled mode
  * const [open, setOpen] = useState(false)
- * <ContextMenu 
+ * <ContextMenu
  *   open={open}
  *   onOpenChange={setOpen}
- *   trigger={<div>우클릭</div>}
+ *   trigger={<div>Right-click</div>}
  * >
- *   <Menu>
- *     <MenuItem>복사</MenuItem>
- *     <MenuItem>삭제</MenuItem>
- *   </Menu>
+ *   <ContextMenuItem>Copy</ContextMenuItem>
+ *   <ContextMenuItem>Delete</ContextMenuItem>
  * </ContextMenu>
- * 
- * @param {ContextMenuProps} props - ContextMenu 컴포넌트의 props / ContextMenu component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} ContextMenu 컴포넌트 / ContextMenu component
  */
 const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
+    style,
     children,
     open: controlledOpen,
     onOpenChange,
@@ -75,14 +177,19 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     align: _align = "start",
     offset: _offset = 8,
     disabled = false,
-    ...props 
+    ...props
   }, ref) => {
-    const [internalOpen, setInternalOpen] = React.useState(false)
+    const [internalOpen, setInternalOpen] = useState(false)
     const [coords, setCoords] = React.useState({ x: 0, y: 0 })
     const triggerRef = React.useRef<HTMLDivElement>(null)
     const menuRef = React.useRef<HTMLDivElement>(null)
     const isControlled = controlledOpen !== undefined
     const isOpen = isControlled ? controlledOpen : internalOpen
+
+    const wrapperStyle = useMemo(() =>
+      mergeStyles(WRAPPER_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
 
     const handleOpenChange = React.useCallback((newOpen: boolean) => {
       if (disabled) return
@@ -97,7 +204,6 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       event.preventDefault()
       if (disabled) return
 
-      const _rect = event.currentTarget.getBoundingClientRect()
       const x = event.clientX
       const y = event.clientY
 
@@ -115,15 +221,14 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       let x = coords.x
       let y = coords.y
 
-      // 뷰포트 경계 확인 및 조정
       if (x + menuRect.width > viewportWidth - 8) {
-        x = viewportWidth - menuRect.width - 8 // 8px 여백
+        x = viewportWidth - menuRect.width - 8
       }
       if (y + menuRect.height > viewportHeight - 8) {
-        y = viewportHeight - menuRect.height - 8 // 8px 여백
+        y = viewportHeight - menuRect.height - 8
       }
-      if (x < 8) x = 8 // 8px 여백
-      if (y < 8) y = 8 // 8px 여백
+      if (x < 8) x = 8
+      if (y < 8) y = 8
 
       setCoords({ x, y })
     }, [coords.x, coords.y])
@@ -133,7 +238,7 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         updatePosition()
         window.addEventListener('resize', updatePosition)
         window.addEventListener('scroll', updatePosition)
-        
+
         return () => {
           window.removeEventListener('resize', updatePosition)
           window.removeEventListener('scroll', updatePosition)
@@ -162,31 +267,27 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     }, [isOpen, handleOpenChange])
 
     return (
-      <div ref={ref} className={merge("relative", className)} {...props}>
-        {/* 트리거 */}
+      <div ref={ref} style={wrapperStyle} {...props}>
+        {/* Trigger */}
         {trigger && (
           <div
             ref={triggerRef}
             onContextMenu={handleContextMenu}
-            className="inline-block"
+            style={TRIGGER_WRAPPER_STYLE}
           >
             {trigger}
           </div>
         )}
 
-        {/* 컨텍스트 메뉴 */}
+        {/* Context menu panel */}
         {isOpen && (
           <div
             ref={menuRef}
-            className={merge(
-              "fixed z-50 bg-popover text-popover-foreground rounded-lg shadow-xl backdrop-blur-sm", // 보더 대신 섀도우 사용
-              "min-w-[200px] py-2", // 16px 패딩
-              "border-0" // 보더 제거
-            )}
+            data-testid="context-menu-panel"
             style={{
+              ...PANEL_BASE_STYLE,
               left: coords.x,
               top: coords.y,
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
             }}
           >
             {children}
@@ -198,94 +299,152 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
 )
 ContextMenu.displayName = "ContextMenu"
 
-export interface ContextMenuItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+// ---------------------------------------------------------------------------
+// ContextMenuItem
+// ---------------------------------------------------------------------------
+
+export interface ContextMenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   icon?: React.ReactNode
   variant?: "default" | "destructive" | "disabled"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const ContextMenuItem = React.forwardRef<HTMLButtonElement, ContextMenuItemProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
+    style,
     icon,
     variant = "default",
     children,
     disabled,
-    ...props 
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
+    ...props
   }, ref) => {
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "destructive":
-          return "text-destructive hover:bg-destructive/10"
-        case "disabled":
-          return "text-muted-foreground cursor-not-allowed"
-        default:
-          return "text-foreground hover:bg-muted"
-      }
-    }
+    const [isHovered, setIsHovered] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
+    const isDisabled = disabled || variant === "disabled"
+
+    const computedStyle = useMemo(() => {
+      return mergeStyles(
+        ITEM_BASE_STYLE,
+        ITEM_VARIANT_STYLE[variant] ?? ITEM_VARIANT_STYLE.default,
+        !isDisabled && isHovered ? ITEM_HOVER_STYLE[variant] ?? ITEM_HOVER_STYLE.default : undefined,
+        !isDisabled && isFocused ? (ITEM_HOVER_STYLE[variant] ?? ITEM_HOVER_STYLE.default) : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, isHovered, isFocused, isDisabled, dotProp, style])
 
     return (
       <button
         ref={ref}
-        className={merge(
-          "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-muted", // 16px, 12px 패딩
-          getVariantClasses(),
-          className
-        )}
-        disabled={disabled || variant === "disabled"}
+        style={computedStyle}
+        disabled={isDisabled}
+        onMouseEnter={(e) => { setIsHovered(true); onMouseEnter?.(e) }}
+        onMouseLeave={(e) => { setIsHovered(false); onMouseLeave?.(e) }}
+        onFocus={(e) => { setIsFocused(true); onFocus?.(e) }}
+        onBlur={(e) => { setIsFocused(false); onBlur?.(e) }}
         {...props}
       >
         {icon && (
-          <div className="flex-shrink-0 w-4 h-4">
+          <span style={ITEM_ICON_WRAPPER_STYLE}>
             {icon}
-          </div>
+          </span>
         )}
-        <span className="flex-1 text-left">{children}</span>
+        <span style={ITEM_LABEL_STYLE}>{children}</span>
       </button>
     )
   }
 )
 ContextMenuItem.displayName = "ContextMenuItem"
 
-export interface ContextMenuSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
+// ---------------------------------------------------------------------------
+// ContextMenuSeparator
+// ---------------------------------------------------------------------------
+
+export interface ContextMenuSeparatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const ContextMenuSeparator = React.forwardRef<HTMLDivElement, ContextMenuSeparatorProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("h-px bg-border my-2", className)} // 8px 여백
-      {...props}
-    />
-  )
+  ({ dot: dotProp, style, ...props }, ref) => {
+    const computedStyle = useMemo(() =>
+      mergeStyles(SEPARATOR_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      />
+    )
+  }
 )
 ContextMenuSeparator.displayName = "ContextMenuSeparator"
 
-export interface ContextMenuLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
+// ---------------------------------------------------------------------------
+// ContextMenuLabel
+// ---------------------------------------------------------------------------
+
+export interface ContextMenuLabelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const ContextMenuLabel = React.forwardRef<HTMLDivElement, ContextMenuLabelProps>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide", className)} // 16px, 8px 패딩
-      {...props}
-    >
-      {children}
-    </div>
-  )
+  ({ dot: dotProp, style, children, ...props }, ref) => {
+    const computedStyle = useMemo(() =>
+      mergeStyles(LABEL_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
 )
 ContextMenuLabel.displayName = "ContextMenuLabel"
 
-// 편의 컴포넌트들
-const ContextMenuGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("py-1", className)} // 4px 패딩
-      {...props}
-    >
-      {children}
-    </div>
-  )
+// ---------------------------------------------------------------------------
+// ContextMenuGroup
+// ---------------------------------------------------------------------------
+
+export interface ContextMenuGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
+
+const ContextMenuGroup = React.forwardRef<HTMLDivElement, ContextMenuGroupProps>(
+  ({ dot: dotProp, style, children, ...props }, ref) => {
+    const computedStyle = useMemo(() =>
+      mergeStyles(GROUP_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
 )
 ContextMenuGroup.displayName = "ContextMenuGroup"
 
-export { ContextMenu, ContextMenuItem, ContextMenuSeparator, ContextMenuLabel, ContextMenuGroup } 
+export { ContextMenu, ContextMenuItem, ContextMenuSeparator, ContextMenuLabel, ContextMenuGroup }

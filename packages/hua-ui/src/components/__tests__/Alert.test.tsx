@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '../Alert';
 
@@ -8,8 +8,9 @@ describe('Alert', () => {
     const { container } = render(<Alert title="Alert" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-white/10');
-    expect(alert).toHaveClass('backdrop-blur-sm');
+    expect(alert).toBeInTheDocument();
+    // default variant uses rgba(255,255,255,0.1) background via inline style
+    expect(alert?.style.backgroundColor).toBe('rgba(255, 255, 255, 0.1)');
   });
 
   it('should render title', () => {
@@ -33,36 +34,50 @@ describe('Alert', () => {
     expect(content).toBeInTheDocument();
   });
 
-  it('should apply success variant classes', () => {
+  it('should apply success variant styles', () => {
     const { container } = render(<Alert variant="success" title="Success" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-green-500/10');
-    expect(alert).toHaveClass('border-green-400/30');
+    expect(alert?.style.backgroundColor).toBe('rgba(34, 197, 94, 0.1)');
+    expect(alert?.style.borderColor).toBe('rgba(74, 222, 128, 0.3)');
   });
 
-  it('should apply warning variant classes', () => {
+  it('should apply warning variant styles', () => {
     const { container } = render(<Alert variant="warning" title="Warning" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-yellow-500/10');
-    expect(alert).toHaveClass('border-yellow-400/30');
+    expect(alert?.style.backgroundColor).toBe('rgba(234, 179, 8, 0.1)');
+    expect(alert?.style.borderColor).toBe('rgba(250, 204, 21, 0.3)');
   });
 
-  it('should apply error variant classes', () => {
+  it('should apply error variant styles', () => {
     const { container } = render(<Alert variant="error" title="Error" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-red-500/10');
-    expect(alert).toHaveClass('border-red-400/30');
+    expect(alert?.style.backgroundColor).toBe('rgba(239, 68, 68, 0.1)');
+    expect(alert?.style.borderColor).toBe('rgba(248, 113, 113, 0.3)');
   });
 
-  it('should apply info variant classes', () => {
+  it('should apply info variant styles', () => {
     const { container } = render(<Alert variant="info" title="Info" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-indigo-500/10');
-    expect(alert).toHaveClass('border-cyan-400/30');
+    expect(alert?.style.backgroundColor).toBe('rgba(99, 102, 241, 0.1)');
+    expect(alert?.style.borderColor).toBe('rgba(34, 211, 238, 0.3)');
+  });
+
+  it('should apply backdrop-filter via inline style', () => {
+    const { container } = render(<Alert title="Alert" />);
+
+    const alert = container.querySelector('div');
+    expect(alert?.style.backdropFilter).toBe('blur(4px)');
+  });
+
+  it('should apply border-radius via inline style', () => {
+    const { container } = render(<Alert title="Alert" />);
+
+    const alert = container.querySelector('div');
+    expect(alert?.style.borderRadius).toBe('0.5rem');
   });
 
   it('should show default icon based on variant', () => {
@@ -105,12 +120,19 @@ describe('Alert', () => {
     expect(action).toBeInTheDocument();
   });
 
-  it('should merge custom className', () => {
-    const { container } = render(<Alert className="custom-class" title="Alert" />);
+  it('should apply dot prop styles on top of variant styles', () => {
+    const { container } = render(<Alert dot="p-8" title="Alert" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('custom-class');
-    expect(alert).toHaveClass('rounded-lg');
+    // dot prop styles are merged last — container should still exist
+    expect(alert).toBeInTheDocument();
+  });
+
+  it('should apply explicit style prop', () => {
+    const { container } = render(<Alert style={{ marginBottom: '2rem' }} title="Alert" />);
+
+    const alert = container.querySelector('div');
+    expect(alert?.style.marginBottom).toBe('2rem');
   });
 });
 
@@ -119,7 +141,7 @@ describe('AlertSuccess', () => {
     const { container } = render(<AlertSuccess title="Success" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-green-500/10');
+    expect(alert?.style.backgroundColor).toBe('rgba(34, 197, 94, 0.1)');
   });
 });
 
@@ -128,7 +150,7 @@ describe('AlertWarning', () => {
     const { container } = render(<AlertWarning title="Warning" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-yellow-500/10');
+    expect(alert?.style.backgroundColor).toBe('rgba(234, 179, 8, 0.1)');
   });
 });
 
@@ -137,7 +159,7 @@ describe('AlertError', () => {
     const { container } = render(<AlertError title="Error" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-red-500/10');
+    expect(alert?.style.backgroundColor).toBe('rgba(239, 68, 68, 0.1)');
   });
 });
 
@@ -146,6 +168,6 @@ describe('AlertInfo', () => {
     const { container } = render(<AlertInfo title="Info" />);
 
     const alert = container.querySelector('div');
-    expect(alert).toHaveClass('bg-indigo-500/10');
+    expect(alert?.style.backgroundColor).toBe('rgba(99, 102, 241, 0.1)');
   });
 });

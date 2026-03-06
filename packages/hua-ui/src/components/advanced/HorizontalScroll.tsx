@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 export interface HorizontalScrollProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onProgress'> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'onProgress'> {
   /** 가로 스크롤 컨텐츠 */
   children: React.ReactNode;
   /** 스크롤 높이 배율 (패널 수 × 이 값 = 총 스크롤 높이) @default 1 */
@@ -13,6 +13,9 @@ export interface HorizontalScrollProps
   snap?: boolean;
   /** 진행률 콜백 */
   onProgress?: (progress: number) => void;
+  /** dot 유틸리티 클래스 (outer wrapper에 적용) */
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -28,7 +31,7 @@ const HorizontalScroll = React.forwardRef<HTMLDivElement, HorizontalScrollProps>
       heightMultiplier = 1,
       snap = false,
       onProgress,
-      className,
+      dot: dotProp,
       style,
       ...props
     },
@@ -75,32 +78,50 @@ const HorizontalScroll = React.forwardRef<HTMLDivElement, HorizontalScrollProps>
     const panelCount = React.Children.count(children);
     const totalHeight = `${panelCount * heightMultiplier * 100}vh`;
 
+    const outerStyle = useMemo(
+      () =>
+        mergeStyles(
+          { position: "relative", height: totalHeight } as React.CSSProperties,
+          resolveDot(dotProp),
+          style,
+        ),
+      [totalHeight, dotProp, style]
+    );
+
+    const stickyStyle: React.CSSProperties = {
+      position: "sticky",
+      top: 0,
+      height: "100vh",
+      overflow: "hidden",
+    };
+
+    const trackStyle: React.CSSProperties = {
+      display: "flex",
+      height: "100%",
+      willChange: "transform",
+      transform: `translateX(${-progress * scrollWidth}px)`,
+      ...(snap
+        ? { scrollSnapType: "x mandatory" }
+        : {}),
+    };
+
+    const panelStyle: React.CSSProperties = {
+      flexShrink: 0,
+      width: "100vw",
+      height: "100%",
+      ...(snap ? { scrollSnapAlign: "start" } : {}),
+    };
+
     return (
       <div
         ref={mergeRefs(ref, outerRef)}
-        className={merge("relative", className)}
-        style={{ height: totalHeight, ...style }}
+        style={outerStyle}
         {...props}
       >
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <div
-            ref={innerRef}
-            className={merge(
-              "flex h-full will-change-transform",
-              snap && "scroll-snap-x"
-            )}
-            style={{
-              transform: `translateX(${-progress * scrollWidth}px)`,
-            }}
-          >
+        <div style={stickyStyle}>
+          <div ref={innerRef} style={trackStyle}>
             {React.Children.map(children, (child, i) => (
-              <div
-                key={i}
-                className={merge(
-                  "flex-shrink-0 w-screen h-full",
-                  snap && "snap-start"
-                )}
-              >
+              <div key={i} style={panelStyle}>
                 {child}
               </div>
             ))}

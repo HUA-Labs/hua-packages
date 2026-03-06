@@ -66,6 +66,223 @@
   --btn-neon-glow: rgba(34, 197, 94, 0.5);
   --btn-gradient-from: rgb(20, 184, 166);
   --btn-gradient-to: rgb(6, 182, 212);
+
+  /* EmptyState */
+  --empty-state-default-bg: rgba(241, 245, 249, 0.5);
+  --empty-state-warning-bg: rgba(254, 249, 195, 0.5);
+  --empty-state-info-bg: rgba(238, 242, 255, 0.5);
+  --empty-state-error-bg: rgba(254, 242, 242, 0.5);
+  --empty-state-success-bg: rgba(240, 253, 244, 0.5);
+  --empty-state-default-icon: rgb(100, 116, 139);
+  --empty-state-warning-icon: rgb(234, 179, 8);
+  --empty-state-info-icon: rgb(99, 102, 241);
+  --empty-state-error-icon: rgb(239, 68, 68);
+  --empty-state-success-icon: rgb(34, 197, 94);
+  --empty-state-title: rgb(15, 23, 42);
+  --empty-state-description: rgb(100, 116, 139);
+  --empty-state-border: rgb(226, 232, 240);
+
+  /* ContextMenu */
+  --context-menu-bg: rgb(255, 255, 255);
+  --context-menu-foreground: rgb(15, 23, 42);
+  --context-menu-border: rgba(229, 231, 235, 0.5);
+  --context-menu-item-hover-bg: rgb(241, 245, 249);
+  --context-menu-item-default-color: rgb(15, 23, 42);
+  --context-menu-item-destructive-color: rgb(220, 38, 38);
+  --context-menu-item-destructive-hover-bg: rgba(220, 38, 38, 0.1);
+  --context-menu-item-muted-color: rgb(100, 116, 139);
+  --context-menu-separator-color: rgb(229, 231, 235);
+  --context-menu-label-color: rgb(100, 116, 139);
+
+  /* Upload */
+  --upload-dropzone-bg: rgba(241, 245, 249, 0.5);
+  --upload-dropzone-border: rgb(203, 213, 225);
+  --upload-dropzone-drag-bg: rgba(20, 184, 166, 0.1);
+  --upload-dropzone-drag-border: var(--color-primary, rgb(20, 184, 166));
+  --upload-icon-wrap-bg: rgba(20, 184, 166, 0.1);
+  --upload-icon-wrap-drag-bg: rgba(20, 184, 166, 0.2);
+  --upload-file-bg: rgb(255, 255, 255);
+  --upload-file-border: rgb(226, 232, 240);
+  --upload-file-error-bg: rgba(239, 68, 68, 0.05);
+  --upload-file-error-border: rgba(239, 68, 68, 0.5);
+  --upload-file-icon-bg: rgb(241, 245, 249);
+  --upload-remove-hover-bg: rgb(241, 245, 249);
+
+  /* Form */
+  --form-error-text: rgb(220, 38, 38);
+  --form-glass-bg: rgba(255, 255, 255, 0.1);
+  --form-glass-border: rgba(255, 255, 255, 0.2);
+  --form-glass-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* ActivityFeed */
+  --activity-feed-bg: rgb(255, 255, 255);
+  --activity-feed-border: rgb(229, 231, 235);
+  --activity-feed-title: rgb(31, 41, 55);
+  --activity-feed-link: rgb(147, 51, 234);
+  --activity-feed-link-hover: rgb(126, 34, 206);
+  --activity-feed-divider: rgb(229, 231, 235);
+  --activity-feed-item-hover-bg: rgb(249, 250, 251);
+  --activity-feed-icon-bg: rgb(243, 232, 255);
+  --activity-feed-icon-color: rgb(147, 51, 234);
+  --activity-feed-title-text: rgb(31, 41, 55);
+  --activity-feed-desc-text: rgb(75, 85, 99);
+  --activity-feed-badge-bg: rgb(220, 252, 231);
+  --activity-feed-badge-text: rgb(21, 128, 61);
+  --activity-feed-meta-bg: rgb(243, 232, 255);
+  --activity-feed-meta-text: rgb(109, 40, 217);
+  --activity-feed-timestamp: rgb(107, 114, 128);
+  --activity-feed-empty-text: rgb(107, 114, 128);
+
+  /* ProfileCard */
+  --profile-card-bg: rgb(255, 255, 255);
+  --profile-card-border: rgb(229, 231, 235);
+  --profile-card-gradient-bg: linear-gradient(to bottom right, rgb(238, 242, 255), rgb(250, 245, 255), rgb(253, 242, 248));
+  --profile-card-gradient-border: rgba(255, 255, 255, 0.20);
+  --profile-card-overlay-opacity: 0.10;
+  --profile-card-overlay2-opacity: 0.05;
+  --profile-card-settings-color: rgb(156, 163, 175);
+  --profile-card-avatar-border: rgb(255, 255, 255);
+  --profile-card-name-color: rgb(17, 24, 39);
+  --profile-card-email-color: rgb(75, 85, 99);
+  --profile-card-since-color: rgb(156, 163, 175);
+
+  /* StatCard — shared */
+  --stat-card-empty-bg: rgb(255, 255, 255);
+  --stat-card-empty-border: rgb(226, 232, 240);
+  --stat-card-empty-title: rgb(100, 116, 139);
+  --stat-card-empty-text: rgb(148, 163, 184);
+  --stat-card-value-color: rgb(30, 41, 59);
+  --stat-card-desc-color: rgb(75, 85, 99);
+  --stat-card-trend-muted: rgb(107, 114, 128);
+  --stat-card-trend-pos: rgb(22, 163, 74);
+  --stat-card-trend-neg: rgb(220, 38, 38);
+  --stat-card-loading-bg: rgb(229, 231, 235);
+  /* StatCard — blue */
+  --stat-card-blue-default-bg: rgba(239, 246, 255, 0.5);
+  --stat-card-blue-default-border: rgb(191, 219, 254);
+  --stat-card-blue-gradient-from: rgb(59, 130, 246);
+  --stat-card-blue-gradient-to: rgb(37, 99, 235);
+  --stat-card-blue-gradient-border: rgb(96, 165, 250);
+  --stat-card-blue-outline-border: rgb(147, 197, 253);
+  --stat-card-blue-outline-text: rgb(37, 99, 235);
+  --stat-card-blue-elevated-bg: rgb(255, 255, 255);
+  --stat-card-blue-elevated-border: rgb(191, 219, 254);
+  --stat-card-blue-icon-bg: rgba(219, 234, 254, 0.7);
+  --stat-card-blue-icon-color: rgb(37, 99, 235);
+  --stat-card-blue-badge-bg: rgba(219, 234, 254, 0.5);
+  --stat-card-blue-badge-text: rgb(29, 78, 216);
+  /* StatCard — purple */
+  --stat-card-purple-default-bg: rgba(250, 245, 255, 0.5);
+  --stat-card-purple-default-border: rgb(233, 213, 255);
+  --stat-card-purple-gradient-from: rgb(168, 85, 247);
+  --stat-card-purple-gradient-to: rgb(147, 51, 234);
+  --stat-card-purple-gradient-border: rgb(192, 132, 252);
+  --stat-card-purple-outline-border: rgb(216, 180, 254);
+  --stat-card-purple-outline-text: rgb(147, 51, 234);
+  --stat-card-purple-elevated-bg: rgb(255, 255, 255);
+  --stat-card-purple-elevated-border: rgb(233, 213, 255);
+  --stat-card-purple-icon-bg: rgba(243, 232, 255, 0.7);
+  --stat-card-purple-icon-color: rgb(147, 51, 234);
+  --stat-card-purple-badge-bg: rgba(243, 232, 255, 0.5);
+  --stat-card-purple-badge-text: rgb(126, 34, 206);
+  /* StatCard — green */
+  --stat-card-green-default-bg: rgba(240, 253, 244, 0.5);
+  --stat-card-green-default-border: rgb(187, 247, 208);
+  --stat-card-green-gradient-from: rgb(34, 197, 94);
+  --stat-card-green-gradient-to: rgb(22, 163, 74);
+  --stat-card-green-gradient-border: rgb(74, 222, 128);
+  --stat-card-green-outline-border: rgb(134, 239, 172);
+  --stat-card-green-outline-text: rgb(22, 163, 74);
+  --stat-card-green-elevated-bg: rgb(255, 255, 255);
+  --stat-card-green-elevated-border: rgb(187, 247, 208);
+  --stat-card-green-icon-bg: rgba(220, 252, 231, 0.7);
+  --stat-card-green-icon-color: rgb(22, 163, 74);
+  --stat-card-green-badge-bg: rgba(220, 252, 231, 0.5);
+  --stat-card-green-badge-text: rgb(21, 128, 61);
+  /* StatCard — orange */
+  --stat-card-orange-default-bg: rgba(255, 247, 237, 0.5);
+  --stat-card-orange-default-border: rgb(254, 215, 170);
+  --stat-card-orange-gradient-from: rgb(249, 115, 22);
+  --stat-card-orange-gradient-to: rgb(234, 88, 12);
+  --stat-card-orange-gradient-border: rgb(251, 146, 60);
+  --stat-card-orange-outline-border: rgb(253, 186, 116);
+  --stat-card-orange-outline-text: rgb(234, 88, 12);
+  --stat-card-orange-elevated-bg: rgb(255, 255, 255);
+  --stat-card-orange-elevated-border: rgb(254, 215, 170);
+  --stat-card-orange-icon-bg: rgba(255, 237, 213, 0.7);
+  --stat-card-orange-icon-color: rgb(234, 88, 12);
+  --stat-card-orange-badge-bg: rgba(255, 237, 213, 0.5);
+  --stat-card-orange-badge-text: rgb(194, 65, 12);
+  /* StatCard — red */
+  --stat-card-red-default-bg: rgba(254, 242, 242, 0.5);
+  --stat-card-red-default-border: rgb(254, 202, 202);
+  --stat-card-red-gradient-from: rgb(239, 68, 68);
+  --stat-card-red-gradient-to: rgb(220, 38, 38);
+  --stat-card-red-gradient-border: rgb(248, 113, 113);
+  --stat-card-red-outline-border: rgb(252, 165, 165);
+  --stat-card-red-outline-text: rgb(220, 38, 38);
+  --stat-card-red-elevated-bg: rgb(255, 255, 255);
+  --stat-card-red-elevated-border: rgb(254, 202, 202);
+  --stat-card-red-icon-bg: rgba(254, 226, 226, 0.7);
+  --stat-card-red-icon-color: rgb(220, 38, 38);
+  --stat-card-red-badge-bg: rgba(254, 226, 226, 0.5);
+  --stat-card-red-badge-text: rgb(185, 28, 28);
+  /* StatCard — indigo */
+  --stat-card-indigo-default-bg: rgba(238, 242, 255, 0.5);
+  --stat-card-indigo-default-border: rgb(199, 210, 254);
+  --stat-card-indigo-gradient-from: rgb(99, 102, 241);
+  --stat-card-indigo-gradient-to: rgb(79, 70, 229);
+  --stat-card-indigo-gradient-border: rgb(129, 140, 248);
+  --stat-card-indigo-outline-border: rgb(165, 180, 252);
+  --stat-card-indigo-outline-text: rgb(79, 70, 229);
+  --stat-card-indigo-elevated-bg: rgb(255, 255, 255);
+  --stat-card-indigo-elevated-border: rgb(199, 210, 254);
+  --stat-card-indigo-icon-bg: rgba(224, 231, 255, 0.7);
+  --stat-card-indigo-icon-color: rgb(79, 70, 229);
+  --stat-card-indigo-badge-bg: rgba(224, 231, 255, 0.5);
+  --stat-card-indigo-badge-text: rgb(67, 56, 202);
+  /* StatCard — pink */
+  --stat-card-pink-default-bg: rgba(253, 242, 248, 0.5);
+  --stat-card-pink-default-border: rgb(251, 207, 232);
+  --stat-card-pink-gradient-from: rgb(236, 72, 153);
+  --stat-card-pink-gradient-to: rgb(219, 39, 119);
+  --stat-card-pink-gradient-border: rgb(244, 114, 182);
+  --stat-card-pink-outline-border: rgb(249, 168, 212);
+  --stat-card-pink-outline-text: rgb(219, 39, 119);
+  --stat-card-pink-elevated-bg: rgb(255, 255, 255);
+  --stat-card-pink-elevated-border: rgb(251, 207, 232);
+  --stat-card-pink-icon-bg: rgba(252, 231, 243, 0.7);
+  --stat-card-pink-icon-color: rgb(219, 39, 119);
+  --stat-card-pink-badge-bg: rgba(252, 231, 243, 0.5);
+  --stat-card-pink-badge-text: rgb(190, 24, 93);
+  /* StatCard — gray */
+  --stat-card-gray-default-bg: rgba(249, 250, 251, 0.5);
+  --stat-card-gray-default-border: rgb(229, 231, 235);
+  --stat-card-gray-gradient-from: rgb(107, 114, 128);
+  --stat-card-gray-gradient-to: rgb(75, 85, 99);
+  --stat-card-gray-gradient-border: rgb(156, 163, 175);
+  --stat-card-gray-outline-border: rgb(209, 213, 219);
+  --stat-card-gray-outline-text: rgb(75, 85, 99);
+  --stat-card-gray-elevated-bg: rgb(255, 255, 255);
+  --stat-card-gray-elevated-border: rgb(229, 231, 235);
+  --stat-card-gray-icon-bg: rgba(243, 244, 246, 0.7);
+  --stat-card-gray-icon-color: rgb(75, 85, 99);
+  --stat-card-gray-badge-bg: rgba(243, 244, 246, 0.5);
+  --stat-card-gray-badge-text: rgb(55, 65, 81);
+  /* StatCard — cyan */
+  --stat-card-cyan-default-bg: rgba(236, 254, 255, 0.5);
+  --stat-card-cyan-default-border: rgb(165, 243, 252);
+  --stat-card-cyan-gradient-from: rgb(6, 182, 212);
+  --stat-card-cyan-gradient-to: rgb(8, 145, 178);
+  --stat-card-cyan-gradient-border: rgb(34, 211, 238);
+  --stat-card-cyan-outline-border: rgb(103, 232, 249);
+  --stat-card-cyan-outline-text: rgb(8, 145, 178);
+  --stat-card-cyan-elevated-bg: rgb(255, 255, 255);
+  --stat-card-cyan-elevated-border: rgb(165, 243, 252);
+  --stat-card-cyan-icon-bg: rgba(207, 250, 254, 0.7);
+  --stat-card-cyan-icon-color: rgb(8, 145, 178);
+  --stat-card-cyan-badge-bg: rgba(207, 250, 254, 0.5);
+  --stat-card-cyan-badge-text: rgb(14, 116, 144);
 }
 
 .dark {
@@ -126,4 +343,221 @@
   --btn-neon-glow: rgba(74, 222, 128, 0.5);
   --btn-gradient-from: rgb(45, 212, 191);
   --btn-gradient-to: rgb(34, 211, 238);
+
+  /* EmptyState */
+  --empty-state-default-bg: rgba(30, 41, 59, 0.3);
+  --empty-state-warning-bg: rgba(78, 55, 0, 0.2);
+  --empty-state-info-bg: rgba(49, 46, 129, 0.2);
+  --empty-state-error-bg: rgba(127, 29, 29, 0.2);
+  --empty-state-success-bg: rgba(20, 83, 45, 0.2);
+  --empty-state-default-icon: rgb(148, 163, 184);
+  --empty-state-warning-icon: rgb(250, 204, 21);
+  --empty-state-info-icon: rgb(129, 140, 248);
+  --empty-state-error-icon: rgb(248, 113, 113);
+  --empty-state-success-icon: rgb(74, 222, 128);
+  --empty-state-title: rgb(241, 245, 249);
+  --empty-state-description: rgb(148, 163, 184);
+  --empty-state-border: rgb(51, 65, 85);
+
+  /* ContextMenu */
+  --context-menu-bg: rgb(31, 41, 55);
+  --context-menu-foreground: rgb(241, 245, 249);
+  --context-menu-border: rgba(55, 65, 81, 0.5);
+  --context-menu-item-hover-bg: rgb(55, 65, 81);
+  --context-menu-item-default-color: rgb(241, 245, 249);
+  --context-menu-item-destructive-color: rgb(248, 113, 113);
+  --context-menu-item-destructive-hover-bg: rgba(248, 113, 113, 0.1);
+  --context-menu-item-muted-color: rgb(148, 163, 184);
+  --context-menu-separator-color: rgb(55, 65, 81);
+  --context-menu-label-color: rgb(148, 163, 184);
+
+  /* Upload */
+  --upload-dropzone-bg: rgba(30, 41, 59, 0.5);
+  --upload-dropzone-border: rgb(55, 65, 81);
+  --upload-dropzone-drag-bg: rgba(45, 212, 191, 0.1);
+  --upload-dropzone-drag-border: var(--color-primary, rgb(45, 212, 191));
+  --upload-icon-wrap-bg: rgba(45, 212, 191, 0.1);
+  --upload-icon-wrap-drag-bg: rgba(45, 212, 191, 0.2);
+  --upload-file-bg: rgb(15, 23, 42);
+  --upload-file-border: rgb(55, 65, 81);
+  --upload-file-error-bg: rgba(248, 113, 113, 0.05);
+  --upload-file-error-border: rgba(248, 113, 113, 0.5);
+  --upload-file-icon-bg: rgb(30, 41, 59);
+  --upload-remove-hover-bg: rgb(30, 41, 59);
+
+  /* Form */
+  --form-error-text: rgb(248, 113, 113);
+  --form-glass-bg: rgba(30, 41, 59, 0.2);
+  --form-glass-border: rgba(51, 65, 85, 0.5);
+  --form-glass-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+
+  /* ActivityFeed */
+  --activity-feed-bg: rgb(31, 41, 55);
+  --activity-feed-border: rgb(55, 65, 81);
+  --activity-feed-title: rgb(255, 255, 255);
+  --activity-feed-link: rgb(192, 132, 252);
+  --activity-feed-link-hover: rgb(216, 180, 254);
+  --activity-feed-divider: rgb(55, 65, 81);
+  --activity-feed-item-hover-bg: rgba(55, 65, 81, 0.5);
+  --activity-feed-icon-bg: rgba(88, 28, 135, 0.3);
+  --activity-feed-icon-color: rgb(192, 132, 252);
+  --activity-feed-title-text: rgb(255, 255, 255);
+  --activity-feed-desc-text: rgb(209, 213, 219);
+  --activity-feed-badge-bg: rgba(20, 83, 45, 0.3);
+  --activity-feed-badge-text: rgb(134, 239, 172);
+  --activity-feed-meta-bg: rgba(88, 28, 135, 0.3);
+  --activity-feed-meta-text: rgb(216, 180, 254);
+  --activity-feed-timestamp: rgb(156, 163, 175);
+  --activity-feed-empty-text: rgb(156, 163, 175);
+
+  /* ProfileCard (dark) */
+  --profile-card-bg: rgb(31, 41, 55);
+  --profile-card-border: rgb(55, 65, 81);
+  --profile-card-gradient-bg: linear-gradient(to bottom right, rgb(31, 41, 55), rgb(31, 41, 55), rgb(17, 24, 39));
+  --profile-card-gradient-border: rgba(55, 65, 81, 0.20);
+  --profile-card-overlay-opacity: 0.20;
+  --profile-card-overlay2-opacity: 0.15;
+  --profile-card-settings-color: rgb(209, 213, 219);
+  --profile-card-avatar-border: rgb(55, 65, 81);
+  --profile-card-name-color: rgb(255, 255, 255);
+  --profile-card-email-color: rgb(156, 163, 175);
+  --profile-card-since-color: rgb(156, 163, 175);
+
+  /* StatCard — shared (dark) */
+  --stat-card-empty-bg: rgb(15, 23, 42);
+  --stat-card-empty-border: rgb(51, 65, 85);
+  --stat-card-empty-title: rgb(148, 163, 184);
+  --stat-card-empty-text: rgb(100, 116, 139);
+  --stat-card-value-color: rgb(255, 255, 255);
+  --stat-card-desc-color: rgb(209, 213, 219);
+  --stat-card-trend-muted: rgb(156, 163, 175);
+  --stat-card-trend-pos: rgb(74, 222, 128);
+  --stat-card-trend-neg: rgb(248, 113, 113);
+  --stat-card-loading-bg: rgb(55, 65, 81);
+  /* StatCard — blue (dark) */
+  --stat-card-blue-default-bg: rgba(29, 78, 216, 0.1);
+  --stat-card-blue-default-border: rgb(29, 78, 216);
+  --stat-card-blue-gradient-from: rgb(59, 130, 246);
+  --stat-card-blue-gradient-to: rgb(37, 99, 235);
+  --stat-card-blue-gradient-border: rgb(37, 99, 235);
+  --stat-card-blue-outline-border: rgb(29, 78, 216);
+  --stat-card-blue-outline-text: rgb(147, 197, 253);
+  --stat-card-blue-elevated-bg: rgb(15, 23, 42);
+  --stat-card-blue-elevated-border: rgb(29, 78, 216);
+  --stat-card-blue-icon-bg: rgba(29, 78, 216, 0.2);
+  --stat-card-blue-icon-color: rgb(147, 197, 253);
+  --stat-card-blue-badge-bg: rgba(29, 78, 216, 0.2);
+  --stat-card-blue-badge-text: rgb(147, 197, 253);
+  /* StatCard — purple (dark) */
+  --stat-card-purple-default-bg: rgba(126, 34, 206, 0.1);
+  --stat-card-purple-default-border: rgb(126, 34, 206);
+  --stat-card-purple-gradient-from: rgb(168, 85, 247);
+  --stat-card-purple-gradient-to: rgb(147, 51, 234);
+  --stat-card-purple-gradient-border: rgb(147, 51, 234);
+  --stat-card-purple-outline-border: rgb(126, 34, 206);
+  --stat-card-purple-outline-text: rgb(216, 180, 254);
+  --stat-card-purple-elevated-bg: rgb(15, 23, 42);
+  --stat-card-purple-elevated-border: rgb(126, 34, 206);
+  --stat-card-purple-icon-bg: rgba(126, 34, 206, 0.2);
+  --stat-card-purple-icon-color: rgb(216, 180, 254);
+  --stat-card-purple-badge-bg: rgba(126, 34, 206, 0.2);
+  --stat-card-purple-badge-text: rgb(216, 180, 254);
+  /* StatCard — green (dark) */
+  --stat-card-green-default-bg: rgba(21, 128, 61, 0.1);
+  --stat-card-green-default-border: rgb(21, 128, 61);
+  --stat-card-green-gradient-from: rgb(34, 197, 94);
+  --stat-card-green-gradient-to: rgb(22, 163, 74);
+  --stat-card-green-gradient-border: rgb(22, 163, 74);
+  --stat-card-green-outline-border: rgb(21, 128, 61);
+  --stat-card-green-outline-text: rgb(134, 239, 172);
+  --stat-card-green-elevated-bg: rgb(15, 23, 42);
+  --stat-card-green-elevated-border: rgb(21, 128, 61);
+  --stat-card-green-icon-bg: rgba(21, 128, 61, 0.2);
+  --stat-card-green-icon-color: rgb(134, 239, 172);
+  --stat-card-green-badge-bg: rgba(21, 128, 61, 0.2);
+  --stat-card-green-badge-text: rgb(134, 239, 172);
+  /* StatCard — orange (dark) */
+  --stat-card-orange-default-bg: rgba(194, 65, 12, 0.1);
+  --stat-card-orange-default-border: rgb(194, 65, 12);
+  --stat-card-orange-gradient-from: rgb(249, 115, 22);
+  --stat-card-orange-gradient-to: rgb(234, 88, 12);
+  --stat-card-orange-gradient-border: rgb(234, 88, 12);
+  --stat-card-orange-outline-border: rgb(194, 65, 12);
+  --stat-card-orange-outline-text: rgb(253, 186, 116);
+  --stat-card-orange-elevated-bg: rgb(15, 23, 42);
+  --stat-card-orange-elevated-border: rgb(194, 65, 12);
+  --stat-card-orange-icon-bg: rgba(194, 65, 12, 0.2);
+  --stat-card-orange-icon-color: rgb(253, 186, 116);
+  --stat-card-orange-badge-bg: rgba(194, 65, 12, 0.2);
+  --stat-card-orange-badge-text: rgb(253, 186, 116);
+  /* StatCard — red (dark) */
+  --stat-card-red-default-bg: rgba(185, 28, 28, 0.1);
+  --stat-card-red-default-border: rgb(185, 28, 28);
+  --stat-card-red-gradient-from: rgb(239, 68, 68);
+  --stat-card-red-gradient-to: rgb(220, 38, 38);
+  --stat-card-red-gradient-border: rgb(220, 38, 38);
+  --stat-card-red-outline-border: rgb(185, 28, 28);
+  --stat-card-red-outline-text: rgb(252, 165, 165);
+  --stat-card-red-elevated-bg: rgb(15, 23, 42);
+  --stat-card-red-elevated-border: rgb(185, 28, 28);
+  --stat-card-red-icon-bg: rgba(185, 28, 28, 0.2);
+  --stat-card-red-icon-color: rgb(252, 165, 165);
+  --stat-card-red-badge-bg: rgba(185, 28, 28, 0.2);
+  --stat-card-red-badge-text: rgb(252, 165, 165);
+  /* StatCard — indigo (dark) */
+  --stat-card-indigo-default-bg: rgba(67, 56, 202, 0.1);
+  --stat-card-indigo-default-border: rgb(67, 56, 202);
+  --stat-card-indigo-gradient-from: rgb(99, 102, 241);
+  --stat-card-indigo-gradient-to: rgb(79, 70, 229);
+  --stat-card-indigo-gradient-border: rgb(79, 70, 229);
+  --stat-card-indigo-outline-border: rgb(67, 56, 202);
+  --stat-card-indigo-outline-text: rgb(165, 180, 252);
+  --stat-card-indigo-elevated-bg: rgb(15, 23, 42);
+  --stat-card-indigo-elevated-border: rgb(67, 56, 202);
+  --stat-card-indigo-icon-bg: rgba(67, 56, 202, 0.2);
+  --stat-card-indigo-icon-color: rgb(165, 180, 252);
+  --stat-card-indigo-badge-bg: rgba(67, 56, 202, 0.2);
+  --stat-card-indigo-badge-text: rgb(165, 180, 252);
+  /* StatCard — pink (dark) */
+  --stat-card-pink-default-bg: rgba(190, 24, 93, 0.1);
+  --stat-card-pink-default-border: rgb(190, 24, 93);
+  --stat-card-pink-gradient-from: rgb(236, 72, 153);
+  --stat-card-pink-gradient-to: rgb(219, 39, 119);
+  --stat-card-pink-gradient-border: rgb(219, 39, 119);
+  --stat-card-pink-outline-border: rgb(190, 24, 93);
+  --stat-card-pink-outline-text: rgb(249, 168, 212);
+  --stat-card-pink-elevated-bg: rgb(15, 23, 42);
+  --stat-card-pink-elevated-border: rgb(190, 24, 93);
+  --stat-card-pink-icon-bg: rgba(190, 24, 93, 0.2);
+  --stat-card-pink-icon-color: rgb(249, 168, 212);
+  --stat-card-pink-badge-bg: rgba(190, 24, 93, 0.2);
+  --stat-card-pink-badge-text: rgb(249, 168, 212);
+  /* StatCard — gray (dark) */
+  --stat-card-gray-default-bg: rgba(55, 65, 81, 0.3);
+  --stat-card-gray-default-border: rgb(75, 85, 99);
+  --stat-card-gray-gradient-from: rgb(107, 114, 128);
+  --stat-card-gray-gradient-to: rgb(75, 85, 99);
+  --stat-card-gray-gradient-border: rgb(75, 85, 99);
+  --stat-card-gray-outline-border: rgb(75, 85, 99);
+  --stat-card-gray-outline-text: rgb(209, 213, 219);
+  --stat-card-gray-elevated-bg: rgb(15, 23, 42);
+  --stat-card-gray-elevated-border: rgb(75, 85, 99);
+  --stat-card-gray-icon-bg: rgba(75, 85, 99, 0.3);
+  --stat-card-gray-icon-color: rgb(209, 213, 219);
+  --stat-card-gray-badge-bg: rgba(75, 85, 99, 0.3);
+  --stat-card-gray-badge-text: rgb(209, 213, 219);
+  /* StatCard — cyan (dark) */
+  --stat-card-cyan-default-bg: rgba(14, 116, 144, 0.1);
+  --stat-card-cyan-default-border: rgb(14, 116, 144);
+  --stat-card-cyan-gradient-from: rgb(6, 182, 212);
+  --stat-card-cyan-gradient-to: rgb(8, 145, 178);
+  --stat-card-cyan-gradient-border: rgb(8, 145, 178);
+  --stat-card-cyan-outline-border: rgb(14, 116, 144);
+  --stat-card-cyan-outline-text: rgb(103, 232, 249);
+  --stat-card-cyan-elevated-bg: rgb(15, 23, 42);
+  --stat-card-cyan-elevated-border: rgb(14, 116, 144);
+  --stat-card-cyan-icon-bg: rgba(14, 116, 144, 0.2);
+  --stat-card-cyan-icon-color: rgb(103, 232, 249);
+  --stat-card-cyan-badge-bg: rgba(14, 116, 144, 0.2);
+  --stat-card-cyan-badge-text: rgb(103, 232, 249);
 }

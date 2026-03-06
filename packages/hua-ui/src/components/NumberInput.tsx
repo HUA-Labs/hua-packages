@@ -1,8 +1,126 @@
 "use client";
 
-import React from "react";
-import { merge } from "../lib/utils";
+import React, { useMemo, useState } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
+// ---------------------------------------------------------------------------
+// Size tokens
+// ---------------------------------------------------------------------------
+const SIZE_STYLES = {
+  sm: {
+    input: {
+      height: '2rem',       // h-8 = 32px
+      padding: '0.25rem 0.5rem', // py-1 px-2
+      fontSize: '0.875rem', // text-sm
+    } satisfies React.CSSProperties,
+    button: {
+      width: '2rem',        // w-8
+      height: '2rem',       // h-8
+      fontSize: '0.875rem', // text-sm
+    } satisfies React.CSSProperties,
+    wrapper: {
+      gap: '0.25rem',       // gap-1
+    } satisfies React.CSSProperties,
+  },
+  md: {
+    input: {
+      height: '2.5rem',     // h-10 = 40px
+      padding: '0.5rem 0.75rem', // py-2 px-3
+      fontSize: '0.875rem', // text-sm
+    } satisfies React.CSSProperties,
+    button: {
+      width: '2.5rem',      // w-10
+      height: '2.5rem',     // h-10
+      fontSize: '0.875rem', // text-sm
+    } satisfies React.CSSProperties,
+    wrapper: {
+      gap: '0.5rem',        // gap-2
+    } satisfies React.CSSProperties,
+  },
+  lg: {
+    input: {
+      height: '3rem',       // h-12 = 48px
+      padding: '0.625rem 1rem', // py-2.5 px-4
+      fontSize: '1rem',     // text-base
+    } satisfies React.CSSProperties,
+    button: {
+      width: '3rem',        // w-12
+      height: '3rem',       // h-12
+      fontSize: '1rem',     // text-base
+    } satisfies React.CSSProperties,
+    wrapper: {
+      gap: '0.5rem',        // gap-2
+    } satisfies React.CSSProperties,
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Base style objects
+// ---------------------------------------------------------------------------
+const WRAPPER_BASE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+};
+
+const BUTTON_BASE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '0.375rem',
+  border: '1px solid var(--color-input)',
+  backgroundColor: 'var(--color-background)',
+  cursor: 'pointer',
+  transition: 'all 150ms ease',
+  flexShrink: 0,
+};
+
+const BUTTON_HOVER: React.CSSProperties = {
+  backgroundColor: 'var(--color-secondary)',
+  borderColor: 'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+};
+
+const BUTTON_ACTIVE: React.CSSProperties = {
+  transform: 'scale(0.95)',
+};
+
+const BUTTON_DISABLED: React.CSSProperties = {
+  opacity: 0.5,
+  cursor: 'not-allowed',
+  backgroundColor: 'var(--color-background)',
+};
+
+const BUTTON_FOCUS: React.CSSProperties = {
+  outline: 'none',
+  boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px color-mix(in srgb, var(--color-ring) 30%, transparent)',
+};
+
+const INPUT_BASE: React.CSSProperties = {
+  width: '4rem',
+  textAlign: 'center',
+  borderRadius: '0.375rem',
+  border: '1px solid var(--color-input)',
+  backgroundColor: 'var(--color-background)',
+  color: 'var(--color-foreground)',
+  transition: 'all 150ms ease',
+  // Hide browser spinners
+  appearance: 'textfield',
+  MozAppearance: 'textfield',
+  WebkitAppearance: 'textfield',
+};
+
+const INPUT_FOCUS: React.CSSProperties = {
+  outline: 'none',
+  boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px color-mix(in srgb, var(--color-ring) 30%, transparent)',
+};
+
+const INPUT_DISABLED: React.CSSProperties = {
+  opacity: 0.5,
+  cursor: 'not-allowed',
+};
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
 /**
  * NumberInput 컴포넌트의 props / NumberInput component props
  * @typedef {Object} NumberInputProps
@@ -16,9 +134,14 @@ import { merge } from "../lib/utils";
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
  * @property {boolean} [showButtons=true] - +/- 버튼 표시 / Show +/- buttons
  * @property {"horizontal" | "vertical"} [buttonLayout="horizontal"] - 버튼 배치 / Button layout
- * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
+ * @property {string} [dot] - dot utility string for additional styles / dot 유틸리티 문자열
+ * @property {React.CSSProperties} [style] - 추가 인라인 스타일 / Additional inline style
  */
-export interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value" | "defaultValue" | "size" | "type"> {
+export interface NumberInputProps
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "onChange" | "value" | "defaultValue" | "size" | "type" | "className"
+  > {
   value?: number;
   defaultValue?: number;
   min?: number;
@@ -29,8 +152,70 @@ export interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInp
   size?: "sm" | "md" | "lg";
   showButtons?: boolean;
   buttonLayout?: "horizontal" | "vertical";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
+// ---------------------------------------------------------------------------
+// Sub-components: interactive button with hover/active/focus state
+// ---------------------------------------------------------------------------
+function StepButton({
+  onClick,
+  disabled,
+  ariaLabel,
+  sizeStyle,
+  extraStyle,
+  children,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  ariaLabel: string;
+  sizeStyle: React.CSSProperties;
+  extraStyle?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const style = useMemo((): React.CSSProperties =>
+    mergeStyles(
+      BUTTON_BASE,
+      sizeStyle,
+      extraStyle,
+      disabled
+        ? BUTTON_DISABLED
+        : mergeStyles(
+            isHovered ? BUTTON_HOVER : undefined,
+            isActive ? BUTTON_ACTIVE : undefined,
+          ),
+      isFocused ? BUTTON_FOCUS : undefined,
+    ),
+    [sizeStyle, extraStyle, disabled, isHovered, isActive, isFocused]
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={style}
+      aria-label={ariaLabel}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setIsActive(false); }}
+      onMouseDown={() => setIsActive(true)}
+      onMouseUp={() => setIsActive(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 /**
  * NumberInput 컴포넌트 / NumberInput component
  *
@@ -66,18 +251,22 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       size = "md",
       showButtons = true,
       buttonLayout = "horizontal",
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
     const [internalValue, setInternalValue] = React.useState(defaultValue);
+    const [isInputFocused, setIsInputFocused] = useState(false);
+
     const isControlled = controlledValue !== undefined;
     const currentValue = isControlled ? controlledValue : internalValue;
 
+    const sizes = SIZE_STYLES[size];
+
     const updateValue = React.useCallback(
       (newValue: number) => {
-        // Clamp to min/max
         let clampedValue = newValue;
         if (min !== undefined) clampedValue = Math.max(min, clampedValue);
         if (max !== undefined) clampedValue = Math.min(max, clampedValue);
@@ -102,13 +291,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value;
-      // Allow empty string, minus sign alone (for typing negative numbers), or valid numbers
-      if (inputValue === "" || inputValue === "-") {
-        return;
-      }
+      if (inputValue === "" || inputValue === "-") return;
       const newValue = parseFloat(inputValue);
       if (!isNaN(newValue)) {
-        // If min is set, enforce it on direct input
         if (min !== undefined && newValue < min) {
           updateValue(min);
         } else {
@@ -118,13 +303,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      // On blur, ensure value is within bounds
-      if (min !== undefined && currentValue < min) {
-        updateValue(min);
-      }
-      if (max !== undefined && currentValue > max) {
-        updateValue(max);
-      }
+      setIsInputFocused(false);
+      if (min !== undefined && currentValue < min) updateValue(min);
+      if (max !== undefined && currentValue > max) updateValue(max);
       props.onBlur?.(e);
     };
 
@@ -138,64 +319,61 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       }
     };
 
-    // Spacing system: 4px grid
-    // sm: h-8 (32px), px-2 (8px), gap-1 (4px)
-    // md: h-10 (40px), px-3 (12px), gap-2 (8px)
-    // lg: h-12 (48px), px-4 (16px), gap-2 (8px)
-    const sizeClasses = {
-      sm: {
-        input: "h-8 text-sm px-2 py-1",
-        button: "w-8 h-8 text-sm",
-        wrapper: "gap-1",
-      },
-      md: {
-        input: "h-10 text-sm px-3 py-2",
-        button: "w-10 h-10 text-sm",
-        wrapper: "gap-2",
-      },
-      lg: {
-        input: "h-12 text-base px-4 py-2.5",
-        button: "w-12 h-12 text-base",
-        wrapper: "gap-2",
-      },
-    };
-
-    const sizes = sizeClasses[size];
-
-    const buttonBase = merge(
-      "flex items-center justify-center rounded-md border border-input bg-background",
-      "hover:bg-secondary hover:border-primary/50 active:scale-95",
-      "transition-all duration-150",
-      "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background",
-      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
-      sizes.button
-    );
-
     const canDecrement = min === undefined || currentValue > min;
     const canIncrement = max === undefined || currentValue < max;
 
+    // Wrapper style
+    const wrapperStyle = useMemo((): React.CSSProperties =>
+      mergeStyles(WRAPPER_BASE, sizes.wrapper, resolveDot(dotProp), style),
+      [sizes.wrapper, dotProp, style]
+    );
+
+    // Input style
+    const inputStyle = useMemo((): React.CSSProperties =>
+      mergeStyles(
+        INPUT_BASE,
+        sizes.input,
+        disabled ? INPUT_DISABLED : undefined,
+        isInputFocused ? INPUT_FOCUS : undefined,
+      ),
+      [sizes.input, disabled, isInputFocused]
+    );
+
     if (buttonLayout === "vertical") {
+      const halfButtonStyle: React.CSSProperties = {
+        ...sizes.button,
+        height: 'calc(50% - 1px)',
+      };
+      const topButtonExtra: React.CSSProperties = {
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+      };
+      const bottomButtonExtra: React.CSSProperties = {
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+      };
+
       return (
-        <div className={merge("inline-flex items-center", sizes.wrapper, className)}>
-          <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
+        <div style={wrapperStyle}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+            <StepButton
               onClick={increment}
               disabled={disabled || !canIncrement}
-              className={merge(buttonBase, "rounded-b-none h-[calc(50%-1px)]")}
-              aria-label="Increase"
+              ariaLabel="Increase"
+              sizeStyle={halfButtonStyle}
+              extraStyle={topButtonExtra}
             >
               <ChevronUp className="w-3 h-3" />
-            </button>
-            <button
-              type="button"
+            </StepButton>
+            <StepButton
               onClick={decrement}
               disabled={disabled || !canDecrement}
-              className={merge(buttonBase, "rounded-t-none h-[calc(50%-1px)]")}
-              aria-label="Decrease"
+              ariaLabel="Decrease"
+              sizeStyle={halfButtonStyle}
+              extraStyle={bottomButtonExtra}
             >
               <ChevronDown className="w-3 h-3" />
-            </button>
+            </StepButton>
           </div>
           <input
             ref={ref}
@@ -206,14 +384,9 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
+            onFocus={() => setIsInputFocused(true)}
             disabled={disabled}
-            className={merge(
-              "w-16 text-center rounded-md border border-input bg-background",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-              sizes.input
-            )}
+            style={inputStyle}
             {...props}
           />
         </div>
@@ -221,17 +394,16 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     }
 
     return (
-      <div className={merge("inline-flex items-center", sizes.wrapper, className)}>
+      <div style={wrapperStyle}>
         {showButtons && (
-          <button
-            type="button"
+          <StepButton
             onClick={decrement}
             disabled={disabled || !canDecrement}
-            className={buttonBase}
-            aria-label="Decrease"
+            ariaLabel="Decrease"
+            sizeStyle={sizes.button}
           >
             <Minus className="w-3.5 h-3.5" />
-          </button>
+          </StepButton>
         )}
         <input
           ref={ref}
@@ -242,26 +414,20 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
+          onFocus={() => setIsInputFocused(true)}
           disabled={disabled}
-          className={merge(
-            "w-16 text-center rounded-md border border-input bg-background",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-            sizes.input
-          )}
+          style={inputStyle}
           {...props}
         />
         {showButtons && (
-          <button
-            type="button"
+          <StepButton
             onClick={increment}
             disabled={disabled || !canIncrement}
-            className={buttonBase}
-            aria-label="Increase"
+            ariaLabel="Increase"
+            sizeStyle={sizes.button}
           >
             <Plus className="w-3.5 h-3.5" />
-          </button>
+          </StepButton>
         )}
       </div>
     );
@@ -270,15 +436,12 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
 NumberInput.displayName = "NumberInput";
 
-// Simple icon components to avoid external dependency
+// ---------------------------------------------------------------------------
+// Icon sub-components (className kept for SVG sizing only)
+// ---------------------------------------------------------------------------
 function Minus({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
     </svg>
   );
@@ -286,12 +449,7 @@ function Minus({ className }: { className?: string }) {
 
 function Plus({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
     </svg>
   );
@@ -299,12 +457,7 @@ function Plus({ className }: { className?: string }) {
 
 function ChevronUp({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
     </svg>
   );
@@ -312,12 +465,7 @@ function ChevronUp({ className }: { className?: string }) {
 
 function ChevronDown({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
   );

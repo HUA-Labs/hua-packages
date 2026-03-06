@@ -1,9 +1,70 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
+
+/**
+ * InfoCard tone CSS variables — injected once into <head>.
+ * Light values are on :root, dark values on .dark (next-themes convention).
+ */
+const INFO_CARD_STYLE_ID = "hua-info-card-vars"
+
+function ensureInfoCardVars() {
+  if (typeof document === "undefined") return
+  if (document.getElementById(INFO_CARD_STYLE_ID)) return
+  const style = document.createElement("style")
+  style.id = INFO_CARD_STYLE_ID
+  style.textContent = `
+:root {
+  --ic-blue-bg: linear-gradient(to right, #eef2ff, #eef2ff);
+  --ic-blue-border: #c7d2fe;
+  --ic-blue-icon: #4f46e5;
+  --ic-blue-title: #1e1b4b;
+  --ic-purple-bg: linear-gradient(to right, #f5f3ff, #fdf2f8);
+  --ic-purple-border: #d8b4fe;
+  --ic-purple-icon: #9333ea;
+  --ic-purple-title: #3b0764;
+  --ic-green-bg: linear-gradient(to right, #f0fdf4, #ecfdf5);
+  --ic-green-border: #bbf7d0;
+  --ic-green-icon: #16a34a;
+  --ic-green-title: #052e16;
+  --ic-orange-bg: linear-gradient(to right, #fff7ed, #fff1f2);
+  --ic-orange-border: #fed7aa;
+  --ic-orange-icon: #ea580c;
+  --ic-orange-title: #431407;
+}
+.dark {
+  --ic-blue-bg: linear-gradient(to right, rgba(67,56,202,0.2), rgba(67,56,202,0.2));
+  --ic-blue-border: #4338ca;
+  --ic-blue-icon: #818cf8;
+  --ic-blue-title: #e0e7ff;
+  --ic-purple-bg: linear-gradient(to right, rgba(107,33,168,0.2), rgba(131,24,67,0.2));
+  --ic-purple-border: #7e22ce;
+  --ic-purple-icon: #c084fc;
+  --ic-purple-title: #f3e8ff;
+  --ic-green-bg: linear-gradient(to right, rgba(21,128,61,0.2), rgba(6,95,70,0.2));
+  --ic-green-border: #15803d;
+  --ic-green-icon: #86efac;
+  --ic-green-title: #dcfce7;
+  --ic-orange-bg: linear-gradient(to right, rgba(194,65,12,0.2), rgba(159,18,57,0.2));
+  --ic-orange-border: #c2410c;
+  --ic-orange-icon: #fdba74;
+  --ic-orange-title: #ffedd5;
+}
+`
+  document.head.appendChild(style)
+}
+
+type Tone = "blue" | "purple" | "green" | "orange"
+
+const TONE_VARS: Record<Tone, { bg: string; border: string; icon: string; title: string }> = {
+  blue:   { bg: "var(--ic-blue-bg)",   border: "var(--ic-blue-border)",   icon: "var(--ic-blue-icon)",   title: "var(--ic-blue-title)"   },
+  purple: { bg: "var(--ic-purple-bg)", border: "var(--ic-purple-border)", icon: "var(--ic-purple-icon)", title: "var(--ic-purple-title)" },
+  green:  { bg: "var(--ic-green-bg)",  border: "var(--ic-green-border)",  icon: "var(--ic-green-icon)",  title: "var(--ic-green-title)"  },
+  orange: { bg: "var(--ic-orange-bg)", border: "var(--ic-orange-border)", icon: "var(--ic-orange-icon)", title: "var(--ic-orange-title)" },
+}
 
 /**
  * InfoCard 컴포넌트의 props / InfoCard component props
@@ -11,50 +72,26 @@ import type { IconName } from "../lib/icons"
  * @property {string} title - 카드 제목 / Card title
  * @property {IconName} icon - 카드 아이콘 / Card icon
  * @property {"blue" | "purple" | "green" | "orange"} [tone="blue"] - InfoCard 톤 색상 / InfoCard tone color
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface InfoCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface InfoCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   title: string
   icon: IconName
   tone?: "blue" | "purple" | "green" | "orange"
-}
-
-const toneClasses: Record<NonNullable<InfoCardProps["tone"]>, { container: string; icon: string; title: string; body: string }> = {
-  blue: {
-    container: "bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-indigo-200 dark:border-indigo-700",
-    icon: "h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-3 mt-0.5 flex-shrink-0",
-    title: "text-sm font-medium text-indigo-900 dark:text-indigo-100 mb-2 block",
-    body: "text-foreground text-sm leading-relaxed",
-  },
-  purple: {
-    container: "bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-700",
-    icon: "h-5 w-5 text-purple-600 dark:text-purple-400 mr-3 mt-0.5 flex-shrink-0",
-    title: "text-sm font-medium text-purple-900 dark:text-purple-100 mb-2 block",
-    body: "text-foreground text-sm leading-relaxed",
-  },
-  green: {
-    container: "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-700",
-    icon: "h-5 w-5 text-green-600 dark:text-green-400 mr-3 mt-0.5 flex-shrink-0",
-    title: "text-sm font-medium text-green-900 dark:text-green-100 mb-2 block",
-    body: "text-foreground text-sm leading-relaxed",
-  },
-  orange: {
-    container: "bg-gradient-to-r from-orange-50 to-rose-50 dark:from-orange-900/20 dark:to-rose-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-700",
-    icon: "h-5 w-5 text-orange-600 dark:text-orange-400 mr-3 mt-0.5 flex-shrink-0",
-    title: "text-sm font-medium text-orange-900 dark:text-orange-100 mb-2 block",
-    body: "text-foreground text-sm leading-relaxed",
-  },
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
  * InfoCard 컴포넌트 / InfoCard component
- * 
+ *
  * 정보를 표시하는 카드 컴포넌트입니다.
  * 아이콘, 제목, 내용을 포함하며, 다양한 톤 색상을 지원합니다.
- * 
+ *
  * Card component that displays information.
  * Includes icon, title, and content, supports various tone colors.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -65,34 +102,86 @@ const toneClasses: Record<NonNullable<InfoCardProps["tone"]>, { container: strin
  * >
  *   이것은 정보 카드입니다.
  * </InfoCard>
- * 
+ *
  * @example
  * // 다양한 톤 / Various tones
  * <InfoCard icon="check" title="성공" tone="green">
  *   작업이 완료되었습니다.
  * </InfoCard>
- * 
+ *
  * @param {InfoCardProps} props - InfoCard 컴포넌트의 props / InfoCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} InfoCard 컴포넌트 / InfoCard component
  */
-export const InfoCard = React.forwardRef<HTMLDivElement, InfoCardProps>(({ className, title, icon, tone = "blue", children, ...props }, ref) => {
-  const t = toneClasses[tone]
-  return (
-    <div ref={ref} className={merge(t.container, className)} {...props}>
-      <div className="flex items-start mb-2">
-        <Icon name={icon} className={t.icon} />
-        <div className="flex-1">
-          <span className={t.title}>{title}</span>
-          <div className={t.body}>{children}</div>
+export const InfoCard = React.forwardRef<HTMLDivElement, InfoCardProps>(
+  ({ dot: dotProp, style, title, icon, tone = "blue", children, ...props }, ref) => {
+    const vars = TONE_VARS[tone]
+
+    // Inject CSS variable definitions on first render (client-side only)
+    React.useEffect(() => {
+      ensureInfoCardVars()
+    }, [])
+
+    const containerStyle = useMemo<React.CSSProperties>(
+      () =>
+        mergeStyles(
+          {
+            background: vars.bg,
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            border: `1px solid ${vars.border}`,
+          },
+          resolveDot(dotProp),
+          style,
+        ),
+      [vars, dotProp, style],
+    )
+
+    const iconStyle = useMemo<React.CSSProperties>(
+      () => ({
+        height: "1.25rem",
+        width: "1.25rem",
+        color: vars.icon,
+        marginRight: "0.75rem",
+        marginTop: "0.125rem",
+        flexShrink: 0,
+      }),
+      [vars.icon],
+    )
+
+    const titleStyle = useMemo<React.CSSProperties>(
+      () => ({
+        fontSize: "0.875rem",
+        fontWeight: 500,
+        color: vars.title,
+        marginBottom: "0.5rem",
+        display: "block",
+      }),
+      [vars.title],
+    )
+
+    const bodyStyle: React.CSSProperties = {
+      color: "var(--color-foreground, inherit)",
+      fontSize: "0.875rem",
+      lineHeight: "1.625",
+    }
+
+    return (
+      <div ref={ref} style={containerStyle} {...props}>
+        <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+          <span style={iconStyle}>
+            <Icon name={icon} dot="h-full w-full" />
+          </span>
+          <div style={{ flex: 1 }}>
+            <span style={titleStyle}>{title}</span>
+            <div style={bodyStyle}>{children}</div>
+          </div>
         </div>
       </div>
-    </div>
-  )
-})
+    )
+  },
+)
 
 InfoCard.displayName = "InfoCard"
 
 export default InfoCard
-
-

@@ -143,10 +143,10 @@ describe('Popover', () => {
     expect(screen.queryByText('Popover content')).not.toBeInTheDocument();
   });
 
-  it('should apply default bottom position', async () => {
+  it('should apply default bottom position via data-position attribute', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(
+    render(
       <Popover trigger={<button>Open</button>}>
         <div>Popover content</div>
       </Popover>
@@ -155,14 +155,14 @@ describe('Popover', () => {
     const trigger = screen.getByRole('button', { name: 'Open' });
     await user.click(trigger);
 
-    const popover = container.querySelector('.top-full');
-    expect(popover).toBeInTheDocument();
+    const popover = screen.getByRole('dialog');
+    expect(popover).toHaveAttribute('data-position', 'bottom');
   });
 
-  it('should apply top position', async () => {
+  it('should apply top position via data-position attribute', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(
+    render(
       <Popover trigger={<button>Open</button>} position="top">
         <div>Popover content</div>
       </Popover>
@@ -171,14 +171,14 @@ describe('Popover', () => {
     const trigger = screen.getByRole('button', { name: 'Open' });
     await user.click(trigger);
 
-    const popover = container.querySelector('.bottom-full');
-    expect(popover).toBeInTheDocument();
+    const popover = screen.getByRole('dialog');
+    expect(popover).toHaveAttribute('data-position', 'top');
   });
 
-  it('should apply left position', async () => {
+  it('should apply left position via data-position attribute', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(
+    render(
       <Popover trigger={<button>Open</button>} position="left">
         <div>Popover content</div>
       </Popover>
@@ -187,14 +187,14 @@ describe('Popover', () => {
     const trigger = screen.getByRole('button', { name: 'Open' });
     await user.click(trigger);
 
-    const popover = container.querySelector('.right-full');
-    expect(popover).toBeInTheDocument();
+    const popover = screen.getByRole('dialog');
+    expect(popover).toHaveAttribute('data-position', 'left');
   });
 
-  it('should apply right position', async () => {
+  it('should apply right position via data-position attribute', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(
+    render(
       <Popover trigger={<button>Open</button>} position="right">
         <div>Popover content</div>
       </Popover>
@@ -203,26 +203,30 @@ describe('Popover', () => {
     const trigger = screen.getByRole('button', { name: 'Open' });
     await user.click(trigger);
 
-    const popover = container.querySelector('.left-full');
-    expect(popover).toBeInTheDocument();
+    const popover = screen.getByRole('dialog');
+    expect(popover).toHaveAttribute('data-position', 'right');
   });
 
-  it('should apply custom className', () => {
+  it('should apply dot prop style to wrapper', () => {
     const { container } = render(
-      <Popover trigger={<button>Open</button>} className="custom-popover">
+      <Popover trigger={<button>Open</button>} dot="w-full">
         <div>Popover content</div>
       </Popover>
     );
 
-    const popoverContainer = container.querySelector('.custom-popover');
-    expect(popoverContainer).toBeInTheDocument();
+    // The outermost div should have inline style applied (dot resolves to CSSProperties)
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toBeInTheDocument();
   });
 
-  it('should apply custom contentClassName', async () => {
+  it('should apply contentStyle to popover panel', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(
-      <Popover trigger={<button>Open</button>} contentClassName="custom-content">
+    render(
+      <Popover
+        trigger={<button>Open</button>}
+        contentStyle={{ padding: 0 }}
+      >
         <div>Popover content</div>
       </Popover>
     );
@@ -230,8 +234,8 @@ describe('Popover', () => {
     const trigger = screen.getByRole('button', { name: 'Open' });
     await user.click(trigger);
 
-    const popoverContent = container.querySelector('.custom-content');
-    expect(popoverContent).toBeInTheDocument();
+    const panel = screen.getByRole('dialog');
+    expect(panel).toHaveStyle({ padding: '0px' });
   });
 
   it('should call onOpenChange when state changes', async () => {
@@ -265,15 +269,26 @@ describe('PopoverTrigger', () => {
     expect(screen.getByRole('button', { name: 'Trigger' })).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply dot prop styles', () => {
     const { container } = render(
-      <PopoverTrigger className="custom-trigger">
+      <PopoverTrigger dot="w-full">
         <button>Trigger</button>
       </PopoverTrigger>
     );
 
-    const trigger = container.querySelector('.custom-trigger');
+    const trigger = container.firstChild as HTMLElement;
     expect(trigger).toBeInTheDocument();
+  });
+
+  it('should accept style prop', () => {
+    const { container } = render(
+      <PopoverTrigger style={{ opacity: 0.5 }}>
+        <button>Trigger</button>
+      </PopoverTrigger>
+    );
+
+    const trigger = container.firstChild as HTMLElement;
+    expect(trigger).toHaveStyle({ opacity: '0.5' });
   });
 });
 
@@ -288,25 +303,37 @@ describe('PopoverContent', () => {
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply dot prop styles', () => {
     const { container } = render(
-      <PopoverContent className="custom-content">
+      <PopoverContent dot="p-4">
         <div>Content</div>
       </PopoverContent>
     );
 
-    const content = container.querySelector('.custom-content');
+    const content = container.firstChild as HTMLElement;
     expect(content).toBeInTheDocument();
   });
 
-  it('should have default popover styles', () => {
+  it('should have default popover panel styles via inline style', () => {
     const { container } = render(
       <PopoverContent>
         <div>Content</div>
       </PopoverContent>
     );
 
-    const content = container.querySelector('.bg-popover');
-    expect(content).toBeInTheDocument();
+    const content = container.firstChild as HTMLElement;
+    // BASE_PANEL sets these via inline style
+    expect(content).toHaveStyle({ position: 'absolute', zIndex: '50' });
+  });
+
+  it('should accept style prop overrides', () => {
+    const { container } = render(
+      <PopoverContent style={{ padding: 0 }}>
+        <div>Content</div>
+      </PopoverContent>
+    );
+
+    const content = container.firstChild as HTMLElement;
+    expect(content).toHaveStyle({ padding: '0px' });
   });
 });

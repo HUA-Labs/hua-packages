@@ -9,14 +9,14 @@ describe('PageNavigation', () => {
   });
 
   it('should render previous page link', () => {
-    render(<PageNavigation prevPage={{ title: 'Getting Started', href: '/start' }} />);
+    render(<PageNavigation prevPage={{ title: 'Getting Started', href: '/start' }} showOnMobile />);
 
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', '/start');
   });
 
   it('should render next page link', () => {
-    render(<PageNavigation nextPage={{ title: 'Advanced', href: '/advanced' }} />);
+    render(<PageNavigation nextPage={{ title: 'Advanced', href: '/advanced' }} showOnMobile />);
 
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', '/advanced');
@@ -27,6 +27,7 @@ describe('PageNavigation', () => {
       <PageNavigation
         prevPage={{ title: 'Intro', href: '/intro' }}
         nextPage={{ title: 'Next', href: '/next' }}
+        showOnMobile
       />
     );
 
@@ -39,6 +40,7 @@ describe('PageNavigation', () => {
       <PageNavigation
         prevPage={{ title: 'Previous Chapter', href: '/prev' }}
         nextPage={{ title: 'Next Chapter', href: '/next' }}
+        showOnMobile
       />
     );
 
@@ -46,33 +48,48 @@ describe('PageNavigation', () => {
     expect(screen.getByText('Next Chapter')).toBeInTheDocument();
   });
 
-  it('should be hidden on mobile by default', () => {
+  it('should be hidden on mobile by default (display: none)', () => {
     const { container } = render(
       <PageNavigation prevPage={{ title: 'Prev', href: '/prev' }} />
     );
 
     const nav = container.firstChild as HTMLElement;
-    expect(nav.className).toContain('hidden');
-    expect(nav.className).toContain('md:flex');
+    expect(nav.style.display).toBe('none');
   });
 
-  it('should show on mobile when showOnMobile is true', () => {
+  it('should show when showOnMobile is true (display not none)', () => {
     const { container } = render(
       <PageNavigation prevPage={{ title: 'Prev', href: '/prev' }} showOnMobile />
     );
 
     const nav = container.firstChild as HTMLElement;
-    expect(nav.className).not.toContain('hidden');
+    expect(nav.style.display).not.toBe('none');
   });
 
-  it('should apply custom className', () => {
+  it('should apply custom dot styles', () => {
     const { container } = render(
       <PageNavigation
         prevPage={{ title: 'Prev', href: '/prev' }}
-        className="my-nav"
+        dot="py-8"
+        showOnMobile
       />
     );
 
-    expect(container.querySelector('.my-nav')).toBeInTheDocument();
+    const nav = container.firstChild as HTMLElement;
+    expect(nav.style.paddingTop).toBeTruthy();
+    expect(nav.style.paddingBottom).toBeTruthy();
+  });
+
+  it('should apply custom inline style', () => {
+    const { container } = render(
+      <PageNavigation
+        prevPage={{ title: 'Prev', href: '/prev' }}
+        style={{ marginTop: '2rem' }}
+        showOnMobile
+      />
+    );
+
+    const nav = container.firstChild as HTMLElement;
+    expect(nav.style.marginTop).toBe('2rem');
   });
 });

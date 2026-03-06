@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useEffect, useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 /**
  * VideoBackground 컴포넌트의 props / VideoBackground component props
@@ -19,8 +19,9 @@ import { merge } from "../../lib/utils";
  * @property {"top" | "bottom" | "both"} [gradientDirection="bottom"] - 그라디언트 방향 / Gradient direction
  * @property {number} [playbackRate=1] - 재생 속도 / Playback rate
  * @property {boolean} [fadeIn=true] - 페이드 인 효과 / Fade in effect
+ * @property {string} [dot] - dot 스타일 유틸리티 문자열 / dot utility string
  */
-export interface VideoBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface VideoBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   src: string;
   type?: "native" | "youtube" | "vimeo";
   poster?: string;
@@ -36,7 +37,33 @@ export interface VideoBackgroundProps extends Omit<React.HTMLAttributes<HTMLDivE
   playbackRate?: number;
   fadeIn?: boolean;
   children?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
+
+/** objectFit → CSSProperties mapping */
+const OBJECT_FIT_MAP: Record<"cover" | "contain" | "fill", React.CSSProperties> = {
+  cover: { objectFit: "cover" },
+  contain: { objectFit: "contain" },
+  fill: { objectFit: "fill" },
+};
+
+/** Base styles for absolutely-positioned full-size video/iframe layers */
+const LAYER_BASE: React.CSSProperties = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  width: "100%",
+  height: "100%",
+  pointerEvents: "none",
+};
+
+/** YouTube scale-up to hide branding */
+const YOUTUBE_SCALE: React.CSSProperties = {
+  transform: "scale(1.2)",
+};
 
 /**
  * VideoBackground 컴포넌트 / VideoBackground component
@@ -85,7 +112,7 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
       playbackRate = 1,
       fadeIn = true,
       children,
-      className,
+      dot: dotProp,
       style,
       ...props
     },
@@ -146,25 +173,17 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
 
     // Render video element based on type
     const renderVideo = () => {
-      const objectFitClass = {
-        cover: "object-cover",
-        contain: "object-contain",
-        fill: "object-fill",
-      }[objectFit];
+      const fadeStyle: React.CSSProperties = {
+        opacity: isLoaded || !fadeIn ? 1 : 0,
+        transition: fadeIn ? "opacity 0.8s ease-out" : undefined,
+      };
 
       switch (type) {
         case "youtube":
           return (
             <iframe
               src={getYouTubeUrl(src)}
-              className={merge(
-                "absolute inset-0 w-full h-full pointer-events-none",
-                "scale-[1.2]" // Scale up to hide YouTube branding
-              )}
-              style={{
-                opacity: isLoaded || !fadeIn ? 1 : 0,
-                transition: fadeIn ? "opacity 0.8s ease-out" : undefined,
-              }}
+              style={mergeStyles(LAYER_BASE, YOUTUBE_SCALE, fadeStyle)}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               onLoad={() => setIsLoaded(true)}
@@ -176,11 +195,7 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
           return (
             <iframe
               src={getVimeoUrl(src)}
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              style={{
-                opacity: isLoaded || !fadeIn ? 1 : 0,
-                transition: fadeIn ? "opacity 0.8s ease-out" : undefined,
-              }}
+              style={mergeStyles(LAYER_BASE, fadeStyle)}
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
               onLoad={() => setIsLoaded(true)}
@@ -200,14 +215,14 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
               muted={muted}
               controls={controls}
               playsInline
-              className={merge(
-                "absolute inset-0 w-full h-full",
-                objectFitClass
+              style={mergeStyles(
+                LAYER_BASE,
+                OBJECT_FIT_MAP[objectFit],
+                {
+                  opacity: isPlaying || !fadeIn ? 1 : 0,
+                  transition: fadeIn ? "opacity 0.8s ease-out" : undefined,
+                }
               )}
-              style={{
-                opacity: isPlaying || !fadeIn ? 1 : 0,
-                transition: fadeIn ? "opacity 0.8s ease-out" : undefined,
-              }}
               onLoadedData={handleLoadedData}
               onPlaying={handlePlaying}
             />
@@ -219,14 +234,18 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
     const renderGradientOverlay = () => {
       if (!gradient) return null;
 
-      const gradients = [];
+      const gradients: React.ReactElement[] = [];
 
       if (gradientDirection === "top" || gradientDirection === "both") {
         gradients.push(
           <div
             key="top"
-            className="absolute top-0 left-0 right-0 h-1/3"
             style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "33.333%",
               background: `linear-gradient(to bottom, ${overlayColor}, transparent)`,
             }}
             aria-hidden="true"
@@ -238,8 +257,12 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
         gradients.push(
           <div
             key="bottom"
-            className="absolute bottom-0 left-0 right-0 h-1/3"
             style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "33.333%",
               background: `linear-gradient(to top, ${overlayColor}, transparent)`,
             }}
             aria-hidden="true"
@@ -250,25 +273,32 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
       return <>{gradients}</>;
     };
 
-    // Check if className contains position class (fixed, absolute, sticky)
-    const hasPositionClass = className && /\b(fixed|absolute|sticky)\b/.test(className);
+    const containerStyle = useMemo(
+      () =>
+        mergeStyles(
+          { overflow: "hidden", position: "relative" },
+          resolveDot(dotProp),
+          style,
+        ),
+      [dotProp, style]
+    );
 
     return (
       <div
         ref={ref}
-        className={merge(
-          "overflow-hidden",
-          !hasPositionClass && "relative",
-          className
-        )}
-        style={style}
+        style={containerStyle}
         {...props}
       >
         {/* Poster image (shows until video loads) */}
         {poster && fadeIn && !isLoaded && !isPlaying && (
           <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${poster})` }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${poster})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             aria-hidden="true"
           />
         )}
@@ -279,8 +309,11 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
         {/* Solid overlay */}
         {overlay && !gradient && (
           <div
-            className="absolute inset-0"
-            style={{ backgroundColor: overlayColor }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: overlayColor,
+            }}
             aria-hidden="true"
           />
         )}
@@ -290,7 +323,7 @@ const VideoBackground = React.forwardRef<HTMLDivElement, VideoBackgroundProps>(
 
         {/* Content */}
         {children && (
-          <div className="relative z-10 h-full">
+          <div style={{ position: "relative", zIndex: 10, height: "100%" }}>
             {children}
           </div>
         )}

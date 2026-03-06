@@ -87,7 +87,7 @@ export function LandingCTA({
         <AnimatedGradient
           colors={gradientColors}
           type="mesh"
-          className="absolute inset-0 -z-0"
+          dot="absolute inset-0 z-0"
           aria-hidden="true"
         />
       )}

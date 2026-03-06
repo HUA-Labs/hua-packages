@@ -46,7 +46,7 @@ export class Translator implements TranslatorInterface {
   // 언어 변경 시 React 리렌더링을 위한 콜백
   private onLanguageChangedCallbacks: Set<(language: string) => void> = new Set();
   // 디바운싱을 위한 타이머
-  private notifyTimer: NodeJS.Timeout | null = null;
+  private notifyTimer: ReturnType<typeof setTimeout> | null = null;
   // 최근 알림한 네임스페이스 (중복 알림 방지)
   private recentlyNotified = new Set<string>();
   

@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Modal } from "./Modal"
 import { Button } from "./Button"
 
@@ -28,6 +28,8 @@ import { Button } from "./Button"
  * @property {string} [requiredInputValue] - 필수 입력 값 (확인 버튼 활성화 조건) / Required input value (confirm button activation condition)
  * @property {boolean} [showCancel=true] - 취소 버튼 표시 여부 / Show cancel button
  * @property {"sm" | "md" | "lg" | "xl" | "2xl"} [size="md"] - 모달 크기 / Modal size
+ * @property {string} [dot] - dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string
+ * @property {React.CSSProperties} [style] - 추가 인라인 스타일 / Additional inline styles
  */
 export interface ConfirmModalProps {
   isOpen: boolean
@@ -50,19 +52,266 @@ export interface ConfirmModalProps {
   requiredInputValue?: string
   showCancel?: boolean
   size?: "sm" | "md" | "lg" | "xl" | "2xl"
+  dot?: string
+  style?: React.CSSProperties
 }
+
+// ──────────────────────────────────────────────
+// Static style constants
+// ──────────────────────────────────────────────
+
+const CONTENT_CENTER: React.CSSProperties = {
+  textAlign: 'center',
+}
+
+const ICON_WRAP_BASE: React.CSSProperties = {
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '64px',
+  width: '64px',
+  borderRadius: '9999px',
+  marginBottom: '24px',
+}
+
+const TITLE_STYLE: React.CSSProperties = {
+  fontSize: '1.25rem',
+  fontWeight: 600,
+  color: 'var(--color-foreground)',
+  margin: '0 0 16px 0',
+}
+
+const MESSAGE_WRAP: React.CSSProperties = {
+  marginBottom: '24px',
+}
+
+const MESSAGE_STYLE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  color: 'var(--color-muted-foreground)',
+  margin: 0,
+}
+
+const WARNING_BASE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  margin: '12px 0 0 0',
+}
+
+const INPUT_WRAP: React.CSSProperties = {
+  marginBottom: '24px',
+}
+
+const INPUT_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  color: 'var(--color-foreground)',
+  marginBottom: '12px',
+  textAlign: 'left',
+}
+
+const INPUT_BASE_STYLE: React.CSSProperties = {
+  width: '100%',
+  paddingLeft: '16px',
+  paddingRight: '16px',
+  paddingTop: '12px',
+  paddingBottom: '12px',
+  border: '1px solid var(--color-input)',
+  borderRadius: '8px',
+  outline: 'none',
+  backgroundColor: 'var(--color-background)',
+  color: 'var(--color-foreground)',
+  transition: 'border-color 200ms, box-shadow 200ms',
+  boxSizing: 'border-box',
+}
+
+const INPUT_FOCUS_STYLE: React.CSSProperties = {
+  borderColor: 'transparent',
+  boxShadow: '0 0 0 1px var(--color-destructive)',
+}
+
+const BUTTON_ROW: React.CSSProperties = {
+  display: 'flex',
+  gap: '12px',
+  justifyContent: 'center',
+}
+
+const LOADING_WRAP: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+}
+
+const SPINNER_STYLE: React.CSSProperties = {
+  animation: 'spin 1s linear infinite',
+  marginLeft: '-4px',
+  marginRight: '8px',
+  height: '16px',
+  width: '16px',
+  color: 'white',
+}
+
+// ──────────────────────────────────────────────
+// Variant-specific color tokens
+// ──────────────────────────────────────────────
+
+type TypeConfig = {
+  iconBg: React.CSSProperties
+  iconColor: React.CSSProperties
+  warningColor: React.CSSProperties
+  buttonStyle: React.CSSProperties
+}
+
+const TYPE_CONFIG: Record<string, TypeConfig> = {
+  danger: {
+    iconBg: { backgroundColor: 'color-mix(in srgb, var(--color-destructive) 10%, transparent)' },
+    iconColor: { color: 'var(--color-destructive)' },
+    warningColor: { color: 'var(--color-destructive)' },
+    buttonStyle: { backgroundColor: 'var(--color-destructive)', color: 'var(--color-destructive-foreground)' },
+  },
+  warning: {
+    iconBg: { backgroundColor: 'color-mix(in srgb, #ca8a04 10%, transparent)' },
+    iconColor: { color: '#ca8a04' },
+    warningColor: { color: '#ca8a04' },
+    buttonStyle: { backgroundColor: '#ca8a04', color: '#ffffff' },
+  },
+  info: {
+    iconBg: { backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' },
+    iconColor: { color: 'var(--color-primary)' },
+    warningColor: { color: 'var(--color-primary)' },
+    buttonStyle: { backgroundColor: 'var(--color-primary)', color: 'var(--color-primary-foreground)' },
+  },
+  success: {
+    iconBg: { backgroundColor: 'color-mix(in srgb, #16a34a 10%, transparent)' },
+    iconColor: { color: '#16a34a' },
+    warningColor: { color: '#16a34a' },
+    buttonStyle: { backgroundColor: '#16a34a', color: '#ffffff' },
+  },
+  error: {
+    iconBg: { backgroundColor: 'color-mix(in srgb, var(--color-destructive) 10%, transparent)' },
+    iconColor: { color: 'var(--color-destructive)' },
+    warningColor: { color: 'var(--color-destructive)' },
+    buttonStyle: { backgroundColor: 'var(--color-destructive)', color: 'var(--color-destructive-foreground)' },
+  },
+}
+
+// ──────────────────────────────────────────────
+// SVG icons as inline-styled elements
+// ──────────────────────────────────────────────
+
+const ICON_SVG_SIZE: React.CSSProperties = { height: '24px', width: '24px' }
+
+function WarningIcon({ iconColor }: { iconColor: React.CSSProperties }) {
+  return (
+    <svg style={mergeStyles(ICON_SVG_SIZE, iconColor)} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+  )
+}
+
+function InfoIcon({ iconColor }: { iconColor: React.CSSProperties }) {
+  return (
+    <svg style={mergeStyles(ICON_SVG_SIZE, iconColor)} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  )
+}
+
+function CheckIcon({ iconColor }: { iconColor: React.CSSProperties }) {
+  return (
+    <svg style={mergeStyles(ICON_SVG_SIZE, iconColor)} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    </svg>
+  )
+}
+
+function CrossIcon({ iconColor }: { iconColor: React.CSSProperties }) {
+  return (
+    <svg style={mergeStyles(ICON_SVG_SIZE, iconColor)} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
+// ──────────────────────────────────────────────
+// Input field with focus state
+// ──────────────────────────────────────────────
+
+function ConfirmInput({
+  id,
+  value,
+  placeholder,
+  onChange,
+}: {
+  id: string
+  value: string
+  placeholder?: string
+  onChange: (value: string) => void
+}) {
+  const [isFocused, setIsFocused] = useState(false)
+
+  const inputStyle = useMemo(
+    () => mergeStyles(INPUT_BASE_STYLE, isFocused ? INPUT_FOCUS_STYLE : undefined),
+    [isFocused]
+  )
+
+  return (
+    <input
+      type="text"
+      id={id}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={inputStyle}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    />
+  )
+}
+
+// ──────────────────────────────────────────────
+// ConfirmButton — variant-colored confirm button
+// ──────────────────────────────────────────────
+
+function ConfirmButton({
+  onClick,
+  disabled,
+  buttonStyle,
+  children,
+}: {
+  onClick: () => void
+  disabled: boolean
+  buttonStyle: React.CSSProperties
+  children: React.ReactNode
+}) {
+  return (
+    <Button
+      variant="default"
+      onClick={onClick}
+      disabled={disabled}
+      style={buttonStyle}
+    >
+      {children}
+    </Button>
+  )
+}
+
+// ──────────────────────────────────────────────
+// Main component
+// ──────────────────────────────────────────────
 
 /**
  * ConfirmModal 컴포넌트 / ConfirmModal component
- * 
+ *
  * 확인/취소가 필요한 모달 컴포넌트입니다.
  * 다양한 타입(danger, warning, info, success, error)을 지원하며,
  * 입력 필드와 필수 입력 값 검증을 지원합니다.
- * 
+ *
  * Modal component that requires confirmation/cancellation.
  * Supports various types (danger, warning, info, success, error),
  * and supports input fields and required input value validation.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -73,7 +322,7 @@ export interface ConfirmModalProps {
  *   title="삭제 확인"
  *   message="정말 삭제하시겠습니까?"
  * />
- * 
+ *
  * @example
  * // 입력 필드와 함께 / With input field
  * <ConfirmModal
@@ -88,7 +337,7 @@ export interface ConfirmModalProps {
  *   inputValue={inputValue}
  *   onInputChange={setInputValue}
  * />
- * 
+ *
  * @param {ConfirmModalProps} props - ConfirmModal 컴포넌트의 props / ConfirmModal component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ConfirmModal 컴포넌트 / ConfirmModal component
@@ -114,157 +363,125 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
     inputLabel,
     requiredInputValue,
     showCancel = true,
-    size = "md"
+    size = "md",
+    dot: dotProp,
+    style,
   }, _ref) => {
-    // 타입별 아이콘과 색상
-    const typeConfig = {
-      danger: {
-        icon: (
-          <svg className="h-6 w-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-        ),
-        bgColor: "bg-destructive/10",
-        buttonColor: "bg-destructive hover:bg-destructive/90 focus:ring-destructive",
-        textColor: "text-destructive"
-      },
-      warning: {
-        icon: (
-          <svg className="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-        ),
-        bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
-        buttonColor: "bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500",
-        textColor: "text-yellow-600 dark:text-yellow-400"
-      },
-      info: {
-        icon: (
-          <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        ),
-        bgColor: "bg-primary/10",
-        buttonColor: "bg-primary hover:bg-primary/80 focus:ring-ring",
-        textColor: "text-primary"
-      },
-      success: {
-        icon: (
-          <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        ),
-        bgColor: "bg-green-100 dark:bg-green-900/20",
-        buttonColor: "bg-green-600 hover:bg-green-700 focus:ring-green-500",
-        textColor: "text-green-600 dark:text-green-400"
-      },
-      error: {
-        icon: (
-          <svg className="h-6 w-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ),
-        bgColor: "bg-destructive/10",
-        buttonColor: "bg-destructive hover:bg-destructive/90 focus:ring-destructive",
-        textColor: "text-destructive"
-      }
-    }
-
-    const config = typeConfig[type]
+    const config = TYPE_CONFIG[type] ?? TYPE_CONFIG.danger
     const isInputValid = !showInput || !requiredInputValue || inputValue === requiredInputValue
     const isDisabled = disabled || loading || !isInputValid
 
+    const containerStyle = useMemo(
+      () => mergeStyles(CONTENT_CENTER, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+
+    const iconWrapStyle = useMemo(
+      () => mergeStyles(ICON_WRAP_BASE, config.iconBg),
+      [config.iconBg]
+    )
+
+    const warningStyle = useMemo(
+      () => mergeStyles(WARNING_BASE, config.warningColor),
+      [config.warningColor]
+    )
+
+    // Render the type-appropriate icon
+    const icon = (() => {
+      switch (type) {
+        case 'warning':
+          return <WarningIcon iconColor={config.iconColor} />
+        case 'info':
+          return <InfoIcon iconColor={config.iconColor} />
+        case 'success':
+          return <CheckIcon iconColor={config.iconColor} />
+        case 'error':
+          return <CrossIcon iconColor={config.iconColor} />
+        case 'danger':
+        default:
+          return <WarningIcon iconColor={config.iconColor} />
+      }
+    })()
+
     return (
-      <Modal 
-        isOpen={isOpen} 
-        onClose={onClose} 
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
         closable={false}
         size={size}
       >
-        <div className="text-center">
-          {/* 아이콘 */}
-          <div className={merge(
-            "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-6", // 64px 아이콘, 24px 여백
-            config.bgColor
-          )}>
-            {config.icon}
+        <div style={containerStyle}>
+          {/* Icon */}
+          <div style={iconWrapStyle}>
+            {icon}
           </div>
 
-          {/* 제목 */}
-          <h3 className="text-xl font-semibold text-foreground mb-4"> {/* 16px 여백 */}
+          {/* Title */}
+          <h3 style={TITLE_STYLE}>
             {title}
           </h3>
 
-          {/* 메시지 */}
-          <div className="mb-6"> {/* 24px 여백 */}
-            <p className="text-sm text-muted-foreground">
+          {/* Message */}
+          <div style={MESSAGE_WRAP}>
+            <p style={MESSAGE_STYLE}>
               {message}
             </p>
-            
-            {/* 경고 메시지 */}
+
+            {/* Warning message */}
             {warning && (
-              <p className={merge(
-                "text-sm mt-3 font-medium", // 12px 여백
-                config.textColor
-              )}>
+              <p style={warningStyle}>
                 {warning}
               </p>
             )}
           </div>
 
-          {/* 입력 필드 */}
+          {/* Input field */}
           {showInput && (
-            <div className="mb-6"> {/* 24px 여백 */}
-              <label htmlFor="confirmInput" className="block text-sm font-medium text-foreground mb-3 text-left"> {/* 12px 여백 */}
+            <div style={INPUT_WRAP}>
+              <label htmlFor="confirmInput" style={INPUT_LABEL_STYLE}>
                 {inputLabel}
               </label>
-              <input
-                type="text"
+              <ConfirmInput
                 id="confirmInput"
                 value={inputValue}
-                onChange={(e) => onInputChange?.(e.target.value)}
                 placeholder={inputPlaceholder}
-                className="w-full px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-1 focus:ring-destructive focus:border-transparent bg-background text-foreground transition-colors" // 16px, 12px 패딩
+                onChange={onInputChange ?? (() => {})}
               />
             </div>
           )}
 
-          {/* 버튼 */}
-          <div className={merge(
-            "flex gap-3", // 12px 간격
-            showCancel ? "justify-center" : "justify-center"
-          )}>
+          {/* Buttons */}
+          <div style={BUTTON_ROW}>
             {showCancel && (
               <Button
                 variant="outline"
                 onClick={onClose}
                 disabled={loading}
-                dot="px-6 py-3" // 24px, 12px 패딩
+                style={{ paddingLeft: '24px', paddingRight: '24px', paddingTop: '12px', paddingBottom: '12px' }}
               >
                 {cancelText}
               </Button>
             )}
-            <Button
-              variant="default"
+            <ConfirmButton
               onClick={onConfirm}
               disabled={isDisabled}
-              dot={merge(
-                "px-6 py-3", // 24px, 12px 패딩
-                config.buttonColor
+              buttonStyle={mergeStyles(
+                { paddingLeft: '24px', paddingRight: '24px', paddingTop: '12px', paddingBottom: '12px' },
+                config.buttonStyle
               )}
             >
               {loading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <div style={LOADING_WRAP}>
+                  <svg style={SPINNER_STYLE} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   처리 중...
                 </div>
               ) : (
                 confirmButtonText || confirmText
               )}
-            </Button>
+            </ConfirmButton>
           </div>
         </div>
       </Modal>
@@ -273,4 +490,4 @@ const ConfirmModal = React.forwardRef<HTMLDivElement, ConfirmModalProps>(
 )
 ConfirmModal.displayName = "ConfirmModal"
 
-export { ConfirmModal } 
+export { ConfirmModal }

@@ -1,11 +1,21 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
-export interface ImageRevealProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+/**
+ * ImageReveal 컴포넌트의 props / ImageReveal component props
+ * @property {string} src - 이미지 src / Image src
+ * @property {string} alt - 이미지 alt / Image alt
+ * @property {"left"|"right"|"up"|"down"} [direction="left"] - 공개 방향 / Reveal direction
+ * @property {number} [threshold=0.3] - 공개 시작 임계값 (0-1) / Reveal threshold (0-1)
+ * @property {string} [height="400px"] - 이미지 높이 / Image height
+ * @property {string} [overlayColor] - 오버레이 색상 / Overlay color
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - inline style overrides
+ */
+export interface ImageRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   /** 이미지 src */
   src: string;
   /** 이미지 alt */
@@ -18,6 +28,10 @@ export interface ImageRevealProps
   height?: string;
   /** 오버레이 색상 */
   overlayColor?: string;
+  /** dot utility string for additional styles */
+  dot?: string;
+  /** inline style overrides */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -25,6 +39,13 @@ export interface ImageRevealProps
  *
  * TextReveal에서 영감 받은 이미지 공개 효과.
  * clip-path를 사용하여 스크롤에 따라 이미지가 점진적으로 드러남.
+ *
+ * @component
+ * @example
+ * <ImageReveal src="/photo.jpg" alt="Scenic view" direction="left" />
+ *
+ * @example
+ * <ImageReveal src="/hero.jpg" alt="Hero image" direction="up" height="600px" overlayColor="rgba(0,0,0,0.4)" />
  */
 const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
   (
@@ -35,7 +56,7 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
       threshold = 0.3,
       height = "400px",
       overlayColor,
-      className,
+      dot: dotProp,
       style,
       ...props
     },
@@ -86,30 +107,49 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
 
     const clipPath = getClipPath(direction, progress);
 
+    const containerStyle = useMemo(() => mergeStyles(
+      {
+        position: "relative",
+        overflow: "hidden",
+        height,
+      },
+      resolveDot(dotProp),
+      style,
+    ), [height, dotProp, style]);
+
+    const imgStyle = useMemo<React.CSSProperties>(() => ({
+      position: "absolute",
+      inset: 0,
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      clipPath,
+      transition: "clip-path 0.1s ease-out",
+    }), [clipPath]);
+
+    const overlayStyle = useMemo<React.CSSProperties>(() => ({
+      position: "absolute",
+      inset: 0,
+      pointerEvents: "none",
+      background: overlayColor,
+      opacity: 1 - progress,
+      transition: "opacity 0.3s ease-out",
+    }), [overlayColor, progress]);
+
     return (
       <div
         ref={mergeRefs(ref, containerRef)}
-        className={merge("relative overflow-hidden", className)}
-        style={{ height, ...style }}
+        style={containerStyle}
         {...props}
       >
         <img
           src={src}
           alt={alt}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            clipPath,
-            transition: "clip-path 0.1s ease-out",
-          }}
+          style={imgStyle}
         />
         {overlayColor && (
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: overlayColor,
-              opacity: 1 - progress,
-              transition: "opacity 0.3s ease-out",
-            }}
+            style={overlayStyle}
             aria-hidden="true"
           />
         )}

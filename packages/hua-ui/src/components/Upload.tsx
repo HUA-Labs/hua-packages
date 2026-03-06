@@ -1,10 +1,9 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Icon } from "./Icon"
 import type { IconName } from "../lib/icons"
-import { resolveDot } from "../hooks/useDotMap"
 
 /**
  * 업로드된 파일 정보 인터페이스 / Uploaded file information interface
@@ -45,9 +44,10 @@ export interface UploadedFile {
  * @property {boolean} [dragDrop=true] - 드래그 앤 드롭 활성화 / Enable drag and drop
  * @property {string} [placeholder="파일을 선택하거나 여기에 드래그하세요"] - 플레이스홀더 / Placeholder
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
- * @property {string} [className] - 추가 클래스명 / Additional class name
+ * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface UploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface UploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'onChange'> {
   files?: UploadedFile[]
   onChange?: (files: File[]) => void
   onRemove?: (file: UploadedFile) => void
@@ -59,7 +59,8 @@ export interface UploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   dragDrop?: boolean
   placeholder?: string
   size?: "sm" | "md" | "lg"
-  className?: string
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -79,22 +80,29 @@ const getFileIcon = (type: string): IconName => {
   return "file"
 }
 
+/** Padding by size */
+const SIZE_PADDING: Record<"sm" | "md" | "lg", string> = {
+  sm: "16px",
+  md: "24px",
+  lg: "32px",
+}
+
 /**
  * Upload 컴포넌트 / Upload component
- * 
+ *
  * 파일을 업로드할 수 있는 컴포넌트입니다.
  * 드래그 앤 드롭, 다중 파일 선택, 파일 크기 제한 등을 지원합니다.
- * 
+ *
  * Component for uploading files.
  * Supports drag and drop, multiple file selection, file size limits, and more.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <Upload
  *   onChange={(files) => console.log(files)}
  * />
- * 
+ *
  * @example
  * // 이미지만, 다중 선택 / Images only, multiple selection
  * <Upload
@@ -105,7 +113,7 @@ const getFileIcon = (type: string): IconName => {
  *   files={uploadedFiles}
  *   onRemove={(file) => handleRemove(file)}
  * />
- * 
+ *
  * @param {UploadProps} props - Upload 컴포넌트의 props / Upload component props
  * @returns {JSX.Element} Upload 컴포넌트 / Upload component
  */
@@ -123,19 +131,21 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
       dragDrop = true,
       placeholder = "파일을 선택하거나 여기에 드래그하세요",
       size = "md",
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
     const fileInputRef = React.useRef<HTMLInputElement>(null)
     const [isDragging, setIsDragging] = React.useState(false)
+    const [isRemoveHovered, setIsRemoveHovered] = React.useState<string | null>(null)
 
     const handleFileSelect = (selectedFiles: FileList | null) => {
       if (!selectedFiles || selectedFiles.length === 0) return
 
       const fileArray = Array.from(selectedFiles)
-      
+
       // 파일 개수 체크
       if (maxFiles && files.length + fileArray.length > maxFiles) {
         alert(`최대 ${maxFiles}개의 파일만 업로드할 수 있습니다.`)
@@ -186,28 +196,80 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
       onRemove?.(file)
     }
 
-    const sizeClasses = {
-      sm: "p-4",
-      md: "p-6",
-      lg: "p-8",
+    // Container style
+    const containerStyle = useMemo(() =>
+      mergeStyles(
+        { width: '100%' },
+        resolveDot(dotProp),
+        style,
+      ),
+      [dotProp, style]
+    )
+
+    // Drop zone style
+    const dropZoneStyle = useMemo((): React.CSSProperties => ({
+      position: 'relative',
+      border: `2px dashed ${isDragging ? 'var(--upload-dropzone-drag-border)' : 'var(--upload-dropzone-border)'}`,
+      borderRadius: '12px',
+      transition: 'all 200ms ease-in-out',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      backgroundColor: isDragging ? 'var(--upload-dropzone-drag-bg)' : 'var(--upload-dropzone-bg)',
+      opacity: disabled ? 0.5 : 1,
+      padding: SIZE_PADDING[size],
+    }), [isDragging, disabled, size])
+
+    // Inner layout style
+    const innerStyle: React.CSSProperties = {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+    }
+
+    // Icon wrapper style
+    const iconWrapStyle = useMemo((): React.CSSProperties => ({
+      borderRadius: '50%',
+      backgroundColor: isDragging ? 'var(--upload-icon-wrap-drag-bg)' : 'var(--upload-icon-wrap-bg)',
+      padding: '16px',
+      marginBottom: '16px',
+      transition: 'background-color 200ms ease-in-out',
+    }), [isDragging])
+
+    // Primary text style
+    const primaryTextStyle: React.CSSProperties = {
+      fontSize: '14px',
+      fontWeight: 500,
+      color: 'var(--color-foreground)',
+      marginBottom: '4px',
+    }
+
+    // Hint text style
+    const hintTextStyle: React.CSSProperties = {
+      fontSize: '12px',
+      color: 'var(--color-muted-foreground)',
+    }
+
+    // File list container style
+    const fileListStyle: React.CSSProperties = {
+      marginTop: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '8px',
     }
 
     return (
-      <div ref={ref} className={merge("w-full", className)} {...props}>
+      <div ref={ref} style={containerStyle} {...props}>
         {/* 업로드 영역 */}
         <div
           onClick={handleClick}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={merge(
-            "relative border-2 border-dashed rounded-xl transition-all cursor-pointer",
-            "bg-muted/50",
-            "border-border",
-            isDragging && "border-primary bg-primary/10",
-            disabled && "cursor-not-allowed opacity-50",
-            sizeClasses[size]
-          )}
+          data-dragging={isDragging ? "true" : undefined}
+          data-disabled={disabled ? "true" : undefined}
+          data-upload-dropzone="true"
+          style={dropZoneStyle}
         >
           <input
             ref={fileInputRef}
@@ -216,27 +278,23 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
             accept={accept}
             disabled={disabled}
             onChange={(e) => handleFileSelect(e.target.files)}
-            className="hidden"
+            style={{ display: 'none' }}
             aria-label="파일 선택"
           />
-          
-          <div className="flex flex-col items-center justify-center text-center">
-            <div className={merge(
-              "rounded-full bg-primary/10 p-4 mb-4",
-              isDragging && "bg-primary/20"
-            )}>
+
+          <div style={innerStyle}>
+            <div style={iconWrapStyle}>
               <Icon
                 name="upload"
-                className={merge(
-                  "h-8 w-8 text-primary",
-                  isDragging && "scale-110"
-                )} 
+                size={32}
+                variant="primary"
+                dot={isDragging ? "transition-all duration-200" : undefined}
               />
             </div>
-            <p className="text-sm font-medium text-foreground mb-1">
+            <p style={primaryTextStyle}>
               {placeholder}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p style={hintTextStyle}>
               {accept && `지원 형식: ${accept}`}
               {maxSize && ` • 최대 크기: ${formatFileSize(maxSize)}`}
               {maxFiles && ` • 최대 ${maxFiles}개`}
@@ -246,73 +304,142 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
 
         {/* 파일 목록 */}
         {files.length > 0 && (
-          <div className="mt-4 space-y-2">
-            {files.map((file) => (
-              <div
-                key={file.id}
-                className={merge(
-                  "flex items-center gap-3 p-3 rounded-lg border",
-                  "bg-card",
-                  "border-border",
-                  file.status === "error" && "border-destructive/50 bg-destructive/5"
-                )}
-              >
-                <div className="flex-shrink-0">
-                  <div className="rounded-lg bg-muted p-2">
+          <div style={fileListStyle}>
+            {files.map((file) => {
+              const isError = file.status === "error"
+              const fileRowStyle: React.CSSProperties = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '8px',
+                border: `1px solid ${isError ? 'var(--upload-file-error-border)' : 'var(--upload-file-border)'}`,
+                backgroundColor: isError ? 'var(--upload-file-error-bg)' : 'var(--upload-file-bg)',
+              }
+
+              const fileIconWrapStyle: React.CSSProperties = {
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: 'var(--upload-file-icon-bg)',
+                padding: '8px',
+              }
+
+              const fileInfoStyle: React.CSSProperties = {
+                flex: 1,
+                minWidth: 0,
+              }
+
+              const fileNameStyle: React.CSSProperties = {
+                fontSize: '14px',
+                fontWeight: 500,
+                color: 'var(--color-foreground)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }
+
+              const fileMeta: React.CSSProperties = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '4px',
+              }
+
+              const fileSizeStyle: React.CSSProperties = {
+                fontSize: '12px',
+                color: 'var(--color-muted-foreground)',
+              }
+
+              const removeButtonStyle: React.CSSProperties = {
+                flexShrink: 0,
+                borderRadius: '8px',
+                padding: '6px',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: isRemoveHovered === file.id ? 'var(--upload-remove-hover-bg)' : 'transparent',
+                transition: 'background-color 150ms ease-in-out',
+              }
+
+              return (
+                <div key={file.id} style={fileRowStyle}>
+                  <div style={fileIconWrapStyle}>
                     <Icon
                       name={getFileIcon(file.type)}
-                      className="h-5 w-5 text-muted-foreground"
+                      size={20}
+                      variant="muted"
                     />
                   </div>
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {file.name}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-xs text-muted-foreground">
-                      {formatFileSize(file.size)}
-                    </p>
-                    {file.status === "uploading" && file.progress !== undefined && (
-                      <>
-                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary transition-all duration-300"
-                            style={{ width: `${file.progress}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {file.progress}%
-                        </span>
-                      </>
-                    )}
-                    {file.status === "success" && (
-                      <span className="text-xs text-[var(--progress-success)] flex items-center gap-1">
-                        <Icon name="check" className="h-3 w-3" />
-                        완료
-                      </span>
-                    )}
-                    {file.status === "error" && (
-                      <span className="text-xs text-destructive">
-                        {file.error || "업로드 실패"}
-                      </span>
-                    )}
-                  </div>
-                </div>
 
-                {onRemove && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemove(file)}
-                    className="flex-shrink-0 rounded-lg p-1.5 hover:bg-muted transition-colors"
-                    aria-label="파일 제거"
-                  >
-                    <Icon name="close" className="h-4 w-4 text-muted-foreground" />
-                  </button>
-                )}
-              </div>
-            ))}
+                  <div style={fileInfoStyle}>
+                    <p style={fileNameStyle}>
+                      {file.name}
+                    </p>
+                    <div style={fileMeta}>
+                      <p style={fileSizeStyle}>
+                        {formatFileSize(file.size)}
+                      </p>
+                      {file.status === "uploading" && file.progress !== undefined && (
+                        <>
+                          <div style={{
+                            flex: 1,
+                            height: '6px',
+                            backgroundColor: 'var(--color-muted)',
+                            borderRadius: '9999px',
+                            overflow: 'hidden',
+                          }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                backgroundColor: 'var(--color-primary)',
+                                borderRadius: '9999px',
+                                width: `${file.progress}%`,
+                                transition: 'width 300ms ease-out',
+                              }}
+                            />
+                          </div>
+                          <span style={fileSizeStyle}>
+                            {file.progress}%
+                          </span>
+                        </>
+                      )}
+                      {file.status === "success" && (
+                        <span style={{
+                          fontSize: '12px',
+                          color: 'var(--progress-success)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}>
+                          <Icon name="check" size={12} variant="success" />
+                          완료
+                        </span>
+                      )}
+                      {file.status === "error" && (
+                        <span style={{
+                          fontSize: '12px',
+                          color: 'var(--color-destructive)',
+                        }}>
+                          {file.error || "업로드 실패"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {onRemove && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(file)}
+                      onMouseEnter={() => setIsRemoveHovered(file.id)}
+                      onMouseLeave={() => setIsRemoveHovered(null)}
+                      style={removeButtonStyle}
+                      aria-label="파일 제거"
+                    >
+                      <Icon name="close" size={16} variant="muted" />
+                    </button>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -321,5 +448,3 @@ export const Upload = React.forwardRef<HTMLDivElement, UploadProps>(
 )
 
 Upload.displayName = "Upload"
-
-

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { merge } from "../../lib/utils";
+import React, { useEffect, useMemo, useState } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
@@ -12,14 +12,18 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
  * @property {number} [blurAmount=100] - 블러 양 (px) / Blur amount in pixels
  * @property {"linear" | "radial" | "conic" | "mesh"} [type="mesh"] - 그라디언트 타입 / Gradient type
  * @property {boolean} [animate=true] - 애니메이션 활성화 / Enable animation
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface AnimatedGradientProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AnimatedGradientProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   colors?: string[];
   speed?: number;
   blur?: boolean;
   blurAmount?: number;
   type?: "linear" | "radial" | "conic" | "mesh";
   animate?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const defaultColors = [
@@ -28,6 +32,15 @@ const defaultColors = [
   "#0070f3",
   "#00dfd8",
 ];
+
+/** Base style for full-coverage absolute overlay divs */
+const INSET_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
 
 /**
  * AnimatedGradient 컴포넌트 / AnimatedGradient component
@@ -41,7 +54,7 @@ const defaultColors = [
  * @component
  * @example
  * // 메쉬 그라디언트 / Mesh gradient
- * <AnimatedGradient type="mesh" className="absolute inset-0 -z-10" />
+ * <AnimatedGradient type="mesh" dot="absolute inset-0" style={{ zIndex: -1 }} />
  *
  * @example
  * // 커스텀 색상 / Custom colors
@@ -55,13 +68,13 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
   (
     {
       children,
-      className,
       colors = defaultColors,
       speed = 3,
       blur = true,
       blurAmount = 100,
       type = "mesh",
       animate = true,
+      dot: dotProp,
       style,
       ...props
     },
@@ -75,13 +88,19 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
       setMounted(true);
     }, []);
 
+    const rootStyle = useMemo<React.CSSProperties>(() => mergeStyles(
+      { position: 'relative', overflow: 'hidden' },
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, style]);
+
     const renderGradient = () => {
       switch (type) {
         case "linear":
           return (
             <div
-              className="absolute inset-0"
               style={{
+                ...INSET_STYLE,
                 background: `linear-gradient(
                   ${shouldAnimate ? "var(--gradient-angle, 0deg)" : "135deg"},
                   ${colors.join(", ")}
@@ -94,8 +113,8 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
         case "radial":
           return (
             <div
-              className="absolute inset-0"
               style={{
+                ...INSET_STYLE,
                 background: `radial-gradient(
                   circle at ${shouldAnimate ? "var(--gradient-x, 50%) var(--gradient-y, 50%)" : "50% 50%"},
                   ${colors.join(", ")}
@@ -108,8 +127,8 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
         case "conic":
           return (
             <div
-              className="absolute inset-0"
               style={{
+                ...INSET_STYLE,
                 background: `conic-gradient(
                   from ${shouldAnimate ? "var(--gradient-angle, 0deg)" : "0deg"} at 50% 50%,
                   ${colors.join(", ")},
@@ -133,8 +152,10 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
                 return (
                   <div
                     key={index}
-                    className="absolute rounded-full mix-blend-screen"
                     style={{
+                      position: 'absolute',
+                      borderRadius: '9999px',
+                      mixBlendMode: 'screen',
                       width: "60%",
                       height: "60%",
                       background: `radial-gradient(circle at center, ${color} 0%, transparent 70%)`,
@@ -156,17 +177,13 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
     return (
       <div
         ref={ref}
-        className={merge(
-          "relative overflow-hidden",
-          className
-        )}
-        style={style}
+        style={rootStyle}
         {...props}
       >
         {/* Gradient layer */}
         <div
-          className="absolute inset-0"
           style={{
+            ...INSET_STYLE,
             filter: blur ? `blur(${blurAmount}px)` : undefined,
           }}
         >
@@ -174,7 +191,11 @@ const AnimatedGradient = React.forwardRef<HTMLDivElement, AnimatedGradientProps>
         </div>
 
         {/* Content */}
-        {children && <div className="relative z-10">{children}</div>}
+        {children && (
+          <div style={{ position: 'relative', zIndex: 10 }}>
+            {children}
+          </div>
+        )}
 
         {/* Animation keyframes - injected as style element */}
         <style dangerouslySetInnerHTML={{ __html: `

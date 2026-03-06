@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { merge, formatRelativeTime } from "../../lib/utils";
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
+import { formatRelativeTime } from "../../lib/utils";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
@@ -40,9 +41,10 @@ export interface NotificationItem {
  * @property {boolean} [showHeader=true] - 헤더 표시 여부 / Show header
  * @property {boolean} [showCount=true] - 개수 표시 여부 / Show count
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface NotificationCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface NotificationCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   title?: string;
   items: NotificationItem[];
   emptyMessage?: string;
@@ -52,46 +54,282 @@ export interface NotificationCardProps extends React.HTMLAttributes<HTMLDivEleme
   showHeader?: boolean;
   showCount?: boolean;
   emptyState?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-const typeStyles = {
+// ---------------------------------------------------------------------------
+// Static CSSProperties style constants
+// ---------------------------------------------------------------------------
+
+/** Root card container */
+const CARD_BASE: React.CSSProperties = {
+  backgroundColor: 'var(--color-card, #ffffff)',
+  borderRadius: '0.75rem',
+  boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
+  padding: '1.5rem',
+};
+
+/** Header row: flex, align-center, justify-between, mb-4 */
+const HEADER_ROW: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: '1rem',
+};
+
+const HEADER_LEFT: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+};
+
+/** Bell icon wrapper */
+const BELL_WRAP: React.CSSProperties = {
+  padding: '0.5rem',
+  backgroundColor: 'rgba(249, 115, 22, 0.1)',
+  borderRadius: '0.5rem',
+  marginRight: '0.75rem',
+};
+
+/** Card title */
+const CARD_TITLE: React.CSSProperties = {
+  fontSize: '1.125rem',
+  fontWeight: 600,
+  color: 'var(--color-foreground, #111827)',
+};
+
+/** Count badge */
+const COUNT_BADGE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  paddingLeft: '0.625rem',
+  paddingRight: '0.625rem',
+  paddingTop: '0.125rem',
+  paddingBottom: '0.125rem',
+  borderRadius: '9999px',
+  fontSize: '0.75rem',
+  fontWeight: 500,
+  backgroundColor: 'rgba(254, 215, 170, 0.8)',
+  color: 'rgba(154, 52, 18, 1)',
+};
+
+/** Notification list container */
+const LIST_CONTAINER: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+};
+
+/** Per-type item container background + border */
+const TYPE_ITEM_STYLES: Record<NonNullable<NotificationItem['type']> | 'default', React.CSSProperties> = {
   info: {
-    container: "bg-gradient-to-r from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20",
-    border: "border-indigo-200/50 dark:border-indigo-700/30",
-    dot: "bg-primary",
+    background: 'linear-gradient(to right, rgba(238, 242, 255, 1), rgba(238, 242, 255, 1))',
+    borderColor: 'rgba(199, 210, 254, 0.5)',
   },
   warning: {
-    container: "bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20",
-    border: "border-orange-200/50 dark:border-orange-700/30",
-    dot: "bg-red-500",
+    background: 'linear-gradient(to right, rgba(255, 247, 237, 1), rgba(254, 242, 242, 1))',
+    borderColor: 'rgba(253, 186, 116, 0.5)',
   },
   error: {
-    container: "bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20",
-    border: "border-red-200/50 dark:border-red-700/30",
-    dot: "bg-red-600",
+    background: 'linear-gradient(to right, rgba(254, 242, 242, 1), rgba(255, 241, 242, 1))',
+    borderColor: 'rgba(252, 165, 165, 0.5)',
   },
   success: {
-    container: "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20",
-    border: "border-green-200/50 dark:border-green-700/30",
-    dot: "bg-green-500",
+    background: 'linear-gradient(to right, rgba(240, 253, 244, 1), rgba(236, 253, 245, 1))',
+    borderColor: 'rgba(134, 239, 172, 0.5)',
+  },
+  default: {
+    background: 'linear-gradient(to right, rgba(249, 250, 251, 1), rgba(243, 244, 246, 1))',
+    borderColor: 'rgba(209, 213, 219, 0.5)',
   },
 };
 
-const defaultTypeStyles = {
-  container: "bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20",
-  border: "border-gray-200/50 dark:border-gray-700/30",
-  dot: "bg-gray-500",
+/** Per-type dot color */
+const TYPE_DOT_COLORS: Record<NonNullable<NotificationItem['type']> | 'default', React.CSSProperties> = {
+  info: { backgroundColor: 'var(--color-primary, #3b82f6)' },
+  warning: { backgroundColor: 'rgba(239, 68, 68, 1)' },
+  error: { backgroundColor: 'rgba(220, 38, 38, 1)' },
+  success: { backgroundColor: 'rgba(34, 197, 94, 1)' },
+  default: { backgroundColor: 'rgba(107, 114, 128, 1)' },
 };
+
+/** Item container base */
+const ITEM_BASE: React.CSSProperties = {
+  padding: '0.75rem',
+  borderRadius: '0.5rem',
+  borderWidth: '1px',
+  borderStyle: 'solid',
+};
+
+const ITEM_INTERACTIVE_BASE: React.CSSProperties = {
+  ...ITEM_BASE,
+  cursor: 'pointer',
+  transition: 'box-shadow 200ms ease-in-out',
+};
+
+const ITEM_HOVER: React.CSSProperties = {
+  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+};
+
+const ITEM_INNER: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+};
+
+const DOT_INDICATOR: React.CSSProperties = {
+  width: '0.5rem',
+  height: '0.5rem',
+  borderRadius: '9999px',
+  marginTop: '0.5rem',
+  marginRight: '0.75rem',
+  flexShrink: 0,
+};
+
+const ITEM_CONTENT: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+};
+
+const ITEM_HEADER: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: '0.25rem',
+};
+
+const ITEM_TITLE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  color: 'var(--color-foreground, #111827)',
+};
+
+const ITEM_TIME: React.CSSProperties = {
+  fontSize: '0.75rem',
+  color: 'var(--color-muted-foreground, #6b7280)',
+  marginLeft: '0.5rem',
+  flexShrink: 0,
+};
+
+const ITEM_MESSAGE: React.CSSProperties = {
+  fontSize: '0.75rem',
+  color: 'var(--color-muted-foreground, #6b7280)',
+};
+
+/** Empty state */
+const EMPTY_STATE: React.CSSProperties = {
+  textAlign: 'center',
+  paddingTop: '2rem',
+  paddingBottom: '2rem',
+};
+
+const EMPTY_MESSAGE: React.CSSProperties = {
+  color: 'var(--color-muted-foreground, #6b7280)',
+  fontSize: '0.875rem',
+};
+
+/** View all button row */
+const VIEW_ALL_ROW: React.CSSProperties = {
+  marginTop: '1rem',
+  textAlign: 'center',
+};
+
+const VIEW_ALL_BUTTON_BASE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  color: 'var(--color-muted-foreground, #9ca3af)',
+  fontWeight: 500,
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  transition: 'color 200ms ease-in-out',
+};
+
+const VIEW_ALL_BUTTON_HOVER: React.CSSProperties = {
+  color: 'var(--color-foreground, #4b5563)',
+};
+
+// ---------------------------------------------------------------------------
+// NotificationItem row — isolated component for hover state
+// ---------------------------------------------------------------------------
+
+interface NotificationRowProps {
+  item: NotificationItem;
+}
+
+const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const isInteractive = !!(item.onClick || item.href);
+
+  const typeKey = (item.type ?? 'default') as NonNullable<NotificationItem['type']> | 'default';
+  const typeStyle = TYPE_ITEM_STYLES[typeKey];
+  const dotColor = TYPE_DOT_COLORS[typeKey];
+
+  const containerStyle = useMemo((): React.CSSProperties => {
+    const base = isInteractive ? ITEM_INTERACTIVE_BASE : ITEM_BASE;
+    return mergeStyles(base, typeStyle, isInteractive && isHovered ? ITEM_HOVER : undefined);
+  }, [isInteractive, isHovered, typeStyle]);
+
+  const content = (
+    <div
+      style={containerStyle}
+      onMouseEnter={isInteractive ? () => setIsHovered(true) : undefined}
+      onMouseLeave={isInteractive ? () => setIsHovered(false) : undefined}
+    >
+      <div style={ITEM_INNER}>
+        <div style={{ ...DOT_INDICATOR, ...dotColor }} />
+        <div style={ITEM_CONTENT}>
+          <div style={ITEM_HEADER}>
+            <span style={ITEM_TITLE}>{item.title}</span>
+            <time
+              dateTime={
+                item.timestamp instanceof Date
+                  ? item.timestamp.toISOString()
+                  : typeof item.timestamp === 'string'
+                  ? item.timestamp
+                  : undefined
+              }
+              style={ITEM_TIME}
+            >
+              {formatRelativeTime(item.timestamp)}
+            </time>
+          </div>
+          <p style={ITEM_MESSAGE}>{item.message}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (item.href) {
+    return (
+      <a href={item.href} style={{ display: 'block', textDecoration: 'none' }}>
+        {content}
+      </a>
+    );
+  }
+
+  if (item.onClick) {
+    return (
+      <div onClick={item.onClick} style={{ cursor: 'pointer' }}>
+        {content}
+      </div>
+    );
+  }
+
+  return <div>{content}</div>;
+};
+
+// ---------------------------------------------------------------------------
+// NotificationCard
+// ---------------------------------------------------------------------------
 
 /**
  * NotificationCard 컴포넌트 / NotificationCard component
- * 
+ *
  * 알림 목록을 표시하는 카드 컴포넌트입니다.
  * 여러 알림 항목을 표시하며, 타입별로 다른 스타일을 적용할 수 있습니다.
- * 
+ *
  * Card component that displays a list of notifications.
  * Shows multiple notification items and can apply different styles by type.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -106,7 +344,7 @@ const defaultTypeStyles = {
  *     }
  *   ]}
  * />
- * 
+ *
  * @example
  * // 최대 항목 수 제한 / Maximum items limit
  * <NotificationCard
@@ -116,7 +354,7 @@ const defaultTypeStyles = {
  *   onViewAll={() => navigate("/notifications")}
  *   showCount
  * />
- * 
+ *
  * @param {NotificationCardProps} props - NotificationCard 컴포넌트의 props / NotificationCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} NotificationCard 컴포넌트 / NotificationCard component
@@ -133,121 +371,70 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
       showHeader = true,
       showCount = true,
       emptyState,
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
+    const [viewAllHovered, setViewAllHovered] = useState(false);
+
     const displayItems = maxItems ? items.slice(0, maxItems) : items;
     const hasMore = maxItems && items.length > maxItems;
 
+    const rootStyle = useMemo(
+      () => mergeStyles(CARD_BASE, resolveDot(dotProp), style),
+      [dotProp, style]
+    );
 
-    const getTypeStyles = (type?: NotificationItem["type"]) => {
-      if (!type) return defaultTypeStyles;
-      return typeStyles[type];
-    };
+    const viewAllButtonStyle = useMemo(
+      () => mergeStyles(VIEW_ALL_BUTTON_BASE, viewAllHovered ? VIEW_ALL_BUTTON_HOVER : undefined),
+      [viewAllHovered]
+    );
 
     return (
-      <div
-        ref={ref}
-        className={merge(
-          "bg-white dark:bg-gray-800 rounded-xl shadow p-6",
-          className
-        )}
-        {...props}
-      >
+      <div ref={ref} style={rootStyle} {...props}>
         {/* 헤더 */}
         {showHeader && (
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-500/10 rounded-lg mr-3">
-                <Icon name="bell" className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+          <div style={HEADER_ROW}>
+            <div style={HEADER_LEFT}>
+              <div style={BELL_WRAP}>
+                <Icon name="bell" size={24} dot="text-orange-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {title}
-              </h3>
+              <h3 style={CARD_TITLE}>{title}</h3>
             </div>
             {showCount && items.length > 0 && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                {items.length}개
-              </span>
+              <span style={COUNT_BADGE}>{items.length}개</span>
             )}
           </div>
         )}
 
         {/* 알림 목록 */}
         {displayItems.length > 0 ? (
-          <div className="space-y-3">
-            {displayItems.map((item) => {
-              const typeStyle = getTypeStyles(item.type);
-              const content = (
-                <div
-                  className={merge(
-                    "p-3 rounded-lg border",
-                    typeStyle.container,
-                    typeStyle.border,
-                    (item.onClick || item.href) && "cursor-pointer hover:shadow-md transition-all duration-200"
-                  )}
-                >
-                  <div className="flex items-start">
-                    <div className={merge(
-                      "w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0",
-                      typeStyle.dot
-                    )}></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {item.title}
-                        </span>
-                        <time 
-                          dateTime={item.timestamp instanceof Date ? item.timestamp.toISOString() : typeof item.timestamp === 'string' ? item.timestamp : undefined}
-                          className="text-xs text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0"
-                        >
-                          {formatRelativeTime(item.timestamp)}
-                        </time>
-                      </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {item.message}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-
-              if (item.href) {
-                return (
-                  <a key={item.id} href={item.href}>
-                    {content}
-                  </a>
-                );
-              }
-
-              if (item.onClick) {
-                return (
-                  <div key={item.id} onClick={item.onClick}>
-                    {content}
-                  </div>
-                );
-              }
-
-              return <div key={item.id}>{content}</div>;
-            })}
+          <div style={LIST_CONTAINER}>
+            {displayItems.map((item) => (
+              <NotificationRow key={item.id} item={item} />
+            ))}
           </div>
         ) : emptyState ? (
           emptyState
         ) : (
-          <div className="text-center py-8">
-            <Icon name="bell" className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 text-sm">{emptyMessage}</p>
+          <div style={EMPTY_STATE}>
+            <span style={{ display: 'block', width: '3rem', height: '3rem', margin: '0 auto 0.75rem', color: 'var(--color-muted-foreground, #9ca3af)' }}>
+              <Icon name="bell" size={48} />
+            </span>
+            <p style={EMPTY_MESSAGE}>{emptyMessage}</p>
           </div>
         )}
 
         {/* 더 보기 */}
         {hasMore && onViewAll && (
-          <div className="mt-4 text-center">
+          <div style={VIEW_ALL_ROW}>
             <button
               onClick={onViewAll}
-              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 font-medium transition-colors"
+              style={viewAllButtonStyle}
+              onMouseEnter={() => setViewAllHovered(true)}
+              onMouseLeave={() => setViewAllHovered(false)}
             >
               {viewAllLabel} ({items.length - (maxItems || 0)}개 더)
             </button>
@@ -259,4 +446,3 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
 );
 
 NotificationCard.displayName = "NotificationCard";
-

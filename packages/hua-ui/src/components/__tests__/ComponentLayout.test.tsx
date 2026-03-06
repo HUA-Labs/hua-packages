@@ -78,10 +78,11 @@ describe('ComponentLayout', () => {
     expect(screen.getByText('Accordion')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply custom style via style prop', () => {
     const { container } = render(
-      <ComponentLayout title="T" description="D" className="my-layout">Content</ComponentLayout>
+      <ComponentLayout title="T" description="D" style={{ color: 'red' }}>Content</ComponentLayout>
     );
-    expect(container.querySelector('.my-layout')).toBeInTheDocument();
+    const inner = container.querySelector('[style*="color"]');
+    expect(inner).toBeInTheDocument();
   });
 });

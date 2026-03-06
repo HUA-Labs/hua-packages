@@ -14,7 +14,7 @@ describe('Form', () => {
         </FormField>
       </Form>
     );
-    
+
     const form = container.querySelector('form');
     expect(form).toBeInTheDocument();
   });
@@ -32,7 +32,7 @@ describe('Form', () => {
 
     const form = container.querySelector('form')!;
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    
+
     expect(handleSubmit).toHaveBeenCalled();
   });
 
@@ -45,7 +45,7 @@ describe('Form', () => {
         </FormField>
       </Form>
     );
-    
+
     const errorMessage = screen.getByText('This field is required');
     expect(errorMessage).toBeInTheDocument();
     expect(errorMessage).toHaveAttribute('role', 'alert');
@@ -61,10 +61,10 @@ describe('Form', () => {
         </FormField>
       </Form>
     );
-    
+
     const input = screen.getByRole('textbox');
     const errorId = screen.getByText('Error message').id;
-    
+
     expect(input).toHaveAttribute('aria-describedby', errorId);
     expect(input).toHaveAttribute('aria-invalid', 'true');
   });
@@ -78,7 +78,7 @@ describe('Form', () => {
         </FormField>
       </Form>
     );
-    
+
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('required');
   });
@@ -98,12 +98,13 @@ describe('FormGroup', () => {
         </FormField>
       </FormGroup>
     );
-    
+
     const group = container.firstChild as HTMLElement;
-    expect(group).toHaveClass('flex', 'gap-4');
+    expect(group.style.flexDirection).toBe('row');
+    expect(group.style.display).toBe('flex');
   });
 
-  it('should render default layout when inline prop is false', () => {
+  it('should render default (stack) layout when inline prop is false', () => {
     const { container } = render(
       <FormGroup>
         <FormField>
@@ -112,9 +113,9 @@ describe('FormGroup', () => {
         </FormField>
       </FormGroup>
     );
-    
+
     const group = container.firstChild as HTMLElement;
-    expect(group).toHaveClass('space-y-4');
+    expect(group.style.flexDirection).toBe('column');
+    expect(group.style.display).toBe('flex');
   });
 });
-

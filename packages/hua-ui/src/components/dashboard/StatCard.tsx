@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { merge } from "../../lib/utils";
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
-import { useColorStyles } from "../../lib/styles/colors";
-import { createVariantStyles } from "../../lib/styles/variants";
 import type { Color } from "../../lib/types/common";
 
 /**
@@ -19,13 +17,15 @@ import type { Color } from "../../lib/types/common";
  * @property {number} trend.value - 추세 값 / Trend value
  * @property {string} trend.label - 추세 라벨 / Trend label
  * @property {boolean} [trend.positive] - 긍정적 추세 여부 / Positive trend
- * @property {"default" | "gradient" | "outline" | "elevated"} [variant="default"] - 카드 스타일 변형 / Card style variant
- * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color] - 카드 색상 / Card color
+ * @property {"default" | "gradient" | "outline" | "elevated"} [variant="elevated"] - 카드 스타일 변형 / Card style variant
+ * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray" | "cyan"} [color="blue"] - 카드 색상 / Card color
  * @property {boolean} [loading] - 로딩 상태 / Loading state
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StatCardProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   title: string;
   value: string | number | null | undefined;
   description?: string;
@@ -39,18 +39,129 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   color?: Color;
   loading?: boolean;
   emptyState?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
+// ─── Base layout styles (CSSProperties) ────────────────────────────────────
+
+const BASE_CARD: React.CSSProperties = {
+  padding: "1.5rem",
+  borderRadius: "1.5rem",
+  border: "1px solid",
+  transition: "box-shadow 200ms ease-in-out",
+};
+
+const GRADIENT_CARD_EXTRAS: React.CSSProperties = {
+  color: "white",
+};
+
+const ELEVATED_CARD_EXTRAS: React.CSSProperties = {
+  boxShadow: "0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1)",
+};
+
+const HOVER_SHADOW: React.CSSProperties = {
+  boxShadow: "0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1)",
+};
+
+// ─── Per-color, per-variant CSS variable references ─────────────────────────
+
+type Variant = "default" | "gradient" | "outline" | "elevated";
+
+function getCardBg(color: Color, variant: Variant): React.CSSProperties {
+  const c = color;
+  switch (variant) {
+    case "default":
+      return {
+        backgroundColor: `var(--stat-card-${c}-default-bg)`,
+        borderColor: `var(--stat-card-${c}-default-border)`,
+      };
+    case "gradient":
+      return {
+        background: `linear-gradient(135deg, var(--stat-card-${c}-gradient-from), var(--stat-card-${c}-gradient-to))`,
+        borderColor: `var(--stat-card-${c}-gradient-border)`,
+        ...GRADIENT_CARD_EXTRAS,
+      };
+    case "outline":
+      return {
+        backgroundColor: "transparent",
+        borderColor: `var(--stat-card-${c}-outline-border)`,
+        borderWidth: "2px",
+        color: `var(--stat-card-${c}-outline-text)`,
+      };
+    case "elevated":
+      return {
+        backgroundColor: `var(--stat-card-${c}-elevated-bg)`,
+        borderColor: `var(--stat-card-${c}-elevated-border)`,
+        ...ELEVATED_CARD_EXTRAS,
+      };
+  }
+}
+
+function getIconContainerStyle(
+  color: Color,
+  isGradient: boolean
+): React.CSSProperties {
+  const base: React.CSSProperties = {
+    width: "3rem",
+    height: "3rem",
+    borderRadius: "0.5rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  };
+  if (isGradient) {
+    return { ...base, backgroundColor: "rgba(255,255,255,0.2)", color: "white" };
+  }
+  return {
+    ...base,
+    backgroundColor: `var(--stat-card-${color}-icon-bg)`,
+    color: `var(--stat-card-${color}-icon-color)`,
+  };
+}
+
+// Returns a size number for Icon's `size` prop (24px = 1.5rem)
+const ICON_SIZE = 24;
+
+function getBadgeStyle(
+  color: Color,
+  isGradient: boolean
+): React.CSSProperties {
+  const base: React.CSSProperties = {
+    fontSize: "0.875rem",
+    paddingLeft: "0.75rem",
+    paddingRight: "0.75rem",
+    paddingTop: "0.25rem",
+    paddingBottom: "0.25rem",
+    borderRadius: "9999px",
+    fontWeight: 500,
+  };
+  if (isGradient) {
+    return {
+      ...base,
+      backgroundColor: "rgba(255,255,255,0.2)",
+      color: "white",
+    };
+  }
+  return {
+    ...base,
+    backgroundColor: `var(--stat-card-${color}-badge-bg)`,
+    color: `var(--stat-card-${color}-badge-text)`,
+  };
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 /**
  * StatCard 컴포넌트 / StatCard component
- * 
+ *
  * 통계 정보를 표시하는 카드 컴포넌트입니다.
  * 제목, 값, 설명, 아이콘, 추세 정보를 포함할 수 있습니다.
- * 
+ *
  * Card component that displays statistic information.
  * Can include title, value, description, icon, and trend information.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -60,7 +171,7 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   description="지난 달 대비"
  *   icon="users"
  * />
- * 
+ *
  * @example
  * // 추세 정보 포함 / With trend information
  * <StatCard
@@ -70,7 +181,7 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   color="green"
  *   variant="gradient"
  * />
- * 
+ *
  * @param {StatCardProps} props - StatCard 컴포넌트의 props / StatCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} StatCard 컴포넌트 / StatCard component
@@ -87,25 +198,15 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       color = "blue",
       loading = false,
       emptyState,
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
-    // 공통 색상 시스템 사용
-    const colorStyles = useColorStyles(color);
-    const isGradient = variant === "gradient";
-    const isTextWhite = isGradient;
+    const [isHovered, setIsHovered] = useState(false);
 
-    // Variant 스타일 생성 (elevated는 rounded-3xl로 커스터마이징)
-    const variantClass = useMemo(() => {
-      const baseClass = createVariantStyles(variant, colorStyles);
-      // elevated variant는 rounded-3xl 사용
-      if (variant === "elevated") {
-        return baseClass.replace("rounded-2xl", "rounded-3xl");
-      }
-      return baseClass;
-    }, [variant, colorStyles]);
+    const isGradient = variant === "gradient";
 
     const formatValue = (val: string | number): string => {
       if (typeof val === "number") {
@@ -114,43 +215,117 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       return val;
     };
 
+    const cardStyle = useMemo((): React.CSSProperties => {
+      const colorVariantStyle = getCardBg(color, variant);
+      return mergeStyles(
+        BASE_CARD,
+        colorVariantStyle,
+        isHovered ? HOVER_SHADOW : undefined,
+        resolveDot(dotProp),
+        style
+      );
+    }, [color, variant, isHovered, dotProp, style]);
+
+    const emptyCardStyle = useMemo(
+      (): React.CSSProperties => ({
+        borderRadius: "1rem",
+        border: "1px solid var(--stat-card-empty-border)",
+        padding: "1.5rem",
+        backgroundColor: "var(--stat-card-empty-bg)",
+        ...resolveDot(dotProp),
+        ...style,
+      }),
+      [dotProp, style]
+    );
+
+    // Empty state
     if (!loading && (value === null || value === undefined || value === "")) {
       return emptyState ? (
-        <div className={className} {...props}>
+        <div style={mergeStyles(resolveDot(dotProp), style)} {...props}>
           {emptyState}
         </div>
       ) : (
-        <div className={merge("rounded-2xl border border-slate-100 dark:border-slate-800 p-6", className)} {...props}>
-          <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</h3>
-          <p className="mt-2 text-sm text-slate-400">데이터가 없습니다.</p>
+        <div style={emptyCardStyle} {...props}>
+          <h3
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              color: "var(--stat-card-empty-title)",
+              margin: 0,
+            }}
+          >
+            {title}
+          </h3>
+          <p
+            style={{
+              marginTop: "0.5rem",
+              fontSize: "0.875rem",
+              color: "var(--stat-card-empty-text)",
+              margin: "0.5rem 0 0",
+            }}
+          >
+            데이터가 없습니다.
+          </p>
         </div>
       );
     }
 
+    const iconContainerStyle = getIconContainerStyle(color, isGradient);
+    const badgeStyle = getBadgeStyle(color, isGradient);
+
+    const valueStyle: React.CSSProperties = {
+      fontSize: "1.875rem",
+      fontWeight: 700,
+      marginBottom: "0.25rem",
+      margin: "0 0 0.25rem",
+      color: isGradient ? "white" : "var(--stat-card-value-color)",
+    };
+
+    const descStyle: React.CSSProperties = {
+      fontSize: "0.875rem",
+      color: isGradient ? "rgba(255,255,255,0.9)" : "var(--stat-card-desc-color)",
+      margin: 0,
+    };
+
+    const loadingBarStyle: React.CSSProperties = {
+      height: "2.5rem",
+      backgroundColor: "var(--stat-card-loading-bg)",
+      borderRadius: "0.375rem",
+      marginBottom: "0.5rem",
+      animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+    };
+
+    const trendRowStyle: React.CSSProperties = {
+      marginTop: "0.75rem",
+      display: "flex",
+      alignItems: "center",
+      gap: "0.25rem",
+    };
+
     return (
       <div
         ref={ref}
-        className={merge(
-          "p-6 transition-all duration-200 hover:shadow-xl",
-          variantClass,
-          className
-        )}
+        style={cardStyle}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
-        <div className="flex items-start justify-between mb-4">
-          {/* 아이콘 */}
+        {/* Header row: icon + badge */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            marginBottom: "1rem",
+          }}
+        >
           {icon && (
-            <div className={merge(
-              "w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0",
-              isGradient ? "bg-white/20" : colorStyles.icon
-            )}>
+            <div style={iconContainerStyle}>
               {typeof icon === "string" ? (
                 <Icon
                   name={icon as IconName}
-                  className={merge(
-                    "w-6 h-6",
-                    isTextWhite ? "text-white" : ""
-                  )}
+                  size={ICON_SIZE}
+                  variant="default"
                 />
               ) : (
                 icon
@@ -158,56 +333,42 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
             </div>
           )}
 
-          {/* 배지 */}
-          {title && (
-            <span className={merge(
-              "text-sm px-3 py-1 rounded-full font-medium",
-              isGradient ? "bg-white/20 text-white" : colorStyles.badge
-            )}>
-              {title}
-            </span>
-          )}
+          {title && <span style={badgeStyle}>{title}</span>}
         </div>
 
-        {/* 값 */}
+        {/* Value */}
         {loading ? (
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+          <div style={loadingBarStyle} />
         ) : (
-          <h3 className={merge(
-            "text-3xl font-bold mb-1",
-            isTextWhite ? "text-white" : "text-gray-800 dark:text-white"
-          )}>
-            {formatValue(value ?? 0)}
-          </h3>
+          <h3 style={valueStyle}>{formatValue(value ?? 0)}</h3>
         )}
 
-        {/* 설명 */}
-        {description && (
-          <p className={merge(
-            "text-sm",
-            isTextWhite ? "text-white/90" : "text-gray-600 dark:text-gray-300"
-          )}>
-            {description}
-          </p>
-        )}
+        {/* Description */}
+        {description && <p style={descStyle}>{description}</p>}
 
-        {/* 트렌드 */}
+        {/* Trend */}
         {trend && !loading && (
-          <div className="mt-3 flex items-center gap-1">
+          <div style={trendRowStyle}>
             <span
-              className={merge(
-                "text-xs font-medium",
-                trend.positive !== false
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-red-600 dark:text-red-400"
-              )}
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                color:
+                  trend.positive !== false
+                    ? "var(--stat-card-trend-pos)"
+                    : "var(--stat-card-trend-neg)",
+              }}
             >
               {trend.positive !== false ? "↑" : "↓"} {Math.abs(trend.value)}%
             </span>
-            <span className={merge(
-              "text-xs",
-              isTextWhite ? "text-white/70" : "text-gray-500 dark:text-gray-400"
-            )}>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                color: isGradient
+                  ? "rgba(255,255,255,0.7)"
+                  : "var(--stat-card-trend-muted)",
+              }}
+            >
               {trend.label}
             </span>
           </div>
@@ -218,4 +379,3 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
 );
 
 StatCard.displayName = "StatCard";
-

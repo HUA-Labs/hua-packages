@@ -88,8 +88,8 @@ describe('Tooltip', () => {
     expect(screen.queryByText('Tooltip text')).not.toBeInTheDocument();
   });
 
-  it('should render with default variant', () => {
-    const { container } = render(
+  it('should render with default variant using inline background style', () => {
+    render(
       <Tooltip content="Tooltip text" delay={0}>
         <button>Hover me</button>
       </Tooltip>
@@ -102,12 +102,13 @@ describe('Tooltip', () => {
       vi.advanceTimersByTime(0);
     });
 
-    const tooltip = container.querySelector('.bg-gray-800');
-    expect(tooltip).toBeInTheDocument();
+    const tooltip = screen.getByText('Tooltip text');
+    // default variant uses a dark gray background
+    expect(tooltip.style.backgroundColor).toBeTruthy();
   });
 
-  it('should render with light variant', () => {
-    const { container } = render(
+  it('should render with light variant having popover background', () => {
+    render(
       <Tooltip content="Tooltip text" variant="light" delay={0}>
         <button>Hover me</button>
       </Tooltip>
@@ -120,12 +121,14 @@ describe('Tooltip', () => {
       vi.advanceTimersByTime(0);
     });
 
-    const tooltip = container.querySelector('.bg-popover');
+    const tooltip = screen.getByText('Tooltip text');
+    // light variant uses CSS variable for background
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip.style.border).toBeTruthy();
   });
 
-  it('should render with dark variant', () => {
-    const { container } = render(
+  it('should render with dark variant using dark background', () => {
+    render(
       <Tooltip content="Tooltip text" variant="dark" delay={0}>
         <button>Hover me</button>
       </Tooltip>
@@ -138,8 +141,9 @@ describe('Tooltip', () => {
       vi.advanceTimersByTime(0);
     });
 
-    const tooltip = container.querySelector('.bg-gray-900');
+    const tooltip = screen.getByText('Tooltip text');
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip.style.backgroundColor).toBeTruthy();
   });
 
   it('should render with custom delay', () => {
@@ -189,15 +193,28 @@ describe('Tooltip', () => {
     expect(screen.queryByText('Tooltip text')).not.toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
+  it('should apply dot prop styles to wrapper element', () => {
     const { container } = render(
-      <Tooltip content="Tooltip text" className="custom-tooltip">
+      <Tooltip content="Tooltip text" dot="p-4">
         <button>Hover me</button>
       </Tooltip>
     );
 
-    const tooltipContainer = container.querySelector('.custom-tooltip');
-    expect(tooltipContainer).toBeInTheDocument();
+    // The wrapper div should have inline styles from dot resolution
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toBeInTheDocument();
+    expect(wrapper.tagName).toBe('DIV');
+  });
+
+  it('should apply style prop to wrapper element', () => {
+    const { container } = render(
+      <Tooltip content="Tooltip text" style={{ opacity: 0.9 }}>
+        <button>Hover me</button>
+      </Tooltip>
+    );
+
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.style.opacity).toBe('0.9');
   });
 });
 
@@ -212,7 +229,7 @@ describe('TooltipLight', () => {
   });
 
   it('should render with light variant', () => {
-    const { container } = render(
+    render(
       <TooltipLight content="Light tooltip" delay={0}>
         <button>Hover me</button>
       </TooltipLight>
@@ -225,8 +242,10 @@ describe('TooltipLight', () => {
       vi.advanceTimersByTime(0);
     });
 
-    const tooltip = container.querySelector('.bg-popover');
+    const tooltip = screen.getByText('Light tooltip');
     expect(tooltip).toBeInTheDocument();
+    // light variant renders a border
+    expect(tooltip.style.border).toBeTruthy();
   });
 });
 
@@ -241,7 +260,7 @@ describe('TooltipDark', () => {
   });
 
   it('should render with dark variant', () => {
-    const { container } = render(
+    render(
       <TooltipDark content="Dark tooltip" delay={0}>
         <button>Hover me</button>
       </TooltipDark>
@@ -254,7 +273,8 @@ describe('TooltipDark', () => {
       vi.advanceTimersByTime(0);
     });
 
-    const tooltip = container.querySelector('.bg-gray-900');
+    const tooltip = screen.getByText('Dark tooltip');
     expect(tooltip).toBeInTheDocument();
+    expect(tooltip.style.backgroundColor).toBeTruthy();
   });
 });

@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { createContext, useContext, useState, useCallback } from "react"
-import { merge } from "../lib/utils"
+import { createContext, useContext, useState, useCallback, useMemo } from "react"
+import { mergeStyles } from "../hooks/useDotMap"
 
 /**
  * Toast 메시지 타입 / Toast message type
@@ -118,24 +118,24 @@ interface ToastProviderProps {
 
 /**
  * ToastProvider 컴포넌트 / ToastProvider component
- * 
+ *
  * Toast 시스템의 컨텍스트를 제공하는 Provider 컴포넌트입니다.
  * 앱의 루트 레벨에서 사용하여 전역 Toast 기능을 활성화합니다.
- * 
+ *
  * Provider component that provides context for the Toast system.
  * Use at the root level of your app to enable global Toast functionality.
- * 
+ *
  * @component
  * @example
  * // App.tsx
  * <ToastProvider position="top-center" maxToasts={3}>
  *   <App />
  * </ToastProvider>
- * 
+ *
  * @example
  * // 컴포넌트에서 사용 / Usage in component
  * const { addToast } = useToast()
- * 
+ *
  * const handleSave = () => {
  *   addToast({
  *     type: "success",
@@ -143,10 +143,10 @@ interface ToastProviderProps {
  *     title: "성공"
  *   })
  * }
- * 
+ *
  * @param {ToastProviderProps} props - ToastProvider 컴포넌트의 props / ToastProvider component props
  * @returns {JSX.Element} ToastProvider 컴포넌트 / ToastProvider component
- * 
+ *
  * @todo 접근성 개선: ToastItem에 role="alert" 또는 role="status" 추가 필요 / Accessibility: Add role="alert" or role="status" to ToastItem
  * @todo 접근성 개선: aria-live="polite" 또는 aria-live="assertive" 추가 필요 / Accessibility: Add aria-live="polite" or aria-live="assertive"
  */
@@ -197,24 +197,43 @@ interface ToastContainerProps {
   position: string
 }
 
+/** Inline CSSProperties for each position key */
+const POSITION_STYLES: Record<string, React.CSSProperties> = {
+  "top-right": { top: '1rem', right: '1rem' },
+  "top-left": { top: '1rem', left: '1rem' },
+  "bottom-right": { bottom: '1rem', right: '1rem' },
+  "bottom-left": { bottom: '1rem', left: '1rem' },
+  "top-center": { top: '1rem', left: '50%', transform: 'translateX(-50%)' },
+  "bottom-center": { bottom: '1rem', left: '50%', transform: 'translateX(-50%)' },
+}
+
+const CONTAINER_BASE: React.CSSProperties = {
+  position: 'fixed',
+  zIndex: 50,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+  maxWidth: '24rem',
+}
+
 // Toast Container
 function ToastContainer({ toasts, removeToast, position }: ToastContainerProps) {
-  const positionClasses = {
-    "top-right": "top-4 right-4",
-    "top-left": "top-4 left-4",
-    "bottom-right": "bottom-4 right-4",
-    "bottom-left": "bottom-4 left-4",
-    "top-center": "top-4 left-1/2 transform -translate-x-1/2",
-    "bottom-center": "bottom-4 left-1/2 transform -translate-x-1/2"
-  }
+  const containerStyle = useMemo((): React.CSSProperties =>
+    mergeStyles(
+      CONTAINER_BASE,
+      POSITION_STYLES[position] ?? POSITION_STYLES["top-right"],
+    ),
+    [position]
+  )
 
   if (toasts.length === 0) return null
 
   return (
-    <div className={merge(
-      "fixed z-50 space-y-3 max-w-sm", // 12px 간격
-      positionClasses[position as keyof typeof positionClasses]
-    )}>
+    <div
+      data-toast-container
+      data-position={position}
+      style={containerStyle}
+    >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
@@ -228,9 +247,58 @@ interface ToastItemProps {
   onRemove: (id: string) => void
 }
 
+/** Static base style for a toast item */
+const ITEM_BASE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  padding: '1rem',
+  borderRadius: '0.75rem',
+  border: '1px solid',
+  backdropFilter: 'blur(4px)',
+  WebkitBackdropFilter: 'blur(4px)',
+  transition: 'all 300ms ease-in-out',
+}
+
+/** Type-specific styles: background, border color, text color */
+const TYPE_STYLES: Record<Toast["type"], React.CSSProperties> = {
+  success: {
+    backgroundColor: 'var(--toast-success-bg)',
+    borderColor: 'var(--toast-success-border, rgba(134, 239, 172, 0.6))',
+    color: 'var(--toast-success-text, #166534)',
+    boxShadow: '0 10px 15px -3px rgba(187, 247, 208, 0.5)',
+  },
+  error: {
+    backgroundColor: 'var(--toast-error-bg)',
+    borderColor: 'var(--toast-error-border, rgba(252, 165, 165, 0.6))',
+    color: 'var(--toast-error-text, #991b1b)',
+    boxShadow: '0 10px 15px -3px rgba(254, 202, 202, 0.5)',
+  },
+  warning: {
+    backgroundColor: 'var(--toast-warning-bg)',
+    borderColor: 'var(--toast-warning-border, rgba(253, 224, 71, 0.6))',
+    color: 'var(--toast-warning-text, #854d0e)',
+    boxShadow: '0 10px 15px -3px rgba(254, 240, 138, 0.5)',
+  },
+  info: {
+    backgroundColor: 'var(--toast-info-bg)',
+    borderColor: 'var(--toast-info-border, rgba(165, 180, 252, 0.6))',
+    color: 'var(--toast-info-text, #1e3a5f)',
+    boxShadow: '0 10px 15px -3px rgba(199, 210, 254, 0.5)',
+  },
+}
+
+/** Type-specific icon colors */
+const ICON_COLOR: Record<Toast["type"], string> = {
+  success: 'var(--toast-success-icon, #22c55e)',
+  error: 'var(--toast-error-icon, #ef4444)',
+  warning: 'var(--toast-warning-icon, #eab308)',
+  info: 'var(--toast-info-icon, #06b6d4)',
+}
+
 // Toast Item
 function ToastItem({ toast, onRemove }: ToastItemProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const [isCloseHovered, setIsCloseHovered] = useState(false)
 
   React.useEffect(() => {
     setIsVisible(true)
@@ -241,89 +309,86 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
     setTimeout(() => onRemove(toast.id), 300)
   }
 
-  // CSS 변수 기반 배경색 (Tailwind v4 dark: variant + bg-color 충돌 우회)
-  // 앱에서 --toast-*-bg 변수 정의 필요
-  const getToastStyles = (type: Toast["type"]) => {
-    switch (type) {
-      case "success":
-        return "bg-[var(--toast-success-bg)] border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 shadow-lg shadow-green-100/50 dark:shadow-none"
-      case "error":
-        return "bg-[var(--toast-error-bg)] border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 shadow-lg shadow-red-100/50 dark:shadow-none"
-      case "warning":
-        return "bg-[var(--toast-warning-bg)] border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 shadow-lg shadow-yellow-100/50 dark:shadow-none"
-      case "info":
-        return "bg-[var(--toast-info-bg)] border-indigo-300 dark:border-indigo-700 text-cyan-800 dark:text-cyan-200 shadow-lg shadow-indigo-100/50 dark:shadow-none"
-    }
+  const itemStyle = useMemo((): React.CSSProperties =>
+    mergeStyles(
+      ITEM_BASE,
+      TYPE_STYLES[toast.type],
+      isVisible
+        ? { transform: 'translateX(0)', opacity: 1, scale: '1' }
+        : { transform: 'translateX(100%)', opacity: 0, scale: '0.95' },
+      isVisible ? { animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)' } : undefined,
+    ),
+    [toast.type, isVisible]
+  )
+
+  const iconColor = ICON_COLOR[toast.type]
+
+  const iconStyle: React.CSSProperties = {
+    flexShrink: 0,
+    marginRight: '0.75rem',
+    color: iconColor,
   }
 
-  const getIconStyles = (type: Toast["type"]) => {
-    switch (type) {
-      case "success":
-        return "text-green-500 dark:text-green-400"
-      case "error":
-        return "text-red-500 dark:text-red-400"
-      case "warning":
-        return "text-yellow-500 dark:text-yellow-400"
-      case "info":
-        return "text-cyan-500 dark:text-cyan-400"
-    }
+  const contentStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: 0,
   }
 
-  const getToastIcon = (type: Toast["type"]) => {
-    switch (type) {
-      case "success":
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        )
-      case "error":
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        )
-      case "warning":
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-        )
-      case "info":
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )
-    }
+  const titleStyle: React.CSSProperties = {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    marginBottom: '0.25rem',
+  }
+
+  const messageStyle: React.CSSProperties = {
+    fontSize: '0.875rem',
+    lineHeight: 1.625,
+  }
+
+  const actionStyle: React.CSSProperties = {
+    marginTop: '0.75rem',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    textDecoration: 'underline',
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    cursor: 'pointer',
+    color: 'inherit',
+  }
+
+  const closeWrapperStyle: React.CSSProperties = {
+    flexShrink: 0,
+    marginLeft: '1rem',
+  }
+
+  const closeButtonStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    borderRadius: '0.375rem',
+    padding: '0.375rem',
+    transition: 'background-color 200ms ease-in-out',
+    background: isCloseHovered ? 'rgba(0, 0, 0, 0.05)' : 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    color: iconColor,
+    outline: 'none',
   }
 
   return (
-    <div
-      className={merge(
-        "flex items-start p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 transform",
-        getToastStyles(toast.type),
-        isVisible
-          ? "translate-x-0 opacity-100 scale-100"
-          : "translate-x-full opacity-0 scale-95"
-      )}
-      style={{
-        animation: isVisible ? "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)" : undefined
-      }}
-    >
+    <div style={itemStyle}>
       {/* 아이콘 */}
-      <div className={merge("flex-shrink-0 mr-3", getIconStyles(toast.type))}> {/* 12px 여백 */}
+      <div style={iconStyle}>
         {getToastIcon(toast.type)}
       </div>
 
       {/* 내용 */}
-      <div className="flex-1 min-w-0">
+      <div style={contentStyle}>
         {toast.title && (
-          <h4 className="text-sm font-semibold mb-1"> {/* 4px 여백 */}
+          <h4 style={titleStyle}>
             {toast.title}
           </h4>
         )}
-        <p className="text-sm leading-relaxed">
+        <p style={messageStyle}>
           {toast.message}
         </p>
 
@@ -331,7 +396,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         {toast.action && (
           <button
             onClick={toast.action.onClick}
-            className="mt-3 text-sm font-medium underline hover:no-underline transition-all duration-200" // 12px 여백
+            style={actionStyle}
           >
             {toast.action.label}
           </button>
@@ -339,13 +404,12 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       </div>
 
       {/* 닫기 버튼 */}
-      <div className="flex-shrink-0 ml-4"> {/* 16px 여백 */}
+      <div style={closeWrapperStyle}>
         <button
           onClick={handleRemove}
-          className={merge(
-            "inline-flex rounded-md p-1.5 transition-colors duration-200 ease-in-out hover:bg-black/5 dark:hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-2",
-            getIconStyles(toast.type)
-          )}
+          onMouseEnter={() => setIsCloseHovered(true)}
+          onMouseLeave={() => setIsCloseHovered(false)}
+          style={closeButtonStyle}
           aria-label="닫기"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -355,6 +419,35 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       </div>
     </div>
   )
+}
+
+function getToastIcon(type: Toast["type"]): React.ReactElement {
+  switch (type) {
+    case "success":
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      )
+    case "error":
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      )
+    case "warning":
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      )
+    case "info":
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+  }
 }
 
 // 편의 함수들 (ToastProvider 내부에서만 사용 가능 - 스텁 함수)
@@ -376,4 +469,4 @@ export const showWarningToast = (_message: string, _title?: string, _duration?: 
 
 export const showInfoToast = (_message: string, _title?: string, _duration?: number) => {
   // ToastProvider 컨텍스트 필요
-} 
+}

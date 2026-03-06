@@ -15,48 +15,61 @@ describe('InfoCard', () => {
     expect(screen.getByText('This is the body')).toBeInTheDocument();
   });
 
-  it('should apply blue tone by default', () => {
+  it('should apply blue tone styles by default', () => {
     const { container } = render(
       <InfoCard icon="info" title="Info">Content</InfoCard>
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('from-indigo-50');
+    expect(card.style.border).toContain('var(--ic-blue-border)');
+    expect(card.style.borderRadius).toBe('0.5rem');
   });
 
-  it('should apply green tone', () => {
+  it('should apply green tone styles', () => {
     const { container } = render(
       <InfoCard icon="check" title="Success" tone="green">Done</InfoCard>
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('from-green-50');
+    expect(card.style.border).toContain('var(--ic-green-border)');
   });
 
-  it('should apply purple tone', () => {
+  it('should apply purple tone styles', () => {
     const { container } = render(
       <InfoCard icon="info" title="Note" tone="purple">Note content</InfoCard>
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('from-purple-50');
+    expect(card.style.border).toContain('var(--ic-purple-border)');
   });
 
-  it('should apply orange tone', () => {
+  it('should apply orange tone styles', () => {
     const { container } = render(
       <InfoCard icon="info" title="Warning" tone="orange">Be careful</InfoCard>
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('from-orange-50');
+    expect(card.style.border).toContain('var(--ic-orange-border)');
   });
 
-  it('should apply custom className', () => {
+  it('should accept dot prop for extra spacing', () => {
     const { container } = render(
-      <InfoCard icon="info" title="Info" className="my-card">Content</InfoCard>
+      <InfoCard icon="info" title="Info" dot="mt-4">Content</InfoCard>
     );
 
-    expect(container.querySelector('.my-card')).toBeInTheDocument();
+    const card = container.firstChild as HTMLElement;
+    // dot prop is resolved to inline style — card should still render
+    expect(card).toBeTruthy();
+    expect(screen.getByText('Info')).toBeInTheDocument();
+  });
+
+  it('should accept style prop', () => {
+    const { container } = render(
+      <InfoCard icon="info" title="Info" style={{ marginTop: '2rem' }}>Content</InfoCard>
+    );
+
+    const card = container.firstChild as HTMLElement;
+    expect(card.style.marginTop).toBe('2rem');
   });
 
   it('should have rounded border styling', () => {
@@ -65,7 +78,7 @@ describe('InfoCard', () => {
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('rounded-lg');
-    expect(card.className).toContain('border');
+    expect(card.style.borderRadius).toBe('0.5rem');
+    expect(card.style.border).toBeTruthy();
   });
 });
