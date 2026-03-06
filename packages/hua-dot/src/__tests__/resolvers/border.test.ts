@@ -39,6 +39,27 @@ describe('resolveBorder', () => {
     expect(resolveBorder('border', 'gray-300', config)).toEqual({ borderColor: '#d1d5db' });
   });
 
+  it('resolves arbitrary color as borderColor (not borderWidth)', () => {
+    expect(resolveBorder('border', '[#dadce0]', config)).toEqual({ borderColor: '#dadce0' });
+    expect(resolveBorder('border', '[#ff0000]', config)).toEqual({ borderColor: '#ff0000' });
+    expect(resolveBorder('border', '[rgb(0,0,0)]', config)).toEqual({ borderColor: 'rgb(0,0,0)' });
+  });
+
+  it('resolves directional arbitrary color', () => {
+    expect(resolveBorder('border-t', '[#ff0000]', config)).toEqual({ borderTopColor: '#ff0000' });
+    expect(resolveBorder('border-r', '[#00ff00]', config)).toEqual({ borderRightColor: '#00ff00' });
+    expect(resolveBorder('border-b', '[#0000ff]', config)).toEqual({ borderBottomColor: '#0000ff' });
+    expect(resolveBorder('border-l', '[#fff]', config)).toEqual({ borderLeftColor: '#fff' });
+    expect(resolveBorder('border-x', '[#aaa]', config)).toEqual({ borderLeftColor: '#aaa', borderRightColor: '#aaa' });
+    expect(resolveBorder('border-y', '[#bbb]', config)).toEqual({ borderTopColor: '#bbb', borderBottomColor: '#bbb' });
+  });
+
+  it('resolves arbitrary width as borderWidth', () => {
+    expect(resolveBorder('border', '[3px]', config)).toEqual({ borderWidth: '3px' });
+    expect(resolveBorder('border-t', '[2px]', config)).toEqual({ borderTopWidth: '2px' });
+    expect(resolveBorder('border-x', '[4px]', config)).toEqual({ borderLeftWidth: '4px', borderRightWidth: '4px' });
+  });
+
   it('returns empty for unknown border value', () => {
     expect(resolveBorder('border', 'nonexistent', config)).toEqual({});
   });
