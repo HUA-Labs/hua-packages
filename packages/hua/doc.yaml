@@ -67,6 +67,10 @@ subpathExports:
     description: "Re-exports from @hua-labs/hooks"
   - path: "loaders"
     description: "Re-exports from @hua-labs/i18n-loaders"
+  - path: "dot"
+    description: "Re-exports from @hua-labs/dot — dot, dotMap, createDotConfig, clearDotCache, dotCx, dotVariants, adaptNative"
+  - path: "dot/react"
+    description: "React hooks for dot — useDot, useDotMap (requires 'use client')"
 
 apiFilter: notes-only
 
