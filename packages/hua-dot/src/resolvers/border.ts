@@ -20,9 +20,23 @@ import { parseArbitrary } from './utils';
  * resolveBorder('border', 'red-500', config) → { borderColor: '#ef4444' }
  */
 export function resolveBorder(prefix: string, value: string, config: DotConfig): StyleObject {
-  // Arbitrary value: border-[3px], border-t-[2px]
+  // Arbitrary value: border-[3px], border-t-[2px], border-[#dadce0]
   const arbitrary = parseArbitrary(value);
   if (arbitrary !== undefined) {
+    // Detect color values — route to borderColor instead of borderWidth
+    // Applies to all border prefixes: border, border-t, border-x, etc.
+    const strVal = String(arbitrary);
+    if (strVal.startsWith('#') || strVal.startsWith('rgb') || strVal.startsWith('hsl')) {
+      const colorResult: StyleObject = { borderColor: arbitrary };
+      // For directional prefixes, map to specific side colors
+      if (prefix === 'border-t') return { borderTopColor: arbitrary };
+      if (prefix === 'border-r') return { borderRightColor: arbitrary };
+      if (prefix === 'border-b') return { borderBottomColor: arbitrary };
+      if (prefix === 'border-l') return { borderLeftColor: arbitrary };
+      if (prefix === 'border-x') return { borderLeftColor: arbitrary, borderRightColor: arbitrary };
+      if (prefix === 'border-y') return { borderTopColor: arbitrary, borderBottomColor: arbitrary };
+      return colorResult;
+    }
     const widthProps = BORDER_WIDTH_PROP_MAP[prefix];
     if (widthProps) {
       const result: StyleObject = {};
