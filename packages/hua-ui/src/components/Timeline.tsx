@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { merge } from "../lib/utils";
+import React, { useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { Icon } from "./Icon";
 import type { IconName } from "../lib/icons";
 
@@ -45,9 +45,9 @@ export interface TimelineItem {
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
  * @property {boolean} [showConnector=true] - 연결선 표시 / Show connector
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface TimelineProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   items: TimelineItem[];
   orientation?: "vertical" | "horizontal";
   align?: "left" | "right" | "alternate";
@@ -56,61 +56,94 @@ export interface TimelineProps extends React.HTMLAttributes<HTMLDivElement> {
   emptyState?: React.ReactNode;
   showConnector?: boolean;
   size?: "sm" | "md" | "lg";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-const STATUS_CONFIG: Record<
-  TimelineStatus,
-  { dot: string; border: string; text: string; label: string; labelEn: string }
-> = {
+// ── Color tokens ──────────────────────────────────────────────────────────────
+
+const STATUS_COLORS: Record<TimelineStatus, {
+  dotBg: string;
+  dotBorder: string;
+  dotShadow?: string;
+  cardBorder: string;
+  badgeBg: string;
+  badgeText: string;
+  label: string;
+  labelEn: string;
+  pulse?: boolean;
+}> = {
   completed: {
-    dot: "bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]",
-    border: "border-emerald-200 dark:border-emerald-500/40",
-    text: "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10",
+    dotBg: "#10b981",
+    dotBorder: "#10b981",
+    dotShadow: "0 0 8px rgba(16,185,129,0.4)",
+    cardBorder: "var(--color-emerald-200, #a7f3d0)",
+    badgeBg: "var(--color-emerald-50, #ecfdf5)",
+    badgeText: "var(--color-emerald-700, #047857)",
     label: "완료",
     labelEn: "Completed",
   },
   active: {
-    dot: "bg-sky-500 border-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.4)] animate-pulse",
-    border: "border-sky-200 dark:border-sky-500/40",
-    text: "text-sky-700 dark:text-sky-200 bg-sky-50 dark:bg-sky-500/10",
+    dotBg: "#0ea5e9",
+    dotBorder: "#0ea5e9",
+    dotShadow: "0 0 8px rgba(14,165,233,0.4)",
+    cardBorder: "var(--color-sky-200, #bae6fd)",
+    badgeBg: "var(--color-sky-50, #f0f9ff)",
+    badgeText: "var(--color-sky-700, #0369a1)",
     label: "진행 중",
     labelEn: "Active",
+    pulse: true,
   },
   pending: {
-    dot: "bg-muted-foreground/40 border-muted-foreground/40",
-    border: "border-border",
-    text: "text-muted-foreground bg-muted",
+    dotBg: "var(--color-muted-foreground, #94a3b8)",
+    dotBorder: "var(--color-muted-foreground, #94a3b8)",
+    cardBorder: "var(--color-border, #e2e8f0)",
+    badgeBg: "var(--color-muted, #f1f5f9)",
+    badgeText: "var(--color-muted-foreground, #64748b)",
     label: "대기",
     labelEn: "Pending",
   },
   error: {
-    dot: "bg-rose-500 border-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]",
-    border: "border-rose-200 dark:border-rose-500/40",
-    text: "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/10",
+    dotBg: "#f43f5e",
+    dotBorder: "#f43f5e",
+    dotShadow: "0 0 8px rgba(244,63,94,0.4)",
+    cardBorder: "var(--color-rose-200, #fecdd3)",
+    badgeBg: "var(--color-rose-50, #fff1f2)",
+    badgeText: "var(--color-rose-700, #be123c)",
     label: "오류",
     labelEn: "Error",
   },
   warning: {
-    dot: "bg-amber-500 border-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]",
-    border: "border-amber-200 dark:border-amber-500/40",
-    text: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10",
+    dotBg: "#f59e0b",
+    dotBorder: "#f59e0b",
+    dotShadow: "0 0 8px rgba(245,158,11,0.4)",
+    cardBorder: "var(--color-amber-200, #fde68a)",
+    badgeBg: "var(--color-amber-50, #fffbeb)",
+    badgeText: "var(--color-amber-700, #b45309)",
     label: "경고",
     labelEn: "Warning",
   },
   info: {
-    dot: "bg-violet-500 border-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.4)]",
-    border: "border-violet-200 dark:border-violet-500/40",
-    text: "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/10",
+    dotBg: "#8b5cf6",
+    dotBorder: "#8b5cf6",
+    dotShadow: "0 0 8px rgba(139,92,246,0.4)",
+    cardBorder: "var(--color-violet-200, #ddd6fe)",
+    badgeBg: "var(--color-violet-50, #f5f3ff)",
+    badgeText: "var(--color-violet-700, #6d28d9)",
     label: "정보",
     labelEn: "Info",
   },
 };
 
+// ── Size tokens ───────────────────────────────────────────────────────────────
+
 const SIZE_CONFIG = {
-  sm: { dot: "h-2.5 w-2.5", gap: "gap-3", padding: "p-3", text: "text-xs" },
-  md: { dot: "h-3.5 w-3.5", gap: "gap-4", padding: "p-4", text: "text-sm" },
-  lg: { dot: "h-4 w-4", gap: "gap-5", padding: "p-5", text: "text-base" },
-};
+  sm: { dotSize: 10, gap: 12, padding: 12, fontSize: "0.75rem" },
+  md: { dotSize: 14, gap: 16, padding: 16, fontSize: "0.875rem" },
+  lg: { dotSize: 16, gap: 20, padding: 20, fontSize: "1rem" },
+} as const;
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const formatDate = (value?: string | Date, locale = "ko-KR") => {
   if (!value) return undefined;
@@ -118,6 +151,116 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
   if (Number.isNaN(parsed.getTime())) return undefined;
   return parsed.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
 };
+
+// ── Static styles ─────────────────────────────────────────────────────────────
+
+const WRAP_STYLE: React.CSSProperties = {
+  overflowX: "auto",
+};
+
+const EMPTY_STYLE: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingTop: "2rem",
+  paddingBottom: "2rem",
+  textAlign: "center",
+};
+
+const EMPTY_TEXT_PRIMARY: React.CSSProperties = {
+  fontSize: "0.875rem",
+  fontWeight: 500,
+  color: "var(--color-muted-foreground, #64748b)",
+};
+
+const EMPTY_TEXT_SECONDARY: React.CSSProperties = {
+  fontSize: "0.75rem",
+  color: "var(--color-muted-foreground, #64748b)",
+  marginTop: "0.25rem",
+};
+
+const OL_HORIZONTAL: React.CSSProperties = {
+  display: "flex",
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  minWidth: "max-content",
+};
+
+const LI_HORIZONTAL: React.CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+};
+
+const CONNECTOR_HORIZONTAL: React.CSSProperties = {
+  height: "2px",
+  width: "64px",
+  backgroundColor: "var(--color-border, #e2e8f0)",
+  marginTop: "0.4375rem",
+  marginLeft: "0.5rem",
+  marginRight: "0.5rem",
+  flexShrink: 0,
+};
+
+const OL_VERTICAL: React.CSSProperties = {
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+};
+
+const DOT_COL: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};
+
+const CONNECTOR_VERTICAL: React.CSSProperties = {
+  marginTop: "0.25rem",
+  flex: 1,
+  width: "1px",
+  backgroundColor: "var(--color-border, #e2e8f0)",
+};
+
+const TITLE_STYLE: React.CSSProperties = {
+  fontWeight: 600,
+  color: "var(--color-foreground, #0f172a)",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+};
+
+const DESCRIPTION_STYLE: React.CSSProperties = {
+  marginTop: "0.25rem",
+  color: "var(--color-muted-foreground, #64748b)",
+};
+
+const META_STYLE: React.CSSProperties = {
+  fontSize: "0.75rem",
+  color: "var(--color-muted-foreground, #64748b)",
+};
+
+const DATE_ROW_STYLE: React.CSSProperties = {
+  marginTop: "0.75rem",
+  display: "flex",
+  alignItems: "center",
+  gap: "0.25rem",
+  fontSize: "0.75rem",
+  color: "var(--color-muted-foreground, #64748b)",
+};
+
+const CUSTOM_CONTENT_STYLE: React.CSSProperties = {
+  marginTop: "0.75rem",
+};
+
+const ICON_WRAP_STYLE: React.CSSProperties = {
+  color: "var(--color-muted-foreground, #64748b)",
+};
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 /**
  * Timeline 컴포넌트
@@ -171,67 +314,100 @@ export const Timeline: React.FC<TimelineProps> = ({
   emptyState,
   showConnector = true,
   size = "md",
-  className,
+  dot: dotProp,
+  style,
   ...props
 }) => {
   const hasItems = items.length > 0;
   const sizeConfig = SIZE_CONFIG[size];
 
+  const rootStyle = useMemo(
+    () => mergeStyles(resolveDot(dotProp), style),
+    [dotProp, style],
+  );
+
   if (!hasItems) {
     return (
-      <div className={merge("", className)} {...props}>
+      <div style={rootStyle} data-timeline-root {...props}>
         {emptyState ?? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Icon name="clock" className="h-10 w-10 text-muted-foreground/50 mb-3" />
-            <p className="text-sm font-medium text-muted-foreground">타임라인이 비어 있습니다</p>
-            <p className="text-xs text-muted-foreground mt-1">이벤트가 추가되면 여기에 표시됩니다.</p>
+          <div style={EMPTY_STYLE}>
+            <span style={{ opacity: 0.5, marginBottom: "0.75rem" }}>
+              <Icon name="clock" size={40} />
+            </span>
+            <p style={EMPTY_TEXT_PRIMARY}>타임라인이 비어 있습니다</p>
+            <p style={EMPTY_TEXT_SECONDARY}>이벤트가 추가되면 여기에 표시됩니다.</p>
           </div>
         )}
       </div>
     );
   }
 
-  // Horizontal layout
+  // ── Horizontal ──────────────────────────────────────────────────────────────
   if (orientation === "horizontal") {
     return (
-      <div className={merge("overflow-x-auto", className)} {...props}>
-        <ol className="flex min-w-max" role="list" aria-label="타임라인">
+      <div style={mergeStyles(WRAP_STYLE, rootStyle)} data-timeline-root data-orientation="horizontal" {...props}>
+        <ol style={OL_HORIZONTAL} role="list" aria-label="타임라인">
           {items.map((item, index) => {
             const status = item.status ?? "pending";
-            const statusConfig = STATUS_CONFIG[status];
+            const sc = STATUS_COLORS[status];
             const date = formatDate(item.date, locale);
             const isHighlighted = highlightedId === item.id;
             const showLine = showConnector && index !== items.length - 1;
 
+            const dotStyle: React.CSSProperties = {
+              display: "inline-block",
+              borderRadius: "9999px",
+              border: "2px solid",
+              flexShrink: 0,
+              height: sizeConfig.dotSize,
+              width: sizeConfig.dotSize,
+              backgroundColor: sc.dotBg,
+              borderColor: sc.dotBorder,
+              boxShadow: sc.dotShadow,
+              ...(isHighlighted && {
+                transform: "scale(1.25)",
+                outline: "1px solid var(--color-border, #e2e8f0)",
+                outlineOffset: "2px",
+              }),
+              ...(sc.pulse && {
+                animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+              }),
+            };
+
+            const contentStyle: React.CSSProperties = {
+              marginTop: "0.75rem",
+              textAlign: "center",
+              maxWidth: "160px",
+              fontSize: sizeConfig.fontSize,
+            };
+
             return (
-              <li key={item.id} className="flex items-start" role="listitem">
-                <div className="flex flex-col items-center">
-                  {/* Dot */}
+              <li key={item.id} style={LI_HORIZONTAL} role="listitem">
+                <div style={DOT_COL}>
                   <span
-                    className={merge(
-                      "rounded-full border-2 shrink-0",
-                      sizeConfig.dot,
-                      statusConfig.dot,
-                      isHighlighted && "scale-125 ring-1 ring-offset-2 ring-border"
-                    )}
-                    aria-label={statusConfig.label}
+                    style={dotStyle}
+                    aria-label={sc.label}
+                    data-status={status}
                   />
-                  {/* Content below dot */}
-                  <div className={merge("mt-3 text-center max-w-[160px]", sizeConfig.text)}>
-                    <p className="font-semibold text-foreground truncate">{item.title}</p>
+                  <div style={contentStyle}>
+                    <p style={TITLE_STYLE}>{item.title}</p>
                     {item.description && (
-                      <p className="text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
+                      <p style={{ ...DESCRIPTION_STYLE, fontSize: sizeConfig.fontSize, WebkitLineClamp: 2, overflow: "hidden", display: "-webkit-box", WebkitBoxOrient: "vertical" }}>
+                        {item.description}
+                      </p>
                     )}
                     {date && (
-                      <time className="text-xs text-muted-foreground mt-1 block" dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
+                      <time
+                        style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #64748b)", marginTop: "0.25rem", display: "block" }}
+                        dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}
+                      >
                         {date}
                       </time>
                     )}
                   </div>
                 </div>
-                {/* Connector */}
                 {showLine && (
-                  <span className="h-0.5 w-16 bg-border mt-[0.4375rem] mx-2" aria-hidden="true" />
+                  <span style={CONNECTOR_HORIZONTAL} aria-hidden="true" data-connector="horizontal" />
                 )}
               </li>
             );
@@ -241,13 +417,13 @@ export const Timeline: React.FC<TimelineProps> = ({
     );
   }
 
-  // Vertical layout
+  // ── Vertical ────────────────────────────────────────────────────────────────
   return (
-    <div className={merge("", className)} {...props}>
-      <ol className="space-y-4" role="list" aria-label="타임라인">
+    <div style={rootStyle} data-timeline-root data-orientation="vertical" {...props}>
+      <ol style={OL_VERTICAL} role="list" aria-label="타임라인">
         {items.map((item, index) => {
           const status = item.status ?? "pending";
-          const statusConfig = STATUS_CONFIG[status];
+          const sc = STATUS_COLORS[status];
           const date = formatDate(item.date, locale);
           const isHighlighted = highlightedId === item.id;
           const showLine = showConnector && index !== items.length - 1;
@@ -257,82 +433,125 @@ export const Timeline: React.FC<TimelineProps> = ({
           const renderIcon = () => {
             if (!item.icon) return null;
             if (typeof item.icon === "string") {
-              return <Icon name={item.icon as IconName} className="h-4 w-4" />;
+              return <Icon name={item.icon as IconName} size={16} />;
             }
             return item.icon;
           };
 
-          const itemContent = (
-            <div
-              className={merge(
-                "flex-1 rounded-xl border transition-all",
-                sizeConfig.padding,
-                statusConfig.border,
-                isHighlighted && "border-2 shadow-md ring-1 ring-border"
-              )}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                {renderIcon() && (
-                  <span className="text-muted-foreground">{renderIcon()}</span>
-                )}
-                <span className={merge("font-semibold text-foreground", sizeConfig.text)}>
-                  {item.title}
-                </span>
-                <span className={merge("text-xs font-medium rounded-full px-2 py-0.5", statusConfig.text)}>
-                  {statusConfig.label}
-                </span>
-                {item.meta && (
-                  <span className="text-xs text-muted-foreground">{item.meta}</span>
-                )}
-              </div>
+          const dotStyle: React.CSSProperties = {
+            display: "inline-block",
+            zIndex: 10,
+            borderRadius: "9999px",
+            border: "2px solid",
+            flexShrink: 0,
+            height: sizeConfig.dotSize,
+            width: sizeConfig.dotSize,
+            backgroundColor: sc.dotBg,
+            borderColor: sc.dotBorder,
+            boxShadow: sc.dotShadow,
+            ...(isHighlighted && {
+              transform: "scale(1.1)",
+            }),
+            ...(sc.pulse && {
+              animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+            }),
+          };
 
-              {item.description && (
-                <p className={merge("mt-1 text-muted-foreground", sizeConfig.text)}>
-                  {item.description}
-                </p>
-              )}
+          const cardStyle: React.CSSProperties = {
+            flex: 1,
+            borderRadius: "0.75rem",
+            border: `${isHighlighted ? "2px" : "1px"} solid ${sc.cardBorder}`,
+            padding: sizeConfig.padding,
+            transition: "all 200ms",
+            ...(isHighlighted && {
+              boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+              outline: "1px solid var(--color-border, #e2e8f0)",
+            }),
+          };
 
-              {item.content && <div className="mt-3">{item.content}</div>}
+          const badgeStyle: React.CSSProperties = {
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            borderRadius: "9999px",
+            paddingLeft: "0.5rem",
+            paddingRight: "0.5rem",
+            paddingTop: "0.125rem",
+            paddingBottom: "0.125rem",
+            backgroundColor: sc.badgeBg,
+            color: sc.badgeText,
+          };
 
-              {date && (
-                <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                  <Icon name="clock" className="h-3 w-3" aria-hidden={true} />
-                  <time dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
-                    {date}
-                  </time>
-                </div>
-              )}
-            </div>
-          );
+          const titleRowStyle: React.CSSProperties = {
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "0.5rem",
+          };
+
+          const liStyle: React.CSSProperties = {
+            position: "relative",
+            display: "flex",
+            gap: sizeConfig.gap,
+            ...(isRight && { flexDirection: "row-reverse" }),
+          };
+
+          const iconNode = renderIcon();
 
           return (
             <li
               key={item.id}
               role="listitem"
-              className={merge(
-                "relative flex",
-                sizeConfig.gap,
-                isRight && "flex-row-reverse"
-              )}
+              style={liStyle}
+              data-size={size}
             >
               {/* Dot and Connector */}
-              <div className="flex flex-col items-center">
+              <div style={DOT_COL}>
                 <span
-                  className={merge(
-                    "z-10 rounded-full border-2 shrink-0",
-                    sizeConfig.dot,
-                    statusConfig.dot,
-                    isHighlighted && "scale-110"
-                  )}
-                  aria-label={statusConfig.label}
+                  style={dotStyle}
+                  aria-label={sc.label}
+                  data-status={status}
                 />
                 {showLine && (
-                  <span className="mt-1 flex-1 w-px bg-border" aria-hidden="true" />
+                  <span style={CONNECTOR_VERTICAL} aria-hidden="true" data-connector="vertical" />
                 )}
               </div>
 
-              {/* Content */}
-              {itemContent}
+              {/* Card */}
+              <div style={cardStyle} data-highlighted={isHighlighted ? "true" : undefined}>
+                <div style={titleRowStyle}>
+                  {iconNode && (
+                    <span style={ICON_WRAP_STYLE}>{iconNode}</span>
+                  )}
+                  <span style={{ ...TITLE_STYLE, fontSize: sizeConfig.fontSize }}>
+                    {item.title}
+                  </span>
+                  <span style={badgeStyle}>
+                    {sc.label}
+                  </span>
+                  {item.meta && (
+                    <span style={META_STYLE}>{item.meta}</span>
+                  )}
+                </div>
+
+                {item.description && (
+                  <p style={{ ...DESCRIPTION_STYLE, fontSize: sizeConfig.fontSize }}>
+                    {item.description}
+                  </p>
+                )}
+
+                {item.content && (
+                  <div style={CUSTOM_CONTENT_STYLE}>{item.content}</div>
+                )}
+
+                {date && (
+                  <div style={DATE_ROW_STYLE}>
+                    <Icon name="clock" size={12} aria-hidden />
+                    <time dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
+                      {date}
+                    </time>
+                  </div>
+                )}
+              </div>
             </li>
           );
         })}

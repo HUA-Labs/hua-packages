@@ -1,62 +1,148 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+
+// --- Static style constants ---
+
+const SR_ONLY_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0,0,0,0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+}
+
+const WRAPPER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '0.75rem',
+}
+
+const LABEL_COL_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+}
+
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  color: 'var(--color-foreground)',
+  cursor: 'pointer',
+}
+
+const DESCRIPTION_STYLE: React.CSSProperties = {
+  fontSize: '0.875rem',
+  color: 'var(--color-muted-foreground)',
+}
+
+// --- Size maps ---
+
+type Size = "sm" | "md" | "lg"
+
+const CIRCLE_SIZE: Record<Size, React.CSSProperties> = {
+  sm: { width: '1rem',    height: '1rem' },
+  md: { width: '1.25rem', height: '1.25rem' },
+  lg: { width: '1.5rem',  height: '1.5rem' },
+}
+
+const DOT_SIZE: Record<Size, React.CSSProperties> = {
+  sm: { width: '0.375rem', height: '0.375rem' },
+  md: { width: '0.5rem',   height: '0.5rem' },
+  lg: { width: '0.625rem', height: '0.625rem' },
+}
+
+// --- Variant base styles ---
+
+type Variant = "default" | "outline" | "filled" | "glass"
+
+const VARIANT_BASE: Record<Variant, React.CSSProperties> = {
+  default: {
+    borderColor: 'var(--color-input)',
+    backgroundColor: 'var(--color-background)',
+    color: 'var(--color-primary)',
+  },
+  outline: {
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderColor: 'var(--color-input)',
+    backgroundColor: 'transparent',
+    color: 'var(--color-primary)',
+  },
+  filled: {
+    borderColor: 'transparent',
+    backgroundColor: 'var(--color-muted)',
+    color: 'var(--color-primary)',
+  },
+  glass: {
+    borderColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    backdropFilter: 'blur(4px)',
+    WebkitBackdropFilter: 'blur(4px)',
+    color: '#fff',
+  },
+}
+
+// --- Focus ring colors per variant/state ---
+
+const FOCUS_SHADOW: Record<string, string> = {
+  default: '0 0 0 1px var(--color-ring)',
+  outline: '0 0 0 1px var(--color-ring)',
+  filled:  '0 0 0 1px var(--color-ring)',
+  glass:   '0 0 0 1px rgba(var(--color-ring), 0.5)',
+  error:   '0 0 0 1px var(--color-destructive)',
+  success: '0 0 0 1px #22c55e',
+}
 
 /**
- * Radio 컴포넌트의 props / Radio component props
+ * Radio component props
+ *
  * @typedef {Object} RadioProps
- * @property {"default" | "outline" | "filled" | "glass"} [variant="default"] - Radio 스타일 변형 / Radio style variant
- * @property {"sm" | "md" | "lg"} [size="md"] - Radio 크기 / Radio size
- * @property {boolean} [error=false] - 에러 상태 표시 / Error state
- * @property {boolean} [success=false] - 성공 상태 표시 / Success state
- * @property {string} [label] - 라디오 버튼 레이블 텍스트 / Radio button label text
- * @property {string} [description] - 라디오 버튼 설명 텍스트 / Radio button description text
- * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>}
+ * @property {"default" | "outline" | "filled" | "glass"} [variant="default"] - Radio style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - Radio size
+ * @property {boolean} [error=false] - Error state
+ * @property {boolean} [success=false] - Success state
+ * @property {string} [label] - Radio button label text
+ * @property {string} [description] - Radio button description text
+ * @property {string} [dot] - Dot utility string for additional styles on the wrapper
+ * @property {React.CSSProperties} [style] - Inline styles for the wrapper
+ * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'className'>}
  */
-export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  variant?: "default" | "outline" | "filled" | "glass"
-  size?: "sm" | "md" | "lg"
+export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'className'> {
+  variant?: Variant
+  size?: Size
   error?: boolean
   success?: boolean
   label?: string
   description?: string
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * Radio 컴포넌트 / Radio component
- * 
- * 라디오 버튼 입력 필드를 제공하는 컴포넌트입니다.
- * 같은 name 속성을 가진 여러 Radio는 그룹으로 동작합니다.
- * ARIA 속성을 자동으로 설정하여 접근성을 지원합니다.
- * 
- * Radio button input field component.
- * Multiple Radio components with the same name attribute work as a group.
- * Automatically sets ARIA attributes for accessibility support.
- * 
+ * Radio component
+ *
+ * A radio button input field. Multiple Radio components with the same name attribute
+ * work as a group. Automatically sets ARIA attributes for accessibility.
+ *
  * @component
  * @example
- * // 기본 사용 (그룹) / Basic usage (group)
- * <Radio name="option" value="1" label="옵션 1" />
- * <Radio name="option" value="2" label="옵션 2" />
- * <Radio name="option" value="3" label="옵션 3" />
- * 
+ * // Basic usage (group)
+ * <Radio name="option" value="1" label="Option 1" />
+ * <Radio name="option" value="2" label="Option 2" />
+ *
  * @example
- * // 에러 상태 / Error state
- * <Radio 
- *   name="gender"
- *   value="male"
- *   label="남성"
- *   error
- * />
- * 
- * @param {RadioProps} props - Radio 컴포넌트의 props / Radio component props
- * @param {React.Ref<HTMLInputElement>} ref - input 요소 ref / input element ref
- * @returns {JSX.Element} Radio 컴포넌트 / Radio component
+ * // Error state
+ * <Radio name="gender" value="male" label="Male" error />
+ *
+ * @param {RadioProps} props - Radio component props
+ * @param {React.Ref<HTMLInputElement>} ref - input element ref
+ * @returns {JSX.Element} Radio component
  */
 const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
-  ({ 
-    className, 
+  ({
     variant = "default",
     size = "md",
     error = false,
@@ -64,53 +150,83 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     label,
     description,
     id,
-    ...props 
+    dot: dotProp,
+    style,
+    disabled,
+    onFocus,
+    onBlur,
+    ...props
   }, ref) => {
     const generatedId = React.useId()
     const radioId = id || generatedId
     const labelId = label ? `${radioId}-label` : undefined
     const descriptionId = description ? `${radioId}-description` : undefined
-    const sizeClasses = {
-      sm: "w-4 h-4",
-      md: "w-5 h-5",
-      lg: "w-6 h-6"
-    }
 
-    const dotSizes = {
-      sm: "w-1.5 h-1.5",
-      md: "w-2 h-2",
-      lg: "w-2.5 h-2.5"
-    }
-
-    const variantClasses = {
-      default: "border-input bg-background text-primary focus:ring-ring",
-      outline: "border-2 border-input bg-transparent text-primary focus:ring-ring",
-      filled: "border-transparent bg-muted text-primary focus:bg-background focus:ring-ring",
-      glass: "border-white/30 bg-white/10 backdrop-blur-sm text-white focus:ring-ring/50 focus:bg-white/20",
-    }
-
-    const stateClasses = error
-      ? "border-destructive focus:ring-destructive"
-      : success
-      ? "border-green-500 focus:ring-green-500"
-      : ""
+    const [isFocused, setIsFocused] = useState(false)
 
     // Support both controlled and uncontrolled modes
-    const isControlled = props.checked !== undefined;
-    const isChecked = props.checked ?? props.defaultChecked ?? false;
-    // Add readOnly if controlled without onChange to suppress React warning
-    const needsReadOnly = isControlled && !props.onChange && !props.readOnly;
+    const isControlled = props.checked !== undefined
+    const isChecked = props.checked ?? props.defaultChecked ?? false
+    const needsReadOnly = isControlled && !props.onChange && !props.readOnly
+
+    // Resolve which focus shadow to use
+    const focusShadowKey = error ? 'error' : success ? 'success' : variant
+    const focusShadow = FOCUS_SHADOW[focusShadowKey] ?? FOCUS_SHADOW['default']
+
+    // State border color overrides
+    const stateBorderColor: React.CSSProperties | undefined = error
+      ? { borderColor: 'var(--color-destructive)' }
+      : success
+      ? { borderColor: '#22c55e' }
+      : isChecked
+      ? { borderColor: 'var(--color-primary)' }
+      : undefined
+
+    // Computed circle (outer) style
+    const circleStyle = useMemo((): React.CSSProperties => mergeStyles(
+      {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        border: '1px solid',
+        transition: 'all 200ms ease-in-out',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        outline: 'none',
+      },
+      CIRCLE_SIZE[size],
+      VARIANT_BASE[variant],
+      stateBorderColor,
+      isFocused ? { boxShadow: focusShadow } : undefined,
+    ), [size, variant, error, success, isChecked, isFocused, disabled, focusShadow])
+
+    // Computed inner dot style
+    const innerDotStyle = useMemo((): React.CSSProperties => mergeStyles(
+      {
+        borderRadius: '50%',
+        backgroundColor: 'var(--color-primary)',
+        transition: 'all 200ms ease-in-out',
+        opacity: isChecked ? 1 : 0,
+        transform: isChecked ? 'scale(1)' : 'scale(0)',
+      },
+      DOT_SIZE[size],
+    ), [size, isChecked])
+
+    // Computed wrapper style (supports dot prop + style override)
+    const wrapperStyle = useMemo((): React.CSSProperties => mergeStyles(
+      WRAPPER_STYLE,
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, style])
 
     return (
-      <div className="flex items-start space-x-3">
-        <div className="relative">
+      <div style={wrapperStyle}>
+        <div style={{ position: 'relative' }}>
           <input
             type="radio"
             id={radioId}
-            className={merge(
-              "peer sr-only",
-              className
-            )}
+            style={SR_ONLY_STYLE}
             ref={ref}
             aria-checked={isChecked}
             aria-invalid={error}
@@ -118,38 +234,35 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
             aria-labelledby={label ? labelId : undefined}
             aria-describedby={descriptionId}
             role="radio"
+            disabled={disabled}
             readOnly={needsReadOnly || props.readOnly}
+            onFocus={(e) => {
+              setIsFocused(true)
+              onFocus?.(e)
+            }}
+            onBlur={(e) => {
+              setIsFocused(false)
+              onBlur?.(e)
+            }}
             {...props}
           />
-          <div
-            className={merge(
-              "flex items-center justify-center rounded-full border transition-all duration-200 cursor-pointer",
-              "peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-offset-2",
-              "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-              sizeClasses[size],
-              variantClasses[variant],
-              stateClasses,
-              isChecked && "border-primary dark:border-primary"
-            )}
-          >
-            <div
-              className={merge(
-                "rounded-full bg-primary dark:bg-primary transition-all duration-200",
-                dotSizes[size],
-                isChecked ? "opacity-100 scale-100" : "opacity-0 scale-0"
-              )}
-            />
+          <div style={circleStyle}>
+            <div style={innerDotStyle} />
           </div>
         </div>
         {(label || description) && (
-          <div className="flex flex-col">
+          <div style={LABEL_COL_STYLE}>
             {label && (
-              <label htmlFor={radioId} id={labelId} className="text-sm font-medium text-foreground cursor-pointer">
+              <label
+                htmlFor={radioId}
+                id={labelId}
+                style={disabled ? { ...LABEL_STYLE, cursor: 'not-allowed', opacity: 0.5 } : LABEL_STYLE}
+              >
                 {label}
               </label>
             )}
             {description && (
-              <p id={descriptionId} className="text-sm text-muted-foreground">
+              <p id={descriptionId} style={DESCRIPTION_STYLE}>
                 {description}
               </p>
             )}
@@ -161,4 +274,4 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
 )
 Radio.displayName = "Radio"
 
-export { Radio } 
+export { Radio }

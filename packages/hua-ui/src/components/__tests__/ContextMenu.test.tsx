@@ -105,7 +105,7 @@ describe('ContextMenu', () => {
     const trigger = screen.getByText('Right-click');
     fireEvent.contextMenu(trigger, { clientX: 100, clientY: 200 });
 
-    const menu = container.querySelector('.fixed') as HTMLElement;
+    const menu = container.querySelector('[data-testid="context-menu-panel"]') as HTMLElement;
     expect(menu).toHaveStyle({ left: '100px', top: '200px' });
   });
 

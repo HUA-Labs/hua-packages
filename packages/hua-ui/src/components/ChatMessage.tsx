@@ -1,10 +1,13 @@
 'use client'
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { dot as dotFn } from "@hua-labs/dot"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { Avatar, AvatarImage, AvatarFallback } from "./Avatar"
 import { Badge } from "./Badge"
 import { Card, CardContent } from "./Card"
+
+const s = (input: string) => dotFn(input) as React.CSSProperties
 
 /**
  * ChatMessage 컴포넌트의 props / ChatMessage component props
@@ -34,9 +37,8 @@ import { Card, CardContent } from "./Card"
  * @property {string} [theme.userBubbleText] - 사용자 버블 텍스트 색상 / User bubble text color
  * @property {string} [theme.aiBubbleBg] - AI 버블 배경색 / AI bubble background color
  * @property {string} [theme.aiBubbleText] - AI 버블 텍스트 색상 / AI bubble text color
- * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
-interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ChatMessageProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   message: {
     id: string
     content: string
@@ -66,14 +68,62 @@ interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
     aiBubbleBg?: string
     aiBubbleText?: string
   }
+  dot?: string
+  style?: React.CSSProperties
+}
+
+/** Emotion color map — CSSProperties per emotion key */
+type EmotionStyle = { backgroundColor: string; color: string }
+
+const EMOTION_STYLES: Record<string, EmotionStyle> = {
+  joy:        { backgroundColor: '#fef9c3', color: '#854d0e' },
+  sadness:    { backgroundColor: '#e0e7ff', color: '#0e7490' },
+  anger:      { backgroundColor: '#fee2e2', color: '#991b1b' },
+  calm:       { backgroundColor: '#dcfce7', color: '#166534' },
+  excitement: { backgroundColor: '#fce7f3', color: '#9d174d' },
+  worry:      { backgroundColor: '#f3f4f6', color: '#1f2937' },
+  gratitude:  { backgroundColor: '#f3e8ff', color: '#6b21a8' },
+  loneliness: { backgroundColor: '#e0e7ff', color: '#3730a3' },
+}
+
+const DEFAULT_EMOTION_STYLE: EmotionStyle = { backgroundColor: '#f3f4f6', color: '#1f2937' }
+
+function getEmotionStyle(emotion?: string): EmotionStyle {
+  if (!emotion) return DEFAULT_EMOTION_STYLE
+  return EMOTION_STYLES[emotion] ?? DEFAULT_EMOTION_STYLE
+}
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** Animated bounce dots for typing indicator */
+const TypingDots = ({ size = 8 }: { size?: number }) => {
+  const dotStyle: React.CSSProperties = {
+    width: size,
+    height: size,
+    backgroundColor: 'currentColor',
+    borderRadius: '50%',
+    animation: 'bounce 1s infinite',
+  }
+  return (
+    <div style={s("flex gap-1")}>
+      <div style={dotStyle} />
+      <div style={{ ...dotStyle, animationDelay: '100ms' }} />
+      <div style={{ ...dotStyle, animationDelay: '200ms' }} />
+    </div>
+  )
 }
 
 /**
  * ChatMessage 컴포넌트
- * 
+ *
  * 채팅 메시지를 표시하는 컴포넌트입니다.
  * 사용자, AI 어시스턴트, 시스템 메시지를 지원하며, 감정 정보를 표시할 수 있습니다.
- * 
+ *
  * @component
  * @example
  * // 기본 사용
@@ -85,7 +135,7 @@ interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
  *     timestamp: new Date()
  *   }}
  * />
- * 
+ *
  * @example
  * // AI 메시지, 감정 정보 포함
  * <ChatMessage
@@ -99,14 +149,15 @@ interface ChatMessageProps extends React.HTMLAttributes<HTMLDivElement> {
  *   }}
  *   variant="bubble"
  * />
- * 
+ *
  * @param {ChatMessageProps} props - ChatMessage 컴포넌트의 props / ChatMessage component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ChatMessage 컴포넌트 / ChatMessage component
  */
 const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
+    style,
     message,
     user = { name: "사용자", color: "#3b82f6" },
     assistant = { name: "AI", color: "#10b981" },
@@ -120,51 +171,93 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
       aiBubbleBg: "#f3f4f6",
       aiBubbleText: "#1f2937"
     },
-    ...props 
+    ...props
   }, ref) => {
     const isUser = message.role === "user"
-    const _isAssistant = message.role === "assistant"
-    const _isSystem = message.role === "system"
+    const emotionStyle = getEmotionStyle(message.emotion)
 
-    const getEmotionColor = (emotion?: string) => {
-      if (!emotion) return "bg-gray-100"
-      
-      const emotionColors = {
-        joy: "bg-yellow-100 text-yellow-800",
-        sadness: "bg-indigo-100 text-cyan-800",
-        anger: "bg-red-100 text-red-800",
-        calm: "bg-green-100 text-green-800",
-        excitement: "bg-pink-100 text-pink-800",
-        worry: "bg-gray-100 text-gray-800",
-        gratitude: "bg-purple-100 text-purple-800",
-        loneliness: "bg-indigo-100 text-indigo-800"
-      }
-      
-      return emotionColors[emotion as keyof typeof emotionColors] || "bg-gray-100 text-gray-800"
-    }
+    // --- bubble variant styles ---
+    const bubbleOuterStyle = useMemo(
+      () => mergeStyles(
+        s("flex w-full"),
+        isUser ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' },
+        variant === "bubble" ? resolveDot(dotProp) : undefined,
+        variant === "bubble" ? style : undefined,
+      ),
+      [isUser, variant, dotProp, style],
+    )
 
-    const formatTime = (date: Date) => {
-      return date.toLocaleTimeString('ko-KR', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      })
-    }
+    const bubbleInnerStyle = useMemo(
+      () => mergeStyles(
+        s("flex gap-2"),
+        { maxWidth: '80%' },
+        isUser ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' },
+      ),
+      [isUser],
+    )
+
+    const bubbleMsgStyle = useMemo(
+      () => mergeStyles(
+        {
+          paddingTop: 8,
+          paddingBottom: 8,
+          paddingLeft: 16,
+          paddingRight: 16,
+          borderRadius: 16,
+          maxWidth: '100%',
+          wordBreak: 'break-word' as React.CSSProperties['wordBreak'],
+          backgroundColor: isUser ? theme.userBubbleBg : theme.aiBubbleBg,
+          color: isUser ? theme.userBubbleText : theme.aiBubbleText,
+        },
+        isUser
+          ? { borderBottomRightRadius: 4 }
+          : { borderBottomLeftRadius: 4 },
+      ),
+      [isUser, theme],
+    )
+
+    const bubbleMetaStyle = useMemo(
+      () => mergeStyles(
+        s("flex items-center gap-2"),
+        { fontSize: 12, color: 'var(--color-muted-foreground)' },
+        isUser ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' },
+      ),
+      [isUser],
+    )
+
+    // --- compact variant styles ---
+    const compactOuterStyle = useMemo(
+      () => mergeStyles(
+        s("flex items-start gap-3"),
+        { paddingTop: 8, paddingBottom: 8 },
+        variant === "compact" ? resolveDot(dotProp) : undefined,
+        variant === "compact" ? style : undefined,
+      ),
+      [variant, dotProp, style],
+    )
+
+    // --- default variant styles ---
+    const defaultOuterStyle = useMemo(
+      () => mergeStyles(
+        s("flex items-start gap-3"),
+        { paddingTop: 16, paddingBottom: 16 },
+        variant === "default" ? resolveDot(dotProp) : undefined,
+        variant === "default" ? style : undefined,
+      ),
+      [variant, dotProp, style],
+    )
+
+    const cardStyle = useMemo(
+      () => isUser
+        ? { display: 'inline-block' as const, backgroundColor: 'var(--color-primary)', color: 'var(--color-primary-foreground)' }
+        : { display: 'inline-block' as const, backgroundColor: 'var(--color-muted)' },
+      [isUser],
+    )
 
     if (variant === "bubble") {
       return (
-        <div
-          ref={ref}
-          className={merge(
-            "flex w-full",
-            isUser ? "justify-end" : "justify-start",
-            className
-          )}
-          {...props}
-        >
-          <div className={merge(
-            "flex max-w-[80%] space-x-2",
-            isUser ? "flex-row-reverse space-x-reverse" : "flex-row"
-          )}>
+        <div ref={ref} style={bubbleOuterStyle} {...props}>
+          <div style={bubbleInnerStyle}>
             {showAvatar && (
               <Avatar dot="w-8 h-8 flex-shrink-0">
                 <AvatarImage
@@ -172,51 +265,26 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   alt={isUser ? user.name : assistant.name}
                 />
                 <AvatarFallback
-                  style={{
-                    backgroundColor: isUser ? user.color : assistant.color
-                  }}
+                  style={{ backgroundColor: isUser ? user.color : assistant.color }}
                 >
                   {(isUser ? user.name : assistant.name)?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             )}
-            
-            <div className="space-y-1">
-              <div
-                className={merge(
-                  "px-4 py-2 rounded-2xl max-w-full break-words",
-                  isUser 
-                    ? "rounded-br-md" 
-                    : "rounded-bl-md"
-                )}
-                style={{
-                  backgroundColor: isUser ? theme.userBubbleBg : theme.aiBubbleBg,
-                  color: isUser ? theme.userBubbleText : theme.aiBubbleText
-                }}
-              >
+
+            <div style={s("flex flex-col gap-1")}>
+              <div style={bubbleMsgStyle}>
                 {message.isTyping ? (
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-100" />
-                    <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-200" />
-                  </div>
+                  <TypingDots size={8} />
                 ) : (
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{message.content}</div>
                 )}
               </div>
-              
-              <div className={merge(
-                "flex items-center space-x-2 text-xs text-muted-foreground",
-                isUser ? "justify-end" : "justify-start"
-              )}>
-                {showTimestamp && (
-                  <span>{formatTime(message.timestamp)}</span>
-                )}
+
+              <div style={bubbleMetaStyle}>
+                {showTimestamp && <span>{formatTime(message.timestamp)}</span>}
                 {showEmotion && message.emotion && (
-                  <Badge
-                    variant="secondary"
-                    dot={merge("text-xs", getEmotionColor(message.emotion))}
-                  >
+                  <Badge variant="secondary" style={emotionStyle}>
                     {message.emotion}
                   </Badge>
                 )}
@@ -229,14 +297,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
 
     if (variant === "compact") {
       return (
-        <div
-          ref={ref}
-          className={merge(
-            "flex items-start space-x-3 py-2",
-            className
-          )}
-          {...props}
-        >
+        <div ref={ref} style={compactOuterStyle} {...props}>
           {showAvatar && (
             <Avatar dot="w-6 h-6 flex-shrink-0">
               <AvatarImage
@@ -244,44 +305,35 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 alt={isUser ? user.name : assistant.name}
               />
               <AvatarFallback
-                style={{
-                  backgroundColor: isUser ? user.color : assistant.color
-                }}
+                style={{ backgroundColor: isUser ? user.color : assistant.color }}
               >
                 {(isUser ? user.name : assistant.name)?.charAt(0)}
               </AvatarFallback>
             </Avatar>
           )}
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-2 mb-1">
-              <span className="text-sm font-medium">
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={mergeStyles(s("flex items-center gap-2"), { marginBottom: 4 })}>
+              <span style={{ fontSize: 14, fontWeight: 500 }}>
                 {isUser ? user.name : assistant.name}
               </span>
               {showTimestamp && (
-                <span className="text-xs text-muted-foreground">
+                <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>
                   {formatTime(message.timestamp)}
                 </span>
               )}
               {showEmotion && message.emotion && (
-                <Badge
-                  variant="secondary"
-                  dot={merge("text-xs", getEmotionColor(message.emotion))}
-                >
+                <Badge variant="secondary" style={emotionStyle}>
                   {message.emotion}
                 </Badge>
               )}
             </div>
 
-            <div className="text-sm">
+            <div style={{ fontSize: 14 }}>
               {message.isTyping ? (
-                <div className="flex space-x-1">
-                  <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" />
-                  <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce delay-100" />
-                  <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce delay-200" />
-                </div>
+                <TypingDots size={6} />
               ) : (
-                <div className="whitespace-pre-wrap">{message.content}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }}>{message.content}</div>
               )}
             </div>
           </div>
@@ -291,14 +343,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
 
     // default variant
     return (
-      <div
-        ref={ref}
-        className={merge(
-          "flex items-start space-x-3 py-4",
-          className
-        )}
-        {...props}
-      >
+      <div ref={ref} style={defaultOuterStyle} {...props}>
         {showAvatar && (
           <Avatar dot="w-10 h-10 flex-shrink-0">
             <AvatarImage
@@ -306,48 +351,36 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               alt={isUser ? user.name : assistant.name}
             />
             <AvatarFallback
-              style={{
-                backgroundColor: isUser ? user.color : assistant.color
-              }}
+              style={{ backgroundColor: isUser ? user.color : assistant.color }}
             >
               {(isUser ? user.name : assistant.name)?.charAt(0)}
             </AvatarFallback>
           </Avatar>
         )}
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="font-medium">
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={mergeStyles(s("flex items-center gap-2"), { marginBottom: 8 })}>
+            <span style={{ fontWeight: 500 }}>
               {isUser ? user.name : assistant.name}
             </span>
             {showTimestamp && (
-              <span className="text-sm text-muted-foreground">
+              <span style={{ fontSize: 14, color: 'var(--color-muted-foreground)' }}>
                 {formatTime(message.timestamp)}
               </span>
             )}
             {showEmotion && message.emotion && (
-              <Badge
-                variant="secondary"
-                dot={merge("text-xs", getEmotionColor(message.emotion))}
-              >
+              <Badge variant="secondary" style={emotionStyle}>
                 {message.emotion}
               </Badge>
             )}
           </div>
 
-          <Card dot={merge(
-            "inline-block",
-            isUser ? "bg-primary text-primary-foreground" : "bg-muted"
-          )}>
+          <Card style={cardStyle}>
             <CardContent dot="p-3">
               {message.isTyping ? (
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-100" />
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-200" />
-                </div>
+                <TypingDots size={8} />
               ) : (
-                <div className="whitespace-pre-wrap">{message.content}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }}>{message.content}</div>
               )}
             </CardContent>
           </Card>
@@ -359,4 +392,4 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
 
 ChatMessage.displayName = "ChatMessage"
 
-export { ChatMessage } 
+export { ChatMessage }

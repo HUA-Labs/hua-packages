@@ -938,7 +938,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8">
       <div className="container mx-auto px-4">
         {/* 통계 카드들 */}
-        <DashboardGrid columns={4} gap="md" className="mb-8">
+        <DashboardGrid columns={4} gap="md" style={{ marginBottom: "2rem" }}>
           <StatCard
             title="총 사용자"
             value={1234}
@@ -979,7 +979,7 @@ export default function AdminDashboard() {
         </DashboardGrid>
 
         {/* 빠른 액션 */}
-        <DashboardGrid columns={3} gap="md" className="mb-8">
+        <DashboardGrid columns={3} gap="md" style={{ marginBottom: "2rem" }}>
           <QuickActionCard
             title="일기 관리"
             description="전체 일기 보기"
@@ -1058,7 +1058,7 @@ export default function AdvancedDashboard() {
         />
 
         {/* 요약 카드들 */}
-        <DashboardGrid columns={3} gap="md" className="mb-8">
+        <DashboardGrid columns={3} gap="md" style={{ marginBottom: "2rem" }}>
           <SummaryCard
             title="크레딧 잔액"
             value={1000}
@@ -1088,7 +1088,7 @@ export default function AdvancedDashboard() {
         </DashboardGrid>
 
         {/* 메트릭 카드와 알림 */}
-        <DashboardGrid columns={2} gap="md" className="mb-8">
+        <DashboardGrid columns={2} gap="md" style={{ marginBottom: "2rem" }}>
           <MetricCard
             title="API 사용량 추이"
             value={1234}

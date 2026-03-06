@@ -1,38 +1,55 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useMotionConfig } from "../../context/MotionConfigContext";
 
+/** Base card styles applied to every SpotlightCard */
+const BASE_STYLE: React.CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
+  borderRadius: "0.75rem",
+  backgroundColor: "rgb(17 24 39)",
+  border: "1px solid rgb(31 41 55)",
+  transition: "border-color 300ms ease, box-shadow 300ms ease",
+};
+
+const HOVERED_STYLE: React.CSSProperties = {
+  borderColor: "rgb(55 65 81)",
+  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.2)",
+};
+
 /**
- * SpotlightCard 컴포넌트의 props / SpotlightCard component props
- * @property {string} [spotlightColor="rgba(255, 255, 255, 0.1)"] - 스포트라이트 색상 / Spotlight color
- * @property {number} [spotlightSize=300] - 스포트라이트 크기 (px) / Spotlight size in pixels
- * @property {boolean} [gradient=true] - 그라디언트 배경 효과 / Gradient background effect
- * @property {string} [gradientFrom="rgba(255, 255, 255, 0.05)"] - 그라디언트 시작 색상 / Gradient start color
- * @property {string} [gradientTo="transparent"] - 그라디언트 끝 색상 / Gradient end color
+ * SpotlightCard component props
+ * @property {string} [spotlightColor="rgba(255, 255, 255, 0.1)"] - Spotlight color
+ * @property {number} [spotlightSize=300] - Spotlight size in pixels
+ * @property {boolean} [gradient=true] - Gradient background effect
+ * @property {string} [gradientFrom="rgba(255, 255, 255, 0.05)"] - Gradient start color
+ * @property {string} [gradientTo="transparent"] - Gradient end color
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - Additional inline styles (merged last)
  */
-export interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SpotlightCardProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   spotlightColor?: string;
   spotlightSize?: number;
   gradient?: boolean;
   gradientFrom?: string;
   gradientTo?: string;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
- * SpotlightCard 컴포넌트 / SpotlightCard component
- *
- * 마우스 위치에 스포트라이트 효과를 표시하는 프리미엄 카드 컴포넌트입니다.
- * 다크 테마 랜딩 페이지, 프리미엄 UI에 적합합니다.
+ * SpotlightCard component
  *
  * Premium card component that displays a spotlight effect at mouse position.
  * Perfect for dark theme landing pages and premium UI.
  *
  * @component
  * @example
- * <SpotlightCard className="bg-gray-900 text-white p-8">
+ * <SpotlightCard dot="p-8" style={{ background: 'rgb(17 24 39)' }}>
  *   <h3>Premium Feature</h3>
  *   <p>Discover our exclusive features</p>
  * </SpotlightCard>
@@ -41,13 +58,16 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
   (
     {
       children,
-      className,
+      dot: dotProp,
       spotlightColor = "rgba(255, 255, 255, 0.1)",
       spotlightSize = 300,
       gradient = true,
       gradientFrom = "rgba(255, 255, 255, 0.05)",
       gradientTo = "transparent",
       style,
+      onMouseMove,
+      onMouseEnter,
+      onMouseLeave,
       ...props
     },
     ref
@@ -61,6 +81,7 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
 
     const handleMouseMove = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseMove?.(e);
         if (motionDisabled) return;
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
@@ -69,59 +90,88 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
           y: e.clientY - rect.top,
         });
       },
-      [motionDisabled]
+      [motionDisabled, onMouseMove]
     );
 
-    const spotlightStyle: React.CSSProperties = {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: "inherit",
-      opacity: isHovered ? 1 : 0,
-      background: `radial-gradient(${spotlightSize}px circle at ${mousePosition.x}px ${mousePosition.y}px, ${spotlightColor}, transparent 60%)`,
-      transition: "opacity 0.4s ease",
-      pointerEvents: "none",
-    };
+    const handleMouseEnter = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseEnter?.(e);
+        setIsHovered(true);
+      },
+      [onMouseEnter]
+    );
 
-    const gradientOverlayStyle: React.CSSProperties = gradient
-      ? {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          borderRadius: "inherit",
-          background: `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
-          pointerEvents: "none",
-        }
-      : {};
+    const handleMouseLeave = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        onMouseLeave?.(e);
+        setIsHovered(false);
+      },
+      [onMouseLeave]
+    );
+
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(
+          BASE_STYLE,
+          isHovered ? HOVERED_STYLE : undefined,
+          resolveDot(dotProp),
+          style
+        ),
+      [isHovered, dotProp, style]
+    );
+
+    const spotlightStyle = useMemo(
+      (): React.CSSProperties => ({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: "inherit",
+        opacity: isHovered ? 1 : 0,
+        background: `radial-gradient(${spotlightSize}px circle at ${mousePosition.x}px ${mousePosition.y}px, ${spotlightColor}, transparent 60%)`,
+        transition: "opacity 0.4s ease",
+        pointerEvents: "none",
+      }),
+      [isHovered, spotlightSize, mousePosition.x, mousePosition.y, spotlightColor]
+    );
+
+    const gradientOverlayStyle = useMemo(
+      (): React.CSSProperties | undefined =>
+        gradient
+          ? {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: "inherit",
+              background: `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
+              pointerEvents: "none",
+            }
+          : undefined,
+      [gradient, gradientFrom, gradientTo]
+    );
 
     return (
       <div
         ref={mergeRefs(ref, cardRef)}
-        className={merge(
-          "relative overflow-hidden rounded-xl",
-          "bg-gray-900 border border-gray-800",
-          "transition-all duration-300",
-          isHovered && "border-gray-700 shadow-2xl shadow-black/20",
-          className
-        )}
-        style={style}
+        style={computedStyle}
         onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         {...props}
       >
         {/* Gradient overlay */}
-        {gradient && <div style={gradientOverlayStyle} aria-hidden="true" />}
+        {gradient && gradientOverlayStyle && (
+          <div style={gradientOverlayStyle} aria-hidden="true" />
+        )}
 
         {/* Spotlight effect */}
         <div style={spotlightStyle} aria-hidden="true" />
 
         {/* Content */}
-        <div className="relative z-10">{children}</div>
+        <div style={{ position: "relative", zIndex: 10 }}>{children}</div>
       </div>
     );
   }
@@ -129,7 +179,7 @@ const SpotlightCard = React.forwardRef<HTMLDivElement, SpotlightCardProps>(
 
 SpotlightCard.displayName = "SpotlightCard";
 
-// Utility to merge refs
+/** Utility to merge refs */
 function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
   return (value) => {
     refs.forEach((ref) => {

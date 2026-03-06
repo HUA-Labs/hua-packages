@@ -46,7 +46,7 @@ function renderCard(
   switch (cardType) {
     case 'glow':
       return (
-        <GlowCard style={style} className="p-6">
+        <GlowCard style={style} dot="p-6">
           {item.icon && <div className="text-4xl mb-4">{item.icon}</div>}
           <h3 className="text-xl font-bold mb-2">{item.title}</h3>
           <p className="text-muted-foreground text-sm">{item.description}</p>
@@ -54,7 +54,7 @@ function renderCard(
       )
     case 'spotlight':
       return (
-        <SpotlightCard style={style} className="p-6">
+        <SpotlightCard style={style} dot="p-6">
           {item.icon && <div className="text-4xl mb-4">{item.icon}</div>}
           <h3 className="text-xl font-bold mb-2">{item.title}</h3>
           <p className="text-muted-foreground text-sm">{item.description}</p>

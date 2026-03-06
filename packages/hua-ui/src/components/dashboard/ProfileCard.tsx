@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { merge } from "../../lib/utils";
+import React, { useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 
 /**
@@ -32,9 +32,10 @@ export interface MembershipTier {
  * @property {boolean} [showAvatar=true] - 아바타 표시 여부 / Show avatar
  * @property {boolean} [showMembership=true] - 멤버십 표시 여부 / Show membership
  * @property {boolean} [showSettings=true] - 설정 버튼 표시 여부 / Show settings button
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
+ * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface ProfileCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ProfileCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   name: string;
   email?: string;
   avatar?: string;
@@ -49,43 +50,220 @@ export interface ProfileCardProps extends React.HTMLAttributes<HTMLDivElement> {
   showAvatar?: boolean;
   showMembership?: boolean;
   showSettings?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-const tierStyles = {
+// ── Tier badge gradient styles (hardcoded — no CSS var equivalent) ────────────
+
+const TIER_BADGE_STYLES: Record<MembershipTier["tier"], React.CSSProperties> = {
   basic: {
-    badge: "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white",
-    icon: "text-indigo-600 dark:text-indigo-400",
+    background: 'linear-gradient(to right, rgb(99,102,241), rgb(6,182,212))',
+    color: 'white',
   },
   pro: {
-    badge: "bg-gradient-to-r from-purple-500 to-pink-500 text-white",
-    icon: "text-purple-600 dark:text-purple-400",
+    background: 'linear-gradient(to right, rgb(168,85,247), rgb(236,72,153))',
+    color: 'white',
   },
   premium: {
-    badge: "bg-gradient-to-r from-yellow-400 to-orange-500 text-white",
-    icon: "text-yellow-600 dark:text-yellow-400",
+    background: 'linear-gradient(to right, rgb(250,204,21), rgb(249,115,22))',
+    color: 'white',
   },
   admin: {
-    badge: "bg-gradient-to-r from-red-500 to-pink-500 text-white",
-    icon: "text-red-600 dark:text-red-400",
+    background: 'linear-gradient(to right, rgb(239,68,68), rgb(236,72,153))',
+    color: 'white',
   },
 };
 
-const tierLabels = {
+const tierLabels: Record<MembershipTier["tier"], string> = {
   basic: "Basic",
   pro: "Pro",
   premium: "Premium",
   admin: "Admin",
 };
 
+// ── Static style constants ────────────────────────────────────────────────────
+
+const CONTAINER_BASE: React.CSSProperties = {
+  position: 'relative',
+  overflow: 'hidden',
+  padding: '1.5rem',
+};
+
+const VARIANT_STYLES: Record<"default" | "gradient" | "minimal", React.CSSProperties> = {
+  default: {
+    backgroundColor: 'var(--profile-card-bg)',
+    borderRadius: '1rem',
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    border: '1px solid var(--profile-card-border)',
+  },
+  gradient: {
+    background: 'var(--profile-card-gradient-bg)',
+    borderRadius: '1rem',
+    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+    border: '1px solid var(--profile-card-gradient-border)',
+  },
+  minimal: {
+    background: 'transparent',
+  },
+};
+
+// Gradient overlay decorations (gradient variant only)
+const GRADIENT_OVERLAY_1: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  background: 'linear-gradient(to bottom right, rgb(99,102,241), rgb(168,85,247), rgb(236,72,153))',
+  opacity: 'var(--profile-card-overlay-opacity, 0.10)',
+  pointerEvents: 'none',
+};
+
+const GRADIENT_OVERLAY_2: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  background: 'linear-gradient(to top right, rgb(34,211,238), rgb(99,102,241), rgb(147,51,234))',
+  opacity: 'var(--profile-card-overlay2-opacity, 0.05)',
+  pointerEvents: 'none',
+};
+
+const INNER_ROW: React.CSSProperties = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '1.5rem',
+};
+
+const SETTINGS_ABS: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+};
+
+const SETTINGS_BTN_BASE: React.CSSProperties = {
+  padding: '0.5rem',
+  color: 'var(--profile-card-settings-color)',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  transition: 'color 150ms ease',
+  display: 'inline-flex',
+  alignItems: 'center',
+};
+
+const AVATAR_WRAP: React.CSSProperties = {
+  position: 'relative',
+  flexShrink: 0,
+};
+
+const AVATAR_IMG: React.CSSProperties = {
+  width: '5rem',
+  height: '5rem',
+  borderRadius: '9999px',
+  border: '4px solid var(--profile-card-avatar-border)',
+  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+  objectFit: 'cover',
+};
+
+const AVATAR_FALLBACK: React.CSSProperties = {
+  width: '5rem',
+  height: '5rem',
+  borderRadius: '9999px',
+  background: 'linear-gradient(to bottom right, rgb(99,102,241), rgb(147,51,234))',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: '4px solid var(--profile-card-avatar-border)',
+  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+};
+
+const AVATAR_INITIAL: React.CSSProperties = {
+  fontSize: '1.5rem',
+  fontWeight: 700,
+  color: 'white',
+};
+
+const INFO_WRAP: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+};
+
+const GREETING_WRAP: React.CSSProperties = {
+  fontSize: '1.125rem',
+  fontWeight: 600,
+  marginBottom: '0.5rem',
+};
+
+const GREETING_GRADIENT_SPAN: React.CSSProperties = {
+  fontSize: '1.25rem',
+  fontWeight: 700,
+  background: 'linear-gradient(to right, rgb(99,102,241), rgb(168,85,247))',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
+const GREETING_PLAIN_SPAN: React.CSSProperties = {
+  color: 'var(--profile-card-name-color)',
+};
+
+const NAME_ROW: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: '0.5rem',
+  marginBottom: '0.5rem',
+};
+
+const NAME_TEXT: React.CSSProperties = {
+  fontSize: '1.25rem',
+  fontWeight: 700,
+  color: 'var(--profile-card-name-color)',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+const TIER_BADGE_BASE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0.25rem 0.75rem',
+  borderRadius: '9999px',
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+};
+
+const TIER_ICON: React.CSSProperties = {
+  width: '0.75rem',
+  height: '0.75rem',
+  marginRight: '0.25rem',
+};
+
+const EMAIL_STYLE: React.CSSProperties = {
+  color: 'var(--profile-card-email-color)',
+  fontSize: '0.875rem',
+  marginBottom: '0.25rem',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+};
+
+const SINCE_ROW: React.CSSProperties = {
+  color: 'var(--profile-card-since-color)',
+  fontSize: '0.75rem',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+};
+
 /**
  * ProfileCard 컴포넌트
- * 
+ *
  * 사용자 프로필 정보를 표시하는 카드 컴포넌트입니다.
  * 아바타, 이름, 이메일, 멤버십 등급 등을 표시할 수 있습니다.
- * 
+ *
  * Card component that displays user profile information.
  * Can show avatar, name, email, membership tier, and more.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -96,7 +274,7 @@ const tierLabels = {
  *   membershipTier="premium"
  *   memberSince={new Date("2024-01-01")}
  * />
- * 
+ *
  * @example
  * // 그라디언트 스타일 / Gradient style
  * <ProfileCard
@@ -106,7 +284,7 @@ const tierLabels = {
  *   membershipTier="pro"
  *   onSettingsClick={() => navigate("/settings")}
  * />
- * 
+ *
  * @param {ProfileCardProps} props - ProfileCard 컴포넌트의 props / ProfileCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ProfileCard 컴포넌트 / ProfileCard component
@@ -128,7 +306,8 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
       showAvatar = true,
       showMembership = true,
       showSettings = true,
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
@@ -143,52 +322,45 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
     };
 
     const tier = membershipTier || "basic";
-    const tierStyle = tierStyles[tier];
+    const tierBadgeStyle = TIER_BADGE_STYLES[tier];
     const tierLabel = membershipLabel || tierLabels[tier];
 
-    const variantClasses = {
-      default: "bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700",
-      gradient: "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20",
-      minimal: "bg-transparent",
-    };
+    const containerStyle = useMemo(() => mergeStyles(
+      CONTAINER_BASE,
+      VARIANT_STYLES[variant],
+      resolveDot(dotProp),
+      style,
+    ), [variant, dotProp, style]);
 
     return (
-      <div
-        ref={ref}
-        className={merge(
-          "relative overflow-hidden p-6",
-          variantClasses[variant],
-          className
-        )}
-        {...props}
-      >
+      <div ref={ref} style={containerStyle} {...props}>
         {/* 그라데이션 배경 장식 (gradient variant일 때) */}
         {variant === "gradient" && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-10 dark:opacity-20"></div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-purple-600 opacity-5 dark:opacity-15"></div>
+            <div style={GRADIENT_OVERLAY_1} />
+            <div style={GRADIENT_OVERLAY_2} />
           </>
         )}
 
-        <div className="relative flex items-start gap-6">
+        <div style={INNER_ROW}>
           {/* 설정 아이콘 */}
           {showSettings && (onSettingsClick || settingsHref) && (
-            <div className="absolute top-0 right-0">
+            <div style={SETTINGS_ABS}>
               {settingsHref ? (
                 <a
                   href={settingsHref}
-                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  style={SETTINGS_BTN_BASE}
                   title="설정"
                 >
-                  <Icon name="settings" className="w-6 h-6" />
+                  <Icon name="settings" dot="w-6 h-6" />
                 </a>
               ) : (
                 <button
                   onClick={onSettingsClick}
-                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  style={SETTINGS_BTN_BASE}
                   title="설정"
                 >
-                  <Icon name="settings" className="w-6 h-6" />
+                  <Icon name="settings" dot="w-6 h-6" />
                 </button>
               )}
             </div>
@@ -196,16 +368,16 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
 
           {/* 아바타 */}
           {showAvatar && (
-            <div className="relative flex-shrink-0">
+            <div style={AVATAR_WRAP}>
               {avatar ? (
                 <img
                   src={avatar}
                   alt={avatarAlt || name}
-                  className="w-20 h-20 rounded-full border-4 border-white dark:border-gray-700 shadow-lg object-cover"
+                  style={AVATAR_IMG}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-lg">
-                  <span className="text-2xl font-bold text-white">
+                <div style={AVATAR_FALLBACK}>
+                  <span style={AVATAR_INITIAL}>
                     {name.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -214,20 +386,18 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
           )}
 
           {/* 정보 */}
-          <div className="flex-1 min-w-0">
+          <div style={INFO_WRAP}>
             {/* 인사말 */}
             {greeting && (
-              <div className="text-lg sm:text-xl font-semibold mb-2">
+              <div style={GREETING_WRAP}>
                 {greeting.split(" ").map((part, index) => {
                   const isEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(part);
                   return (
                     <span key={index}>
                       {isEmoji ? (
-                        <span className="text-gray-900 dark:text-white">{part}</span>
+                        <span style={GREETING_PLAIN_SPAN}>{part}</span>
                       ) : (
-                        <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                          {part}
-                        </span>
+                        <span style={GREETING_GRADIENT_SPAN}>{part}</span>
                       )}
                       {index < greeting.split(" ").length - 1 && " "}
                     </span>
@@ -237,18 +407,11 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
             )}
 
             {/* 이름과 멤버십 뱃지 */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-              <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
-                {name}!
-              </span>
+            <div style={NAME_ROW}>
+              <span style={NAME_TEXT}>{name}!</span>
               {showMembership && membershipTier && (
-                <span
-                  className={merge(
-                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-lg",
-                    tierStyle.badge
-                  )}
-                >
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <span style={mergeStyles(TIER_BADGE_BASE, tierBadgeStyle)}>
+                  <svg style={TIER_ICON} fill="currentColor" viewBox="0 0 20 20">
                     {tier === "premium" ? (
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     ) : tier === "admin" ? (
@@ -264,15 +427,13 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
 
             {/* 이메일 */}
             {email && (
-              <div className="text-gray-600 dark:text-gray-400 text-sm mb-1 truncate">
-                {email}
-              </div>
+              <div style={EMAIL_STYLE}>{email}</div>
             )}
 
             {/* 가입일 */}
             {memberSince && (
-              <div className="text-gray-400 text-xs flex items-center gap-1">
-                <Icon name="clock" className="w-3 h-3" />
+              <div style={SINCE_ROW}>
+                <Icon name="clock" dot="w-3 h-3" />
                 가입일 {formatDate(memberSince)}
               </div>
             )}
@@ -284,4 +445,3 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
 );
 
 ProfileCard.displayName = "ProfileCard";
-

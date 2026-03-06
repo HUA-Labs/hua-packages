@@ -1,4 +1,4 @@
-overview: "A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible."
+overview: "A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API."
 docsUrl: "https://docs.hua-labs.com"
 
 features:
@@ -6,6 +6,7 @@ features:
   - "Zero dependencies — Pure JavaScript motion engine"
   - "Ref-based — Direct DOM manipulation for consistent performance"
   - "SSR compatible — Works with Next.js, Remix, and SSR frameworks"
+  - "React Native — 10 native hooks via Animated API (separate entry point)"
   - "Fully tested — Comprehensive test coverage"
 
 quickStart: |
@@ -23,8 +24,24 @@ quickStart: |
     );
   }
 
+  // React Native — import from /native
+  import { useFadeIn, useStagger } from '@hua-labs/motion-core/native';
+
+  function ListItem() {
+    const fadeIn = useFadeIn({ duration: 400 });
+    return (
+      <Animated.View style={fadeIn.style}>
+        <Text>Hello</Text>
+      </Animated.View>
+    );
+  }
+
 related:
   - "hua"
+
+subpathExports:
+  - path: "native"
+    description: "React Native hooks using Animated API (useFadeIn, useSlide*, useScaleIn, useBounceIn, useSpringMotion, usePulse, useStagger)"
 
 apiFilter: notes-only
 
@@ -104,3 +121,25 @@ apiNotes:
   getEasing:
     description: "Get easing function by name"
     kind: "function"
+
+  # React Native hooks (import from /native)
+  useFadeIn (native):
+    description: "Native fade-in using Animated.timing"
+  useSlideUp (native):
+    description: "Native slide-up using Animated.parallel"
+  useSlideDown (native):
+    description: "Native slide-down using Animated.parallel"
+  useSlideLeft (native):
+    description: "Native slide-left using Animated.parallel"
+  useSlideRight (native):
+    description: "Native slide-right using Animated.parallel"
+  useScaleIn (native):
+    description: "Native scale-in using Animated.parallel"
+  useBounceIn (native):
+    description: "Native bounce-in using Animated.spring"
+  useSpringMotion (native):
+    description: "Native generic spring animation with animateTo()"
+  usePulse (native):
+    description: "Native looping pulse using Animated.loop"
+  useStagger (native):
+    description: "Native staggered list animation using Animated.stagger"

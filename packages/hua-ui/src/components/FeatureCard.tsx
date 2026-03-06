@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useState, useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 import { composeRefs } from "../lib/Slot"
 import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance"
 import { Icon } from "./Icon"
@@ -24,10 +24,12 @@ type FeatureCardIconType = AllIconName | `http${string}`
  * @property {"sm" | "md" | "lg"} [size="md"] - FeatureCard 크기 / FeatureCard size
  * @property {"scale" | "glow" | "slide" | "none"} [hover="scale"] - 호버 효과 / Hover effect
  * @property {"blue" | "purple" | "green" | "orange" | "pink" | "custom"} [gradient="blue"] - 그라디언트 색상 / Gradient color
- * @property {string} [customGradient] - 커스텀 그라디언트 클래스 / Custom gradient class
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [customGradient] - 커스텀 그라디언트 (CSS linear-gradient value) / Custom gradient CSS value
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - inline style overrides
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface FeatureCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   icon?: FeatureCardIconType
   title: string
   description: string
@@ -38,17 +40,101 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
   customGradient?: string
   /** Enable preset entrance animation (reads from MotionConfigContext) */
   animated?: boolean
+  dot?: string
+  style?: React.CSSProperties
+}
+
+// ─── Size styles ──────────────────────────────────────────────────────────────
+
+const SIZE_PADDING: Record<"sm" | "md" | "lg", React.CSSProperties> = {
+  sm: { padding: "1rem" },
+  md: { padding: "1.5rem" },
+  lg: { padding: "2rem" },
+}
+
+const ICON_PX: Record<"sm" | "md" | "lg", number> = {
+  sm: 30,
+  md: 36,
+  lg: 48,
+}
+
+const TITLE_SIZE: Record<"sm" | "md" | "lg", React.CSSProperties> = {
+  sm: { fontSize: "1.125rem" },
+  md: { fontSize: "1.25rem" },
+  lg: { fontSize: "1.5rem" },
+}
+
+const DESC_SIZE: Record<"sm" | "md" | "lg", React.CSSProperties> = {
+  sm: { fontSize: "0.875rem" },
+  md: { fontSize: "0.875rem" },
+  lg: { fontSize: "1rem" },
+}
+
+// ─── Variant base styles ──────────────────────────────────────────────────────
+
+const VARIANT_BASE: Record<"default" | "gradient" | "glass" | "neon", React.CSSProperties> = {
+  default: {
+    backgroundColor: "var(--color-background, hsl(210 20% 98% / 0.9))",
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+    border: "1px solid var(--color-border, hsl(210 15% 88% / 0.5))",
+  },
+  gradient: {
+    border: "none",
+  },
+  glass: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+  },
+  neon: {
+    backgroundColor: "rgba(17, 24, 39, 0.9)",
+    border: "1px solid rgba(34, 211, 238, 0.3)",
+    boxShadow: "0 10px 15px -3px rgba(34, 211, 238, 0.2)",
+  },
+}
+
+// ─── Gradient backgrounds ─────────────────────────────────────────────────────
+
+const GRADIENT_BACKGROUNDS: Record<string, string> = {
+  blue: "linear-gradient(135deg, #6366f1, #06b6d4, #0891b2)",
+  purple: "linear-gradient(135deg, #a855f7, #ec4899, #9333ea)",
+  green: "linear-gradient(135deg, #22c55e, #10b981, #16a34a)",
+  orange: "linear-gradient(135deg, #f97316, #ef4444, #ea580c)",
+  pink: "linear-gradient(135deg, #ec4899, #f43f5e, #db2777)",
+}
+
+// ─── Hover effect styles ──────────────────────────────────────────────────────
+
+const HOVER_EFFECTS: Record<"scale" | "glow" | "slide" | "none", React.CSSProperties> = {
+  scale: { transform: "scale(1.05)" },
+  glow: { boxShadow: "0 25px 50px -12px rgba(34, 211, 238, 0.25)" },
+  slide: { transform: "translateY(-0.5rem)" },
+  none: {},
+}
+
+// ─── Shared card base ─────────────────────────────────────────────────────────
+
+const CARD_BASE: React.CSSProperties = {
+  borderRadius: "1rem",
+  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  textAlign: "center",
+  transition: "all 300ms ease-in-out",
 }
 
 /**
  * FeatureCard 컴포넌트 / FeatureCard component
- * 
+ *
  * 기능을 소개하는 카드 컴포넌트입니다.
  * 아이콘, 제목, 설명을 포함하며, 다양한 스타일과 호버 효과를 지원합니다.
- * 
+ *
  * Card component that introduces features.
  * Includes icon, title, and description, supports various styles and hover effects.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -57,7 +143,7 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   title="고급 기능"
  *   description="강력한 기능을 제공합니다"
  * />
- * 
+ *
  * @example
  * // Gradient 스타일 / Gradient style
  * <FeatureCard
@@ -68,103 +154,115 @@ export interface FeatureCardProps extends React.HTMLAttributes<HTMLDivElement> {
  *   gradient="purple"
  *   hover="glow"
  * />
- * 
+ *
  * @param {FeatureCardProps} props - FeatureCard 컴포넌트의 props / FeatureCard component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} FeatureCard 컴포넌트 / FeatureCard component
  */
 const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
-  ({
-    className,
-    icon,
-    title,
-    description,
-    variant = "default",
-    size = "md",
-    hover = "scale",
-    gradient = "blue",
-    customGradient,
-    animated,
-    style,
-    ...props
-  }, ref) => {
+  (
+    {
+      dot: dotProp,
+      icon,
+      title,
+      description,
+      variant = "default",
+      size = "md",
+      hover = "scale",
+      gradient = "blue",
+      customGradient,
+      animated,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     const entrance = useAnimatedEntrance<HTMLDivElement>({ role: "card", enabled: animated })
-    const sizeClasses = {
-      sm: "p-4",
-      md: "p-6",
-      lg: "p-8"
-    }
+    const [isHovered, setIsHovered] = useState(false)
 
-    const variantClasses = {
-      default: "bg-background/90 backdrop-blur-sm border border-border/50",
-      gradient: `bg-gradient-to-br ${customGradient || getGradientClass(gradient)}`,
-      glass: "bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border border-white/20 dark:border-gray-700/20",
-      neon: "bg-gray-900/90 dark:bg-gray-900/90 border border-cyan-400/30 dark:border-cyan-400/30 shadow-lg shadow-cyan-400/20"
-    }
+    const gradientBackground = useMemo<React.CSSProperties | undefined>(() => {
+      if (variant !== "gradient") return undefined
+      const bg = customGradient ?? GRADIENT_BACKGROUNDS[gradient] ?? GRADIENT_BACKGROUNDS.blue
+      return { background: bg }
+    }, [variant, gradient, customGradient])
 
-    const hoverClasses = {
-      scale: "hover:scale-105 transition-transform duration-300",
-      glow: "hover:shadow-2xl hover:shadow-cyan-500/25 dark:hover:shadow-cyan-400/25 transition-shadow duration-300",
-      slide: "hover:-translate-y-2 transition-transform duration-300",
-      none: ""
-    }
+    const entranceWillChange = entrance.className
+      ? ({ willChange: "opacity, transform" } as React.CSSProperties)
+      : undefined
 
-    const iconSize = size === "lg" ? "text-5xl" : size === "md" ? "text-4xl" : "text-3xl"
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(
+          CARD_BASE,
+          SIZE_PADDING[size],
+          VARIANT_BASE[variant],
+          gradientBackground,
+          hover !== "none" && isHovered ? HOVER_EFFECTS[hover] : undefined,
+          entranceWillChange,
+          entrance.style,
+          resolveDot(dotProp),
+          style,
+        ),
+      [size, variant, gradientBackground, hover, isHovered, entranceWillChange, entrance.style, dotProp, style],
+    )
+
+    // Icon color: neon → cyan, gradient → white, others → inherit
+    const iconColor: React.CSSProperties =
+      variant === "neon"
+        ? { color: "rgb(34, 211, 238)" }
+        : variant === "gradient"
+          ? { color: "rgba(255, 255, 255, 0.9)" }
+          : {}
+
+    const titleColor: React.CSSProperties =
+      variant === "gradient"
+        ? { color: "#ffffff" }
+        : { color: "var(--color-foreground, hsl(210 10% 10%))" }
+
+    const descColor: React.CSSProperties =
+      variant === "gradient"
+        ? { color: "rgba(255, 255, 255, 0.9)" }
+        : { color: "var(--color-muted-foreground, hsl(210 10% 40%))" }
 
     return (
       <div
         ref={composeRefs(ref, entrance.ref)}
-        className={merge(
-          "rounded-2xl shadow-lg transition-all duration-300 flex flex-col items-center text-center",
-          sizeClasses[size],
-          variantClasses[variant],
-          hoverClasses[hover],
-          entrance.className,
-          className
-        )}
-        style={{ ...entrance.style, ...style }}
+        style={computedStyle}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
         {icon && (
-          <div className={`mb-4 ${iconSize} ${variant === "neon" ? "text-cyan-400" : ""}`}>
+          <div
+            style={{
+              marginBottom: "1rem",
+              ...iconColor,
+            }}
+          >
             {typeof icon === "string" && icon.startsWith("http") ? (
-              <img src={icon} alt={title} className="w-full h-full object-contain" />
+              <img src={icon} alt={title} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
             ) : (
-              <Icon name={icon as AllIconName} className="w-full h-full" />
+              <Icon name={icon as AllIconName} size={ICON_PX[size]} />
             )}
           </div>
         )}
-        
-        <h3 className={merge(
-          "font-bold mb-2",
-          size === "lg" ? "text-2xl" : size === "md" ? "text-xl" : "text-lg",
-          variant === "gradient" ? "text-white" : "text-foreground"
-        )}>
+
+        <h3
+          style={mergeStyles(
+            { fontWeight: 700, marginBottom: "0.5rem" },
+            TITLE_SIZE[size],
+            titleColor,
+          )}
+        >
           {title}
         </h3>
-        
-        <p className={merge(
-          size === "lg" ? "text-base" : "text-sm",
-          variant === "gradient" ? "text-white/90" : "text-muted-foreground"
-        )}>
-          {description}
-        </p>
+
+        <p style={mergeStyles(DESC_SIZE[size], descColor)}>{description}</p>
       </div>
     )
-  }
+  },
 )
 
 FeatureCard.displayName = "FeatureCard"
 
-function getGradientClass(gradient: string): string {
-  const gradients = {
-    blue: "from-indigo-500 via-cyan-500 to-cyan-600",
-    purple: "from-purple-500 via-pink-500 to-purple-600",
-    green: "from-green-500 via-emerald-500 to-green-600",
-    orange: "from-orange-500 via-red-500 to-orange-600",
-    pink: "from-pink-500 via-rose-500 to-pink-600"
-  }
-  return gradients[gradient as keyof typeof gradients] || gradients.blue
-}
-
-export { FeatureCard } 
+export { FeatureCard }

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
@@ -12,14 +12,18 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
  * @property {number} [threshold=0.5] - 공개 시작 임계값 (0-1) / Reveal threshold (0-1)
  * @property {boolean} [byWord=false] - 단어별 공개 / Reveal by word
  * @property {boolean} [byChar=false] - 글자별 공개 / Reveal by character
+ * @property {string} [dot] - dot utility string for additional styles
+ * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TextRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface TextRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   text: string;
   revealColor?: string;
   hiddenColor?: string;
   threshold?: number;
   byWord?: boolean;
   byChar?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -48,7 +52,7 @@ const TextReveal = React.forwardRef<HTMLDivElement, TextRevealProps>(
   (
     {
       text,
-      className,
+      dot: dotProp,
       revealColor = "currentColor",
       hiddenColor = "rgba(128, 128, 128, 0.3)",
       threshold = 0.5,
@@ -106,6 +110,12 @@ const TextReveal = React.forwardRef<HTMLDivElement, TextRevealProps>(
         window.removeEventListener("resize", handleScroll);
       };
     }, [updateProgress, prefersReducedMotion]);
+
+    const containerStyle = useMemo(() => mergeStyles(
+      { fontWeight: 500 },
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, style]);
 
     // Split text based on mode
     const renderText = () => {
@@ -168,8 +178,7 @@ const TextReveal = React.forwardRef<HTMLDivElement, TextRevealProps>(
     return (
       <div
         ref={mergeRefs(ref, containerRef)}
-        className={merge("font-medium", className)}
-        style={style}
+        style={containerStyle}
         {...props}
       >
         {renderText()}

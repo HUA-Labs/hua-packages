@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useCallback } from "react";
-import { merge } from "../../lib/utils";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /**
@@ -15,7 +15,7 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
  * @property {boolean} [rotate=false] - 회전 효과 추가 / Add rotation effect
  * @property {boolean} [disableOnMobile=false] - 모바일(768px 미만)에서 자동 비활성화
  */
-export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ParallaxProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   speed?: number;
   direction?: "up" | "down" | "left" | "right";
   offset?: number;
@@ -25,6 +25,8 @@ export interface ParallaxProps extends React.HTMLAttributes<HTMLDivElement> {
   rotate?: boolean;
   rotateDirection?: "cw" | "ccw";
   disableOnMobile?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /* ────────────────────────────────────────
@@ -83,14 +85,14 @@ function subscribe(cb: ScrollCallback) {
  * @example
  * // 모바일에서 비활성화
  * <Parallax speed={0.5} disableOnMobile>
- *   <div className="decorative-blob" />
+ *   <div style={{ position: 'absolute', inset: 0 }} />
  * </Parallax>
  */
 const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
   (
     {
       children,
-      className,
+      dot: dotProp,
       speed = 0.5,
       direction = "up",
       offset = 0,
@@ -208,16 +210,17 @@ const Parallax = React.forwardRef<HTMLDivElement, ParallaxProps>(
 
     const isActive = !disabled && !prefersReducedMotion;
 
-    const combinedStyle: React.CSSProperties = {
-      ...style,
-      willChange: isActive ? "transform, opacity" : undefined,
-    };
+    const computedStyle = mergeStyles(
+      { transition: 'none' },
+      isActive ? { willChange: 'transform, opacity' } : undefined,
+      resolveDot(dotProp),
+      style,
+    );
 
     return (
       <div
         ref={mergeRefs(ref, innerRef)}
-        className={merge("transition-none", className)}
-        style={combinedStyle}
+        style={computedStyle}
         {...props}
       >
         {children}

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
-import { merge } from "../../lib/utils";
+import React, { useRef, useEffect, useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 /**
  * Marquee 컴포넌트의 props / Marquee component props
@@ -14,7 +14,7 @@ import { merge } from "../../lib/utils";
  * @property {string} [gradientColor="hsl(var(--background))"] - 그라디언트 색상 / Gradient color
  * @property {number} [gradientWidth=100] - 그라디언트 너비 (px) / Gradient width in pixels
  */
-export interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MarqueeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   direction?: "left" | "right" | "up" | "down";
   speed?: number;
   pauseOnHover?: boolean;
@@ -23,6 +23,8 @@ export interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
   gradient?: boolean;
   gradientColor?: string;
   gradientWidth?: number;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -53,7 +55,7 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
   (
     {
       children,
-      className,
+      dot: dotProp,
       direction = "left",
       speed = 50,
       pauseOnHover = true,
@@ -63,6 +65,9 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       gradientColor = "hsl(var(--background))",
       gradientWidth = 100,
       style,
+      onMouseEnter,
+      onMouseLeave,
+      onClick,
       ...props
     },
     ref
@@ -104,68 +109,86 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       ? contentWidth / speed
       : contentHeight / speed;
 
-    const animationStyle: React.CSSProperties = {
-      ["--marquee-duration" as string]: `${duration}s`,
-      ["--marquee-gap" as string]: `${gap}px`,
-    };
+    // Pick animation class name based on direction/pause state
+    const animationClass = isPaused
+      ? "animate-pause"
+      : isHorizontal
+      ? isReverse
+        ? "animate-marquee-right"
+        : "animate-marquee-left"
+      : isReverse
+      ? "animate-marquee-down"
+      : "animate-marquee-up";
 
-    // Gradient styles
-    const gradientStyle = gradient
-      ? {
-          ["--gradient-color" as string]: gradientColor,
-          ["--gradient-width" as string]: `${gradientWidth}px`,
-        }
-      : {};
+    // Container outer style
+    const outerStyle = useMemo<React.CSSProperties>(() => {
+      const base: React.CSSProperties = {
+        position: "relative",
+        overflow: "hidden",
+      };
+      const gradientVars = gradient
+        ? ({
+            ["--gradient-color" as string]: gradientColor,
+            ["--gradient-width" as string]: `${gradientWidth}px`,
+          } as React.CSSProperties)
+        : {};
+      return mergeStyles(base, gradientVars, resolveDot(dotProp), style);
+    }, [gradient, gradientColor, gradientWidth, dotProp, style]);
+
+    // Inner track style (flex row or col + animation vars)
+    const trackStyle = useMemo<React.CSSProperties>(() => {
+      return {
+        display: "flex",
+        flexDirection: isHorizontal ? "row" : "column",
+        ["--marquee-duration" as string]: `${duration}s`,
+        ["--marquee-gap" as string]: `${gap}px`,
+      } as React.CSSProperties;
+    }, [isHorizontal, duration, gap]);
+
+    // Shared item strip style
+    const stripStyle = useMemo<React.CSSProperties>(() => ({
+      display: "flex",
+      flexShrink: 0,
+      flexDirection: isHorizontal ? "row" : "column",
+      gap,
+    }), [isHorizontal, gap]);
+
+    // Second strip style (offset margin for seamless loop)
+    const stripStyle2 = useMemo<React.CSSProperties>(() => ({
+      ...stripStyle,
+      ...(isHorizontal ? { marginLeft: gap } : { marginTop: gap }),
+    }), [stripStyle, isHorizontal, gap]);
 
     return (
       <div
         ref={ref}
-        className={merge(
-          "relative overflow-hidden",
-          gradient && "marquee-gradient",
-          className
-        )}
-        style={{ ...style, ...gradientStyle }}
-        onMouseEnter={() => pauseOnHover && setIsPaused(true)}
-        onMouseLeave={() => pauseOnHover && setIsPaused(false)}
-        onClick={() => pauseOnClick && setIsPaused(!isPaused)}
+        className={gradient ? "marquee-gradient" : undefined}
+        style={outerStyle}
+        onMouseEnter={(e) => {
+          if (pauseOnHover) setIsPaused(true);
+          onMouseEnter?.(e);
+        }}
+        onMouseLeave={(e) => {
+          if (pauseOnHover) setIsPaused(false);
+          onMouseLeave?.(e);
+        }}
+        onClick={(e) => {
+          if (pauseOnClick) setIsPaused(!isPaused);
+          onClick?.(e);
+        }}
         {...props}
       >
         <div
           ref={containerRef}
-          className={merge(
-            "flex",
-            isHorizontal ? "flex-row" : "flex-col",
-            isPaused ? "animate-pause" : "",
-            isHorizontal
-              ? isReverse
-                ? "animate-marquee-right"
-                : "animate-marquee-left"
-              : isReverse
-              ? "animate-marquee-down"
-              : "animate-marquee-up"
-          )}
-          style={animationStyle}
+          className={animationClass}
+          style={trackStyle}
         >
           {/* Original content */}
-          <div
-            className={merge(
-              "flex shrink-0",
-              isHorizontal ? "flex-row" : "flex-col"
-            )}
-            style={{ gap }}
-          >
+          <div style={stripStyle}>
             {children}
           </div>
           {/* Duplicated content for seamless loop */}
-          <div
-            className={merge(
-              "flex shrink-0",
-              isHorizontal ? "flex-row" : "flex-col"
-            )}
-            style={{ gap, [isHorizontal ? "marginLeft" : "marginTop"]: gap }}
-            aria-hidden="true"
-          >
+          <div style={stripStyle2} aria-hidden="true">
             {children}
           </div>
         </div>

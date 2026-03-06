@@ -48,14 +48,15 @@ describe('Upload', () => {
     expect(screen.getByText('file2.pdf')).toBeInTheDocument();
   });
 
-  it('should apply size classes', () => {
+  it('should apply padding based on size prop', () => {
     const { container, rerender } = render(<Upload size="sm" />);
 
-    expect(container.querySelector('.p-4')).toBeInTheDocument();
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]') as HTMLElement;
+    expect(dropZone).not.toBeNull();
+    expect(dropZone.style.padding).toBe('16px');
 
     rerender(<Upload size="lg" />);
-
-    expect(container.querySelector('.p-8')).toBeInTheDocument();
+    expect(dropZone.style.padding).toBe('32px');
   });
 
   it('should open file input on click', async () => {
@@ -66,7 +67,7 @@ describe('Upload', () => {
     const fileInput = screen.getByLabelText('파일 선택') as HTMLInputElement;
     const clickSpy = vi.spyOn(fileInput, 'click');
 
-    const uploadArea = screen.getByText('파일을 선택하거나 여기에 드래그하세요').closest('div[class*="border-dashed"]')!;
+    const uploadArea = screen.getByText('파일을 선택하거나 여기에 드래그하세요').closest('[data-upload-dropzone="true"]')!;
     await user.click(uploadArea);
 
     expect(clickSpy).toHaveBeenCalled();
@@ -105,23 +106,23 @@ describe('Upload', () => {
     expect(screen.getByText(/지원 형식: image\/\*/)).toBeInTheDocument();
   });
 
-  it('should apply drag over state', () => {
+  it('should apply drag over state via data attribute', () => {
     const { container } = render(<Upload />);
 
-    const dropZone = container.querySelector('[class*="border-dashed"]')!;
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]')!;
     fireEvent.dragOver(dropZone);
 
-    expect(dropZone.className).toContain('border-primary');
+    expect(dropZone.getAttribute('data-dragging')).toBe('true');
   });
 
   it('should remove drag state on drag leave', () => {
     const { container } = render(<Upload />);
 
-    const dropZone = container.querySelector('[class*="border-dashed"]')!;
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]')!;
     fireEvent.dragOver(dropZone);
     fireEvent.dragLeave(dropZone);
 
-    expect(dropZone.className).not.toContain('border-primary');
+    expect(dropZone.getAttribute('data-dragging')).toBeNull();
   });
 
   it('should handle file drop', () => {
@@ -129,7 +130,7 @@ describe('Upload', () => {
 
     const { container } = render(<Upload onChange={handleChange} />);
 
-    const dropZone = container.querySelector('[class*="border-dashed"]')!;
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]')!;
     const file = createMockFile('dropped.txt', 100, 'text/plain');
 
     fireEvent.drop(dropZone, {
@@ -144,7 +145,7 @@ describe('Upload', () => {
 
     const { container } = render(<Upload onChange={handleChange} dragDrop={false} />);
 
-    const dropZone = container.querySelector('[class*="border-dashed"]')!;
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]')!;
     const file = createMockFile('dropped.txt', 100, 'text/plain');
 
     fireEvent.drop(dropZone, {
@@ -244,7 +245,8 @@ describe('Upload', () => {
     const fileInput = screen.getByLabelText('파일 선택') as HTMLInputElement;
     expect(fileInput.disabled).toBe(true);
 
-    const dropZone = container.querySelector('[class*="border-dashed"]')!;
-    expect(dropZone.className).toContain('cursor-not-allowed');
+    const dropZone = container.querySelector('[data-upload-dropzone="true"]') as HTMLElement;
+    expect(dropZone.getAttribute('data-disabled')).toBe('true');
+    expect(dropZone.style.cursor).toBe('not-allowed');
   });
 });

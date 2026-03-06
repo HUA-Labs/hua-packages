@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { merge } from "../lib/utils";
+import React, { useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { Icon } from "./Icon";
 import type { IconName } from "../lib/icons";
 import { Button } from "./Button";
@@ -10,7 +10,7 @@ import { Button } from "./Button";
  * EmptyState 컴포넌트 Props
  * EmptyState component props
  */
-export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   /** 아이콘 (IconName 또는 ReactNode) / Icon (IconName or ReactNode) */
   icon?: IconName | React.ReactNode;
   /** 제목 / Title */
@@ -33,60 +33,91 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg";
   /** 테두리 표시 여부 / Show border */
   bordered?: boolean;
+  /** dot 스타일 유틸리티 문자열 / Dot style utility string */
+  dot?: string;
+  /** 인라인 스타일 / Inline style */
+  style?: React.CSSProperties;
 }
 
-const variantStyles = {
-  default: {
-    container: "bg-muted/50",
-    icon: "text-muted-foreground",
-    title: "text-foreground",
-    description: "text-muted-foreground",
-  },
-  warning: {
-    container: "bg-yellow-50/50 dark:bg-yellow-900/10",
-    icon: "text-yellow-500 dark:text-yellow-400",
-    title: "text-foreground",
-    description: "text-muted-foreground",
-  },
-  info: {
-    container: "bg-primary/5",
-    icon: "text-primary",
-    title: "text-foreground",
-    description: "text-muted-foreground",
-  },
-  error: {
-    container: "bg-destructive/5",
-    icon: "text-destructive",
-    title: "text-foreground",
-    description: "text-muted-foreground",
-  },
-  success: {
-    container: "bg-green-50/50 dark:bg-green-900/10",
-    icon: "text-green-500 dark:text-green-400",
-    title: "text-foreground",
-    description: "text-muted-foreground",
-  },
+const VARIANT_CONTAINER: Record<string, React.CSSProperties> = {
+  default: { backgroundColor: 'var(--empty-state-default-bg)' },
+  warning: { backgroundColor: 'var(--empty-state-warning-bg)' },
+  info:    { backgroundColor: 'var(--empty-state-info-bg)' },
+  error:   { backgroundColor: 'var(--empty-state-error-bg)' },
+  success: { backgroundColor: 'var(--empty-state-success-bg)' },
 };
 
-const sizeStyles = {
-  sm: {
-    container: "py-8 px-4",
-    icon: "w-8 h-8 mb-3",
-    title: "text-base",
-    description: "text-sm",
-  },
-  md: {
-    container: "py-12 px-6",
-    icon: "w-12 h-12 mb-4",
-    title: "text-lg",
-    description: "text-sm",
-  },
-  lg: {
-    container: "py-16 px-8",
-    icon: "w-16 h-16 mb-6",
-    title: "text-xl",
-    description: "text-base",
-  },
+const VARIANT_ICON_COLOR: Record<string, React.CSSProperties> = {
+  default: { color: 'var(--empty-state-default-icon)' },
+  warning: { color: 'var(--empty-state-warning-icon)' },
+  info:    { color: 'var(--empty-state-info-icon)' },
+  error:   { color: 'var(--empty-state-error-icon)' },
+  success: { color: 'var(--empty-state-success-icon)' },
+};
+
+const TITLE_STYLE: React.CSSProperties = {
+  color: 'var(--empty-state-title)',
+};
+
+const DESCRIPTION_STYLE: React.CSSProperties = {
+  color: 'var(--empty-state-description)',
+};
+
+const SIZE_CONTAINER: Record<string, React.CSSProperties> = {
+  sm: { paddingTop: '2rem',  paddingBottom: '2rem',  paddingLeft: '1rem',  paddingRight: '1rem' },
+  md: { paddingTop: '3rem',  paddingBottom: '3rem',  paddingLeft: '1.5rem', paddingRight: '1.5rem' },
+  lg: { paddingTop: '4rem',  paddingBottom: '4rem',  paddingLeft: '2rem',  paddingRight: '2rem' },
+};
+
+const SIZE_ICON: Record<string, React.CSSProperties> = {
+  sm: { width: '2rem',   height: '2rem',   marginBottom: '0.75rem' },
+  md: { width: '3rem',   height: '3rem',   marginBottom: '1rem' },
+  lg: { width: '4rem',   height: '4rem',   marginBottom: '1.5rem' },
+};
+
+const SIZE_TITLE: Record<string, React.CSSProperties> = {
+  sm: { fontSize: '1rem',    lineHeight: '1.5rem' },
+  md: { fontSize: '1.125rem', lineHeight: '1.75rem' },
+  lg: { fontSize: '1.25rem', lineHeight: '1.75rem' },
+};
+
+const SIZE_DESCRIPTION: Record<string, React.CSSProperties> = {
+  sm: { fontSize: '0.875rem', lineHeight: '1.25rem' },
+  md: { fontSize: '0.875rem', lineHeight: '1.25rem' },
+  lg: { fontSize: '1rem',    lineHeight: '1.5rem' },
+};
+
+const BASE_CONTAINER: React.CSSProperties = {
+  textAlign: 'center',
+  borderRadius: '0.5rem',
+};
+
+const BORDERED_STYLE: React.CSSProperties = {
+  border: '1px solid var(--empty-state-border)',
+};
+
+const ICON_WRAPPER_BASE: React.CSSProperties = {
+  marginLeft: 'auto',
+  marginRight: 'auto',
+};
+
+const TITLE_BASE: React.CSSProperties = {
+  fontWeight: 600,
+  marginBottom: '0.5rem',
+};
+
+const DESCRIPTION_BASE: React.CSSProperties = {
+  maxWidth: '24rem',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+};
+
+const ACTION_WRAPPER: React.CSSProperties = {
+  marginTop: '1.5rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '0.75rem',
 };
 
 /**
@@ -133,61 +164,81 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       variant = "default",
       size = "md",
       bordered = false,
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
   ) => {
-    const styles = variantStyles[variant];
-    const sizes = sizeStyles[size];
+    const containerStyle = useMemo(() => mergeStyles(
+      BASE_CONTAINER,
+      VARIANT_CONTAINER[variant],
+      SIZE_CONTAINER[size],
+      bordered ? BORDERED_STYLE : undefined,
+      resolveDot(dotProp),
+      style,
+    ), [variant, size, bordered, dotProp, style]);
+
+    const iconWrapperStyle = useMemo(() => mergeStyles(
+      ICON_WRAPPER_BASE,
+      SIZE_ICON[size],
+    ), [size]);
+
+    const iconStyle = useMemo(() => mergeStyles(
+      { display: 'block', width: '100%', height: '100%' },
+      VARIANT_ICON_COLOR[variant],
+    ), [variant]);
+
+    const titleStyle = useMemo(() => mergeStyles(
+      TITLE_BASE,
+      TITLE_STYLE,
+      SIZE_TITLE[size],
+    ), [size]);
+
+    const descriptionStyle = useMemo(() => mergeStyles(
+      DESCRIPTION_BASE,
+      DESCRIPTION_STYLE,
+      SIZE_DESCRIPTION[size],
+    ), [size]);
 
     return (
       <div
         ref={ref}
-        className={merge(
-          "text-center rounded-lg",
-          styles.container,
-          sizes.container,
-          bordered && "border border-border",
-          className
-        )}
+        style={containerStyle}
         {...props}
       >
         {/* 아이콘 / Icon */}
         {icon && (
-          <div className={merge("mx-auto", sizes.icon)}>
+          <div style={iconWrapperStyle}>
             {typeof icon === "string" ? (
-              <Icon
-                name={icon as IconName}
-                className={merge("w-full h-full", styles.icon)}
-              />
+              <span style={iconStyle}>
+                <Icon
+                  name={icon as IconName}
+                  variant="inherit"
+                  size="100%"
+                />
+              </span>
             ) : (
-              <div className={styles.icon}>{icon}</div>
+              <div style={VARIANT_ICON_COLOR[variant]}>{icon}</div>
             )}
           </div>
         )}
 
         {/* 제목 / Title */}
-        <h3 className={merge("font-semibold mb-2", styles.title, sizes.title)}>
+        <h3 style={titleStyle}>
           {title}
         </h3>
 
         {/* 설명 / Description */}
         {description && (
-          <p
-            className={merge(
-              "max-w-sm mx-auto",
-              styles.description,
-              sizes.description
-            )}
-          >
+          <p style={descriptionStyle}>
             {description}
           </p>
         )}
 
         {/* 액션 버튼들 / Action buttons */}
         {(actionText || secondaryActionText) && (
-          <div className="mt-6 flex items-center justify-center gap-3">
+          <div style={ACTION_WRAPPER}>
             {actionText && (
               <>
                 {actionHref ? (

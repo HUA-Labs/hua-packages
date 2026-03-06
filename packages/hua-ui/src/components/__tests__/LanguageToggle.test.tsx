@@ -60,8 +60,10 @@ describe('LanguageToggle', () => {
     expect(screen.queryByText('English')).not.toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
-    const { container } = render(<LanguageToggle className="my-lang" />);
-    expect(container.querySelector('.my-lang')).toBeInTheDocument();
+  it('should apply custom dot style', () => {
+    const { container } = render(<LanguageToggle style={{ opacity: 0.5 }} />);
+    const button = container.querySelector('button');
+    expect(button).toBeTruthy();
+    expect(button?.style.opacity).toBe('0.5');
   });
 });

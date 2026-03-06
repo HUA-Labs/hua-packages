@@ -1,6 +1,6 @@
 # @hua-labs/motion-core
 
-A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible.
+A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
@@ -14,6 +14,7 @@ A collection of 35+ React animation hooks built on a ref-based engine. Direct DO
 - **Zero dependencies — Pure JavaScript motion engine**
 - **Ref-based — Direct DOM manipulation for consistent performance**
 - **SSR compatible — Works with Next.js, Remix, and SSR frameworks**
+- **React Native — 10 native hooks via Animated API (separate entry point)**
 - **Fully tested — Comprehensive test coverage**
 
 ## Installation
@@ -22,7 +23,7 @@ A collection of 35+ React animation hooks built on a ref-based engine. Direct DO
 pnpm add @hua-labs/motion-core
 ```
 
-> Peer dependencies: react >=19.0.0, react-dom >=19.0.0
+> Peer dependencies: react >=19.0.0, react-dom >=19.0.0, react-native >=0.73.0
 
 ## Quick Start
 
@@ -38,6 +39,18 @@ function Hero() {
       <h1 ref={fadeIn.ref} style={fadeIn.style}>Welcome</h1>
       <p ref={slideUp.ref} style={slideUp.style}>Animated content</p>
     </div>
+  );
+}
+
+// React Native — import from /native
+import { useFadeIn, useStagger } from '@hua-labs/motion-core/native';
+
+function ListItem() {
+  const fadeIn = useFadeIn({ duration: 400 });
+  return (
+    <Animated.View style={fadeIn.style}>
+      <Text>Hello</Text>
+    </Animated.View>
   );
 }
 
@@ -77,6 +90,16 @@ function Hero() {
 | `useGestureMotion` | hook | Gesture-driven motion animation |
 | `easeInOut` | function | Smooth ease-in-out curve |
 | `getEasing` | function | Get easing function by name |
+| `useFadeIn (native)` | hook | Native fade-in using Animated.timing |
+| `useSlideUp (native)` | hook | Native slide-up using Animated.parallel |
+| `useSlideDown (native)` | hook | Native slide-down using Animated.parallel |
+| `useSlideLeft (native)` | hook | Native slide-left using Animated.parallel |
+| `useSlideRight (native)` | hook | Native slide-right using Animated.parallel |
+| `useScaleIn (native)` | hook | Native scale-in using Animated.parallel |
+| `useBounceIn (native)` | hook | Native bounce-in using Animated.spring |
+| `useSpringMotion (native)` | hook | Native generic spring animation with animateTo() |
+| `usePulse (native)` | hook | Native looping pulse using Animated.loop |
+| `useStagger (native)` | hook | Native staggered list animation using Animated.stagger |
 
 ## Documentation
 

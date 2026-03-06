@@ -1,73 +1,223 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { merge } from "../../lib/utils";
+import React, { useState, useMemo, useEffect } from "react";
+import { dot as dotFn } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
-import { useColorStyles } from "../../lib/styles/colors";
 import type { Color } from "../../lib/types/common";
 
-/**
- * QuickActionCard 컴포넌트의 props / QuickActionCard component props
- * @typedef {Object} QuickActionCardProps
- * @property {string} title - 카드 제목 / Card title
- * @property {string} [description] - 카드 설명 / Card description
- * @property {IconName | React.ReactNode} [icon] - 아이콘 / Icon
- * @property {string} [href] - 링크 URL / Link URL
- * @property {() => void} [onClick] - 클릭 핸들러 / Click handler
- * @property {"gradient" | "outline" | "solid"} [variant="gradient"] - 카드 스타일 변형 / Card style variant
- * @property {"blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray"} [color="blue"] - 카드 색상 / Card color
- * @property {boolean} [loading] - 로딩 상태 / Loading state
- * @extends {React.HTMLAttributes<HTMLAnchorElement | HTMLButtonElement>}
- */
-export interface QuickActionCardProps extends React.HTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
-  title: string;
-  description?: string;
-  icon?: IconName | React.ReactNode;
-  href?: string;
-  onClick?: () => void;
-  variant?: "gradient" | "outline" | "solid";
-  color?: Color;
-  loading?: boolean;
-  /** 우측 상단 뱃지 텍스트 (예: "준비중", "Coming Soon") */
-  badge?: string;
+// ─── Dark-mode detection ────────────────────────────────────────
+
+function useIsDark(): boolean {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const check = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+
+    check();
+
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
 }
 
+// ─── Color palette (hex) ────────────────────────────────────────
+
+const PALETTE: Record<Color, Record<string, string>> = {
+  blue:   { "50":"#eff6ff","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a" },
+  purple: { "50":"#faf5ff","200":"#e9d5ff","300":"#d8b4fe","400":"#c084fc","500":"#a855f7","600":"#9333ea","700":"#7e22ce","800":"#6b21a8","900":"#581c87" },
+  green:  { "50":"#f0fdf4","200":"#bbf7d0","300":"#86efac","400":"#4ade80","500":"#22c55e","600":"#16a34a","700":"#15803d","800":"#166534","900":"#14532d" },
+  orange: { "50":"#fff7ed","200":"#fed7aa","300":"#fdba74","400":"#fb923c","500":"#f97316","600":"#ea580c","700":"#c2410c","800":"#9a3412","900":"#7c2d12" },
+  red:    { "50":"#fef2f2","200":"#fecaca","300":"#fca5a5","400":"#f87171","500":"#ef4444","600":"#dc2626","700":"#b91c1c","800":"#991b1b","900":"#7f1d1d" },
+  indigo: { "50":"#eef2ff","200":"#c7d2fe","300":"#a5b4fc","400":"#818cf8","500":"#6366f1","600":"#4f46e5","700":"#4338ca","800":"#3730a3","900":"#312e81" },
+  pink:   { "50":"#fdf2f8","200":"#fbcfe8","300":"#f9a8d4","400":"#f472b6","500":"#ec4899","600":"#db2777","700":"#be185d","800":"#9d174d","900":"#831843" },
+  gray:   { "50":"#f9fafb","200":"#e5e7eb","300":"#d1d5db","400":"#9ca3af","500":"#6b7280","600":"#4b5563","700":"#374151","800":"#1f2937","900":"#111827" },
+  cyan:   { "50":"#ecfeff","200":"#a5f3fc","300":"#67e8f9","400":"#22d3ee","500":"#06b6d4","600":"#0891b2","700":"#0e7490","800":"#155e75","900":"#164e63" },
+};
+
+function px(color: Color, shade: string): string {
+  return PALETTE[color][shade] ?? "#000";
+}
+
+/** rgba with alpha from a hex color */
+function rgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// ─── Per-variant style builders ─────────────────────────────────
+
+function getGradientStyle(color: Color): React.CSSProperties {
+  return {
+    background: `linear-gradient(135deg, ${px(color, "500")}, ${px(color, "600")})`,
+    borderColor: px(color, "400"),
+    color: "#ffffff",
+  };
+}
+
+function getGradientHoverStyle(color: Color): React.CSSProperties {
+  return {
+    boxShadow: `0 20px 25px -5px ${rgba(px(color, "500"), 0.3)}, 0 8px 10px -6px ${rgba(px(color, "500"), 0.2)}`,
+  };
+}
+
+function getOutlineStyle(color: Color, isDark: boolean): React.CSSProperties {
+  return {
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: isDark ? px(color, "600") : px(color, "300"),
+    backgroundColor: "transparent",
+    color: isDark ? px(color, "400") : px(color, "600"),
+  };
+}
+
+function getOutlineHoverStyle(): React.CSSProperties {
+  return {
+    boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
+  };
+}
+
+function getSolidStyle(color: Color): React.CSSProperties {
+  return {
+    backgroundColor: px(color, "600"),
+    color: "#ffffff",
+  };
+}
+
+function getSolidHoverStyle(color: Color): React.CSSProperties {
+  return {
+    backgroundColor: px(color, "700"),
+    boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
+  };
+}
+
+// ─── Icon container style ────────────────────────────────────────
+
+function getIconContainerStyle(
+  variant: "gradient" | "outline" | "solid",
+  color: Color,
+  isDark: boolean,
+): React.CSSProperties {
+  if (variant === "gradient" || variant === "solid") {
+    return {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      width: 48,
+      height: 48,
+      borderRadius: 8,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      margin: "0 auto 8px",
+      flexShrink: 0,
+    };
+  }
+  // outline
+  return {
+    backgroundColor: isDark
+      ? rgba(px(color, "900"), 0.3)
+      : rgba(px(color, "100"), 0.3),
+    color: isDark ? px(color, "400") : px(color, "600"),
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 8px",
+    flexShrink: 0,
+  };
+}
+
+// ─── Base layout style (shared) ─────────────────────────────────
+
+const s = (input: string) => dotFn(input) as React.CSSProperties;
+
+const BASE_LAYOUT: React.CSSProperties = {
+  ...s("rounded-2xl p-6 transition-all shadow-lg"),
+  textAlign: "center",
+  display: "block",
+  boxSizing: "border-box",
+  cursor: "pointer",
+  width: "100%",
+  textDecoration: "none",
+};
+
+// ─── Types ───────────────────────────────────────────────────────
 
 /**
- * QuickActionCard 컴포넌트 / QuickActionCard component
- * 
- * 빠른 액션을 수행하는 카드 컴포넌트입니다.
- * 링크나 버튼으로 동작하며, 클릭 가능한 액션 카드로 사용됩니다.
- * 
+ * QuickActionCard component props
+ */
+export interface QuickActionCardProps
+  extends Omit<
+    React.HTMLAttributes<HTMLAnchorElement | HTMLButtonElement>,
+    "className"
+  > {
+  /** Card title */
+  title: string;
+  /** Card description */
+  description?: string;
+  /** Icon name or ReactNode */
+  icon?: IconName | React.ReactNode;
+  /** Link URL — renders as <a> when provided */
+  href?: string;
+  /** Click handler — renders as <button> when provided */
+  onClick?: () => void;
+  /** Card style variant */
+  variant?: "gradient" | "outline" | "solid";
+  /** Card color */
+  color?: Color;
+  /** Loading state */
+  loading?: boolean;
+  /** Top-right badge label (e.g. "Coming Soon") */
+  badge?: string;
+  /** Extra dot utility string */
+  dot?: string;
+  /** Extra inline style (applied last, overrides everything) */
+  style?: React.CSSProperties;
+}
+
+// ─── Component ──────────────────────────────────────────────────
+
+/**
+ * QuickActionCard component
+ *
  * Card component for quick actions.
  * Works as a link or button, used as a clickable action card.
- * 
+ *
  * @component
  * @example
- * // 링크 카드 / Link card
+ * // Link card
  * <QuickActionCard
- *   title="새 주문 생성"
- *   description="주문을 빠르게 생성하세요"
+ *   title="New Order"
+ *   description="Create an order quickly"
  *   icon="plus"
  *   href="/orders/new"
  *   color="blue"
  * />
- * 
+ *
  * @example
- * // 버튼 카드 / Button card
+ * // Button card
  * <QuickActionCard
- *   title="리포트 다운로드"
- *   description="최신 리포트를 다운로드하세요"
+ *   title="Download Report"
+ *   description="Download the latest report"
  *   icon="download"
  *   onClick={handleDownload}
  *   variant="outline"
  *   color="green"
  * />
- * 
- * @param {QuickActionCardProps} props - QuickActionCard 컴포넌트의 props / QuickActionCard component props
- * @param {React.Ref<HTMLAnchorElement | HTMLButtonElement>} ref - anchor 또는 button 요소 ref / anchor or button element ref
- * @returns {JSX.Element} QuickActionCard 컴포넌트 / QuickActionCard component
  */
 export const QuickActionCard = React.forwardRef<
   HTMLAnchorElement | HTMLButtonElement,
@@ -84,111 +234,135 @@ export const QuickActionCard = React.forwardRef<
       color = "blue",
       loading = false,
       badge,
-      className,
+      dot: dotProp,
+      style: styleProp,
       ...props
     },
     ref
   ) => {
-    // 공통 색상 시스템 사용
-    const colorStyles = useColorStyles(color);
-    const isGradient = variant === "gradient";
-    const isTextWhite = isGradient || variant === "solid";
+    const [isHovered, setIsHovered] = useState(false);
+    const isDark = useIsDark();
 
-    // Variant 스타일 생성 (QuickActionCard는 gradient, outline, solid만 사용)
-    const variantClass = useMemo(() => {
+    const isTextWhite = variant === "gradient" || variant === "solid";
+
+    const computedStyle = useMemo<React.CSSProperties>(() => {
+      // 1. Variant base style
+      let variantStyle: React.CSSProperties;
+      let variantHoverStyle: React.CSSProperties | undefined;
+
       if (variant === "gradient") {
-        // gradient는 공통 시스템 사용
-        return `text-white ${colorStyles.gradient}`;
+        variantStyle = getGradientStyle(color);
+        variantHoverStyle = getGradientHoverStyle(color);
       } else if (variant === "outline") {
-        // outline은 공통 시스템 사용
-        return colorStyles.outline;
+        variantStyle = getOutlineStyle(color, isDark);
+        variantHoverStyle = getOutlineHoverStyle();
       } else {
-        // solid는 별도 처리 (정적 클래스 사용)
-        const solidClasses: Record<Color, string> = {
-          blue: "text-white bg-primary hover:bg-primary/90",
-          purple: "text-white bg-purple-600 hover:bg-purple-700",
-          green: "text-white bg-green-600 hover:bg-green-700",
-          orange: "text-white bg-orange-600 hover:bg-orange-700",
-          red: "text-white bg-red-600 hover:bg-red-700",
-          indigo: "text-white bg-indigo-600 hover:bg-indigo-700",
-          pink: "text-white bg-pink-600 hover:bg-pink-700",
-          gray: "text-white bg-gray-600 hover:bg-gray-700",
-          cyan: "text-white bg-cyan-600 hover:bg-cyan-700",
-        };
-        return solidClasses[color];
+        variantStyle = getSolidStyle(color);
+        variantHoverStyle = getSolidHoverStyle(color);
       }
-    }, [variant, colorStyles, color]);
 
-    const baseClasses = merge(
-      "rounded-2xl p-6 transition-all shadow-lg hover:shadow-xl text-center",
-      badge && "relative",
-      variantClass,
-      className
+      // 2. Position context for badge
+      const positionStyle: React.CSSProperties = badge
+        ? { position: "relative" }
+        : {};
+
+      return mergeStyles(
+        BASE_LAYOUT,
+        variantStyle,
+        positionStyle,
+        { transition: "all 200ms ease-in-out" },
+        isHovered ? variantHoverStyle : undefined,
+        resolveDot(dotProp),
+        styleProp,
+      );
+    }, [variant, color, isDark, badge, isHovered, dotProp, styleProp]);
+
+    const iconContainerStyle = useMemo(
+      () => getIconContainerStyle(variant, color, isDark),
+      [variant, color, isDark],
     );
+
+    const iconStyle: React.CSSProperties = isTextWhite
+      ? { width: 24, height: 24, color: "#ffffff" }
+      : { width: 24, height: 24 };
+
+    const titleStyle: React.CSSProperties = {
+      fontSize: "1.25rem",
+      fontWeight: 600,
+      marginBottom: "0.25rem",
+      ...(isTextWhite ? { color: "#ffffff" } : {}),
+    };
+
+    const descriptionStyle: React.CSSProperties = isTextWhite
+      ? { fontSize: "0.875rem", color: "rgba(255,255,255,0.9)", margin: 0 }
+      : {
+          fontSize: "0.875rem",
+          color: isDark ? "var(--color-muted-foreground, #9ca3af)" : "#4b5563",
+          margin: 0,
+        };
+
+    const badgeStyle: React.CSSProperties = {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      fontSize: "0.625rem",
+      fontWeight: 500,
+      backgroundColor: isDark ? "#374151" : "#e5e7eb",
+      color: isDark ? "#9ca3af" : "#6b7280",
+      padding: "2px 6px",
+      borderRadius: 9999,
+      pointerEvents: "none",
+    };
 
     const content = (
       <>
-        {/* 뱃지 */}
-        {badge && (
-          <span className="absolute top-2 right-2 text-[10px] font-medium bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
-            {badge}
-          </span>
-        )}
+        {/* Badge */}
+        {badge && <span style={badgeStyle}>{badge}</span>}
 
-        {/* 아이콘 */}
+        {/* Icon */}
         {icon && (
-          <div className={merge(
-            "w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-2",
-            isGradient || variant === "solid"
-              ? "bg-white/20"
-              : variant === "outline"
-              ? colorStyles.icon
-              : ""
-          )}>
+          <div style={iconContainerStyle}>
             {typeof icon === "string" ? (
-              <Icon
-                name={icon as IconName}
-                className={merge(
-                  "w-6 h-6",
-                  isTextWhite ? "text-white" : ""
-                )}
-              />
+              <Icon name={icon as IconName} style={iconStyle} />
             ) : (
               icon
             )}
           </div>
         )}
 
-        {/* 제목 */}
-        <h3 className={merge(
-          "text-xl font-semibold mb-1",
-          isTextWhite ? "text-white" : ""
-        )}>
-          {title}
-        </h3>
+        {/* Title */}
+        <h3 style={titleStyle}>{title}</h3>
 
-        {/* 설명 */}
-        {description && (
-          <p className={merge(
-            "text-sm",
-            isTextWhite ? "text-white/90" : "text-gray-600 dark:text-gray-300"
-          )}>
-            {description}
-          </p>
-        )}
+        {/* Description */}
+        {description && <p style={descriptionStyle}>{description}</p>}
 
+        {/* Loading bar */}
         {loading && (
-          <div className="mt-2 h-4 bg-white/20 rounded animate-pulse" />
+          <div
+            style={{
+              marginTop: 8,
+              height: 16,
+              backgroundColor: "rgba(255,255,255,0.2)",
+              borderRadius: 4,
+              animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+            }}
+          />
         )}
       </>
     );
+
+    const interactionHandlers = {
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => setIsHovered(false),
+    };
 
     if (href) {
       return (
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}
           href={href}
-          className={baseClasses}
+          style={computedStyle}
+          {...interactionHandlers}
           {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
         >
           {content}
@@ -200,7 +374,8 @@ export const QuickActionCard = React.forwardRef<
       <button
         ref={ref as React.Ref<HTMLButtonElement>}
         onClick={onClick}
-        className={baseClasses}
+        style={computedStyle}
+        {...interactionHandlers}
         {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >
         {content}
@@ -210,4 +385,3 @@ export const QuickActionCard = React.forwardRef<
 );
 
 QuickActionCard.displayName = "QuickActionCard";
-

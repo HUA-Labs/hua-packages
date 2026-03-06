@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useMemo } from "react"
 import {
   useFloating,
   autoUpdate,
@@ -16,19 +16,127 @@ import {
   FloatingArrow,
   type Placement,
 } from "@floating-ui/react"
-import { merge } from "../lib/utils"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
 
-export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
-  trigger: React.ReactNode
-  children: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  placement?: "top" | "bottom" | "left" | "right"
-  align?: "start" | "center" | "end"
-  offset?: number
-  disabled?: boolean
-  showArrow?: boolean
+// ---------------------------------------------------------------------------
+// Static style objects
+// ---------------------------------------------------------------------------
+
+const TRIGGER_WRAPPER_STYLE: React.CSSProperties = {
+  display: 'inline-block',
+  cursor: 'pointer',
 }
+
+const FLOATING_PANEL_STYLE: React.CSSProperties = {
+  zIndex: 50,
+  minWidth: '8rem',
+  width: 'max-content',
+  paddingTop: '0.25rem',
+  paddingBottom: '0.25rem',
+  borderRadius: '0.5rem',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-popover, var(--dropdown-bg, #fff))',
+  color: 'var(--color-popover-foreground)',
+  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+}
+
+// DropdownItem variants
+const ITEM_BASE_STYLE: React.CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  paddingLeft: '0.75rem',
+  paddingRight: '0.75rem',
+  paddingTop: '0.5rem',
+  paddingBottom: '0.5rem',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  transition: 'background-color 200ms ease-in-out, color 200ms ease-in-out',
+  background: 'none',
+  border: 'none',
+  textAlign: 'left' as const,
+  cursor: 'pointer',
+  outline: 'none',
+  color: 'var(--color-foreground)',
+}
+
+const ITEM_VARIANT_STYLE: Record<string, React.CSSProperties> = {
+  default: {
+    color: 'var(--color-foreground)',
+  },
+  destructive: {
+    color: 'var(--color-destructive)',
+  },
+  disabled: {
+    color: 'var(--color-muted-foreground)',
+    cursor: 'not-allowed',
+  },
+}
+
+const ITEM_HOVER_STYLE: Record<string, React.CSSProperties> = {
+  default: {
+    backgroundColor: 'var(--color-muted)',
+  },
+  destructive: {
+    backgroundColor: 'color-mix(in srgb, var(--color-destructive) 10%, transparent)',
+  },
+  disabled: {},
+}
+
+const ITEM_FOCUS_STYLE: React.CSSProperties = {
+  backgroundColor: 'var(--color-muted)',
+  outline: 'none',
+}
+
+const ITEM_ICON_STYLE: React.CSSProperties = {
+  flexShrink: 0,
+  width: '1rem',
+  height: '1rem',
+}
+
+const ITEM_LABEL_STYLE: React.CSSProperties = {
+  flex: 1,
+  textAlign: 'left',
+}
+
+// DropdownSeparator
+const SEPARATOR_STYLE: React.CSSProperties = {
+  height: '1px',
+  backgroundColor: 'var(--color-border)',
+  marginTop: '0.5rem',
+  marginBottom: '0.5rem',
+}
+
+// DropdownLabel
+const LABEL_STYLE: React.CSSProperties = {
+  paddingLeft: '1rem',
+  paddingRight: '1rem',
+  paddingTop: '0.5rem',
+  paddingBottom: '0.5rem',
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  color: 'var(--color-muted-foreground)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+}
+
+// DropdownMenu
+const MENU_STYLE: React.CSSProperties = {
+  paddingTop: '0.25rem',
+  paddingBottom: '0.25rem',
+}
+
+// DropdownGroup
+const GROUP_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.25rem',
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function resolveFloatingPlacement(
   placement: "top" | "bottom" | "left" | "right",
@@ -40,9 +148,27 @@ function resolveFloatingPlacement(
 
 const ARROW_SIZE = 8
 
+// ---------------------------------------------------------------------------
+// Dropdown (root)
+// ---------------------------------------------------------------------------
+
+export interface DropdownProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  trigger: React.ReactNode
+  children: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  placement?: "top" | "bottom" | "left" | "right"
+  align?: "start" | "center" | "end"
+  offset?: number
+  disabled?: boolean
+  showArrow?: boolean
+  dot?: string
+  style?: React.CSSProperties
+}
+
 const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
   ({
-    className,
+    dot: dotProp,
     trigger,
     children,
     open: controlledOpen,
@@ -52,6 +178,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     offset = 8,
     disabled = false,
     showArrow = false,
+    style,
     ...props
   }, ref) => {
     const [internalOpen, setInternalOpen] = React.useState(false)
@@ -97,12 +224,22 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
       role,
     ])
 
+    const rootStyle = useMemo(
+      () => mergeStyles({ position: 'relative', display: 'inline-block' }, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+
+    const panelStyle = useMemo(
+      () => mergeStyles(FLOATING_PANEL_STYLE, floatingStyles),
+      [floatingStyles]
+    )
+
     return (
-      <div ref={ref} className={merge("relative inline-block", className)} {...props}>
+      <div ref={ref} style={rootStyle} {...props}>
         {/* Trigger */}
         <div
           ref={refs.setReference}
-          className="inline-block cursor-pointer"
+          style={TRIGGER_WRAPPER_STYLE}
           {...getReferenceProps()}
         >
           {trigger}
@@ -113,11 +250,7 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
           <FloatingPortal>
             <div
               ref={refs.setFloating}
-              style={floatingStyles}
-              className={merge(
-                "z-50 bg-[var(--dropdown-bg,_#fff)] dark:bg-[var(--dropdown-bg,_rgb(31,41,55))] rounded-lg shadow-lg border border-border",
-                "min-w-[var(--reference-width)] w-max py-1"
-              )}
+              style={panelStyle}
               {...getFloatingProps()}
             >
               {showArrow && (
@@ -126,7 +259,9 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
                   context={context}
                   width={ARROW_SIZE * 2}
                   height={ARROW_SIZE}
-                  className="fill-[var(--dropdown-bg,_#fff)] dark:fill-[var(--dropdown-bg,_rgb(31,41,55))] [&>path:first-of-type]:stroke-border"
+                  style={{
+                    fill: 'var(--color-popover, var(--dropdown-bg, #fff))',
+                  }}
                 />
               )}
               {children}
@@ -139,106 +274,176 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
 )
 Dropdown.displayName = "Dropdown"
 
-// Sub-components (unchanged)
-export interface DropdownItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+// ---------------------------------------------------------------------------
+// DropdownItem
+// ---------------------------------------------------------------------------
+
+export interface DropdownItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   icon?: React.ReactNode
   variant?: "default" | "destructive" | "disabled"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProps>(
   ({
-    className,
+    dot: dotProp,
     icon,
     variant = "default",
     children,
     disabled,
+    style,
     ...props
   }, ref) => {
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "destructive":
-          return "text-destructive hover:bg-destructive/10"
-        case "disabled":
-          return "text-muted-foreground cursor-not-allowed"
-        default:
-          return "text-foreground hover:bg-muted"
-      }
-    }
+    const [isHovered, setIsHovered] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
+
+    const isDisabled = disabled || variant === "disabled"
+
+    const computedStyle = useMemo(() => {
+      const variantStyle = ITEM_VARIANT_STYLE[variant] ?? ITEM_VARIANT_STYLE.default
+      const hoverStyle = (isHovered && !isDisabled) ? (ITEM_HOVER_STYLE[variant] ?? ITEM_HOVER_STYLE.default) : undefined
+      const focusStyle = (isFocused && !isDisabled) ? ITEM_FOCUS_STYLE : undefined
+      return mergeStyles(
+        ITEM_BASE_STYLE,
+        variantStyle,
+        hoverStyle,
+        focusStyle,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, isHovered, isFocused, isDisabled, dotProp, style])
 
     return (
       <button
         ref={ref}
-        className={merge(
-          "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:bg-muted",
-          getVariantClasses(),
-          className
-        )}
-        disabled={disabled || variant === "disabled"}
+        style={computedStyle}
+        disabled={isDisabled}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         {...props}
       >
         {icon && (
-          <div className="flex-shrink-0 w-4 h-4">
+          <div style={ITEM_ICON_STYLE}>
             {icon}
           </div>
         )}
-        <span className="flex-1 text-left">{children}</span>
+        <span style={ITEM_LABEL_STYLE}>{children}</span>
       </button>
     )
   }
 )
 DropdownItem.displayName = "DropdownItem"
 
-export interface DropdownSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
+// ---------------------------------------------------------------------------
+// DropdownSeparator
+// ---------------------------------------------------------------------------
+
+export interface DropdownSeparatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const DropdownSeparator = React.forwardRef<HTMLDivElement, DropdownSeparatorProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("h-px bg-border my-2", className)}
-      {...props}
-    />
-  )
+  ({ dot: dotProp, style, ...props }, ref) => {
+    const computedStyle = useMemo(
+      () => mergeStyles(SEPARATOR_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      />
+    )
+  }
 )
 DropdownSeparator.displayName = "DropdownSeparator"
 
-export interface DropdownLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
+// ---------------------------------------------------------------------------
+// DropdownLabel
+// ---------------------------------------------------------------------------
+
+export interface DropdownLabelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
 
 const DropdownLabel = React.forwardRef<HTMLDivElement, DropdownLabelProps>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  )
+  ({ dot: dotProp, children, style, ...props }, ref) => {
+    const computedStyle = useMemo(
+      () => mergeStyles(LABEL_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
 )
 DropdownLabel.displayName = "DropdownLabel"
 
-const DropdownMenu = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("py-1", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  )
+// ---------------------------------------------------------------------------
+// DropdownMenu
+// ---------------------------------------------------------------------------
+
+export interface DropdownMenuProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
+
+const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
+  ({ dot: dotProp, children, style, ...props }, ref) => {
+    const computedStyle = useMemo(
+      () => mergeStyles(MENU_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
 )
 DropdownMenu.displayName = "DropdownMenu"
 
-const DropdownGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={merge("space-y-1", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  )
+// ---------------------------------------------------------------------------
+// DropdownGroup
+// ---------------------------------------------------------------------------
+
+export interface DropdownGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+  dot?: string
+  style?: React.CSSProperties
+}
+
+const DropdownGroup = React.forwardRef<HTMLDivElement, DropdownGroupProps>(
+  ({ dot: dotProp, children, style, ...props }, ref) => {
+    const computedStyle = useMemo(
+      () => mergeStyles(GROUP_STYLE, resolveDot(dotProp), style),
+      [dotProp, style]
+    )
+    return (
+      <div
+        ref={ref}
+        style={computedStyle}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
 )
 DropdownGroup.displayName = "DropdownGroup"
 

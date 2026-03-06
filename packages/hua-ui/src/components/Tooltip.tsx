@@ -1,7 +1,132 @@
 "use client"
 
-import React from "react"
-import { merge } from "../lib/utils"
+import React, { useMemo } from "react"
+import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+
+// ---------------------------------------------------------------------------
+// Variant style maps
+// ---------------------------------------------------------------------------
+
+const VARIANT_STYLES: Record<string, React.CSSProperties> = {
+  default: {
+    backgroundColor: 'rgba(31, 41, 55, 0.95)', // gray-800
+    color: '#ffffff',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2)',
+  },
+  dark: {
+    backgroundColor: 'rgba(17, 24, 39, 0.97)', // gray-900
+    color: '#ffffff',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3)',
+  },
+  light: {
+    backgroundColor: 'var(--color-popover, #ffffff)',
+    color: 'var(--color-popover-foreground, #0f172a)',
+    border: '1px solid var(--color-border, rgba(226,232,240,1))',
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+  },
+}
+
+// Arrow color per variant+position (the "colored" side of the border trick)
+const ARROW_COLOR: Record<string, string> = {
+  default: 'rgba(31, 41, 55, 0.95)',
+  dark: 'rgba(17, 24, 39, 0.97)',
+  light: 'var(--color-popover, #ffffff)',
+}
+
+// ---------------------------------------------------------------------------
+// Arrow CSSProperties by position
+// ---------------------------------------------------------------------------
+
+function getArrowStyle(
+  position: TooltipProps['position'],
+  variant: TooltipProps['variant'] = 'default',
+): React.CSSProperties {
+  const color = ARROW_COLOR[variant ?? 'default']
+  const transparent = 'transparent'
+  const size = 5
+
+  const base: React.CSSProperties = {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+  }
+
+  switch (position) {
+    case 'top':
+      return {
+        ...base,
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        borderLeft: `${size}px solid ${transparent}`,
+        borderRight: `${size}px solid ${transparent}`,
+        borderTop: `${size}px solid ${color}`,
+      }
+    case 'bottom':
+      return {
+        ...base,
+        bottom: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        borderLeft: `${size}px solid ${transparent}`,
+        borderRight: `${size}px solid ${transparent}`,
+        borderBottom: `${size}px solid ${color}`,
+      }
+    case 'left':
+      return {
+        ...base,
+        left: '100%',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        borderTop: `${size}px solid ${transparent}`,
+        borderBottom: `${size}px solid ${transparent}`,
+        borderLeft: `${size}px solid ${color}`,
+      }
+    case 'right':
+      return {
+        ...base,
+        right: '100%',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        borderTop: `${size}px solid ${transparent}`,
+        borderBottom: `${size}px solid ${transparent}`,
+        borderRight: `${size}px solid ${color}`,
+      }
+    default:
+      return {
+        ...base,
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        borderLeft: `${size}px solid ${transparent}`,
+        borderRight: `${size}px solid ${transparent}`,
+        borderTop: `${size}px solid ${color}`,
+      }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tooltip popup transform per position
+// ---------------------------------------------------------------------------
+
+function getPopupTransform(position: TooltipProps['position']): string {
+  switch (position) {
+    case 'top':
+      return 'translate(-50%, -100%)'
+    case 'bottom':
+      return 'translate(-50%, 0%)'
+    case 'left':
+      return 'translate(-100%, -50%)'
+    case 'right':
+      return 'translate(0%, -50%)'
+    default:
+      return 'translate(-50%, -100%)'
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TooltipProps
+// ---------------------------------------------------------------------------
 
 /**
  * Tooltip 컴포넌트의 props / Tooltip component props
@@ -12,63 +137,71 @@ import { merge } from "../lib/utils"
  * @property {"default" | "light" | "dark"} [variant="default"] - Tooltip 스타일 변형 / Tooltip style variant
  * @property {number} [delay=300] - Tooltip 표시 지연 시간(ms) / Tooltip display delay (ms)
  * @property {boolean} [disabled=false] - Tooltip 비활성화 여부 / Disable tooltip
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @property {string} [dot] - dot utility string for wrapper element
+ * @property {React.CSSProperties} [style] - inline style for wrapper element
  */
-export interface TooltipProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TooltipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   content: string
   children: React.ReactNode
   position?: "top" | "bottom" | "left" | "right"
   variant?: "default" | "light" | "dark"
   delay?: number
   disabled?: boolean
+  dot?: string
+  style?: React.CSSProperties
 }
+
+// ---------------------------------------------------------------------------
+// Tooltip
+// ---------------------------------------------------------------------------
 
 /**
  * Tooltip 컴포넌트 / Tooltip component
- * 
+ *
  * 호버 시 추가 정보를 표시하는 툴팁 컴포넌트입니다.
  * 마우스 호버 시 지연 시간 후 표시됩니다.
- * 
+ *
  * Tooltip component that displays additional information on hover.
  * Appears after a delay when the mouse hovers over the element.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
  * <Tooltip content="이것은 도움말입니다">
  *   <Button>호버하세요</Button>
  * </Tooltip>
- * 
+ *
  * @example
  * // 다양한 위치 / Different positions
  * <Tooltip content="위치 변경" position="bottom">
  *   <Icon name="info" />
  * </Tooltip>
- * 
+ *
  * @example
  * // 커스텀 스타일 / Custom styles
  * <Tooltip content="라이트 스타일" variant="light" delay={500}>
  *   <span>호버</span>
  * </Tooltip>
- * 
+ *
  * @param {TooltipProps} props - Tooltip 컴포넌트의 props / Tooltip component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} Tooltip 컴포넌트 / Tooltip component
- * 
+ *
  * @todo 접근성 개선: role="tooltip" 추가 필요 / Accessibility: Add role="tooltip"
  * @todo 접근성 개선: aria-describedby 연결 필요 / Accessibility: Connect aria-describedby
  * @todo 접근성 개선: 키보드 포커스 시 Tooltip 표시 필요 / Accessibility: Show tooltip on keyboard focus
  */
 const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
+    style,
     content,
     children,
     position = "top",
     variant = "default",
     delay = 300,
     disabled = false,
-    ...props 
+    ...props
   }, ref) => {
     const [isVisible, setIsVisible] = React.useState(false)
     const [coords, setCoords] = React.useState({ x: 0, y: 0 })
@@ -77,34 +210,33 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
 
     const showTooltip = (e: React.MouseEvent) => {
       if (disabled) return
-      
+
       const rect = e.currentTarget.getBoundingClientRect()
-      const _tooltipRect = tooltipRef.current?.getBoundingClientRect()
-      
+
       let x = 0
       let y = 0
-      
+
       switch (position) {
         case "top":
           x = rect.left + rect.width / 2
-          y = rect.top - 8 // 8px 간격
+          y = rect.top - 8
           break
         case "bottom":
           x = rect.left + rect.width / 2
-          y = rect.bottom + 8 // 8px 간격
+          y = rect.bottom + 8
           break
         case "left":
-          x = rect.left - 8 // 8px 간격
+          x = rect.left - 8
           y = rect.top + rect.height / 2
           break
         case "right":
-          x = rect.right + 8 // 8px 간격
+          x = rect.right + 8
           y = rect.top + rect.height / 2
           break
       }
-      
+
       setCoords({ x, y })
-      
+
       timeoutRef.current = window.setTimeout(() => {
         setIsVisible(true)
       }, delay)
@@ -125,78 +257,59 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       }
     }, [])
 
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "light":
-          return "bg-popover text-popover-foreground border border-border shadow-lg"
-        case "dark":
-          return "bg-gray-900 text-white shadow-lg"
-        default:
-          return "bg-gray-800 text-white shadow-lg"
-      }
-    }
+    const wrapperStyle = useMemo((): React.CSSProperties =>
+      mergeStyles(
+        { position: 'relative', display: 'inline-block' },
+        resolveDot(dotProp),
+        style,
+      ),
+      [dotProp, style],
+    )
 
-    const _getPositionClasses = () => {
-      switch (position) {
-        case "top":
-          return "bottom-full left-1/2 -translate-x-1/2 mb-2" // 8px 간격
-        case "bottom":
-          return "top-full left-1/2 -translate-x-1/2 mt-2" // 8px 간격
-        case "left":
-          return "right-full top-1/2 -translate-y-1/2 mr-2" // 8px 간격
-        case "right":
-          return "left-full top-1/2 -translate-y-1/2 ml-2" // 8px 간격
-        default:
-          return "bottom-full left-1/2 -translate-x-1/2 mb-2"
-      }
-    }
+    const popupStyle = useMemo((): React.CSSProperties =>
+      mergeStyles(
+        {
+          position: 'fixed',
+          zIndex: 50,
+          padding: '8px 12px',
+          fontSize: '0.875rem',
+          borderRadius: '0.5rem',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+        },
+        VARIANT_STYLES[variant],
+        {
+          left: `${coords.x}px`,
+          top: `${coords.y}px`,
+          transform: getPopupTransform(position),
+        },
+      ),
+      [variant, coords, position],
+    )
 
-    const getArrowClasses = () => {
-      switch (position) {
-        case "top":
-          return "top-full left-1/2 -translate-x-1/2 border-t-gray-800 dark:border-t-gray-800"
-        case "bottom":
-          return "bottom-full left-1/2 -translate-x-1/2 border-b-gray-800 dark:border-b-gray-800"
-        case "left":
-          return "left-full top-1/2 -translate-y-1/2 border-l-gray-800 dark:border-l-gray-800"
-        case "right":
-          return "right-full top-1/2 -translate-y-1/2 border-r-gray-800 dark:border-r-gray-800"
-        default:
-          return "top-full left-1/2 -translate-x-1/2 border-t-gray-800 dark:border-t-gray-800"
-      }
-    }
+    const arrowStyle = useMemo(
+      () => getArrowStyle(position, variant),
+      [position, variant],
+    )
 
     return (
       <div
         ref={ref}
-        className={merge("relative inline-block", className)}
+        style={wrapperStyle}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
         {...props}
       >
         {children}
-        
+
         {isVisible && (
           <div
             ref={tooltipRef}
-            className={merge(
-              "fixed z-50 px-3 py-2 text-sm rounded-lg whitespace-nowrap pointer-events-none", // 12px, 8px 패딩
-              getVariantClasses()
-            )}
-            style={{
-              left: `${coords.x}px`,
-              top: `${coords.y}px`,
-              transform: 'translate(-50%, -50%)'
-            }}
+            style={popupStyle}
           >
             {content}
-            {/* 화살표 */}
-            <div
-              className={merge(
-                "absolute w-0 h-0 border-4 border-transparent",
-                getArrowClasses()
-              )}
-            />
+            {/* Arrow */}
+            <div style={arrowStyle} />
           </div>
         )}
       </div>
@@ -205,19 +318,22 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
 )
 Tooltip.displayName = "Tooltip"
 
-// 편의 컴포넌트들
+// ---------------------------------------------------------------------------
+// Convenience components
+// ---------------------------------------------------------------------------
+
 export const TooltipLight = React.forwardRef<HTMLDivElement, Omit<TooltipProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Tooltip ref={ref} variant="light" className={className} {...props} />
+  (props, ref) => (
+    <Tooltip ref={ref} variant="light" {...props} />
   )
 )
 TooltipLight.displayName = "TooltipLight"
 
 export const TooltipDark = React.forwardRef<HTMLDivElement, Omit<TooltipProps, "variant">>(
-  ({ className, ...props }, ref) => (
-    <Tooltip ref={ref} variant="dark" className={className} {...props} />
+  (props, ref) => (
+    <Tooltip ref={ref} variant="dark" {...props} />
   )
 )
 TooltipDark.displayName = "TooltipDark"
 
-export { Tooltip } 
+export { Tooltip }

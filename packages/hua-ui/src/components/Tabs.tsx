@@ -1,33 +1,155 @@
 "use client"
 
-import React from 'react'
-import { merge } from '../lib/utils'
+import React, { useState, useMemo } from 'react'
+import { mergeStyles, resolveDot } from '../hooks/useDotMap'
+
+// ── Style constants ───────────────────────────────────────────────
+
+const BASE_LIST_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+const VARIANT_LIST_STYLES: Record<string, React.CSSProperties> = {
+  default: {
+    backgroundColor: 'var(--color-muted)',
+    padding: '0.75rem',
+    borderRadius: '0.75rem',
+    border: '1px solid color-mix(in srgb, var(--color-border) 50%, transparent)',
+  },
+  pills: {
+    backgroundColor: 'var(--color-muted)',
+    padding: '0.75rem',
+    borderRadius: '0.75rem',
+    border: '1px solid color-mix(in srgb, var(--color-border) 50%, transparent)',
+  },
+  underline: {
+    borderBottom: '1px solid var(--color-border)',
+    padding: '0',
+    borderRadius: '0',
+    backgroundColor: 'transparent',
+  },
+  cards: {
+    backgroundColor: 'color-mix(in srgb, var(--color-muted) 80%, transparent)',
+    padding: '0.75rem',
+    borderRadius: '0.75rem',
+    border: '1px solid color-mix(in srgb, var(--color-border) 50%, transparent)',
+  },
+}
+
+const SIZE_LIST_STYLES: Record<string, React.CSSProperties> = {
+  sm: { height: '3rem' },
+  md: { height: '3.5rem' },
+  lg: { height: '4rem' },
+}
+
+const BASE_TRIGGER_STYLE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  whiteSpace: 'nowrap',
+  fontWeight: 500,
+  transition: 'all 200ms ease-in-out',
+  cursor: 'pointer',
+  border: 'none',
+  background: 'none',
+  outline: 'none',
+}
+
+const SIZE_TRIGGER_STYLES: Record<string, React.CSSProperties> = {
+  sm: { height: '2.5rem', padding: '0.5rem 1rem', fontSize: '0.75rem' },
+  md: { height: '3rem', padding: '0.625rem 1.25rem', fontSize: '0.875rem' },
+  lg: { height: '3.5rem', padding: '0.75rem 1.5rem', fontSize: '1rem' },
+}
+
+const ACTIVE_TRIGGER_STYLE: React.CSSProperties = {
+  backgroundColor: 'var(--color-background)',
+  color: 'var(--color-foreground)',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+}
+
+const INACTIVE_TRIGGER_STYLE: React.CSSProperties = {
+  color: 'var(--color-muted-foreground)',
+}
+
+const ACTIVE_UNDERLINE_TRIGGER_STYLE: React.CSSProperties = {
+  borderBottom: '2px solid var(--color-primary)',
+  color: 'var(--color-primary)',
+  borderRadius: '0',
+  backgroundColor: 'transparent',
+  boxShadow: 'none',
+  marginBottom: '-1px',
+}
+
+const INACTIVE_UNDERLINE_TRIGGER_STYLE: React.CSSProperties = {
+  borderBottom: '2px solid transparent',
+  color: 'var(--color-muted-foreground)',
+  borderRadius: '0',
+  backgroundColor: 'transparent',
+  boxShadow: 'none',
+  marginBottom: '-1px',
+}
+
+const VARIANT_TRIGGER_BASE_STYLES: Record<string, React.CSSProperties> = {
+  default: { borderRadius: '0.5rem', padding: '0.625rem 1rem' },
+  pills: { borderRadius: '0.5rem', padding: '0.625rem 1rem' },
+  underline: { borderRadius: '0' },
+  cards: { borderRadius: '0.5rem', padding: '0.625rem 1rem' },
+}
+
+const HOVER_TRIGGER_STYLE: React.CSSProperties = {
+  color: 'var(--color-foreground)',
+  backgroundColor: 'var(--color-muted)',
+}
+
+const HOVER_UNDERLINE_TRIGGER_STYLE: React.CSSProperties = {
+  color: 'var(--color-foreground)',
+  backgroundColor: 'transparent',
+}
+
+const FOCUS_RING_STYLE: React.CSSProperties = {
+  boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)',
+}
+
+const DISABLED_TRIGGER_STYLE: React.CSSProperties = {
+  opacity: 0.5,
+  pointerEvents: 'none',
+}
+
+const CONTENT_BASE_STYLE: React.CSSProperties = {
+  marginTop: '0.5rem',
+}
+
+// ── TabsContent ───────────────────────────────────────────────────
 
 /**
- * TabsContent 컴포넌트의 props / TabsContent component props
- * @typedef {Object} TabsContentProps
- * @property {string} value - 탭 패널의 고유 값 (TabsTrigger의 value와 일치해야 함) / Unique value for tab panel (must match TabsTrigger value)
- * @property {boolean} [active] - 탭 패널 활성화 상태 (자동 설정됨) / Tab panel active state (auto-set)
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * TabsContent component props
+ * @property {string} value - Unique value for tab panel (must match TabsTrigger value)
+ * @property {boolean} [active] - Tab panel active state (auto-set)
  */
-export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TabsContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   value: string
   active?: boolean
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * TabsContent 컴포넌트 / TabsContent component
- * 탭의 콘텐츠 패널을 표시합니다. Tabs 컴포넌트 내부에서 사용됩니다.
+ * TabsContent component
  * Displays the tab content panel. Used inside Tabs component.
- * 
- * @component
- * @param {TabsContentProps} props - TabsContent 컴포넌트의 props / TabsContent component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} TabsContent 컴포넌트 / TabsContent component
  */
 const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
-  ({ className, value, active, children, ...props }, ref) => {
-    // active prop이 명시적으로 false로 설정된 경우에만 숨김
+  ({ dot: dotProp, value, active, children, style, ...props }, ref) => {
+    const [isFocused, setIsFocused] = useState(false)
+
+    const computedStyle = useMemo(() => mergeStyles(
+      CONTENT_BASE_STYLE,
+      isFocused ? FOCUS_RING_STYLE : undefined,
+      resolveDot(dotProp),
+      style,
+    ), [dotProp, isFocused, style])
+
     if (active === false) return null
 
     return (
@@ -37,10 +159,9 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
         id={`tabpanel-${value}`}
         aria-labelledby={`tab-${value}`}
         hidden={!active}
-        className={merge(
-          "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2",
-          className
-        )}
+        style={computedStyle}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         {...props}
       >
         {children}
@@ -50,72 +171,65 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
 )
 TabsContent.displayName = "TabsContent"
 
+// ── Tabs ─────────────────────────────────────────────────────────
+
 /**
- * Tabs 컴포넌트의 props / Tabs component props
- * @typedef {Object} TabsProps
- * @property {string} [value] - 현재 활성화된 탭 값 (제어 컴포넌트) / Currently active tab value (controlled component)
- * @property {string} [defaultValue] - 초기 활성화된 탭 값 (비제어 컴포넌트) / Initial active tab value (uncontrolled component)
- * @property {(value: string) => void} [onValueChange] - 탭 변경 시 호출되는 콜백 / Callback when tab changes
- * @property {"horizontal" | "vertical"} [orientation="horizontal"] - 탭 방향 / Tab orientation
- * @property {"default" | "pills" | "underline" | "cards"} [variant="default"] - 탭 스타일 변형 / Tab style variant
- * @property {"sm" | "md" | "lg"} [size="md"] - 탭 크기 / Tab size
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * Tabs component props
+ * @property {string} [value] - Currently active tab value (controlled component)
+ * @property {string} [defaultValue] - Initial active tab value (uncontrolled component)
+ * @property {(value: string) => void} [onValueChange] - Callback when tab changes
+ * @property {"horizontal" | "vertical"} [orientation="horizontal"] - Tab orientation
+ * @property {"default" | "pills" | "underline" | "cards"} [variant="default"] - Tab style variant
+ * @property {"sm" | "md" | "lg"} [size="md"] - Tab size
  */
-export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
   orientation?: "horizontal" | "vertical"
   variant?: "default" | "pills" | "underline" | "cards"
   size?: "sm" | "md" | "lg"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * Tabs 컴포넌트 / Tabs component
- * 
- * 탭 네비게이션을 제공하는 컴포넌트입니다.
- * 키보드 네비게이션(Arrow keys, Home/End)을 지원하며, ARIA 속성을 자동으로 설정합니다.
- * 
+ * Tabs component
+ *
  * Component that provides tab navigation.
  * Supports keyboard navigation (Arrow keys, Home/End) and automatically sets ARIA attributes.
- * 
- * @component
+ *
  * @example
- * // 기본 사용 / Basic usage
  * <Tabs defaultValue="tab1">
  *   <TabsList>
- *     <TabsTrigger value="tab1">탭 1</TabsTrigger>
- *     <TabsTrigger value="tab2">탭 2</TabsTrigger>
+ *     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+ *     <TabsTrigger value="tab2">Tab 2</TabsTrigger>
  *   </TabsList>
- *   <TabsContent value="tab1">탭 1 내용</TabsContent>
- *   <TabsContent value="tab2">탭 2 내용</TabsContent>
+ *   <TabsContent value="tab1">Content 1</TabsContent>
+ *   <TabsContent value="tab2">Content 2</TabsContent>
  * </Tabs>
- * 
+ *
  * @example
- * // 제어 컴포넌트 / Controlled component
+ * // Controlled component
  * const [activeTab, setActiveTab] = useState("tab1")
  * <Tabs value={activeTab} onValueChange={setActiveTab}>
  *   <TabsList>
- *     <TabsTrigger value="tab1">탭 1</TabsTrigger>
+ *     <TabsTrigger value="tab1">Tab 1</TabsTrigger>
  *   </TabsList>
- *   <TabsContent value="tab1">내용</TabsContent>
+ *   <TabsContent value="tab1">Content</TabsContent>
  * </Tabs>
- * 
+ *
  * @example
- * // 다양한 변형 / Various variants
+ * // Various variants
  * <Tabs variant="pills" size="lg">
  *   <TabsList>
- *     <TabsTrigger value="tab1">Pills 스타일</TabsTrigger>
+ *     <TabsTrigger value="tab1">Pills style</TabsTrigger>
  *   </TabsList>
  * </Tabs>
- * 
- * @param {TabsProps} props - Tabs 컴포넌트의 props / Tabs component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} Tabs 컴포넌트 / Tabs component
  */
 const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
     value,
     defaultValue,
     onValueChange,
@@ -123,7 +237,8 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
     variant = "default",
     size = "md",
     children,
-    ...props 
+    style,
+    ...props
   }, ref) => {
     const [activeTab, setActiveTab] = React.useState(value || defaultValue || "")
     const isControlled = value !== undefined
@@ -142,26 +257,27 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       }
     }, [value])
 
+    const computedStyle = useMemo(() => mergeStyles(
+      { width: '100%' } as React.CSSProperties,
+      orientation === "vertical" ? { display: 'flex' } as React.CSSProperties : undefined,
+      resolveDot(dotProp),
+      style,
+    ), [orientation, dotProp, style])
+
     return (
       <div
         ref={ref}
-        className={merge(
-          "w-full",
-          orientation === "vertical" && "flex",
-          className
-        )}
+        style={computedStyle}
         {...props}
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            // TabsContent인 경우 active prop만 설정 (value는 원래 값 유지)
             if (child.type === TabsContent) {
               const childProps = child.props as TabsContentProps
               return React.cloneElement(child, {
                 active: childProps.value === currentValue
               } as Partial<TabsContentProps>)
             }
-            // TabsList인 경우에만 onValueChange 전달
             if (child.type === TabsList) {
               return React.cloneElement(child, {
                 value: currentValue,
@@ -171,8 +287,6 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
                 size
               } as Partial<TabsListProps>)
             }
-            // 다른 React 컴포넌트들 (다른 custom wrapper 등)
-            // HTML 요소가 아닌 경우에만 props 전달
             if (typeof child.type !== 'string') {
               return React.cloneElement(child, {
                 value: currentValue,
@@ -191,50 +305,46 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 )
 Tabs.displayName = "Tabs"
 
+// ── TabsList ──────────────────────────────────────────────────────
+
 /**
- * TabsList 컴포넌트의 props / TabsList component props
- * @typedef {Object} TabsListProps
- * @property {string} [value] - 현재 활성화된 탭 값 (Tabs에서 자동 전달) / Currently active tab value (auto-passed from Tabs)
- * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 (Tabs에서 자동 전달) / Tab change callback (auto-passed from Tabs)
- * @property {"horizontal" | "vertical"} [orientation] - 탭 방향 (Tabs에서 자동 전달) / Tab orientation (auto-passed from Tabs)
- * @property {"default" | "pills" | "underline" | "cards"} [variant] - 탭 스타일 (Tabs에서 자동 전달) / Tab style (auto-passed from Tabs)
- * @property {"sm" | "md" | "lg"} [size] - 탭 크기 (Tabs에서 자동 전달) / Tab size (auto-passed from Tabs)
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * TabsList component props
+ * @property {string} [value] - Currently active tab value (auto-passed from Tabs)
+ * @property {(value: string) => void} [onValueChange] - Tab change callback (auto-passed from Tabs)
+ * @property {"horizontal" | "vertical"} [orientation] - Tab orientation (auto-passed from Tabs)
+ * @property {"default" | "pills" | "underline" | "cards"} [variant] - Tab style (auto-passed from Tabs)
+ * @property {"sm" | "md" | "lg"} [size] - Tab size (auto-passed from Tabs)
  */
-export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TabsListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   value?: string
   onValueChange?: (value: string) => void
   orientation?: "horizontal" | "vertical"
   variant?: "default" | "pills" | "underline" | "cards"
   size?: "sm" | "md" | "lg"
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * TabsList 컴포넌트 / TabsList component
- * 탭 트리거 목록을 표시합니다. Tabs 컴포넌트 내부에서 사용됩니다.
+ * TabsList component
  * Displays the list of tab triggers. Used inside Tabs component.
- * 
- * @component
- * @param {TabsListProps} props - TabsList 컴포넌트의 props / TabsList component props
- * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
- * @returns {JSX.Element} TabsList 컴포넌트 / TabsList component
  */
 const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
-  ({ 
-    className, 
+  ({
+    dot: dotProp,
     value,
     onValueChange,
     orientation = "horizontal",
     variant = "default",
     size = "md",
     children,
-    ...props 
+    style,
+    ...props
   }, ref) => {
     const listRef = React.useRef<HTMLDivElement>(null)
     React.useImperativeHandle(ref, () => listRef.current as HTMLDivElement)
-    
-    // 모든 탭 트리거의 value를 수집
-    const tabValues = React.useMemo(() => {
+
+    const tabValues = useMemo(() => {
       const values: string[] = []
       React.Children.forEach(children, (child) => {
         if (React.isValidElement(child)) {
@@ -287,36 +397,21 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 
       if (newIndex !== currentIndex && tabValues[newIndex]) {
         onValueChange?.(tabValues[newIndex])
-        // 포커스 이동
         const triggerElement = listRef.current?.querySelector(
           `[data-tab-value="${tabValues[newIndex]}"]`
         ) as HTMLElement
         triggerElement?.focus()
       }
     }
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "pills":
-          return "bg-muted p-3 rounded-xl border border-border/50"
-        case "underline":
-          return "border-b border-border"
-        case "cards":
-          return "bg-muted/80 p-3 rounded-xl border border-border/50"
-        default:
-          return "bg-muted p-3 rounded-xl border border-border/50"
-      }
-    }
 
-    const getSizeClasses = () => {
-      switch (size) {
-        case "sm":
-          return "h-12"
-        case "lg":
-          return "h-16"
-        default:
-          return "h-14"
-      }
-    }
+    const computedStyle = useMemo(() => mergeStyles(
+      BASE_LIST_STYLE,
+      orientation === "vertical" ? { flexDirection: 'column' } as React.CSSProperties : undefined,
+      VARIANT_LIST_STYLES[variant] ?? VARIANT_LIST_STYLES.default,
+      SIZE_LIST_STYLES[size] ?? SIZE_LIST_STYLES.md,
+      resolveDot(dotProp),
+      style,
+    ), [orientation, variant, size, dotProp, style])
 
     return (
       <div
@@ -324,18 +419,11 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         role="tablist"
         aria-orientation={orientation}
         onKeyDown={handleKeyDown}
-        className={merge(
-          "flex items-center justify-center",
-          orientation === "vertical" && "flex-col",
-          getVariantClasses(),
-          getSizeClasses(),
-          className
-        )}
+        style={computedStyle}
         {...props}
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            // Only pass tab props to non-HTML elements (React components)
             if (typeof child.type === 'string') {
               return child
             }
@@ -356,39 +444,35 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 )
 TabsList.displayName = "TabsList"
 
+// ── TabsTrigger ───────────────────────────────────────────────────
+
 /**
- * TabsTrigger 컴포넌트의 props
- * @typedef {Object} TabsTriggerProps
- * @property {string} value - 탭 트리거의 고유 값 (TabsContent의 value와 일치해야 함)
- * @property {(value: string) => void} [onValueChange] - 탭 변경 콜백 (TabsList에서 자동 전달)
- * @property {"horizontal" | "vertical"} [orientation] - 탭 방향 (TabsList에서 자동 전달)
- * @property {"default" | "pills" | "underline" | "cards"} [variant] - 탭 스타일 (TabsList에서 자동 전달)
- * @property {"sm" | "md" | "lg"} [size] - 탭 크기 (TabsList에서 자동 전달)
- * @property {boolean} [active] - 탭 활성화 상태 (자동 설정됨)
- * @extends {React.ButtonHTMLAttributes<HTMLButtonElement>}
+ * TabsTrigger component props
+ * @property {string} value - Unique trigger value (must match TabsContent value)
+ * @property {(value: string) => void} [onValueChange] - Tab change callback (auto-passed from TabsList)
+ * @property {"horizontal" | "vertical"} [orientation] - Tab orientation (auto-passed from TabsList)
+ * @property {"default" | "pills" | "underline" | "cards"} [variant] - Tab style (auto-passed from TabsList)
+ * @property {"sm" | "md" | "lg"} [size] - Tab size (auto-passed from TabsList)
+ * @property {boolean} [active] - Active state (auto-set)
  */
-export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface TabsTriggerProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   value: string
   onValueChange?: (value: string) => void
   orientation?: "horizontal" | "vertical"
   variant?: "default" | "pills" | "underline" | "cards"
   size?: "sm" | "md" | "lg"
   active?: boolean
+  dot?: string
+  style?: React.CSSProperties
 }
 
 /**
- * TabsTrigger 컴포넌트 / TabsTrigger component
- * 탭을 활성화하는 버튼입니다. TabsList 컴포넌트 내부에서 사용됩니다.
+ * TabsTrigger component
  * Button that activates a tab. Used inside TabsList component.
- * 
- * @component
- * @param {TabsTriggerProps} props - TabsTrigger 컴포넌트의 props / TabsTrigger component props
- * @param {React.Ref<HTMLButtonElement>} ref - button 요소 ref / button element ref
- * @returns {JSX.Element} TabsTrigger 컴포넌트 / TabsTrigger component
  */
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
-  ({ 
-    className,
+  ({
+    dot: dotProp,
     value,
     onValueChange,
     orientation: _orientation = "horizontal",
@@ -396,51 +480,32 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
     size = "md",
     active = false,
     children,
+    disabled,
+    style,
     ...props
   }, ref) => {
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "pills":
-          return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active
-              ? "bg-background text-foreground shadow-md"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          )
-        case "underline":
-          return merge(
-            "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          )
-        case "cards":
-          return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active
-              ? "bg-background text-foreground shadow-md"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          )
-        default:
-          return merge(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-            active
-              ? "bg-background text-foreground shadow-md"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          )
-      }
-    }
+    const [isHovered, setIsHovered] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
 
-    const getSizeClasses = () => {
-      switch (size) {
-        case "sm":
-          return "h-10 px-4 py-2 text-xs"
-        case "lg":
-          return "h-14 px-6 py-3 text-base"
-        default:
-          return "h-12 px-5 py-2.5 text-sm"
-      }
-    }
+    const computedStyle = useMemo(() => {
+      const isUnderline = variant === "underline"
+
+      const activeStyle = isUnderline ? ACTIVE_UNDERLINE_TRIGGER_STYLE : ACTIVE_TRIGGER_STYLE
+      const inactiveStyle = isUnderline ? INACTIVE_UNDERLINE_TRIGGER_STYLE : INACTIVE_TRIGGER_STYLE
+      const hoverStyle = isUnderline ? HOVER_UNDERLINE_TRIGGER_STYLE : HOVER_TRIGGER_STYLE
+
+      return mergeStyles(
+        BASE_TRIGGER_STYLE,
+        VARIANT_TRIGGER_BASE_STYLES[variant] ?? VARIANT_TRIGGER_BASE_STYLES.default,
+        SIZE_TRIGGER_STYLES[size] ?? SIZE_TRIGGER_STYLES.md,
+        active ? activeStyle : inactiveStyle,
+        !active && isHovered && !disabled ? hoverStyle : undefined,
+        isFocused ? FOCUS_RING_STYLE : undefined,
+        disabled ? DISABLED_TRIGGER_STYLE : undefined,
+        resolveDot(dotProp),
+        style,
+      )
+    }, [variant, size, active, isHovered, isFocused, disabled, dotProp, style])
 
     const handleClick = () => {
       if (onValueChange) {
@@ -457,13 +522,14 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         id={`tab-${value}`}
         data-tab-value={value}
         tabIndex={active ? 0 : -1}
-        className={merge(
-          getVariantClasses(),
-          getSizeClasses(),
-          className
-        )}
+        style={computedStyle}
         onClick={handleClick}
         type="button"
+        disabled={disabled}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         {...props}
       >
         {children}
@@ -473,20 +539,27 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
 )
 TabsTrigger.displayName = "TabsTrigger"
 
-// 편의 컴포넌트들
+// ── Convenience components ────────────────────────────────────────
+
 const TabsPills = React.forwardRef<HTMLDivElement, TabsProps>(
-  (props, ref) => <Tabs ref={ref} variant="pills" {...props} />
+  ({ dot, style, ...props }, ref) => (
+    <Tabs ref={ref} variant="pills" dot={dot} style={style} {...props} />
+  )
 )
 TabsPills.displayName = "TabsPills"
 
 const TabsUnderline = React.forwardRef<HTMLDivElement, TabsProps>(
-  (props, ref) => <Tabs ref={ref} variant="underline" {...props} />
+  ({ dot, style, ...props }, ref) => (
+    <Tabs ref={ref} variant="underline" dot={dot} style={style} {...props} />
+  )
 )
 TabsUnderline.displayName = "TabsUnderline"
 
 const TabsCards = React.forwardRef<HTMLDivElement, TabsProps>(
-  (props, ref) => <Tabs ref={ref} variant="cards" {...props} />
+  ({ dot, style, ...props }, ref) => (
+    <Tabs ref={ref} variant="cards" dot={dot} style={style} {...props} />
+  )
 )
 TabsCards.displayName = "TabsCards"
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, TabsPills, TabsUnderline, TabsCards } 
+export { Tabs, TabsList, TabsTrigger, TabsContent, TabsPills, TabsUnderline, TabsCards }

@@ -137,8 +137,10 @@ describe('Tabs', () => {
       </Tabs>
     );
 
-    const tabList = container.querySelector('[role="tablist"]');
-    expect(tabList).toHaveClass('bg-muted');
+    const tabList = container.querySelector('[role="tablist"]') as HTMLElement;
+    expect(tabList).toBeTruthy();
+    // Tabs now uses inline styles (dot engine); pills variant has a muted background
+    expect(tabList.style.backgroundColor).toBeTruthy();
   });
 
   it('should support keyboard navigation', async () => {

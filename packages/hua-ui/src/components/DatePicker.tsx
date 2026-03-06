@@ -290,7 +290,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           position="bottom"
           align="start"
           fullWidth
-          contentClassName="p-0"
+          contentStyle={{ padding: 0 }}
         >
           <div
             className="rounded-lg bg-popover"

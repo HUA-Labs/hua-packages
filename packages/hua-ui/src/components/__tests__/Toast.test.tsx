@@ -298,9 +298,12 @@ describe('Toast - Position', () => {
 
     await user.click(screen.getByText('Add Toast'));
 
-    const toastContainer = container.querySelector('.fixed.z-50');
-    expect(toastContainer?.className).toContain('top-4');
-    expect(toastContainer?.className).toContain('right-4');
+    const toastContainer = container.querySelector('[data-toast-container]');
+    expect(toastContainer).toBeTruthy();
+    expect(toastContainer?.getAttribute('data-position')).toBe('top-right');
+    const s = (toastContainer as HTMLElement)?.style;
+    expect(s.top).toBe('1rem');
+    expect(s.right).toBe('1rem');
   });
 
   it('should render in specified position', async () => {
@@ -314,8 +317,11 @@ describe('Toast - Position', () => {
 
     await user.click(screen.getByText('Add Toast'));
 
-    const toastContainer = container.querySelector('.fixed.z-50');
-    expect(toastContainer?.className).toContain('bottom-4');
-    expect(toastContainer?.className).toContain('left-4');
+    const toastContainer = container.querySelector('[data-toast-container]');
+    expect(toastContainer).toBeTruthy();
+    expect(toastContainer?.getAttribute('data-position')).toBe('bottom-left');
+    const s = (toastContainer as HTMLElement)?.style;
+    expect(s.bottom).toBe('1rem');
+    expect(s.left).toBe('1rem');
   });
 });

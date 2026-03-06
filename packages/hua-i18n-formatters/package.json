@@ -2,7 +2,7 @@
   "name": "@hua-labs/i18n-formatters",
   "version": "2.1.0",
   "description": "HUA Labs - Date, Number, and Currency formatting utilities for i18n",
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
@@ -11,23 +11,31 @@
   ],
   "exports": {
     ".": {
+      "react-native": "./dist/index.mjs",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
     },
     "./date": {
+      "react-native": "./dist/date/index.mjs",
       "types": "./dist/date/index.d.ts",
       "import": "./dist/date/index.mjs",
+      "require": "./dist/date/index.cjs",
       "default": "./dist/date/index.mjs"
     },
     "./number": {
+      "react-native": "./dist/number/index.mjs",
       "types": "./dist/number/index.d.ts",
       "import": "./dist/number/index.mjs",
+      "require": "./dist/number/index.cjs",
       "default": "./dist/number/index.mjs"
     },
     "./currency": {
+      "react-native": "./dist/currency/index.mjs",
       "types": "./dist/currency/index.d.ts",
       "import": "./dist/currency/index.mjs",
+      "require": "./dist/currency/index.cjs",
       "default": "./dist/currency/index.mjs"
     }
   },

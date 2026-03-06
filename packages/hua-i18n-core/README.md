@@ -17,6 +17,7 @@ Lightweight, production-ready i18n library for React. Delivers zero-flicker lang
 - **Type-safe arrays — tArray() returns string[] without casting**
 - **State management — First-class Zustand support via i18n-core-zustand**
 - **Automatic retry — Exponential backoff for API loader failures**
+- **React Native — Works in Expo and bare RN projects via CJS/ESM dual format**
 - **~6.5KB gzipped — Zero external dependencies**
 
 ## Installation

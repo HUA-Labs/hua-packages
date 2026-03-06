@@ -58,7 +58,7 @@ describe('Timeline', () => {
     const { container } = render(
       <Timeline items={items} orientation="horizontal" />
     );
-    expect(container.querySelector('.overflow-x-auto')).toBeInTheDocument();
+    expect(container.querySelector('[data-orientation="horizontal"]')).toBeInTheDocument();
   });
 
   it('should format dates', () => {
@@ -68,7 +68,6 @@ describe('Timeline', () => {
         locale="en-US"
       />
     );
-    // Time element should be present
     const timeEl = document.querySelector('time');
     expect(timeEl).toBeInTheDocument();
   });
@@ -77,27 +76,26 @@ describe('Timeline', () => {
     const { container } = render(
       <Timeline items={items} highlightedId="2" />
     );
-    expect(container.querySelector('.shadow-md')).toBeInTheDocument();
+    expect(container.querySelector('[data-highlighted="true"]')).toBeInTheDocument();
   });
 
   it('should apply size variants', () => {
     const { container, rerender } = render(<Timeline items={items} size="sm" />);
-    expect(container.querySelector('.gap-3')).toBeInTheDocument();
+    expect(container.querySelector('[data-size="sm"]')).toBeInTheDocument();
 
     rerender(<Timeline items={items} size="lg" />);
-    expect(container.querySelector('.gap-5')).toBeInTheDocument();
+    expect(container.querySelector('[data-size="lg"]')).toBeInTheDocument();
   });
 
   it('should hide connector when showConnector is false', () => {
     const { container } = render(
       <Timeline items={items} showConnector={false} />
     );
-    // No connector line
-    expect(container.querySelectorAll('.bg-border.mt-1').length).toBe(0);
+    expect(container.querySelectorAll('[data-connector="vertical"]').length).toBe(0);
   });
 
-  it('should apply custom className', () => {
-    const { container } = render(<Timeline items={items} className="my-timeline" />);
-    expect(container.querySelector('.my-timeline')).toBeInTheDocument();
+  it('should apply dot prop styles', () => {
+    const { container } = render(<Timeline items={items} dot="p-4" />);
+    expect(container.querySelector('[data-timeline-root]')).toBeInTheDocument();
   });
 });

@@ -225,7 +225,7 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
                     </Button>
                   }
                 >
-                  <DropdownMenu className="max-h-64 overflow-auto">
+                  <DropdownMenu style={{ maxHeight: '16rem', overflowY: 'auto' }}>
                     {dateRange.presets?.map((preset) => (
                       <DropdownItem
                         key={preset.value}

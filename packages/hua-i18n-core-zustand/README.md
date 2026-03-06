@@ -14,6 +14,7 @@ Type-safe adapter for integrating Zustand state management with @hua-labs/i18n-c
 - **Auto-sync — Zustand store changes automatically sync to i18n**
 - **SSR compatible — Language syncs after hydration to prevent mismatches**
 - **Circular reference prevention — Safe unidirectional data flow**
+- **React Native — Works in Expo and bare RN projects**
 - **Minimal — Only Zustand as peer dependency**
 
 ## Installation

@@ -14,6 +14,7 @@ Production-ready translation loaders with built-in TTL caching, duplicate reques
 - **TTL caching — Time-based cache with global cache support**
 - **Duplicate prevention — Deduplicates concurrent requests for the same resource**
 - **Preloading — Warm up namespaces and fallback languages at startup**
+- **React Native — Works in Expo and bare RN projects**
 - **Default merging — Merge API translations with bundled defaults**
 
 ## Installation
