@@ -232,4 +232,18 @@ describe('dot() with target: native — integration', () => {
     const result = dot('-m-4', { target: 'native' });
     expect(result).toEqual({ margin: -16 });
   });
+
+  it('border with arbitrary color does not set borderWidth to string', () => {
+    const result = dot('border border-[#dadce0]', { target: 'native' });
+    expect(result.borderWidth).toBe(1);
+    expect(result.borderColor).toBe('#dadce0');
+  });
+
+  it('color shade tokens work on native', () => {
+    const result = dot('bg-cyan-500 text-red-300', { target: 'native' });
+    expect(result).toEqual({
+      backgroundColor: '#06b6d4',
+      color: '#fca5a5',
+    });
+  });
 });
