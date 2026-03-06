@@ -287,8 +287,13 @@ describe('adaptNative — numeric (px→number)', () => {
     expect(adaptNative({ fontSize: '14px' })).toEqual({ fontSize: 14 });
   });
 
-  it('converts lineHeight number string', () => {
-    expect(adaptNative({ lineHeight: '1.25' })).toEqual({ lineHeight: 1.25 });
+  it('converts unitless lineHeight to absolute px (multiplier * fontSize)', () => {
+    // '1.25' unitless → 1.25 × 16 (default) = 20
+    expect(adaptNative({ lineHeight: '1.25' })).toEqual({ lineHeight: 20 });
+    // With explicit fontSize: 1.5 × 20 = 30
+    expect(adaptNative({ fontSize: '20px', lineHeight: '1.5' })).toEqual({ fontSize: 20, lineHeight: 30 });
+    // px lineHeight stays as-is
+    expect(adaptNative({ lineHeight: '28px' })).toEqual({ lineHeight: 28 });
   });
 
   it('converts letterSpacing em to px', () => {

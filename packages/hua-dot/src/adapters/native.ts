@@ -407,6 +407,19 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
 
     // Numeric conversion (px → number)
     if (NUMERIC_PROPS.has(key)) {
+      // lineHeight: unitless multiplier → absolute px (RN requires absolute values)
+      if (key === 'lineHeight') {
+        const strVal = String(value).trim();
+        const num = parseFloat(strVal);
+        // Unitless (e.g., '1.5', '2') — multiply by fontSize or default 16
+        if (!isNaN(num) && String(num) === strVal && !strVal.endsWith('px') && !strVal.endsWith('em') && !strVal.endsWith('rem')) {
+          const fontSize = typeof webStyle.fontSize === 'string'
+            ? parseFloat(webStyle.fontSize) || remBase
+            : (typeof webStyle.fontSize === 'number' ? webStyle.fontSize : remBase);
+          result[key] = Math.round(num * fontSize * 100) / 100;
+          continue;
+        }
+      }
       const converted = toNumeric(value, remBase);
       if (converted !== undefined) {
         result[key] = converted;
