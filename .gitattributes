@@ -1,6 +1,5 @@
 # Auto detect text files and ensure LF line endings in repo
 * text=auto eol=lf
-
 # Binary files
 *.png binary
 *.jpg binary
@@ -10,4 +9,5 @@
 *.woff binary
 *.woff2 binary
 *.ttf binary
+*.otf binary
 *.eot binary
