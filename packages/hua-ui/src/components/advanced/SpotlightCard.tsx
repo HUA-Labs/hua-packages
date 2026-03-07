@@ -11,7 +11,9 @@ const BASE_STYLE: React.CSSProperties = {
   overflow: "hidden",
   borderRadius: "0.75rem",
   backgroundColor: "rgb(17 24 39)",
-  border: "1px solid rgb(31 41 55)",
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: "rgb(31 41 55)",
   transition: "border-color 300ms ease, box-shadow 300ms ease",
 };
 

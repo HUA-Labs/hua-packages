@@ -115,6 +115,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@hua-labs/dot": "workspace:*",
     "@hua-labs/hooks": "workspace:*",
     "@hua-labs/i18n-core": "workspace:*",
     "@hua-labs/i18n-core-zustand": "workspace:*",
@@ -123,7 +124,6 @@
     "@hua-labs/motion-core": "workspace:*",
     "@hua-labs/state": "workspace:*",
     "@hua-labs/ui": "workspace:*",
-    "@hua-labs/dot": "workspace:*",
     "@hua-labs/utils": "workspace:*",
     "@phosphor-icons/react": "^2.1.10"
   },
@@ -178,7 +178,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.3.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
