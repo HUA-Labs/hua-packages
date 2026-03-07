@@ -1,5 +1,6 @@
 import React from 'react'
 import type { IconProps as PhosphorIconProps } from '@phosphor-icons/react'
+import { dot } from '@hua-labs/dot'
 import { merge, mergeMap } from '../../lib/utils'
 import { mergeStyles, resolveDot } from '../../hooks/useDotMap'
 import { icons, IconName, emotionIcons, statusIcons } from '../../lib/icons'
@@ -134,8 +135,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   if (!isClient) {
     return (
       <span
-        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
-        className={merge(variantClasses, className)}
+        style={mergeStyles(dot(merge(variantClasses, className)), { width: iconSize, height: iconSize }, dotStyle, styleProp)}
         aria-hidden={ariaHidden !== undefined ? ariaHidden : true}
         aria-label={ariaLabel}
       />
@@ -183,16 +183,11 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
     return (
       <span
         ref={ref}
-        className={merge(
-          'inline-flex items-center justify-center rounded-full border-2 border-dashed border-border',
-          variantClasses,
-          className
-        )}
-        style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
+        style={mergeStyles(dot(merge('inline-flex items-center justify-center rounded-full border-2 border-dashed border-border', variantClasses, className)), { width: iconSize, height: iconSize }, dotStyle, styleProp)}
         aria-label={ariaLabel || `아이콘을 찾을 수 없음: ${iconName}`}
         title={`Icon not found: ${iconName}`}
       >
-        <span className="text-xs text-muted-foreground" aria-hidden="true">
+        <span style={dot('text-xs text-muted-foreground')} aria-hidden="true">
           ?
         </span>
       </span>
@@ -243,13 +238,7 @@ const IconComponent = React.forwardRef<HTMLSpanElement, IconProps>(({
   return (
     <span
       ref={ref}
-      className={merge(
-        'inline-flex items-center justify-center',
-        animationClasses,
-        variantClasses,
-        className
-      )}
-      style={mergeStyles({ width: iconSize, height: iconSize }, dotStyle, styleProp)}
+      style={mergeStyles(dot(merge('inline-flex items-center justify-center', animationClasses, variantClasses, className)), { width: iconSize, height: iconSize }, dotStyle, styleProp)}
       {...accessibilityProps}
     >
       {ResolvedIcon && React.createElement(ResolvedIcon, {

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
+import { mergeStyles } from '../hooks/useDotMap'
 import { Section } from '../components/Section'
 import { useLandingTheme } from './LandingProvider'
 import type { LandingMetricsProps, LandingMetricItem, LandingMotionOverride } from './types'
@@ -43,21 +45,20 @@ function MetricBar({ item, delay = 0 }: { item: LandingMetricItem; delay?: numbe
   }, [item.value, delay])
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">{item.label}</span>
-        <span className={merge("text-2xl font-bold", color.text)}>
+    <div style={dot("space-y-2")}>
+      <div style={dot("flex justify-between items-center")}>
+        <span style={dot("text-sm font-medium")}>{item.label}</span>
+        <span style={dot(merge("text-2xl font-bold", color.text))}>
           {Math.round(animatedValue)}
         </span>
       </div>
-      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <div style={dot("h-2 bg-secondary rounded-full overflow-hidden")}>
         <div
-          className={merge("h-full rounded-full transition-all duration-1000 ease-out", color.bar)}
-          style={{ width: `${animatedValue}%` }}
+          style={mergeStyles(dot(merge("h-full rounded-full transition-all duration-1000 ease-out", color.bar)), { width: `${animatedValue}%` })}
         />
       </div>
       {item.description && (
-        <p className="text-xs text-muted-foreground">{item.description}</p>
+        <p style={dot("text-xs text-muted-foreground")}>{item.description}</p>
       )}
     </div>
   )
@@ -101,22 +102,21 @@ export function LandingMetrics({
     <Section header={header} dot={className} {...rest}>
       <div
         ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
-        style={scrollReveal?.style ?? fallbackStyle}
-        className="max-w-3xl mx-auto"
+        style={mergeStyles(dot("max-w-3xl mx-auto"), scrollReveal?.style ?? fallbackStyle)}
       >
         {/* Tabs */}
         {tabs && tabs.length > 1 && (
-          <div className="flex gap-2 mb-8 justify-center">
+          <div style={dot("flex gap-2 mb-8 justify-center")}>
             {tabs.map((tab, i) => (
               <button
                 key={i}
                 onClick={() => setActiveTab(i)}
-                className={merge(
+                style={dot(merge(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                   activeTab === i
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                )}
+                ))}
               >
                 {tab.label}
               </button>
@@ -125,7 +125,7 @@ export function LandingMetrics({
         )}
 
         {/* Metrics */}
-        <div className="space-y-6">
+        <div style={dot("space-y-6")}>
           {displayItems.map((item, i) => (
             <MetricBar key={i} item={item} delay={i * 100} />
           ))}

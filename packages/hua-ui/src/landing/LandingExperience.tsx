@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { useLandingTheme } from './LandingProvider'
 import type { LandingExperienceProps, LandingExperienceItem, LandingMotionOverride } from './types'
@@ -29,33 +30,33 @@ try {
 
 function ExperienceItem({ item, style }: { item: LandingExperienceItem; style?: React.CSSProperties }) {
   return (
-    <div className="relative pl-8 pb-8 last:pb-0" style={style}>
+    <div style={{ ...dot('relative pl-8 pb-8'), ...style }}>
       {/* Timeline dot */}
       <div
-        className={merge(
+        style={dot(merge(
           "absolute left-0 top-1.5 w-3 h-3 rounded-full border-2",
           item.current
             ? "bg-primary border-primary animate-pulse"
             : "bg-background border-border"
-        )}
+        ))}
       />
       {/* Timeline line */}
-      <div className="absolute left-[5px] top-4 bottom-0 w-0.5 bg-border" />
+      <div style={dot("absolute left-[5px] top-4 bottom-0 w-0.5 bg-border")} />
 
       {/* Content */}
-      <div className="space-y-1">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-          <h3 className="text-lg font-bold">{item.title}</h3>
-          <span className="text-sm text-muted-foreground">{item.period}</span>
+      <div style={dot("space-y-1")}>
+        <div style={dot("flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1")}>
+          <h3 style={dot("text-lg font-bold")}>{item.title}</h3>
+          <span style={dot("text-sm text-muted-foreground")}>{item.period}</span>
         </div>
-        <p className="text-base text-foreground/80 font-medium">{item.company}</p>
+        <p style={dot("text-base text-foreground/80 font-medium")}>{item.company}</p>
         {item.description && (
-          <p className="text-sm text-muted-foreground leading-relaxed pt-2">
+          <p style={dot("text-sm text-muted-foreground leading-relaxed pt-2")}>
             {item.description}
           </p>
         )}
         {item.current && (
-          <span className="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+          <span style={dot("inline-block mt-2 px-2 py-1 text-xs rounded-full bg-primary/10 text-primary")}>
             Current
           </span>
         )}
@@ -93,7 +94,7 @@ export function LandingExperience({
 
   return (
     <Section header={header} dot={className} {...rest}>
-      <div ref={stagger?.containerRef} className="max-w-3xl mx-auto">
+      <div ref={stagger?.containerRef} style={dot("max-w-3xl mx-auto")}>
         {items.map((item, i) => (
           <ExperienceItem
             key={i}

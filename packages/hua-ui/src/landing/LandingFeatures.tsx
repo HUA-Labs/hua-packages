@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { GlowCard } from '../components/advanced/GlowCard'
 import { SpotlightCard } from '../components/advanced/SpotlightCard'
@@ -47,17 +48,17 @@ function renderCard(
     case 'glow':
       return (
         <GlowCard style={style} dot="p-6">
-          {item.icon && <div className="text-4xl mb-4">{item.icon}</div>}
-          <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-          <p className="text-muted-foreground text-sm">{item.description}</p>
+          {item.icon && <div style={dot("text-4xl mb-4")}>{item.icon}</div>}
+          <h3 style={dot("text-xl font-bold mb-2")}>{item.title}</h3>
+          <p style={dot("text-muted-foreground text-sm")}>{item.description}</p>
         </GlowCard>
       )
     case 'spotlight':
       return (
         <SpotlightCard style={style} dot="p-6">
-          {item.icon && <div className="text-4xl mb-4">{item.icon}</div>}
-          <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-          <p className="text-muted-foreground text-sm">{item.description}</p>
+          {item.icon && <div style={dot("text-4xl mb-4")}>{item.icon}</div>}
+          <h3 style={dot("text-xl font-bold mb-2")}>{item.title}</h3>
+          <p style={dot("text-muted-foreground text-sm")}>{item.description}</p>
         </SpotlightCard>
       )
     case 'feature-glass':
@@ -71,7 +72,7 @@ function renderCard(
           variant="glass"
           hover="slide"
         >
-          {item.icon && <div className="text-4xl mb-4">{item.icon}</div>}
+          {item.icon && <div style={dot("text-4xl mb-4")}>{item.icon}</div>}
         </FeatureCard>
       )
   }
@@ -121,7 +122,7 @@ export function LandingFeatures({
     >
       <div
         ref={stagger?.containerRef}
-        className={merge("grid gap-6 lg:gap-8", gridColsMap[columns])}
+        style={dot(merge("grid gap-6 lg:gap-8", gridColsMap[columns]))}
       >
         {items.map((item, i) => (
           <div key={i}>

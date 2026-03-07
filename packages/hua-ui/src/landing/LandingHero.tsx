@@ -2,6 +2,8 @@
 
 import React, { useMemo } from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
+import { mergeStyles } from '../hooks/useDotMap'
 import { Container } from '../components/Container'
 import { AnimatedGradient } from '../components/advanced/AnimatedGradient'
 import { useLandingTheme } from './LandingProvider'
@@ -53,17 +55,17 @@ export function LandingHero({
 
   return (
     <section
-      className={merge(
+      style={dot(merge(
         "relative overflow-hidden flex items-center justify-center",
         size === 'full' ? 'min-h-screen' : 'py-28 sm:py-36',
         bg === 'dark' && 'bg-gray-950 text-white',
         className
-      )}
+      ))}
       {...rest}
     >
       {/* Background layer */}
       {bg === 'gradient' && (
-        <div className="absolute inset-0 gradient-bg-soft" aria-hidden="true" />
+        <div style={dot("absolute inset-0")} className="gradient-bg-soft" aria-hidden="true" />
       )}
       {bg === 'animated-gradient' && (
         <AnimatedGradient
@@ -75,35 +77,34 @@ export function LandingHero({
       )}
       {bg === 'dark' && (
         <div
-          className="absolute inset-0"
-          style={{
+          style={mergeStyles(dot("absolute inset-0"), {
             background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)',
-          }}
+          })}
           aria-hidden="true"
         />
       )}
 
       {/* Content */}
       <Container size="lg" padding="none" centered dot="relative z-10 px-6">
-        <div style={contentStyle} className="text-center max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
+        <div style={mergeStyles(dot("text-center max-w-4xl mx-auto"), contentStyle)}>
+          <h1 style={dot("text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6")}>
             {title}
           </h1>
 
           {subtitle && (
-            <p className="text-xl sm:text-2xl text-muted-foreground mb-4">
+            <p style={dot("text-xl sm:text-2xl text-muted-foreground mb-4")}>
               {subtitle}
             </p>
           )}
 
           {description && (
-            <p className="text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8">
+            <p style={dot("text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8")}>
               {description}
             </p>
           )}
 
           {(primaryAction || secondaryAction) && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div style={dot("flex flex-col sm:flex-row items-center justify-center gap-4")}>
               {primaryAction}
               {secondaryAction}
             </div>
@@ -113,8 +114,8 @@ export function LandingHero({
 
       {/* Scroll indicator */}
       {scrollIndicator && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+        <div style={dot("absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce")} aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={dot("text-muted-foreground")}>
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </div>

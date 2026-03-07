@@ -2,6 +2,8 @@
 
 import React from "react";
 import { merge } from "../lib/utils";
+import { dot } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * StatsPanelItem 인터페이스 / StatsPanelItem interface
@@ -31,13 +33,15 @@ export interface StatsPanelItem {
  * @property {StatsPanelItem[]} items - 통계 항목 배열 / Stat items array
  * @property {1 | 2 | 3 | 4} [columns=4] - 그리드 컬럼 수 / Grid column count
  * @property {boolean} [loading=false] - 로딩 상태 / Loading state
- * @extends {React.HTMLAttributes<HTMLDivElement>}
+ * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface StatsPanelProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StatsPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
   title?: string;
   items: StatsPanelItem[];
   columns?: 1 | 2 | 3 | 4;
   loading?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -81,7 +85,8 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
       items,
       columns = 4,
       loading = false,
-      className,
+      dot: dotProp,
+      style,
       ...props
     },
     ref
@@ -139,26 +144,26 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
     return (
       <div
         ref={ref}
-        className={merge("w-full", className)}
+        style={mergeStyles(dot("w-full"), resolveDot(dotProp), style)}
         {...props}
       >
         {title && (
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
+          <h2 style={dot("mb-4 text-lg font-semibold text-foreground")}>
             {title}
           </h2>
         )}
         <div
-          className={merge("grid gap-5", gridCols)}
+          style={dot(merge("grid gap-5", gridCols))}
         >
           {loading ? (
             Array.from({ length: columns }).map((_, i) => (
               <div
                 key={i}
-                className="animate-pulse rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6"
+                style={dot("animate-pulse rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6")}
               >
-                <div className="mb-2 h-4 w-20 rounded bg-[var(--surface-muted)]/80" />
-                <div className="mb-1 h-8 w-24 rounded bg-[var(--surface-muted)]/80" />
-                <div className="h-3 w-32 rounded bg-[var(--surface-muted)]/80" />
+                <div style={dot("mb-2 h-4 w-20 rounded bg-[var(--surface-muted)]/80")} />
+                <div style={dot("mb-1 h-8 w-24 rounded bg-[var(--surface-muted)]/80")} />
+                <div style={dot("h-3 w-32 rounded bg-[var(--surface-muted)]/80")} />
               </div>
             ))
           ) : (
@@ -170,7 +175,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
                   accentStyles[item.accent ?? "neutral"].card
                 )}
               >
-                <div className="mb-3 flex items-start justify-between gap-4">
+                <div style={dot("mb-3 flex items-start justify-between gap-4")}>
                   <div
                     className={merge(
                       "text-sm font-medium",
@@ -200,7 +205,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
                   {item.value}
                 </div>
                 {item.description && (
-                  <div className="mt-1 text-xs text-muted-foreground">
+                  <div style={dot("mt-1 text-xs text-muted-foreground")}>
                     {item.description}
                   </div>
                 )}

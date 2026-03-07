@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { Card } from '../components/Card'
 import { Icon } from '../components/Icon/Icon'
@@ -46,27 +47,27 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
       style={style}
     >
       {item.image && (
-        <div className="relative overflow-hidden aspect-video">
+        <div style={dot("relative overflow-hidden aspect-video")}>
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            style={dot("w-full h-full object-cover group-hover:scale-105 transition-transform duration-300")}
           />
         </div>
       )}
-      <div className="p-6">
-        <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-        <p className="text-muted-foreground mb-4 leading-relaxed">
+      <div style={dot("p-6")}>
+        <h3 style={dot("text-xl font-bold mb-2")}>{item.title}</h3>
+        <p style={dot("text-muted-foreground mb-4 leading-relaxed")}>
           {item.description}
         </p>
 
         {/* Tags */}
         {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div style={dot("flex flex-wrap gap-2 mb-4")}>
             {item.tags.map((tag, i) => (
               <span
                 key={i}
-                className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary"
+                style={dot("px-2 py-1 text-xs rounded-full bg-primary/10 text-primary")}
               >
                 {tag}
               </span>
@@ -75,13 +76,13 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
         )}
 
         {/* Links */}
-        <div className="flex gap-3">
+        <div style={dot("flex gap-3")}>
           {item.href && (
             <a
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
+              style={dot("text-sm text-primary hover:underline flex items-center gap-1")}
             >
               View Project <Icon name="arrowRight" size={16} />
             </a>
@@ -91,7 +92,7 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
               href={item.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+              style={dot("text-sm text-muted-foreground hover:text-foreground flex items-center gap-1")}
             >
               <Icon name="github" size={16} /> GitHub
             </a>
@@ -150,15 +151,15 @@ export function LandingProjects({
     <Section header={header} dot={className} {...rest}>
       {/* Tag Filter */}
       {filter && allTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-8 justify-center">
+        <div style={dot("flex flex-wrap gap-2 mb-8 justify-center")}>
           <button
             onClick={() => setSelectedTag(null)}
-            className={merge(
+            style={dot(merge(
               "px-4 py-2 rounded-full text-sm font-medium transition-colors",
               !selectedTag
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            )}
+            ))}
           >
             All
           </button>
@@ -166,12 +167,12 @@ export function LandingProjects({
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={merge(
+              style={dot(merge(
                 "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                 selectedTag === tag
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              )}
+              ))}
             >
               {tag}
             </button>
@@ -182,7 +183,7 @@ export function LandingProjects({
       {/* Projects Grid */}
       <div
         ref={stagger?.containerRef}
-        className={merge("grid gap-6", gridColsMap[columns])}
+        style={dot(merge("grid gap-6", gridColsMap[columns]))}
       >
         {filteredItems.map((item, i) => (
           <ProjectCard
