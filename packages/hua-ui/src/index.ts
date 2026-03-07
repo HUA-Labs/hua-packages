@@ -146,6 +146,11 @@ export {
   useReducedMotion,
   useWindowSize,
   useAnimatedEntrance,
+  useBreakpoint,
+  useDotEnv,
+  useDotMap,
+  mergeStyles,
+  resolveDot,
 } from './hooks';
 export type {
   UseInViewOptions,
@@ -158,4 +163,6 @@ export type {
   UseWindowSizeReturn,
   UseAnimatedEntranceOptions,
   UseAnimatedEntranceReturn,
+  DotStyleMap,
+  StyleObject,
 } from './hooks';

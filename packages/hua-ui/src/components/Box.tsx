@@ -1,7 +1,9 @@
 "use client"
 
 import React, { useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import { dot as dotFn } from "@hua-labs/dot"
+import { useDotEnv } from "../hooks/useDotEnv"
+import { mergeStyles } from "../hooks/useDotMap"
 
 type BoxElement =
   | "div" | "section" | "article" | "aside" | "main" | "nav"
@@ -15,9 +17,10 @@ export interface BoxProps extends Omit<React.HTMLAttributes<HTMLElement>, 'class
 
 const Box = React.forwardRef<HTMLElement, BoxProps>(
   ({ as: Tag = "div", dot: dotProp, style, ...props }, ref) => {
+    const env = useDotEnv()
     const computedStyle = useMemo(
-      () => mergeStyles(resolveDot(dotProp), style),
-      [dotProp, style],
+      () => mergeStyles(dotProp ? dotFn(dotProp, env) as React.CSSProperties : {}, style),
+      [dotProp, env, style],
     )
 
     return <Tag ref={ref as React.Ref<never>} style={computedStyle} {...props} />

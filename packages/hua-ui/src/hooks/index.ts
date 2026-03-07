@@ -17,3 +17,9 @@ export type { UseWindowSizeOptions, UseWindowSizeReturn } from "./useWindowSize"
 
 export { useAnimatedEntrance } from "./useAnimatedEntrance";
 export type { UseAnimatedEntranceOptions, UseAnimatedEntranceReturn } from "./useAnimatedEntrance";
+
+// Dot environment hooks
+export { useBreakpoint } from "./useBreakpoint";
+export { useDotEnv } from "./useDotEnv";
+export { useDotMap, mergeStyles, resolveDot } from "./useDotMap";
+export type { DotStyleMap, StyleObject } from "./useDotMap";

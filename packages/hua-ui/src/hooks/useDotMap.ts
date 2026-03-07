@@ -3,16 +3,18 @@
 import { useState, useMemo, useCallback } from "react"
 import { dotMap, dot as dotFn } from "@hua-labs/dot"
 import type { DotStyleMap, StyleObject } from "@hua-labs/dot"
+import { useDotEnv } from "./useDotEnv"
 
 /**
  * useDotMap — dotMap() 기반 interactive style 관리 훅
  *
  * hover/focus/active/disabled 상태에 따라 inline style을 자동 전환합니다.
  * className 없이 순수 inline style로 동작하여 RN 호환 가능.
+ * dark mode + responsive breakpoint 자동 감지.
  *
  * @example
  * const { style, handlers } = useDotMap(
- *   'bg-white hover:bg-gray-100 focus:ring-2',
+ *   'bg-white hover:bg-gray-100 focus:ring-2 dark:bg-gray-900 md:p-8',
  *   { disabled: isDisabled }
  * );
  * <div style={style} {...handlers} />
@@ -31,11 +33,12 @@ export function useDotMap(
 } {
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const env = useDotEnv();
 
   const styleMap = useMemo((): DotStyleMap => {
     if (!input) return { base: {} };
-    return dotMap(input);
-  }, [input]);
+    return dotMap(input, env);
+  }, [input, env]);
 
   const style = useMemo((): StyleObject => {
     const result: StyleObject = { ...(styleMap.base as StyleObject) };

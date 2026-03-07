@@ -48,6 +48,43 @@ describe('resolveTransform — translate', () => {
   it('resolves translate-y-8 (spacing scale)', () => {
     expect(resolveTransform('translate-y', '8', config)).toEqual({ transform: 'translateY(32px)' });
   });
+
+  it('resolves translate-y-full (keyword)', () => {
+    expect(resolveTransform('translate-y', 'full', config)).toEqual({ transform: 'translateY(100%)' });
+  });
+
+  it('resolves translate-x-1/2 (keyword)', () => {
+    expect(resolveTransform('translate-x', '1/2', config)).toEqual({ transform: 'translateX(50%)' });
+  });
+
+  it('resolves translate-y-0 (spacing)', () => {
+    expect(resolveTransform('translate-y', '0', config)).toEqual({ transform: 'translateY(0px)' });
+  });
+
+  it('resolves translate-x-3/4 (keyword fraction)', () => {
+    expect(resolveTransform('translate-x', '3/4', config)).toEqual({ transform: 'translateX(75%)' });
+  });
+
+  it('rejects translate-y-screen (viewport keywords excluded)', () => {
+    expect(resolveTransform('translate-y', 'screen', config)).toEqual({});
+  });
+
+  it('resolves translate-x-auto via spacing (auto is in spacing tokens)', () => {
+    // auto is in spacing tokens, so it resolves — browsers ignore invalid translateX(auto)
+    expect(resolveTransform('translate-x', 'auto', config)).toEqual({ transform: 'translateX(auto)' });
+  });
+
+  it('rejects translate-y-min (content keywords excluded)', () => {
+    expect(resolveTransform('translate-y', 'min', config)).toEqual({});
+  });
+
+  it('rejects translate-x-fit (content keywords excluded)', () => {
+    expect(resolveTransform('translate-x', 'fit', config)).toEqual({});
+  });
+
+  it('rejects translate-y-max (content keywords excluded)', () => {
+    expect(resolveTransform('translate-y', 'max', config)).toEqual({});
+  });
 });
 
 describe('resolveTransform — skew', () => {

@@ -64,7 +64,7 @@
       "outputs": []
     },
     "@hua-labs/ui#build": {
-      "dependsOn": [],
+      "dependsOn": ["@hua-labs/dot#build"],
       "outputs": ["dist/**"]
     },
     "@hua-labs/ui-dashboard#build": {
