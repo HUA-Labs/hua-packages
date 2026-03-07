@@ -71,7 +71,7 @@ let cache = new DotCache(currentConfig.cacheSize);
  * dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
  * // → { padding: '48px' }  (mobile-first cascade: base → md → lg)
  */
-export function dot(input: string, options?: DotOptions): StyleObject | RNStyleObject {
+export function dot(input: string | undefined | null, options?: DotOptions): StyleObject | RNStyleObject {
   if (!input || !input.trim()) return {};
 
   const isDark = options?.dark === true;
@@ -233,7 +233,7 @@ export function clearDotCache(): void {
  * const styles = dotMap('bg-white hover:bg-gray-100');
  * <div style={styles.base} onMouseEnter={...} />
  */
-export function dotMap(input: string, options?: DotOptions): DotStyleMap {
+export function dotMap(input: string | undefined | null, options?: DotOptions): DotStyleMap {
   if (!input || !input.trim()) return { base: {} };
 
   const isDark = options?.dark === true;
