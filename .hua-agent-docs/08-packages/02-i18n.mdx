@@ -16,15 +16,15 @@ related:
 
 ---
 
-## @hua-labs/hua/i18n (14 exports)
+## @hua-labs/hua/i18n (17 exports)
 
-Merges `i18n-core` (12) + `i18n-core-zustand` (2).
+Merges `i18n-core` (12) + `i18n-core-zustand` (2) + platform adapters (3).
 
 ### Hooks
 
 | Export | Description |
 |--------|-------------|
-| `useTranslation` | Returns `t()` function. Most commonly used hook |
+| `useTranslation` | Returns `t()`, `tArray()`, `tPlural()`, `getRawValue<T>()` functions |
 | `useI18n` | Full i18n context (language, setLanguage, t) |
 | `useLanguageChange` | Language change handler hook |
 | `useZustandI18n` | Zustand-based i18n store hook |
@@ -48,6 +48,19 @@ Merges `i18n-core` (12) + `i18n-core-zustand` (2).
 | `serverTranslate` | Server-side translation function |
 | `ssrTranslate` | SSR translation function |
 | `Translator` | Translator class |
+
+### Platform Adapters
+
+| Export | Description |
+|--------|-------------|
+| `webPlatformAdapter` | Web default adapter (navigator.language + window events) |
+| `headlessPlatformAdapter` | No-op adapter for SSR / test / Flutter bridge |
+
+**Types**
+
+| Export | Description |
+|--------|-------------|
+| `I18nPlatformAdapter` | Platform adapter interface (for custom adapters like RN) |
 
 ### Server Subpath
 
@@ -76,6 +89,36 @@ import { getSSRTranslations } from '@hua-labs/hua/framework/server'
 export default async function Page() {
   const { t } = await getSSRTranslations('ko', ['common'])
   return <h1>{t('common:welcome')}</h1>
+}
+```
+
+### Cross-Platform Usage
+
+```typescript
+// React Native — custom platform adapter
+import { createCoreI18n, type I18nPlatformAdapter } from '@hua-labs/hua/i18n'
+import * as Localization from 'expo-localization'
+
+const nativeAdapter: I18nPlatformAdapter = {
+  getDeviceLanguage: () => Localization.locale?.slice(0, 2),
+  onLanguageChange: (cb) => { /* AppState listener */ return () => {} },
+}
+
+const I18nProvider = createCoreI18n({
+  platformAdapter: nativeAdapter,
+  defaultLanguage: 'ko',
+})
+```
+
+### Typed Namespace Hook (my-app pattern)
+
+```typescript
+// Type-safe namespace-scoped translations
+import { useNamespacedTranslation } from '@/app/lib/i18n/useNamespacedTranslation'
+
+function TermsPage() {
+  const { t, tArray } = useNamespacedTranslation('terms')
+  return <h1>{t('title')}</h1>  // fully typed per namespace
 }
 ```
 

@@ -131,6 +131,7 @@ interface I18nConfig {
   supportedLanguages: LanguageConfig[];
   namespaces?: string[];
   loadTranslations: (language: string, namespace: string) => Promise<TranslationNamespace>;
+  platformAdapter?: I18nPlatformAdapter; // default: webPlatformAdapter
   // ...
 }
 ```
@@ -140,6 +141,52 @@ interface I18nConfig {
 - `isTranslationNamespace()`: Validates translation namespace type
 - `isLanguageConfig()`: Validates language config type
 - `isTranslationError()`: Validates translation error type
+
+## Platform Adapter Architecture
+
+### Overview
+
+i18n-core uses a platform adapter pattern to abstract browser-specific APIs, enabling cross-platform usage (Web, React Native, Flutter bridge).
+
+### I18nPlatformAdapter Interface
+
+```typescript
+interface I18nPlatformAdapter {
+  /** Device/browser language code (e.g. 'ko'). Returns undefined if undetectable */
+  getDeviceLanguage(): string | undefined;
+  /** Subscribe to system language change events. Returns unsubscribe function */
+  onLanguageChange(cb: (lang: string) => void): () => void;
+}
+```
+
+### Built-in Adapters
+
+| Adapter | Use Case | Behavior |
+|---------|----------|----------|
+| `webPlatformAdapter` | Browser (default) | `navigator.language` + `window` CustomEvent |
+| `headlessPlatformAdapter` | SSR / Test / Flutter | No-op — relies on `config.defaultLanguage` |
+
+### Custom Adapter (React Native)
+
+```typescript
+import * as Localization from 'expo-localization';
+
+const nativeAdapter: I18nPlatformAdapter = {
+  getDeviceLanguage: () => Localization.locale?.slice(0, 2),
+  onLanguageChange: (cb) => {
+    // Subscribe to AppState changes or Localization events
+    return () => {}; // unsubscribe
+  },
+};
+
+createCoreI18n({ platformAdapter: nativeAdapter, ... });
+```
+
+### How It Works
+
+1. `resolveInitialLanguage()` calls `adapter.getDeviceLanguage()` instead of `navigator.language`
+2. Auto language sync useEffect delegates to `adapter.onLanguageChange()` instead of `window.addEventListener`
+3. Default adapter is `webPlatformAdapter` — existing apps require zero changes
 
 ## Extensibility
 

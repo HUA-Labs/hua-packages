@@ -23,7 +23,7 @@ export interface TranslatorInterface {
   initialize(): Promise<void>;
   isReady(): boolean;
   debug(): unknown;
-  getRawValue(key: string, language?: string): unknown;
+  getRawValue<T = unknown>(key: string, language?: string): T | undefined;
   tArray(key: string, language?: string): string[];
 }
 
@@ -517,7 +517,7 @@ export class Translator implements TranslatorInterface {
   /**
    * 원시 값 가져오기 (배열, 객체 포함)
    */
-  getRawValue(key: string, language?: string): unknown {
+  getRawValue<T = unknown>(key: string, language?: string): T | undefined {
     const targetLang = language || this.currentLang;
 
     if (!this.isInitialized) {
@@ -536,13 +536,13 @@ export class Translator implements TranslatorInterface {
 
     // 직접 키 매칭
     if (actualKey in translations) {
-      return translations[actualKey];
+      return translations[actualKey] as T;
     }
 
     // 중첩 키 매칭
     const nestedValue = this.getNestedValue(translations, actualKey);
     if (nestedValue !== undefined) {
-      return nestedValue;
+      return nestedValue as T;
     }
 
     // 폴백 언어에서 찾기
@@ -550,11 +550,11 @@ export class Translator implements TranslatorInterface {
       const fallbackTranslations = this.allTranslations[this.config.fallbackLanguage || 'en']?.[namespace];
       if (fallbackTranslations) {
         if (actualKey in fallbackTranslations) {
-          return fallbackTranslations[actualKey];
+          return fallbackTranslations[actualKey] as T;
         }
         const fallbackNestedValue = this.getNestedValue(fallbackTranslations, actualKey);
         if (fallbackNestedValue !== undefined) {
-          return fallbackNestedValue;
+          return fallbackNestedValue as T;
         }
       }
     }

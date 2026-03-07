@@ -189,10 +189,12 @@ export const reportMissingKey = (key: string, options: {
       component: options.component
     };
 
-    // 커스텀 이벤트 발생
-    window.dispatchEvent(new CustomEvent('i18n:missing-key', {
-      detail: missingKey
-    }));
+    // 커스텀 이벤트 발생 (브라우저 환경에서만)
+    if (typeof window !== 'undefined' && typeof CustomEvent !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('i18n:missing-key', {
+        detail: missingKey
+      }));
+    }
 
     // 콘솔에도 로그
     if (process.env.NODE_ENV === 'development') console.warn(`Missing translation key: ${key}`, {

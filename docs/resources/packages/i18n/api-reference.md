@@ -26,7 +26,10 @@
 ├── Translator            # 번역 엔진 클래스
 ├── ssrTranslate()        # SSR 번역 함수
 ├── serverTranslate()     # 서버 번역 함수
-└── MissingKeyOverlay     # 디버깅 컴포넌트
+├── MissingKeyOverlay     # 디버깅 컴포넌트
+├── webPlatformAdapter    # Web platform adapter (default)
+├── headlessPlatformAdapter # SSR/test/Flutter adapter
+└── I18nPlatformAdapter   # Platform adapter interface (type)
 ```
 
 ---
@@ -67,6 +70,9 @@ interface I18nCoreOptions {
   
   /** API 경로 (translationLoader가 'api'일 때 사용) */
   translationApiPath?: string;
+
+  /** Platform adapter for cross-platform support (default: webPlatformAdapter) */
+  platformAdapter?: I18nPlatformAdapter;
 }
 ```
 
@@ -425,6 +431,28 @@ function LanguageSwitcher() {
     </select>
   );
 }
+```
+
+---
+
+### getRawValue<T>
+
+Raw value access with generic type support. Returns arrays, objects, or any JSON value without casting.
+
+#### Signature
+
+```typescript
+getRawValue<T = unknown>(key: string, language?: string): T | undefined
+```
+
+#### Example
+
+```typescript
+const { getRawValue } = useTranslation();
+
+// Type-safe: no `as` cast needed
+const headers = getRawValue<string[]>('privacy:table_headers');
+const rows = getRawValue<string[][]>('privacy:table_data');
 ```
 
 ---
