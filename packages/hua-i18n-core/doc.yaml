@@ -11,6 +11,8 @@ features:
   - "Automatic retry — Exponential backoff for API loader failures"
   - "React Native — Works in Expo and bare RN projects via CJS/ESM dual format"
   - "~6.5KB gzipped — Zero external dependencies"
+  - "Cross-platform — I18nPlatformAdapter for Web, React Native, Flutter bridge"
+  - "Generic getRawValue<T>() — type-safe raw value access without casting"
 
 quickStart: |
   import { createCoreI18n, useTranslation } from '@hua-labs/i18n-core';
@@ -71,3 +73,10 @@ apiNotes:
     description: "Create a Provider with just namespace settings"
   createCustomLoaderProvider:
     description: "Create a Provider with custom translation loader"
+  webPlatformAdapter:
+    description: "Default web adapter — navigator.language detection + window event language sync"
+  headlessPlatformAdapter:
+    description: "No-op adapter for SSR, testing, and Flutter bridge scenarios"
+  I18nPlatformAdapter:
+    description: "Platform adapter interface — implement for React Native or custom environments"
+    kind: "interface"

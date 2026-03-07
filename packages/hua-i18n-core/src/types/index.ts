@@ -27,6 +27,61 @@ export function isPluralValue(value: unknown): value is PluralValue {
 }
 
 // ---------------------------------------------------------------------------
+// Platform Adapter (cross-platform: Web / React Native / Flutter bridge)
+// ---------------------------------------------------------------------------
+
+/**
+ * 플랫폼별 i18n 어댑터 인터페이스.
+ *
+ * Web(기본), React Native, Flutter 브릿지 등 환경에 맞는 구현체를 주입.
+ * I18nConfig.platformAdapter로 전달하면 useI18n이 자동으로 사용한다.
+ */
+export interface I18nPlatformAdapter {
+  /** 디바이스/브라우저 언어 코드 (e.g. 'ko', 'en'). 감지 불가 시 undefined */
+  getDeviceLanguage(): string | undefined;
+
+  /** 시스템 언어 변경 이벤트 구독. 해제 함수 반환 */
+  onLanguageChange(cb: (lang: string) => void): () => void;
+}
+
+/**
+ * Web 기본 어댑터.
+ * navigator.language + CustomEvent 기반. SSR에서는 안전하게 no-op.
+ */
+export const webPlatformAdapter: I18nPlatformAdapter = {
+  getDeviceLanguage() {
+    if (typeof globalThis !== 'undefined' && typeof navigator !== 'undefined' && navigator.language) {
+      return navigator.language.slice(0, 2).toLowerCase();
+    }
+    return undefined;
+  },
+  onLanguageChange(cb) {
+    if (typeof globalThis === 'undefined' || typeof window === 'undefined' || typeof CustomEvent === 'undefined') {
+      return () => {};
+    }
+    const handler = (e: Event) => {
+      const lang = (e as CustomEvent).detail;
+      if (typeof lang === 'string') cb(lang);
+    };
+    window.addEventListener('huaI18nLanguageChange', handler);
+    window.addEventListener('i18nLanguageChanged', handler);
+    return () => {
+      window.removeEventListener('huaI18nLanguageChange', handler);
+      window.removeEventListener('i18nLanguageChanged', handler);
+    };
+  },
+};
+
+/**
+ * Headless 어댑터 (SSR / 테스트 / Flutter 브릿지용).
+ * 언어 감지·이벤트 없이 config.defaultLanguage만 사용.
+ */
+export const headlessPlatformAdapter: I18nPlatformAdapter = {
+  getDeviceLanguage() { return undefined; },
+  onLanguageChange() { return () => {}; },
+};
+
+// ---------------------------------------------------------------------------
 // Translation namespace
 // ---------------------------------------------------------------------------
 export interface TranslationNamespace {
@@ -79,6 +134,8 @@ export interface I18nConfig {
   };
   // 자동 언어 전환 이벤트 처리 (withDefaultConfig용)
   autoLanguageSync?: boolean;
+  // 플랫폼 어댑터 (기본: webPlatformAdapter)
+  platformAdapter?: I18nPlatformAdapter;
 }
 
 // 에러 타입 정의
@@ -160,8 +217,8 @@ export interface I18nContextType {
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
   // 기존 동기 번역 함수 (하위 호환성)
   tSync: (key: string, namespace?: string, params?: TranslationParams) => string;
-  // 원시 값 가져오기 (배열, 객체 포함)
-  getRawValue: (key: string, language?: string) => unknown;
+  // 원시 값 가져오기 (배열, 객체 포함) — 제네릭으로 타입 캐스팅 가능
+  getRawValue: <T = unknown>(key: string, language?: string) => T | undefined;
   // 배열 번역 값 가져오기 (타입 안전)
   tArray: (key: ResolveArrayKey, language?: string) => string[];
   isLoading: boolean;

@@ -2,12 +2,13 @@
 import { useState, useEffect, useCallback, useContext, createContext, useMemo } from 'react';
 import { Translator } from '../core/translator';
 import { TranslatorFactory } from '../core/translator-factory';
-import { 
-  I18nConfig, 
-  I18nContextType, 
-  TranslationParams, 
+import {
+  I18nConfig,
+  I18nContextType,
+  TranslationParams,
   TranslationError,
-  validateI18nConfig
+  validateI18nConfig,
+  webPlatformAdapter
 } from '../types';
 import { getDefaultTranslations } from '../utils/default-translations';
 
@@ -16,8 +17,8 @@ const I18nContext = createContext<I18nContextType | null>(null);
 
 /**
  * 초기 언어를 결정하는 헬퍼 함수
- * 우선순위: config.defaultLanguage > navigator.language 매칭 > supportedLanguages[0]
- * config.defaultLanguage가 명시적으로 제공되지 않은 경우에만 navigator.language 감지 동작
+ * 우선순위: config.defaultLanguage > platformAdapter.getDeviceLanguage 매칭 > supportedLanguages[0]
+ * config.defaultLanguage가 명시적으로 제공되지 않은 경우에만 디바이스 언어 감지 동작
  */
 function resolveInitialLanguage(
   config: I18nConfig & { autoLanguageSync?: boolean }
@@ -27,12 +28,13 @@ function resolveInitialLanguage(
     return config.defaultLanguage;
   }
 
-  // 2. navigator.language 매칭 (SSR 환경에서는 navigator가 없으므로 체크 필요)
-  if (typeof window !== 'undefined' && navigator?.language) {
-    const browserLang = navigator.language.slice(0, 2).toLowerCase();
+  // 2. 플랫폼 어댑터로 디바이스 언어 감지
+  const adapter = config.platformAdapter ?? webPlatformAdapter;
+  const deviceLang = adapter.getDeviceLanguage();
+  if (deviceLang) {
     const supportedCodes = config.supportedLanguages?.map(l => l.code) ?? [];
-    if (supportedCodes.includes(browserLang)) {
-      return browserLang;
+    if (supportedCodes.includes(deviceLang)) {
+      return deviceLang;
     }
   }
 
@@ -170,33 +172,22 @@ export function I18nProvider({
     return unsubscribe;
   }, [translator, isInitialized, currentLanguage, config.debug]);
 
-  // 자동 언어 전환 이벤트 처리
+  // 자동 언어 전환 이벤트 처리 (플랫폼 어댑터 위임)
   useEffect(() => {
-    if (!config.autoLanguageSync || typeof window === 'undefined') {
+    if (!config.autoLanguageSync) {
       return;
     }
 
-    const handleLanguageChange = (event: CustomEvent) => {
-      const newLanguage = event.detail;
-      if (typeof newLanguage === 'string' && newLanguage !== currentLanguage) {
+    const adapter = config.platformAdapter ?? webPlatformAdapter;
+    return adapter.onLanguageChange((newLanguage) => {
+      if (newLanguage !== currentLanguage) {
         if (config.debug) {
           console.log('🌐 Auto language sync:', newLanguage);
         }
         setLanguage(newLanguage);
       }
-    };
-
-    // HUA i18n 언어 전환 이벤트 감지
-    window.addEventListener('huaI18nLanguageChange', handleLanguageChange as EventListener);
-    
-    // 일반적인 언어 변경 이벤트도 감지
-    window.addEventListener('i18nLanguageChanged', handleLanguageChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('huaI18nLanguageChange', handleLanguageChange as EventListener);
-      window.removeEventListener('i18nLanguageChanged', handleLanguageChange as EventListener);
-    };
-  }, [config.autoLanguageSync, currentLanguage]);
+    });
+  }, [config.autoLanguageSync, config.platformAdapter, currentLanguage]);
 
   // 언어 변경 함수 (메모이제이션)
   const setLanguage = useCallback(async (language: string) => {
@@ -411,12 +402,12 @@ export function I18nProvider({
     return translator.translateSync(key, params);
   }, [translator, config.debug]);
 
-  // 원시 값 가져오기 (배열, 객체 포함)
-  const getRawValue = useCallback((key: string, language?: string): unknown => {
+  // 원시 값 가져오기 (배열, 객체 포함) — 제네릭으로 타입 캐스팅 가능
+  const getRawValue = useCallback(<T = unknown>(key: string, language?: string): T | undefined => {
     if (!translator || !isInitialized) {
       return undefined;
     }
-    return translator.getRawValue(key, language);
+    return translator.getRawValue<T>(key, language);
   }, [translator, isInitialized]);
 
   // 배열 번역 값 가져오기 (타입 안전)
@@ -573,7 +564,7 @@ export function useI18n(): I18nContextType {
       tPlural: (key: string) => key,
       tAsync: async (key: string) => key,
       tSync: (key: string) => key,
-      getRawValue: () => undefined,
+      getRawValue: <T = unknown>() => undefined as T | undefined,
       tArray: () => [],
       isLoading: false,
       error: null,

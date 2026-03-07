@@ -9,7 +9,7 @@ import React from 'react';
 import { I18nProvider, useI18n } from './hooks/useI18n';
 import { useTranslation, useLanguageChange } from './hooks/useTranslation';
 import { Translator, ssrTranslate, serverTranslate } from './core/translator';
-import { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey, ResolvePluralKey, PluralValue, PluralCategory } from './types';
+import { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey, ResolvePluralKey, PluralValue, PluralCategory, I18nPlatformAdapter, webPlatformAdapter, headlessPlatformAdapter } from './types';
 
 // Window 객체 타입 확장
 declare global {
@@ -391,5 +391,8 @@ export { I18nProvider };
 // 핵심 클래스/함수들 export
 export { Translator, ssrTranslate, serverTranslate };
 
+// 플랫폼 어댑터 export
+export { webPlatformAdapter, headlessPlatformAdapter };
+
 // 타입 export
-export type { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey, ResolvePluralKey, PluralValue, PluralCategory };
+export type { I18nConfig, I18nContextType, TranslationParams, TypedTranslationKeys, ResolveStringKey, ResolveArrayKey, ResolvePluralKey, PluralValue, PluralCategory, I18nPlatformAdapter };

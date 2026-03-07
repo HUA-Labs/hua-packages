@@ -19,6 +19,8 @@ Lightweight, production-ready i18n library for React. Delivers zero-flicker lang
 - **Automatic retry — Exponential backoff for API loader failures**
 - **React Native — Works in Expo and bare RN projects via CJS/ESM dual format**
 - **~6.5KB gzipped — Zero external dependencies**
+- **Cross-platform — I18nPlatformAdapter for Web, React Native, Flutter bridge**
+- **Generic getRawValue<T>() — type-safe raw value access without casting**
 
 ## Installation
 
@@ -66,6 +68,8 @@ function Welcome() {
 | `Translator` | class | Core translator class (for manual instantiation) |
 | `ssrTranslate` | function | Server-side translation function (no React needed) |
 | `serverTranslate` | function | Server-side translate with full config |
+| `webPlatformAdapter` | function | Default web adapter — navigator.language detection + window event language sync |
+| `headlessPlatformAdapter` | function | No-op adapter for SSR, testing, and Flutter bridge scenarios |
 | `I18nConfig` | type |  |
 | `I18nContextType` | type |  |
 | `TranslationParams` | type |  |
@@ -75,6 +79,7 @@ function Welcome() {
 | `ResolvePluralKey` | type |  |
 | `PluralValue` | type |  |
 | `PluralCategory` | type |  |
+| `I18nPlatformAdapter` | interface | Platform adapter interface — implement for React Native or custom environments |
 | `createCoreI18n` | function | Create an i18n Provider component with configuration |
 | `CoreProvider` | function | Minimal Provider with zero config |
 | `createLanguageProvider` | function | Create a Provider with just a language setting |
