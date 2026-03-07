@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
+import { mergeStyles } from '../hooks/useDotMap'
 import { Section } from '../components/Section'
 import { Icon } from '../components/Icon/Icon'
 import { Marquee } from '../components/advanced/Marquee'
@@ -70,9 +72,9 @@ export function LandingSkills({
       <Section header={header} dot={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
-            <div key={i} className="w-40 shrink-0 flex items-center gap-3 px-4 py-2">
+            <div key={i} style={dot("w-40 shrink-0 flex items-center gap-3 px-4 py-2")}>
               {item.icon && <Icon name={item.icon as any} size={24} />}
-              <span className="font-medium">{item.name}</span>
+              <span style={dot("font-medium")}>{item.name}</span>
             </div>
           ))}
         </Marquee>
@@ -86,20 +88,19 @@ export function LandingSkills({
       <Section header={header} dot={className} {...rest}>
         <div
           ref={stagger?.containerRef}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          style={dot("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6")}
         >
           {items.map((item, i) => (
             <div
               key={i}
-              className="flex flex-col items-center gap-3 p-6 bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl hover:shadow-lg transition-shadow"
-              style={stagger?.styles[i]}
+              style={{ ...dot("flex flex-col items-center gap-3 p-6 bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl hover:shadow-lg transition-shadow"), ...stagger?.styles[i] }}
             >
               {item.icon && (
                 <Icon name={item.icon as any} size={32} variant="primary" />
               )}
-              <span className="font-semibold text-center">{item.name}</span>
+              <span style={dot("font-semibold text-center")}>{item.name}</span>
               {item.category && (
-                <span className="text-xs text-muted-foreground">{item.category}</span>
+                <span style={dot("text-xs text-muted-foreground")}>{item.category}</span>
               )}
             </div>
           ))}
@@ -111,28 +112,27 @@ export function LandingSkills({
   // Bars variant
   return (
     <Section header={header} dot={className} {...rest}>
-      <div ref={stagger?.containerRef} className="space-y-6 max-w-3xl mx-auto">
+      <div ref={stagger?.containerRef} style={dot("space-y-6 max-w-3xl mx-auto")}>
         {items.map((item, i) => {
           const level = item.level ?? 100
           return (
-            <div key={i} className="space-y-2" style={stagger?.styles[i]}>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
+            <div key={i} style={{ ...dot("space-y-2"), ...stagger?.styles[i] }}>
+              <div style={dot("flex justify-between items-center")}>
+                <div style={dot("flex items-center gap-2")}>
                   {item.icon && <Icon name={item.icon as any} size={20} />}
-                  <span className="font-semibold">{item.name}</span>
+                  <span style={dot("font-semibold")}>{item.name}</span>
                 </div>
-                <span className="text-sm text-muted-foreground">{level}%</span>
+                <span style={dot("text-sm text-muted-foreground")}>{level}%</span>
               </div>
-              <div className="h-2 bg-secondary rounded-full overflow-hidden">
+              <div style={dot("h-2 bg-secondary rounded-full overflow-hidden")}>
                 <div
-                  className={merge(
+                  style={mergeStyles(dot(merge(
                     "h-full rounded-full transition-all duration-1000",
                     getBarColor(level)
-                  )}
-                  style={{
+                  )), {
                     width: `${level}%`,
                     animation: 'skill-bar-fill 1s ease-out forwards',
-                  }}
+                  })}
                 />
               </div>
             </div>

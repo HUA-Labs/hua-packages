@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import type { IconName } from '../lib/icons';
+import { dot } from '@hua-labs/dot';
 import { merge } from '../lib/utils';
 import { mergeStyles, resolveDot } from '../hooks/useDotMap';
 
@@ -167,11 +168,11 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         disabled={action.disabled || loading}
         dot={merge('flex-1 sm:flex-initial', action.className)}
       >
-        {action.icon && <Icon name={action.icon} className="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />}
-        <span className="hidden sm:inline">{action.label}</span>
-        <span className="sm:hidden">{action.labelMobile || action.label}</span>
+        {action.icon && <Icon name={action.icon} dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />}
+        <span style={dot('hidden sm:inline')}>{action.label}</span>
+        <span style={dot('sm:hidden')}>{action.labelMobile || action.label}</span>
         {action.badge && action.badge.count > 0 && (
-          <span className={merge('ml-1.5', getBadgeColor(action.badge.color), 'px-1.5 py-0.5 rounded-full text-xs font-semibold')}>
+          <span style={dot(merge('ml-1.5', getBadgeColor(action.badge.color), 'px-1.5 py-0.5 rounded-full text-xs font-semibold'))}>
             {action.badge.count}
           </span>
         )}
@@ -196,7 +197,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         {...props}
       >
         {isSelectMode ? (
-          <div className="flex flex-wrap items-center gap-2">
+          <div style={dot('flex flex-wrap items-center gap-2')}>
             {/* 전체 선택/해제 버튼 */}
             {onToggleSelectAll && (
               <Button
@@ -205,15 +206,15 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 onClick={onToggleSelectAll}
                 dot="flex-1 sm:flex-initial min-w-[100px]"
               >
-                <Icon name={selectedCount === totalCount ? "square" : "check"} className="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                <span className="hidden sm:inline">{selectedCount === totalCount ? '전체 해제' : '전체 선택'}</span>
-                <span className="sm:hidden">{selectedCount === totalCount ? '해제' : '전체'}</span>
+                <Icon name={selectedCount === totalCount ? "square" : "check"} dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
+                <span style={dot('hidden sm:inline')}>{selectedCount === totalCount ? '전체 해제' : '전체 선택'}</span>
+                <span style={dot('sm:hidden')}>{selectedCount === totalCount ? '해제' : '전체'}</span>
               </Button>
             )}
 
             {/* 선택 모드 액션 버튼들 */}
             {selectModeActions.map((action, index) => (
-              <div key={`select-action-${index}`} className={merge('flex-1 sm:flex-initial min-w-[100px]', action.className)}>
+              <div key={`select-action-${index}`} style={dot(merge('flex-1 sm:flex-initial min-w-[100px]', action.className))}>
                 {renderButton(action, `select-${index}`)}
               </div>
             ))}
@@ -231,7 +232,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
             )}
           </div>
         ) : (
-          <div className="flex flex-wrap items-center gap-2">
+          <div style={dot('flex flex-wrap items-center gap-2')}>
             {/* 선택 모드 진입 버튼 */}
             {onToggleSelectMode && (
               <Button
@@ -242,14 +243,14 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 dot="flex-1 sm:flex-initial min-w-[80px] sm:min-w-[auto] px-2 sm:px-3"
                 title={totalCount === 0 ? "항목이 없습니다" : "여러 항목 선택"}
               >
-                <Icon name="check" className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-                <span className="hidden sm:inline ml-1.5 sm:ml-2">선택</span>
+                <Icon name="check" dot="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+                <span style={dot('hidden sm:inline ml-1.5 sm:ml-2')}>선택</span>
               </Button>
             )}
 
             {/* 일반 모드 액션 버튼들 */}
             {actions.map((action, index) => (
-              <div key={`action-${index}`} className={merge('flex-1 sm:flex-initial min-w-[100px]', action.className)}>
+              <div key={`action-${index}`} style={dot(merge('flex-1 sm:flex-initial min-w-[100px]', action.className))}>
                 {renderButton(action, `action-${index}`)}
               </div>
             ))}

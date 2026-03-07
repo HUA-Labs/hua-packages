@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { merge } from "../lib/utils";
 import { defaultTokens } from "../lib/styles/system/tokens";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * Logo variant 타입
@@ -21,7 +21,7 @@ export type LogoSize = "sm" | "md" | "lg" | number;
 /**
  * Logo 컴포넌트 Props
  */
-export interface LogoProps extends Omit<React.HTMLAttributes<HTMLElement>, "width" | "height"> {
+export interface LogoProps extends Omit<React.HTMLAttributes<HTMLElement>, "width" | "height" | "className"> {
   /**
    * 로고 변형
    * @default "symbol"
@@ -38,9 +38,13 @@ export interface LogoProps extends Omit<React.HTMLAttributes<HTMLElement>, "widt
    */
   animated?: boolean;
   /**
-   * 추가 className
+   * dot utility string for additional styles
    */
-  className?: string;
+  dot?: string;
+  /**
+   * Additional inline styles (merged last)
+   */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -98,7 +102,8 @@ export function Logo({
   variant = "symbol",
   size = "md",
   animated = false,
-  className,
+  dot: dotProp,
+  style,
   ...props
 }: LogoProps) {
   const sizeInRem = getSizeInRem(size);
@@ -161,7 +166,7 @@ export function Logo({
         viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={merge("text-foreground", className)}
+        style={mergeStyles(resolveDot("text-foreground"), resolveDot(dotProp), style)}
       >
         <path
           d={EMBLEM_PATH}
@@ -182,7 +187,7 @@ export function Logo({
 
   return (
     <div
-      className={merge("inline-flex items-center gap-1 flex-shrink-0 min-w-max", className)}
+      style={mergeStyles(resolveDot("inline-flex items-center gap-1 flex-shrink-0 min-w-max"), resolveDot(dotProp), style)}
       {...(props as React.HTMLAttributes<HTMLDivElement>)}
     >
       {/* 엠블럼 */}
@@ -190,8 +195,7 @@ export function Logo({
         viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="flex-shrink-0"
-        style={{ width: sizeInRem, height: sizeInRem }}
+        style={{ flexShrink: 0, width: sizeInRem, height: sizeInRem }}
       >
         <path
           d={EMBLEM_PATH}
@@ -208,8 +212,8 @@ export function Logo({
         viewBox="40 0 152 37"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="flex-shrink-0"
-        style={{ 
+        style={{
+          flexShrink: 0,
           height: sizeInRem,
           width: `calc(${sizeInRem} * ${wordmarkRatio})`,
         }}

@@ -2,6 +2,8 @@
 
 import React, { useMemo } from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
+import { mergeStyles } from '../hooks/useDotMap'
 import { Container } from '../components/Container'
 import { AnimatedGradient } from '../components/advanced/AnimatedGradient'
 import { useLandingTheme } from './LandingProvider'
@@ -72,16 +74,16 @@ export function LandingCTA({
 
   return (
     <section
-      className={merge(
+      style={dot(merge(
         "relative overflow-hidden py-20 sm:py-28",
         bg === 'dark' && 'bg-gray-950 text-white',
         className
-      )}
+      ))}
       {...rest}
     >
       {/* Background */}
       {bg === 'gradient-soft' && (
-        <div className="absolute inset-0 gradient-bg-soft" aria-hidden="true" />
+        <div style={dot("absolute inset-0")} className="gradient-bg-soft" aria-hidden="true" />
       )}
       {bg === 'animated-gradient' && (
         <AnimatedGradient
@@ -93,10 +95,9 @@ export function LandingCTA({
       )}
       {bg === 'dark' && (
         <div
-          className="absolute inset-0"
-          style={{
+          style={mergeStyles(dot("absolute inset-0"), {
             background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)',
-          }}
+          })}
           aria-hidden="true"
         />
       )}
@@ -104,21 +105,20 @@ export function LandingCTA({
       <Container size="md" padding="none" centered dot="relative z-10 px-6">
         <div
           ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
-          style={scrollReveal?.style ?? fallbackStyle}
-          className="text-center"
+          style={mergeStyles(dot("text-center"), scrollReveal?.style ?? fallbackStyle)}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
+          <h2 style={dot("text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4")}>
             {title}
           </h2>
 
           {subtitle && (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p style={dot("text-lg text-muted-foreground max-w-2xl mx-auto mb-8")}>
               {subtitle}
             </p>
           )}
 
           {(primaryAction || secondaryAction) && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div style={dot("flex flex-col sm:flex-row items-center justify-center gap-4")}>
               {primaryAction}
               {secondaryAction}
             </div>

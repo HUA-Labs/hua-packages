@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { Carousel } from '../components/advanced/Carousel'
 import { Marquee } from '../components/advanced/Marquee'
@@ -33,20 +34,19 @@ try {
 function TestimonialCard({ item, style }: { item: LandingTestimonialItem; style?: React.CSSProperties }) {
   return (
     <div
-      className="bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 flex flex-col gap-4"
-      style={style}
+      style={{ ...dot("bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 flex flex-col gap-4"), ...style }}
     >
-      <blockquote className="text-foreground/90 leading-relaxed flex-1">
+      <blockquote style={dot("text-foreground/90 leading-relaxed flex-1")}>
         &ldquo;{item.quote}&rdquo;
       </blockquote>
-      <div className="flex items-center gap-3">
+      <div style={dot("flex items-center gap-3")}>
         {item.avatar && (
           <Avatar size="sm" src={item.avatar} alt={item.author} />
         )}
         <div>
-          <p className="font-semibold text-sm">{item.author}</p>
+          <p style={dot("font-semibold text-sm")}>{item.author}</p>
           {(item.role || item.company) && (
-            <p className="text-xs text-muted-foreground">
+            <p style={dot("text-xs text-muted-foreground")}>
               {item.role}{item.role && item.company && ', '}{item.company}
             </p>
           )}
@@ -98,7 +98,7 @@ export function LandingTestimonials({
       <Section header={header} dot={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
-            <div key={i} className="w-80 shrink-0">
+            <div key={i} style={dot("w-80 shrink-0")}>
               <TestimonialCard item={item} />
             </div>
           ))}
@@ -118,8 +118,8 @@ export function LandingTestimonials({
           indicators="dots"
         >
           {items.map((item, i) => (
-            <div key={i} className="flex justify-center px-4">
-              <div className="max-w-2xl w-full">
+            <div key={i} style={dot("flex justify-center px-4")}>
+              <div style={dot("max-w-2xl w-full")}>
                 <TestimonialCard item={item} />
               </div>
             </div>
@@ -135,7 +135,7 @@ export function LandingTestimonials({
     <Section header={header} dot={className} {...rest}>
       <div
         ref={stagger?.containerRef}
-        className={merge("grid gap-6", gridColsMap[cols])}
+        style={dot(merge("grid gap-6", gridColsMap[cols]))}
       >
         {items.map((item, i) => (
           <TestimonialCard

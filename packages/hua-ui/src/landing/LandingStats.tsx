@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { useLandingTheme } from './LandingProvider'
 import type { LandingStatsProps, LandingStatItem } from './types'
@@ -95,11 +96,11 @@ function StatItemDisplay({
     : item.value
 
   return (
-    <div className="text-center" style={style}>
-      <div className={merge("font-extrabold stat-number", numberSize)}>
+    <div style={{ ...dot("text-center"), ...style }}>
+      <div style={dot(merge("font-extrabold stat-number", numberSize))}>
         {displayValue}
       </div>
-      <div className="text-muted-foreground mt-2 text-sm sm:text-base">
+      <div style={dot("text-muted-foreground mt-2 text-sm sm:text-base")}>
         {item.label}
       </div>
     </div>
@@ -154,7 +155,7 @@ export function LandingStats({
     >
       <div
         ref={stagger?.containerRef}
-        className={merge("grid gap-8 lg:gap-12", gridCols)}
+        style={dot(merge("grid gap-8 lg:gap-12", gridCols))}
       >
         {items.map((item, i) => (
           <StatItemDisplay

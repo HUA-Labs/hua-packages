@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { merge } from '../lib/utils'
+import { dot } from '@hua-labs/dot'
 import { Section } from '../components/Section'
 import { Container } from '../components/Container'
 import { useLandingTheme } from './LandingProvider'
@@ -57,36 +58,35 @@ export function LandingShowcase({
 
   return (
     <Section header={header} dot={className} {...rest}>
-      <div ref={stagger?.containerRef} className="space-y-16 sm:space-y-24">
+      <div ref={stagger?.containerRef} style={dot("space-y-16 sm:space-y-24")}>
         {items.map((item, i) => {
           const isEven = i % 2 === 0
           return (
             <Container key={i} size="lg" padding="none" dot="px-4">
               <div
-                className={merge(
+                style={{ ...dot(merge(
                   "flex flex-col gap-8 items-center",
                   isEven ? "md:flex-row" : "md:flex-row-reverse"
-                )}
-                style={stagger?.styles[i]}
+                )), ...stagger?.styles[i] }}
               >
                 {/* Image */}
-                <div className="flex-1 w-full">
-                  <div className="relative overflow-hidden rounded-xl border border-border/30 shadow-lg">
+                <div style={dot("flex-1 w-full")}>
+                  <div style={dot("relative overflow-hidden rounded-xl border border-border/30 shadow-lg")}>
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-full h-auto object-cover"
+                      style={dot("w-full h-auto object-cover")}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                   </div>
                 </div>
 
                 {/* Text */}
-                <div className="flex-1 w-full space-y-4">
-                  <h3 className="text-2xl sm:text-3xl font-bold">
+                <div style={dot("flex-1 w-full space-y-4")}>
+                  <h3 style={dot("text-2xl sm:text-3xl font-bold")}>
                     {item.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p style={dot("text-muted-foreground leading-relaxed")}>
                     {item.description}
                   </p>
                 </div>
