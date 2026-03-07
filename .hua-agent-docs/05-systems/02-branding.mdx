@@ -1,6 +1,6 @@
 ---
 title: Branding System
-description: BrandingProvider, CSS variable generation, Tailwind config, white-labeling patterns
+description: BrandingProvider, CSS variable generation, styling integration, white-labeling patterns
 category: systems
 related:
   - ../03-config/02-config-schema.mdx
@@ -119,6 +119,8 @@ generateCSSVariablesObject({
 
 ## Tailwind Config Generation
 
+> **Note (dot-based projects):** If your project uses the `dot` style engine instead of Tailwind, CSS variables work directly without this config. `generateTailwindConfig` is only needed for legacy Tailwind setups where you want brand tokens available as Tailwind utility classes.
+
 ### generateTailwindConfig
 
 ```typescript
@@ -165,11 +167,13 @@ import { BrandedButton } from '@hua-labs/hua/framework'
 ```
 
 **Color mapping:**
-| variant | CSS class |
-|---------|----------|
-| default | `bg-[var(--color-primary)] text-white hover:opacity-90` |
-| secondary | `bg-[var(--color-secondary)] text-white hover:opacity-90` |
-| outline | `border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-accent/10` |
+| variant | Applied style (inline, via CSS vars) |
+|---------|--------------------------------------|
+| default | `backgroundColor: var(--color-primary)`, `color: white`, opacity on hover |
+| secondary | `backgroundColor: var(--color-secondary)`, `color: white`, opacity on hover |
+| outline | `borderColor: var(--color-accent)`, `color: var(--color-accent)`, bg tint on hover |
+
+> Internally uses inline `style` props with CSS variables — no Tailwind dependency.
 
 > Outside of BrandingProvider, it behaves the same as a regular Button.
 
@@ -223,14 +227,18 @@ function TenantLayout({ tenant, children }) {
 ### 3. Using CSS Variables Directly
 
 ```tsx
+import { dot } from '@hua-labs/dot'
+
 function CustomComponent() {
   return (
-    <div className="bg-[var(--color-primary)] text-white p-4">
+    <div style={{ backgroundColor: 'var(--color-primary)', color: 'white', ...dot('p-4') }}>
       Brand color background
     </div>
   )
 }
 ```
+
+> CSS variables are resolved at runtime, so they cannot be passed as dot tokens. Spread `dot()` for spacing/layout and set CSS var properties explicitly via `style`.
 
 ## Constraints & Gotchas
 

@@ -1,6 +1,6 @@
 # @hua-labs/ui
 
-Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and Tailwind CSS integration.
+Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and cross-platform styling via the dot style engine.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/ui.svg)](https://www.npmjs.com/package/@hua-labs/ui)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/ui.svg)](https://www.npmjs.com/package/@hua-labs/ui)
@@ -14,7 +14,7 @@ Accessible, TypeScript-first component library for React applications. Provides 
 - **Modular entry points — Import only what you need for optimal bundle size**
 - **Accessible — ARIA attributes, keyboard navigation, WCAG compliant**
 - **Dark mode — Built-in dark mode support**
-- **Tailwind CSS — Utility-first styling with class variance authority**
+- **dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop**
 - **Tree-shakeable — Side-effect free (except CSS)**
 
 ## Installation
@@ -82,7 +82,7 @@ function App() {
 | `ThemeToggle` | component | Theme switch button |
 | `useTheme` | hook | Theme context hook — { theme, setTheme } |
 | `IconProvider` | component | Icon configuration context provider |
-| `cn` | function | Tailwind-safe class name merging (clsx + tailwind-merge) |
+| `cn` | function | Class name merging utility (clsx + tailwind-merge). Legacy — prefer dot prop for new code |
 | `Slot` | component | Polymorphic slot for asChild pattern |
 
 ## Related Packages

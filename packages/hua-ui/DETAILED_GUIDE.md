@@ -29,7 +29,7 @@ Complete technical reference for the modern React UI component library.
 `@hua-labs/ui` is built on four core principles:
 
 1. **Atomic-First** - Root export contains only atomic components; composite components are organized into subpath exports for optimal tree-shaking
-2. **Zero-Config Design System** - Works out of the box with Tailwind CSS v4, optional theme customization
+2. **Zero-Config Design System** - Works out of the box with the dot style engine, optional theme customization
 3. **Accessibility First** - Full ARIA support, keyboard navigation, WCAG 2.1 AA compliant
 4. **Developer Experience** - TypeScript-first with full type safety and IntelliSense support
 
@@ -581,64 +581,47 @@ function CustomThemeControl() {
 
 ## Style System
 
-### Utility Functions
+### dot() Function and dot Prop
 
 ```tsx
-import { merge, mergeIf, mergeMap, cn } from '@hua-labs/ui';
+import { dot } from '@hua-labs/dot';
 
-// Smart class merging (clsx + tailwind-merge)
-merge("px-2 py-1", "px-4") // → "py-1 px-4"
+// Convert tokens to CSSProperties
+dot('p-4 rounded-lg bg-primary-500')
+// → { padding: '1rem', borderRadius: '0.5rem', backgroundColor: '#6366f1' }
 
-// Conditional merging
-mergeIf(isActive, "bg-blue-500", "bg-gray-200")
-
-// Object-based merging
-mergeMap({
-  "bg-blue-500": isPrimary,
-  "bg-gray-500": !isPrimary,
-  "text-white": true,
-  "opacity-50": isDisabled
-})
-
-// Alias for merge (backward compatibility)
-cn("text-lg", "font-bold")
+// Component dot prop (all hua-ui components support this)
+<Button dot="px-4 py-2 text-lg">Submit</Button>
+<Card dot="p-6 rounded-xl shadow-lg">Content</Card>
 ```
 
-### Style Creators
+### dotVariants and dotMap
 
 ```tsx
-import {
-  createColorStyles,
-  createVariantStyles,
-  createSizeStyles,
-  createRoundedStyles,
-  createShadowStyles,
-  createHoverStyles
-} from '@hua-labs/ui';
+import { dotVariants, dotMap } from '@hua-labs/dot';
 
-// Color styles
-const colorStyles = createColorStyles({
-  primary: "bg-blue-500 text-white",
-  secondary: "bg-gray-200 text-gray-800"
-});
-
-// Variant styles with CVA
-const buttonVariants = createVariantStyles({
-  base: "inline-flex items-center justify-center",
+// Variant-based styles (replaces CVA)
+const buttonStyles = dotVariants({
+  base: 'inline-flex items-center justify-center rounded-md',
   variants: {
     variant: {
-      default: "bg-primary text-primary-foreground",
-      destructive: "bg-destructive text-destructive-foreground"
+      primary: 'bg-primary-500 text-white',
+      outline: 'border border-gray-300',
     },
     size: {
-      sm: "text-sm px-3 py-1.5",
-      md: "text-base px-4 py-2"
-    }
+      sm: 'text-sm px-3 py-1.5',
+      md: 'text-base px-4 py-2',
+    },
   },
-  defaultVariants: {
-    variant: "default",
-    size: "md"
-  }
+  defaultVariants: { variant: 'primary', size: 'md' },
+});
+
+// State-based styles (hover, focus, active)
+const interactiveStyles = dotMap({
+  default: 'bg-gray-100',
+  hover: 'bg-gray-200',
+  focus: 'ring-2 ring-primary-500',
+  active: 'bg-gray-300',
 });
 ```
 
@@ -676,21 +659,22 @@ HUA UI uses CSS variables for theming:
 }
 ```
 
-### Tailwind Utilities
+### Styling with dot
 
 ```tsx
-// Background colors
-className="bg-background text-foreground"
-className="bg-primary text-primary-foreground"
-className="bg-card text-card-foreground"
+// Background and text colors
+<Box dot="bg-background text-foreground" />
+<Box dot="bg-primary text-primary-foreground" />
 
 // Borders
-className="border border-border"
-className="ring-2 ring-ring"
+<Box dot="border border-border" />
 
-// Dark mode
-className="bg-white dark:bg-slate-900"
-className="text-gray-900 dark:text-gray-100"
+// Dark mode (dot supports dark: prefix)
+<Box dot="bg-white dark:bg-slate-900" />
+<Box dot="text-gray-900 dark:text-gray-100" />
+
+// Using style prop directly
+<div style={dot('p-4 bg-card rounded-lg')}>Content</div>
 ```
 
 ### Micro Motion
@@ -706,9 +690,9 @@ function Component() {
   return <button {...motion.props}>Click me</button>;
 }
 
-// Class-based
-const classes = getMicroMotionClasses('hover-lift');
-<div className={classes}>Hover me</div>
+// Style-based
+const motionStyle = getMicroMotionClasses('hover-lift');
+<div style={motionStyle}>Hover me</div>
 
 // Available presets:
 // 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'

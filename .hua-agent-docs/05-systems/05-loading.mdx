@@ -49,7 +49,7 @@ Groups multiple Skeletons with consistent spacing:
 interface SkeletonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode
   spacing?: 'sm' | 'md' | 'lg'   // default: 'md'
-  className?: string
+  className?: string              // legacy; prefer dot prop on child Skeletons
 }
 ```
 
@@ -64,9 +64,9 @@ interface SkeletonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 import { SkeletonGroup, Skeleton } from '@hua-labs/hua/framework'
 
 <SkeletonGroup spacing="md">
-  <Skeleton className="h-8 w-48" />    {/* Title */}
-  <Skeleton className="h-4 w-full" />  {/* Body line 1 */}
-  <Skeleton className="h-4 w-3/4" />   {/* Body line 2 */}
+  <Skeleton dot="h-8 w-48" />    {/* Title */}
+  <Skeleton dot="h-4 w-full" />  {/* Body line 1 */}
+  <Skeleton dot="h-4 w-3/4" />   {/* Body line 2 */}
 </SkeletonGroup>
 ```
 
@@ -124,7 +124,7 @@ import { withSuspense } from '@hua-labs/hua/framework'
 
 const LazyChart = withSuspense(
   React.lazy(() => import('./Chart')),
-  <Skeleton className="h-64 w-full" />
+  <Skeleton dot="h-64 w-full" />
 )
 
 // Usage
@@ -141,11 +141,11 @@ import { SuspenseWrapper, SkeletonGroup, Skeleton } from '@hua-labs/hua/framewor
 function PageSkeleton() {
   return (
     <SkeletonGroup spacing="lg">
-      <Skeleton className="h-10 w-64" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-48 w-full" />
+      <Skeleton dot="h-10 w-64" />
+      <Skeleton dot="h-4 w-full" />
+      <Skeleton dot="h-4 w-full" />
+      <Skeleton dot="h-4 w-3/4" />
+      <Skeleton dot="h-48 w-full" />
     </SkeletonGroup>
   )
 }
@@ -167,8 +167,8 @@ function UserProfile({ userId }) {
 
   if (showSkeleton) {
     return <SkeletonGroup>
-      <Skeleton className="h-12 w-12 rounded-full" />
-      <Skeleton className="h-4 w-32" />
+      <Skeleton dot="h-12 w-12 rounded-full" />
+      <Skeleton dot="h-4 w-32" />
     </SkeletonGroup>
   }
 
@@ -179,7 +179,9 @@ function UserProfile({ userId }) {
 ### 3. Multiple Async Components
 
 ```tsx
-<div className="grid grid-cols-2 gap-4">
+import { dot } from '@hua-labs/dot'
+
+<div style={dot('grid grid-cols-2 gap-4')}>
   <SuspenseWrapper>
     <AsyncStats />
   </SuspenseWrapper>

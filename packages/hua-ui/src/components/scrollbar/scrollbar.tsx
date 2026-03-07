@@ -1,8 +1,10 @@
 import React from "react"
+import { dot as dotFn } from "@hua-labs/dot"
 import { merge } from "../../lib/utils"
 
-export interface ScrollbarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ScrollbarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
   children: React.ReactNode
+  dot?: string
   variant?: "default" | "glass" | "colorful" | "minimal" | "neon"
   size?: "sm" | "md" | "lg" | "xl"
   orientation?: "vertical" | "horizontal" | "both"
@@ -11,15 +13,16 @@ export interface ScrollbarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Scrollbar = React.forwardRef<HTMLDivElement, ScrollbarProps>(
-  ({ 
-    className, 
-    variant = "default", 
-    size = "md", 
-    orientation = "both", 
-    autoHide = true, 
-    smooth = true, 
-    children, 
-    ...props 
+  ({
+    dot,
+    variant = "default",
+    size = "md",
+    orientation = "both",
+    autoHide = true,
+    smooth = true,
+    children,
+    style,
+    ...props
   }, ref) => {
     
     const getVariantClasses = () => {
@@ -68,13 +71,15 @@ const Scrollbar = React.forwardRef<HTMLDivElement, ScrollbarProps>(
       getOrientationClasses(),
       autoHide && "scrollbar-hide",
       smooth && "scroll-smooth",
-      className
     )
+
+    const dotStyle = dot ? dotFn(dot) as React.CSSProperties : undefined
 
     return (
       <div
         className={baseClasses}
         ref={ref}
+        style={dotStyle ? { ...dotStyle, ...style } : style}
         {...props}
       >
         {children}

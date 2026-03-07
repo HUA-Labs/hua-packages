@@ -1,11 +1,11 @@
-overview: "Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and Tailwind CSS integration."
+overview: "Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and cross-platform styling via the dot style engine."
 
 features:
   - "70+ components — Buttons, forms, tables, modals, overlays, and more"
   - "Modular entry points — Import only what you need for optimal bundle size"
   - "Accessible — ARIA attributes, keyboard navigation, WCAG compliant"
   - "Dark mode — Built-in dark mode support"
-  - "Tailwind CSS — Utility-first styling with class variance authority"
+  - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
   - "Tree-shakeable — Side-effect free (except CSS)"
 
 quickStart: |
@@ -145,7 +145,7 @@ apiNotes:
 
   # Utilities
   cn:
-    description: "Tailwind-safe class name merging (clsx + tailwind-merge)"
+    description: "Class name merging utility (clsx + tailwind-merge). Legacy — prefer dot prop for new code"
     kind: "function"
   Slot:
     description: "Polymorphic slot for asChild pattern"
