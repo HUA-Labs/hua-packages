@@ -124,6 +124,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const [isOpen, setIsOpen] = React.useState(false)
     const [currentMonth, setCurrentMonth] = React.useState(value ? new Date(value.getFullYear(), value.getMonth()) : new Date())
     const [hoveredDate, setHoveredDate] = React.useState<Date | null>(null)
+    const [viewMode, setViewMode] = React.useState<"days" | "months" | "years">("days")
 
     const displayDate = value ? formatDate(value, dateFormat, locale) : ""
 
@@ -146,6 +147,22 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       handleDateSelect(today)
+    }
+
+    const handleMonthSelect = (monthIndex: number) => {
+      setCurrentMonth(new Date(currentMonth.getFullYear(), monthIndex))
+      setViewMode("days")
+    }
+
+    const handleYearSelect = (selectedYear: number) => {
+      setCurrentMonth(new Date(selectedYear, currentMonth.getMonth()))
+      setViewMode("months")
+    }
+
+    const handleHeaderClick = () => {
+      if (viewMode === "days") setViewMode("months")
+      else if (viewMode === "months") setViewMode("years")
+      else setViewMode("months")
     }
 
     const year = currentMonth.getFullYear()
@@ -188,10 +205,26 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     }
     const todayText = todayTextMap[locale] || "Today"
 
+    // 로케일별 짧은 월 이름
+    const shortMonthsMap: Record<string, string[]> = {
+      "ko-KR": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+      "ko": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+      "ja-JP": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+      "ja": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+      "en-US": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "en": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    }
+    const shortMonths = shortMonthsMap[locale] || shortMonthsMap["en"]
+
     // 로케일별 aria-label 텍스트
     const ariaLabels = {
       prevMonth: locale.startsWith("ko") ? "이전 달" : locale.startsWith("ja") ? "前月" : "Previous month",
       nextMonth: locale.startsWith("ko") ? "다음 달" : locale.startsWith("ja") ? "翌月" : "Next month",
+      prevYear: locale.startsWith("ko") ? "이전 연도" : locale.startsWith("ja") ? "前年" : "Previous year",
+      nextYear: locale.startsWith("ko") ? "다음 연도" : locale.startsWith("ja") ? "翌年" : "Next year",
+      prevYearPage: locale.startsWith("ko") ? "이전 12년" : locale.startsWith("ja") ? "前の12年" : "Previous 12 years",
+      nextYearPage: locale.startsWith("ko") ? "다음 12년" : locale.startsWith("ja") ? "次の12年" : "Next 12 years",
+      selectMonthYear: locale.startsWith("ko") ? "월/연도 선택" : locale.startsWith("ja") ? "月/年選択" : "Select month/year",
     }
 
     // 날짜 aria-label 포맷
@@ -287,7 +320,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       fontSize: sizeStyles[size].fontSize,
       height: sizeStyles[size].height,
       padding: sizeStyles[size].padding,
-      transition: 'colors 150ms',
+      transition: 'all 150ms',
       cursor: disabled ? 'not-allowed' : 'pointer',
       opacity: disabled ? 0.5 : 1,
     }
@@ -313,7 +346,10 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       <div ref={ref} style={mergeStyles(resolveDot('relative'), resolveDot(dotProp), style)} {...props}>
         <Popover
           open={isOpen}
-          onOpenChange={setIsOpen}
+          onOpenChange={(open) => {
+            setIsOpen(open)
+            if (open) setViewMode("days")
+          }}
           trigger={triggerButton}
           position="bottom"
           align="start"
@@ -328,128 +364,220 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <button
                   type="button"
-                  onClick={handlePrevMonth}
-                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms' }}
+                  onClick={() => {
+                    if (viewMode === "days") handlePrevMonth()
+                    else if (viewMode === "years") setCurrentMonth(new Date(currentMonth.getFullYear() - 12, currentMonth.getMonth()))
+                    else setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth()))
+                  }}
+                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms', minWidth: '2.25rem', minHeight: '2.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
-                  aria-label={ariaLabels.prevMonth}
+                  aria-label={viewMode === "days" ? ariaLabels.prevMonth : viewMode === "years" ? ariaLabels.prevYearPage : ariaLabels.prevYear}
                 >
                   <Icon name="chevronLeft" className="h-4 w-4" />
                 </button>
-                <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>
-                  {formatMonth(year, month, locale)}
-                </div>
                 <button
                   type="button"
-                  onClick={handleNextMonth}
-                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms' }}
+                  onClick={handleHeaderClick}
+                  style={{ fontSize: '1.125rem', fontWeight: 600, color: 'hsl(var(--foreground))', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '0.375rem', padding: '0.25rem 0.75rem', transition: 'background-color 150ms' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
-                  aria-label={ariaLabels.nextMonth}
+                  aria-label={ariaLabels.selectMonthYear}
+                >
+                  {viewMode === "years"
+                    ? `${year - 5}–${year + 6}`
+                    : viewMode === "months"
+                      ? `${year}`
+                      : formatMonth(year, month, locale)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (viewMode === "days") handleNextMonth()
+                    else if (viewMode === "years") setCurrentMonth(new Date(currentMonth.getFullYear() + 12, currentMonth.getMonth()))
+                    else setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth()))
+                  }}
+                  style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms', minWidth: '2.25rem', minHeight: '2.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                  aria-label={viewMode === "days" ? ariaLabels.nextMonth : viewMode === "years" ? ariaLabels.nextYearPage : ariaLabels.nextYear}
                 >
                   <Icon name="chevronRight" className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* 요일 헤더 */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem', marginBottom: '0.5rem' }}>
-                {weekDays.map((day, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      textAlign: 'center',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      padding: '0.5rem 0',
-                      color: index === 0
-                        ? 'hsl(var(--destructive))'
-                        : index === 6
-                          ? 'hsl(var(--primary))'
-                          : 'hsl(var(--foreground))',
-                    }}
-                  >
-                    {day}
+              {viewMode === "days" && (
+                <>
+                  {/* 요일 헤더 */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem', marginBottom: '0.5rem' }}>
+                    {weekDays.map((day, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          textAlign: 'center',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          padding: '0.5rem 0',
+                          color: index === 0
+                            ? 'hsl(var(--destructive))'
+                            : index === 6
+                              ? 'hsl(var(--primary))'
+                              : 'hsl(var(--foreground))',
+                        }}
+                      >
+                        {day}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              {/* 캘린더 그리드 */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem' }}>
-                {calendarDays.map((date, index) => {
-                  if (!date) return <div key={index} />
+                  {/* 캘린더 그리드 */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.25rem' }}>
+                    {calendarDays.map((date, index) => {
+                      if (!date) return <div key={index} />
 
-                  const isCurrentMonth = date.getMonth() === month
-                  const isDisabled = isDateDisabled(date)
-                  const isSelected = isDateSelected(date)
-                  const isTodayDate = isToday(date)
-                  const isMarked = isMarkedDate(date)
-                  const isHovered = hoveredDate &&
-                    date.getFullYear() === hoveredDate.getFullYear() &&
-                    date.getMonth() === hoveredDate.getMonth() &&
-                    date.getDate() === hoveredDate.getDate()
+                      const isCurrentMonth = date.getMonth() === month
+                      const isDisabled = isDateDisabled(date)
+                      const isSelected = isDateSelected(date)
+                      const isTodayDate = isToday(date)
+                      const isMarked = isMarkedDate(date)
+                      const isHovered = hoveredDate &&
+                        date.getFullYear() === hoveredDate.getFullYear() &&
+                        date.getMonth() === hoveredDate.getMonth() &&
+                        date.getDate() === hoveredDate.getDate()
 
-                  const buttonStyle: React.CSSProperties = {
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '2.25rem',
-                    width: '2.25rem',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    transition: 'all 150ms',
-                    border: 'none',
-                    cursor: isDisabled ? 'not-allowed' : 'pointer',
-                    outline: 'none',
-                    backgroundColor: 'transparent',
-                    ...(!isCurrentMonth && !isSelected ? { opacity: 0.3 } : {}),
-                    ...(isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%))', color: '#fff' } : {}),
-                    ...(isTodayDate && !isSelected ? {
-                      boxShadow: 'inset 0 0 0 2px hsl(var(--primary, 187 92% 50%))',
-                      fontWeight: 700,
-                    } : {}),
-                    ...(isHovered && !isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%) / 0.15)' } : {}),
-                  }
+                      const buttonStyle: React.CSSProperties = {
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '2.25rem',
+                        width: '2.25rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                        transition: 'all 150ms',
+                        border: 'none',
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        outline: 'none',
+                        backgroundColor: 'transparent',
+                        ...(!isCurrentMonth && !isSelected ? { opacity: 0.3 } : {}),
+                        ...(isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%))', color: '#fff' } : {}),
+                        ...(isTodayDate && !isSelected ? {
+                          boxShadow: 'inset 0 0 0 2px hsl(var(--primary, 187 92% 50%))',
+                          fontWeight: 700,
+                        } : {}),
+                        ...(isHovered && !isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%) / 0.15)' } : {}),
+                      }
 
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      disabled={isDisabled}
-                      onClick={() => handleDateSelect(date)}
-                      onMouseEnter={() => setHoveredDate(date)}
-                      onMouseLeave={() => setHoveredDate(null)}
-                      style={buttonStyle}
-                      aria-label={formatDateAriaLabel(date, locale)}
-                    >
-                      <span style={{ position: 'relative', zIndex: 10, lineHeight: 1 }}>
-                        {date.getDate()}
-                      </span>
-                      {isMarked && (
-                        <span
-                          style={{
-                            position: 'absolute',
-                            bottom: '1px',
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '9999px',
-                            backgroundColor: isSelected ? '#fff' : 'hsl(var(--primary, 187 92% 50%))',
-                          }}
-                        />
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleDateSelect(date)}
+                          onMouseEnter={() => setHoveredDate(date)}
+                          onMouseLeave={() => setHoveredDate(null)}
+                          style={buttonStyle}
+                          aria-label={formatDateAriaLabel(date, locale)}
+                        >
+                          <span style={{ position: 'relative', zIndex: 10, lineHeight: 1 }}>
+                            {date.getDate()}
+                          </span>
+                          {isMarked && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                bottom: '1px',
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '9999px',
+                                backgroundColor: isSelected ? '#fff' : 'hsl(var(--primary, 187 92% 50%))',
+                              }}
+                            />
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+
+              {viewMode === "months" && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                  {shortMonths.map((monthName, index) => {
+                    const isCurrentMonthSelected = month === index
+                    const cellStyle: React.CSSProperties = {
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: '0.5rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '0.875rem',
+                      fontWeight: isCurrentMonthSelected ? 600 : 400,
+                      backgroundColor: isCurrentMonthSelected ? 'hsl(var(--primary, 187 92% 50%))' : 'transparent',
+                      color: isCurrentMonthSelected ? '#fff' : 'hsl(var(--foreground))',
+                      transition: 'all 150ms',
+                    }
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleMonthSelect(index)}
+                        onMouseEnter={(e) => { if (!isCurrentMonthSelected) (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                        onMouseLeave={(e) => { if (!isCurrentMonthSelected) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                        style={cellStyle}
+                        aria-label={`${monthName} ${year}`}
+                      >
+                        {monthName}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {viewMode === "years" && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                  {Array.from({ length: 12 }, (_, i) => year - 5 + i).map((y) => {
+                    const isCurrentYear = year === y
+                    const cellStyle: React.CSSProperties = {
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: '0.5rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '0.875rem',
+                      fontWeight: isCurrentYear ? 600 : 400,
+                      backgroundColor: isCurrentYear ? 'hsl(var(--primary, 187 92% 50%))' : 'transparent',
+                      color: isCurrentYear ? '#fff' : 'hsl(var(--foreground))',
+                      transition: 'all 150ms',
+                    }
+                    return (
+                      <button
+                        key={y}
+                        type="button"
+                        onClick={() => handleYearSelect(y)}
+                        onMouseEnter={(e) => { if (!isCurrentYear) (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                        onMouseLeave={(e) => { if (!isCurrentYear) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                        style={cellStyle}
+                        aria-label={String(y)}
+                      >
+                        {y}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
 
               {/* 오늘 버튼 */}
               <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid hsl(var(--border))' }}>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleToday}
+                  onClick={() => {
+                    const now = new Date()
+                    setViewMode("days")
+                    setCurrentMonth(new Date(now.getFullYear(), now.getMonth()))
+                    handleToday()
+                  }}
                   dot="w-full"
                 >
                   {todayText}

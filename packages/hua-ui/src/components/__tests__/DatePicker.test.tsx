@@ -256,3 +256,327 @@ describe('DatePicker', () => {
     expect(trigger?.style.border).toContain('destructive');
   });
 });
+
+describe('DatePicker markedDateKeys', () => {
+  it('should show marker dots for markedDateKeys', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-03-05', '2026-03-10', '2026-03-20']}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    // Marked dates should have 2 children: text span + dot span
+    const day5 = screen.getByLabelText('March 5, 2026');
+    const day10 = screen.getByLabelText('March 10, 2026');
+    const day20 = screen.getByLabelText('March 20, 2026');
+    expect(day5.children.length).toBe(2);
+    expect(day10.children.length).toBe(2);
+    expect(day20.children.length).toBe(2);
+
+    // Unmarked date should have only 1 child
+    const day6 = screen.getByLabelText('March 6, 2026');
+    expect(day6.children.length).toBe(1);
+  });
+
+  it('should not show markers for dates outside current month view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-02-15', '2026-04-10']}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    // March 15 is not marked — only 1 child
+    const day15 = screen.getByLabelText('March 15, 2026');
+    expect(day15.children.length).toBe(1);
+  });
+
+  it('should handle empty markedDateKeys gracefully', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={[]}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    const day1 = screen.getByLabelText('March 1, 2026');
+    expect(day1.children.length).toBe(1);
+  });
+
+  it('should prefer markedDateKeys over markedDates when both provided', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-03-07']}
+        markedDates={[new Date(2026, 2, 15)]}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    // markedDateKeys wins: day 7 marked, day 15 not
+    const day7 = screen.getByLabelText('March 7, 2026');
+    expect(day7.children.length).toBe(2);
+
+    const day15 = screen.getByLabelText('March 15, 2026');
+    expect(day15.children.length).toBe(1);
+  });
+
+  it('should mark boundary dates correctly (first and last day of month)', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 15)}
+        markedDateKeys={['2026-03-01', '2026-03-31']}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+
+    const day1 = screen.getByLabelText('March 1, 2026');
+    const day31 = screen.getByLabelText('March 31, 2026');
+    expect(day1.children.length).toBe(2);
+    expect(day31.children.length).toBe(2);
+  });
+
+  it('should update markers when markedDateKeys changes', async () => {
+    const user = userEvent.setup();
+
+    const { rerender } = render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-03-05']}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    const day5 = screen.getByLabelText('March 5, 2026');
+    expect(day5.children.length).toBe(2);
+
+    const day10 = screen.getByLabelText('March 10, 2026');
+    expect(day10.children.length).toBe(1);
+
+    // Rerender with different keys
+    rerender(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-03-10']}
+        locale="en"
+      />
+    );
+
+    // Now day 10 should be marked, day 5 should not
+    const day5After = screen.getByLabelText('March 5, 2026');
+    expect(day5After.children.length).toBe(1);
+
+    const day10After = screen.getByLabelText('March 10, 2026');
+    expect(day10After.children.length).toBe(2);
+  });
+
+  it('should show markers after navigating to the marked month', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 1)}
+        markedDateKeys={['2026-04-15']}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-01'));
+
+    // Navigate to April
+    await user.click(screen.getByLabelText('Next month'));
+
+    const day15 = screen.getByLabelText('April 15, 2026');
+    expect(day15.children.length).toBe(2);
+  });
+});
+
+describe('DatePicker month/year jump', () => {
+  it('should switch to month selection when header is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+
+    // Click header text to enter month selection
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Should show month grid — year only in header
+    expect(screen.getByText('2026')).toBeInTheDocument();
+    // Short month names should appear
+    expect(screen.getByText('Jan')).toBeInTheDocument();
+    expect(screen.getByText('Dec')).toBeInTheDocument();
+  });
+
+  it('should select a month and return to day view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Select June
+    await user.click(screen.getByLabelText('Jun 2026'));
+
+    // Should return to day view showing June
+    expect(screen.getByText('June 2026')).toBeInTheDocument();
+  });
+
+  it('should switch to year selection when header is clicked in month view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+    // First click → month view
+    await user.click(screen.getByLabelText('Select month/year'));
+    // Second click → year view
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Should show year range
+    expect(screen.getByLabelText('2026')).toBeInTheDocument();
+    expect(screen.getByLabelText('2021')).toBeInTheDocument();
+    expect(screen.getByLabelText('2032')).toBeInTheDocument();
+  });
+
+  it('should select a year and return to month view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+    await user.click(screen.getByLabelText('Select month/year'));
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Select 2024
+    await user.click(screen.getByLabelText('2024'));
+
+    // Should go back to month view with 2024
+    expect(screen.getByText('2024')).toBeInTheDocument();
+    expect(screen.getByText('Jan')).toBeInTheDocument();
+  });
+
+  it('should jump to a distant date via year → month → day flow', async () => {
+    const handleChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker
+        value={new Date(2026, 2, 15)}
+        onChange={handleChange}
+        locale="en"
+      />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+
+    // Header → months → years
+    await user.click(screen.getByLabelText('Select month/year'));
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Select 2024
+    await user.click(screen.getByLabelText('2024'));
+    // Select August
+    await user.click(screen.getByLabelText('Aug 2024'));
+    // Now in day view for August 2024
+    expect(screen.getByText('August 2024')).toBeInTheDocument();
+
+    // Select day 20
+    await user.click(screen.getByLabelText('August 20, 2024'));
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    const selected = handleChange.mock.calls[0][0] as Date;
+    expect(selected.getFullYear()).toBe(2024);
+    expect(selected.getMonth()).toBe(7);
+    expect(selected.getDate()).toBe(20);
+  });
+
+  it('should show Korean month names in month view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="ko" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+    await user.click(screen.getByLabelText('월/연도 선택'));
+
+    expect(screen.getByLabelText('1월 2026')).toBeInTheDocument();
+    expect(screen.getByLabelText('12월 2026')).toBeInTheDocument();
+  });
+
+  it('should navigate year pages with arrows in year view', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    await user.click(screen.getByText('2026-03-15'));
+    await user.click(screen.getByLabelText('Select month/year'));
+    await user.click(screen.getByLabelText('Select month/year'));
+
+    // Default range: 2021–2032
+    expect(screen.getByLabelText('2021')).toBeInTheDocument();
+
+    // Click next → should advance by 12 years
+    await user.click(screen.getByLabelText('Next 12 years'));
+    expect(screen.getByLabelText('2033')).toBeInTheDocument();
+  });
+
+  it('should reset to day view when popover reopens', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker value={new Date(2026, 2, 15)} locale="en" />
+    );
+
+    // Open and go to month view
+    await user.click(screen.getByText('2026-03-15'));
+    await user.click(screen.getByLabelText('Select month/year'));
+    expect(screen.getByText('Jan')).toBeInTheDocument();
+
+    // Close by clicking trigger again
+    await user.click(screen.getByText('2026-03-15'));
+
+    // Reopen — should be back in day view
+    await user.click(screen.getByText('2026-03-15'));
+    expect(screen.getByText('March 2026')).toBeInTheDocument();
+    expect(screen.queryByText('Jan')).not.toBeInTheDocument();
+  });
+});
