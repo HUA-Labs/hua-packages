@@ -34,29 +34,14 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
+      - name: Validate workspace registry
+        run: node --experimental-strip-types scripts/check-workspace-registry.ts
+
       - name: Build packages
-        run: pnpm build --filter "@hua-labs/*"
+        run: pnpm workspace:build:packages
 
       - name: Type check
-        run: |
-          pnpm --filter my-app \
-               --filter @hua-labs/ui \
-               --filter @hua-labs/ui-dashboard \
-               --filter @hua-labs/utils \
-               --filter @hua-labs/dot \
-               --filter @hua-labs/i18n-core \
-               --filter @hua-labs/i18n-core-zustand \
-               --filter @hua-labs/i18n-loaders \
-               --filter @hua-labs/i18n-formatters \
-               --filter @hua-labs/motion-core \
-               --filter @hua-labs/hooks \
-               --filter @hua-labs/state \
-               --filter @hua-labs/hua \
-               --filter @hua-labs/docs-engine \
-               --filter @hua-labs/security \
-               --filter @hua-labs/pro \
-               --filter create-hua \
-               run type-check
+        run: pnpm workspace:type-check
 
   lint:
     runs-on: ubuntu-latest
@@ -82,22 +67,14 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
+      - name: Validate workspace registry
+        run: node --experimental-strip-types scripts/check-workspace-registry.ts
+
       - name: Build packages
-        run: pnpm build --filter "@hua-labs/*"
+        run: pnpm workspace:build:packages
 
       - name: Lint
-        run: |
-          pnpm --filter my-app \
-               --filter @hua-labs/ui \
-               --filter @hua-labs/utils \
-               --filter @hua-labs/i18n-core \
-               --filter @hua-labs/i18n-core-zustand \
-               --filter @hua-labs/i18n-loaders \
-               --filter @hua-labs/motion-core \
-               --filter @hua-labs/hooks \
-               --filter @hua-labs/state \
-               --filter @hua-labs/hua \
-               run lint
+        run: pnpm workspace:lint
 
   test:
     runs-on: ubuntu-latest
@@ -123,21 +100,14 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
+      - name: Validate workspace registry
+        run: node --experimental-strip-types scripts/check-workspace-registry.ts
+
       - name: Build packages
-        run: pnpm build --filter "@hua-labs/*"
+        run: pnpm workspace:build:packages
 
       - name: Test
-        run: |
-          pnpm --filter @hua-labs/dot \
-               --filter @hua-labs/i18n-core \
-               --filter @hua-labs/i18n-core-zustand \
-               --filter @hua-labs/i18n-formatters \
-               --filter @hua-labs/i18n-loaders \
-               --filter @hua-labs/hooks \
-               --filter @hua-labs/utils \
-               --filter @hua-labs/eslint-plugin-i18n \
-               --filter create-hua \
-               run test
+        run: pnpm workspace:test
 
   doc-validation:
     runs-on: ubuntu-latest
