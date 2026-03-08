@@ -6,7 +6,7 @@
 |----------|--------|------|
 | `generate-docs.ts` | `pnpm generate:docs` | doc.yaml → README.md + ai.yaml 자동 생성 |
 | `generate-pr.ts` | `pnpm generate:pr` | PR 템플릿 생성 (`/pr` 스킬) |
-| `generate-devlog.ts` | `pnpm generate:devlog` | devlog 스캐폴딩 (`/devlog` 스킬) |
+| `generate-devlog.ts` | `pnpm generate:devlog --date=YYYY-MM-DD --title=topic` | devlog 스캐폴딩 (`docs/devlogs/YYYY-MM/YYYY-MM-DD-topic.md`) |
 | `check-workspace-registry.ts` | `pnpm workspace:check` | workspace registry SSOT 검증 |
 | `generate-workspace-report.ts` | `pnpm workspace:report` | workspace registry 기준 운영 표 출력 |
 | `audit-public-mirror.ts` | `pnpm workspace:audit:public-mirror` | registry vs public mirror sync 정책 드리프트 감사 |
