@@ -32,8 +32,11 @@ export interface DatePickerProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   dateFormat?: string
   locale?: string
   size?: "sm" | "md" | "lg"
-  /** 표시할 날짜 배열 (점으로 표시) / Dates to mark with a dot */
+  /** 표시할 날짜 배열 (점으로 표시) / Dates to mark with a dot
+   * @deprecated markedDateKeys 사용 권장 (타임존 안전) */
   markedDates?: Date[]
+  /** 표시할 날짜 키 배열 (YYYY-MM-DD 형식, 타임존 안전) / Date keys to mark with a dot */
+  markedDateKeys?: string[]
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
   /** 추가 인라인 스타일 / Additional inline style */
@@ -111,6 +114,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       locale = "ko-KR",
       size = "md",
       markedDates,
+      markedDateKeys,
       dot: dotProp,
       style,
       ...props
@@ -225,7 +229,22 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       )
     }
 
+    const toDateKey = (date: Date): string => {
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, "0")
+      const d = String(date.getDate()).padStart(2, "0")
+      return `${y}-${m}-${d}`
+    }
+
+    const markedKeySet = React.useMemo(
+      () => markedDateKeys ? new Set(markedDateKeys) : null,
+      [markedDateKeys]
+    )
+
     const isMarkedDate = (date: Date): boolean => {
+      if (markedKeySet) {
+        return markedKeySet.has(toDateKey(date))
+      }
       if (!markedDates) return false
       return markedDates.some(
         (marked) =>
