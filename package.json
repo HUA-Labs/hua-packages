@@ -19,6 +19,13 @@
     "generate:devlog": "tsx scripts/generate-devlog.ts",
     "generate:docs": "tsx scripts/generate-docs.ts",
     "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
+    "workspace:check": "node --experimental-strip-types scripts/check-workspace-registry.ts",
+    "workspace:report": "node --experimental-strip-types scripts/generate-workspace-report.ts",
+    "workspace:audit:public-mirror": "node --experimental-strip-types scripts/audit-public-mirror.ts",
+    "workspace:build:packages": "node scripts/run-workspace-task.mjs build --kind package",
+    "workspace:type-check": "node scripts/run-workspace-task.mjs type-check",
+    "workspace:lint": "node scripts/run-workspace-task.mjs lint",
+    "workspace:test": "node scripts/run-workspace-task.mjs test",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"

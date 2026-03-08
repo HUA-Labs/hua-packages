@@ -1,0 +1,406 @@
+version: 1
+updated: 2026-03-08
+purpose: >
+  Canonical machine-readable registry for workspace packages and apps.
+  CI targets, package status docs, visibility policy, and founder summaries
+  should derive from this file instead of hard-coded lists.
+  Public mirror policy should also be tracked here.
+  The `ci.*` flags represent participation in the default PR CI pipeline,
+  not merely whether a script exists.
+
+defaults:
+  ci:
+    build: true
+    typeCheck: true
+    test: false
+    lint: false
+  release:
+    mode: no-publish
+  publicMirror:
+    mode: defer
+  lifecycle: maintain
+
+entries:
+  - name: "@hua-labs/ui"
+    path: "packages/hua-ui"
+    kind: package
+    tier: spine
+    accessClass: public-oss
+    lifecycle: grow
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/hua"
+    path: "packages/hua"
+    kind: package
+    tier: spine
+    accessClass: public-oss
+    lifecycle: grow
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/dot"
+    path: "packages/hua-dot"
+    kind: package
+    tier: spine
+    accessClass: internal-core
+    lifecycle: pre-release
+    release:
+      mode: no-publish
+    publicMirror:
+      mode: defer
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/i18n-core"
+    path: "packages/hua-i18n-core"
+    kind: package
+    tier: spine
+    accessClass: public-oss
+    lifecycle: grow
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/i18n-core-zustand"
+    path: "packages/hua-i18n-core-zustand"
+    kind: package
+    tier: spine
+    accessClass: public-oss
+    lifecycle: grow
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/motion-core"
+    path: "packages/hua-motion-core"
+    kind: package
+    tier: spine
+    accessClass: public-oss
+    lifecycle: grow
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/state"
+    path: "packages/hua-state"
+    kind: package
+    tier: support
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/i18n-formatters"
+    path: "packages/hua-i18n-formatters"
+    kind: package
+    tier: support
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/i18n-loaders"
+    path: "packages/hua-i18n-loaders"
+    kind: package
+    tier: support
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: true
+
+  - name: "@hua-labs/eslint-plugin-i18n"
+    path: "packages/eslint-plugin-i18n"
+    kind: package
+    tier: support
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: defer
+    ci:
+      build: true
+      typeCheck: false
+      test: true
+      lint: false
+
+  - name: "@hua-labs/hooks"
+    path: "packages/hua-hooks"
+    kind: package
+    tier: bundle-internal
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/utils"
+    path: "packages/hua-utils"
+    kind: package
+    tier: bundle-internal
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/pro"
+    path: "packages/hua-pro"
+    kind: package
+    tier: bundle-internal
+    accessClass: framework-entitled
+    lifecycle: reserved
+    release:
+      mode: private-workspace
+    publicMirror:
+      mode: exclude
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/security"
+    path: "packages/hua-security"
+    kind: package
+    tier: support
+    accessClass: private-internal
+    lifecycle: maintain
+    release:
+      mode: private-workspace
+    publicMirror:
+      mode: exclude
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/ui-dashboard"
+    path: "packages/hua-ui-dashboard"
+    kind: package
+    tier: support
+    accessClass: private-internal
+    lifecycle: freeze-candidate
+    release:
+      mode: private-workspace
+    publicMirror:
+      mode: exclude
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/docs-engine"
+    path: "packages/my-docs-engine"
+    kind: package
+    tier: support
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: defer
+    ci:
+      build: true
+      typeCheck: true
+      test: true
+      lint: false
+
+  - name: "@hua-labs/codemod"
+    path: "packages/hua-codemod"
+    kind: package
+    tier: tooling
+    accessClass: public-oss
+    lifecycle: freeze-candidate
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: false
+      test: false
+      lint: false
+
+  - name: "create-hua"
+    path: "packages/create-hua"
+    kind: package
+    tier: tooling
+    accessClass: public-oss
+    lifecycle: maintain
+    release:
+      mode: public-npm
+    publicMirror:
+      mode: include
+    ci:
+      build: true
+      typeCheck: false
+      test: true
+      lint: false
+
+  - name: "my-app"
+    path: "apps/my-app"
+    kind: app
+    tier: product
+    accessClass: private-app
+    lifecycle: grow
+    release:
+      mode: app-deploy
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: true
+
+  - name: "my-app-app"
+    path: "apps/my-app-app"
+    kind: app
+    tier: product
+    accessClass: private-app
+    lifecycle: grow
+    release:
+      mode: app-deploy
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: false
+
+  - name: "hue"
+    path: "apps/hue"
+    kind: app
+    tier: product
+    accessClass: hosted-only
+    lifecycle: grow
+    release:
+      mode: private-app
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: false
+
+  - name: "my-docs"
+    path: "apps/my-docs"
+    kind: app
+    tier: internal-site
+    accessClass: private-app
+    lifecycle: maintain
+    release:
+      mode: app-deploy
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: false
+
+  - name: "my-site"
+    path: "apps/my-site"
+    kind: app
+    tier: internal-site
+    accessClass: private-app
+    lifecycle: maintain
+    release:
+      mode: app-deploy
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: false
+
+  - name: "slides"
+    path: "apps/slides"
+    kind: app
+    tier: internal-site
+    accessClass: private-app
+    lifecycle: maintain
+    release:
+      mode: app-deploy
+    publicMirror:
+      mode: exclude
+    ci:
+      build: false
+      typeCheck: false
+      test: false
+      lint: false
