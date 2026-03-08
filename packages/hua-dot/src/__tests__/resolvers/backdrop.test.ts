@@ -57,3 +57,27 @@ describe('resolveBackdrop', () => {
     expect(resolveBackdrop('backdrop-blur', 'unknown', config)).toEqual({});
   });
 });
+
+// Integration tests via dot() for backdropFilter accumulation
+import { dot } from '../../index';
+
+describe('backdropFilter accumulation', () => {
+  it('accumulates backdrop-blur + backdrop-brightness', () => {
+    const result = dot('backdrop-blur-md backdrop-brightness-75');
+    expect(result.backdropFilter).toBe('blur(12px) brightness(.75)');
+  });
+
+  it('accumulates three backdrop functions', () => {
+    const result = dot('backdrop-blur-sm backdrop-brightness-125 backdrop-contrast-75');
+    expect(result.backdropFilter).toBe('blur(4px) brightness(1.25) contrast(.75)');
+  });
+
+  it('accumulates backdrop-blur + backdrop-saturate', () => {
+    const result = dot('backdrop-blur-lg backdrop-saturate-150');
+    expect(result.backdropFilter).toBe('blur(16px) saturate(1.5)');
+  });
+
+  it('single backdrop utility still works', () => {
+    expect(dot('backdrop-blur-md')).toEqual({ backdropFilter: 'blur(12px)' });
+  });
+});

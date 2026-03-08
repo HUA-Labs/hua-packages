@@ -23,19 +23,19 @@ export function resolveRing(_prefix: string, value: string, config: DotConfig): 
   // Arbitrary value: ring-[5px]
   const arbitrary = parseArbitrary(value);
   if (arbitrary !== undefined) {
-    return { boxShadow: buildRingShadow(arbitrary, defaultColor) };
+    return { __dot_ringLayer: buildRingShadow(arbitrary, defaultColor) };
   }
 
   // Width value: ring (bare), ring-0, ring-1, ring-2, ring-4, ring-8
   const width = RING_WIDTHS[value];
   if (width !== undefined) {
-    return { boxShadow: buildRingShadow(width, defaultColor) };
+    return { __dot_ringLayer: buildRingShadow(width, defaultColor) };
   }
 
   // Color value: ring-blue-500, ring-white, etc.
   const color = lookupColor(value, config.tokens.colors);
   if (color) {
-    return { boxShadow: buildRingShadow('3px', color) };
+    return { __dot_ringLayer: buildRingShadow('3px', color) };
   }
 
   return {};

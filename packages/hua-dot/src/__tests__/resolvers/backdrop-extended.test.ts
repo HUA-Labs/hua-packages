@@ -92,10 +92,8 @@ describe('backdrop combinations', () => {
     createDotConfig();
   });
 
-  it('last backdrop filter wins (CSS property override)', () => {
-    // Since all backdrop-* tokens map to the same CSS property,
-    // the last one wins in the style object
+  it('accumulates multiple backdrop filter functions', () => {
     const result = dot('backdrop-blur-md backdrop-brightness-75');
-    expect(result).toHaveProperty('backdropFilter', 'brightness(.75)');
+    expect(result).toHaveProperty('backdropFilter', 'blur(12px) brightness(.75)');
   });
 });
