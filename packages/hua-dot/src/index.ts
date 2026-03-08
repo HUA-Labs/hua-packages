@@ -5,15 +5,66 @@ import { DotCache } from './cache';
 import { resolveConfig } from './config';
 import { adaptNative } from './adapters/native';
 
-/** Merge resolved styles, accumulating transform values instead of overwriting */
+/** Keys whose values accumulate (space-separated) instead of last-wins */
+const ACCUMULATE_KEYS = new Set(['transform', 'filter', 'backdropFilter']);
+
+/** Internal layer keys that get merged into boxShadow */
+const SHADOW_LAYER_KEYS = new Set(['__dot_shadowLayer', '__dot_ringLayer']);
+
+/** Merge resolved styles, accumulating transform/filter/backdropFilter instead of overwriting */
 function mergeStyle(target: StyleObject, source: StyleObject): void {
   for (const key of Object.keys(source)) {
-    if (key === 'transform' && target[key]) {
+    if (ACCUMULATE_KEYS.has(key) && target[key]) {
       target[key] = `${target[key]} ${source[key]}`;
     } else {
       target[key] = source[key];
     }
   }
+}
+
+/** Strip trailing ' !important' from a value, return [cleanValue, hadImportant] */
+function stripImportant(val: string | number): [string, boolean] {
+  if (typeof val !== 'string') return [String(val), false];
+  if (val.endsWith(' !important')) {
+    return [val.slice(0, -' !important'.length), true];
+  }
+  return [val, false];
+}
+
+/** Finalize style: merge shadow layers into boxShadow, remove internal keys */
+function finalizeStyle(style: StyleObject): StyleObject {
+  const ringLayer = style.__dot_ringLayer;
+  const shadowLayer = style.__dot_shadowLayer;
+
+  // Fast path: no shadow layers
+  if (ringLayer === undefined && shadowLayer === undefined) return style;
+
+  const result: StyleObject = {};
+  for (const [key, value] of Object.entries(style)) {
+    if (!SHADOW_LAYER_KEYS.has(key)) {
+      result[key] = value;
+    }
+  }
+
+  // Compose: ring before shadow (Tailwind convention)
+  // Strip !important from individual layers, apply once at the end if any layer had it
+  const layers: string[] = [];
+  let anyImportant = false;
+
+  if (ringLayer !== undefined) {
+    const [clean, imp] = stripImportant(ringLayer);
+    layers.push(clean);
+    if (imp) anyImportant = true;
+  }
+  if (shadowLayer !== undefined) {
+    const [clean, imp] = stripImportant(shadowLayer);
+    layers.push(clean);
+    if (imp) anyImportant = true;
+  }
+
+  result.boxShadow = layers.join(', ') + (anyImportant ? ' !important' : '');
+
+  return result;
 }
 
 /** Append !important to all values in a style object */
@@ -178,8 +229,11 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
     }
   }
 
+  // Finalize shadow layers → boxShadow
+  const finalized = finalizeStyle(result);
+
   // Apply native adapter if targeting RN
-  const finalResult = isNative ? adaptNative(result, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : result;
+  const finalResult = isNative ? adaptNative(finalized, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalized;
 
   // Layer 1: Cache the full result
   if (currentConfig.cache) {
@@ -187,6 +241,73 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
   }
 
   return finalResult;
+}
+
+import type { CapabilityLevel, DotCapabilityReport } from './types';
+import { getCapability } from './capabilities';
+
+/** Result of dotExplain() — resolved styles plus capability metadata */
+export interface DotExplainResult {
+  /** Resolved style object (same as dot() output) */
+  styles: StyleObject | RNStyleObject;
+  /** Capability report for the target */
+  report: DotCapabilityReport;
+}
+
+/**
+ * Resolve a utility string and return both styles and a capability report.
+ *
+ * The report lists which utilities were dropped, approximated, or have
+ * limited support on the target platform.
+ *
+ * @example
+ * dotExplain('p-4 blur-md grid grid-cols-3', { target: 'native' })
+ * // → {
+ * //   styles: { padding: 16, ... },
+ * //   report: {
+ * //     _dropped: ['filter', 'gridTemplateColumns'],
+ * //     _approximated: [],
+ * //     _capabilities: { spacing: 'native', filter: 'unsupported', grid: 'unsupported' }
+ * //   }
+ * // }
+ */
+export function dotExplain(input: string | undefined | null, options?: DotOptions): DotExplainResult {
+  const target: DotTarget = options?.target ?? currentConfig.runtime;
+
+  if (!input || !input.trim() || target === 'web') {
+    const styles = dot(input, options);
+    return { styles, report: {} };
+  }
+
+  // Resolve as web first to see all CSS properties before native drops them
+  const webStyles = dot(input, { ...options, target: 'web' });
+  // Then resolve as native for final output
+  const styles = dot(input, options);
+
+  const dropped: string[] = [];
+  const approximated: string[] = [];
+  const capabilities: Record<string, CapabilityLevel> = {};
+
+  for (const prop of Object.keys(webStyles)) {
+    const level = getCapability(prop, target);
+
+    if (level === 'unsupported') {
+      dropped.push(prop);
+    } else if (level === 'approximate') {
+      approximated.push(prop);
+    }
+
+    if (level !== 'native') {
+      capabilities[prop] = level;
+    }
+  }
+
+  const report: DotCapabilityReport = {};
+  if (dropped.length > 0) report._dropped = dropped;
+  if (approximated.length > 0) report._approximated = approximated;
+  if (Object.keys(capabilities).length > 0) report._capabilities = capabilities;
+
+  return { styles, report };
 }
 
 /**
@@ -338,14 +459,18 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
     }
   }
 
+  // Finalize shadow layers → boxShadow
+  const finalizedBase = finalizeStyle(baseResult);
+
   // Build result
   const result: DotStyleMap = {
-    base: isNative ? adaptNative(baseResult, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : baseResult,
+    base: isNative ? adaptNative(finalizedBase, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalizedBase,
   };
 
   for (const [stateKey, stateStyle] of Object.entries(stateLayers)) {
     if (Object.keys(stateStyle).length > 0) {
-      result[stateKey as DotState] = isNative ? adaptNative(stateStyle, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : stateStyle;
+      const finalizedState = finalizeStyle(stateStyle);
+      result[stateKey as DotState] = isNative ? adaptNative(finalizedState, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalizedState;
     }
   }
 
@@ -373,7 +498,13 @@ export type {
   RNStyleValue,
   RNTransformEntry,
   RNShadowOffset,
+  CapabilityLevel,
+  TargetCapability,
+  DotCapabilityReport,
 } from './types';
+
+// Re-export capabilities
+export { CAPABILITY_MATRIX, PROPERTY_TO_FAMILY, getCapability } from './capabilities';
 
 // Re-export adapters for direct usage
 export { adaptNative, _resetNativeWarnings } from './adapters/native';

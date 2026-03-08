@@ -2,7 +2,8 @@ import type { StyleObject, DotConfig } from '../types';
 import { parseArbitrary } from './utils';
 
 /**
- * Resolve shadow tokens: shadow-lg → { boxShadow: '...' }
+ * Resolve shadow tokens: shadow-lg → { __dot_shadowLayer: '...' }
+ * Uses internal layer key for composition with ring.
  * Bare `shadow` uses DEFAULT ('') key.
  */
 export function resolveShadow(_prefix: string, value: string, config: DotConfig): StyleObject {
@@ -10,12 +11,12 @@ export function resolveShadow(_prefix: string, value: string, config: DotConfig)
   const arbitrary = parseArbitrary(value);
   if (arbitrary !== undefined) {
     // Replace underscores with spaces for shadow syntax
-    return { boxShadow: arbitrary.replace(/_/g, ' ') };
+    return { __dot_shadowLayer: arbitrary.replace(/_/g, ' ') };
   }
 
   const cssValue = config.tokens.shadows[value];
   if (cssValue !== undefined) {
-    return { boxShadow: cssValue };
+    return { __dot_shadowLayer: cssValue };
   }
   return {};
 }

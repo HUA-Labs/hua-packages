@@ -205,11 +205,30 @@ describe('mix-blend-*', () => {
   });
 });
 
-describe('filter combinations', () => {
-  it('last filter wins (single filter property)', () => {
+describe('filter accumulation', () => {
+  it('accumulates multiple filter functions', () => {
     const result = dot('blur-md brightness-75');
-    // Both set `filter`, last wins
-    expect(result.filter).toBe('brightness(.75)');
+    expect(result.filter).toBe('blur(12px) brightness(.75)');
+  });
+
+  it('accumulates three filter functions', () => {
+    const result = dot('blur-sm brightness-125 contrast-75');
+    expect(result.filter).toBe('blur(4px) brightness(1.25) contrast(.75)');
+  });
+
+  it('accumulates blur + saturate + hue-rotate', () => {
+    const result = dot('blur-lg saturate-150 hue-rotate-90');
+    expect(result.filter).toBe('blur(16px) saturate(1.5) hue-rotate(90deg)');
+  });
+
+  it('accumulates grayscale + sepia', () => {
+    const result = dot('grayscale sepia');
+    expect(result.filter).toBe('grayscale(100%) sepia(100%)');
+  });
+
+  it('accumulates drop-shadow with other filters', () => {
+    const result = dot('drop-shadow-sm blur-sm');
+    expect(result.filter).toBe('drop-shadow(0 1px 1px rgb(0 0 0 / 0.05)) blur(4px)');
   });
 
   it('filter + non-filter utilities combine correctly', () => {

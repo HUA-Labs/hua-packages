@@ -1,6 +1,30 @@
 /** Target platform for style output */
 export type DotTarget = 'web' | 'native';
 
+/**
+ * Support level for a utility family on a given target platform.
+ *
+ * - `native`: target supports the intent directly (e.g., padding on all targets)
+ * - `approximate`: target can produce a similar but not identical effect (e.g., RN shadow via elevation)
+ * - `recipe-only`: requires widget/component recipe, not flat style (e.g., gradients on Flutter)
+ * - `plugin-backed`: needs ecosystem plugin/package (e.g., backdrop-blur on Flutter)
+ * - `unsupported`: not available on this target
+ */
+export type CapabilityLevel = 'native' | 'approximate' | 'recipe-only' | 'plugin-backed' | 'unsupported';
+
+/** Per-target capability report for a utility family */
+export type TargetCapability = Record<DotTarget, CapabilityLevel>;
+
+/** Capability metadata attached to explain output */
+export interface DotCapabilityReport {
+  /** Utilities that were silently dropped for the target */
+  _dropped?: string[];
+  /** Utilities that were approximated (not exact match) */
+  _approximated?: string[];
+  /** Per-family capability levels for the target */
+  _capabilities?: Record<string, CapabilityLevel>;
+}
+
 /** Single RN transform entry, e.g. { translateX: 16 } or { rotate: '45deg' } */
 export type RNTransformEntry = Record<string, string | number>;
 
