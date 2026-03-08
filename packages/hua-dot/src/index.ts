@@ -1,9 +1,11 @@
 import type { StyleObject, RNStyleObject, DotUserConfig, DotConfig, DotOptions, DotTarget, DotStyleMap, DotState } from './types';
+import type { FlutterRecipe } from './adapters/flutter-types';
 import { parse } from './parser';
 import { resolveToken } from './resolver';
 import { DotCache } from './cache';
 import { resolveConfig } from './config';
 import { adaptNative } from './adapters/native';
+import { adaptFlutter } from './adapters/flutter';
 
 /** Keys whose values accumulate (space-separated) instead of last-wins */
 const ACCUMULATE_KEYS = new Set(['transform', 'filter', 'backdropFilter']);
@@ -122,20 +124,22 @@ let cache = new DotCache(currentConfig.cacheSize);
  * dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
  * // → { padding: '48px' }  (mobile-first cascade: base → md → lg)
  */
-export function dot(input: string | undefined | null, options?: DotOptions): StyleObject | RNStyleObject {
+export function dot(input: string | undefined | null, options?: DotOptions): StyleObject | RNStyleObject | FlutterRecipe {
   if (!input || !input.trim()) return {};
 
   const isDark = options?.dark === true;
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
   const isNative = target === 'native';
+  const isFlutter = target === 'flutter';
   const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
     ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Layer 1: Full input cache hit (cache key encodes full context including target)
-  const cacheKey = `${isNative ? '\x02n' : ''}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
+  const targetPrefix = isFlutter ? '\x02f' : isNative ? '\x02n' : '';
+  const cacheKey = `${targetPrefix}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
   if (currentConfig.cache) {
     const cached = cache.getInput(cacheKey);
     if (cached) return cached;
@@ -232,12 +236,19 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
   // Finalize shadow layers → boxShadow
   const finalized = finalizeStyle(result);
 
-  // Apply native adapter if targeting RN
-  const finalResult = isNative ? adaptNative(finalized, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalized;
+  // Apply target adapter
+  let finalResult: StyleObject | RNStyleObject | FlutterRecipe;
+  if (isFlutter) {
+    finalResult = adaptFlutter(finalized, { remBase: currentConfig.remBase });
+  } else if (isNative) {
+    finalResult = adaptNative(finalized, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown });
+  } else {
+    finalResult = finalized;
+  }
 
   // Layer 1: Cache the full result
   if (currentConfig.cache) {
-    cache.setInput(cacheKey, finalResult);
+    cache.setInput(cacheKey, finalResult as StyleObject);
   }
 
   return finalResult;
@@ -249,7 +260,7 @@ import { getCapability } from './capabilities';
 /** Result of dotExplain() — resolved styles plus capability metadata */
 export interface DotExplainResult {
   /** Resolved style object (same as dot() output) */
-  styles: StyleObject | RNStyleObject;
+  styles: StyleObject | RNStyleObject | FlutterRecipe;
   /** Capability report for the target */
   report: DotCapabilityReport;
 }
@@ -361,13 +372,15 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
   const isNative = target === 'native';
+  const isFlutter = target === 'flutter';
   const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
     ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Cache key with map prefix
-  const cacheKey = `\x03m${isNative ? '\x02n' : ''}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
+  const targetPrefix = isFlutter ? '\x02f' : isNative ? '\x02n' : '';
+  const cacheKey = `\x03m${targetPrefix}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
   if (currentConfig.cache) {
     const cached = cache.getInput(cacheKey);
     if (cached && typeof cached === 'object' && 'base' in cached) {
@@ -462,15 +475,22 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
   // Finalize shadow layers → boxShadow
   const finalizedBase = finalizeStyle(baseResult);
 
+  // Apply target adapter to a style object
+  const applyAdapter = (style: StyleObject): StyleObject | RNStyleObject | FlutterRecipe => {
+    if (isFlutter) return adaptFlutter(style, { remBase: currentConfig.remBase });
+    if (isNative) return adaptNative(style, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown });
+    return style;
+  };
+
   // Build result
   const result: DotStyleMap = {
-    base: isNative ? adaptNative(finalizedBase, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalizedBase,
+    base: applyAdapter(finalizedBase),
   };
 
   for (const [stateKey, stateStyle] of Object.entries(stateLayers)) {
     if (Object.keys(stateStyle).length > 0) {
       const finalizedState = finalizeStyle(stateStyle);
-      result[stateKey as DotState] = isNative ? adaptNative(finalizedState, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown }) : finalizedState;
+      result[stateKey as DotState] = applyAdapter(finalizedState);
     }
   }
 
@@ -510,12 +530,20 @@ export { CAPABILITY_MATRIX, PROPERTY_TO_FAMILY, getCapability } from './capabili
 export { adaptNative, _resetNativeWarnings } from './adapters/native';
 export type { AdaptNativeOptions } from './adapters/native';
 export { adaptWeb } from './adapters/web';
+export { adaptFlutter } from './adapters/flutter';
+export type { AdaptFlutterOptions } from './adapters/flutter';
+export type {
+  FlutterRecipe, FlutterDecoration, FlutterEdgeInsets, FlutterConstraints,
+  FlutterLayout, FlutterFlexChild, FlutterPositioning, FlutterTextStyle,
+  FlutterTransform, FlutterBoxShadow, FlutterBorderSide, FlutterBorderRadius,
+} from './adapters/flutter-types';
 
 // Re-export cx utility
 export { dotCx } from './cx';
 
 // Re-export variants (CVA replacement) — inject dot function to avoid circular import
-import { _setDotFn, dotVariants } from './variants';
+import { _setDotFn, _setGetRuntime, dotVariants } from './variants';
 _setDotFn(dot as (input: string, options?: DotOptions) => StyleObject);
+_setGetRuntime(() => currentConfig.runtime);
 export { dotVariants };
 export type { VariantProps, DotVariantsConfig, DotVariantsFn, CompoundVariant, VariantShape } from './variants';
