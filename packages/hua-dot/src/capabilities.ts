@@ -6,34 +6,34 @@ import type { CapabilityLevel, DotTarget } from './types';
  * This is the single source of truth for what each target supports.
  * Used by explain() and native adapter for dropped/approximated reporting.
  */
-export const CAPABILITY_MATRIX: Record<string, Record<DotTarget, CapabilityLevel>> = {
+export const CAPABILITY_MATRIX: Record<string, Partial<Record<DotTarget, CapabilityLevel>>> = {
   // Core — universal support
-  spacing:       { web: 'native', native: 'native' },
-  color:         { web: 'native', native: 'native' },
-  typography:    { web: 'native', native: 'native' },
-  layout:        { web: 'native', native: 'native' },
-  sizing:        { web: 'native', native: 'native' },
-  border:        { web: 'native', native: 'native' },
-  borderRadius:  { web: 'native', native: 'native' },
-  flexbox:       { web: 'native', native: 'native' },
-  opacity:       { web: 'native', native: 'native' },
-  zIndex:        { web: 'native', native: 'native' },
-  positioning:   { web: 'native', native: 'native' },
+  spacing:       { web: 'native', native: 'native',  flutter: 'native' },
+  color:         { web: 'native', native: 'native',  flutter: 'native' },
+  typography:    { web: 'native', native: 'native',  flutter: 'native' },
+  layout:        { web: 'native', native: 'native',  flutter: 'native' },
+  sizing:        { web: 'native', native: 'native',  flutter: 'native' },
+  border:        { web: 'native', native: 'native',  flutter: 'native' },
+  borderRadius:  { web: 'native', native: 'native',  flutter: 'native' },
+  flexbox:       { web: 'native', native: 'native',  flutter: 'native' },
+  opacity:       { web: 'native', native: 'native',  flutter: 'native' },
+  zIndex:        { web: 'native', native: 'native',  flutter: 'approximate' },
+  positioning:   { web: 'native', native: 'native',  flutter: 'recipe-only' },
 
-  // Native with approximation on RN
-  shadow:        { web: 'native', native: 'approximate' },
-  transform:     { web: 'native', native: 'native' },
+  // Shadow/transform
+  shadow:        { web: 'native', native: 'approximate', flutter: 'native' },
+  transform:     { web: 'native', native: 'native',      flutter: 'native' },
 
-  // Web-native, partial or unsupported on RN
-  transition:    { web: 'native', native: 'unsupported' },
-  animation:     { web: 'native', native: 'unsupported' },
-  filter:        { web: 'native', native: 'unsupported' },
-  backdropFilter:{ web: 'native', native: 'unsupported' },
-  mixBlendMode:  { web: 'native', native: 'unsupported' },
-  grid:          { web: 'native', native: 'unsupported' },
-  ring:          { web: 'native', native: 'approximate' },
-  lineClamp:     { web: 'native', native: 'native' },
-  interactivity: { web: 'native', native: 'unsupported' },
+  // Web-native, partial or unsupported on mobile
+  transition:    { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  animation:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  filter:        { web: 'native', native: 'unsupported', flutter: 'plugin-backed' },
+  backdropFilter:{ web: 'native', native: 'unsupported', flutter: 'plugin-backed' },
+  mixBlendMode:  { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  grid:          { web: 'native', native: 'unsupported', flutter: 'recipe-only' },
+  ring:          { web: 'native', native: 'approximate', flutter: 'native' },
+  lineClamp:     { web: 'native', native: 'native',      flutter: 'native' },
+  interactivity: { web: 'native', native: 'unsupported', flutter: 'unsupported' },
 };
 
 /**

@@ -1,5 +1,7 @@
+import type { FlutterRecipe } from './adapters/flutter-types';
+
 /** Target platform for style output */
-export type DotTarget = 'web' | 'native';
+export type DotTarget = 'web' | 'native' | 'flutter';
 
 /**
  * Support level for a utility family on a given target platform.
@@ -62,15 +64,18 @@ export type StyleObject = Record<string, string | number>;
 /** Supported state variant names */
 export type DotState = 'hover' | 'focus' | 'active' | 'focus-visible' | 'focus-within' | 'disabled';
 
+/** Style output from any target adapter (web, native, or flutter) */
+export type DotAdapterOutput = StyleObject | RNStyleObject | FlutterRecipe;
+
 /** Style map with base styles + optional state-variant styles */
 export interface DotStyleMap {
-  base: StyleObject | RNStyleObject;
-  hover?: StyleObject | RNStyleObject;
-  focus?: StyleObject | RNStyleObject;
-  active?: StyleObject | RNStyleObject;
-  'focus-visible'?: StyleObject | RNStyleObject;
-  'focus-within'?: StyleObject | RNStyleObject;
-  disabled?: StyleObject | RNStyleObject;
+  base: DotAdapterOutput;
+  hover?: DotAdapterOutput;
+  focus?: DotAdapterOutput;
+  active?: DotAdapterOutput;
+  'focus-visible'?: DotAdapterOutput;
+  'focus-within'?: DotAdapterOutput;
+  disabled?: DotAdapterOutput;
 }
 
 /** Resolver function signature — receives config for token lookups */

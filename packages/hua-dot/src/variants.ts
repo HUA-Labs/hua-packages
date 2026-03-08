@@ -51,9 +51,23 @@ export function _setDotFn(fn: (input: string, options?: DotOptions) => StyleObje
   dotFn = fn;
 }
 
+// Runtime config accessor injected alongside dotFn
+let getRuntimeFn: (() => string) | null = null;
+
+/** @internal Used by index.ts to inject the runtime accessor */
+export function _setGetRuntime(fn: () => string): void {
+  getRuntimeFn = fn;
+}
+
 function resolveDot(input: string): StyleObject {
   if (!dotFn) {
     throw new Error('[dotVariants] dot function not initialized. Import from @hua-labs/dot root.');
+  }
+  if (getRuntimeFn?.() === 'flutter') {
+    throw new Error(
+      '[dotVariants] Flutter target is not supported. FlutterRecipe uses nested objects ' +
+      'that are incompatible with dotVariants\' shallow merge. Use dot(input, { target: "flutter" }) directly.',
+    );
   }
   return dotFn(input) as StyleObject;
 }
