@@ -17,6 +17,7 @@ import {
   isViewportUnit,
   degToRad,
   parseShadowLayers,
+  splitShadowLayers,
 } from './shared';
 
 // ---------------------------------------------------------------------------
@@ -195,6 +196,82 @@ export function adaptFlutter(webStyle: StyleObject, options?: AdaptFlutterOption
     // ── Background color ──
     if (key === 'backgroundColor') {
       ensureDecoration().color = sv;
+      continue;
+    }
+
+    // ── Background gradient ──
+    if (key === 'backgroundImage' && sv.startsWith('linear-gradient(')) {
+      const inner = sv.slice('linear-gradient('.length, -1);
+      // Parenthesis-aware split to handle rgba(), color-mix() etc.
+      const parts = splitShadowLayers(inner);
+      if (parts.length >= 2) {
+        const directionMap: Record<string, [string, string]> = {
+          'to right':        ['centerLeft', 'centerRight'],
+          'to left':         ['centerRight', 'centerLeft'],
+          'to top':          ['bottomCenter', 'topCenter'],
+          'to bottom':       ['topCenter', 'bottomCenter'],
+          'to top right':    ['bottomLeft', 'topRight'],
+          'to top left':     ['bottomRight', 'topLeft'],
+          'to bottom right': ['topLeft', 'bottomRight'],
+          'to bottom left':  ['topRight', 'bottomLeft'],
+        };
+        const dirPart = parts[0];
+        const alignment = directionMap[dirPart];
+        if (alignment) {
+          const colorParts = parts.slice(1);
+          const colors: string[] = [];
+          const stops: (number | undefined)[] = [];
+          let hasAnyStop = false;
+
+          for (const cp of colorParts) {
+            const spaceIdx = cp.lastIndexOf(' ');
+            if (spaceIdx !== -1 && cp.slice(spaceIdx + 1).endsWith('%')) {
+              colors.push(cp.slice(0, spaceIdx));
+              stops.push(parseFloat(cp.slice(spaceIdx + 1)) / 100);
+              hasAnyStop = true;
+            } else {
+              colors.push(cp);
+              stops.push(undefined);
+            }
+          }
+
+          const gradient: import('./flutter-types').FlutterGradient = {
+            type: 'linear',
+            begin: alignment[0],
+            end: alignment[1],
+            colors,
+          };
+
+          // Include stops if any are specified (undefined entries mean "auto" position)
+          if (hasAnyStop) {
+            // Fill undefined stops: evenly distribute between known anchors
+            const filledStops: number[] = [];
+            for (let i = 0; i < stops.length; i++) {
+              if (stops[i] !== undefined) {
+                filledStops.push(stops[i]!);
+              } else if (i === 0) {
+                filledStops.push(0);
+              } else if (i === stops.length - 1) {
+                filledStops.push(1);
+              } else {
+                // Find prev and next known stops for interpolation
+                let prev = 0, prevIdx = 0;
+                for (let j = i - 1; j >= 0; j--) {
+                  if (filledStops[j] !== undefined) { prev = filledStops[j]; prevIdx = j; break; }
+                }
+                let next = 1, nextIdx = stops.length - 1;
+                for (let j = i + 1; j < stops.length; j++) {
+                  if (stops[j] !== undefined) { next = stops[j]!; nextIdx = j; break; }
+                }
+                filledStops.push(prev + (next - prev) * (i - prevIdx) / (nextIdx - prevIdx));
+              }
+            }
+            gradient.stops = filledStops;
+          }
+
+          ensureDecoration().gradient = gradient;
+        }
+      }
       continue;
     }
 

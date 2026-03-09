@@ -46,6 +46,7 @@ export const CAPABILITY_MATRIX: Record<string, Partial<Record<DotTarget, Capabil
   willChange:    { web: 'native', native: 'unsupported', flutter: 'unsupported' },
   wordBreak:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
   isolation:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  gradient:      { web: 'native', native: 'unsupported', flutter: 'recipe-only' },
 
   // Fine-grained families for props that don't match their parent family's support
   display:              { web: 'native', native: 'approximate', flutter: 'approximate' },  // only flex/none (RN), flex/inline-flex (Flutter)
@@ -171,6 +172,7 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   placeContent: 'placeAlignment', placeItems: 'placeAlignment', placeSelf: 'placeAlignment',
   backfaceVisibility: 'transform',
   overflowWrap: 'wordBreak', wordBreak: 'wordBreak',
+  backgroundImage: 'gradient',
 };
 
 /**

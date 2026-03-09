@@ -22,6 +22,7 @@ import { resolveObjectFit } from './resolvers/object-fit';
 import { resolveTable } from './resolvers/table';
 import { resolveList } from './resolvers/list';
 import { resolveScroll } from './resolvers/scroll';
+import { resolveGradientDirection, resolveGradientStop } from './resolvers/gradient';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -197,6 +198,12 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   'scroll-pr': resolveScroll,
   'scroll-pb': resolveScroll,
   'scroll-pl': resolveScroll,
+
+  // gradient
+  'bg-gradient-to': resolveGradientDirection,
+  from: resolveGradientStop,
+  via: resolveGradientStop,
+  to: resolveGradientStop,
 };
 
 /** Negate a CSS value: '16px' → '-16px', 'translateX(16px)' → 'translateX(-16px)' */

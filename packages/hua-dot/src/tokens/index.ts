@@ -83,3 +83,4 @@ export {
 export { TABLE_LAYOUT, CAPTION_SIDE } from './table';
 export { LIST_STYLE_TYPE, LIST_STYLE_POSITION } from './list';
 export { SCROLL_BEHAVIOR, SCROLL_SPACING_PROP_MAP } from './scroll';
+export { GRADIENT_DIRECTIONS } from './gradients';
