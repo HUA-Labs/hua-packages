@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { resolveShadow } from '../../resolvers/shadow';
 import { resolveConfig } from '../../config';
-import { dot } from '../../index';
+import { dot, dotExplain } from '../../index';
+import { parseBoxShadow, _resetNativeWarnings } from '../../adapters/native';
 
 const config = resolveConfig();
 
@@ -96,5 +97,63 @@ describe('shadow + ring composition', () => {
     const result = dot('shadow-lg shadow-sm');
     // Last shadow wins within shadow layer
     expect(result.boxShadow).toBe('0 1px 2px 0 rgb(0 0 0 / 0.05)');
+  });
+});
+
+describe('shadow native approximation warnings', () => {
+  beforeEach(() => _resetNativeWarnings());
+
+  it('warns about inset shadows when warnFn provided', () => {
+    const warnings: string[] = [];
+    const warnFn = (prop: string, reason: string) => warnings.push(`${prop}: ${reason}`);
+    parseBoxShadow('inset 0 2px 4px 0 rgb(0 0 0 / 0.05)', warnFn);
+    expect(warnings).toContain('boxShadow: inset shadows unsupported on RN');
+  });
+
+  it('warns about multi-layer shadows', () => {
+    const warnings: string[] = [];
+    const warnFn = (prop: string, reason: string) => warnings.push(`${prop}: ${reason}`);
+    parseBoxShadow('0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)', warnFn);
+    expect(warnings.some(w => w.includes('layers → 1'))).toBe(true);
+  });
+
+  it('warns about spread radius', () => {
+    const warnings: string[] = [];
+    const warnFn = (prop: string, reason: string) => warnings.push(`${prop}: ${reason}`);
+    parseBoxShadow('0 10px 15px -3px rgb(0 0 0 / 0.1)', warnFn);
+    expect(warnings.some(w => w.includes('spread'))).toBe(true);
+  });
+
+  it('no warnings for simple shadow without spread', () => {
+    const warnings: string[] = [];
+    const warnFn = (prop: string, reason: string) => warnings.push(`${prop}: ${reason}`);
+    parseBoxShadow('0 1px 2px 0 rgb(0 0 0 / 0.05)', warnFn);
+    expect(warnings).toEqual([]);
+  });
+});
+
+describe('dotExplain shadow details on native', () => {
+  it('reports multi-layer detail for shadow (default)', () => {
+    const result = dotExplain('shadow', { target: 'native' });
+    expect(result.report._approximated).toContain('boxShadow');
+    // Default shadow has 2 layers
+    expect(result.report._details?.boxShadow).toContain('2 layers → 1');
+  });
+
+  it('reports no details for shadow-sm (single layer, no spread)', () => {
+    const result = dotExplain('shadow-sm', { target: 'native' });
+    expect(result.report._approximated).toContain('boxShadow');
+    // shadow-sm: 0 1px 2px 0 — single layer, spread=0 → no details
+    expect(result.report._details?.boxShadow).toBeUndefined();
+  });
+
+  it('reports inset detail for shadow-inner', () => {
+    const result = dotExplain('shadow-inner', { target: 'native' });
+    expect(result.report._details?.boxShadow).toContain('inset dropped');
+  });
+
+  it('reports spread detail for shadow-lg', () => {
+    const result = dotExplain('shadow-lg', { target: 'native' });
+    expect(result.report._details?.boxShadow).toContain('spread ignored');
   });
 });

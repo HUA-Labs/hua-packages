@@ -31,6 +31,8 @@ export interface DotCapabilityReport {
   _approximated?: string[];
   /** Per-family capability levels for the target */
   _capabilities?: Record<string, CapabilityLevel>;
+  /** Per-property approximation details (e.g. boxShadow: ['inset dropped', 'spread ignored']) */
+  _details?: Record<string, string[]>;
 }
 
 /** Parsed representation of a single utility token */

@@ -221,19 +221,40 @@ export function parseTransformString(str: string): RNTransformEntry[] {
  *
  * Delegates parsing to shared parseShadowLayers, then converts to RN format.
  */
+/** Warnings emitted during shadow conversion for reporting */
+export interface ShadowWarnings {
+  droppedInset: boolean;
+  droppedLayers: number;
+  droppedSpread: boolean;
+}
+
 export function parseBoxShadow(
   str: string,
+  warnFn?: (prop: string, reason: string) => void,
 ): Record<string, string | number | { width: number; height: number }> {
   if (!str || str === 'none') return {};
 
   // Use shared parser
   const layers: ParsedShadowLayer[] = parseShadowLayers(str);
 
-  // Take first non-inset layer only (RN doesn't support inset or multi-layer shadows)
-  const first = layers.find((l) => !l.inset);
-  if (!first) return {};
+  const hasInset = layers.some((l) => l.inset);
+  const nonInset = layers.filter((l) => !l.inset);
+  const first = nonInset[0];
+  if (!first) {
+    // All layers were inset — nothing to render
+    if (warnFn && hasInset) warnFn('boxShadow', 'inset shadows unsupported on RN');
+    return {};
+  }
 
-  // elevation approximation for Android (blur-based)
+  // Dev warnings for approximation details
+  if (warnFn) {
+    if (hasInset) warnFn('boxShadow:inset', 'inset shadows dropped on RN');
+    if (nonInset.length > 1) warnFn('boxShadow:multi', `${nonInset.length} layers → 1 (RN single-layer)`);
+    if (first.spread !== 0) warnFn('boxShadow:spread', 'spread radius ignored on RN');
+  }
+
+  // Elevation approximation for Android (Material Design heuristic)
+  // blur contributes most (depth perception), offset adds subtle lift
   const elevation = Math.min(
     Math.round(first.blur * 0.5 + Math.abs(first.offsetY) * 0.5),
     24,
@@ -336,7 +357,7 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
 
     // Box shadow → RN shadow properties
     if (key === 'boxShadow') {
-      const shadow = parseBoxShadow(String(value));
+      const shadow = parseBoxShadow(String(value), warn ? warnOnce : undefined);
       for (const [sk, sv] of Object.entries(shadow)) {
         result[sk] = sv as RNStyleObject[string];
       }
