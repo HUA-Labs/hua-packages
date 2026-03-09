@@ -1,0 +1,63 @@
+{
+  "name": "@hua-labs/dot-aot",
+  "version": "0.1.0",
+  "description": "Build-time static extraction for @hua-labs/dot — Vite and Babel plugins",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.mjs",
+      "default": "./dist/vite.mjs"
+    },
+    "./babel": {
+      "types": "./dist/babel.d.ts",
+      "import": "./dist/babel.mjs",
+      "default": "./dist/babel.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hua-labs/dot": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/types": "^7.26.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^6.2.0",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "vite": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
