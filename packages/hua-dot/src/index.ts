@@ -1,4 +1,4 @@
-import type { StyleObject, RNStyleObject, DotUserConfig, DotConfig, DotOptions, DotTarget, DotStyleMap, DotState } from './types';
+import type { StyleObject, RNStyleObject, DotUserConfig, DotConfig, DotOptions, DotTarget, DotStyleMap, DotState, DotAdapterOutput } from './types';
 import type { FlutterRecipe } from './adapters/flutter-types';
 import { parse } from './parser';
 import { resolveToken } from './resolver';
@@ -159,6 +159,14 @@ let cache = new DotCache(currentConfig.cacheSize);
 /**
  * Convert a utility string into a CSSProperties-compatible style object.
  *
+ * Type narrowing: When `target` is a string literal ('native' | 'flutter'),
+ * the return type is narrowed accordingly. Without an explicit target,
+ * the return type is `StyleObject` (web).
+ *
+ * **Important:** If you change the global runtime via `createDotConfig({ runtime: 'native' })`,
+ * the TypeScript type will still be `StyleObject` — use `@hua-labs/dot/native`
+ * entry point instead for type-safe native usage.
+ *
  * @example
  * dot('p-4 flex items-center bg-primary-500')
  * // → { padding: '16px', display: 'flex', alignItems: 'center', backgroundColor: '#3b82f6' }
@@ -169,6 +177,11 @@ let cache = new DotCache(currentConfig.cacheSize);
  * dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
  * // → { padding: '48px' }  (mobile-first cascade: base → md → lg)
  */
+export function dot(input: string | undefined | null, options: DotOptions & { target: 'web' }): StyleObject;
+export function dot(input: string | undefined | null, options: DotOptions & { target: 'native' }): RNStyleObject;
+export function dot(input: string | undefined | null, options: DotOptions & { target: 'flutter' }): FlutterRecipe;
+export function dot(input: string | undefined | null, options: DotOptions & { target: DotTarget }): DotAdapterOutput;
+export function dot(input: string | undefined | null, options?: DotOptions): StyleObject;
 export function dot(input: string | undefined | null, options?: DotOptions): StyleObject | RNStyleObject | FlutterRecipe {
   if (!input || !input.trim()) return {};
 
@@ -414,6 +427,8 @@ export function clearDotCache(): void {
  * Unlike dot(), this function resolves hover:/focus:/active: variants
  * into separate style objects for the consumer to apply via event handlers.
  *
+ * See `dot()` JSDoc for type narrowing behavior and global runtime caveat.
+ *
  * @example
  * dotMap('p-4 bg-white hover:bg-gray-100 focus:ring-2')
  * // → {
@@ -426,6 +441,11 @@ export function clearDotCache(): void {
  * const styles = dotMap('bg-white hover:bg-gray-100');
  * <div style={styles.base} onMouseEnter={...} />
  */
+export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'web' }): DotStyleMap<StyleObject>;
+export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'native' }): DotStyleMap<RNStyleObject>;
+export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'flutter' }): DotStyleMap<FlutterRecipe>;
+export function dotMap(input: string | undefined | null, options: DotOptions & { target: DotTarget }): DotStyleMap;
+export function dotMap(input: string | undefined | null, options?: DotOptions): DotStyleMap<StyleObject>;
 export function dotMap(input: string | undefined | null, options?: DotOptions): DotStyleMap {
   if (!input || !input.trim()) return { base: {} };
 

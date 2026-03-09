@@ -17,7 +17,7 @@ export function dot(input: string, options?: Omit<DotOptions, 'target'>): RNStyl
 }
 
 /** dotMap() pre-bound to native target */
-export function dotMap(input: string, options?: Omit<DotOptions, 'target'>): DotStyleMap {
+export function dotMap(input: string, options?: Omit<DotOptions, 'target'>): DotStyleMap<RNStyleObject> {
   return dotMapCore(input, { ...options, target: 'native' });
 }
 
