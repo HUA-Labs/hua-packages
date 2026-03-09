@@ -13,6 +13,17 @@ const ACCUMULATE_KEYS = new Set(['transform', 'filter', 'backdropFilter']);
 /** Internal layer keys that get merged into boxShadow */
 const SHADOW_LAYER_KEYS = new Set(['__dot_shadowLayer', '__dot_ringLayer']);
 
+/** Internal gradient keys that get merged into backgroundImage */
+const GRADIENT_KEYS = new Set([
+  '__dot_gradientDirection',
+  '__dot_gradientFrom', '__dot_gradientFromPos',
+  '__dot_gradientVia', '__dot_gradientViaPos',
+  '__dot_gradientTo', '__dot_gradientToPos',
+]);
+
+/** All internal keys (shadow + gradient) */
+const INTERNAL_KEYS = new Set([...SHADOW_LAYER_KEYS, ...GRADIENT_KEYS]);
+
 /** Merge resolved styles, accumulating transform/filter/backdropFilter instead of overwriting */
 function mergeStyle(target: StyleObject, source: StyleObject): void {
   for (const key of Object.keys(source)) {
@@ -33,38 +44,71 @@ function stripImportant(val: string | number): [string, boolean] {
   return [val, false];
 }
 
-/** Finalize style: merge shadow layers into boxShadow, remove internal keys */
+/** Finalize style: merge shadow layers into boxShadow, gradient into backgroundImage, remove internal keys */
 function finalizeStyle(style: StyleObject): StyleObject {
   const ringLayer = style.__dot_ringLayer;
   const shadowLayer = style.__dot_shadowLayer;
+  const hasGradient = style.__dot_gradientDirection !== undefined || style.__dot_gradientFrom !== undefined;
 
-  // Fast path: no shadow layers
-  if (ringLayer === undefined && shadowLayer === undefined) return style;
+  // Fast path: no internal keys
+  if (ringLayer === undefined && shadowLayer === undefined && !hasGradient) return style;
 
   const result: StyleObject = {};
   for (const [key, value] of Object.entries(style)) {
-    if (!SHADOW_LAYER_KEYS.has(key)) {
+    if (!INTERNAL_KEYS.has(key)) {
       result[key] = value;
     }
   }
 
-  // Compose: ring before shadow (Tailwind convention)
-  // Strip !important from individual layers, apply once at the end if any layer had it
-  const layers: string[] = [];
-  let anyImportant = false;
+  // Shadow composition: ring before shadow (Tailwind convention)
+  if (ringLayer !== undefined || shadowLayer !== undefined) {
+    const layers: string[] = [];
+    let anyImportant = false;
 
-  if (ringLayer !== undefined) {
-    const [clean, imp] = stripImportant(ringLayer);
-    layers.push(clean);
-    if (imp) anyImportant = true;
-  }
-  if (shadowLayer !== undefined) {
-    const [clean, imp] = stripImportant(shadowLayer);
-    layers.push(clean);
-    if (imp) anyImportant = true;
+    if (ringLayer !== undefined) {
+      const [clean, imp] = stripImportant(ringLayer);
+      layers.push(clean);
+      if (imp) anyImportant = true;
+    }
+    if (shadowLayer !== undefined) {
+      const [clean, imp] = stripImportant(shadowLayer);
+      layers.push(clean);
+      if (imp) anyImportant = true;
+    }
+
+    result.boxShadow = layers.join(', ') + (anyImportant ? ' !important' : '');
   }
 
-  result.boxShadow = layers.join(', ') + (anyImportant ? ' !important' : '');
+  // Gradient composition: direction + from/via/to color stops → backgroundImage
+  if (hasGradient) {
+    const direction = String(style.__dot_gradientDirection ?? 'to bottom');
+    const stops: string[] = [];
+    let anyImportant = false;
+
+    if (style.__dot_gradientFrom !== undefined) {
+      const [color, imp] = stripImportant(style.__dot_gradientFrom);
+      if (imp) anyImportant = true;
+      const pos = style.__dot_gradientFromPos;
+      stops.push(pos ? `${color} ${pos}` : color);
+    }
+    if (style.__dot_gradientVia !== undefined) {
+      const [color, imp] = stripImportant(style.__dot_gradientVia);
+      if (imp) anyImportant = true;
+      const pos = style.__dot_gradientViaPos;
+      stops.push(pos ? `${color} ${pos}` : color);
+    }
+    if (style.__dot_gradientTo !== undefined) {
+      const [color, imp] = stripImportant(style.__dot_gradientTo);
+      if (imp) anyImportant = true;
+      const pos = style.__dot_gradientToPos;
+      stops.push(pos ? `${color} ${pos}` : color);
+    }
+
+    if (stops.length > 0) {
+      result.backgroundImage = `linear-gradient(${direction}, ${stops.join(', ')})` +
+        (anyImportant ? ' !important' : '');
+    }
+  }
 
   return result;
 }

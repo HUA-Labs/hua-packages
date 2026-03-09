@@ -39,9 +39,19 @@ export interface FlutterBorderRadius {
   bottomRight?: number;
 }
 
+/** LinearGradient — maps to Flutter LinearGradient() */
+export interface FlutterGradient {
+  type: 'linear';
+  begin: string;
+  end: string;
+  colors: string[];
+  stops?: number[];
+}
+
 /** BoxDecoration — maps to Flutter BoxDecoration() */
 export interface FlutterDecoration {
   color?: string;
+  gradient?: FlutterGradient;
   borderRadius?: FlutterBorderRadius;
   border?: FlutterBorderSide;
   boxShadow?: FlutterBoxShadow[];

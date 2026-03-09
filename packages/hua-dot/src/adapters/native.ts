@@ -77,6 +77,7 @@ const SKIP_PROPS = new Set([
   'objectPosition',
   'overflowWrap',
   'wordBreak',
+  'backgroundImage',
 ]);
 
 /** Properties whose px/number values should be converted to plain numbers */

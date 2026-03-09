@@ -95,6 +95,8 @@ const STANDALONE_TOKENS = new Set<string>([
  * Sorted longest-first for correct matching.
  */
 const MULTI_SEGMENT_PREFIXES = [
+  // gradient (longest first — must be before backdrop)
+  'bg-gradient-to',
   // backdrop (longest first)
   'backdrop-brightness',
   'backdrop-contrast',
