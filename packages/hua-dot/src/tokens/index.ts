@@ -7,6 +7,9 @@ export {
   LINE_HEIGHTS,
   LETTER_SPACINGS,
   TEXT_ALIGNS,
+  TEXT_DECORATION_STYLE,
+  TEXT_DECORATION_THICKNESS,
+  UNDERLINE_OFFSET,
 } from './typography';
 export {
   DISPLAY,
@@ -17,6 +20,9 @@ export {
   INSET_KEYWORDS,
   INSET_PROP_MAP,
   ASPECT_RATIO,
+  FLOAT,
+  CLEAR,
+  ISOLATION,
 } from './layout';
 export {
   GRID_COLS,
@@ -46,7 +52,12 @@ export {
   FLEX_GROW,
   FLEX_SHRINK,
   ORDER_VALUES,
+  FLEX_BASIS,
+  PLACE_CONTENT,
+  PLACE_ITEMS,
+  PLACE_SELF,
 } from './flexbox';
+export { OBJECT_FIT, OBJECT_POSITION } from './object-fit';
 export { Z_INDEX } from './z-index';
 export { SHADOWS } from './shadows';
 export { OPACITY } from './opacity';
@@ -54,7 +65,7 @@ export { ROTATE, SCALE, SKEW, TRANSFORM_ORIGIN } from './transforms';
 export { TRANSITION_PROPERTY, DURATION, TIMING } from './transitions';
 export { ANIMATION } from './animations';
 export { BREAKPOINT_ORDER, BREAKPOINT_SET } from './breakpoints';
-export { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE } from './interactivity';
+export { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE, WORD_BREAK, TOUCH_ACTION, WILL_CHANGE } from './interactivity';
 export { RING_WIDTHS, RING_OFFSETS, RING_DEFAULT_COLOR, buildRingShadow } from './rings';
 export { BACKDROP_BLUR, BACKDROP_BRIGHTNESS, BACKDROP_CONTRAST, BACKDROP_SATURATE } from './backdrop';
 export {
@@ -69,3 +80,6 @@ export {
   DROP_SHADOW,
   MIX_BLEND,
 } from './filter';
+export { TABLE_LAYOUT, CAPTION_SIDE } from './table';
+export { LIST_STYLE_TYPE, LIST_STYLE_POSITION } from './list';
+export { SCROLL_BEHAVIOR, SCROLL_SPACING_PROP_MAP } from './scroll';

@@ -67,3 +67,33 @@ export const TEXT_ALIGNS: Record<string, string> = {
   'right': 'right',
   'justify': 'justify',
 } as const;
+
+/** Text decoration style values (prefix: decoration) */
+export const TEXT_DECORATION_STYLE: Record<string, string> = {
+  'solid': 'solid',
+  'double': 'double',
+  'dotted': 'dotted',
+  'dashed': 'dashed',
+  'wavy': 'wavy',
+} as const;
+
+/** Text decoration thickness values (prefix: decoration) */
+export const TEXT_DECORATION_THICKNESS: Record<string, string> = {
+  '0': '0px',
+  '1': '1px',
+  '2': '2px',
+  '4': '4px',
+  '8': '8px',
+  'auto': 'auto',
+  'from-font': 'from-font',
+} as const;
+
+/** Underline offset values (prefix: underline-offset) */
+export const UNDERLINE_OFFSET: Record<string, string> = {
+  '0': '0px',
+  '1': '1px',
+  '2': '2px',
+  '4': '4px',
+  '8': '8px',
+  'auto': 'auto',
+} as const;

@@ -11,91 +11,48 @@ import type {
   FlutterTransform,
   FlutterBoxShadow,
 } from './flutter-types';
+import {
+  toAbsoluteNumber,
+  isFullPercent,
+  isViewportUnit,
+  degToRad,
+  parseShadowLayers,
+} from './shared';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Units that represent relative/viewport values — cannot be converted to a static pixel number */
-const RELATIVE_UNIT_RE = /(%|vh|vw|vmin|vmax|svh|dvh|lvh|svw|dvw|lvw)$/;
+/** Alias for shared toAbsoluteNumber — used throughout this adapter */
+const toNumber = toAbsoluteNumber;
 
-/** Parse a CSS value to a number (strip px, rem, em). Returns undefined if not numeric or relative. */
-function toNumber(value: string | number, remBase = 16): number | undefined {
-  if (typeof value === 'number') return value;
-  const s = String(value).trim();
-  // Reject relative/viewport units — they can't map to static Flutter pixels
-  if (RELATIVE_UNIT_RE.test(s)) return undefined;
-  if (s.endsWith('px')) return parseFloat(s);
-  if (s.endsWith('rem') || s.endsWith('em')) return parseFloat(s) * remBase;
-  const num = parseFloat(s);
-  return isNaN(num) ? undefined : num;
-}
-
-/** Check if a CSS value is a percentage fill value (e.g. 100%) */
-function isFullPercent(value: string | number): boolean {
-  if (typeof value === 'number') return false;
-  const s = String(value).trim();
-  return s === '100%';
-}
-
-/** Check if a CSS value is a viewport unit (e.g. 100vh, 100vw) */
-function isViewportUnit(value: string | number): boolean {
-  if (typeof value === 'number') return false;
-  return /^\d+(\.\d+)?(vh|vw|vmin|vmax|svh|dvh|lvh|svw|dvw|lvw)$/.test(String(value).trim());
-}
-
-/** Parse deg to radians */
-function degToRad(value: string): number {
-  const deg = parseFloat(value);
-  return (deg * Math.PI) / 180;
-}
-
-/** Parse a CSS box-shadow string into FlutterBoxShadow entries */
+/** Parse a CSS box-shadow string into FlutterBoxShadow entries using shared parser */
 function parseBoxShadowForFlutter(str: string): FlutterBoxShadow[] {
-  if (!str || str === 'none') return [];
-
+  const layers = parseShadowLayers(str);
   const results: FlutterBoxShadow[] = [];
 
-  // Split on comma respecting parentheses
-  const layers: string[] = [];
-  let depth = 0;
-  let start = 0;
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '(') depth++;
-    else if (str[i] === ')') depth--;
-    else if (str[i] === ',' && depth === 0) {
-      layers.push(str.slice(start, i).trim());
-      start = i + 1;
-    }
-  }
-  layers.push(str.slice(start).trim());
-
   for (const layer of layers) {
-    const trimmed = layer.replace(/ !important$/, '').trim();
-    if (trimmed.startsWith('inset') || !trimmed) continue;
+    if (layer.inset) continue; // Flutter doesn't support inset shadows
 
-    // Extract color (rgb/rgba/hex at end)
-    let color = '#000000';
-    let rest = trimmed;
-
-    const rgbMatch = rest.match(/rgba?\([^)]+\)\s*$/);
-    if (rgbMatch) {
-      color = rgbMatch[0].trim();
-      rest = rest.slice(0, rgbMatch.index).trim();
+    // Flutter keeps the original color string (rgb/hex) for its own rendering
+    // Reconstruct the color string from parsed hex + opacity
+    let colorStr: string;
+    if (layer.opacity < 1) {
+      // Convert hex back to rgba for Flutter
+      const hex = layer.color;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      colorStr = `rgba(${r}, ${g}, ${b}, ${layer.opacity})`;
     } else {
-      const hexMatch = rest.match(/#[0-9a-fA-F]{3,8}\s*$/);
-      if (hexMatch) {
-        color = hexMatch[0].trim();
-        rest = rest.slice(0, hexMatch.index).trim();
-      }
+      colorStr = layer.color;
     }
 
-    const parts = rest.split(/\s+/).map((p) => parseFloat(p));
     results.push({
-      color,
-      offset: { dx: parts[0] || 0, dy: parts[1] || 0 },
-      blurRadius: parts[2] || 0,
-      spreadRadius: parts[3] || 0,
+      color: colorStr,
+      offset: { dx: layer.offsetX, dy: layer.offsetY },
+      blurRadius: layer.blur,
+      spreadRadius: layer.spread,
     });
   }
 
@@ -188,7 +145,9 @@ export function adaptFlutter(webStyle: StyleObject, options?: AdaptFlutterOption
   const ensureTextStyle = (): FlutterTextStyle => recipe.textStyle ??= {};
   const ensureTransform = (): FlutterTransform => recipe.transform ??= {};
 
-  for (const [key, value] of Object.entries(webStyle)) {
+  for (const [key, rawValue] of Object.entries(webStyle)) {
+    // Strip !important — not meaningful in Flutter recipes
+    const value = typeof rawValue === 'string' ? rawValue.replace(/\s*!important\s*$/, '') : rawValue;
     const sv = String(value);
 
     // Skip unsupported

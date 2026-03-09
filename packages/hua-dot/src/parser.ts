@@ -17,6 +17,17 @@ import {
   POINTER_EVENTS,
   APPEARANCE,
   WHITESPACE,
+  WORD_BREAK,
+  TOUCH_ACTION,
+  WILL_CHANGE,
+  FLOAT,
+  CLEAR,
+  ISOLATION,
+  OBJECT_FIT,
+  OBJECT_POSITION,
+  PLACE_CONTENT,
+  PLACE_ITEMS,
+  PLACE_SELF,
 } from './tokens';
 
 /**
@@ -63,6 +74,20 @@ const STANDALONE_TOKENS = new Set<string>([
   ...Object.keys(POINTER_EVENTS),
   ...Object.keys(APPEARANCE),
   ...Object.keys(WHITESPACE),
+  ...Object.keys(WORD_BREAK),
+  ...Object.keys(TOUCH_ACTION),
+  ...Object.keys(WILL_CHANGE),
+  // layout: float / clear / isolation
+  ...Object.keys(FLOAT),
+  ...Object.keys(CLEAR),
+  ...Object.keys(ISOLATION),
+  // object-fit / object-position
+  ...Object.keys(OBJECT_FIT),
+  ...Object.keys(OBJECT_POSITION),
+  // place utilities
+  ...Object.keys(PLACE_CONTENT),
+  ...Object.keys(PLACE_ITEMS),
+  ...Object.keys(PLACE_SELF),
 ]);
 
 /**
@@ -119,6 +144,23 @@ const MULTI_SEGMENT_PREFIXES = [
   'hue-rotate',
   'drop-shadow',
   'mix-blend',
+  // typography extended
+  'underline-offset',
+  // scroll margin/padding (longer variants first to avoid prefix shadowing)
+  'scroll-mx',
+  'scroll-my',
+  'scroll-mt',
+  'scroll-mr',
+  'scroll-mb',
+  'scroll-ml',
+  'scroll-px',
+  'scroll-py',
+  'scroll-pt',
+  'scroll-pr',
+  'scroll-pb',
+  'scroll-pl',
+  'scroll-m',
+  'scroll-p',
   // Phase 3a: grid (longest first)
   'grid-cols',
   'grid-rows',

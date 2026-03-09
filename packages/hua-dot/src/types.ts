@@ -1,5 +1,11 @@
 import type { FlutterRecipe } from './adapters/flutter-types';
 
+// Re-export RN types from their dedicated file (external API preserved)
+export type { RNTransformEntry, RNShadowOffset, RNStyleValue, RNStyleObject } from './adapters/native-types';
+export type { AdaptNativeOptions } from './adapters/native-types';
+// Import for local use in this file
+import type { RNStyleObject } from './adapters/native-types';
+
 /** Target platform for style output */
 export type DotTarget = 'web' | 'native' | 'flutter';
 
@@ -26,21 +32,6 @@ export interface DotCapabilityReport {
   /** Per-family capability levels for the target */
   _capabilities?: Record<string, CapabilityLevel>;
 }
-
-/** Single RN transform entry, e.g. { translateX: 16 } or { rotate: '45deg' } */
-export type RNTransformEntry = Record<string, string | number>;
-
-/** RN shadowOffset shape */
-export interface RNShadowOffset {
-  width: number;
-  height: number;
-}
-
-/** Possible value types in an RN StyleSheet object */
-export type RNStyleValue = string | number | RNTransformEntry[] | RNShadowOffset;
-
-/** React Native StyleSheet-compatible style object */
-export type RNStyleObject = Record<string, RNStyleValue>;
 
 /** Parsed representation of a single utility token */
 export interface DotToken {

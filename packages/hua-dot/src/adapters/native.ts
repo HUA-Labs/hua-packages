@@ -1,4 +1,10 @@
-import type { StyleObject, RNStyleObject, RNTransformEntry } from '../types';
+import type { StyleObject } from '../types';
+import type { RNStyleObject, RNTransformEntry, AdaptNativeOptions } from './native-types';
+import { toNumericValue, parseShadowLayers } from './shared';
+import type { ParsedShadowLayer } from './shared';
+
+// Re-export types for consumers importing from this module
+export type { AdaptNativeOptions } from './native-types';
 
 // ---------------------------------------------------------------------------
 // Property classification sets
@@ -41,6 +47,36 @@ const SKIP_PROPS = new Set([
   'visibility',
   'filter',
   'mixBlendMode',
+  // Wave 2: web-only properties
+  'float',
+  'clear',
+  'isolation',
+  'tableLayout',
+  'borderCollapse',
+  'borderSpacing',
+  'captionSide',
+  'listStyleType',
+  'listStylePosition',
+  'scrollBehavior',
+  'scrollMarginTop',
+  'scrollMarginRight',
+  'scrollMarginBottom',
+  'scrollMarginLeft',
+  'scrollPaddingTop',
+  'scrollPaddingRight',
+  'scrollPaddingBottom',
+  'scrollPaddingLeft',
+  'willChange',
+  'touchAction',
+  'textIndent',
+  'textDecorationThickness',
+  'textUnderlineOffset',
+  'placeContent',
+  'placeItems',
+  'placeSelf',
+  'objectPosition',
+  'overflowWrap',
+  'wordBreak',
 ]);
 
 /** Properties whose px/number values should be converted to plain numbers */
@@ -85,6 +121,7 @@ const NUMERIC_PROPS = new Set([
   'fontSize',
   'letterSpacing',
   'lineHeight',
+  'flexBasis',
 ]);
 
 /** Properties that should be parseFloat'd */
@@ -123,6 +160,8 @@ const PASSTHROUGH_PROPS = new Set([
   'overflowY',
   'pointerEvents',
   'textTransform',
+  'backfaceVisibility',
+  'textAlignVertical',
 ]);
 
 // ---------------------------------------------------------------------------
@@ -131,45 +170,9 @@ const PASSTHROUGH_PROPS = new Set([
 
 /**
  * Convert a CSS value string to a numeric value for RN.
- * - `'16px'` → `16`
- * - `'1.5rem'` → `24` (rem × 16)
- * - `'2em'` → `32` (em × 16)
- * - `'50%'` → `'50%'` (preserved)
- * - `'auto'` → `'auto'` (preserved)
- * - `'100vh'` / `'100vw'` → `undefined` (skip)
+ * Delegates to shared toNumericValue — kept as re-export for API compatibility.
  */
-export function toNumeric(value: string | number, remBase = 16): string | number | undefined {
-  if (typeof value === 'number') return value;
-  const trimmed = value.trim();
-
-  // Viewport units — can't convert without Dimensions API
-  if (trimmed.endsWith('vh') || trimmed.endsWith('vw') || trimmed.endsWith('dvh') || trimmed.endsWith('dvw')) {
-    return undefined;
-  }
-
-  // Percentage — keep as string
-  if (trimmed.endsWith('%')) return trimmed;
-
-  // Keywords — keep as string
-  if (trimmed === 'auto' || trimmed === 'none') return trimmed;
-
-  // px — strip suffix
-  if (trimmed.endsWith('px')) {
-    return parseFloat(trimmed);
-  }
-
-  // rem/em — multiply by remBase (default 16)
-  if (trimmed.endsWith('rem') || trimmed.endsWith('em')) {
-    return parseFloat(trimmed) * remBase;
-  }
-
-  // Pure number string
-  const num = parseFloat(trimmed);
-  if (!isNaN(num) && String(num) === trimmed) return num;
-
-  // Fallback — keep as is (e.g., color strings shouldn't be here, but safety)
-  return trimmed;
-}
+export const toNumeric = toNumericValue;
 
 /**
  * Parse a CSS transform string into an RN transform array.
@@ -215,107 +218,38 @@ export function parseTransformString(str: string): RNTransformEntry[] {
  * Parse a CSS box-shadow string into RN shadow properties.
  * Uses only the first layer (RN doesn't support multi-layer shadows).
  *
- * Returns properties: shadowColor, shadowOffset, shadowOpacity, shadowRadius, elevation
+ * Delegates parsing to shared parseShadowLayers, then converts to RN format.
  */
 export function parseBoxShadow(
   str: string,
 ): Record<string, string | number | { width: number; height: number }> {
   if (!str || str === 'none') return {};
 
-  // Skip inset shadows (RN unsupported)
-  if (str.trim().startsWith('inset')) return {};
+  // Use shared parser
+  const layers: ParsedShadowLayer[] = parseShadowLayers(str);
 
-  // Take first layer only (split on comma that's outside parentheses)
-  const firstLayer = splitShadowLayers(str)[0];
-  if (!firstLayer) return {};
-
-  // Skip if first layer is inset
-  if (firstLayer.trim().startsWith('inset')) return {};
-
-  // Extract color — look for rgb(...) or hex at end
-  let color = '#000000';
-  let opacity = 1;
-  let rest = firstLayer.trim();
-
-  // Match rgb(r g b / a) or rgba(r, g, b, a) at end
-  const rgbMatch = rest.match(/rgba?\([^)]+\)\s*$/);
-  if (rgbMatch) {
-    const colorStr = rgbMatch[0].trim();
-    rest = rest.slice(0, rgbMatch.index).trim();
-    const parsed = parseRgbColor(colorStr);
-    color = parsed.hex;
-    opacity = parsed.opacity;
-  } else {
-    // Match hex at end
-    const hexMatch = rest.match(/#[0-9a-fA-F]{3,8}\s*$/);
-    if (hexMatch) {
-      color = hexMatch[0].trim();
-      rest = rest.slice(0, hexMatch.index).trim();
-    }
-  }
-
-  // Remaining should be: offsetX offsetY blur? spread?
-  const parts = rest.split(/\s+/).map((p) => parseFloat(p));
-  const offsetX = parts[0] || 0;
-  const offsetY = parts[1] || 0;
-  const blur = parts[2] || 0;
-  // spread is parts[3] — RN ignores it
+  // Take first non-inset layer only (RN doesn't support inset or multi-layer shadows)
+  const first = layers.find((l) => !l.inset);
+  if (!first) return {};
 
   // elevation approximation for Android (blur-based)
-  const elevation = Math.min(Math.round(blur * 0.5 + Math.abs(offsetY) * 0.5), 24);
+  const elevation = Math.min(
+    Math.round(first.blur * 0.5 + Math.abs(first.offsetY) * 0.5),
+    24,
+  );
 
   return {
-    shadowColor: color,
-    shadowOffset: { width: offsetX, height: offsetY },
-    shadowOpacity: opacity,
-    shadowRadius: blur / 2,
+    shadowColor: first.color,
+    shadowOffset: { width: first.offsetX, height: first.offsetY },
+    shadowOpacity: first.opacity,
+    shadowRadius: first.blur / 2,
     elevation,
   };
-}
-
-/** Split shadow layers respecting parentheses (commas inside rgb() are not separators) */
-function splitShadowLayers(str: string): string[] {
-  const layers: string[] = [];
-  let depth = 0;
-  let start = 0;
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === '(') depth++;
-    else if (str[i] === ')') depth--;
-    else if (str[i] === ',' && depth === 0) {
-      layers.push(str.slice(start, i).trim());
-      start = i + 1;
-    }
-  }
-  layers.push(str.slice(start).trim());
-  return layers;
-}
-
-/** Parse rgb/rgba color string → { hex, opacity } */
-function parseRgbColor(str: string): { hex: string; opacity: number } {
-  // Modern: rgb(0 0 0 / 0.1) or rgb(0, 0, 0, 0.1)
-  const match = str.match(
-    /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)\s*(?:[,/]\s*([\d.]+))?\s*\)/,
-  );
-  if (match) {
-    const r = parseInt(match[1], 10);
-    const g = parseInt(match[2], 10);
-    const b = parseInt(match[3], 10);
-    const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
-    const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-    return { hex, opacity: a };
-  }
-  return { hex: '#000000', opacity: 1 };
 }
 
 // ---------------------------------------------------------------------------
 // Dev warnings for dropped properties
 // ---------------------------------------------------------------------------
-
-export interface AdaptNativeOptions {
-  remBase?: number;
-  /** When true, emit console.warn for dropped CSS properties (once per property per session) */
-  warnDropped?: boolean;
-}
 
 /** Set of property names already warned about (session-scoped dedup) */
 const _warnedProps = new Set<string>();
@@ -347,10 +281,27 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
   const warn = options?.warnDropped === true;
   const result: RNStyleObject = {};
 
-  for (const [key, value] of Object.entries(webStyle)) {
+  for (const [key, rawValue] of Object.entries(webStyle)) {
+    // Strip !important — not meaningful in RN
+    const value = typeof rawValue === 'string' ? rawValue.replace(/\s*!important\s*$/, '') : rawValue;
+
     // Skip unsupported
     if (SKIP_PROPS.has(key)) {
       if (warn) warnOnce(key);
+      continue;
+    }
+
+    // objectFit → RN resizeMode
+    if (key === 'objectFit') {
+      const resizeModeMap: Record<string, string> = {
+        contain: 'contain',
+        cover: 'cover',
+        fill: 'stretch',
+        none: 'center',
+        'scale-down': 'contain',
+      };
+      const mapped = resizeModeMap[String(value)];
+      if (mapped) result['resizeMode'] = mapped;
       continue;
     }
 

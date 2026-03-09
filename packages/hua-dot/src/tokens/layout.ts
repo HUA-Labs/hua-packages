@@ -109,3 +109,28 @@ export const SIZE_PROP_MAP: Record<string, string> = {
   'max-w': 'maxWidth',
   'max-h': 'maxHeight',
 } as const;
+
+/** Float values — standalone tokens */
+export const FLOAT: Record<string, string> = {
+  'float-left': 'left',
+  'float-right': 'right',
+  'float-none': 'none',
+  'float-start': 'inline-start',
+  'float-end': 'inline-end',
+} as const;
+
+/** Clear values — standalone tokens */
+export const CLEAR: Record<string, string> = {
+  'clear-left': 'left',
+  'clear-right': 'right',
+  'clear-both': 'both',
+  'clear-none': 'none',
+  'clear-start': 'inline-start',
+  'clear-end': 'inline-end',
+} as const;
+
+/** Isolation values — standalone tokens */
+export const ISOLATION: Record<string, string> = {
+  'isolate': 'isolate',
+  'isolation-auto': 'auto',
+} as const;

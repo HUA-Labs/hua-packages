@@ -1,5 +1,5 @@
 import type { StyleObject } from '../types';
-import { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE } from '../tokens/interactivity';
+import { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE, TOUCH_ACTION, WILL_CHANGE } from '../tokens/interactivity';
 
 /**
  * Resolve standalone interactivity tokens.
@@ -12,5 +12,12 @@ export function resolveInteractivity(value: string): StyleObject {
   if (POINTER_EVENTS[value]) return { pointerEvents: POINTER_EVENTS[value] };
   if (APPEARANCE[value]) return { appearance: APPEARANCE[value] };
   if (WHITESPACE[value]) return { whiteSpace: WHITESPACE[value] };
+  // Word break — Tailwind-compatible mapping
+  if (value === 'break-normal') return { overflowWrap: 'normal', wordBreak: 'normal' };
+  if (value === 'break-words') return { overflowWrap: 'break-word' };
+  if (value === 'break-all') return { wordBreak: 'break-all' };
+  if (value === 'break-keep') return { wordBreak: 'keep-all' };
+  if (TOUCH_ACTION[value]) return { touchAction: TOUCH_ACTION[value] };
+  if (WILL_CHANGE[value]) return { willChange: WILL_CHANGE[value] };
   return {};
 }
