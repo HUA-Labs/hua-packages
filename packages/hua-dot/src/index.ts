@@ -6,6 +6,7 @@ import { DotCache } from './cache';
 import { resolveConfig } from './config';
 import { adaptNative } from './adapters/native';
 import { adaptFlutter } from './adapters/flutter';
+import { parseShadowLayers } from './adapters/shared';
 
 /** Keys whose values accumulate (space-separated) instead of last-wins */
 const ACCUMULATE_KEYS = new Set(['transform', 'filter', 'backdropFilter']);
@@ -357,10 +358,26 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
     }
   }
 
+  // Collect approximation details for shadow on native
+  const details: Record<string, string[]> = {};
+  if (target === 'native' && webStyles.boxShadow && typeof webStyles.boxShadow === 'string') {
+    const shadowStr = webStyles.boxShadow as string;
+    if (shadowStr !== 'none') {
+      const layers = parseShadowLayers(shadowStr);
+      const reasons: string[] = [];
+      if (layers.some((l) => l.inset)) reasons.push('inset dropped');
+      const nonInset = layers.filter((l) => !l.inset);
+      if (nonInset.length > 1) reasons.push(`${nonInset.length} layers → 1`);
+      if (nonInset.some((l) => l.spread !== 0)) reasons.push('spread ignored');
+      if (reasons.length > 0) details.boxShadow = reasons;
+    }
+  }
+
   const report: DotCapabilityReport = {};
   if (dropped.length > 0) report._dropped = dropped;
   if (approximated.length > 0) report._approximated = approximated;
   if (Object.keys(capabilities).length > 0) report._capabilities = capabilities;
+  if (Object.keys(details).length > 0) report._details = details;
 
   return { styles, report };
 }
