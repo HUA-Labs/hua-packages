@@ -61,14 +61,14 @@ export type DotState = 'hover' | 'focus' | 'active' | 'focus-visible' | 'focus-w
 export type DotAdapterOutput = StyleObject | RNStyleObject | FlutterRecipe;
 
 /** Style map with base styles + optional state-variant styles */
-export interface DotStyleMap {
-  base: DotAdapterOutput;
-  hover?: DotAdapterOutput;
-  focus?: DotAdapterOutput;
-  active?: DotAdapterOutput;
-  'focus-visible'?: DotAdapterOutput;
-  'focus-within'?: DotAdapterOutput;
-  disabled?: DotAdapterOutput;
+export interface DotStyleMap<T extends DotAdapterOutput = DotAdapterOutput> {
+  base: T;
+  hover?: T;
+  focus?: T;
+  active?: T;
+  'focus-visible'?: T;
+  'focus-within'?: T;
+  disabled?: T;
 }
 
 /** Resolver function signature — receives config for token lookups */
