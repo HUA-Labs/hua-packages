@@ -1,5 +1,5 @@
 import type { StyleObject, DotConfig } from '../types';
-import { TEXT_ALIGNS } from '../tokens/typography';
+import { TEXT_ALIGNS, TEXT_DECORATION_STYLE, TEXT_DECORATION_THICKNESS, UNDERLINE_OFFSET } from '../tokens/typography';
 import { resolveColor } from './color';
 
 /**
@@ -49,6 +49,30 @@ export function resolveTypography(prefix: string, value: string, config: DotConf
     case 'tracking': {
       if (config.tokens.letterSpacing[value]) {
         return { letterSpacing: config.tokens.letterSpacing[value] };
+      }
+      return {};
+    }
+    case 'decoration': {
+      // Priority: style > thickness
+      if (TEXT_DECORATION_STYLE[value]) {
+        return { textDecorationStyle: TEXT_DECORATION_STYLE[value] };
+      }
+      if (TEXT_DECORATION_THICKNESS[value]) {
+        return { textDecorationThickness: TEXT_DECORATION_THICKNESS[value] };
+      }
+      return {};
+    }
+    case 'underline-offset': {
+      if (UNDERLINE_OFFSET[value]) {
+        return { textUnderlineOffset: UNDERLINE_OFFSET[value] };
+      }
+      return {};
+    }
+    case 'indent': {
+      // Use spacing scale for indent values
+      const spacingVal = config.tokens.spacing[value];
+      if (spacingVal) {
+        return { textIndent: spacingVal };
       }
       return {};
     }

@@ -112,7 +112,8 @@ describe('Wave 0: shadow/ring composition edge cases', () => {
 
 describe('Wave 0: capability edge cases', () => {
   it('dotExplain with only native-supported utils has empty report', () => {
-    const result = dotExplain('p-4 flex items-center', { target: 'native' });
+    // Use tokens that produce only fully-native props (no display — it's approximate)
+    const result = dotExplain('p-4 items-center text-center', { target: 'native' });
     expect(result.report._dropped).toBeUndefined();
     expect(result.report._approximated).toBeUndefined();
   });

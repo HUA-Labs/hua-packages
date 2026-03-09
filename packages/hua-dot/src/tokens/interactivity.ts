@@ -56,3 +56,29 @@ export const WHITESPACE: Record<string, string> = {
   'whitespace-pre-wrap': 'pre-wrap',
   'whitespace-break-spaces': 'break-spaces',
 } as const;
+
+/** Word break values — standalone tokens */
+export const WORD_BREAK: Record<string, string> = {
+  'break-normal': 'normal',
+  'break-words': 'break-word',
+  'break-all': 'break-all',
+  'break-keep': 'keep-all',
+} as const;
+
+/** Touch action values — standalone tokens */
+export const TOUCH_ACTION: Record<string, string> = {
+  'touch-auto': 'auto',
+  'touch-none': 'none',
+  'touch-pan-x': 'pan-x',
+  'touch-pan-y': 'pan-y',
+  'touch-pinch-zoom': 'pinch-zoom',
+  'touch-manipulation': 'manipulation',
+} as const;
+
+/** Will change values — standalone tokens */
+export const WILL_CHANGE: Record<string, string> = {
+  'will-change-auto': 'auto',
+  'will-change-scroll': 'scroll-position',
+  'will-change-contents': 'contents',
+  'will-change-transform': 'transform',
+} as const;

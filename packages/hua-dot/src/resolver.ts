@@ -18,6 +18,10 @@ import { resolveInteractivity } from './resolvers/interactivity';
 import { resolveRing, resolveRingOffset } from './resolvers/ring';
 import { resolveLineClamp } from './resolvers/line-clamp';
 import { resolveFilter, resolveMixBlend } from './resolvers/filter';
+import { resolveObjectFit } from './resolvers/object-fit';
+import { resolveTable } from './resolvers/table';
+import { resolveList } from './resolvers/list';
+import { resolveScroll } from './resolvers/scroll';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -51,6 +55,9 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   font: resolveTypography,
   leading: resolveTypography,
   tracking: resolveTypography,
+  decoration: resolveTypography,
+  'underline-offset': resolveTypography,
+  indent: resolveTypography,
 
   // sizing
   w: resolveSizing,
@@ -86,6 +93,7 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   // flexbox prefix
   flex: resolveFlexbox,
   order: resolveFlexbox,
+  basis: resolveFlexbox,
 
   // z-index
   z: resolveZIndex,
@@ -165,6 +173,30 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
 
   // Phase 5: mix-blend-mode
   'mix-blend': resolveMixBlend,
+
+  // table layout
+  table: resolveTable,
+  caption: resolveTable,
+
+  // list style
+  list: resolveList,
+
+  // scroll behavior + scroll margin/padding
+  scroll: resolveScroll,
+  'scroll-m': resolveScroll,
+  'scroll-mx': resolveScroll,
+  'scroll-my': resolveScroll,
+  'scroll-mt': resolveScroll,
+  'scroll-mr': resolveScroll,
+  'scroll-mb': resolveScroll,
+  'scroll-ml': resolveScroll,
+  'scroll-p': resolveScroll,
+  'scroll-px': resolveScroll,
+  'scroll-py': resolveScroll,
+  'scroll-pt': resolveScroll,
+  'scroll-pr': resolveScroll,
+  'scroll-pb': resolveScroll,
+  'scroll-pl': resolveScroll,
 };
 
 /** Negate a CSS value: '16px' → '-16px', 'translateX(16px)' → 'translateX(-16px)' */
@@ -223,6 +255,10 @@ export function resolveToken(token: DotToken, config: DotConfig): StyleObject {
     const interactivityResult = resolveInteractivity(value);
     if (Object.keys(interactivityResult).length > 0) return interactivityResult;
 
+    // Object fit standalone (object-contain, object-cover, etc.)
+    const objectFitResult = resolveObjectFit(value);
+    if (Object.keys(objectFitResult).length > 0) return objectFitResult;
+
     if (config.strictMode) {
       throw new Error(`[dot] Unknown token: "${token.raw}"`);
     }
@@ -235,6 +271,11 @@ export function resolveToken(token: DotToken, config: DotConfig): StyleObject {
   // Special case: border-{style} like border-solid, border-dashed
   if (prefix === 'border' && BORDER_STYLES[value]) {
     return resolveBorderStyle(value);
+  }
+
+  // Special case: border-collapse, border-separate → borderCollapse
+  if (prefix === 'border' && (value === 'collapse' || value === 'separate')) {
+    return { borderCollapse: value };
   }
 
   // Look up prefix resolver

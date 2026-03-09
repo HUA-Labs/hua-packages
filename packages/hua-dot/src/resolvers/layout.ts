@@ -6,6 +6,9 @@ import {
   MAX_WIDTH_KEYWORDS,
   SIZE_PROP_MAP,
   ASPECT_RATIO,
+  FLOAT,
+  CLEAR,
+  ISOLATION,
 } from '../tokens/layout';
 import { GRID_FLOW } from '../tokens/grid';
 import { parseArbitrary } from './utils';
@@ -70,6 +73,11 @@ export function resolveLayout(value: string): StyleObject {
       borderWidth: '0',
     };
   }
+
+  // Float / clear / isolation standalone
+  if (FLOAT[value]) return { float: FLOAT[value] };
+  if (CLEAR[value]) return { clear: CLEAR[value] };
+  if (ISOLATION[value]) return { isolation: ISOLATION[value] };
 
   // Grid flow standalone
   if (GRID_FLOW[value]) {

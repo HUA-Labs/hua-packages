@@ -34,6 +34,29 @@ export const CAPABILITY_MATRIX: Record<string, Partial<Record<DotTarget, Capabil
   ring:          { web: 'native', native: 'approximate', flutter: 'native' },
   lineClamp:     { web: 'native', native: 'native',      flutter: 'native' },
   interactivity: { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+
+  // Wave 2: extended families
+  objectFit:     { web: 'native', native: 'approximate', flutter: 'recipe-only' },
+  objectPosition:{ web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  float:         { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  table:         { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  list:          { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  scroll:        { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  touchAction:   { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  willChange:    { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  wordBreak:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  isolation:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+
+  // Fine-grained families for props that don't match their parent family's support
+  display:              { web: 'native', native: 'approximate', flutter: 'approximate' },  // only flex/none (RN), flex/inline-flex (Flutter)
+  visibility:           { web: 'native', native: 'unsupported', flutter: 'native' },  // Flutter: recipe.visible
+  pointerEvents:        { web: 'native', native: 'native',      flutter: 'unsupported' },
+  flexShrinkDetail:     { web: 'native', native: 'native',      flutter: 'unsupported' },
+  alignSelfDetail:      { web: 'native', native: 'native',      flutter: 'unsupported' },
+  textIndent:           { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  textDecorationDetail: { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  textDecorationStyle:  { web: 'native', native: 'native',      flutter: 'unsupported' },
+  placeAlignment:       { web: 'native', native: 'unsupported', flutter: 'unsupported' },
 };
 
 /**
@@ -55,11 +78,11 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   lineHeight: 'typography', letterSpacing: 'typography',
   textAlign: 'typography', textTransform: 'typography',
   textDecoration: 'typography', textDecorationLine: 'typography',
-  fontStyle: 'typography', wordBreak: 'typography', overflowWrap: 'typography',
+  fontStyle: 'typography',
   whiteSpace: 'typography', textOverflow: 'typography',
 
-  // layout
-  display: 'layout', overflow: 'layout', overflowX: 'layout', overflowY: 'layout',
+  // layout (display/visibility have their own fine-grained families)
+  display: 'display', overflow: 'layout', overflowX: 'layout', overflowY: 'layout',
 
   // sizing
   width: 'sizing', height: 'sizing', minWidth: 'sizing', minHeight: 'sizing',
@@ -73,10 +96,10 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   borderTopRightRadius: 'borderRadius', borderBottomLeftRadius: 'borderRadius',
   borderBottomRightRadius: 'borderRadius',
 
-  // flexbox
+  // flexbox (flexShrink/alignSelf have fine-grained families for Flutter)
   flexDirection: 'flexbox', flexWrap: 'flexbox', alignItems: 'flexbox',
-  alignSelf: 'flexbox', justifyContent: 'flexbox', flexGrow: 'flexbox',
-  flexShrink: 'flexbox', flex: 'flexbox', order: 'flexbox',
+  alignSelf: 'alignSelfDetail', justifyContent: 'flexbox', flexGrow: 'flexbox',
+  flexShrink: 'flexShrinkDetail', flex: 'flexbox', order: 'flexbox',
 
   // shadow/ring (after finalization)
   boxShadow: 'shadow',
@@ -114,26 +137,66 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   gridRowStart: 'grid', gridRowEnd: 'grid',
   gridAutoColumns: 'grid', gridAutoRows: 'grid',
 
-  // interactivity
+  // interactivity (pointerEvents has its own family — supported on RN)
   cursor: 'interactivity', userSelect: 'interactivity',
-  resize: 'interactivity', pointerEvents: 'interactivity',
-  touchAction: 'interactivity',
+  resize: 'interactivity', pointerEvents: 'pointerEvents',
+  touchAction: 'touchAction',
+  willChange: 'willChange',
 
   // aspect ratio
   aspectRatio: 'layout',
 
-  // visibility
-  visibility: 'layout',
+  // visibility (own family — unsupported on RN)
+  visibility: 'visibility',
 
   // line-clamp (vendor-prefixed web output)
   WebkitLineClamp: 'lineClamp',
   WebkitBoxOrient: 'lineClamp',
+
+  // Wave 2: extended property families
+  objectFit: 'objectFit', objectPosition: 'objectPosition',
+  float: 'float', clear: 'float', isolation: 'isolation',
+  tableLayout: 'table', borderCollapse: 'table', borderSpacing: 'table', captionSide: 'table',
+  listStyleType: 'list', listStylePosition: 'list',
+  scrollBehavior: 'scroll',
+  scrollMarginTop: 'scroll', scrollMarginRight: 'scroll',
+  scrollMarginBottom: 'scroll', scrollMarginLeft: 'scroll',
+  scrollPaddingTop: 'scroll', scrollPaddingRight: 'scroll',
+  scrollPaddingBottom: 'scroll', scrollPaddingLeft: 'scroll',
+  textIndent: 'textIndent',
+  textDecorationStyle: 'textDecorationStyle',
+  textDecorationThickness: 'textDecorationDetail',
+  textUnderlineOffset: 'textDecorationDetail',
+  flexBasis: 'flexbox',
+  placeContent: 'placeAlignment', placeItems: 'placeAlignment', placeSelf: 'placeAlignment',
+  backfaceVisibility: 'transform',
+  overflowWrap: 'wordBreak', wordBreak: 'wordBreak',
+};
+
+/**
+ * Value-level capability overrides for properties where support varies by value.
+ * Checked before the property-level family lookup.
+ */
+const VALUE_OVERRIDES: Record<string, Record<string, Partial<Record<DotTarget, CapabilityLevel>>>> = {
+  display: {
+    flex:         { native: 'native', flutter: 'native' },
+    none:         { native: 'native' },
+    'inline-flex': { flutter: 'native' },
+  },
 };
 
 /**
  * Get capability level for a CSS property on a target platform.
+ * Optionally accepts a value for value-dependent capability lookup.
  */
-export function getCapability(property: string, target: DotTarget): CapabilityLevel {
+export function getCapability(property: string, target: DotTarget, value?: string): CapabilityLevel {
+  // Check value-level override first (strip !important suffix)
+  if (value !== undefined) {
+    const normalized = value.replace(/\s*!important\s*$/, '');
+    const override = VALUE_OVERRIDES[property]?.[normalized]?.[target];
+    if (override) return override;
+  }
+
   const family = PROPERTY_TO_FAMILY[property];
   if (!family) return 'unsupported';
   return CAPABILITY_MATRIX[family]?.[target] ?? 'unsupported';

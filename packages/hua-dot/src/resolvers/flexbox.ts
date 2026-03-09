@@ -10,6 +10,10 @@ import {
   FLEX_GROW,
   FLEX_SHRINK,
   ORDER_VALUES,
+  FLEX_BASIS,
+  PLACE_CONTENT,
+  PLACE_ITEMS,
+  PLACE_SELF,
 } from '../tokens/flexbox';
 
 /**
@@ -40,6 +44,9 @@ export function resolveFlexboxStandalone(value: string): StyleObject {
   if (FLEX_SHRINK[value]) {
     return { flexShrink: FLEX_SHRINK[value] };
   }
+  if (PLACE_CONTENT[value]) return { placeContent: PLACE_CONTENT[value] };
+  if (PLACE_ITEMS[value]) return { placeItems: PLACE_ITEMS[value] };
+  if (PLACE_SELF[value]) return { placeSelf: PLACE_SELF[value] };
   return {};
 }
 
@@ -56,6 +63,18 @@ export function resolveFlexbox(_prefix: string, value: string, _config: DotConfi
   if (_prefix === 'order') {
     if (ORDER_VALUES[value]) {
       return { order: ORDER_VALUES[value] };
+    }
+    return {};
+  }
+  if (_prefix === 'basis') {
+    // Check keywords first
+    if (FLEX_BASIS[value]) {
+      return { flexBasis: FLEX_BASIS[value] };
+    }
+    // Check spacing scale
+    const spacingVal = _config.tokens.spacing[value];
+    if (spacingVal) {
+      return { flexBasis: spacingVal };
     }
     return {};
   }

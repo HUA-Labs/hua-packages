@@ -291,7 +291,7 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
   }
 
   // Resolve as web first to see all CSS properties before native drops them
-  const webStyles = dot(input, { ...options, target: 'web' });
+  const webStyles = dot(input, { ...options, target: 'web' }) as StyleObject;
   // Then resolve as native for final output
   const styles = dot(input, options);
 
@@ -300,7 +300,7 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
   const capabilities: Record<string, CapabilityLevel> = {};
 
   for (const prop of Object.keys(webStyles)) {
-    const level = getCapability(prop, target);
+    const level = getCapability(prop, target, String(webStyles[prop]));
 
     if (level === 'unsupported') {
       dropped.push(prop);
