@@ -204,6 +204,7 @@ dot('bg-brand-500 p-18');
 | `createDotConfig` | function | Set global token configuration with deep merge. Accepts theme overrides (colors, spacing, borderRadius, fontSize, gridCols), runtime target, breakpoints (custom array), remBase, cache settings, strictMode, warnUnknown. |
 | `clearDotCache` | function | Clear both input and token caches. Call after config changes or for memory management. |
 | `dotMap` | function | Convert utility string to style map with state variants. Same type-safe overloads as dot(). Returns { base, hover?, focus?, active?, 'focus-visible'?, 'focus-within'?, disabled? } |
+| `semanticVars` | function |  |
 
 ## Related Packages
 
