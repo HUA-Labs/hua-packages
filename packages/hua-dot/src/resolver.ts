@@ -23,6 +23,8 @@ import { resolveTable } from './resolvers/table';
 import { resolveList } from './resolvers/list';
 import { resolveScroll } from './resolvers/scroll';
 import { resolveGradientDirection, resolveGradientStop } from './resolvers/gradient';
+import { resolveOutline } from './resolvers/outline';
+import { resolveDivide } from './resolvers/divide';
 import { BORDER_STYLES } from './tokens/borders';
 
 /** Maps prefix → resolver function for prefix-value tokens */
@@ -130,6 +132,11 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   'backdrop-brightness': resolveBackdrop,
   'backdrop-contrast': resolveBackdrop,
   'backdrop-saturate': resolveBackdrop,
+  'backdrop-grayscale': resolveBackdrop,
+  'backdrop-sepia': resolveBackdrop,
+  'backdrop-invert': resolveBackdrop,
+  'backdrop-hue-rotate': resolveBackdrop,
+  'backdrop-opacity': resolveBackdrop,
 
   // Phase 3a: positioning
   top: resolvePositioning,
@@ -204,6 +211,15 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
   from: resolveGradientStop,
   via: resolveGradientStop,
   to: resolveGradientStop,
+
+  // outline
+  outline: resolveOutline,
+  'outline-offset': resolveOutline,
+
+  // divide
+  divide: resolveDivide,
+  'divide-x': resolveDivide,
+  'divide-y': resolveDivide,
 };
 
 /** Negate a CSS value: '16px' → '-16px', 'translateX(16px)' → 'translateX(-16px)' */

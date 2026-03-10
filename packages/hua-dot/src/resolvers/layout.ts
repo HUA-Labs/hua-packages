@@ -40,6 +40,31 @@ export function resolveLayout(value: string): StyleObject {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     };
+    // Font style
+    case 'italic': return { fontStyle: 'italic' };
+    case 'not-italic': return { fontStyle: 'normal' };
+    // Text decoration line
+    case 'underline': return { textDecorationLine: 'underline' };
+    case 'overline': return { textDecorationLine: 'overline' };
+    case 'line-through': return { textDecorationLine: 'line-through' };
+    case 'no-underline': return { textDecorationLine: 'none' };
+    // Overflow directional
+    case 'overflow-x-auto': return { overflowX: 'auto' };
+    case 'overflow-x-hidden': return { overflowX: 'hidden' };
+    case 'overflow-x-scroll': return { overflowX: 'scroll' };
+    case 'overflow-x-visible': return { overflowX: 'visible' };
+    case 'overflow-y-auto': return { overflowY: 'auto' };
+    case 'overflow-y-hidden': return { overflowY: 'hidden' };
+    case 'overflow-y-scroll': return { overflowY: 'scroll' };
+    case 'overflow-y-visible': return { overflowY: 'visible' };
+    // Background clip
+    case 'bg-clip-text': return { backgroundClip: 'text', WebkitBackgroundClip: 'text' };
+    case 'bg-clip-border': return { backgroundClip: 'border-box' };
+    case 'bg-clip-padding': return { backgroundClip: 'padding-box' };
+    case 'bg-clip-content': return { backgroundClip: 'content-box' };
+    // Font smoothing
+    case 'antialiased': return { WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' };
+    case 'subpixel-antialiased': return { WebkitFontSmoothing: 'auto', MozOsxFontSmoothing: 'auto' };
   }
 
   // Visibility

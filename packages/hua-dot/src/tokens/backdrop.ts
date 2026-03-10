@@ -44,3 +44,50 @@ export const BACKDROP_SATURATE: Record<string, string> = {
   '150': '1.5',
   '200': '2',
 } as const;
+
+/** Backdrop grayscale values — bare '' = 100% */
+export const BACKDROP_GRAYSCALE: Record<string, string> = {
+  '': '100%',
+  '0': '0',
+} as const;
+
+/** Backdrop sepia values — bare '' = 100% */
+export const BACKDROP_SEPIA: Record<string, string> = {
+  '': '100%',
+  '0': '0',
+} as const;
+
+/** Backdrop invert values — bare '' = 100% */
+export const BACKDROP_INVERT: Record<string, string> = {
+  '': '100%',
+  '0': '0',
+} as const;
+
+/** Backdrop hue-rotate values (degrees) */
+export const BACKDROP_HUE_ROTATE: Record<string, string> = {
+  '0': '0deg',
+  '15': '15deg',
+  '30': '30deg',
+  '60': '60deg',
+  '90': '90deg',
+  '180': '180deg',
+} as const;
+
+/** Backdrop opacity values */
+export const BACKDROP_OPACITY: Record<string, string> = {
+  '0': '0',
+  '5': '0.05',
+  '10': '0.1',
+  '20': '0.2',
+  '25': '0.25',
+  '30': '0.3',
+  '40': '0.4',
+  '50': '0.5',
+  '60': '0.6',
+  '70': '0.7',
+  '75': '0.75',
+  '80': '0.8',
+  '90': '0.9',
+  '95': '0.95',
+  '100': '1',
+} as const;

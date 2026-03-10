@@ -11,10 +11,15 @@ import { parseArbitrary, hexToRgb } from './utils';
  * lookupColor('gray-100', colors)    → '#f3f4f6'
  */
 export function lookupColor(value: string, colors: ResolvedTokens['colors']): string | undefined {
-  // Check special/flat colors first (white, black, transparent, current)
+  // Check special/flat colors first (white, black, transparent, current, CSS vars)
   const flat = colors[value];
   if (typeof flat === 'string') {
     return flat;
+  }
+
+  // If a palette object is found without a shade, use 500 as default (matches Tailwind behavior)
+  if (flat && typeof flat === 'object') {
+    return (flat as Record<string, string>)['500'];
   }
 
   // Split color name and shade: 'primary-500' → ['primary', '500']
@@ -27,7 +32,7 @@ export function lookupColor(value: string, colors: ResolvedTokens['colors']): st
   const palette = colors[colorName];
   if (!palette || typeof palette === 'string') return undefined;
 
-  return palette[shade];
+  return (palette as Record<string, string>)[shade];
 }
 
 /**

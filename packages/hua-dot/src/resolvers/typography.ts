@@ -25,6 +25,11 @@ export function resolveTypography(prefix: string, value: string, config: DotConf
       if (config.tokens.fontSize[value]) {
         return { fontSize: config.tokens.fontSize[value] };
       }
+      // Text wrap utilities
+      if (value === 'wrap') return { textWrap: 'wrap' };
+      if (value === 'nowrap') return { textWrap: 'nowrap' };
+      if (value === 'balance') return { textWrap: 'balance' };
+      if (value === 'pretty') return { textWrap: 'pretty' };
       // Color fallthrough: text-red-500, text-white, text-red-500/50, text-[#ff0000]
       return resolveColor('text', value, config);
     }

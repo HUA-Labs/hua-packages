@@ -88,6 +88,31 @@ const STANDALONE_TOKENS = new Set<string>([
   ...Object.keys(PLACE_CONTENT),
   ...Object.keys(PLACE_ITEMS),
   ...Object.keys(PLACE_SELF),
+  // font style
+  'italic',
+  'not-italic',
+  // text decoration line
+  'underline',
+  'overline',
+  'line-through',
+  'no-underline',
+  // overflow directional
+  'overflow-x-auto',
+  'overflow-x-hidden',
+  'overflow-x-scroll',
+  'overflow-x-visible',
+  'overflow-y-auto',
+  'overflow-y-hidden',
+  'overflow-y-scroll',
+  'overflow-y-visible',
+  // background clip
+  'bg-clip-text',
+  'bg-clip-border',
+  'bg-clip-padding',
+  'bg-clip-content',
+  // font smoothing
+  'antialiased',
+  'subpixel-antialiased',
 ]);
 
 /**
@@ -98,9 +123,14 @@ const MULTI_SEGMENT_PREFIXES = [
   // gradient (longest first — must be before backdrop)
   'bg-gradient-to',
   // backdrop (longest first)
+  'backdrop-hue-rotate',
   'backdrop-brightness',
+  'backdrop-grayscale',
   'backdrop-contrast',
   'backdrop-saturate',
+  'backdrop-opacity',
+  'backdrop-invert',
+  'backdrop-sepia',
   'backdrop-blur',
   // border radius directional
   'rounded-tl',
@@ -140,6 +170,8 @@ const MULTI_SEGMENT_PREFIXES = [
   // Phase 3a: positioning
   'inset-x',
   'inset-y',
+  // outline-offset (before outline to avoid prefix shadowing)
+  'outline-offset',
   // Phase 4: ring
   'ring-offset',
   // Phase 5: filter
@@ -174,6 +206,9 @@ const MULTI_SEGMENT_PREFIXES = [
   'row-end',
   'auto-cols',
   'auto-rows',
+  // divide (before plain 'divide' to avoid prefix shadowing)
+  'divide-x',
+  'divide-y',
 ] as const;
 
 /**

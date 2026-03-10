@@ -78,6 +78,13 @@ const SKIP_PROPS = new Set([
   'overflowWrap',
   'wordBreak',
   'backgroundImage',
+  // Phase 0: web-only properties
+  'backgroundClip',
+  'WebkitBackgroundClip',
+  'WebkitFontSmoothing',
+  'MozOsxFontSmoothing',
+  'overflowX',
+  'overflowY',
 ]);
 
 /** Properties whose px/number values should be converted to plain numbers */
