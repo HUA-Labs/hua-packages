@@ -69,6 +69,22 @@ entries:
       test: true
       lint: false
 
+  - name: "@hua-labs/dot-aot"
+    path: "packages/hua-dot-aot"
+    kind: package
+    tier: support
+    accessClass: internal-core
+    lifecycle: pre-release
+    release:
+      mode: no-publish
+    publicMirror:
+      mode: defer
+    ci:
+      build: true
+      typeCheck: false
+      test: true
+      lint: false
+
   - name: "@hua-labs/i18n-core"
     path: "packages/hua-i18n-core"
     kind: package

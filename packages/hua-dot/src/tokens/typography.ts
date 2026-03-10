@@ -10,6 +10,9 @@ export const FONT_SIZES: Record<string, string> = {
   '4xl': '36px',
   '5xl': '48px',
   '6xl': '60px',
+  '7xl': '72px',
+  '8xl': '96px',
+  '9xl': '128px',
 } as const;
 
 /** Font weight scale */

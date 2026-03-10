@@ -1,5 +1,5 @@
 import type { StyleObject, DotConfig } from '../types';
-import { BACKDROP_BRIGHTNESS, BACKDROP_CONTRAST, BACKDROP_SATURATE } from '../tokens/backdrop';
+import { BACKDROP_BRIGHTNESS, BACKDROP_CONTRAST, BACKDROP_SATURATE, BACKDROP_GRAYSCALE, BACKDROP_SEPIA, BACKDROP_INVERT, BACKDROP_HUE_ROTATE, BACKDROP_OPACITY } from '../tokens/backdrop';
 
 /**
  * Resolve backdrop tokens:
@@ -37,6 +37,41 @@ export function resolveBackdrop(prefix: string, value: string, config: DotConfig
       const val = BACKDROP_SATURATE[value];
       if (val !== undefined) {
         return { backdropFilter: `saturate(${val})` };
+      }
+      return {};
+    }
+    case 'backdrop-grayscale': {
+      const val = BACKDROP_GRAYSCALE[value];
+      if (val !== undefined) {
+        return { backdropFilter: `grayscale(${val})` };
+      }
+      return {};
+    }
+    case 'backdrop-sepia': {
+      const val = BACKDROP_SEPIA[value];
+      if (val !== undefined) {
+        return { backdropFilter: `sepia(${val})` };
+      }
+      return {};
+    }
+    case 'backdrop-invert': {
+      const val = BACKDROP_INVERT[value];
+      if (val !== undefined) {
+        return { backdropFilter: `invert(${val})` };
+      }
+      return {};
+    }
+    case 'backdrop-hue-rotate': {
+      const val = BACKDROP_HUE_ROTATE[value];
+      if (val !== undefined) {
+        return { backdropFilter: `hue-rotate(${val})` };
+      }
+      return {};
+    }
+    case 'backdrop-opacity': {
+      const val = BACKDROP_OPACITY[value];
+      if (val !== undefined) {
+        return { backdropFilter: `opacity(${val})` };
       }
       return {};
     }

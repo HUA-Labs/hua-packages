@@ -47,6 +47,10 @@ export const CAPABILITY_MATRIX: Record<string, Partial<Record<DotTarget, Capabil
   wordBreak:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
   isolation:     { web: 'native', native: 'unsupported', flutter: 'unsupported' },
   gradient:      { web: 'native', native: 'unsupported', flutter: 'recipe-only' },
+  bgClip:        { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  fontSmoothing: { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  overflowAxis:  { web: 'native', native: 'unsupported', flutter: 'unsupported' },
+  divide:        { web: 'native', native: 'unsupported', flutter: 'unsupported' },
 
   // Fine-grained families for props that don't match their parent family's support
   display:              { web: 'native', native: 'approximate', flutter: 'approximate' },  // only flex/none (RN), flex/inline-flex (Flutter)
@@ -83,7 +87,7 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   whiteSpace: 'typography', textOverflow: 'typography',
 
   // layout (display/visibility have their own fine-grained families)
-  display: 'display', overflow: 'layout', overflowX: 'layout', overflowY: 'layout',
+  display: 'display', overflow: 'layout', overflowX: 'overflowAxis', overflowY: 'overflowAxis',
 
   // sizing
   width: 'sizing', height: 'sizing', minWidth: 'sizing', minHeight: 'sizing',
@@ -173,6 +177,9 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
   backfaceVisibility: 'transform',
   overflowWrap: 'wordBreak', wordBreak: 'wordBreak',
   backgroundImage: 'gradient',
+  // Phase 0: web-only property families
+  backgroundClip: 'bgClip', WebkitBackgroundClip: 'bgClip',
+  WebkitFontSmoothing: 'fontSmoothing', MozOsxFontSmoothing: 'fontSmoothing',
 };
 
 /**

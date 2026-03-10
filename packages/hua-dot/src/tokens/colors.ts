@@ -167,4 +167,5 @@ export const COLOR_PROP_MAP: Record<string, string> = {
   'bg': 'backgroundColor',
   'text': 'color',
   'border': 'borderColor',
+  'outline': 'outlineColor',
 } as const;

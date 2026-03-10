@@ -102,9 +102,13 @@ dot('bg-brand-500 p-18');
 
 | Export | Type | Description |
 |--------|------|-------------|
+| `CAPABILITY_MATRIX` | component |  |
+| `PROPERTY_TO_FAMILY` | component |  |
+| `getCapability` | function |  |
 | `adaptNative` | function | Convert web CSSProperties to RN StyleSheet format. Supports warnDropped option for dev warnings on unsupported properties. |
 | `_resetNativeWarnings` | function | Reset native adapter warning dedup set. For testing only. |
 | `adaptWeb` | function | Identity adapter for web — returns input as-is. Used for symmetry with adaptNative. |
+| `adaptFlutter` | function |  |
 | `dotCx` | function | clsx replacement — filters falsy values and joins utility strings. No style computation. |
 | `dotVariants` | function | CVA-style variant system. Accepts base, variants, defaultVariants, compoundVariants. Returns function that produces StyleObject. |
 | `StyleObject` | type |  |
@@ -121,13 +125,30 @@ dot('bg-brand-500 p-18');
 | `RNStyleValue` | type |  |
 | `RNTransformEntry` | type |  |
 | `RNShadowOffset` | type |  |
+| `CapabilityLevel` | type |  |
+| `TargetCapability` | type |  |
+| `DotCapabilityReport` | type |  |
 | `AdaptNativeOptions` | type |  |
+| `AdaptFlutterOptions` | type |  |
+| `FlutterRecipe` | type |  |
+| `FlutterDecoration` | type |  |
+| `FlutterEdgeInsets` | type |  |
+| `FlutterConstraints` | type |  |
+| `FlutterLayout` | type |  |
+| `FlutterFlexChild` | type |  |
+| `FlutterPositioning` | type |  |
+| `FlutterTextStyle` | type |  |
+| `FlutterTransform` | type |  |
+| `FlutterBoxShadow` | type |  |
+| `FlutterBorderSide` | type |  |
+| `FlutterBorderRadius` | type |  |
 | `VariantProps` | type |  |
 | `DotVariantsConfig` | type |  |
 | `DotVariantsFn` | type |  |
 | `CompoundVariant` | type |  |
 | `VariantShape` | type |  |
 | `dot` | function | Convert utility string to flat style object. Options: { dark?: boolean, breakpoint?: string, target?: 'web' | 'native' } |
+| `dotExplain` | function |  |
 | `createDotConfig` | function | Set global token configuration with deep merge. Accepts theme overrides, runtime target, cache settings, strictMode. |
 | `clearDotCache` | function | Clear both input and token caches. Call after config changes or for memory management. |
 | `dotMap` | function | Convert utility string to style map with state variants. Returns { base, hover?, focus?, active?, 'focus-visible'?, 'focus-within'?, disabled? } |
