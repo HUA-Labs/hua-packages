@@ -235,9 +235,9 @@ function CopyButton({
       title={copied ? "Copied!" : "Copy code"}
     >
       {copied ? (
-        <CheckIcon className="w-4 h-4" />
+        <CheckIcon style={{ width: '1rem', height: '1rem' }} />
       ) : (
-        <CopyIcon className="w-4 h-4" />
+        <CopyIcon style={{ width: '1rem', height: '1rem' }} />
       )}
     </button>
   )
@@ -246,10 +246,10 @@ function CopyButton({
 /**
  * 복사 아이콘
  */
-function CopyIcon({ className }: { className?: string }) {
+function CopyIcon({ style }: { style?: React.CSSProperties }) {
   return (
     <svg
-      className={className}
+      style={style}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -264,10 +264,10 @@ function CopyIcon({ className }: { className?: string }) {
 /**
  * 체크 아이콘
  */
-function CheckIcon({ className }: { className?: string }) {
+function CheckIcon({ style }: { style?: React.CSSProperties }) {
   return (
     <svg
-      className={className}
+      style={style}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

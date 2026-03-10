@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { merge } from "../lib/utils";
 import { dot } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
@@ -153,7 +152,7 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
           </h2>
         )}
         <div
-          style={dot(merge("grid gap-5", gridCols))}
+          style={dot(`grid gap-5 ${gridCols}`)}
         >
           {loading ? (
             Array.from({ length: columns }).map((_, i) => (
@@ -170,37 +169,24 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
             items.map((item, index) => (
               <div
                 key={index}
-                className={merge(
-                  "rounded-xl transition-all duration-200 p-6",
-                  accentStyles[item.accent ?? "neutral"].card
-                )}
+                style={dot(`rounded-xl transition-all duration-200 p-6 ${accentStyles[item.accent ?? "neutral"].card}`)}
               >
                 <div style={dot("mb-3 flex items-start justify-between gap-4")}>
                   <div
-                    className={merge(
-                      "text-sm font-medium",
-                      accentStyles[item.accent ?? "neutral"].label
-                    )}
+                    style={dot(`text-sm font-medium ${accentStyles[item.accent ?? "neutral"].label}`)}
                   >
                     {item.label}
                   </div>
                   {item.icon && (
                     <div
-                      className={merge(
-                        "inline-flex h-10 w-10 items-center justify-center rounded-xl text-base font-semibold",
-                        accentStyles[item.accent ?? "neutral"].iconWrapper,
-                        accentStyles[item.accent ?? "neutral"].icon
-                      )}
+                      style={dot(`inline-flex h-10 w-10 items-center justify-center rounded-xl text-base font-semibold ${accentStyles[item.accent ?? "neutral"].iconWrapper} ${accentStyles[item.accent ?? "neutral"].icon}`)}
                     >
                       {item.icon}
                     </div>
                   )}
                 </div>
                 <div
-                  className={merge(
-                    "text-2xl font-semibold leading-tight mb-2",
-                    accentStyles[item.accent ?? "neutral"].value
-                  )}
+                  style={dot(`text-2xl font-semibold leading-tight mb-2 ${accentStyles[item.accent ?? "neutral"].value}`)}
                 >
                   {item.value}
                 </div>
@@ -211,14 +197,13 @@ export const StatsPanel = React.forwardRef<HTMLDivElement, StatsPanelProps>(
                 )}
                 {item.trend && item.trendValue && (
                   <div
-                    className={merge(
-                      "mt-2 flex items-center gap-1 text-xs",
+                    style={dot(`mt-2 flex items-center gap-1 text-xs ${
                       item.trend === "up"
-                        ? "text-green-600 dark:text-green-400"
+                        ? "text-green-600"
                         : item.trend === "down"
-                        ? "text-red-600 dark:text-red-400"
+                        ? "text-red-600"
                         : "text-muted-foreground"
-                    )}
+                    }`)}
                   >
                     {item.trend === "up" && "↑"}
                     {item.trend === "down" && "↓"}

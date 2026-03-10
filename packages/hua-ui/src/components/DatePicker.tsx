@@ -337,7 +337,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         </span>
         <Icon
           name="calendar"
-          className="ml-2 h-4 w-4"
+          dot="ml-2 h-4 w-4"
         />
       </button>
     )
@@ -374,7 +374,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={viewMode === "days" ? ariaLabels.prevMonth : viewMode === "years" ? ariaLabels.prevYearPage : ariaLabels.prevYear}
                 >
-                  <Icon name="chevronLeft" className="h-4 w-4" />
+                  <Icon name="chevronLeft" dot="h-4 w-4" />
                 </button>
                 <button
                   type="button"
@@ -402,7 +402,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={viewMode === "days" ? ariaLabels.nextMonth : viewMode === "years" ? ariaLabels.nextYearPage : ariaLabels.nextYear}
                 >
-                  <Icon name="chevronRight" className="h-4 w-4" />
+                  <Icon name="chevronRight" dot="h-4 w-4" />
                 </button>
               </div>
 

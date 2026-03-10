@@ -92,7 +92,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
     maxItems,
     showHomeIcon,
     homeLabel = "Home",
-    separator = <Icon name="chevronRight" className="w-3 h-3 text-muted-foreground flex-shrink-0" />,
+    separator = <Icon name="chevronRight" dot="w-3 h-3 text-muted-foreground flex-shrink-0" />,
     variant = 'default',
     dot: dotProp,
     style,
@@ -141,7 +141,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               isCurrent={isCurrent}
             >
               {item.icon && (
-                <Icon name={item.icon} className="w-4 h-4 mr-1" />
+                <Icon name={item.icon} dot="w-4 h-4 mr-1" />
               )}
               {item.label}
             </BreadcrumbItem>
@@ -157,7 +157,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
                 {child}
                 {index < React.Children.count(children) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="text-muted-foreground" aria-hidden="true">
+                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
                     {separator}
                   </span>
                 )}
@@ -185,11 +185,11 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
           {showHomeIcon && (
             <li style={{ display: 'flex', alignItems: 'center' }}>
               <BreadcrumbItem href="/">
-                <Icon name="home" className="w-4 h-4 mr-1" />
+                <Icon name="home" dot="w-4 h-4 mr-1" />
                 {homeLabel}
               </BreadcrumbItem>
               {itemsCount > 0 && (
-                <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="text-muted-foreground" aria-hidden="true">
+                <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
                   {separator}
                 </span>
               )}
@@ -200,7 +200,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
                 {item}
                 {index < (renderedItems?.length || 0) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="text-muted-foreground" aria-hidden="true">
+                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
                     {separator}
                   </span>
                 )}

@@ -233,7 +233,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                 background: "transparent",
               }}
             >
-              <Icon name={collapsed ? "chevronRight" : "chevronLeft"} className="h-4 w-4" />
+              <Icon name={collapsed ? "chevronRight" : "chevronLeft"} dot="h-4 w-4" />
               <span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>사이드바 토글</span>
             </button>
           )}
@@ -284,7 +284,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                       {item.icon && (
                         <span style={{ marginRight: collapsed ? 0 : "0.75rem" }}>
                           {typeof item.icon === "string" ? (
-                            <Icon name={item.icon as IconName} className="h-5 w-5" variant="inherit" />
+                            <Icon name={item.icon as IconName} dot="h-5 w-5" variant="inherit" />
                           ) : (
                             item.icon
                           )}
@@ -376,7 +376,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                 }}
                 onClick={() => setIsMobileOpen(true)}
               >
-                <Icon name="menu" className="h-5 w-5" />
+                <Icon name="menu" dot="h-5 w-5" />
               </button>
             )}
             {isMobileOpen && (
@@ -406,7 +406,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                     }}
                     onClick={() => setIsMobileOpen(false)}
                   >
-                    <Icon name="close" className="h-5 w-5" />
+                    <Icon name="close" dot="h-5 w-5" />
                   </button>
                 </div>
               </div>

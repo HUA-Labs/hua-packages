@@ -264,7 +264,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
               {typeof icon === "string" ? (
                 <Icon
                   name={icon as IconName}
-                  className="w-6 h-6"
+                  dot="w-6 h-6"
                   style={{ color: isGradient ? "#ffffff" : tokens.iconText }}
                 />
               ) : (
