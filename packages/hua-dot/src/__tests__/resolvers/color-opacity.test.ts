@@ -4,13 +4,13 @@ import { hexToRgb } from '../../resolvers/utils';
 
 describe('hexToRgb', () => {
   it('converts 6-digit hex', () => {
-    expect(hexToRgb('#3b82f6')).toBe('rgb(59 130 246)');
+    expect(hexToRgb('#0079b1')).toBe('rgb(0 121 177)');
   });
   it('converts 3-digit shorthand', () => {
     expect(hexToRgb('#fff')).toBe('rgb(255 255 255)');
   });
   it('applies alpha', () => {
-    expect(hexToRgb('#3b82f6', 0.5)).toBe('rgb(59 130 246 / 0.5)');
+    expect(hexToRgb('#0079b1', 0.5)).toBe('rgb(0 121 177 / 0.5)');
   });
   it('returns undefined for invalid hex', () => {
     expect(hexToRgb('#gg0000')).toBeUndefined();
@@ -24,12 +24,12 @@ describe('Opacity modifier (/50)', () => {
   describe('bg color', () => {
     it('bg-primary-500/50', () => {
       expect(dot('bg-primary-500/50')).toEqual({
-        backgroundColor: 'rgb(59 130 246 / 0.5)',
+        backgroundColor: 'rgb(43 108 214 / 0.5)',
       });
     });
     it('bg-red-500/75', () => {
       expect(dot('bg-red-500/75')).toEqual({
-        backgroundColor: 'rgb(239 68 68 / 0.75)',
+        backgroundColor: 'rgb(202 44 34 / 0.75)',
       });
     });
     it('bg-white/10', () => {
@@ -44,7 +44,7 @@ describe('Opacity modifier (/50)', () => {
     });
     it('bg-blue-500/100', () => {
       expect(dot('bg-blue-500/100')).toEqual({
-        backgroundColor: 'rgb(59 130 246 / 1)',
+        backgroundColor: 'rgb(0 121 177 / 1)',
       });
     });
   });
@@ -52,7 +52,7 @@ describe('Opacity modifier (/50)', () => {
   describe('text color', () => {
     it('text-gray-900/80', () => {
       expect(dot('text-gray-900/80')).toEqual({
-        color: 'rgb(17 24 39 / 0.8)',
+        color: 'rgb(18 20 24 / 0.8)',
       });
     });
   });
@@ -60,7 +60,7 @@ describe('Opacity modifier (/50)', () => {
   describe('border color', () => {
     it('border-red-500/25', () => {
       expect(dot('border-red-500/25')).toEqual({
-        borderColor: 'rgb(239 68 68 / 0.25)',
+        borderColor: 'rgb(202 44 34 / 0.25)',
       });
     });
   });
@@ -92,7 +92,7 @@ describe('Opacity modifier (/50)', () => {
   describe('with variants', () => {
     it('dark:bg-primary-500/30', () => {
       expect(dot('dark:bg-primary-500/30', { dark: true })).toEqual({
-        backgroundColor: 'rgb(59 130 246 / 0.3)',
+        backgroundColor: 'rgb(43 108 214 / 0.3)',
       });
     });
   });

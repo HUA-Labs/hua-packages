@@ -470,13 +470,13 @@ describe('adaptNative — passthrough', () => {
     expect(
       adaptNative({
         color: '#ffffff',
-        backgroundColor: '#3b82f6',
-        borderColor: '#d1d5db',
+        backgroundColor: '#0079b1',
+        borderColor: '#a3a7ae',
       }),
     ).toEqual({
       color: '#ffffff',
-      backgroundColor: '#3b82f6',
-      borderColor: '#d1d5db',
+      backgroundColor: '#0079b1',
+      borderColor: '#a3a7ae',
     });
   });
 

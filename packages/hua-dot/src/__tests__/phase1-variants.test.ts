@@ -12,7 +12,7 @@ describe('state variants via dotMap', () => {
 
   it('hover:bg-blue-500 → hover state', () => {
     const r = dotMap('hover:bg-blue-500');
-    expect(r.hover?.backgroundColor).toBe('#3b82f6');
+    expect(r.hover?.backgroundColor).toBe('#0079b1');
   });
 
   it('focus:outline-none → focus state', () => {
@@ -23,7 +23,7 @@ describe('state variants via dotMap', () => {
 
   it('active:bg-blue-700 → active state', () => {
     const r = dotMap('active:bg-blue-700');
-    expect(r.active?.backgroundColor).toBe('#1d4ed8');
+    expect(r.active?.backgroundColor).toBe('#004565');
   });
 
   it('disabled:opacity-50 → disabled state', () => {
@@ -40,21 +40,21 @@ describe('state variants via dotMap', () => {
   it('focus-within:border-blue-500 → focus-within state (hyphenated key)', () => {
     const r = dotMap('focus-within:border-blue-500');
     // dotMap uses the raw state string as key: 'focus-within'
-    expect(r['focus-within']?.borderColor).toBe('#3b82f6');
+    expect(r['focus-within']?.borderColor).toBe('#0079b1');
   });
 
   it('base + hover combined', () => {
     const r = dotMap('bg-white hover:bg-gray-100');
     expect(r.base?.backgroundColor).toBe('#ffffff');
-    expect(r.hover?.backgroundColor).toBe('#f3f4f6');
+    expect(r.hover?.backgroundColor).toBe('#dee1e4');
   });
 
   it('multiple state variants', () => {
     const r = dotMap('bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-300');
-    expect(r.base?.backgroundColor).toBe('#3b82f6');
-    expect(r.hover?.backgroundColor).toBe('#2563eb');
-    expect(r.active?.backgroundColor).toBe('#1d4ed8');
-    expect(r.disabled?.backgroundColor).toBe('#d1d5db');
+    expect(r.base?.backgroundColor).toBe('#0079b1');
+    expect(r.hover?.backgroundColor).toBe('#005e8a');
+    expect(r.active?.backgroundColor).toBe('#004565');
+    expect(r.disabled?.backgroundColor).toBe('#a3a7ae');
   });
 });
 
@@ -77,7 +77,7 @@ describe('dark: variant via dotMap', () => {
   it('bg-white dark:bg-gray-900 with { dark: true } → dark overrides base', () => {
     // dark: tokens merge into base when isDark=true
     const r = dotMap('bg-white dark:bg-gray-900', { dark: true });
-    expect(r.base?.backgroundColor).toBe('#111827');
+    expect(r.base?.backgroundColor).toBe('#121418');
   });
 
   it('text-gray-900 dark:text-white with { dark: true } → dark color in base', () => {
@@ -103,7 +103,7 @@ describe('dark: + state combinations', () => {
   it('dark:hover:bg-gray-800 with { dark: true } → goes to hover bucket', () => {
     // dark+state token: when isDark=true, routes to stateLayers['hover']
     const r = dotMap('dark:hover:bg-gray-800', { dark: true });
-    expect(r.hover?.backgroundColor).toBe('#1f2937');
+    expect(r.hover?.backgroundColor).toBe('#26292d');
   });
 
   it('dark:hover:bg-gray-800 without dark option → skipped entirely', () => {
@@ -118,7 +118,7 @@ describe('dark: + state combinations', () => {
     // bg-white goes to base, hover:bg-gray-100 goes to hover, dark:hover:bg-gray-800 goes to hover (overrides)
     expect(r.base?.backgroundColor).toBe('#ffffff');
     // hover bucket: dark:hover overrides hover since dark mode is active
-    expect(r.hover?.backgroundColor).toBe('#1f2937');
+    expect(r.hover?.backgroundColor).toBe('#26292d');
   });
 });
 
@@ -163,7 +163,7 @@ describe('responsive variants', () => {
     // State variants still route to their own bucket
     const r = dotMap('p-4 md:p-8 hover:bg-gray-100', { breakpoint: 'md' });
     expect(r.base?.padding).toBe('32px'); // md:p-8 cascades into base
-    expect(r.hover?.backgroundColor).toBe('#f3f4f6');
+    expect(r.hover?.backgroundColor).toBe('#dee1e4');
   });
 });
 
@@ -183,7 +183,7 @@ describe('!important modifier', () => {
 
   it('!bg-red-500 → backgroundColor with !important', () => {
     const r = dot('!bg-red-500');
-    expect(r.backgroundColor).toBe('#ef4444 !important');
+    expect(r.backgroundColor).toBe('#ca2c22 !important');
   });
 
   it('!flex → display with !important', () => {
@@ -327,7 +327,7 @@ describe('edge cases', () => {
 
   it('conflicting tokens → last wins', () => {
     const r = dot('text-red-500 text-blue-500');
-    expect(r.color).toBe('#3b82f6');
+    expect(r.color).toBe('#0079b1');
   });
 
   it('many tokens at once', () => {
@@ -391,6 +391,6 @@ describe('cache behavior', () => {
     const light = dot('bg-white dark:bg-gray-900');
     const dark = dot('bg-white dark:bg-gray-900', { dark: true });
     expect(light.backgroundColor).toBe('#ffffff');
-    expect(dark.backgroundColor).toBe('#111827');
+    expect(dark.backgroundColor).toBe('#121418');
   });
 });

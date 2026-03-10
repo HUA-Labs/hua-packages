@@ -28,7 +28,7 @@ describe('dot() with target: native — integration', () => {
   it('resolves colors (passthrough)', () => {
     const result = dot('bg-primary-500 text-white', { target: 'native' });
     expect(result).toEqual({
-      backgroundColor: '#3b82f6',
+      backgroundColor: '#2b6cd6',
       color: '#ffffff',
     });
   });
@@ -147,7 +147,7 @@ describe('dot() with target: native — integration', () => {
       dark: true,
       target: 'native',
     });
-    expect(result).toHaveProperty('backgroundColor', '#111827');
+    expect(result).toHaveProperty('backgroundColor', '#121418');
   });
 
   it('ignores dark tokens in light mode', () => {
@@ -176,7 +176,7 @@ describe('dot() with target: native — integration', () => {
       target: 'native',
     });
     expect(result.padding).toBe(32);
-    expect(result.backgroundColor).toBe('#111827');
+    expect(result.backgroundColor).toBe('#121418');
   });
 
   // -----------------------------------------------------------------------
@@ -201,8 +201,8 @@ describe('dot() with target: native — integration', () => {
       target: 'native',
     });
 
-    expect(webDark).toEqual({ backgroundColor: '#111827' });
-    expect(nativeDark).toEqual({ backgroundColor: '#111827' });
+    expect(webDark).toEqual({ backgroundColor: '#121418' });
+    expect(nativeDark).toEqual({ backgroundColor: '#121418' });
   });
 
   // -----------------------------------------------------------------------
@@ -242,8 +242,8 @@ describe('dot() with target: native — integration', () => {
   it('color shade tokens work on native', () => {
     const result = dot('bg-cyan-500 text-red-300', { target: 'native' });
     expect(result).toEqual({
-      backgroundColor: '#06b6d4',
-      color: '#fca5a5',
+      backgroundColor: '#008284',
+      color: '#fa7c6a',
     });
   });
 });

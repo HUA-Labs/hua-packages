@@ -6,9 +6,9 @@ const config = resolveConfig();
 
 describe('lookupColor', () => {
   it('looks up palette colors', () => {
-    expect(lookupColor('primary-500', config.tokens.colors)).toBe('#3b82f6');
-    expect(lookupColor('gray-100', config.tokens.colors)).toBe('#f3f4f6');
-    expect(lookupColor('red-600', config.tokens.colors)).toBe('#dc2626');
+    expect(lookupColor('primary-500', config.tokens.colors)).toBe('#2b6cd6');
+    expect(lookupColor('gray-100', config.tokens.colors)).toBe('#dee1e4');
+    expect(lookupColor('red-600', config.tokens.colors)).toBe('#9f211a');
   });
 
   it('looks up special colors', () => {
@@ -24,26 +24,26 @@ describe('lookupColor', () => {
   });
 
   it('returns shade 500 for flat palette names (no shade specified)', () => {
-    expect(lookupColor('primary', config.tokens.colors)).toBe('#3b82f6');
-    expect(lookupColor('red', config.tokens.colors)).toBe('#ef4444');
-    expect(lookupColor('gray', config.tokens.colors)).toBe('#6b7280');
-    expect(lookupColor('blue', config.tokens.colors)).toBe('#3b82f6');
+    expect(lookupColor('primary', config.tokens.colors)).toBe('#2b6cd6');
+    expect(lookupColor('red', config.tokens.colors)).toBe('#ca2c22');
+    expect(lookupColor('gray', config.tokens.colors)).toBe('#6d7178');
+    expect(lookupColor('blue', config.tokens.colors)).toBe('#0079b1');
   });
 });
 
 describe('resolveColor', () => {
   it('resolves background color', () => {
-    expect(resolveColor('bg', 'primary-500', config)).toEqual({ backgroundColor: '#3b82f6' });
+    expect(resolveColor('bg', 'primary-500', config)).toEqual({ backgroundColor: '#2b6cd6' });
     expect(resolveColor('bg', 'white', config)).toEqual({ backgroundColor: '#ffffff' });
   });
 
   it('resolves text color', () => {
-    expect(resolveColor('text', 'gray-700', config)).toEqual({ color: '#374151' });
+    expect(resolveColor('text', 'gray-700', config)).toEqual({ color: '#3c4045' });
     expect(resolveColor('text', 'black', config)).toEqual({ color: '#000000' });
   });
 
   it('resolves border color', () => {
-    expect(resolveColor('border', 'red-500', config)).toEqual({ borderColor: '#ef4444' });
+    expect(resolveColor('border', 'red-500', config)).toEqual({ borderColor: '#ca2c22' });
   });
 
   it('returns empty for unknown prefix', () => {
@@ -66,22 +66,22 @@ describe('resolveColor', () => {
 describe('flat color (no shade)', () => {
   it('bg-primary uses 500 shade as default', () => {
     const result = dot('bg-primary');
-    expect(result).toEqual({ backgroundColor: '#3b82f6' });
+    expect(result).toEqual({ backgroundColor: '#2b6cd6' });
   });
 
   it('bg-red uses 500 shade', () => {
     const result = dot('bg-red');
-    expect(result).toEqual({ backgroundColor: '#ef4444' });
+    expect(result).toEqual({ backgroundColor: '#ca2c22' });
   });
 
   it('text-primary uses 500 shade', () => {
     const result = dot('text-primary');
-    expect(result).toEqual({ color: '#3b82f6' });
+    expect(result).toEqual({ color: '#2b6cd6' });
   });
 
   it('border-gray uses 500 shade', () => {
     const result = dot('border-gray');
-    expect(result).toEqual({ borderColor: '#6b7280' });
+    expect(result).toEqual({ borderColor: '#6d7178' });
   });
 
   it('bg-primary/50 uses 500 shade with opacity', () => {
