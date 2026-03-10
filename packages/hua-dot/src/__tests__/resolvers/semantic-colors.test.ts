@@ -22,12 +22,12 @@ describe('semantic colors — lookupColor priority', () => {
   });
 
   it('without semanticColors param, palette shade 500 is returned', () => {
-    expect(lookupColor('primary', colors)).toBe('#3b82f6');
+    expect(lookupColor('primary', colors)).toBe('#2b6cd6');
   });
 
   it('shade lookup bypasses semantic', () => {
-    expect(lookupColor('primary-500', colors, semanticColors)).toBe('#3b82f6');
-    expect(lookupColor('primary-300', colors, semanticColors)).toBe('#93c5fd');
+    expect(lookupColor('primary-500', colors, semanticColors)).toBe('#2b6cd6');
+    expect(lookupColor('primary-300', colors, semanticColors)).toBe('#73a6ff');
   });
 
   it('semantic colors without palette entry work', () => {
@@ -44,8 +44,8 @@ describe('semantic colors — lookupColor priority', () => {
   });
 
   it('non-semantic palette colors unaffected', () => {
-    expect(lookupColor('red', colors, semanticColors)).toBe('#ef4444');
-    expect(lookupColor('blue-700', colors, semanticColors)).toBe('#1d4ed8');
+    expect(lookupColor('red', colors, semanticColors)).toBe('#ca2c22');
+    expect(lookupColor('blue-700', colors, semanticColors)).toBe('#004565');
   });
 });
 
@@ -127,24 +127,24 @@ describe('semantic colors — dot() integration', () => {
 
   // Shade access still works
   it('bg-primary-500 → palette hex', () => {
-    expect(dot('bg-primary-500')).toEqual({ backgroundColor: '#3b82f6' });
+    expect(dot('bg-primary-500')).toEqual({ backgroundColor: '#2b6cd6' });
   });
 
   it('text-primary-300 → palette hex', () => {
-    expect(dot('text-primary-300')).toEqual({ color: '#93c5fd' });
+    expect(dot('text-primary-300')).toEqual({ color: '#73a6ff' });
   });
 
   it('bg-secondary-200 → palette hex', () => {
-    expect(dot('bg-secondary-200')).toEqual({ backgroundColor: '#e2e8f0' });
+    expect(dot('bg-secondary-200')).toEqual({ backgroundColor: '#bac6ca' });
   });
 
   // Non-semantic palette unaffected
   it('bg-red → palette 500 (no semantic)', () => {
-    expect(dot('bg-red')).toEqual({ backgroundColor: '#ef4444' });
+    expect(dot('bg-red')).toEqual({ backgroundColor: '#ca2c22' });
   });
 
   it('text-blue-700 → palette hex', () => {
-    expect(dot('text-blue-700')).toEqual({ color: '#1d4ed8' });
+    expect(dot('text-blue-700')).toEqual({ color: '#004565' });
   });
 
   // Opacity with semantic
@@ -343,8 +343,8 @@ describe('semantic colors — non-web targets', () => {
     const result = dot('bg-red-500 text-blue-700', { target: 'flutter' }) as Record<string, unknown>;
     const decoration = result.decoration as Record<string, unknown> | undefined;
     const textStyle = result.textStyle as Record<string, unknown> | undefined;
-    expect(decoration?.color).toBe('#ef4444');
-    expect(textStyle?.color).toBe('#1d4ed8');
+    expect(decoration?.color).toBe('#ca2c22');
+    expect(textStyle?.color).toBe('#004565');
   });
 
   it('dotExplain reports CSS variable values as unsupported on native', () => {
