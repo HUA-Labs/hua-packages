@@ -42,13 +42,13 @@ describe('dotVariants()', () => {
 
     it('applies default variant when no props', () => {
       const result = badge();
-      expect(result).toHaveProperty('backgroundColor', '#3b82f6');
+      expect(result).toHaveProperty('backgroundColor', '#2b6cd6');
       expect(result).toHaveProperty('display', 'inline-flex');
     });
 
     it('applies explicit variant', () => {
       const result = badge({ variant: 'secondary' });
-      expect(result).toHaveProperty('backgroundColor', '#e5e7eb');
+      expect(result).toHaveProperty('backgroundColor', '#c1c4c8');
     });
 
     it('applies outline variant', () => {
@@ -76,20 +76,20 @@ describe('dotVariants()', () => {
 
     it('applies all default variants', () => {
       const result = button();
-      expect(result).toHaveProperty('backgroundColor', '#3b82f6');
+      expect(result).toHaveProperty('backgroundColor', '#2b6cd6');
       expect(result).toHaveProperty('paddingLeft', '16px');
       expect(result).toHaveProperty('paddingRight', '16px');
     });
 
     it('overrides one axis, keeps other default', () => {
       const result = button({ size: 'sm' });
-      expect(result).toHaveProperty('backgroundColor', '#3b82f6'); // default variant
+      expect(result).toHaveProperty('backgroundColor', '#2b6cd6'); // default variant
       expect(result).toHaveProperty('paddingLeft', '8px'); // sm size
     });
 
     it('overrides both axes', () => {
       const result = button({ variant: 'secondary', size: 'lg' });
-      expect(result).toHaveProperty('backgroundColor', '#e5e7eb');
+      expect(result).toHaveProperty('backgroundColor', '#c1c4c8');
       expect(result).toHaveProperty('paddingLeft', '24px');
     });
   });
@@ -123,7 +123,7 @@ describe('dotVariants()', () => {
 
     it('applies compound when all conditions match', () => {
       const result = input({ variant: 'error', size: 'sm' });
-      expect(result).toHaveProperty('backgroundColor', '#fef2f2');
+      expect(result).toHaveProperty('backgroundColor', '#ffeae6');
     });
 
     it('applies compound with default variants filling in', () => {
@@ -165,7 +165,7 @@ describe('dotVariants()', () => {
         },
       });
       const result = fn({ color: 'blue' });
-      expect(result).toHaveProperty('backgroundColor', '#3b82f6');
+      expect(result).toHaveProperty('backgroundColor', '#0079b1');
     });
   });
 
@@ -201,7 +201,7 @@ describe('dotVariants()', () => {
         },
       });
       const result = fn({ variant: 'dark' });
-      expect(result).toHaveProperty('backgroundColor', '#111827');
+      expect(result).toHaveProperty('backgroundColor', '#121418');
       expect(result).toHaveProperty('padding', '16px'); // base preserved
     });
   });

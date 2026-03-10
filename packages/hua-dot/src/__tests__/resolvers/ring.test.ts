@@ -25,10 +25,10 @@ describe('ring utilities', () => {
 
   describe('ring color', () => {
     it('ring-blue-500', () => {
-      expect(dot('ring-blue-500')).toEqual({ boxShadow: '0 0 0 3px #3b82f6' });
+      expect(dot('ring-blue-500')).toEqual({ boxShadow: '0 0 0 3px #0079b1' });
     });
     it('ring-red-500', () => {
-      expect(dot('ring-red-500')).toEqual({ boxShadow: '0 0 0 3px #ef4444' });
+      expect(dot('ring-red-500')).toEqual({ boxShadow: '0 0 0 3px #ca2c22' });
     });
     it('ring-white', () => {
       expect(dot('ring-white')).toEqual({ boxShadow: '0 0 0 3px #ffffff' });
@@ -62,7 +62,7 @@ describe('ring utilities', () => {
   describe('combined ring', () => {
     it('ring-2 ring-blue-500 → last-wins (both produce boxShadow)', () => {
       expect(dot('ring-2 ring-blue-500')).toEqual({
-        boxShadow: '0 0 0 3px #3b82f6',
+        boxShadow: '0 0 0 3px #0079b1',
       });
     });
     it('ring-2 ring-offset-2', () => {
@@ -82,7 +82,7 @@ describe('ring utilities', () => {
     it('focus-visible:ring-2 focus-visible:ring-blue-500', () => {
       const result = dotMap('focus-visible:ring-2 focus-visible:ring-blue-500');
       expect(result['focus-visible']).toEqual({
-        boxShadow: '0 0 0 3px #3b82f6',
+        boxShadow: '0 0 0 3px #0079b1',
       });
     });
   });
@@ -90,7 +90,7 @@ describe('ring utilities', () => {
   describe('with dark variant', () => {
     it('dark:ring-purple-500', () => {
       expect(dot('dark:ring-purple-500', { dark: true })).toEqual({
-        boxShadow: '0 0 0 3px #a855f7',
+        boxShadow: '0 0 0 3px #8650c5',
       });
     });
     it('dark:ring-purple-500 (dark=false → ignored)', () => {

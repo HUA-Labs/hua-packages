@@ -25,9 +25,9 @@ describe('dot() integration', () => {
   });
 
   it('resolves colors', () => {
-    expect(dot('bg-primary-500')).toEqual({ backgroundColor: '#3b82f6' });
+    expect(dot('bg-primary-500')).toEqual({ backgroundColor: '#2b6cd6' });
     expect(dot('text-white')).toEqual({ color: '#ffffff' });
-    expect(dot('border-gray-300')).toEqual({ borderColor: '#d1d5db' });
+    expect(dot('border-gray-300')).toEqual({ borderColor: '#a3a7ae' });
   });
 
   it('resolves typography', () => {
@@ -72,7 +72,7 @@ describe('dot() integration', () => {
     expect(dot('border-2 border-dashed border-red-500')).toEqual({
       borderWidth: '2px',
       borderStyle: 'dashed',
-      borderColor: '#ef4444',
+      borderColor: '#ca2c22',
     });
   });
 
@@ -109,7 +109,7 @@ describe('dot() integration', () => {
       padding: '16px',
       display: 'flex',
       alignItems: 'center',
-      backgroundColor: '#3b82f6',
+      backgroundColor: '#2b6cd6',
       color: '#ffffff',
       borderRadius: '8px',
     });
@@ -122,7 +122,7 @@ describe('dot() integration', () => {
       borderRadius: '12px',
       padding: '24px',
       borderWidth: '1px',
-      borderColor: '#e5e7eb',
+      borderColor: '#c1c4c8',
     });
   });
 
@@ -133,7 +133,7 @@ describe('dot() integration', () => {
       paddingRight: '16px',
       paddingTop: '8px',
       paddingBottom: '8px',
-      backgroundColor: '#3b82f6',
+      backgroundColor: '#2b6cd6',
       color: '#ffffff',
       borderRadius: '6px',
       fontWeight: '500',
@@ -223,7 +223,7 @@ describe('dot() integration', () => {
       expect(result).toEqual({
         padding: '16px',
         display: 'flex',
-        backgroundColor: '#3b82f6',
+        backgroundColor: '#2b6cd6',
       });
     });
 
@@ -263,7 +263,7 @@ describe('dot() integration', () => {
       expect(result).toEqual({
         textAlign: 'center',
         fontSize: '14px',
-        color: '#ef4444',
+        color: '#ca2c22',
       });
     });
 
@@ -272,7 +272,7 @@ describe('dot() integration', () => {
       expect(result).toEqual({
         borderWidth: '2px',
         borderStyle: 'solid',
-        borderColor: '#9ca3af',
+        borderColor: '#888c93',
       });
     });
 
@@ -456,7 +456,7 @@ describe('dot() integration', () => {
 
     it('applies dark overrides in dark mode', () => {
       const result = dot('bg-white dark:bg-gray-900', { dark: true });
-      expect(result).toEqual({ backgroundColor: '#111827' });
+      expect(result).toEqual({ backgroundColor: '#121418' });
     });
 
     it('handles dark-only tokens', () => {
@@ -471,7 +471,7 @@ describe('dot() integration', () => {
 
     it('dark overrides only affected properties', () => {
       const result = dot('p-4 bg-white dark:bg-gray-900', { dark: true });
-      expect(result).toEqual({ padding: '16px', backgroundColor: '#111827' });
+      expect(result).toEqual({ padding: '16px', backgroundColor: '#121418' });
     });
 
     it('dark tokens without dark context returns base only', () => {
@@ -483,7 +483,7 @@ describe('dot() integration', () => {
       const light = dot('bg-white dark:bg-gray-900');
       const dark = dot('bg-white dark:bg-gray-900', { dark: true });
       expect(light).toEqual({ backgroundColor: '#ffffff' });
-      expect(dark).toEqual({ backgroundColor: '#111827' });
+      expect(dark).toEqual({ backgroundColor: '#121418' });
       expect(light).not.toEqual(dark);
     });
   });
@@ -882,7 +882,7 @@ describe('dot() integration', () => {
         position: 'absolute',
         top: '0px',
         right: '0px',
-        backgroundColor: '#ef4444',
+        backgroundColor: '#ca2c22',
         color: '#ffffff',
         borderRadius: '9999px',
         width: '20px',
@@ -958,7 +958,7 @@ describe('dot() integration', () => {
       const result = dot('p-4 md:p-8 dark:bg-gray-900', { breakpoint: 'md', dark: true });
       expect(result).toEqual({
         padding: '32px',
-        backgroundColor: '#111827',
+        backgroundColor: '#121418',
       });
     });
 
@@ -967,7 +967,7 @@ describe('dot() integration', () => {
         breakpoint: 'md',
         dark: true,
       });
-      expect(result).toEqual({ backgroundColor: '#111827' });
+      expect(result).toEqual({ backgroundColor: '#121418' });
     });
 
     it('dark:md: without dark mode ignores dark tokens', () => {

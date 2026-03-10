@@ -114,6 +114,6 @@ describe('ring semantic color', () => {
       },
     });
     const result = dot('ring-blue-500');
-    expect(result.boxShadow).toContain('#3b82f6');
+    expect(result.boxShadow).toContain('#0079b1');
   });
 });

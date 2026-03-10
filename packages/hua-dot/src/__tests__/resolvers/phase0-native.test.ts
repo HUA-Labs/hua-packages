@@ -98,7 +98,7 @@ describe('Phase 0 — native target correctness', () => {
     });
 
     it('divide-color still works', () => {
-      expect(dot('divide-gray-200')).toEqual({ borderColor: '#e5e7eb' });
+      expect(dot('divide-gray-200')).toEqual({ borderColor: '#c1c4c8' });
     });
   });
 });

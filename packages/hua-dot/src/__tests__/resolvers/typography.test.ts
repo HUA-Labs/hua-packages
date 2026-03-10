@@ -22,9 +22,9 @@ describe('resolveTypography', () => {
     });
 
     it('resolves color (fallthrough)', () => {
-      expect(resolveTypography('text', 'red-500', config)).toEqual({ color: '#ef4444' });
+      expect(resolveTypography('text', 'red-500', config)).toEqual({ color: '#ca2c22' });
       expect(resolveTypography('text', 'white', config)).toEqual({ color: '#ffffff' });
-      expect(resolveTypography('text', 'gray-900', config)).toEqual({ color: '#111827' });
+      expect(resolveTypography('text', 'gray-900', config)).toEqual({ color: '#121418' });
     });
 
     it('returns empty for unknown text value', () => {

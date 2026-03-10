@@ -31,7 +31,7 @@ describe('divide resolver', () => {
   describe('divide-color', () => {
     it('divide-gray-200 → borderColor', () => {
       const result = dot('divide-gray-200');
-      expect(result).toEqual({ borderColor: '#e5e7eb' });
+      expect(result).toEqual({ borderColor: '#c1c4c8' });
     });
 
     it('divide-white → borderColor white', () => {
@@ -46,14 +46,14 @@ describe('divide resolver', () => {
 
     it('divide-primary-500 → borderColor', () => {
       const result = dot('divide-primary-500');
-      expect(result).toEqual({ borderColor: '#3b82f6' });
+      expect(result).toEqual({ borderColor: '#2b6cd6' });
     });
   });
 
   describe('combined', () => {
     it('divide-y divide-gray-200 → only color (width unsupported)', () => {
       const result = dot('divide-y divide-gray-200');
-      expect(result).toEqual({ borderColor: '#e5e7eb' });
+      expect(result).toEqual({ borderColor: '#c1c4c8' });
     });
   });
 });

@@ -37,7 +37,7 @@ describe('Flutter adapter: spacing', () => {
 describe('Flutter adapter: decoration', () => {
   it('bg-blue-500 → decoration.color', () => {
     const r = flutterDot('bg-blue-500');
-    expect(r.decoration?.color).toBe('#3b82f6');
+    expect(r.decoration?.color).toBe('#0079b1');
   });
 
   it('rounded-lg → decoration.borderRadius', () => {
@@ -56,7 +56,7 @@ describe('Flutter adapter: decoration', () => {
   it('border-2 border-red-500 → decoration.border', () => {
     const r = flutterDot('border-2 border-red-500');
     expect(r.decoration?.border?.width).toBe(2);
-    expect(r.decoration?.border?.color).toBe('#ef4444');
+    expect(r.decoration?.border?.color).toBe('#ca2c22');
   });
 
   it('shadow-lg → decoration.boxShadow', () => {
@@ -133,7 +133,7 @@ describe('Flutter adapter: typography', () => {
 
   it('text-red-500 → textStyle.color', () => {
     const r = flutterDot('text-red-500');
-    expect(r.textStyle?.color).toBe('#ef4444');
+    expect(r.textStyle?.color).toBe('#ca2c22');
   });
 
   // italic/underline standalone tokens are not yet in dot resolver (Wave 2 typography)
@@ -229,7 +229,7 @@ describe('Flutter adapter: dropped properties', () => {
 describe('Flutter adapter: dark variant', () => {
   it('dark:bg-gray-900 in dark mode', () => {
     const r = dot('bg-white dark:bg-gray-900', { target: 'flutter', dark: true }) as FlutterRecipe;
-    expect(r.decoration?.color).toBe('#111827');
+    expect(r.decoration?.color).toBe('#121418');
   });
 
   it('dark:bg-gray-900 in light mode (ignored)', () => {
@@ -270,12 +270,12 @@ describe('adaptFlutter direct usage', () => {
   it('converts web style to recipe', () => {
     const webStyle: StyleObject = {
       padding: '16px',
-      backgroundColor: '#3b82f6',
+      backgroundColor: '#0079b1',
       borderRadius: '8px',
     };
     const recipe = adaptFlutter(webStyle);
     expect(recipe.padding).toEqual({ top: 16, right: 16, bottom: 16, left: 16 });
-    expect(recipe.decoration?.color).toBe('#3b82f6');
+    expect(recipe.decoration?.color).toBe('#0079b1');
     expect(recipe.decoration?.borderRadius?.topLeft).toBe(8);
   });
 });

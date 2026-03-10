@@ -261,15 +261,15 @@ describe('Phase 0 standalone tokens', () => {
     expect(dot('divide-x-2')).toEqual({});
   });
   it('divide-gray-200 → borderColor', () => {
-    expect(dot('divide-gray-200')).toEqual({ borderColor: '#e5e7eb' });
+    expect(dot('divide-gray-200')).toEqual({ borderColor: '#c1c4c8' });
   });
 
   // flat color (no shade — defaults to 500)
   it('bg-primary → 500 default', () => {
-    expect(dot('bg-primary')).toEqual({ backgroundColor: '#3b82f6' });
+    expect(dot('bg-primary')).toEqual({ backgroundColor: '#2b6cd6' });
   });
   it('text-red → color red-500', () => {
-    expect(dot('text-red')).toEqual({ color: '#ef4444' });
+    expect(dot('text-red')).toEqual({ color: '#ca2c22' });
   });
 });
 
@@ -310,7 +310,7 @@ describe('border comprehensive', () => {
   it('border-t-2', () => { expect(dot('border-t-2')).toEqual({ borderTopWidth: '2px' }); });
   it('border-solid → style', () => { expect(dot('border-solid')).toEqual({ borderStyle: 'solid' }); });
   it('border-dashed → style', () => { expect(dot('border-dashed')).toEqual({ borderStyle: 'dashed' }); });
-  it('border-gray-200 → color', () => { expect(dot('border-gray-200')).toEqual({ borderColor: '#e5e7eb' }); });
+  it('border-gray-200 → color', () => { expect(dot('border-gray-200')).toEqual({ borderColor: '#c1c4c8' }); });
   it('border-transparent', () => { expect(dot('border-transparent')).toEqual({ borderColor: 'transparent' }); });
   it('rounded → borderRadius', () => { expect(dot('rounded')).toHaveProperty('borderRadius'); });
   it('rounded-lg', () => { expect(dot('rounded-lg')).toHaveProperty('borderRadius'); });
@@ -388,10 +388,10 @@ describe('color comprehensive', () => {
   it('bg-black', () => { expect(dot('bg-black')).toEqual({ backgroundColor: '#000000' }); });
   it('bg-transparent', () => { expect(dot('bg-transparent')).toEqual({ backgroundColor: 'transparent' }); });
   it('bg-current', () => { expect(dot('bg-current')).toEqual({ backgroundColor: 'currentColor' }); });
-  it('bg-red-500', () => { expect(dot('bg-red-500')).toEqual({ backgroundColor: '#ef4444' }); });
-  it('bg-blue-100', () => { expect(dot('bg-blue-100')).toEqual({ backgroundColor: '#dbeafe' }); });
+  it('bg-red-500', () => { expect(dot('bg-red-500')).toEqual({ backgroundColor: '#ca2c22' }); });
+  it('bg-blue-100', () => { expect(dot('bg-blue-100')).toEqual({ backgroundColor: '#c4e6ff' }); });
   it('text-white', () => { expect(dot('text-white')).toEqual({ color: '#ffffff' }); });
-  it('text-gray-500', () => { expect(dot('text-gray-500')).toEqual({ color: '#6b7280' }); });
+  it('text-gray-500', () => { expect(dot('text-gray-500')).toEqual({ color: '#6d7178' }); });
   it('bg-[#ff0000] arbitrary', () => { expect(dot('bg-[#ff0000]')).toEqual({ backgroundColor: '#ff0000' }); });
   it('bg-red-500/50 opacity', () => {
     const r = dot('bg-red-500/50');
@@ -556,7 +556,7 @@ describe('combined utility strings', () => {
     const r = dot('px-4 py-2 rounded-md bg-blue-500 text-white font-semibold');
     expect(r.paddingLeft).toBe('16px');
     expect(r.paddingTop).toBe('8px');
-    expect(r.backgroundColor).toBe('#3b82f6');
+    expect(r.backgroundColor).toBe('#0079b1');
     expect(r.color).toBe('#ffffff');
     expect(r.fontWeight).toBe('600');
   });

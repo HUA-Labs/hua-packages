@@ -35,8 +35,8 @@ describe('resolveBorder', () => {
   });
 
   it('resolves border color (fallthrough)', () => {
-    expect(resolveBorder('border', 'red-500', config)).toEqual({ borderColor: '#ef4444' });
-    expect(resolveBorder('border', 'gray-300', config)).toEqual({ borderColor: '#d1d5db' });
+    expect(resolveBorder('border', 'red-500', config)).toEqual({ borderColor: '#ca2c22' });
+    expect(resolveBorder('border', 'gray-300', config)).toEqual({ borderColor: '#a3a7ae' });
   });
 
   it('resolves arbitrary color as borderColor (not borderWidth)', () => {

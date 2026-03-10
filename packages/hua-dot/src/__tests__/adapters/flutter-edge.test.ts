@@ -29,7 +29,7 @@ describe('Flutter edge cases: combined utilities', () => {
     const r = flutterDot('p-4 m-2 bg-blue-500 rounded-lg');
     expect(r.padding).toBeDefined();
     expect(r.margin).toBeDefined();
-    expect(r.decoration?.color).toBe('#3b82f6');
+    expect(r.decoration?.color).toBe('#0079b1');
     expect(r.decoration?.borderRadius).toBeDefined();
   });
 
@@ -170,7 +170,7 @@ describe('Flutter edge cases: dotMap() flutter support', () => {
     expect(base.padding?.top).toBe(16);
     // hover state should also be flutter-adapted
     const hover = map.hover as FlutterRecipe;
-    expect(hover?.decoration?.color).toBe('#ef4444');
+    expect(hover?.decoration?.color).toBe('#ca2c22');
   });
 });
 

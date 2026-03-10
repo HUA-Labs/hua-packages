@@ -25,7 +25,7 @@ describe('@hua-labs/dot/native subpath', () => {
     it('passes through colors', () => {
       const result = dot('bg-primary-500 text-white');
       expect(result).toEqual({
-        backgroundColor: '#3b82f6',
+        backgroundColor: '#2b6cd6',
         color: '#ffffff',
       });
     });
@@ -60,7 +60,7 @@ describe('@hua-labs/dot/native subpath', () => {
       expect(result.base).toHaveProperty('padding', 16);
       expect(result.base).toHaveProperty('backgroundColor', '#ffffff');
       expect(result.hover).toBeDefined();
-      expect(result.hover).toHaveProperty('backgroundColor', '#f3f4f6');
+      expect(result.hover).toHaveProperty('backgroundColor', '#dee1e4');
     });
 
     it('handles focus state', () => {
@@ -77,7 +77,7 @@ describe('@hua-labs/dot/native subpath', () => {
   describe('dark mode', () => {
     it('resolves dark variant styles', () => {
       const result = dot('bg-white dark:bg-gray-900', { dark: true });
-      expect(result).toHaveProperty('backgroundColor', '#111827');
+      expect(result).toHaveProperty('backgroundColor', '#121418');
     });
 
     it('ignores dark variants when dark=false', () => {

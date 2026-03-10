@@ -32,17 +32,17 @@ describe('gradient direction', () => {
 describe('gradient color stops', () => {
   it('resolves from-red-500 to-blue-500 with default direction', () => {
     const result = dot('from-red-500 to-blue-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to bottom, #ef4444, #3b82f6)');
+    expect(result.backgroundImage).toBe('linear-gradient(to bottom, #ca2c22, #0079b1)');
   });
 
   it('resolves full gradient: direction + from + via + to', () => {
     const result = dot('bg-gradient-to-r from-red-500 via-yellow-500 to-green-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444, #eab308, #22c55e)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #896e00, #478400)');
   });
 
   it('resolves from + to without via', () => {
     const result = dot('bg-gradient-to-r from-red-500 to-blue-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444, #3b82f6)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #0079b1)');
   });
 
   it('resolves special colors (white, black, transparent)', () => {
@@ -57,31 +57,31 @@ describe('gradient color stops', () => {
 
   it('handles opacity modifier: from-red-500/50', () => {
     const result = dot('bg-gradient-to-r from-red-500/50 to-blue-500');
-    expect(result.backgroundImage).toMatch(/linear-gradient\(to right, rgb\(239 68 68 \/ 0\.5\), #3b82f6\)/);
+    expect(result.backgroundImage).toMatch(/linear-gradient\(to right, rgb\(202 44 34 \/ 0\.5\), #0079b1\)/);
   });
 });
 
 describe('gradient stop positions', () => {
   it('resolves from-50% position', () => {
     const result = dot('bg-gradient-to-r from-red-500 from-10% to-blue-500 to-90%');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444 10%, #3b82f6 90%)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22 10%, #0079b1 90%)');
   });
 
   it('resolves arbitrary position: from-[25%]', () => {
     const result = dot('bg-gradient-to-r from-red-500 from-[25%] to-blue-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444 25%, #3b82f6)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22 25%, #0079b1)');
   });
 
   it('resolves via position', () => {
     const result = dot('bg-gradient-to-r from-red-500 via-yellow-500 via-30% to-blue-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444, #eab308 30%, #3b82f6)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #896e00 30%, #0079b1)');
   });
 });
 
 describe('gradient combinations with other utilities', () => {
   it('combines gradient with spacing', () => {
     const result = dot('bg-gradient-to-r from-red-500 to-blue-500 p-4');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ef4444, #3b82f6)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #0079b1)');
     expect(result.padding).toBe('16px');
   });
 
@@ -121,7 +121,7 @@ describe('gradient on flutter target', () => {
     expect(gradient.type).toBe('linear');
     expect(gradient.begin).toBe('centerLeft');
     expect(gradient.end).toBe('centerRight');
-    expect(gradient.colors).toEqual(['#ef4444', '#3b82f6']);
+    expect(gradient.colors).toEqual(['#ca2c22', '#0079b1']);
   });
 
   it('handles colors with internal commas (rgba) on flutter', () => {
@@ -137,7 +137,7 @@ describe('gradient on flutter target', () => {
     const decoration = result.decoration as Record<string, unknown> | undefined;
     expect(decoration?.gradient).toBeDefined();
     const gradient = decoration!.gradient as Record<string, unknown>;
-    expect(gradient.colors).toEqual(['#ef4444', '#eab308', '#3b82f6']);
+    expect(gradient.colors).toEqual(['#ca2c22', '#896e00', '#0079b1']);
     // via-30% → stops[1]=0.3, from/to auto-filled to 0 and 1
     expect(gradient.stops).toEqual([0, 0.3, 1]);
   });
