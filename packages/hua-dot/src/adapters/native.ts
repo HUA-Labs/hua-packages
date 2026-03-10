@@ -320,6 +320,13 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
       continue;
     }
 
+    // Skip CSS variable values — not supported in React Native
+    // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
+    if (typeof value === 'string' && value.includes('var(')) {
+      if (warn) warnOnce(key, `CSS variable value "${value}" not supported in RN`);
+      continue;
+    }
+
     // objectFit → RN resizeMode
     if (key === 'objectFit') {
       const resizeModeMap: Record<string, string> = {

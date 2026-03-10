@@ -157,6 +157,13 @@ export function adaptFlutter(webStyle: StyleObject, options?: AdaptFlutterOption
       continue;
     }
 
+    // Skip CSS variable values — not supported in Flutter
+    // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
+    if (typeof sv === 'string' && sv.includes('var(')) {
+      dropped.push(key);
+      continue;
+    }
+
     // ── Padding ──
     if (key === 'padding') {
       const n = toNumber(value, remBase);

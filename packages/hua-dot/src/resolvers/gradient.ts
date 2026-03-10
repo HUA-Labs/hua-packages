@@ -37,6 +37,8 @@ export function resolveGradientStop(prefix: string, value: string, config: DotCo
     return { [`__dot_gradient${key}Pos`]: value };
   }
 
+  const { colors, semanticColors } = config.tokens;
+
   // Opacity modifier: from-red-500/50
   const slashIdx = value.lastIndexOf('/');
   if (slashIdx !== -1) {
@@ -44,7 +46,7 @@ export function resolveGradientStop(prefix: string, value: string, config: DotCo
     const opacityKey = value.slice(slashIdx + 1);
     const opacityNum = parseInt(opacityKey, 10);
     if (!isNaN(opacityNum) && opacityNum >= 0 && opacityNum <= 100) {
-      const hex = lookupColor(colorValue, config.tokens.colors);
+      const hex = lookupColor(colorValue, colors, semanticColors);
       if (hex && hex.startsWith('#')) {
         const rgb = hexToRgb(hex, opacityNum / 100);
         if (rgb) return { [`__dot_gradient${key}`]: rgb };
@@ -56,7 +58,7 @@ export function resolveGradientStop(prefix: string, value: string, config: DotCo
   }
 
   // Color lookup: from-red-500, via-white, to-transparent
-  const color = lookupColor(value, config.tokens.colors);
+  const color = lookupColor(value, colors, semanticColors);
   if (color) {
     return { [`__dot_gradient${key}`]: color };
   }

@@ -358,7 +358,17 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
   const capabilities: Record<string, CapabilityLevel> = {};
 
   for (const prop of Object.keys(webStyles)) {
-    const level = getCapability(prop, target, String(webStyles[prop]));
+    const propValue = String(webStyles[prop]);
+
+    // CSS variable values are unsupported on non-web targets
+    // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
+    if (propValue.includes('var(')) {
+      dropped.push(prop);
+      capabilities[prop] = 'unsupported';
+      continue;
+    }
+
+    const level = getCapability(prop, target, propValue);
 
     if (level === 'unsupported') {
       dropped.push(prop);
@@ -621,6 +631,44 @@ export type {
 
 // Re-export cx utility
 export { dotCx } from './cx';
+
+/**
+ * Helper to generate semantic color mappings from token names.
+ *
+ * @example
+ * import { semanticVars, createDotConfig } from '@hua-labs/dot';
+ *
+ * createDotConfig({
+ *   theme: {
+ *     semanticColors: {
+ *       ...semanticVars('sidebar', 'sidebar-foreground', 'chart-1'),
+ *       brand: 'var(--my-brand)',  // mix with explicit mappings
+ *     },
+ *   },
+ * });
+ *
+ * @param names - Semantic token names
+ * @param prefix - CSS variable prefix (default: '--color')
+ */
+export function semanticVars(...names: string[]): Record<string, string>;
+export function semanticVars(options: { prefix: string }, ...names: string[]): Record<string, string>;
+export function semanticVars(...args: unknown[]): Record<string, string> {
+  let prefix = '--color';
+  let names: string[];
+
+  if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null && 'prefix' in args[0]) {
+    prefix = (args[0] as { prefix: string }).prefix;
+    names = args.slice(1) as string[];
+  } else {
+    names = args as string[];
+  }
+
+  const result: Record<string, string> = {};
+  for (const name of names) {
+    result[name] = `var(${prefix}-${name})`;
+  }
+  return result;
+}
 
 // Re-export variants (CVA replacement) — inject dot function to avoid circular import
 import { _setDotFn, _setGetRuntime, dotVariants } from './variants';

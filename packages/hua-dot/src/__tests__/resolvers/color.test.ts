@@ -64,29 +64,36 @@ describe('resolveColor', () => {
 });
 
 describe('flat color (no shade)', () => {
-  it('bg-primary uses 500 shade as default', () => {
+  it('bg-primary resolves to semantic CSS variable', () => {
     const result = dot('bg-primary');
-    expect(result).toEqual({ backgroundColor: '#2b6cd6' });
+    expect(result).toEqual({ backgroundColor: 'var(--color-primary)' });
   });
 
-  it('bg-red uses 500 shade', () => {
+  it('bg-red uses 500 shade (no semantic entry)', () => {
     const result = dot('bg-red');
     expect(result).toEqual({ backgroundColor: '#ca2c22' });
   });
 
-  it('text-primary uses 500 shade', () => {
+  it('text-primary resolves to semantic CSS variable', () => {
     const result = dot('text-primary');
-    expect(result).toEqual({ color: '#2b6cd6' });
+    expect(result).toEqual({ color: 'var(--color-primary)' });
   });
 
-  it('border-gray uses 500 shade', () => {
+  it('border-gray uses 500 shade (no semantic entry)', () => {
     const result = dot('border-gray');
     expect(result).toEqual({ borderColor: '#6d7178' });
   });
 
-  it('bg-primary/50 uses 500 shade with opacity', () => {
+  it('bg-primary/50 uses color-mix with CSS variable', () => {
     const result = dot('bg-primary/50');
     expect(result).toHaveProperty('backgroundColor');
-    expect((result as { backgroundColor: string }).backgroundColor).toContain('rgb');
+    expect((result as { backgroundColor: string }).backgroundColor).toBe(
+      'color-mix(in srgb, var(--color-primary) 50%, transparent)',
+    );
+  });
+
+  it('bg-primary-500 still uses palette hex', () => {
+    const result = dot('bg-primary-500');
+    expect(result).toEqual({ backgroundColor: '#3b82f6' });
   });
 });

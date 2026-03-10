@@ -18,7 +18,7 @@ import { BREAKPOINT_ORDER } from './tokens/breakpoints';
 const DEFAULT_TOKENS: ResolvedTokens = {
   colors: { ...COLORS, ...Object.fromEntries(
     Object.entries(SPECIAL_COLORS).map(([k, v]) => [k, v])
-  ), ...SEMANTIC_COLORS},
+  )},
   spacing: { ...SPACING },
   borderRadius: { ...BORDER_RADIUS },
   fontSize: { ...FONT_SIZES },
@@ -41,6 +41,7 @@ const DEFAULT_TOKENS: ResolvedTokens = {
   gridRows: { ...GRID_ROWS },
   ringWidths: { ...RING_WIDTHS },
   ringOffsets: { ...RING_OFFSETS },
+  semanticColors: { ...SEMANTIC_COLORS },
 };
 
 /**
@@ -74,13 +75,54 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
 }
 
 /**
+ * Normalize semantic colors from user config.
+ *
+ * Accepts `string[]` (auto-mapped to `var({prefix}-{name})`) or `Record<string, string>`.
+ * Merges with built-in SEMANTIC_COLORS defaults.
+ */
+function normalizeSemanticColors(
+  input: string[] | Record<string, string> | undefined,
+  prefix: string,
+): Record<string, string> {
+  if (!input) return { ...SEMANTIC_COLORS };
+
+  let userMap: Record<string, string>;
+  if (Array.isArray(input)) {
+    userMap = {};
+    for (const name of input) {
+      userMap[name] = `var(${prefix}-${name})`;
+    }
+  } else {
+    userMap = input;
+  }
+
+  return { ...SEMANTIC_COLORS, ...userMap };
+}
+
+/**
  * Resolve user config into final DotConfig by merging with defaults.
  */
 export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
   const theme = userConfig?.theme;
-  const tokens: ResolvedTokens = theme
-    ? deepMerge(DEFAULT_TOKENS, theme as Partial<ResolvedTokens>)
+
+  // Normalize semanticColors before deepMerge (handles string[] → Record conversion)
+  const semanticPrefix = theme?.semanticPrefix ?? '--color';
+  const resolvedSemantic = normalizeSemanticColors(theme?.semanticColors, semanticPrefix);
+
+  // Strip semanticColors/semanticPrefix from theme before deepMerge (already handled above)
+  let themeForMerge: Partial<ResolvedTokens> | undefined;
+  if (theme) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { semanticColors: _sc, semanticPrefix: _sp, ...rest } = theme;
+    themeForMerge = rest as Partial<ResolvedTokens>;
+  }
+
+  const tokens: ResolvedTokens = themeForMerge
+    ? deepMerge(DEFAULT_TOKENS, themeForMerge)
     : { ...DEFAULT_TOKENS };
+
+  // Override semanticColors with our normalized version
+  tokens.semanticColors = resolvedSemantic;
 
   const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
 

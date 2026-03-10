@@ -3,26 +3,42 @@ import { COLOR_PROP_MAP } from '../tokens/colors';
 import { parseArbitrary, hexToRgb } from './utils';
 
 /**
- * Look up a color value from palette or special colors.
+ * Look up a color value from palette, special colors, or semantic colors.
+ *
+ * Priority order:
+ *   1. colors[value] as string → user override / SPECIAL_COLORS (highest)
+ *   2. semanticColors[value]   → CSS variable-based semantic token
+ *   3. colors[value] as object → palette shade 500 default
+ *   4. shade split lookup      → palette[colorName][shade]
  *
  * @example
- * lookupColor('primary-500', colors) → '#3b82f6'
- * lookupColor('white', colors)       → '#ffffff'
- * lookupColor('gray-100', colors)    → '#f3f4f6'
+ * lookupColor('white', colors)                    → '#ffffff'
+ * lookupColor('primary', colors, semanticColors)  → 'var(--color-primary)'
+ * lookupColor('primary-500', colors, semanticColors) → '#3b82f6'
+ * lookupColor('primary', colors)                  → '#3b82f6' (no semantic → palette 500)
  */
-export function lookupColor(value: string, colors: ResolvedTokens['colors']): string | undefined {
-  // Check special/flat colors first (white, black, transparent, current, CSS vars)
+export function lookupColor(
+  value: string,
+  colors: ResolvedTokens['colors'],
+  semanticColors?: Record<string, string>,
+): string | undefined {
+  // 1. Check special/flat string colors first (white, black, transparent, current, user overrides)
   const flat = colors[value];
   if (typeof flat === 'string') {
     return flat;
   }
 
-  // If a palette object is found without a shade, use 500 as default (matches Tailwind behavior)
+  // 2. Check semantic colors (CSS variable-based tokens like 'primary', 'muted-foreground')
+  if (semanticColors?.[value]) {
+    return semanticColors[value];
+  }
+
+  // 3. If a palette object is found without a shade, use 500 as default (matches Tailwind behavior)
   if (flat && typeof flat === 'object') {
     return (flat as Record<string, string>)['500'];
   }
 
-  // Split color name and shade: 'primary-500' → ['primary', '500']
+  // 4. Split color name and shade: 'primary-500' → ['primary', '500']
   const lastDash = value.lastIndexOf('-');
   if (lastDash === -1) return undefined;
 
@@ -42,6 +58,8 @@ export function resolveColor(prefix: string, value: string, config: DotConfig): 
   const prop = COLOR_PROP_MAP[prefix];
   if (!prop) return {};
 
+  const { colors, semanticColors } = config.tokens;
+
   // Arbitrary value: bg-[#ff0000], text-[rgb(0,0,0)]
   const arbitrary = parseArbitrary(value);
   if (arbitrary !== undefined) return { [prop]: arbitrary };
@@ -53,7 +71,7 @@ export function resolveColor(prefix: string, value: string, config: DotConfig): 
     const opacityKey = value.slice(slashIdx + 1);
     const opacityNum = parseInt(opacityKey, 10);
     if (!isNaN(opacityNum) && opacityNum >= 0 && opacityNum <= 100) {
-      const hex = lookupColor(colorValue, config.tokens.colors);
+      const hex = lookupColor(colorValue, colors, semanticColors);
       if (hex && hex.startsWith('#')) {
         const rgb = hexToRgb(hex, opacityNum / 100);
         if (rgb) return { [prop]: rgb };
@@ -65,7 +83,7 @@ export function resolveColor(prefix: string, value: string, config: DotConfig): 
     }
   }
 
-  const hex = lookupColor(value, config.tokens.colors);
+  const hex = lookupColor(value, colors, semanticColors);
   if (!hex) return {};
 
   return { [prop]: hex };

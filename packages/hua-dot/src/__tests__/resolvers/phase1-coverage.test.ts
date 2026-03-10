@@ -264,9 +264,9 @@ describe('Phase 0 standalone tokens', () => {
     expect(dot('divide-gray-200')).toEqual({ borderColor: '#c1c4c8' });
   });
 
-  // flat color (no shade — defaults to 500)
-  it('bg-primary → 500 default', () => {
-    expect(dot('bg-primary')).toEqual({ backgroundColor: '#2b6cd6' });
+  // flat color with semantic → CSS variable takes priority
+  it('bg-primary → semantic CSS variable', () => {
+    expect(dot('bg-primary')).toEqual({ backgroundColor: 'var(--color-primary)' });
   });
   it('text-red → color red-500', () => {
     expect(dot('text-red')).toEqual({ color: '#ca2c22' });

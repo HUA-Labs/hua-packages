@@ -111,6 +111,33 @@ export interface DotUserConfig {
     gridRows?: Record<string, string>;
     ringWidths?: Record<string, string>;
     ringOffsets?: Record<string, string>;
+    /**
+     * CSS variable-based semantic colors.
+     *
+     * - **string[]** — auto-mapped to `var(--color-{name})` (or custom `semanticPrefix`)
+     * - **Record<string, string>** — explicit mapping (key → CSS variable)
+     *
+     * Merged with built-in defaults (shadcn tokens).
+     *
+     * @example
+     * // Shorthand (auto-mapped to var(--color-*))
+     * semanticColors: ['sidebar', 'sidebar-foreground', 'chart-1']
+     *
+     * // Explicit mapping
+     * semanticColors: { brand: 'var(--my-brand)', accent: 'var(--theme-accent)' }
+     */
+    semanticColors?: string[] | Record<string, string>;
+    /**
+     * CSS variable prefix for shorthand semantic colors.
+     * Only used when `semanticColors` is a `string[]`.
+     * @default '--color'
+     *
+     * @example
+     * semanticPrefix: '--theme'
+     * semanticColors: ['brand']
+     * // → { brand: 'var(--theme-brand)' }
+     */
+    semanticPrefix?: string;
   };
   cache?: boolean;
   cacheSize?: number;
@@ -166,4 +193,5 @@ export interface ResolvedTokens {
   gridRows: Record<string, string>;
   ringWidths: Record<string, string>;
   ringOffsets: Record<string, string>;
+  semanticColors: Record<string, string>;
 }
