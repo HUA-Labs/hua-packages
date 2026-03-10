@@ -37,7 +37,7 @@ describe('gradient color stops', () => {
 
   it('resolves full gradient: direction + from + via + to', () => {
     const result = dot('bg-gradient-to-r from-red-500 via-yellow-500 to-green-500');
-    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #896e00, #478400)');
+    expect(result.backgroundImage).toBe('linear-gradient(to right, #ca2c22, #896e00, #00874c)');
   });
 
   it('resolves from + to without via', () => {

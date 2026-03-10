@@ -9,8 +9,8 @@ const config = resolveConfig();
 describe('Wave 5: Extended color palettes', () => {
   const newPalettes = [
     'slate', 'zinc', 'neutral', 'stone',
-    'amber', 'lime', 'emerald', 'teal',
-    'cyan', 'sky', 'indigo', 'violet',
+    'amber', 'lime', 'grass', 'green',
+    'emerald', 'teal', 'cyan', 'indigo', 'violet',
     'fuchsia', 'rose',
   ];
 
@@ -23,16 +23,16 @@ describe('Wave 5: Extended color palettes', () => {
     }
   });
 
-  it('resolves bg-cyan-500', () => {
-    expect(resolveColor('bg', 'cyan-500', config)).toEqual({ backgroundColor: '#008284' });
+  it('resolves bg-teal-500', () => {
+    expect(resolveColor('bg', 'teal-500', config)).toEqual({ backgroundColor: '#008284' });
   });
 
-  it('resolves text-cyan-700', () => {
-    expect(resolveColor('text', 'cyan-700', config)).toEqual({ color: '#004a4b' });
+  it('resolves text-teal-700', () => {
+    expect(resolveColor('text', 'teal-700', config)).toEqual({ color: '#004a4b' });
   });
 
-  it('resolves bg-teal-400', () => {
-    expect(resolveColor('bg', 'teal-400', config)).toEqual({ backgroundColor: '#00a389' });
+  it('resolves bg-emerald-400', () => {
+    expect(resolveColor('bg', 'emerald-400', config)).toEqual({ backgroundColor: '#00a389' });
   });
 
   it('resolves text-indigo-600', () => {
@@ -51,12 +51,12 @@ describe('Wave 5: Extended color palettes', () => {
     expect(resolveColor('bg', 'amber-200', config)).toEqual({ backgroundColor: '#e7bb82' });
   });
 
-  it('resolves text-emerald-500', () => {
-    expect(resolveColor('text', 'emerald-500', config)).toEqual({ color: '#00874c' });
+  it('resolves text-green-500', () => {
+    expect(resolveColor('text', 'green-500', config)).toEqual({ color: '#00874c' });
   });
 
-  it('resolves bg-sky-100', () => {
-    expect(resolveColor('bg', 'sky-100', config)).toEqual({ backgroundColor: '#c0e8f6' });
+  it('resolves bg-cyan-100', () => {
+    expect(resolveColor('bg', 'cyan-100', config)).toEqual({ backgroundColor: '#c0e8f6' });
   });
 
   it('resolves text-fuchsia-400', () => {
@@ -84,7 +84,7 @@ describe('Wave 5: Extended color palettes', () => {
   });
 
   it('950 shade works', () => {
-    expect(lookupColor('cyan-950', config.tokens.colors)).toBe('#000d0e');
+    expect(lookupColor('teal-950', config.tokens.colors)).toBe('#000d0e');
     expect(lookupColor('rose-950', config.tokens.colors)).toBe('#180307');
   });
 
@@ -95,7 +95,7 @@ describe('Wave 5: Extended color palettes', () => {
   });
 
   it('dot() resolves new colors end-to-end', () => {
-    expect(dot('bg-cyan-500')).toEqual({ backgroundColor: '#008284' });
+    expect(dot('bg-teal-500')).toEqual({ backgroundColor: '#008284' });
     expect(dot('text-indigo-300')).toEqual({ color: '#73a6ff' });
   });
 });
@@ -136,7 +136,7 @@ describe('Wave 5: Font family tokens', () => {
   });
 
   it('dot() combines font-family with other tokens', () => {
-    const result = dot('font-mono text-sm text-cyan-500');
+    const result = dot('font-mono text-sm text-teal-500');
     expect(result).toHaveProperty('fontFamily');
     expect(result).toHaveProperty('fontSize', '14px');
     expect(result).toHaveProperty('color', '#008284');

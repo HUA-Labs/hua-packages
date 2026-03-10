@@ -240,7 +240,7 @@ describe('dot() with target: native — integration', () => {
   });
 
   it('color shade tokens work on native', () => {
-    const result = dot('bg-cyan-500 text-red-300', { target: 'native' });
+    const result = dot('bg-teal-500 text-red-300', { target: 'native' });
     expect(result).toEqual({
       backgroundColor: '#008284',
       color: '#fa7c6a',
