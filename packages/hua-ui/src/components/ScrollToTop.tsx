@@ -107,7 +107,7 @@ const ScrollToTop = ({
         aria-label="Scroll to top"
         {...props}
       >
-        <Icon name={icon} className="w-5 h-5" />
+        <Icon name={icon} dot="w-5 h-5" />
       </button>
     )
 }

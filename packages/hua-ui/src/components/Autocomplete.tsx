@@ -276,7 +276,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             {loading || isSearching ? (
               <Icon
                       name="loader"
-                className="h-4 w-4 animate-spin text-muted-foreground"
+                dot="h-4 w-4 animate-spin" style={{ color: 'hsl(var(--muted-foreground))' }}
               />
             ) : clearable && inputValue ? (
               <button
@@ -287,10 +287,10 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '' }}
                 aria-label="지우기"
               >
-                <Icon name="close" className="h-4 w-4 text-muted-foreground" />
+                <Icon name="close" dot="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
               </button>
             ) : (
-              <Icon name="chevronDown" className="h-4 w-4 text-muted-foreground" />
+              <Icon name="chevronDown" dot="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
             )}
           </div>
         </div>
@@ -314,7 +314,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
           >
             <div style={{ overflowY: 'auto', maxHeight: `${maxHeight}px` }}>
               {filteredOptions.length === 0 ? (
-                <div style={resolveDot('px-4 py-8 text-center text-sm')} className="text-muted-foreground">
+                <div style={mergeStyles(resolveDot('px-4 py-8 text-center text-sm'), { color: 'hsl(var(--muted-foreground))' })}>
                   {emptyText}
                 </div>
               ) : (
@@ -337,24 +337,24 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                     >
                       <div style={resolveDot('flex items-center gap-3')}>
                         {option.icon && (
-                          <div style={resolveDot('flex-shrink-0')} className="text-muted-foreground">
+                          <div style={mergeStyles(resolveDot('flex-shrink-0'), { color: 'hsl(var(--muted-foreground))' })}>
                             {option.icon}
                           </div>
                         )}
                         <div style={resolveDot('flex-1 min-w-0')}>
                           <div style={resolveDot('flex items-center gap-2')}>
-                            <p style={resolveDot('text-sm font-medium')} className="text-foreground">
+                            <p style={mergeStyles(resolveDot('text-sm font-medium'), { color: 'hsl(var(--foreground))' })}>
                               {option.label}
                             </p>
                             {isValueSelected && (
                               <Icon
                                 name="check"
-                                className="h-4 w-4 text-primary flex-shrink-0"
+                                dot="h-4 w-4 flex-shrink-0" style={{ color: 'hsl(var(--primary))' }}
                               />
                             )}
                           </div>
                           {option.description && (
-                            <p style={resolveDot('text-xs mt-0.5')} className="text-muted-foreground">
+                            <p style={mergeStyles(resolveDot('text-xs mt-0.5'), { color: 'hsl(var(--muted-foreground))' })}>
                               {option.description}
                             </p>
                           )}

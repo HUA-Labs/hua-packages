@@ -363,7 +363,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
               sizeStyle={halfButtonStyle}
               extraStyle={topButtonExtra}
             >
-              <ChevronUp className="w-3 h-3" />
+              <ChevronUp style={{ width: '0.75rem', height: '0.75rem' }} />
             </StepButton>
             <StepButton
               onClick={decrement}
@@ -372,7 +372,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
               sizeStyle={halfButtonStyle}
               extraStyle={bottomButtonExtra}
             >
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown style={{ width: '0.75rem', height: '0.75rem' }} />
             </StepButton>
           </div>
           <input
@@ -402,7 +402,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             ariaLabel="Decrease"
             sizeStyle={sizes.button}
           >
-            <Minus className="w-3.5 h-3.5" />
+            <Minus style={{ width: '0.875rem', height: '0.875rem' }} />
           </StepButton>
         )}
         <input
@@ -426,7 +426,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             ariaLabel="Increase"
             sizeStyle={sizes.button}
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus style={{ width: '0.875rem', height: '0.875rem' }} />
           </StepButton>
         )}
       </div>
@@ -437,35 +437,35 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 NumberInput.displayName = "NumberInput";
 
 // ---------------------------------------------------------------------------
-// Icon sub-components (className kept for SVG sizing only)
+// Icon sub-components (inline style for SVG sizing)
 // ---------------------------------------------------------------------------
-function Minus({ className }: { className?: string }) {
+function Minus({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
     </svg>
   );
 }
 
-function Plus({ className }: { className?: string }) {
+function Plus({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
     </svg>
   );
 }
 
-function ChevronUp({ className }: { className?: string }) {
+function ChevronUp({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
     </svg>
   );
 }
 
-function ChevronDown({ className }: { className?: string }) {
+function ChevronDown({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
   );

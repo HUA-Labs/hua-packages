@@ -378,8 +378,8 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
       [containerStyle, dotProp, style]
     );
 
-    // Icon className for size (Icon still accepts className)
-    const iconClassName = `w-${size === "sm" ? "4" : size === "md" ? "6" : "8"} h-${size === "sm" ? "4" : size === "md" ? "6" : "8"}`;
+    // Icon dot style for size
+    const iconDot = `w-${size === "sm" ? "4" : size === "md" ? "6" : "8"} h-${size === "sm" ? "4" : size === "md" ? "6" : "8"}`;
 
     return (
       <div ref={ref} style={computedStyle} {...props}>
@@ -391,7 +391,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
               {typeof icon === "string" ? (
                 <Icon
                   name={icon as IconName}
-                  className={iconClassName}
+                  dot={iconDot}
                   style={isGradient ? { color: "#ffffff" } : { color: tokens.accent }}
                 />
               ) : (

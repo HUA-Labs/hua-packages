@@ -149,7 +149,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({
               key={s.label}
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
-              className="absolute inset-0 h-full w-full"
+              style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}
             >
               {s.area && (
                 <path
