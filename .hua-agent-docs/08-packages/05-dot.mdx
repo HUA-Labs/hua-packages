@@ -1,6 +1,6 @@
 ---
 title: Dot Style Engine
-description: "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet. 824 tests, 21 resolvers."
+description: "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Flutter recipes. 1176+ tests, 33 resolvers, 12 utility families added in Wave 2."
 category: packages
 related:
   - ./01-package-map.mdx
@@ -12,7 +12,7 @@ related:
 
 `@hua-labs/dot` | `@hua-labs/hua/dot` (re-export) | `@hua-labs/hua/dot/react` (hooks)
 
-> Tailwind-inspired syntax, zero Tailwind dependency. Web + RN from one string.
+> Tailwind-inspired syntax, zero Tailwind dependency. Web + RN + Flutter from one string.
 
 ---
 
@@ -20,10 +20,13 @@ related:
 
 | Import Path | Contents | Note |
 |-------------|----------|------|
-| `@hua-labs/hua/dot` | `dot`, `dotMap`, `createDotConfig`, `clearDotCache`, `dotCx`, `dotVariants`, `adaptNative`, `adaptWeb` | Pure functions, server-safe |
+| `@hua-labs/hua/dot` | `dot`, `dotMap`, `dotExplain`, `createDotConfig`, `clearDotCache`, `dotCx`, `dotVariants`, `adaptNative`, `adaptWeb`, `adaptFlutter`, `CAPABILITY_MATRIX`, `PROPERTY_TO_FAMILY`, `getCapability` | Pure functions, server-safe |
 | `@hua-labs/hua/dot/react` | `useDot`, `useDotMap` | `'use client'` required |
 | `@hua-labs/dot` | Same as hua/dot | Direct import (prefer hua path) |
 | `@hua-labs/dot/native` | dot/dotMap pre-bound `target:'native'` | Auto-resolved by Metro |
+| `@hua-labs/dot-aot` | `extractStaticCalls`, `transformSource`, `styleToObjectLiteral` | Build-time extraction engine |
+| `@hua-labs/dot-aot/vite` | Vite plugin | Build-time AOT (complete) |
+| `@hua-labs/dot-aot/babel` | Babel plugin | Works with Metro, Next.js, etc. |
 
 ---
 
@@ -65,6 +68,18 @@ dot('!p-4 !bg-white')
 // React Native
 dot('p-4 rounded-lg shadow-lg', { target: 'native' })
 // { padding: 16, borderRadius: 8, shadowColor: '#000000', elevation: 8, ... }
+
+// Flutter — returns FlutterRecipe (structured widget composition object)
+dot('p-4 bg-blue-500 rounded-lg flex items-center', { target: 'flutter' })
+// { padding: { top: 16, right: 16, bottom: 16, left: 16 }, decoration: { color: '#3b82f6', borderRadius: {...} }, layout: { crossAxisAlignment: 'center' } }
+
+// Gradient (Wave 3)
+dot('bg-gradient-to-r from-cyan-500 to-blue-600')
+// { backgroundImage: 'linear-gradient(to right, #06b6d4, #2563eb)' }
+
+// Gradient with via stop
+dot('bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500')
+// { backgroundImage: 'linear-gradient(to bottom right, #a855f7, #ec4899, #f97316)' }
 ```
 
 ### `dotMap(input, options?)` — State-Aware Styles
@@ -82,6 +97,30 @@ const styles = dotMap('bg-white hover:bg-gray-100 focus:ring-2 active:scale-95')
 ```
 
 **Supported states:** `hover`, `focus`, `active`, `focus-visible`, `focus-within`, `disabled`
+
+### `dotExplain(input, options?)` — Resolve with Capability Report
+
+```typescript
+import { dotExplain } from '@hua-labs/hua/dot'
+
+dotExplain('p-4 blur-md grid grid-cols-3', { target: 'native' })
+// {
+//   styles: { padding: 16 },
+//   report: {
+//     _dropped: ['filter', 'gridTemplateColumns'],
+//     _approximated: [],
+//     _capabilities: { filter: 'unsupported', grid: 'unsupported' }
+//   }
+// }
+
+dotExplain('p-4 bg-white shadow-lg', { target: 'flutter' })
+// {
+//   styles: { padding: { top: 16, ... }, decoration: { color: '#ffffff', boxShadow: [...] } },
+//   report: {}
+// }
+```
+
+Use `dotExplain()` when you need to know which utilities will be silently dropped or approximated on a given platform. For web target the report is always empty (`{}`).
 
 ### `dotCx(...inputs)` — Utility Joiner
 
@@ -119,7 +158,7 @@ badge({ variant: 'outline', size: 'lg' })
 import { createDotConfig } from '@hua-labs/hua/dot'
 
 createDotConfig({
-  runtime: 'web',           // 'web' | 'native'
+  runtime: 'web',           // 'web' | 'native' | 'flutter'
   theme: {
     colors: {
       brand: { 500: '#6630E6', 600: '#5525C0' },
@@ -163,6 +202,52 @@ adaptNative({
 
 **45 properties silently dropped** on RN (animation, transition, cursor, grid, filter, backdrop, etc.)
 
+### `adaptFlutter(webStyle, options?)` — Web to Flutter Recipe Conversion
+
+```typescript
+import { adaptFlutter } from '@hua-labs/hua/dot'
+
+adaptFlutter({
+  padding: '16px',
+  backgroundColor: '#3b82f6',
+  borderRadius: '8px',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+})
+// {
+//   padding: { top: 16, right: 16, bottom: 16, left: 16 },
+//   decoration: {
+//     color: '#3b82f6',
+//     borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 8, bottomRight: 8 },
+//     boxShadow: [{ color: 'rgba(0, 0, 0, 0.1)', offset: { dx: 0, dy: 4 }, blurRadius: 6, spreadRadius: 0 }],
+//   },
+//   layout: { mainAxisAlignment: 'spaceBetween', crossAxisAlignment: 'center' },
+// }
+```
+
+`FlutterRecipe` is a structured object — NOT a flat style map. Each section maps to a specific Flutter widget in your SDUI bridge:
+
+| Recipe key | Flutter widget / property |
+|------------|--------------------------|
+| `padding` | `EdgeInsets` on `Padding` or `Container` |
+| `margin` | `EdgeInsets` on `Container.margin` |
+| `decoration` | `BoxDecoration` on `Container` |
+| `constraints` | `BoxConstraints` on `Container` |
+| `layout` | `Row`/`Column` direction + alignment |
+| `flexChild` | `Flexible`/`Expanded` wrapping |
+| `positioning` | `Positioned` within `Stack` |
+| `textStyle` | `TextStyle` on `Text` |
+| `transform` | `Transform` widget |
+| `opacity` | `Opacity` widget |
+| `visible` | `Visibility` widget |
+| `aspectRatio` | `AspectRatio` widget |
+| `zIndex` | `IndexedStack` / elevation hint |
+| `_dropped` | Properties that had no Flutter mapping |
+
+**Gradient support in Flutter:** `bg-gradient-to-{dir}` resolves into `decoration.gradient` as a `FlutterGradient` with `type: 'linear'`, `begin`/`end` alignment strings, `colors` array, and optional `stops`.
+
 ---
 
 ## React Hooks
@@ -200,13 +285,47 @@ Internally tracks hover, focus, active, focus-visible, focus-within, disabled st
 interface DotOptions {
   dark?: boolean;        // Apply dark: variants
   breakpoint?: string;   // Active breakpoint (mobile-first cascade)
-  target?: 'web' | 'native';  // Override config-level runtime
+  target?: 'web' | 'native' | 'flutter';  // Override config-level runtime
 }
 ```
 
 ---
 
-## Token Categories (21 Resolvers)
+## AOT Static Extraction (`@hua-labs/dot-aot`)
+
+Replaces static `dot('...')` calls with pre-computed style objects at build time, eliminating runtime parsing overhead entirely.
+
+### Vite Plugin
+
+```typescript
+// vite.config.ts
+import dotAot from '@hua-labs/dot-aot/vite'
+
+export default defineConfig({
+  plugins: [dotAot()],
+})
+```
+
+Options: `include` (default: `['.ts', '.tsx', '.js', '.jsx']`), `exclude` (default: `['node_modules']`), `functionNames` (default: `['dot']`), `target`.
+
+### Babel Plugin (Metro / Next.js)
+
+```javascript
+// babel.config.js
+module.exports = {
+  plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]],
+}
+```
+
+**What gets extracted:** Only calls where the first argument is a string literal and there is no `breakpoint` option (breakpoint must stay runtime because it depends on window width). `dark: true/false` is extracted as a static option.
+
+**Core API** (`@hua-labs/dot-aot`): `extractStaticCalls(source)`, `transformSource(source, options)`, `styleToObjectLiteral(style)`.
+
+---
+
+## Token Categories (33 Resolver Families)
+
+### Original 21 families
 
 | Category | Examples | Count |
 |----------|----------|-------|
@@ -231,6 +350,72 @@ interface DotOptions {
 | Mix-blend | `mix-blend-overlay`, `mix-blend-multiply` | ~12 |
 | Interactivity | `cursor-pointer`, `select-none`, `resize`, `pointer-events-none` | ~30 |
 | Line-clamp | `line-clamp-3` (WebkitLineClamp / numberOfLines on RN) | ~6 |
+
+### Wave 2 additions (12 new families, ~90% Tailwind parity)
+
+| Category | Examples |
+|----------|----------|
+| Object fit | `object-cover`, `object-contain`, `object-position-center` |
+| Text decoration | `underline`, `overline`, `line-through`, `no-underline`, `decoration-2`, `underline-offset-2` |
+| Text indent | `indent-4`, `indent-[2rem]` |
+| Float / clear | `float-left`, `float-right`, `clear-both` |
+| Isolation | `isolate`, `isolation-auto` |
+| Table | `table-auto`, `table-fixed`, `border-collapse`, `border-separate` |
+| List | `list-disc`, `list-decimal`, `list-inside`, `list-outside` |
+| Scroll | `scroll-smooth`, `scroll-mt-4`, `scroll-pt-4` |
+| Touch action | `touch-auto`, `touch-none`, `touch-pan-x`, `touch-pan-y` |
+| Will change | `will-change-auto`, `will-change-transform`, `will-change-opacity` |
+| Word break | `break-normal`, `break-words`, `break-all`, `break-keep` |
+| Place alignment | `place-content-center`, `place-items-start`, `place-self-end` |
+
+### Wave 3 additions (gradient + shadow composition)
+
+| Feature | Examples |
+|---------|---------|
+| Gradient direction | `bg-gradient-to-r`, `bg-gradient-to-br`, `bg-gradient-to-t` (8 directions) |
+| Gradient from | `from-cyan-500`, `from-[#ff0000]`, `from-cyan-500/75` |
+| Gradient via | `via-pink-500`, `via-transparent` |
+| Gradient to | `to-blue-600`, `to-[#0000ff]` |
+| Shadow composition | Multi-layer `boxShadow` (ring layer + shadow layer merged at finalization) |
+| Ring + shadow | `ring-2 ring-blue-500 shadow-lg` — both compose into one `boxShadow` value |
+
+---
+
+## Shadow Composition
+
+`ring-*` and `shadow-*` tokens write to internal keys (`__dot_ringLayer`, `__dot_shadowLayer`) and are merged into a single `boxShadow` string during finalization. This matches Tailwind convention where ring appears before shadow.
+
+```typescript
+dot('ring-2 ring-primary-500 shadow-lg')
+// { boxShadow: '0 0 0 2px #3b82f6, 0 10px 15px -3px rgba(0,0,0,0.1)' }
+// ^ring layer                        ^shadow layer
+```
+
+The `!important` flag is propagated correctly: if either layer is `!important`, the composed value carries `!important`.
+
+---
+
+## Capability Matrix
+
+Exported from `@hua-labs/dot` as `CAPABILITY_MATRIX` and `PROPERTY_TO_FAMILY`:
+
+```typescript
+import { CAPABILITY_MATRIX, PROPERTY_TO_FAMILY, getCapability } from '@hua-labs/hua/dot'
+
+// Check if a CSS property is supported on a target
+getCapability('gridTemplateColumns', 'native') // 'unsupported'
+getCapability('boxShadow', 'flutter')           // 'native'
+getCapability('filter', 'flutter')              // 'plugin-backed'
+getCapability('display', 'native', 'flex')      // 'native' (value-level override)
+getCapability('display', 'native', 'grid')      // 'approximate'
+```
+
+**Capability levels:**
+- `native` — full support
+- `approximate` — supported with caveats (e.g., RN shadow loses multi-layer)
+- `recipe-only` — Flutter: expressed as recipe field, not flat style
+- `plugin-backed` — Flutter: requires a third-party plugin (e.g., `image_filter`)
+- `unsupported` — silently dropped
 
 ---
 
@@ -262,25 +447,74 @@ Usage: `dot('bg-card text-card-foreground border-border')`
 ## Architecture
 
 ```
-dot('p-4 hover:bg-gray-100 dark:bg-gray-900')
+dot('p-4 hover:bg-gray-100 dark:bg-gray-900 bg-gradient-to-r from-cyan-500')
   |
   v
 Parser (tokenize + variant extract)
   |
   v
 Resolver (token -> CSS property + value)
-  |           |
-  v           v
-base map    variant maps (hover, dark, etc.)
+  — gradient tokens → __dot_gradientDirection / __dot_gradientFrom / etc.
+  — ring tokens     → __dot_ringLayer (internal key)
+  — shadow tokens   → __dot_shadowLayer (internal key)
+  |
+  v
+Cascade merge (base → sm → md → lg → xl → 2xl → dark → dark:sm → ...)
+  |
+  v
+finalizeStyle()
+  — merges __dot_ringLayer + __dot_shadowLayer → boxShadow
+  — merges gradient internal keys → backgroundImage
+  — strips all __dot_* internal keys
   |
   v
 Cache (2-layer FIFO: input + token level)
   |
   v
-Output: StyleObject (web) or adaptNative() for RN
+Target adapter:
+  web    → StyleObject (CSSProperties)
+  native → adaptNative() → RNStyleObject
+  flutter→ adaptFlutter() → FlutterRecipe
 ```
 
 Full architecture doc: [dot-style-engine.md](../../docs/areas/architecture/dot-style-engine.md)
+
+---
+
+## Flutter Adapter — `adaptFlutter()` (Wave 1, complete)
+
+The Flutter adapter converts a resolved web `StyleObject` into a `FlutterRecipe` — a structured object for SDUI bridges. It is fully integrated as `target: 'flutter'` in `dot()` and `dotMap()`.
+
+**Key types exported from `@hua-labs/dot`:**
+
+```typescript
+import type {
+  FlutterRecipe,
+  FlutterDecoration,
+  FlutterEdgeInsets,
+  FlutterConstraints,
+  FlutterLayout,
+  FlutterFlexChild,
+  FlutterPositioning,
+  FlutterTextStyle,
+  FlutterTransform,
+  FlutterBoxShadow,
+  FlutterBorderSide,
+  FlutterBorderRadius,
+} from '@hua-labs/dot'
+```
+
+**Properties dropped by Flutter adapter** (no direct widget mapping):
+- Transitions and animations
+- `cursor`, `userSelect`, `resize`, `pointerEvents`
+- `whiteSpace`, `textOverflow`
+- `filter`, `backdropFilter`, `mixBlendMode`
+- All grid properties
+- `touchAction`
+
+**Font weight** maps to Flutter's `FontWeight` enum strings: `w100`–`w900`.
+**Text decoration** maps to Flutter's `TextDecoration` constants: `underline`, `overline`, `lineThrough`, `none`.
+**Transform** maps to radian rotation, scale, translate, skew fields (not a matrix string).
 
 ---
 
@@ -302,6 +536,14 @@ createDotConfig({ theme: { colors: { primary: '#ff0000' } } })
 
 // GOOD: add new semantic name
 createDotConfig({ theme: { colors: { brand: { 500: '#ff0000' } } } })
+
+// BAD: use breakpoint option in AOT context
+dot('p-4 md:p-8', { breakpoint: currentBp })
+// AOT cannot extract — stays runtime (correct behavior)
+
+// GOOD: AOT-friendly calls (string literal + no breakpoint)
+dot('p-4 rounded-lg bg-card text-white')
+dot('bg-white dark:bg-gray-900', { dark: true })
 ```
 
 ---
@@ -312,6 +554,4 @@ createDotConfig({ theme: { colors: { brand: { 500: '#ff0000' } } } })
 |---------|--------|
 | `group-hover:` | Requires CSS selectors (parent→child relationship) |
 | `divide-*` | Requires CSS selectors (`:not(:first-child)`) |
-| AOT static extraction | Planned for build-time optimization |
-| Debug trace | Planned for explainable styling |
-| Flutter adapter | Phase 4 (Dart parser for SDUI bridge) |
+| Debug trace | Planned — `dotExplain()` covers capability reporting; token-level trace not yet exposed |

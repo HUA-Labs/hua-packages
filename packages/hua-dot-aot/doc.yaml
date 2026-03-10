@@ -1,0 +1,51 @@
+overview: "Build-time static extraction for @hua-labs/dot. Replaces static dot() calls with pre-computed style objects at build time, eliminating runtime parsing overhead. Provides a Vite plugin and a Babel plugin (Metro, Next.js compatible)."
+
+status: pre-release
+access: internal-core
+
+features:
+  - "Zero-runtime CSS — static dot() calls replaced with inline object literals at build time"
+  - "Vite plugin — enforce: 'pre' transform hook, fast path skips files with no dot calls"
+  - "Babel plugin — AST-accurate CallExpression visitor, works with Metro and Next.js"
+  - "Regex-based extraction engine — skips calls in strings, comments, template literals, and chained methods"
+  - "Static options support — extracts target and dark when literal values; skips breakpoint (dynamic)"
+  - "Cross-platform output — correct serialization for web, native, and flutter targets"
+  - "Graceful fallback — malformed or unresolvable calls silently left as runtime"
+  - "styleToObjectLiteral — handles nested structures (RN transform arrays, Flutter recipe objects)"
+
+quickStart: |
+  // Vite
+  import dotAot from '@hua-labs/dot-aot/vite';
+  export default defineConfig({ plugins: [dotAot()] });
+
+  // Babel / Metro / Next.js
+  module.exports = { plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]] };
+
+  // Before build:
+  const style = dot('p-4 flex items-center bg-primary-500');
+
+  // After build (inlined by plugin):
+  const style = ({padding: "16px", display: "flex", alignItems: "center", backgroundColor: "var(--color-primary-500)"});
+
+related:
+  - "dot"
+
+apiNotes:
+  extractStaticCalls:
+    description: "Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' | 'native' | 'flutter' }"
+  transformSource:
+    description: "Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline."
+  styleToObjectLiteral:
+    description: "Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets."
+  ExtractedCall:
+    description: "Single extraction result: { start, end, input, options?, result }. start/end are character offsets in the source string."
+  ExtractOptions:
+    description: "Options for core extraction: functionNames (default: ['dot']), target (default: 'web')."
+  DotAotViteOptions:
+    description: "Vite plugin options — extends ExtractOptions with include (file extensions) and exclude (path patterns)."
+  DotAotBabelOptions:
+    description: "Babel plugin options — functionNames and target. Passed as second argument to the plugin tuple."
+  "@hua-labs/dot-aot/vite":
+    description: "Default export: dotAotVite(options?) — returns a Vite Plugin. Logs extraction count in buildEnd hook."
+  "@hua-labs/dot-aot/babel":
+    description: "Default export: dotAotBabel(_babel, options?) — standard Babel plugin factory. Uses CallExpression AST visitor."
