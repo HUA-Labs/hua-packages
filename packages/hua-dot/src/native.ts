@@ -27,6 +27,7 @@ export {
   clearDotCache,
   dotCx,
   dotVariants,
+  semanticVars,
   adaptNative,
   adaptWeb,
   _resetNativeWarnings,

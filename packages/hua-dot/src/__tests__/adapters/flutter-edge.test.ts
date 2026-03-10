@@ -62,10 +62,15 @@ describe('Flutter edge cases: !important', () => {
     expect(r.padding).toBeDefined();
   });
 
-  it('!shadow-lg !ring-2 → boxShadow without !important leak', () => {
+  it('!shadow-lg !ring-2 → boxShadow dropped (ring uses CSS var)', () => {
     const r = flutterDot('!shadow-lg !ring-2');
+    // ring-2 uses var(--color-ring) → composed boxShadow contains var() → dropped on Flutter
+    expect(r.decoration?.boxShadow).toBeUndefined();
+  });
+
+  it('!shadow-lg alone → boxShadow without !important leak', () => {
+    const r = flutterDot('!shadow-lg');
     expect(r.decoration?.boxShadow).toBeDefined();
-    // Verify no !important in color or other shadow fields
     if (r.decoration?.boxShadow) {
       for (const shadow of r.decoration.boxShadow) {
         expect(shadow.color).not.toContain('!important');

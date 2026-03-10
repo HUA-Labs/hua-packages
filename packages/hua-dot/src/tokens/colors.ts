@@ -852,7 +852,19 @@ export const SPECIAL_COLORS: Record<string, string> = {
   'current': 'currentColor',
 } as const;
 
-/** CSS variable-based semantic colors (Tailwind v4 @theme compatible) */
+/**
+ * CSS variable-based semantic colors (Tailwind v4 @theme compatible).
+ *
+ * These live in a **separate** `semanticColors` field (not merged into `colors`)
+ * so that palette shade lookups like `bg-primary-500` still work while bare
+ * names like `bg-primary` resolve to the CSS variable.
+ *
+ * Priority in lookupColor:
+ *   1. colors[value] string  → user override / SPECIAL_COLORS
+ *   2. semanticColors[value] → CSS variable (this map)
+ *   3. colors[value] object  → palette shade 500
+ *   4. shade split lookup    → palette[colorName][shade]
+ */
 export const SEMANTIC_COLORS: Record<string, string> = {
   'background': 'var(--color-background)',
   'foreground': 'var(--color-foreground)',
@@ -860,7 +872,9 @@ export const SEMANTIC_COLORS: Record<string, string> = {
   'card-foreground': 'var(--color-card-foreground)',
   'popover': 'var(--color-popover)',
   'popover-foreground': 'var(--color-popover-foreground)',
+  'primary': 'var(--color-primary)',
   'primary-foreground': 'var(--color-primary-foreground)',
+  'secondary': 'var(--color-secondary)',
   'secondary-foreground': 'var(--color-secondary-foreground)',
   'muted': 'var(--color-muted)',
   'muted-foreground': 'var(--color-muted-foreground)',

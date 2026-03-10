@@ -16,8 +16,9 @@ import { parseArbitrary } from './utils';
  * resolveRing('ring', 'blue-500', config) → { boxShadow: '0 0 0 3px #3b82f6' }
  */
 export function resolveRing(_prefix: string, value: string, config: DotConfig): StyleObject {
-  // Resolve default ring color from config (e.g., createDotConfig({ theme: { colors: { ring: 'var(--color-ring)' } } }))
-  const configRingColor = lookupColor('ring', config.tokens.colors);
+  const { colors, semanticColors } = config.tokens;
+  // Resolve default ring color from config or semantic colors
+  const configRingColor = lookupColor('ring', colors, semanticColors);
   const defaultColor = configRingColor ?? RING_DEFAULT_COLOR;
 
   // Arbitrary value: ring-[5px]
@@ -33,7 +34,7 @@ export function resolveRing(_prefix: string, value: string, config: DotConfig): 
   }
 
   // Color value: ring-blue-500, ring-white, etc.
-  const color = lookupColor(value, config.tokens.colors);
+  const color = lookupColor(value, colors, semanticColors);
   if (color) {
     return { __dot_ringLayer: buildRingShadow('3px', color) };
   }
