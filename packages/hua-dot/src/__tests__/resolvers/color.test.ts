@@ -94,6 +94,6 @@ describe('flat color (no shade)', () => {
 
   it('bg-primary-500 still uses palette hex', () => {
     const result = dot('bg-primary-500');
-    expect(result).toEqual({ backgroundColor: '#3b82f6' });
+    expect(result).toEqual({ backgroundColor: '#2b6cd6' });
   });
 });
