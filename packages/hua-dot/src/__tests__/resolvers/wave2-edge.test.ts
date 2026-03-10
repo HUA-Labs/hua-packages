@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { dot, dotExplain } from '../../index';
 import { dot as dotNative } from '../../native';
 import { adaptNative, _resetNativeWarnings } from '../../adapters/native';

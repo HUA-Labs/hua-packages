@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { resolveShadow } from '../../resolvers/shadow';
 import { resolveConfig } from '../../config';
 import { dot, dotExplain } from '../../index';

@@ -183,25 +183,26 @@ function generatePalette(config: PaletteConfig): PaletteEntry[] {
 //   pink:   344°    │
 
 const PALETTE_CONFIGS: PaletteConfig[] = [
-  // ── Neutrals (5 families) ──
+  // ── Neutrals (6 families, cold → warm) ──
+  { name: 'steel',   hue: 230, chromaPeak: 0.035, chromaLight: 0.007, chromaDark: 0.025 },
   { name: 'slate',   hue: 220, chromaPeak: 0.025, chromaLight: 0.005, chromaDark: 0.018 },
   { name: 'gray',    hue: 260, chromaPeak: 0.012, chromaLight: 0.003, chromaDark: 0.008 },
   { name: 'zinc',    hue: 240, chromaPeak: 0.010, chromaLight: 0.002, chromaDark: 0.007 },
   { name: 'neutral', hue: 0,   chromaPeak: 0.003, chromaLight: 0.001, chromaDark: 0.002 },
   { name: 'stone',   hue: 40,  chromaPeak: 0.015, chromaLight: 0.004, chromaDark: 0.010 },
 
-  // ── Chromatic colors (17, ~21° spacing) ──
+  // ── Chromatic colors (16, ~21° spacing, sky removed) ──
   { name: 'rose',    hue:   8, chromaPeak: 0.19, hueShift: -3 },
   { name: 'red',     hue:  29, chromaPeak: 0.20, hueShift: -4 },
   { name: 'orange',  hue:  50, chromaPeak: 0.19, hueShift: -5 },
   { name: 'amber',   hue:  71, chromaPeak: 0.17, hueShift: -5 },
   { name: 'yellow',  hue:  92, chromaPeak: 0.17, hueShift: -4 },
   { name: 'lime',    hue: 113, chromaPeak: 0.18, hueShift:  3 },
-  { name: 'green',   hue: 134, chromaPeak: 0.18, hueShift:  3 },
-  { name: 'emerald', hue: 155, chromaPeak: 0.16, hueShift:  3 },
-  { name: 'teal',    hue: 176, chromaPeak: 0.14, hueShift:  3 },
-  { name: 'cyan',    hue: 197, chromaPeak: 0.14, hueShift:  0 },
-  { name: 'sky',     hue: 218, chromaPeak: 0.15, hueShift: -3 },
+  { name: 'grass',   hue: 134, chromaPeak: 0.18, hueShift:  3 },
+  { name: 'green',   hue: 155, chromaPeak: 0.16, hueShift:  3 },
+  { name: 'emerald', hue: 176, chromaPeak: 0.14, hueShift:  3 },
+  { name: 'teal',    hue: 197, chromaPeak: 0.14, hueShift:  0 },
+  { name: 'cyan',    hue: 218, chromaPeak: 0.15, hueShift: -3 },
   { name: 'blue',    hue: 239, chromaPeak: 0.17, hueShift: -4 },
   { name: 'indigo',  hue: 260, chromaPeak: 0.18, hueShift: -5 },
   { name: 'violet',  hue: 281, chromaPeak: 0.19, hueShift: -3 },
@@ -305,7 +306,7 @@ function toCssVariables(palettes: Record<string, PaletteEntry[]>): string {
 
 function toHtmlPreview(palettes: Record<string, PaletteEntry[]>): string {
   // Separate neutrals from chromatic
-  const neutralNames = ['slate', 'gray', 'zinc', 'neutral', 'stone'];
+  const neutralNames = ['steel', 'slate', 'gray', 'zinc', 'neutral', 'stone'];
   const chromaticNames = Object.keys(palettes).filter(n => !neutralNames.includes(n));
 
   function renderRows(names: string[]) {
@@ -556,7 +557,7 @@ if (isPreview) {
   console.log(`Total swatches: ${PALETTE_CONFIGS.length * STEPS.length}\n`);
 
   // Hue distribution
-  const chromatic = PALETTE_CONFIGS.filter(c => !['slate','gray','zinc','neutral','stone'].includes(c.name));
+  const chromatic = PALETTE_CONFIGS.filter(c => !['steel','slate','gray','zinc','neutral','stone'].includes(c.name));
   const sorted = [...chromatic].sort((a, b) => a.hue - b.hue);
   console.log('Hue distribution:');
   for (let i = 0; i < sorted.length; i++) {

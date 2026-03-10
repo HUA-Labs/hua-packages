@@ -2,6 +2,19 @@
 /** OKLCH-based 21-step palette, Tailwind-compatible 11-step subset */
 
 export const COLORS: Record<string, Record<string, string>> = {
+  steel: {
+    '50': '#e8f1f6',
+    '100': '#d8e2e8',
+    '200': '#b7c6ce',
+    '300': '#96abb6',
+    '400': '#77909d',
+    '500': '#5d7582',
+    '600': '#455c67',
+    '700': '#2f434c',
+    '800': '#1a2b34',
+    '900': '#07161d',
+    '950': '#010c13',
+  },
   slate: {
     '50': '#eaf1f3',
     '100': '#dae2e5',
@@ -145,7 +158,7 @@ export const COLORS: Record<string, Record<string, string>> = {
     '900': '#141600',
     '950': '#0a0c00',
   },
-  green: {
+  grass: {
     '50': '#e6f5db',
     '100': '#d3e9c5',
     '200': '#acd192',
@@ -158,7 +171,7 @@ export const COLORS: Record<string, Record<string, string>> = {
     '900': '#091802',
     '950': '#030e00',
   },
-  emerald: {
+  green: {
     '50': '#def7e4',
     '100': '#c9ebd2',
     '200': '#98d4ab',
@@ -171,7 +184,7 @@ export const COLORS: Record<string, Record<string, string>> = {
     '900': '#001a0b',
     '950': '#000e05',
   },
-  teal: {
+  emerald: {
     '50': '#daf7ee',
     '100': '#c4ebdf',
     '200': '#8fd4c1',
@@ -184,7 +197,7 @@ export const COLORS: Record<string, Record<string, string>> = {
     '900': '#001914',
     '950': '#000e0a',
   },
-  cyan: {
+  teal: {
     '50': '#d7f7f7',
     '100': '#c0eaea',
     '200': '#88d3d4',
@@ -197,7 +210,7 @@ export const COLORS: Record<string, Record<string, string>> = {
     '900': '#001819',
     '950': '#000d0e',
   },
-  sky: {
+  cyan: {
     '50': '#d7f5ff',
     '100': '#c0e8f6',
     '200': '#87d0e6',
@@ -292,6 +305,29 @@ export const COLORS: Record<string, Record<string, string>> = {
 
 /** Full 21-step palette for fine-grained design system use */
 export const COLORS_FULL: Record<string, Record<string, string>> = {
+  steel: {
+    '25': '#f0f8fd',
+    '50': '#e8f1f6',
+    '75': '#e0eaef',
+    '100': '#d8e2e8',
+    '150': '#c7d4db',
+    '200': '#b7c6ce',
+    '250': '#a6b9c2',
+    '300': '#96abb6',
+    '350': '#869daa',
+    '400': '#77909d',
+    '450': '#69838f',
+    '500': '#5d7582',
+    '550': '#516874',
+    '600': '#455c67',
+    '650': '#3a4f59',
+    '700': '#2f434c',
+    '750': '#253740',
+    '800': '#1a2b34',
+    '850': '#102028',
+    '900': '#07161d',
+    '950': '#010c13',
+  },
   slate: {
     '25': '#f2f8fa',
     '50': '#eaf1f3',
@@ -545,7 +581,7 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
     '900': '#141600',
     '950': '#0a0c00',
   },
-  green: {
+  grass: {
     '25': '#eefce5',
     '50': '#e6f5db',
     '75': '#dcefd0',
@@ -568,7 +604,7 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
     '900': '#091802',
     '950': '#030e00',
   },
-  emerald: {
+  green: {
     '25': '#e8fded',
     '50': '#def7e4',
     '75': '#d4f1db',
@@ -591,7 +627,7 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
     '900': '#001a0b',
     '950': '#000e05',
   },
-  teal: {
+  emerald: {
     '25': '#e4fdf5',
     '50': '#daf7ee',
     '75': '#cff1e6',
@@ -614,7 +650,7 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
     '900': '#001914',
     '950': '#000e0a',
   },
-  cyan: {
+  teal: {
     '25': '#e2fdfd',
     '50': '#d7f7f7',
     '75': '#ccf0f0',
@@ -637,7 +673,7 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
     '900': '#001819',
     '950': '#000d0e',
   },
-  sky: {
+  cyan: {
     '25': '#eafaff',
     '50': '#d7f5ff',
     '75': '#cceffa',
@@ -800,21 +836,6 @@ export const COLORS_FULL: Record<string, Record<string, string>> = {
   },
 };
 
-// --- Semantic aliases (map to palette colors) ---
-// primary = indigo, secondary = slate, success = green
-// These are convenience aliases so `bg-primary-500` works in dot()
-Object.assign(COLORS, {
-  primary: COLORS.indigo,
-  secondary: COLORS.slate,
-  success: COLORS.green,
-});
-
-Object.assign(COLORS_FULL, {
-  primary: COLORS_FULL.indigo,
-  secondary: COLORS_FULL.slate,
-  success: COLORS_FULL.green,
-});
-
 /** Color prefix → CSS property mapping */
 export const COLOR_PROP_MAP: Record<string, string> = {
   'bg': 'backgroundColor',
@@ -851,3 +872,18 @@ export const SEMANTIC_COLORS: Record<string, string> = {
   'input': 'var(--color-input)',
   'ring': 'var(--color-ring)',
 } as const;
+
+// --- Semantic aliases (map to palette colors) ---
+// primary = indigo, secondary = slate, success = green
+// These are convenience aliases so `bg-primary-500` works in dot()
+Object.assign(COLORS, {
+  primary: COLORS.indigo,
+  secondary: COLORS.slate,
+  success: COLORS.green,
+});
+
+Object.assign(COLORS_FULL, {
+  primary: COLORS_FULL.indigo,
+  secondary: COLORS_FULL.slate,
+  success: COLORS_FULL.green,
+});
