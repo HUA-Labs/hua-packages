@@ -1,40 +1,54 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { merge } from '../lib/utils'
-import { dot } from '@hua-labs/dot'
-import { Section } from '../components/Section'
-import { Carousel } from '../components/advanced/Carousel'
-import { Marquee } from '../components/advanced/Marquee'
-import { Avatar } from '../components/Avatar'
-import { useLandingTheme } from './LandingProvider'
-import type { LandingTestimonialsProps, LandingTestimonialItem, LandingMotionOverride } from './types'
+import React from "react";
+import { dot } from "@hua-labs/dot";
+import { Section } from "../components/Section";
+import { Carousel } from "../components/advanced/Carousel";
+import { Marquee } from "../components/advanced/Marquee";
+import { Avatar } from "../components/Avatar";
+import { useLandingTheme } from "./LandingProvider";
+import type {
+  LandingTestimonialsProps,
+  LandingTestimonialItem,
+  LandingMotionOverride,
+} from "./types";
 
 interface StaggerResult {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  styles: React.CSSProperties[]
-  isVisible: boolean
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  styles: React.CSSProperties[];
+  isVisible: boolean;
 }
 interface StaggerOptions {
-  count: number
-  staggerDelay?: number
-  duration?: number
-  motionType?: string
-  easing?: string
+  count: number;
+  staggerDelay?: number;
+  duration?: number;
+  motionType?: string;
+  easing?: string;
 }
 
-let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined
+let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  useStagger = require('@hua-labs/motion-core').useStagger
+  useStagger = require("@hua-labs/motion-core").useStagger;
 } catch {
   // motion-core unavailable
 }
 
-function TestimonialCard({ item, style }: { item: LandingTestimonialItem; style?: React.CSSProperties }) {
+function TestimonialCard({
+  item,
+  style,
+}: {
+  item: LandingTestimonialItem;
+  style?: React.CSSProperties;
+}) {
   return (
     <div
-      style={{ ...dot("bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 flex flex-col gap-4"), ...style }}
+      style={{
+        ...dot(
+          "bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 flex flex-col gap-4",
+        ),
+        ...style,
+      }}
     >
       <blockquote style={dot("text-foreground/90 leading-relaxed flex-1")}>
         &ldquo;{item.quote}&rdquo;
@@ -47,19 +61,21 @@ function TestimonialCard({ item, style }: { item: LandingTestimonialItem; style?
           <p style={dot("font-semibold text-sm")}>{item.author}</p>
           {(item.role || item.company) && (
             <p style={dot("text-xs text-muted-foreground")}>
-              {item.role}{item.role && item.company && ', '}{item.company}
+              {item.role}
+              {item.role && item.company && ", "}
+              {item.company}
             </p>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const gridColsMap = {
-  2: 'md:grid-cols-2',
-  3: 'md:grid-cols-2 lg:grid-cols-3',
-} as const
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-2 lg:grid-cols-3",
+} as const;
 
 export function LandingTestimonials({
   items,
@@ -74,12 +90,12 @@ export function LandingTestimonials({
   className,
   ...rest
 }: LandingTestimonialsProps) {
-  const theme = useLandingTheme()
-  const variant = variantProp ?? theme.testimonials.variant
+  const theme = useLandingTheme();
+  const variant = variantProp ?? theme.testimonials.variant;
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.testimonials.motion, ...motionOverride }
-    : theme.testimonials.motion
-  const staggerDelay = staggerProp ?? theme.testimonials.staggerDelay
+    : theme.testimonials.motion;
+  const staggerDelay = staggerProp ?? theme.testimonials.staggerDelay;
 
   const stagger = useStagger?.({
     count: items.length,
@@ -87,13 +103,12 @@ export function LandingTestimonials({
     duration: motion.duration,
     motionType: motion.type,
     easing: motion.easing,
-  })
+  });
 
-  const header = (title || subtitle)
-    ? { title: title ?? '', subtitle }
-    : undefined
+  const header =
+    title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
-  if (variant === 'marquee') {
+  if (variant === "marquee") {
     return (
       <Section header={header} dot={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
@@ -104,10 +119,10 @@ export function LandingTestimonials({
           ))}
         </Marquee>
       </Section>
-    )
+    );
   }
 
-  if (variant === 'carousel') {
+  if (variant === "carousel") {
     return (
       <Section header={header} dot={className} {...rest}>
         <Carousel
@@ -126,25 +141,21 @@ export function LandingTestimonials({
           ))}
         </Carousel>
       </Section>
-    )
+    );
   }
 
   // grid variant
-  const cols = colsProp ?? (items.length <= 2 ? 2 : 3) as 2 | 3
+  const cols = colsProp ?? ((items.length <= 2 ? 2 : 3) as 2 | 3);
   return (
     <Section header={header} dot={className} {...rest}>
       <div
         ref={stagger?.containerRef}
-        style={dot(merge("grid gap-6", gridColsMap[cols]))}
+        style={dot(`grid gap-6 ${gridColsMap[cols]}`)}
       >
         {items.map((item, i) => (
-          <TestimonialCard
-            key={i}
-            item={item}
-            style={stagger?.styles[i]}
-          />
+          <TestimonialCard key={i} item={item} style={stagger?.styles[i]} />
         ))}
       </div>
     </Section>
-  )
+  );
 }

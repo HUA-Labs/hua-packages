@@ -1,30 +1,29 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { merge } from '../lib/utils'
-import { dot } from '@hua-labs/dot'
-import { Section } from '../components/Section'
-import { Container } from '../components/Container'
-import { useLandingTheme } from './LandingProvider'
-import type { LandingShowcaseProps, LandingMotionOverride } from './types'
+import React from "react";
+import { dot } from "@hua-labs/dot";
+import { Section } from "../components/Section";
+import { Container } from "../components/Container";
+import { useLandingTheme } from "./LandingProvider";
+import type { LandingShowcaseProps, LandingMotionOverride } from "./types";
 
 interface StaggerResult {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  styles: React.CSSProperties[]
-  isVisible: boolean
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  styles: React.CSSProperties[];
+  isVisible: boolean;
 }
 interface StaggerOptions {
-  count: number
-  staggerDelay?: number
-  duration?: number
-  motionType?: string
-  easing?: string
+  count: number;
+  staggerDelay?: number;
+  duration?: number;
+  motionType?: string;
+  easing?: string;
 }
 
-let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined
+let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  useStagger = require('@hua-labs/motion-core').useStagger
+  useStagger = require("@hua-labs/motion-core").useStagger;
 } catch {
   // motion-core unavailable
 }
@@ -38,11 +37,11 @@ export function LandingShowcase({
   className,
   ...rest
 }: LandingShowcaseProps) {
-  const theme = useLandingTheme()
+  const theme = useLandingTheme();
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.showcase.motion, ...motionOverride }
-    : theme.showcase.motion
-  const staggerDelay = staggerProp ?? theme.showcase.staggerDelay
+    : theme.showcase.motion;
+  const staggerDelay = staggerProp ?? theme.showcase.staggerDelay;
 
   const stagger = useStagger?.({
     count: items.length,
@@ -50,28 +49,33 @@ export function LandingShowcase({
     duration: motion.duration,
     motionType: motion.type,
     easing: motion.easing,
-  })
+  });
 
-  const header = (title || subtitle)
-    ? { title: title ?? '', subtitle }
-    : undefined
+  const header =
+    title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
   return (
     <Section header={header} dot={className} {...rest}>
       <div ref={stagger?.containerRef} style={dot("space-y-16 sm:space-y-24")}>
         {items.map((item, i) => {
-          const isEven = i % 2 === 0
+          const isEven = i % 2 === 0;
           return (
             <Container key={i} size="lg" padding="none" dot="px-4">
               <div
-                style={{ ...dot(merge(
-                  "flex flex-col gap-8 items-center",
-                  isEven ? "md:flex-row" : "md:flex-row-reverse"
-                )), ...stagger?.styles[i] }}
+                style={{
+                  ...dot(
+                    `flex flex-col gap-8 items-center ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`,
+                  ),
+                  ...stagger?.styles[i],
+                }}
               >
                 {/* Image */}
                 <div style={dot("flex-1 w-full")}>
-                  <div style={dot("relative overflow-hidden rounded-xl border border-border/30 shadow-lg")}>
+                  <div
+                    style={dot(
+                      "relative overflow-hidden rounded-xl border border-border/30 shadow-lg",
+                    )}
+                  >
                     <img
                       src={item.image}
                       alt={item.title}
@@ -92,9 +96,9 @@ export function LandingShowcase({
                 </div>
               </div>
             </Container>
-          )
+          );
         })}
       </div>
     </Section>
-  )
+  );
 }
