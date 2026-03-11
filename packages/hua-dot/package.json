@@ -19,6 +19,11 @@
       "types": "./dist/native.d.mts",
       "import": "./dist/native.mjs",
       "default": "./dist/native.mjs"
+    },
+    "./class": {
+      "types": "./dist/class.d.mts",
+      "import": "./dist/class.mjs",
+      "default": "./dist/class.mjs"
     }
   },
   "files": [

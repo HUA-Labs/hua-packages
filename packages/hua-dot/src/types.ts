@@ -1,13 +1,18 @@
-import type { FlutterRecipe } from './adapters/flutter-types';
+import type { FlutterRecipe } from "./adapters/flutter-types";
 
 // Re-export RN types from their dedicated file (external API preserved)
-export type { RNTransformEntry, RNShadowOffset, RNStyleValue, RNStyleObject } from './adapters/native-types';
-export type { AdaptNativeOptions } from './adapters/native-types';
+export type {
+  RNTransformEntry,
+  RNShadowOffset,
+  RNStyleValue,
+  RNStyleObject,
+} from "./adapters/native-types";
+export type { AdaptNativeOptions } from "./adapters/native-types";
 // Import for local use in this file
-import type { RNStyleObject } from './adapters/native-types';
+import type { RNStyleObject } from "./adapters/native-types";
 
 /** Target platform for style output */
-export type DotTarget = 'web' | 'native' | 'flutter';
+export type DotTarget = "web" | "native" | "flutter";
 
 /**
  * Support level for a utility family on a given target platform.
@@ -18,7 +23,12 @@ export type DotTarget = 'web' | 'native' | 'flutter';
  * - `plugin-backed`: needs ecosystem plugin/package (e.g., backdrop-blur on Flutter)
  * - `unsupported`: not available on this target
  */
-export type CapabilityLevel = 'native' | 'approximate' | 'recipe-only' | 'plugin-backed' | 'unsupported';
+export type CapabilityLevel =
+  | "native"
+  | "approximate"
+  | "recipe-only"
+  | "plugin-backed"
+  | "unsupported";
 
 /** Per-target capability report for a utility family */
 export type TargetCapability = Record<DotTarget, CapabilityLevel>;
@@ -55,7 +65,13 @@ export interface DotToken {
 export type StyleObject = Record<string, string | number>;
 
 /** Supported state variant names */
-export type DotState = 'hover' | 'focus' | 'active' | 'focus-visible' | 'focus-within' | 'disabled';
+export type DotState =
+  | "hover"
+  | "focus"
+  | "active"
+  | "focus-visible"
+  | "focus-within"
+  | "disabled";
 
 /** Style output from any target adapter (web, native, or flutter) */
 export type DotAdapterOutput = StyleObject | RNStyleObject | FlutterRecipe;
@@ -66,13 +82,17 @@ export interface DotStyleMap<T extends DotAdapterOutput = DotAdapterOutput> {
   hover?: T;
   focus?: T;
   active?: T;
-  'focus-visible'?: T;
-  'focus-within'?: T;
+  "focus-visible"?: T;
+  "focus-within"?: T;
   disabled?: T;
 }
 
 /** Resolver function signature — receives config for token lookups */
-export type ResolverFn = (prefix: string, value: string, config: DotConfig) => StyleObject;
+export type ResolverFn = (
+  prefix: string,
+  value: string,
+  config: DotConfig,
+) => StyleObject;
 
 /** Options for dot() call */
 export interface DotOptions {
@@ -146,6 +166,8 @@ export interface DotUserConfig {
   warnUnknown?: boolean;
   /** Custom breakpoint names in mobile-first order. Defaults to ['sm','md','lg','xl','2xl']. */
   breakpoints?: string[];
+  /** Map of breakpoint name → min-width (e.g. { tablet: '900px' }). Merged with defaults. */
+  breakpointWidths?: Record<string, string>;
   /** Base pixel value for rem/em conversion in native adapter. Defaults to 16. */
   remBase?: number;
 }
@@ -164,6 +186,8 @@ export interface DotConfig {
   breakpointOrder: string[];
   /** Set of breakpoint names for quick lookup */
   breakpointSet: Set<string>;
+  /** Breakpoint name → min-width for @media generation (class mode) */
+  breakpointWidths: Record<string, string>;
   /** Base pixel value for rem/em conversion in native adapter */
   remBase: number;
 }
