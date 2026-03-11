@@ -1,25 +1,38 @@
-import type { StyleObject, RNStyleObject, DotUserConfig, DotConfig, DotOptions, DotTarget, DotStyleMap, DotState, DotAdapterOutput } from './types';
-import type { FlutterRecipe } from './adapters/flutter-types';
-import { parse } from './parser';
-import { resolveToken } from './resolver';
-import { DotCache } from './cache';
-import { resolveConfig } from './config';
-import { adaptNative } from './adapters/native';
-import { adaptFlutter } from './adapters/flutter';
-import { parseShadowLayers } from './adapters/shared';
+import type {
+  StyleObject,
+  RNStyleObject,
+  DotUserConfig,
+  DotConfig,
+  DotOptions,
+  DotTarget,
+  DotStyleMap,
+  DotState,
+  DotAdapterOutput,
+} from "./types";
+import type { FlutterRecipe } from "./adapters/flutter-types";
+import { parse } from "./parser";
+import { resolveToken } from "./resolver";
+import { DotCache } from "./cache";
+import { resolveConfig, setGlobalConfig } from "./config";
+import { adaptNative } from "./adapters/native";
+import { adaptFlutter } from "./adapters/flutter";
+import { parseShadowLayers } from "./adapters/shared";
 
 /** Keys whose values accumulate (space-separated) instead of last-wins */
-const ACCUMULATE_KEYS = new Set(['transform', 'filter', 'backdropFilter']);
+const ACCUMULATE_KEYS = new Set(["transform", "filter", "backdropFilter"]);
 
 /** Internal layer keys that get merged into boxShadow */
-const SHADOW_LAYER_KEYS = new Set(['__dot_shadowLayer', '__dot_ringLayer']);
+const SHADOW_LAYER_KEYS = new Set(["__dot_shadowLayer", "__dot_ringLayer"]);
 
 /** Internal gradient keys that get merged into backgroundImage */
 const GRADIENT_KEYS = new Set([
-  '__dot_gradientDirection',
-  '__dot_gradientFrom', '__dot_gradientFromPos',
-  '__dot_gradientVia', '__dot_gradientViaPos',
-  '__dot_gradientTo', '__dot_gradientToPos',
+  "__dot_gradientDirection",
+  "__dot_gradientFrom",
+  "__dot_gradientFromPos",
+  "__dot_gradientVia",
+  "__dot_gradientViaPos",
+  "__dot_gradientTo",
+  "__dot_gradientToPos",
 ]);
 
 /** All internal keys (shadow + gradient) */
@@ -38,9 +51,9 @@ function mergeStyle(target: StyleObject, source: StyleObject): void {
 
 /** Strip trailing ' !important' from a value, return [cleanValue, hadImportant] */
 function stripImportant(val: string | number): [string, boolean] {
-  if (typeof val !== 'string') return [String(val), false];
-  if (val.endsWith(' !important')) {
-    return [val.slice(0, -' !important'.length), true];
+  if (typeof val !== "string") return [String(val), false];
+  if (val.endsWith(" !important")) {
+    return [val.slice(0, -" !important".length), true];
   }
   return [val, false];
 }
@@ -49,10 +62,13 @@ function stripImportant(val: string | number): [string, boolean] {
 function finalizeStyle(style: StyleObject): StyleObject {
   const ringLayer = style.__dot_ringLayer;
   const shadowLayer = style.__dot_shadowLayer;
-  const hasGradient = style.__dot_gradientDirection !== undefined || style.__dot_gradientFrom !== undefined;
+  const hasGradient =
+    style.__dot_gradientDirection !== undefined ||
+    style.__dot_gradientFrom !== undefined;
 
   // Fast path: no internal keys
-  if (ringLayer === undefined && shadowLayer === undefined && !hasGradient) return style;
+  if (ringLayer === undefined && shadowLayer === undefined && !hasGradient)
+    return style;
 
   const result: StyleObject = {};
   for (const [key, value] of Object.entries(style)) {
@@ -77,12 +93,12 @@ function finalizeStyle(style: StyleObject): StyleObject {
       if (imp) anyImportant = true;
     }
 
-    result.boxShadow = layers.join(', ') + (anyImportant ? ' !important' : '');
+    result.boxShadow = layers.join(", ") + (anyImportant ? " !important" : "");
   }
 
   // Gradient composition: direction + from/via/to color stops → backgroundImage
   if (hasGradient) {
-    const direction = String(style.__dot_gradientDirection ?? 'to bottom');
+    const direction = String(style.__dot_gradientDirection ?? "to bottom");
     const stops: string[] = [];
     let anyImportant = false;
 
@@ -106,8 +122,9 @@ function finalizeStyle(style: StyleObject): StyleObject {
     }
 
     if (stops.length > 0) {
-      result.backgroundImage = `linear-gradient(${direction}, ${stops.join(', ')})` +
-        (anyImportant ? ' !important' : '');
+      result.backgroundImage =
+        `linear-gradient(${direction}, ${stops.join(", ")})` +
+        (anyImportant ? " !important" : "");
     }
   }
 
@@ -118,22 +135,31 @@ function finalizeStyle(style: StyleObject): StyleObject {
 function applyImportant(style: StyleObject): StyleObject {
   const result: StyleObject = {};
   for (const [key, value] of Object.entries(style)) {
-    result[key] = typeof value === 'string' && !value.endsWith('!important')
-      ? `${value} !important`
-      : typeof value === 'number'
+    result[key] =
+      typeof value === "string" && !value.endsWith("!important")
         ? `${value} !important`
-        : value;
+        : typeof value === "number"
+          ? `${value} !important`
+          : value;
   }
   return result;
 }
 
 /** Supported state variants for dotMap() */
 const STATE_VARIANT_SET = new Set<string>([
-  'hover', 'focus', 'active', 'focus-visible', 'focus-within', 'disabled',
+  "hover",
+  "focus",
+  "active",
+  "focus-visible",
+  "focus-within",
+  "disabled",
 ]);
 
 /** Categorize a token's variants into dark, breakpoint, state, and unsupported */
-function categorizeVariants(variants: string[], breakpointSet: Set<string>): {
+function categorizeVariants(
+  variants: string[],
+  breakpointSet: Set<string>,
+): {
   dark: boolean;
   breakpoint: string | null;
   state: string | null;
@@ -144,7 +170,7 @@ function categorizeVariants(variants: string[], breakpointSet: Set<string>): {
   let state: string | null = null;
   let unsupported = false;
   for (const v of variants) {
-    if (v === 'dark') dark = true;
+    if (v === "dark") dark = true;
     else if (breakpointSet.has(v)) breakpoint = v;
     else if (STATE_VARIANT_SET.has(v)) state = v;
     else unsupported = true;
@@ -177,27 +203,45 @@ let cache = new DotCache(currentConfig.cacheSize);
  * dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
  * // → { padding: '48px' }  (mobile-first cascade: base → md → lg)
  */
-export function dot(input: string | undefined | null, options: DotOptions & { target: 'web' }): StyleObject;
-export function dot(input: string | undefined | null, options: DotOptions & { target: 'native' }): RNStyleObject;
-export function dot(input: string | undefined | null, options: DotOptions & { target: 'flutter' }): FlutterRecipe;
-export function dot(input: string | undefined | null, options: DotOptions & { target: DotTarget }): DotAdapterOutput;
-export function dot(input: string | undefined | null, options?: DotOptions): StyleObject;
-export function dot(input: string | undefined | null, options?: DotOptions): StyleObject | RNStyleObject | FlutterRecipe {
+export function dot(
+  input: string | undefined | null,
+  options: DotOptions & { target: "web" },
+): StyleObject;
+export function dot(
+  input: string | undefined | null,
+  options: DotOptions & { target: "native" },
+): RNStyleObject;
+export function dot(
+  input: string | undefined | null,
+  options: DotOptions & { target: "flutter" },
+): FlutterRecipe;
+export function dot(
+  input: string | undefined | null,
+  options: DotOptions & { target: DotTarget },
+): DotAdapterOutput;
+export function dot(
+  input: string | undefined | null,
+  options?: DotOptions,
+): StyleObject;
+export function dot(
+  input: string | undefined | null,
+  options?: DotOptions,
+): StyleObject | RNStyleObject | FlutterRecipe {
   if (!input || !input.trim()) return {};
 
   const isDark = options?.dark === true;
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
-  const isNative = target === 'native';
-  const isFlutter = target === 'flutter';
+  const isNative = target === "native";
+  const isFlutter = target === "flutter";
   const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
     ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Layer 1: Full input cache hit (cache key encodes full context including target)
-  const targetPrefix = isFlutter ? '\x02f' : isNative ? '\x02n' : '';
-  const cacheKey = `${targetPrefix}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
+  const targetPrefix = isFlutter ? "\x02f" : isNative ? "\x02n" : "";
+  const cacheKey = `${targetPrefix}${activeBreakpoint ?? ""}${isDark ? "\x01d" : ""}\x01${input}`;
   if (currentConfig.cache) {
     const cached = cache.getInput(cacheKey);
     if (cached) return cached;
@@ -213,7 +257,10 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
   const darkBpLayers: Record<string, StyleObject> = {};
 
   for (const token of tokens) {
-    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants, currentConfig.breakpointSet);
+    const { dark, breakpoint, state, unsupported } = categorizeVariants(
+      token.variants,
+      currentConfig.breakpointSet,
+    );
 
     // Skip unsupported and state variants (dot() returns flat styles; use dotMap() for states)
     if (unsupported || state) continue;
@@ -229,10 +276,10 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
     }
 
     // Strip variants and !important from raw for resolution
-    let rawUtility = token.raw.includes(':')
-      ? token.raw.slice(token.raw.lastIndexOf(':') + 1)
+    let rawUtility = token.raw.includes(":")
+      ? token.raw.slice(token.raw.lastIndexOf(":") + 1)
       : token.raw;
-    if (rawUtility.startsWith('!')) rawUtility = rawUtility.slice(1);
+    if (rawUtility.startsWith("!")) rawUtility = rawUtility.slice(1);
 
     const resolveTarget = { ...token, variants: [], raw: rawUtility };
 
@@ -299,7 +346,10 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
   if (isFlutter) {
     finalResult = adaptFlutter(finalized, { remBase: currentConfig.remBase });
   } else if (isNative) {
-    finalResult = adaptNative(finalized, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown });
+    finalResult = adaptNative(finalized, {
+      remBase: currentConfig.remBase,
+      warnDropped: currentConfig.warnUnknown,
+    });
   } else {
     finalResult = finalized;
   }
@@ -312,8 +362,8 @@ export function dot(input: string | undefined | null, options?: DotOptions): Sty
   return finalResult;
 }
 
-import type { CapabilityLevel, DotCapabilityReport } from './types';
-import { getCapability } from './capabilities';
+import type { CapabilityLevel, DotCapabilityReport } from "./types";
+import { getCapability } from "./capabilities";
 
 /** Result of dotExplain() — resolved styles plus capability metadata */
 export interface DotExplainResult {
@@ -340,16 +390,19 @@ export interface DotExplainResult {
  * //   }
  * // }
  */
-export function dotExplain(input: string | undefined | null, options?: DotOptions): DotExplainResult {
+export function dotExplain(
+  input: string | undefined | null,
+  options?: DotOptions,
+): DotExplainResult {
   const target: DotTarget = options?.target ?? currentConfig.runtime;
 
-  if (!input || !input.trim() || target === 'web') {
+  if (!input || !input.trim() || target === "web") {
     const styles = dot(input, options);
     return { styles, report: {} };
   }
 
   // Resolve as web first to see all CSS properties before native drops them
-  const webStyles = dot(input, { ...options, target: 'web' }) as StyleObject;
+  const webStyles = dot(input, { ...options, target: "web" }) as StyleObject;
   // Then resolve as native for final output
   const styles = dot(input, options);
 
@@ -362,36 +415,40 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
 
     // CSS variable values are unsupported on non-web targets
     // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
-    if (propValue.includes('var(')) {
+    if (propValue.includes("var(")) {
       dropped.push(prop);
-      capabilities[prop] = 'unsupported';
+      capabilities[prop] = "unsupported";
       continue;
     }
 
     const level = getCapability(prop, target, propValue);
 
-    if (level === 'unsupported') {
+    if (level === "unsupported") {
       dropped.push(prop);
-    } else if (level === 'approximate') {
+    } else if (level === "approximate") {
       approximated.push(prop);
     }
 
-    if (level !== 'native') {
+    if (level !== "native") {
       capabilities[prop] = level;
     }
   }
 
   // Collect approximation details for shadow on native
   const details: Record<string, string[]> = {};
-  if (target === 'native' && webStyles.boxShadow && typeof webStyles.boxShadow === 'string') {
+  if (
+    target === "native" &&
+    webStyles.boxShadow &&
+    typeof webStyles.boxShadow === "string"
+  ) {
     const shadowStr = webStyles.boxShadow as string;
-    if (shadowStr !== 'none') {
+    if (shadowStr !== "none") {
       const layers = parseShadowLayers(shadowStr);
       const reasons: string[] = [];
-      if (layers.some((l) => l.inset)) reasons.push('inset dropped');
+      if (layers.some((l) => l.inset)) reasons.push("inset dropped");
       const nonInset = layers.filter((l) => !l.inset);
       if (nonInset.length > 1) reasons.push(`${nonInset.length} layers → 1`);
-      if (nonInset.some((l) => l.spread !== 0)) reasons.push('spread ignored');
+      if (nonInset.some((l) => l.spread !== 0)) reasons.push("spread ignored");
       if (reasons.length > 0) details.boxShadow = reasons;
     }
   }
@@ -419,6 +476,7 @@ export function dotExplain(input: string | undefined | null, options?: DotOption
  */
 export function createDotConfig(userConfig?: DotUserConfig): DotConfig {
   currentConfig = resolveConfig(userConfig);
+  setGlobalConfig(currentConfig);
   cache = new DotCache(currentConfig.cacheSize);
   return currentConfig;
 }
@@ -451,30 +509,48 @@ export function clearDotCache(): void {
  * const styles = dotMap('bg-white hover:bg-gray-100');
  * <div style={styles.base} onMouseEnter={...} />
  */
-export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'web' }): DotStyleMap<StyleObject>;
-export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'native' }): DotStyleMap<RNStyleObject>;
-export function dotMap(input: string | undefined | null, options: DotOptions & { target: 'flutter' }): DotStyleMap<FlutterRecipe>;
-export function dotMap(input: string | undefined | null, options: DotOptions & { target: DotTarget }): DotStyleMap;
-export function dotMap(input: string | undefined | null, options?: DotOptions): DotStyleMap<StyleObject>;
-export function dotMap(input: string | undefined | null, options?: DotOptions): DotStyleMap {
+export function dotMap(
+  input: string | undefined | null,
+  options: DotOptions & { target: "web" },
+): DotStyleMap<StyleObject>;
+export function dotMap(
+  input: string | undefined | null,
+  options: DotOptions & { target: "native" },
+): DotStyleMap<RNStyleObject>;
+export function dotMap(
+  input: string | undefined | null,
+  options: DotOptions & { target: "flutter" },
+): DotStyleMap<FlutterRecipe>;
+export function dotMap(
+  input: string | undefined | null,
+  options: DotOptions & { target: DotTarget },
+): DotStyleMap;
+export function dotMap(
+  input: string | undefined | null,
+  options?: DotOptions,
+): DotStyleMap<StyleObject>;
+export function dotMap(
+  input: string | undefined | null,
+  options?: DotOptions,
+): DotStyleMap {
   if (!input || !input.trim()) return { base: {} };
 
   const isDark = options?.dark === true;
   const activeBreakpoint = options?.breakpoint;
   const target: DotTarget = options?.target ?? currentConfig.runtime;
-  const isNative = target === 'native';
-  const isFlutter = target === 'flutter';
+  const isNative = target === "native";
+  const isFlutter = target === "flutter";
   const bpOrder = currentConfig.breakpointOrder;
   const activeBpIndex = activeBreakpoint
     ? bpOrder.indexOf(activeBreakpoint)
     : -1;
 
   // Cache key with map prefix
-  const targetPrefix = isFlutter ? '\x02f' : isNative ? '\x02n' : '';
-  const cacheKey = `\x03m${targetPrefix}${activeBreakpoint ?? ''}${isDark ? '\x01d' : ''}\x01${input}`;
+  const targetPrefix = isFlutter ? "\x02f" : isNative ? "\x02n" : "";
+  const cacheKey = `\x03m${targetPrefix}${activeBreakpoint ?? ""}${isDark ? "\x01d" : ""}\x01${input}`;
   if (currentConfig.cache) {
     const cached = cache.getInput(cacheKey);
-    if (cached && typeof cached === 'object' && 'base' in cached) {
+    if (cached && typeof cached === "object" && "base" in cached) {
       return cached as unknown as DotStyleMap;
     }
   }
@@ -491,7 +567,10 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
   const stateLayers: Record<string, StyleObject> = {};
 
   for (const token of tokens) {
-    const { dark, breakpoint, state, unsupported } = categorizeVariants(token.variants, currentConfig.breakpointSet);
+    const { dark, breakpoint, state, unsupported } = categorizeVariants(
+      token.variants,
+      currentConfig.breakpointSet,
+    );
 
     if (unsupported) continue;
     if (dark && !isDark) continue;
@@ -502,10 +581,10 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
       if (tokenBpIndex === -1 || tokenBpIndex > activeBpIndex) continue;
     }
 
-    let rawUtility = token.raw.includes(':')
-      ? token.raw.slice(token.raw.lastIndexOf(':') + 1)
+    let rawUtility = token.raw.includes(":")
+      ? token.raw.slice(token.raw.lastIndexOf(":") + 1)
       : token.raw;
-    if (rawUtility.startsWith('!')) rawUtility = rawUtility.slice(1);
+    if (rawUtility.startsWith("!")) rawUtility = rawUtility.slice(1);
 
     const resolveTarget = { ...token, variants: [], raw: rawUtility };
 
@@ -567,9 +646,16 @@ export function dotMap(input: string | undefined | null, options?: DotOptions): 
   const finalizedBase = finalizeStyle(baseResult);
 
   // Apply target adapter to a style object
-  const applyAdapter = (style: StyleObject): StyleObject | RNStyleObject | FlutterRecipe => {
-    if (isFlutter) return adaptFlutter(style, { remBase: currentConfig.remBase });
-    if (isNative) return adaptNative(style, { remBase: currentConfig.remBase, warnDropped: currentConfig.warnUnknown });
+  const applyAdapter = (
+    style: StyleObject,
+  ): StyleObject | RNStyleObject | FlutterRecipe => {
+    if (isFlutter)
+      return adaptFlutter(style, { remBase: currentConfig.remBase });
+    if (isNative)
+      return adaptNative(style, {
+        remBase: currentConfig.remBase,
+        warnDropped: currentConfig.warnUnknown,
+      });
     return style;
   };
 
@@ -612,25 +698,38 @@ export type {
   CapabilityLevel,
   TargetCapability,
   DotCapabilityReport,
-} from './types';
+} from "./types";
 
 // Re-export capabilities
-export { CAPABILITY_MATRIX, PROPERTY_TO_FAMILY, getCapability } from './capabilities';
+export {
+  CAPABILITY_MATRIX,
+  PROPERTY_TO_FAMILY,
+  getCapability,
+} from "./capabilities";
 
 // Re-export adapters for direct usage
-export { adaptNative, _resetNativeWarnings } from './adapters/native';
-export type { AdaptNativeOptions } from './adapters/native';
-export { adaptWeb } from './adapters/web';
-export { adaptFlutter } from './adapters/flutter';
-export type { AdaptFlutterOptions } from './adapters/flutter';
+export { adaptNative, _resetNativeWarnings } from "./adapters/native";
+export type { AdaptNativeOptions } from "./adapters/native";
+export { adaptWeb } from "./adapters/web";
+export { adaptFlutter } from "./adapters/flutter";
+export type { AdaptFlutterOptions } from "./adapters/flutter";
 export type {
-  FlutterRecipe, FlutterDecoration, FlutterEdgeInsets, FlutterConstraints,
-  FlutterLayout, FlutterFlexChild, FlutterPositioning, FlutterTextStyle,
-  FlutterTransform, FlutterBoxShadow, FlutterBorderSide, FlutterBorderRadius,
-} from './adapters/flutter-types';
+  FlutterRecipe,
+  FlutterDecoration,
+  FlutterEdgeInsets,
+  FlutterConstraints,
+  FlutterLayout,
+  FlutterFlexChild,
+  FlutterPositioning,
+  FlutterTextStyle,
+  FlutterTransform,
+  FlutterBoxShadow,
+  FlutterBorderSide,
+  FlutterBorderRadius,
+} from "./adapters/flutter-types";
 
 // Re-export cx utility
-export { dotCx } from './cx';
+export { dotCx } from "./cx";
 
 /**
  * Helper to generate semantic color mappings from token names.
@@ -651,12 +750,20 @@ export { dotCx } from './cx';
  * @param prefix - CSS variable prefix (default: '--color')
  */
 export function semanticVars(...names: string[]): Record<string, string>;
-export function semanticVars(options: { prefix: string }, ...names: string[]): Record<string, string>;
+export function semanticVars(
+  options: { prefix: string },
+  ...names: string[]
+): Record<string, string>;
 export function semanticVars(...args: unknown[]): Record<string, string> {
-  let prefix = '--color';
+  let prefix = "--color";
   let names: string[];
 
-  if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null && 'prefix' in args[0]) {
+  if (
+    args.length > 0 &&
+    typeof args[0] === "object" &&
+    args[0] !== null &&
+    "prefix" in args[0]
+  ) {
     prefix = (args[0] as { prefix: string }).prefix;
     names = args.slice(1) as string[];
   } else {
@@ -671,8 +778,14 @@ export function semanticVars(...args: unknown[]): Record<string, string> {
 }
 
 // Re-export variants (CVA replacement) — inject dot function to avoid circular import
-import { _setDotFn, _setGetRuntime, dotVariants } from './variants';
+import { _setDotFn, _setGetRuntime, dotVariants } from "./variants";
 _setDotFn(dot as (input: string, options?: DotOptions) => StyleObject);
 _setGetRuntime(() => currentConfig.runtime);
 export { dotVariants };
-export type { VariantProps, DotVariantsConfig, DotVariantsFn, CompoundVariant, VariantShape } from './variants';
+export type {
+  VariantProps,
+  DotVariantsConfig,
+  DotVariantsFn,
+  CompoundVariant,
+  VariantShape,
+} from "./variants";

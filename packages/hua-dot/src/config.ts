@@ -1,24 +1,33 @@
-import type { DotUserConfig, DotConfig, ResolvedTokens } from './types';
-import { SPACING } from './tokens/spacing';
-import { COLORS, SPECIAL_COLORS, SEMANTIC_COLORS } from './tokens/colors';
-import { FONT_SIZES, FONT_WEIGHTS, FONT_FAMILIES, LINE_HEIGHTS, LETTER_SPACINGS } from './tokens/typography';
-import { BORDER_RADIUS } from './tokens/borders';
-import { Z_INDEX } from './tokens/z-index';
-import { SHADOWS } from './tokens/shadows';
-import { OPACITY } from './tokens/opacity';
-import { ROTATE, SCALE, SKEW } from './tokens/transforms';
-import { TRANSITION_PROPERTY, DURATION, TIMING } from './tokens/transitions';
-import { ANIMATION } from './tokens/animations';
-import { BACKDROP_BLUR } from './tokens/backdrop';
-import { GRID_COLS, GRID_ROWS } from './tokens/grid';
-import { RING_WIDTHS, RING_OFFSETS } from './tokens/rings';
-import { BREAKPOINT_ORDER } from './tokens/breakpoints';
+import type { DotUserConfig, DotConfig, ResolvedTokens } from "./types";
+import { SPACING } from "./tokens/spacing";
+import { COLORS, SPECIAL_COLORS, SEMANTIC_COLORS } from "./tokens/colors";
+import {
+  FONT_SIZES,
+  FONT_WEIGHTS,
+  FONT_FAMILIES,
+  LINE_HEIGHTS,
+  LETTER_SPACINGS,
+} from "./tokens/typography";
+import { BORDER_RADIUS } from "./tokens/borders";
+import { Z_INDEX } from "./tokens/z-index";
+import { SHADOWS } from "./tokens/shadows";
+import { OPACITY } from "./tokens/opacity";
+import { ROTATE, SCALE, SKEW } from "./tokens/transforms";
+import { TRANSITION_PROPERTY, DURATION, TIMING } from "./tokens/transitions";
+import { ANIMATION } from "./tokens/animations";
+import { BACKDROP_BLUR } from "./tokens/backdrop";
+import { GRID_COLS, GRID_ROWS } from "./tokens/grid";
+import { RING_WIDTHS, RING_OFFSETS } from "./tokens/rings";
+import { BREAKPOINT_ORDER, BREAKPOINT_WIDTHS } from "./tokens/breakpoints";
 
 /** Default token set built from hua-css data */
 const DEFAULT_TOKENS: ResolvedTokens = {
-  colors: { ...COLORS, ...Object.fromEntries(
-    Object.entries(SPECIAL_COLORS).map(([k, v]) => [k, v])
-  )},
+  colors: {
+    ...COLORS,
+    ...Object.fromEntries(
+      Object.entries(SPECIAL_COLORS).map(([k, v]) => [k, v]),
+    ),
+  },
   spacing: { ...SPACING },
   borderRadius: { ...BORDER_RADIUS },
   fontSize: { ...FONT_SIZES },
@@ -48,8 +57,11 @@ const DEFAULT_TOKENS: ResolvedTokens = {
  * Deep merge two objects. Source values override target values.
  * Only merges plain objects; arrays and primitives are replaced.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+
+export function deepMerge<T extends Record<string, any>>(
+  target: T,
+  source: Partial<T>,
+): T {
   const result = { ...target };
 
   for (const key of Object.keys(source) as (keyof T)[]) {
@@ -58,13 +70,12 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
 
     if (
       sourceVal &&
-      typeof sourceVal === 'object' &&
+      typeof sourceVal === "object" &&
       !Array.isArray(sourceVal) &&
       targetVal &&
-      typeof targetVal === 'object' &&
+      typeof targetVal === "object" &&
       !Array.isArray(targetVal)
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       result[key] = deepMerge(targetVal as any, sourceVal as any) as T[keyof T];
     } else if (sourceVal !== undefined) {
       result[key] = sourceVal as T[keyof T];
@@ -106,13 +117,15 @@ export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
   const theme = userConfig?.theme;
 
   // Normalize semanticColors before deepMerge (handles string[] → Record conversion)
-  const semanticPrefix = theme?.semanticPrefix ?? '--color';
-  const resolvedSemantic = normalizeSemanticColors(theme?.semanticColors, semanticPrefix);
+  const semanticPrefix = theme?.semanticPrefix ?? "--color";
+  const resolvedSemantic = normalizeSemanticColors(
+    theme?.semanticColors,
+    semanticPrefix,
+  );
 
   // Strip semanticColors/semanticPrefix from theme before deepMerge (already handled above)
   let themeForMerge: Partial<ResolvedTokens> | undefined;
   if (theme) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { semanticColors: _sc, semanticPrefix: _sp, ...rest } = theme;
     themeForMerge = rest as Partial<ResolvedTokens>;
   }
@@ -124,10 +137,14 @@ export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
   // Override semanticColors with our normalized version
   tokens.semanticColors = resolvedSemantic;
 
-  const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+  const isDev =
+    typeof process !== "undefined" && process.env?.NODE_ENV === "development";
 
   const breakpointOrder = userConfig?.breakpoints ?? [...BREAKPOINT_ORDER];
   const breakpointSet = new Set<string>(breakpointOrder);
+  const breakpointWidths = userConfig?.breakpointWidths
+    ? { ...BREAKPOINT_WIDTHS, ...userConfig.breakpointWidths }
+    : { ...BREAKPOINT_WIDTHS };
 
   return {
     tokens,
@@ -135,11 +152,26 @@ export function resolveConfig(userConfig?: DotUserConfig): DotConfig {
     cacheSize: userConfig?.cacheSize ?? 500,
     strictMode: userConfig?.strictMode ?? false,
     warnUnknown: userConfig?.warnUnknown ?? isDev,
-    runtime: userConfig?.runtime ?? 'web',
+    runtime: userConfig?.runtime ?? "web",
     breakpointOrder,
     breakpointSet,
+    breakpointWidths,
     remBase: userConfig?.remBase ?? 16,
   };
+}
+
+// ── Global config store (shared across adapters) ──
+
+let _globalConfig: DotConfig | null = null;
+
+/** Store config globally so adapters (e.g. class mode) can pick it up. */
+export function setGlobalConfig(config: DotConfig): void {
+  _globalConfig = config;
+}
+
+/** Get the current global config, or resolve defaults if none was set. */
+export function getGlobalConfig(): DotConfig {
+  return _globalConfig ?? resolveConfig();
 }
 
 /**
