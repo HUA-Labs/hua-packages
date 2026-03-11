@@ -25,6 +25,13 @@ describe('getCapability', () => {
   it('returns unsupported for unknown property', () => {
     expect(getCapability('__unknown__', 'native')).toBe('unsupported');
   });
+
+  it('maps directional border colors to color family', () => {
+    expect(getCapability('borderTopColor', 'native')).toBe('native');
+    expect(getCapability('borderRightColor', 'native')).toBe('native');
+    expect(getCapability('borderBottomColor', 'native')).toBe('native');
+    expect(getCapability('borderLeftColor', 'native')).toBe('native');
+  });
 });
 
 describe('CAPABILITY_MATRIX', () => {
@@ -98,5 +105,18 @@ describe('dotExplain', () => {
       expect(result.report._dropped).not.toContain('WebkitLineClamp');
       expect(result.report._dropped).not.toContain('WebkitBoxOrient');
     }
+  });
+
+  it('directional border color is NOT dropped on native', () => {
+    const result = dotExplain('border-t-red-500', { target: 'native' });
+    expect(result.styles).toHaveProperty('borderTopColor');
+    expect(result.report._dropped).toBeUndefined();
+  });
+
+  it('border-x color resolves both sides without dropped report', () => {
+    const result = dotExplain('border-x-red-500', { target: 'native' });
+    expect(result.styles).toHaveProperty('borderLeftColor');
+    expect(result.styles).toHaveProperty('borderRightColor');
+    expect(result.report._dropped).toBeUndefined();
   });
 });

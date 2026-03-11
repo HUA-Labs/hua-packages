@@ -77,6 +77,8 @@ export const PROPERTY_TO_FAMILY: Record<string, string> = {
 
   // color
   backgroundColor: 'color', color: 'color', borderColor: 'color',
+  borderTopColor: 'color', borderRightColor: 'color',
+  borderBottomColor: 'color', borderLeftColor: 'color',
 
   // typography
   fontSize: 'typography', fontWeight: 'typography', fontFamily: 'typography',
