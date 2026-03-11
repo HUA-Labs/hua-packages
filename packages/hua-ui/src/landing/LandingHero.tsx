@@ -1,30 +1,35 @@
-"use client"
+"use client";
 
-import React, { useMemo } from 'react'
-import { merge } from '../lib/utils'
-import { dot } from '@hua-labs/dot'
-import { mergeStyles } from '../hooks/useDotMap'
-import { Container } from '../components/Container'
-import { AnimatedGradient } from '../components/advanced/AnimatedGradient'
-import { useLandingTheme } from './LandingProvider'
-import type { LandingHeroProps, LandingMotionOverride } from './types'
+import React, { useMemo } from "react";
+import { dot } from "@hua-labs/dot";
+import { mergeStyles } from "../hooks/useDotMap";
+import { Container } from "../components/Container";
+import { AnimatedGradient } from "../components/advanced/AnimatedGradient";
+import { useLandingTheme } from "./LandingProvider";
+import type { LandingHeroProps, LandingMotionOverride } from "./types";
 
 function resolveMotion(
   themeMotion: Required<LandingMotionOverride>,
-  override?: LandingMotionOverride
+  override?: LandingMotionOverride,
 ): Required<LandingMotionOverride> {
-  if (!override) return themeMotion
-  return { ...themeMotion, ...override }
+  if (!override) return themeMotion;
+  return { ...themeMotion, ...override };
 }
 
 function getInitialTransform(type: string): string {
   switch (type) {
-    case 'slideUp': return 'translateY(32px)'
-    case 'slideLeft': return 'translateX(-32px)'
-    case 'slideRight': return 'translateX(32px)'
-    case 'scaleIn': return 'scale(0.95)'
-    case 'bounceIn': return 'scale(0.75)'
-    default: return 'none'
+    case "slideUp":
+      return "translateY(32px)";
+    case "slideLeft":
+      return "translateX(-32px)";
+    case "slideRight":
+      return "translateX(32px)";
+    case "scaleIn":
+      return "scale(0.95)";
+    case "bounceIn":
+      return "scale(0.75)";
+    default:
+      return "none";
   }
 }
 
@@ -42,32 +47,36 @@ export function LandingHero({
   className,
   ...rest
 }: LandingHeroProps) {
-  const theme = useLandingTheme()
-  const size = sizeProp ?? theme.hero.size
-  const bg = bgProp ?? theme.hero.background
-  const motion = resolveMotion(theme.hero.motion, motionOverride)
+  const theme = useLandingTheme();
+  const size = sizeProp ?? theme.hero.size;
+  const bg = bgProp ?? theme.hero.background;
+  const motion = resolveMotion(theme.hero.motion, motionOverride);
 
-  const contentStyle = useMemo<React.CSSProperties>(() => ({
-    opacity: 0,
-    transform: getInitialTransform(motion.type),
-    animation: `landing-hero-enter ${motion.duration}ms ${motion.easing} ${motion.delay}ms forwards`,
-  }), [motion])
+  const contentStyle = useMemo<React.CSSProperties>(
+    () => ({
+      opacity: 0,
+      transform: getInitialTransform(motion.type),
+      animation: `landing-hero-enter ${motion.duration}ms ${motion.easing} ${motion.delay}ms forwards`,
+    }),
+    [motion],
+  );
 
   return (
     <section
-      style={dot(merge(
-        "relative overflow-hidden flex items-center justify-center",
-        size === 'full' ? 'min-h-screen' : 'py-28 sm:py-36',
-        bg === 'dark' && 'bg-gray-950 text-white',
-        className
-      ))}
+      style={dot(
+        `relative overflow-hidden flex items-center justify-center ${size === "full" ? "min-h-screen" : "py-28 sm:py-36"}${bg === "dark" ? " bg-gray-950 text-white" : ""}${className ? ` ${className}` : ""}`,
+      )}
       {...rest}
     >
       {/* Background layer */}
-      {bg === 'gradient' && (
-        <div style={dot("absolute inset-0")} className="gradient-bg-soft" aria-hidden="true" />
+      {bg === "gradient" && (
+        <div
+          style={dot("absolute inset-0")}
+          className="gradient-bg-soft"
+          aria-hidden="true"
+        />
       )}
-      {bg === 'animated-gradient' && (
+      {bg === "animated-gradient" && (
         <AnimatedGradient
           colors={gradientColors}
           type="mesh"
@@ -75,10 +84,11 @@ export function LandingHero({
           aria-hidden="true"
         />
       )}
-      {bg === 'dark' && (
+      {bg === "dark" && (
         <div
           style={mergeStyles(dot("absolute inset-0"), {
-            background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)',
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)",
           })}
           aria-hidden="true"
         />
@@ -86,8 +96,17 @@ export function LandingHero({
 
       {/* Content */}
       <Container size="lg" padding="none" centered dot="relative z-10 px-6">
-        <div style={mergeStyles(dot("text-center max-w-4xl mx-auto"), contentStyle)}>
-          <h1 style={dot("text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6")}>
+        <div
+          style={mergeStyles(
+            dot("text-center max-w-4xl mx-auto"),
+            contentStyle,
+          )}
+        >
+          <h1
+            style={dot(
+              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6",
+            )}
+          >
             {title}
           </h1>
 
@@ -98,13 +117,21 @@ export function LandingHero({
           )}
 
           {description && (
-            <p style={dot("text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8")}>
+            <p
+              style={dot(
+                "text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8",
+              )}
+            >
               {description}
             </p>
           )}
 
           {(primaryAction || secondaryAction) && (
-            <div style={dot("flex flex-col sm:flex-row items-center justify-center gap-4")}>
+            <div
+              style={dot(
+                "flex flex-col sm:flex-row items-center justify-center gap-4",
+              )}
+            >
               {primaryAction}
               {secondaryAction}
             </div>
@@ -114,19 +141,38 @@ export function LandingHero({
 
       {/* Scroll indicator */}
       {scrollIndicator && (
-        <div style={dot("absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce")} aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={dot("text-muted-foreground")}>
+        <div
+          style={dot(
+            "absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce",
+          )}
+          aria-hidden="true"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={dot("text-muted-foreground")}
+          >
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </div>
       )}
 
       {/* Keyframe injection */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes landing-hero-enter {
           to { opacity: 1; transform: none; }
         }
-      `}} />
+      `,
+        }}
+      />
     </section>
-  )
+  );
 }

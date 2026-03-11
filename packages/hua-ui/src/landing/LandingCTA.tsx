@@ -1,41 +1,48 @@
-"use client"
+"use client";
 
-import React, { useMemo } from 'react'
-import { merge } from '../lib/utils'
-import { dot } from '@hua-labs/dot'
-import { mergeStyles } from '../hooks/useDotMap'
-import { Container } from '../components/Container'
-import { AnimatedGradient } from '../components/advanced/AnimatedGradient'
-import { useLandingTheme } from './LandingProvider'
-import type { LandingCTAProps, LandingMotionOverride } from './types'
+import React, { useMemo } from "react";
+import { dot } from "@hua-labs/dot";
+import { mergeStyles } from "../hooks/useDotMap";
+import { Container } from "../components/Container";
+import { AnimatedGradient } from "../components/advanced/AnimatedGradient";
+import { useLandingTheme } from "./LandingProvider";
+import type { LandingCTAProps, LandingMotionOverride } from "./types";
 
 function getInitialTransform(type: string): string {
   switch (type) {
-    case 'slideUp': return 'translateY(32px)'
-    case 'slideLeft': return 'translateX(-32px)'
-    case 'slideRight': return 'translateX(32px)'
-    case 'scaleIn': return 'scale(0.95)'
-    case 'bounceIn': return 'scale(0.75)'
-    default: return 'none'
+    case "slideUp":
+      return "translateY(32px)";
+    case "slideLeft":
+      return "translateX(-32px)";
+    case "slideRight":
+      return "translateX(32px)";
+    case "scaleIn":
+      return "scale(0.95)";
+    case "bounceIn":
+      return "scale(0.75)";
+    default:
+      return "none";
   }
 }
 
 interface ScrollRevealResult {
-  ref: React.RefObject<HTMLElement | null>
-  style: React.CSSProperties
-  isVisible: boolean
+  ref: React.RefObject<HTMLElement | null>;
+  style: React.CSSProperties;
+  isVisible: boolean;
 }
 
 interface ScrollRevealOptions {
-  motionType?: string
-  duration?: number
-  delay?: number
+  motionType?: string;
+  duration?: number;
+  delay?: number;
 }
 
-let useScrollReveal: ((opts: ScrollRevealOptions) => ScrollRevealResult) | undefined
+let useScrollReveal:
+  | ((opts: ScrollRevealOptions) => ScrollRevealResult)
+  | undefined;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  useScrollReveal = require('@hua-labs/motion-core').useScrollReveal
+  useScrollReveal = require("@hua-labs/motion-core").useScrollReveal;
 } catch {
   // motion-core unavailable
 }
@@ -51,41 +58,43 @@ export function LandingCTA({
   className,
   ...rest
 }: LandingCTAProps) {
-  const theme = useLandingTheme()
-  const bg = bgProp ?? theme.cta.background
+  const theme = useLandingTheme();
+  const bg = bgProp ?? theme.cta.background;
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.cta.motion, ...motionOverride }
-    : theme.cta.motion
+    : theme.cta.motion;
 
   const scrollReveal = useScrollReveal?.({
-    motionType: motion.type as 'fadeIn' | 'slideUp' | 'bounceIn',
+    motionType: motion.type as "fadeIn" | "slideUp" | "bounceIn",
     duration: motion.duration,
     delay: motion.delay,
-  })
+  });
 
   const fallbackStyle = useMemo<React.CSSProperties>(() => {
-    if (scrollReveal) return {}
+    if (scrollReveal) return {};
     return {
       opacity: 0,
       transform: getInitialTransform(motion.type),
       animation: `landing-cta-enter ${motion.duration}ms ${motion.easing} ${motion.delay}ms forwards`,
-    }
-  }, [scrollReveal, motion])
+    };
+  }, [scrollReveal, motion]);
 
   return (
     <section
-      style={dot(merge(
-        "relative overflow-hidden py-20 sm:py-28",
-        bg === 'dark' && 'bg-gray-950 text-white',
-        className
-      ))}
+      style={dot(
+        `relative overflow-hidden py-20 sm:py-28${bg === "dark" ? " bg-gray-950 text-white" : ""}${className ? ` ${className}` : ""}`,
+      )}
       {...rest}
     >
       {/* Background */}
-      {bg === 'gradient-soft' && (
-        <div style={dot("absolute inset-0")} className="gradient-bg-soft" aria-hidden="true" />
+      {bg === "gradient-soft" && (
+        <div
+          style={dot("absolute inset-0")}
+          className="gradient-bg-soft"
+          aria-hidden="true"
+        />
       )}
-      {bg === 'animated-gradient' && (
+      {bg === "animated-gradient" && (
         <AnimatedGradient
           colors={gradientColors}
           type="mesh"
@@ -93,10 +102,11 @@ export function LandingCTA({
           aria-hidden="true"
         />
       )}
-      {bg === 'dark' && (
+      {bg === "dark" && (
         <div
           style={mergeStyles(dot("absolute inset-0"), {
-            background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)',
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(120, 119, 198, 0.08), transparent)",
           })}
           aria-hidden="true"
         />
@@ -105,20 +115,33 @@ export function LandingCTA({
       <Container size="md" padding="none" centered dot="relative z-10 px-6">
         <div
           ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
-          style={mergeStyles(dot("text-center"), scrollReveal?.style ?? fallbackStyle)}
+          style={mergeStyles(
+            dot("text-center"),
+            scrollReveal?.style ?? fallbackStyle,
+          )}
         >
-          <h2 style={dot("text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4")}>
+          <h2
+            style={dot("text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4")}
+          >
             {title}
           </h2>
 
           {subtitle && (
-            <p style={dot("text-lg text-muted-foreground max-w-2xl mx-auto mb-8")}>
+            <p
+              style={dot(
+                "text-lg text-muted-foreground max-w-2xl mx-auto mb-8",
+              )}
+            >
               {subtitle}
             </p>
           )}
 
           {(primaryAction || secondaryAction) && (
-            <div style={dot("flex flex-col sm:flex-row items-center justify-center gap-4")}>
+            <div
+              style={dot(
+                "flex flex-col sm:flex-row items-center justify-center gap-4",
+              )}
+            >
               {primaryAction}
               {secondaryAction}
             </div>
@@ -126,11 +149,15 @@ export function LandingCTA({
         </div>
       </Container>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes landing-cta-enter {
           to { opacity: 1; transform: none; }
         }
-      `}} />
+      `,
+        }}
+      />
     </section>
-  )
+  );
 }

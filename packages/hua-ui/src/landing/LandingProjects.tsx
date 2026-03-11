@@ -1,45 +1,54 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from 'react'
-import { merge } from '../lib/utils'
-import { dot } from '@hua-labs/dot'
-import { Section } from '../components/Section'
-import { Card } from '../components/Card'
-import { Icon } from '../components/Icon/Icon'
-import { useLandingTheme } from './LandingProvider'
-import type { LandingProjectsProps, LandingProjectItem, LandingMotionOverride } from './types'
+import React, { useState, useMemo } from "react";
+import { dot } from "@hua-labs/dot";
+import { Section } from "../components/Section";
+import { Card } from "../components/Card";
+import { Icon } from "../components/Icon/Icon";
+import { useLandingTheme } from "./LandingProvider";
+import type {
+  LandingProjectsProps,
+  LandingProjectItem,
+  LandingMotionOverride,
+} from "./types";
 
 interface StaggerResult {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  styles: React.CSSProperties[]
-  isVisible: boolean
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  styles: React.CSSProperties[];
+  isVisible: boolean;
 }
 interface StaggerOptions {
-  count: number
-  staggerDelay?: number
-  duration?: number
-  motionType?: string
-  easing?: string
+  count: number;
+  staggerDelay?: number;
+  duration?: number;
+  motionType?: string;
+  easing?: string;
 }
 
-let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined
-let TiltCard: React.ComponentType<any> | undefined
+let useStagger: ((opts: StaggerOptions) => StaggerResult) | undefined;
+let TiltCard: React.ComponentType<any> | undefined;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mc = require('@hua-labs/motion-core')
-  useStagger = mc.useStagger
-  TiltCard = mc.TiltCard
+  const mc = require("@hua-labs/motion-core");
+  useStagger = mc.useStagger;
+  TiltCard = mc.TiltCard;
 } catch {
   // motion-core unavailable
 }
 
 const gridColsMap = {
-  2: 'md:grid-cols-2',
-  3: 'md:grid-cols-2 lg:grid-cols-3',
-} as const
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-2 lg:grid-cols-3",
+} as const;
 
-function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.CSSProperties }) {
-  const CardComponent = TiltCard || Card
+function ProjectCard({
+  item,
+  style,
+}: {
+  item: LandingProjectItem;
+  style?: React.CSSProperties;
+}) {
+  const CardComponent = TiltCard || Card;
 
   return (
     <CardComponent
@@ -51,7 +60,9 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
           <img
             src={item.image}
             alt={item.title}
-            style={dot("w-full h-full object-cover group-hover:scale-105 transition-transform duration-300")}
+            style={dot(
+              "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
+            )}
           />
         </div>
       )}
@@ -67,7 +78,9 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
             {item.tags.map((tag, i) => (
               <span
                 key={i}
-                style={dot("px-2 py-1 text-xs rounded-full bg-primary/10 text-primary")}
+                style={dot(
+                  "px-2 py-1 text-xs rounded-full bg-primary/10 text-primary",
+                )}
               >
                 {tag}
               </span>
@@ -82,7 +95,9 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              style={dot("text-sm text-primary hover:underline flex items-center gap-1")}
+              style={dot(
+                "text-sm text-primary hover:underline flex items-center gap-1",
+              )}
             >
               View Project <Icon name="arrowRight" size={16} />
             </a>
@@ -92,7 +107,9 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
               href={item.github}
               target="_blank"
               rel="noopener noreferrer"
-              style={dot("text-sm text-muted-foreground hover:text-foreground flex items-center gap-1")}
+              style={dot(
+                "text-sm text-muted-foreground hover:text-foreground flex items-center gap-1",
+              )}
             >
               <Icon name="github" size={16} /> GitHub
             </a>
@@ -100,7 +117,7 @@ function ProjectCard({ item, style }: { item: LandingProjectItem; style?: React.
         </div>
       </div>
     </CardComponent>
-  )
+  );
 }
 
 export function LandingProjects({
@@ -114,26 +131,26 @@ export function LandingProjects({
   className,
   ...rest
 }: LandingProjectsProps) {
-  const theme = useLandingTheme()
+  const theme = useLandingTheme();
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.features.motion, ...motionOverride }
-    : theme.features.motion
-  const staggerDelay = staggerProp ?? theme.features.staggerDelay
+    : theme.features.motion;
+  const staggerDelay = staggerProp ?? theme.features.staggerDelay;
 
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const allTags = useMemo(() => {
-    const tagSet = new Set<string>()
-    items.forEach(item => {
-      item.tags?.forEach(tag => tagSet.add(tag))
-    })
-    return Array.from(tagSet)
-  }, [items])
+    const tagSet = new Set<string>();
+    items.forEach((item) => {
+      item.tags?.forEach((tag) => tagSet.add(tag));
+    });
+    return Array.from(tagSet);
+  }, [items]);
 
   const filteredItems = useMemo(() => {
-    if (!selectedTag) return items
-    return items.filter(item => item.tags?.includes(selectedTag))
-  }, [items, selectedTag])
+    if (!selectedTag) return items;
+    return items.filter((item) => item.tags?.includes(selectedTag));
+  }, [items, selectedTag]);
 
   const stagger = useStagger?.({
     count: filteredItems.length,
@@ -141,11 +158,10 @@ export function LandingProjects({
     duration: motion.duration,
     motionType: motion.type,
     easing: motion.easing,
-  })
+  });
 
-  const header = (title || subtitle)
-    ? { title: title ?? '', subtitle }
-    : undefined
+  const header =
+    title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
   return (
     <Section header={header} dot={className} {...rest}>
@@ -154,25 +170,19 @@ export function LandingProjects({
         <div style={dot("flex flex-wrap gap-2 mb-8 justify-center")}>
           <button
             onClick={() => setSelectedTag(null)}
-            style={dot(merge(
-              "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-              !selectedTag
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            ))}
+            style={dot(
+              `px-4 py-2 rounded-full text-sm font-medium transition-colors ${!selectedTag ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`,
+            )}
           >
             All
           </button>
-          {allTags.map(tag => (
+          {allTags.map((tag) => (
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              style={dot(merge(
-                "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                selectedTag === tag
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              ))}
+              style={dot(
+                `px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedTag === tag ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`,
+              )}
             >
               {tag}
             </button>
@@ -183,16 +193,12 @@ export function LandingProjects({
       {/* Projects Grid */}
       <div
         ref={stagger?.containerRef}
-        style={dot(merge("grid gap-6", gridColsMap[columns]))}
+        style={dot(`grid gap-6 ${gridColsMap[columns]}`)}
       >
         {filteredItems.map((item, i) => (
-          <ProjectCard
-            key={i}
-            item={item}
-            style={stagger?.styles[i]}
-          />
+          <ProjectCard key={i} item={item} style={stagger?.styles[i]} />
         ))}
       </div>
     </Section>
-  )
+  );
 }

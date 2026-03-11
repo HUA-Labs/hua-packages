@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useCallback } from 'react';
-import { Button } from './Button';
-import { Icon } from './Icon';
-import type { IconName } from '../lib/icons';
-import { dot } from '@hua-labs/dot';
-import { merge } from '../lib/utils';
-import { mergeStyles, resolveDot } from '../hooks/useDotMap';
+import React, { useCallback } from "react";
+import { Button } from "./Button";
+import { Icon } from "./Icon";
+import type { IconName } from "../lib/icons";
+import { dot } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * ActionButton 인터페이스
@@ -28,10 +27,10 @@ export interface ActionButton {
   icon?: IconName;
   onClick: () => void;
   disabled?: boolean;
-  variant?: 'default' | 'outline' | 'destructive' | 'ghost';
+  variant?: "default" | "outline" | "destructive" | "ghost";
   badge?: {
     count: number;
-    color?: 'blue' | 'red' | 'gray' | 'green';
+    color?: "blue" | "red" | "gray" | "green";
   };
   className?: string;
 }
@@ -50,7 +49,10 @@ export interface ActionButton {
  * @property {boolean} [loading=false] - 로딩 상태 / Loading state
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface ActionToolbarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface ActionToolbarProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   /** 선택 모드 활성화 여부 */
   isSelectMode?: boolean;
   /** 전체 항목 개수 */
@@ -127,7 +129,10 @@ export interface ActionToolbarProps extends Omit<React.HTMLAttributes<HTMLDivEle
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} ActionToolbar 컴포넌트 / ActionToolbar component
  */
-const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarProps>(
+const ActionToolbarComponent = React.forwardRef<
+  HTMLDivElement,
+  ActionToolbarProps
+>(
   (
     {
       isSelectMode = false,
@@ -143,61 +148,83 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const getBadgeColor = useCallback((color?: string) => {
       switch (color) {
-        case 'red':
-          return 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
-        case 'blue':
-          return 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300';
-        case 'green':
-          return 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300';
-        case 'gray':
+        case "red":
+          return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300";
+        case "blue":
+          return "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300";
+        case "green":
+          return "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300";
+        case "gray":
         default:
-          return 'bg-muted text-muted-foreground';
+          return "bg-muted text-muted-foreground";
       }
     }, []);
 
-    const renderButton = useCallback((action: ActionButton, key: string) => (
-      <Button
-        key={key}
-        variant={action.variant || 'outline'}
-        size="sm"
-        onClick={action.onClick}
-        disabled={action.disabled || loading}
-        dot={merge('flex-1 sm:flex-initial', action.className)}
-      >
-        {action.icon && <Icon name={action.icon} dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />}
-        <span style={dot('hidden sm:inline')}>{action.label}</span>
-        <span style={dot('sm:hidden')}>{action.labelMobile || action.label}</span>
-        {action.badge && action.badge.count > 0 && (
-          <span style={dot(merge('ml-1.5', getBadgeColor(action.badge.color), 'px-1.5 py-0.5 rounded-full text-xs font-semibold'))}>
-            {action.badge.count}
+    const renderButton = useCallback(
+      (action: ActionButton, key: string) => (
+        <Button
+          key={key}
+          variant={action.variant || "outline"}
+          size="sm"
+          onClick={action.onClick}
+          disabled={action.disabled || loading}
+          dot={["flex-1 sm:flex-initial", action.className]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {action.icon && (
+            <Icon
+              name={action.icon}
+              dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5"
+            />
+          )}
+          <span style={dot("hidden sm:inline")}>{action.label}</span>
+          <span style={dot("sm:hidden")}>
+            {action.labelMobile || action.label}
           </span>
-        )}
-      </Button>
-    ), [getBadgeColor, loading]);
+          {action.badge && action.badge.count > 0 && (
+            <span
+              style={dot(
+                [
+                  "ml-1.5",
+                  getBadgeColor(action.badge.color),
+                  "px-1.5 py-0.5 rounded-full text-xs font-semibold",
+                ]
+                  .filter(Boolean)
+                  .join(" "),
+              )}
+            >
+              {action.badge.count}
+            </span>
+          )}
+        </Button>
+      ),
+      [getBadgeColor, loading],
+    );
 
     return (
       <div
         ref={ref}
         style={mergeStyles(
           {
-            marginBottom: '1rem',
-            backgroundColor: 'var(--color-background)',
-            borderRadius: '0.5rem',
-            boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
-            border: '1px solid var(--color-border)',
-            padding: '0.75rem',
+            marginBottom: "1rem",
+            backgroundColor: "var(--color-background)",
+            borderRadius: "0.5rem",
+            boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
+            border: "1px solid var(--color-border)",
+            padding: "0.75rem",
           },
           resolveDot(dotProp),
-          style
+          style,
         )}
         {...props}
       >
         {isSelectMode ? (
-          <div style={dot('flex flex-wrap items-center gap-2')}>
+          <div style={dot("flex flex-wrap items-center gap-2")}>
             {/* 전체 선택/해제 버튼 */}
             {onToggleSelectAll && (
               <Button
@@ -206,15 +233,29 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 onClick={onToggleSelectAll}
                 dot="flex-1 sm:flex-initial min-w-[100px]"
               >
-                <Icon name={selectedCount === totalCount ? "square" : "check"} dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                <span style={dot('hidden sm:inline')}>{selectedCount === totalCount ? '전체 해제' : '전체 선택'}</span>
-                <span style={dot('sm:hidden')}>{selectedCount === totalCount ? '해제' : '전체'}</span>
+                <Icon
+                  name={selectedCount === totalCount ? "square" : "check"}
+                  dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5"
+                />
+                <span style={dot("hidden sm:inline")}>
+                  {selectedCount === totalCount ? "전체 해제" : "전체 선택"}
+                </span>
+                <span style={dot("sm:hidden")}>
+                  {selectedCount === totalCount ? "해제" : "전체"}
+                </span>
               </Button>
             )}
 
             {/* 선택 모드 액션 버튼들 */}
             {selectModeActions.map((action, index) => (
-              <div key={`select-action-${index}`} style={dot(merge('flex-1 sm:flex-initial min-w-[100px]', action.className))}>
+              <div
+                key={`select-action-${index}`}
+                style={dot(
+                  ["flex-1 sm:flex-initial min-w-[100px]", action.className]
+                    .filter(Boolean)
+                    .join(" "),
+                )}
+              >
                 {renderButton(action, `select-${index}`)}
               </div>
             ))}
@@ -232,7 +273,7 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
             )}
           </div>
         ) : (
-          <div style={dot('flex flex-wrap items-center gap-2')}>
+          <div style={dot("flex flex-wrap items-center gap-2")}>
             {/* 선택 모드 진입 버튼 */}
             {onToggleSelectMode && (
               <Button
@@ -244,13 +285,20 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
                 title={totalCount === 0 ? "항목이 없습니다" : "여러 항목 선택"}
               >
                 <Icon name="check" dot="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-                <span style={dot('hidden sm:inline ml-1.5 sm:ml-2')}>선택</span>
+                <span style={dot("hidden sm:inline ml-1.5 sm:ml-2")}>선택</span>
               </Button>
             )}
 
             {/* 일반 모드 액션 버튼들 */}
             {actions.map((action, index) => (
-              <div key={`action-${index}`} style={dot(merge('flex-1 sm:flex-initial min-w-[100px]', action.className))}>
+              <div
+                key={`action-${index}`}
+                style={dot(
+                  ["flex-1 sm:flex-initial min-w-[100px]", action.className]
+                    .filter(Boolean)
+                    .join(" "),
+                )}
+              >
                 {renderButton(action, `action-${index}`)}
               </div>
             ))}
@@ -258,9 +306,9 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         )}
       </div>
     );
-  }
+  },
 );
 
-ActionToolbarComponent.displayName = 'ActionToolbar';
+ActionToolbarComponent.displayName = "ActionToolbar";
 
 export const ActionToolbar = React.memo(ActionToolbarComponent);
