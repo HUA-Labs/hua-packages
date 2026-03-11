@@ -92,6 +92,7 @@
     "./styles/recommended-theme.css": "./src/styles/recommended-theme.css",
     "./styles/utilities.css": "./src/styles/utilities.css",
     "./styles/landing.css": "./src/styles/landing.css",
+    "./styles/prose.css": "./src/styles/prose.css",
     "./icons": {
       "types": "./src/components/icons/index.ts",
       "import": "./src/components/icons/index.ts",
@@ -222,6 +223,7 @@
   "homepage": "https://github.com/HUA-Labs/hua-packages#readme",
   "sideEffects": [
     "./src/styles/*.css",
+    "./src/styles/prose.css",
     "./dist/iconsax.mjs",
     "./dist/iconsax-extended.mjs"
   ],
