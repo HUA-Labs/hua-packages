@@ -528,8 +528,8 @@ describe('z-index', () => {
   it('z-10', () => { expect(dot('z-10')).toEqual({ zIndex: '10' }); });
   it('z-50', () => { expect(dot('z-50')).toEqual({ zIndex: '50' }); });
   it('z-auto', () => { expect(dot('z-auto')).toEqual({ zIndex: 'auto' }); });
-  // z-index arbitrary values are not supported (no parseArbitrary in z-index resolver)
-  it('z-[999] returns empty (arbitrary not supported)', () => { expect(dot('z-[999]')).toEqual({}); });
+  // z-index arbitrary values are now supported
+  it('z-[999] → zIndex 999 (arbitrary supported)', () => { expect(dot('z-[999]')).toEqual({ zIndex: '999' }); });
 });
 
 // ==========================================

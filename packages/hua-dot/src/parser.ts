@@ -113,6 +113,10 @@ const STANDALONE_TOKENS = new Set<string>([
   // font smoothing
   'antialiased',
   'subpixel-antialiased',
+  // transform enable (GPU layer)
+  'transform',
+  // container
+  'container',
 ]);
 
 /**
@@ -160,6 +164,9 @@ const MULTI_SEGMENT_PREFIXES = [
   'space-y',
   // Phase 4: line-clamp
   'line-clamp',
+  // flex-shrink / flex-grow aliases (must come before single-segment 'flex')
+  'flex-shrink',
+  'flex-grow',
   // transform
   'translate-x',
   'translate-y',

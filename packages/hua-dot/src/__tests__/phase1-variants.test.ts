@@ -274,14 +274,12 @@ describe('arbitrary values', () => {
     expect(r.color).toBe('14px');
   });
 
-  it('z-[9999] → empty (z-index resolver has no arbitrary value support)', () => {
-    // resolveZIndex only handles fixed token table; arbitrary [9999] is not supported yet.
-    expect(dot('z-[9999]')).toEqual({});
+  it('z-[9999] → zIndex 9999 (arbitrary z-index supported)', () => {
+    expect(dot('z-[9999]')).toEqual({ zIndex: '9999' });
   });
 
-  it('top-[50%] → empty (positioning resolver has no arbitrary value support)', () => {
-    // resolvePositioning only handles spacing tokens and keywords; arbitrary [50%] not supported yet.
-    expect(dot('top-[50%]')).toEqual({});
+  it('top-[50%] → top 50% (arbitrary positioning supported)', () => {
+    expect(dot('top-[50%]')).toEqual({ top: '50%' });
   });
 
   it('rounded-[12px] → empty (border-radius resolver has no arbitrary value support)', () => {

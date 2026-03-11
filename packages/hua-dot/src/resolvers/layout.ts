@@ -65,6 +65,10 @@ export function resolveLayout(value: string): StyleObject {
     // Font smoothing
     case 'antialiased': return { WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' };
     case 'subpixel-antialiased': return { WebkitFontSmoothing: 'auto', MozOsxFontSmoothing: 'auto' };
+    // transform enable — identity transform for GPU layer promotion
+    case 'transform': return { transform: 'translateX(0)' };
+    // container — centered full-width block
+    case 'container': return { width: '100%', marginLeft: 'auto', marginRight: 'auto' };
   }
 
   // Visibility

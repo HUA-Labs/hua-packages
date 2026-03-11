@@ -95,6 +95,8 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
 
   // flexbox prefix
   flex: resolveFlexbox,
+  'flex-shrink': resolveFlexbox,
+  'flex-grow': resolveFlexbox,
   order: resolveFlexbox,
   basis: resolveFlexbox,
 
