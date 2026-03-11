@@ -15,16 +15,16 @@
 .gradient-bg {
   background: linear-gradient(
     135deg,
-    var(--color-primary, hsl(var(--primary))) 0%,
-    var(--color-accent, hsl(var(--accent-foreground))) 100%
+    var(--color-primary) 0%,
+    var(--color-accent-foreground) 100%
   );
 }
 
 .gradient-bg-soft {
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 15%, transparent) 0%,
-    color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 10%, transparent) 100%
+    color-mix(in srgb, var(--color-primary) 15%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent-foreground) 10%, transparent) 100%
   );
 }
 
@@ -36,8 +36,8 @@
   border-radius: 9999px;
   background: linear-gradient(
     90deg,
-    var(--color-primary, hsl(var(--primary))),
-    var(--color-accent, hsl(var(--accent-foreground)))
+    var(--color-primary),
+    var(--color-accent-foreground)
   );
   margin-bottom: 1.5rem;
   margin-left: auto;
@@ -50,8 +50,8 @@
   border-radius: 9999px;
   background: linear-gradient(
     90deg,
-    var(--color-primary, hsl(var(--primary))),
-    var(--color-accent, hsl(var(--accent-foreground)))
+    var(--color-primary),
+    var(--color-accent-foreground)
   );
   margin-bottom: 1.5rem;
 }
@@ -62,12 +62,12 @@
   background:
     radial-gradient(
       ellipse 80% 60% at 20% 40%,
-      color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 8%, transparent),
+      color-mix(in srgb, var(--color-primary) 8%, transparent),
       transparent
     ),
     radial-gradient(
       ellipse 60% 80% at 80% 60%,
-      color-mix(in srgb, var(--color-primary, hsl(var(--primary))) 5%, transparent),
+      color-mix(in srgb, var(--color-primary) 5%, transparent),
       transparent
     );
 }
@@ -76,12 +76,12 @@
   background:
     radial-gradient(
       ellipse 80% 60% at 80% 30%,
-      color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 8%, transparent),
+      color-mix(in srgb, var(--color-accent-foreground) 8%, transparent),
       transparent
     ),
     radial-gradient(
       ellipse 60% 80% at 20% 70%,
-      color-mix(in srgb, var(--color-accent, hsl(var(--accent-foreground))) 5%, transparent),
+      color-mix(in srgb, var(--color-accent-foreground) 5%, transparent),
       transparent
     );
 }

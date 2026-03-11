@@ -57,7 +57,7 @@ const sectionLineStyle: React.CSSProperties = {
   width: '80px',
   height: '3px',
   borderRadius: '9999px',
-  background: 'linear-gradient(90deg, var(--color-primary, hsl(var(--primary))), var(--color-accent, hsl(var(--accent-foreground))))',
+  background: 'linear-gradient(90deg, var(--color-primary), var(--color-accent-foreground))',
   marginBottom: '1.5rem',
 }
 

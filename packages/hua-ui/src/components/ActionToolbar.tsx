@@ -185,10 +185,10 @@ const ActionToolbarComponent = React.forwardRef<HTMLDivElement, ActionToolbarPro
         style={mergeStyles(
           {
             marginBottom: '1rem',
-            backgroundColor: 'hsl(var(--background))',
+            backgroundColor: 'var(--color-background)',
             borderRadius: '0.5rem',
             boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
-            border: '1px solid hsl(var(--border))',
+            border: '1px solid var(--color-border)',
             padding: '0.75rem',
           },
           resolveDot(dotProp),

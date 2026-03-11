@@ -105,27 +105,27 @@ export function CodeBlock({
 
   const outerStyle: React.CSSProperties = isDark
     ? { backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '0.5rem', overflow: 'hidden', position: 'relative' }
-    : { backgroundColor: 'hsl(var(--muted) / 0.5)', border: '1px solid hsl(var(--border))', borderRadius: '0.5rem', overflow: 'hidden', position: 'relative' }
+    : { backgroundColor: 'color-mix(in srgb, var(--color-muted) 50%, transparent)', border: '1px solid var(--color-border)', borderRadius: '0.5rem', overflow: 'hidden', position: 'relative' }
 
   const headerStyle: React.CSSProperties = isDark
     ? { backgroundColor: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem' }
-    : { backgroundColor: 'hsl(var(--muted) / 0.3)', borderBottom: '1px solid hsl(var(--border))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem' }
+    : { backgroundColor: 'color-mix(in srgb, var(--color-muted) 30%, transparent)', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem' }
 
   const preStyle: React.CSSProperties = isDark
     ? { padding: '1rem', fontSize: '0.875rem', lineHeight: '1.75', overflowX: 'auto', color: '#c9d1d9' }
-    : { padding: '1rem', fontSize: '0.875rem', lineHeight: '1.75', overflowX: 'auto', color: 'hsl(var(--foreground))' }
+    : { padding: '1rem', fontSize: '0.875rem', lineHeight: '1.75', overflowX: 'auto', color: 'var(--color-foreground)' }
 
   const filenameLabelStyle: React.CSSProperties = isDark
     ? { fontSize: '0.875rem', fontWeight: 500, color: '#c9d1d9' }
-    : { fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--foreground))' }
+    : { fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-foreground)' }
 
   const languageLabelStyle: React.CSSProperties = isDark
     ? { fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#8b949e' }
-    : { fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'hsl(var(--muted-foreground))' }
+    : { fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)' }
 
   const lineNumberStyle: React.CSSProperties = isDark
     ? { userSelect: 'none', width: '2rem', textAlign: 'right', marginRight: '1rem', flexShrink: 0, color: '#484f58' }
-    : { userSelect: 'none', width: '2rem', textAlign: 'right', marginRight: '1rem', flexShrink: 0, color: 'hsl(var(--muted-foreground))' }
+    : { userSelect: 'none', width: '2rem', textAlign: 'right', marginRight: '1rem', flexShrink: 0, color: 'var(--color-muted-foreground)' }
 
   return (
     <div
@@ -151,7 +151,7 @@ export function CodeBlock({
             </span>
           )}
           {language && filename && (
-            <span style={isDark ? { fontSize: '0.75rem', color: '#8b949e' } : { fontSize: '0.75rem', color: 'hsl(var(--muted-foreground))' }}>
+            <span style={isDark ? { fontSize: '0.75rem', color: '#8b949e' } : { fontSize: '0.75rem', color: 'var(--color-muted-foreground)' }}>
               {language}
             </span>
           )}
@@ -224,7 +224,7 @@ function CopyButton({
       : { backgroundColor: '#dcfce7', color: '#15803d' }
     : isDark
       ? { backgroundColor: 'transparent', color: '#8b949e' }
-      : { backgroundColor: 'transparent', color: 'hsl(var(--muted-foreground))' }
+      : { backgroundColor: 'transparent', color: 'var(--color-muted-foreground)' }
 
   return (
     <button
@@ -303,10 +303,10 @@ export function InlineCode({
         {
           padding: '0.125rem 0.375rem',
           borderRadius: '0.375rem',
-          backgroundColor: 'hsl(var(--muted))',
+          backgroundColor: 'var(--color-muted)',
           fontSize: '0.875rem',
           fontFamily: 'monospace',
-          color: 'hsl(var(--foreground))',
+          color: 'var(--color-foreground)',
         },
         resolveDot(dotProp),
         style

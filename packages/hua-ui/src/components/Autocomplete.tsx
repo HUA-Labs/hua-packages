@@ -276,21 +276,21 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             {loading || isSearching ? (
               <Icon
                       name="loader"
-                dot="h-4 w-4 animate-spin" style={{ color: 'hsl(var(--muted-foreground))' }}
+                dot="h-4 w-4 animate-spin text-muted-foreground"
               />
             ) : clearable && inputValue ? (
               <button
                 type="button"
                 onClick={handleClear}
                 style={resolveDot('rounded p-1')}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '' }}
                 aria-label="지우기"
               >
-                <Icon name="close" dot="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
+                <Icon name="close" dot="h-4 w-4 text-muted-foreground" />
               </button>
             ) : (
-              <Icon name="chevronDown" dot="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
+              <Icon name="chevronDown" dot="h-4 w-4 text-muted-foreground" />
             )}
           </div>
         </div>
@@ -304,9 +304,9 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             style={mergeStyles(
               resolveDot('absolute z-50 w-full mt-1 rounded-lg border overflow-hidden'),
               {
-                backgroundColor: 'hsl(var(--popover))',
-                color: 'hsl(var(--popover-foreground))',
-                borderColor: 'hsl(var(--border))',
+                backgroundColor: 'var(--color-popover)',
+                color: 'var(--color-popover-foreground)',
+                borderColor: 'var(--color-border)',
                 boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
                 maxHeight: `${maxHeight}px`,
               }
@@ -314,7 +314,7 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
           >
             <div style={{ overflowY: 'auto', maxHeight: `${maxHeight}px` }}>
               {filteredOptions.length === 0 ? (
-                <div style={mergeStyles(resolveDot('px-4 py-8 text-center text-sm'), { color: 'hsl(var(--muted-foreground))' })}>
+                <div style={mergeStyles(resolveDot('px-4 py-8 text-center text-sm'), { color: 'var(--color-muted-foreground)' })}>
                   {emptyText}
                 </div>
               ) : (
@@ -331,30 +331,30 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                       onMouseEnter={() => setSelectedIndex(index)}
                       style={mergeStyles(
                         resolveDot('px-4 py-3 cursor-pointer'),
-                        isSelected ? { backgroundColor: 'hsl(var(--primary) / 0.10)' } : undefined,
-                        isValueSelected ? { backgroundColor: 'hsl(var(--primary) / 0.15)' } : undefined,
+                        isSelected ? { backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' } : undefined,
+                        isValueSelected ? { backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, transparent)' } : undefined,
                       )}
                     >
                       <div style={resolveDot('flex items-center gap-3')}>
                         {option.icon && (
-                          <div style={mergeStyles(resolveDot('flex-shrink-0'), { color: 'hsl(var(--muted-foreground))' })}>
+                          <div style={mergeStyles(resolveDot('flex-shrink-0'), { color: 'var(--color-muted-foreground)' })}>
                             {option.icon}
                           </div>
                         )}
                         <div style={resolveDot('flex-1 min-w-0')}>
                           <div style={resolveDot('flex items-center gap-2')}>
-                            <p style={mergeStyles(resolveDot('text-sm font-medium'), { color: 'hsl(var(--foreground))' })}>
+                            <p style={mergeStyles(resolveDot('text-sm font-medium'), { color: 'var(--color-foreground)' })}>
                               {option.label}
                             </p>
                             {isValueSelected && (
                               <Icon
                                 name="check"
-                                dot="h-4 w-4 flex-shrink-0" style={{ color: 'hsl(var(--primary))' }}
+                                dot="h-4 w-4 flex-shrink-0 text-primary"
                               />
                             )}
                           </div>
                           {option.description && (
-                            <p style={mergeStyles(resolveDot('text-xs mt-0.5'), { color: 'hsl(var(--muted-foreground))' })}>
+                            <p style={mergeStyles(resolveDot('text-xs mt-0.5'), { color: 'var(--color-muted-foreground)' })}>
                               {option.description}
                             </p>
                           )}

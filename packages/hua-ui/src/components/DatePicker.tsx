@@ -314,8 +314,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       alignItems: 'center',
       justifyContent: 'space-between',
       borderRadius: '0.5rem',
-      border: error ? '1px solid hsl(var(--destructive))' : '1px solid hsl(var(--input))',
-      backgroundColor: 'hsl(var(--background))',
+      border: error ? '1px solid var(--color-destructive)' : '1px solid var(--color-input)',
+      backgroundColor: 'var(--color-background)',
       textAlign: 'left',
       fontSize: sizeStyles[size].fontSize,
       height: sizeStyles[size].height,
@@ -332,7 +332,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
         style={triggerButtonStyle}
         aria-label={displayDate || placeholder}
       >
-        <span style={{ flex: 1, color: displayDate ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))' }}>
+        <span style={{ flex: 1, color: displayDate ? 'var(--color-foreground)' : 'var(--color-muted-foreground)' }}>
           {displayDate || placeholder}
         </span>
         <Icon
@@ -357,7 +357,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           contentStyle={{ padding: 0 }}
         >
           <div
-            style={{ borderRadius: '0.5rem', backgroundColor: 'hsl(var(--popover))' }}
+            style={{ borderRadius: '0.5rem', backgroundColor: 'var(--color-popover)' }}
           >
             <div style={{ padding: '1rem' }}>
               {/* 헤더 */}
@@ -370,7 +370,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                     else setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth()))
                   }}
                   style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms', minWidth: '2.25rem', minHeight: '2.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={viewMode === "days" ? ariaLabels.prevMonth : viewMode === "years" ? ariaLabels.prevYearPage : ariaLabels.prevYear}
                 >
@@ -379,8 +379,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                 <button
                   type="button"
                   onClick={handleHeaderClick}
-                  style={{ fontSize: '1.125rem', fontWeight: 600, color: 'hsl(var(--foreground))', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '0.375rem', padding: '0.25rem 0.75rem', transition: 'background-color 150ms' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-foreground)', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '0.375rem', padding: '0.25rem 0.75rem', transition: 'background-color 150ms' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={ariaLabels.selectMonthYear}
                 >
@@ -398,7 +398,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                     else setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth()))
                   }}
                   style={{ borderRadius: '0.5rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', transition: 'background-color 150ms', minWidth: '2.25rem', minHeight: '2.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                   aria-label={viewMode === "days" ? ariaLabels.nextMonth : viewMode === "years" ? ariaLabels.nextYearPage : ariaLabels.nextYear}
                 >
@@ -419,10 +419,10 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                           fontWeight: 500,
                           padding: '0.5rem 0',
                           color: index === 0
-                            ? 'hsl(var(--destructive))'
+                            ? 'var(--color-destructive)'
                             : index === 6
-                              ? 'hsl(var(--primary))'
-                              : 'hsl(var(--foreground))',
+                              ? 'var(--color-primary)'
+                              : 'var(--color-foreground)',
                         }}
                       >
                         {day}
@@ -462,12 +462,12 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                         outline: 'none',
                         backgroundColor: 'transparent',
                         ...(!isCurrentMonth && !isSelected ? { opacity: 0.3 } : {}),
-                        ...(isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%))', color: '#fff' } : {}),
+                        ...(isSelected ? { backgroundColor: 'var(--color-primary)', color: '#fff' } : {}),
                         ...(isTodayDate && !isSelected ? {
-                          boxShadow: 'inset 0 0 0 2px hsl(var(--primary, 187 92% 50%))',
+                          boxShadow: 'inset 0 0 0 2px var(--color-primary)',
                           fontWeight: 700,
                         } : {}),
-                        ...(isHovered && !isSelected ? { backgroundColor: 'hsl(var(--primary, 187 92% 50%) / 0.15)' } : {}),
+                        ...(isHovered && !isSelected ? { backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, transparent)' } : {}),
                       }
 
                       return (
@@ -492,7 +492,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                                 width: '6px',
                                 height: '6px',
                                 borderRadius: '9999px',
-                                backgroundColor: isSelected ? '#fff' : 'hsl(var(--primary, 187 92% 50%))',
+                                backgroundColor: isSelected ? '#fff' : 'var(--color-primary)',
                               }}
                             />
                           )}
@@ -514,8 +514,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       cursor: 'pointer',
                       fontSize: '0.875rem',
                       fontWeight: isCurrentMonthSelected ? 600 : 400,
-                      backgroundColor: isCurrentMonthSelected ? 'hsl(var(--primary, 187 92% 50%))' : 'transparent',
-                      color: isCurrentMonthSelected ? '#fff' : 'hsl(var(--foreground))',
+                      backgroundColor: isCurrentMonthSelected ? 'var(--color-primary)' : 'transparent',
+                      color: isCurrentMonthSelected ? '#fff' : 'var(--color-foreground)',
                       transition: 'all 150ms',
                     }
                     return (
@@ -523,7 +523,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                         key={index}
                         type="button"
                         onClick={() => handleMonthSelect(index)}
-                        onMouseEnter={(e) => { if (!isCurrentMonthSelected) (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                        onMouseEnter={(e) => { if (!isCurrentMonthSelected) (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                         onMouseLeave={(e) => { if (!isCurrentMonthSelected) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                         style={cellStyle}
                         aria-label={`${monthName} ${year}`}
@@ -546,8 +546,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                       cursor: 'pointer',
                       fontSize: '0.875rem',
                       fontWeight: isCurrentYear ? 600 : 400,
-                      backgroundColor: isCurrentYear ? 'hsl(var(--primary, 187 92% 50%))' : 'transparent',
-                      color: isCurrentYear ? '#fff' : 'hsl(var(--foreground))',
+                      backgroundColor: isCurrentYear ? 'var(--color-primary)' : 'transparent',
+                      color: isCurrentYear ? '#fff' : 'var(--color-foreground)',
                       transition: 'all 150ms',
                     }
                     return (
@@ -555,7 +555,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
                         key={y}
                         type="button"
                         onClick={() => handleYearSelect(y)}
-                        onMouseEnter={(e) => { if (!isCurrentYear) (e.currentTarget as HTMLElement).style.backgroundColor = 'hsl(var(--muted))' }}
+                        onMouseEnter={(e) => { if (!isCurrentYear) (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
                         onMouseLeave={(e) => { if (!isCurrentYear) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
                         style={cellStyle}
                         aria-label={String(y)}
@@ -568,7 +568,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
               )}
 
               {/* 오늘 버튼 */}
-              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid hsl(var(--border))' }}>
+              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
                 <Button
                   variant="outline"
                   size="sm"

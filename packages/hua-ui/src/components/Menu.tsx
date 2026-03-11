@@ -117,19 +117,19 @@ const ITEM_SIZE_STYLE: Record<MenuSize, React.CSSProperties> = {
 
 /** MenuItem active state styles */
 const ITEM_ACTIVE_STYLE: React.CSSProperties = {
-  backgroundColor: cssVar("--color-primary-10, color-mix(in srgb, hsl(var(--primary)) 10%, transparent)"),
-  color: cssVar("--color-primary, hsl(var(--primary))"),
+  backgroundColor: cssVar("--color-primary-10, color-mix(in srgb, var(--color-primary) 10%, transparent)"),
+  color: cssVar("--color-primary"),
 }
 
 /** MenuItem inactive default styles */
 const ITEM_INACTIVE_STYLE: React.CSSProperties = {
-  color: cssVar("--color-foreground, hsl(var(--foreground))"),
+  color: cssVar("--color-foreground"),
 }
 
 /** MenuItem hover overlay (inactive) */
 const ITEM_HOVER_STYLE: React.CSSProperties = {
-  backgroundColor: cssVar("--color-muted, hsl(var(--muted))"),
-  color: cssVar("--color-foreground, hsl(var(--foreground)))"),
+  backgroundColor: cssVar("--color-muted"),
+  color: cssVar("--color-foreground"),
 }
 
 /** MenuItem disabled styles */
@@ -155,7 +155,7 @@ const TEXT_STYLE: React.CSSProperties = {
 const SEPARATOR_HORIZONTAL_STYLE: React.CSSProperties = {
   width: "1px",
   height: "16px",
-  backgroundColor: cssVar("--color-border, hsl(var(--border))"),
+  backgroundColor: cssVar("--color-border"),
   marginLeft: "4px",
   marginRight: "4px",
 }
@@ -163,7 +163,7 @@ const SEPARATOR_HORIZONTAL_STYLE: React.CSSProperties = {
 /** MenuSeparator vertical/default variant */
 const SEPARATOR_VERTICAL_STYLE: React.CSSProperties = {
   height: "1px",
-  backgroundColor: cssVar("--color-border, hsl(var(--border))"),
+  backgroundColor: cssVar("--color-border"),
   marginTop: "8px",
   marginBottom: "8px",
 }
@@ -176,7 +176,7 @@ const LABEL_HORIZONTAL_STYLE: React.CSSProperties = {
   paddingBottom: "4px",
   fontSize: "0.75rem",
   fontWeight: "600",
-  color: cssVar("--color-muted-foreground, hsl(var(--muted-foreground))"),
+  color: cssVar("--color-muted-foreground"),
   textTransform: "uppercase",
   letterSpacing: "0.05em",
 }
@@ -189,7 +189,7 @@ const LABEL_DEFAULT_STYLE: React.CSSProperties = {
   paddingBottom: "8px",
   fontSize: "0.75rem",
   fontWeight: "600",
-  color: cssVar("--color-muted-foreground, hsl(var(--muted-foreground))"),
+  color: cssVar("--color-muted-foreground"),
   textTransform: "uppercase",
   letterSpacing: "0.05em",
 }
@@ -339,7 +339,7 @@ const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(
       ITEM_SIZE_STYLE[size],
       active ? ITEM_ACTIVE_STYLE : ITEM_INACTIVE_STYLE,
       !active && isHovered ? ITEM_HOVER_STYLE : undefined,
-      isFocused ? { outline: "none", boxShadow: `0 0 0 2px ${cssVar("--color-ring, hsl(var(--ring))")}` } : undefined,
+      isFocused ? { outline: "none", boxShadow: `0 0 0 2px ${cssVar("--color-ring")}` } : undefined,
       disabled ? ITEM_DISABLED_STYLE : undefined,
       resolveDot(dotProp),
       style,

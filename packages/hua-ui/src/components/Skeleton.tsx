@@ -37,7 +37,7 @@ const PULSE_STYLE: React.CSSProperties = {
 
 /** Wave/shimmer gradient animation style */
 const SHIMMER_STYLE: React.CSSProperties = {
-  background: "linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.2) 50%, hsl(var(--muted)) 100%)",
+  background: "linear-gradient(90deg, var(--color-muted) 0%, color-mix(in srgb, var(--color-muted-foreground) 20%, transparent) 50%, var(--color-muted) 100%)",
   backgroundSize: "200% 100%",
   animation: "shimmer 1.5s ease-in-out infinite",
 }
