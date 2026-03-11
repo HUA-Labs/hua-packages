@@ -117,6 +117,9 @@ const STANDALONE_TOKENS = new Set<string>([
   'transform',
   // container
   'container',
+  // class-mode marker tokens (group/peer — pass through as className, no style output)
+  'group',
+  'peer',
 ]);
 
 /**

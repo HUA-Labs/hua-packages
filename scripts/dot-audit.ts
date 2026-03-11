@@ -22,10 +22,34 @@ scan('./packages/hua-ui/src');
 const allTokens = new Set<string>();
 patterns.forEach(p => p.split(/\s+/).forEach(t => allTokens.add(t)));
 
+// Tokens intentionally excluded from the unknown-token report:
+//   1. Variant-prefixed tokens — handled by class adapter (dark:, hover:, etc.)
+//   2. Gradient direction tokens — supported by gradient resolver (bg-gradient-to-*)
+//   3. Class-mode-only marker tokens — pass through as literal class names (group, peer)
+//   4. Structural pseudo-class variants — class adapter handles (first:, last:, odd:, even:)
+//   5. divide-x/y — intentionally unsupported by dot style engine
+//   6. Animation/prose tokens — outside dot scope
+const EXCLUDED_PATTERNS: RegExp[] = [
+  // Variant-prefixed tokens
+  /^(dark|hover|focus|active|sm|md|lg|xl|2xl|group-hover|group-focus|group-active|peer-checked|peer-focus|peer-hover|peer-disabled|disabled|placeholder|focus-visible|focus-within|first|last|odd|even|before|after):./,
+  // Gradient direction tokens (supported by gradient resolver)
+  /^bg-gradient-to(-[a-z]+)*$/,
+  // Class-mode-only marker tokens
+  /^(group|peer)$/,
+  // Structural pseudo-class standalone variants used as class-mode selectors
+  /^(first|last|odd|even):/,
+  // divide-x/y (intentionally unsupported)
+  /^divide-[xy]$/,
+  // animate-* (animation tokens — scoped to keyframe context)
+  /^animate-/,
+  // prose (typography plugin — outside dot scope)
+  /^prose/,
+];
+
 const unknown: string[] = [];
 for (const token of allTokens) {
   if (!token) continue;
-  if (/^(dark|hover|focus|active|sm|md|lg|xl|2xl|group-hover|disabled|placeholder):/.test(token)) continue;
+  if (EXCLUDED_PATTERNS.some((re) => re.test(token))) continue;
   const result = dot(token);
   if (Object.keys(result).length === 0) unknown.push(token);
 }
