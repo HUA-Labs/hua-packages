@@ -72,9 +72,13 @@ export interface DashboardSidebarProps extends Omit<React.HTMLAttributes<HTMLEle
   variant?: "default" | "transparent";
   /** 토글 버튼 숨기기 / Hide collapse toggle button */
   hideToggle?: boolean;
-  /** 아이템 기본 스타일 오버라이드 / Item base style override */
+  /** 아이템 기본 dot 스타일 오버라이드 / Item base dot style override */
+  itemDot?: string;
+  /** 활성 아이템 dot 스타일 오버라이드 / Active item dot style override */
+  activeDot?: string;
+  /** @deprecated Use itemDot instead */
   itemClassName?: string;
-  /** 활성 아이템 스타일 오버라이드 / Active item style override */
+  /** @deprecated Use activeDot instead */
   activeClassName?: string;
   /** 모바일 열림 상태 (제어) / Mobile open state (controlled) */
   isMobileOpen?: boolean;
@@ -144,6 +148,8 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       overlayBackground = "rgba(15, 23, 42, 0.45)",
       variant = "default",
       hideToggle = false,
+      itemDot: itemDotProp,
+      activeDot: activeDotProp,
       itemClassName,
       activeClassName,
       isMobileOpen: externalMobileOpen,
@@ -155,6 +161,10 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
     },
     ref
   ) => {
+    // Backwards compat: itemClassName/activeClassName fall back to itemDot/activeDot
+    const itemDot = itemDotProp ?? itemClassName;
+    const activeDot = activeDotProp ?? activeClassName;
+
     const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed);
     const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
     const [isMobile, setIsMobile] = React.useState(false);
@@ -194,9 +204,9 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       width: widthStyle,
       minWidth: widthStyle,
       borderRight: variant === "transparent"
-        ? "1px solid rgba(226, 232, 240, 0.4)"
-        : "1px solid rgba(226, 232, 240, 0.6)",
-      backgroundColor: variant === "transparent" ? undefined : "rgba(255, 255, 255, 0.95)",
+        ? "1px solid var(--color-border, rgba(226, 232, 240, 0.4))"
+        : "1px solid var(--color-border, rgba(226, 232, 240, 0.6))",
+      backgroundColor: variant === "transparent" ? undefined : "var(--color-background, rgba(255, 255, 255, 0.95))",
       boxShadow: variant === "transparent" ? undefined : "0 1px 3px rgba(0,0,0,0.1)",
     };
 
@@ -226,8 +236,8 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "9999px",
-                border: "1px solid #e2e8f0",
-                color: "#64748b",
+                border: "1px solid var(--color-border, #e2e8f0)",
+                color: "var(--color-muted-foreground, #64748b)",
                 transition: "colors 200ms",
                 cursor: "pointer",
                 background: "transparent",
@@ -244,7 +254,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
             <div key={section.id} style={{ marginBottom: "1.5rem" }}>
               {!collapsed && section.label && (
                 <div
-                  style={{ paddingLeft: "0.75rem", paddingRight: "0.75rem", fontSize: "0.75rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8", marginBottom: "0.5rem" }}
+                  style={{ paddingLeft: "0.75rem", paddingRight: "0.75rem", fontSize: "0.75rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-muted-foreground, #94a3b8)", marginBottom: "0.5rem" }}
                   role="heading"
                   aria-level={2}
                 >
@@ -253,13 +263,12 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               )}
               <nav style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }} aria-label={section.label || "네비게이션"}>
                 {section.items.map((item) => {
-                  const activeStyle: React.CSSProperties = {
-                    backgroundColor: "#eef2ff",
-                    color: "#4338ca",
-                  };
-                  const defaultItemStyle: React.CSSProperties = {
-                    color: "#475569",
-                  };
+                  const activeStyle: React.CSSProperties = activeDot
+                    ? resolveDot(activeDot)
+                    : { backgroundColor: "var(--color-accent, #eef2ff)", color: "var(--color-accent-foreground, #4338ca)" };
+                  const defaultItemStyle: React.CSSProperties = itemDot
+                    ? resolveDot(itemDot)
+                    : { color: "var(--color-muted-foreground, #475569)" };
                   const baseStyle: React.CSSProperties = {
                     display: "flex",
                     width: "100%",
@@ -293,7 +302,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                       {!collapsed && (
                         <>
                           <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
-                          {item.badge && <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{item.badge}</span>}
+                          {item.badge && <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #94a3b8)" }}>{item.badge}</span>}
                         </>
                       )}
                     </>
@@ -343,9 +352,9 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
           ))}
         </div>
 
-        <div style={{ marginTop: "1rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
+        <div style={{ marginTop: "1rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "1rem" }}>
           {footerActions}
-          <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#94a3b8" }}>
+          <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--color-muted-foreground, #94a3b8)" }}>
             <span>ⓒ HUA Labs</span>
           </div>
         </div>
@@ -369,8 +378,8 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: "0.75rem",
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#ffffff",
+                  border: "1px solid var(--color-border, #e2e8f0)",
+                  backgroundColor: "var(--color-background, #ffffff)",
                   boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
                   cursor: "pointer",
                 }}
@@ -385,7 +394,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                   style={{ position: "absolute", inset: 0, backgroundColor: overlayBackground }}
                   onClick={() => setIsMobileOpen(false)}
                 />
-                <div style={{ position: "relative", zIndex: 50, height: "100%", backgroundColor: "#ffffff" }}>
+                <div style={{ position: "relative", zIndex: 50, height: "100%", backgroundColor: "var(--color-background, #ffffff)" }}>
                   {sidebarContent}
                   <button
                     style={{
@@ -398,7 +407,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "0.75rem",
-                      color: "#64748b",
+                      color: "var(--color-muted-foreground, #64748b)",
                       transition: "background-color 150ms",
                       cursor: "pointer",
                       border: "none",
