@@ -115,6 +115,38 @@ describe("dotClass — group/peer variants", () => {
   });
 });
 
+// ── Group / Peer Standalone Passthrough ──
+
+describe("dotClass — group/peer standalone passthrough", () => {
+  it("includes 'group' literal class in output className", () => {
+    const { className } = dotCSS("group p-4");
+    expect(className).toContain("group");
+  });
+
+  it("includes 'peer' literal class in output className", () => {
+    const { className } = dotCSS("peer p-4");
+    expect(className).toContain("peer");
+  });
+
+  it("generates CSS for non-passthrough tokens alongside group", () => {
+    const { css } = dotCSS("group p-4 hover:bg-red-500");
+    expect(css).toContain("padding: 16px");
+    expect(css).toContain(":hover");
+  });
+
+  it("dotClass with only 'group' returns exactly 'group' with no dot- hash class", () => {
+    const cls = dotClass("group");
+    expect(cls).toBe("group");
+  });
+
+  it("atomic mode: group appears in classNames, peer appears in classNames", () => {
+    const cls = dotClass("group peer p-4", { naming: "atomic" });
+    const classes = cls.split(" ");
+    expect(classes).toContain("group");
+    expect(classes).toContain("peer");
+  });
+});
+
 // ── Child Position Pseudo-classes (NEW) ──
 
 describe("dotClass — child position variants", () => {

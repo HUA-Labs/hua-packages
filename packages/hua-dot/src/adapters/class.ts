@@ -219,6 +219,11 @@ function finalizeStyle(style: StyleObject): StyleObject {
   return result;
 }
 
+// ── Passthrough tokens (class-mode-only markers) ──
+
+/** Tokens that pass through as literal class names with no style output. */
+const PASSTHROUGH_CLASS_TOKENS = new Set<string>(['group', 'peer']);
+
 // ── Core ──
 
 interface ClassRule {
@@ -372,6 +377,15 @@ export function dotCSS(
   const tokens = parse(input);
   const naming = options.naming ?? "hash";
 
+  // Separate passthrough tokens (group/peer) from style tokens
+  const passthroughClasses: string[] = [];
+  const styleTokens = tokens.filter((token) => {
+    const isPassthrough =
+      token.prefix === "" && PASSTHROUGH_CLASS_TOKENS.has(token.value);
+    if (isPassthrough) passthroughClasses.push(token.value);
+    return !isPassthrough;
+  });
+
   let className: string;
   if (naming === "atomic") {
     // Atomic: each token gets its own class (Tailwind-like).
@@ -382,7 +396,7 @@ export function dotCSS(
     const classNames: string[] = [];
     const cssRules: string[] = [];
 
-    for (const token of tokens) {
+    for (const token of styleTokens) {
       const atomicName = `dot-${tokenToClassName(token.raw)}`;
       const rules = buildRules([token], currentConfig, atomicName, options);
       const css = rulesToCSS(rules);
@@ -397,8 +411,11 @@ export function dotCSS(
       }
     }
 
+    const allClasses = [...classNames, ...passthroughClasses]
+      .filter(Boolean)
+      .join(" ");
     const result: DotClassResult = {
-      className: classNames.join(" "),
+      className: allClasses,
       css: cssRules.join("\n"),
     };
     classCache.set(cacheKey, result);
@@ -406,15 +423,21 @@ export function dotCSS(
   }
 
   // Hash mode (default): single class for entire input
-  className = `dot-${hashString(input)}`;
-  const rules = buildRules(tokens, currentConfig, className, options);
-  const css = rulesToCSS(rules);
-
-  if (css) {
-    collectedRules.push(css);
+  // Only generate a dot- hash class when there are style tokens to resolve
+  let css = "";
+  const hashClass = styleTokens.length > 0 ? `dot-${hashString(input)}` : "";
+  if (hashClass) {
+    const rules = buildRules(styleTokens, currentConfig, hashClass, options);
+    css = rulesToCSS(rules);
+    if (css) {
+      collectedRules.push(css);
+    }
   }
 
-  const result: DotClassResult = { className, css };
+  const allClasses = [hashClass, ...passthroughClasses]
+    .filter(Boolean)
+    .join(" ");
+  const result: DotClassResult = { className: allClasses, css };
   classCache.set(cacheKey, result);
   return result;
 }

@@ -295,5 +295,46 @@ describe('parser', () => {
       const tokens = parse('p-4 flex bg-primary-500');
       expect(tokens.every(t => t.negative === false)).toBe(true);
     });
+
+    it('parses group as standalone token', () => {
+      const tokens = parse('group');
+      expect(tokens).toHaveLength(1);
+      expect(tokens[0]).toEqual({
+        variants: [],
+        prefix: '',
+        value: 'group',
+        raw: 'group',
+        negative: false,
+        important: false,
+      });
+    });
+
+    it('parses peer as standalone token', () => {
+      const tokens = parse('peer');
+      expect(tokens).toHaveLength(1);
+      expect(tokens[0]).toEqual({
+        variants: [],
+        prefix: '',
+        value: 'peer',
+        raw: 'peer',
+        negative: false,
+        important: false,
+      });
+    });
+
+    it('parses group alongside other tokens', () => {
+      const tokens = parse('group p-4 hover:bg-red-500');
+      expect(tokens).toHaveLength(3);
+      expect(tokens[0]).toEqual({
+        variants: [],
+        prefix: '',
+        value: 'group',
+        raw: 'group',
+        negative: false,
+        important: false,
+      });
+      expect(tokens[1].prefix).toBe('p');
+      expect(tokens[2].variants).toEqual(['hover']);
+    });
   });
 });
