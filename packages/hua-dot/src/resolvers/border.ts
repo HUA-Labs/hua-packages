@@ -48,6 +48,16 @@ export function resolveBorder(prefix: string, value: string, config: DotConfig):
     return {};
   }
 
+  // Directional border color property map
+  const DIRECTIONAL_COLOR_PROP: Record<string, string[]> = {
+    'border-t': ['borderTopColor'],
+    'border-r': ['borderRightColor'],
+    'border-b': ['borderBottomColor'],
+    'border-l': ['borderLeftColor'],
+    'border-x': ['borderLeftColor', 'borderRightColor'],
+    'border-y': ['borderTopColor', 'borderBottomColor'],
+  };
+
   // Border width (including bare prefix)
   const widthProps = BORDER_WIDTH_PROP_MAP[prefix];
   if (widthProps) {
@@ -60,9 +70,23 @@ export function resolveBorder(prefix: string, value: string, config: DotConfig):
       return result;
     }
 
-    // Color fallthrough (only for 'border' prefix) — delegates to resolveColor for opacity support
+    // Color fallthrough for 'border' prefix — delegates to resolveColor for opacity support
     if (prefix === 'border') {
       return resolveColor('border', value, config);
+    }
+
+    // Color fallthrough for directional prefixes (border-t, border-r, border-b, border-l, border-x, border-y)
+    const colorProps = DIRECTIONAL_COLOR_PROP[prefix];
+    if (colorProps) {
+      // Try to resolve the value as a color using the generic 'border' resolver
+      const colorResult = resolveColor('border', value, config);
+      if (Object.keys(colorResult).length > 0 && colorResult.borderColor !== undefined) {
+        const resolved: StyleObject = {};
+        for (const prop of colorProps) {
+          resolved[prop] = colorResult.borderColor as string;
+        }
+        return resolved;
+      }
     }
   }
 

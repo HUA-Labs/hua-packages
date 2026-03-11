@@ -60,6 +60,18 @@ export function resolveFlexbox(_prefix: string, value: string, _config: DotConfi
     }
     return {};
   }
+  // flex-shrink-0 → { flexShrink: '0' }, flex-shrink (bare) → { flexShrink: '1' }
+  if (_prefix === 'flex-shrink') {
+    if (value === '0') return { flexShrink: '0' };
+    if (value === '' || value === '1') return { flexShrink: '1' };
+    return {};
+  }
+  // flex-grow-0 → { flexGrow: '0' }, flex-grow (bare) → { flexGrow: '1' }
+  if (_prefix === 'flex-grow') {
+    if (value === '0') return { flexGrow: '0' };
+    if (value === '' || value === '1') return { flexGrow: '1' };
+    return {};
+  }
   if (_prefix === 'order') {
     if (ORDER_VALUES[value]) {
       return { order: ORDER_VALUES[value] };
