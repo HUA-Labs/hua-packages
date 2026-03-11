@@ -11,7 +11,7 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
  * @property {boolean} [pauseOnClick=false] - 클릭시 일시정지 / Pause on click
  * @property {number} [gap=16] - 아이템 간격 (px) / Gap between items in pixels
  * @property {boolean} [gradient=true] - 양쪽 페이드 그라디언트 / Fade gradient on edges
- * @property {string} [gradientColor="hsl(var(--background))"] - 그라디언트 색상 / Gradient color
+ * @property {string} [gradientColor="var(--color-background)"] - 그라디언트 색상 / Gradient color
  * @property {number} [gradientWidth=100] - 그라디언트 너비 (px) / Gradient width in pixels
  */
 export interface MarqueeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
@@ -62,7 +62,7 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       pauseOnClick = false,
       gap = 16,
       gradient = true,
-      gradientColor = "hsl(var(--background))",
+      gradientColor = "var(--color-background)",
       gradientWidth = 100,
       style,
       onMouseEnter,

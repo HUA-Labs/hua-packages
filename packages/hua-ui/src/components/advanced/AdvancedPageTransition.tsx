@@ -222,23 +222,23 @@ export const AdvancedPageTransition = React.forwardRef<HTMLDivElement, AdvancedP
             top: '1rem',
             right: '1rem',
             zIndex: 50,
-            backgroundColor: 'hsl(var(--background))',
+            backgroundColor: 'var(--color-background)',
             borderRadius: '0.5rem',
             padding: '0.5rem 0.75rem',
             boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-            border: '1px solid hsl(var(--border))',
+            border: '1px solid var(--color-border)',
           },
           resolveDot(progressDot),
           progressStyle
         )}>
-          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-foreground)' }}>
             Progress: {Math.round(progress * 100)}%
           </div>
-          <div style={{ width: '6rem', height: '0.5rem', backgroundColor: 'hsl(var(--muted))', borderRadius: '9999px', marginTop: '0.5rem' }}>
+          <div style={{ width: '6rem', height: '0.5rem', backgroundColor: 'var(--color-muted)', borderRadius: '9999px', marginTop: '0.5rem' }}>
             <div
               style={{
                 height: '100%',
-                backgroundColor: 'hsl(var(--primary))',
+                backgroundColor: 'var(--color-primary)',
                 borderRadius: '9999px',
                 transition: 'width 100ms',
                 width: `${progress * 100}%`

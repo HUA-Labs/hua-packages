@@ -102,17 +102,17 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
       default: { display: 'inline-flex', alignItems: 'center', fontSize: '0.875rem', width: 'fit-content' },
       subtle: {
         display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem',
-        backgroundColor: 'hsl(var(--background) / 0.4)', backdropFilter: 'blur(12px)',
+        backgroundColor: 'color-mix(in srgb, var(--color-background) 40%, transparent)', backdropFilter: 'blur(12px)',
         borderRadius: '0.375rem', padding: '0.5rem 0.75rem',
-        border: '1px solid hsl(var(--border) / 0.3)', width: 'fit-content',
+        border: '1px solid color-mix(in srgb, var(--color-border) 30%, transparent)', width: 'fit-content',
         boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
       },
       transparent: { display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem', width: 'fit-content' },
       glass: {
         display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem',
-        backgroundColor: 'hsl(var(--background) / 0.3)', backdropFilter: 'blur(16px)',
+        backgroundColor: 'color-mix(in srgb, var(--color-background) 30%, transparent)', backdropFilter: 'blur(16px)',
         borderRadius: '0.5rem', padding: '0.5rem 1rem',
-        border: '1px solid hsl(var(--border) / 0.25)', width: 'fit-content',
+        border: '1px solid color-mix(in srgb, var(--color-border) 25%, transparent)', width: 'fit-content',
         boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
       },
     }
@@ -157,7 +157,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
                 {child}
                 {index < React.Children.count(children) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
+                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
                     {separator}
                   </span>
                 )}
@@ -189,7 +189,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
                 {homeLabel}
               </BreadcrumbItem>
               {itemsCount > 0 && (
-                <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
+                <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
                   {separator}
                 </span>
               )}
@@ -200,7 +200,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
                 {item}
                 {index < (renderedItems?.length || 0) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'hsl(var(--muted-foreground))' }} aria-hidden="true">
+                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
                     {separator}
                   </span>
                 )}
@@ -227,7 +227,7 @@ Breadcrumb.displayName = "Breadcrumb"
  */
 const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   ({ dot: dotProp, style, href, isCurrent = false, children, ...props }, ref) => {
-    const baseStyle: React.CSSProperties = { color: 'hsl(var(--muted-foreground))' }
+    const baseStyle: React.CSSProperties = { color: 'var(--color-muted-foreground)' }
 
     if (isCurrent) {
       return (

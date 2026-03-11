@@ -266,13 +266,13 @@ function TailwindTab({
                   aspectRatio: '1',
                   borderRadius: '2px',
                   border: currentColor.toLowerCase() === color.toLowerCase()
-                    ? '1px solid hsl(var(--ring))'
+                    ? '1px solid var(--color-ring)'
                     : 'none',
                   background: color,
                   cursor: disabled ? 'not-allowed' : 'pointer',
                   opacity: disabled ? 0.5 : 1,
                   outline: currentColor.toLowerCase() === color.toLowerCase()
-                    ? '1px solid hsl(var(--ring))'
+                    ? '1px solid var(--color-ring)'
                     : 'none',
                   outlineOffset: currentColor.toLowerCase() === color.toLowerCase() ? '1px' : '0',
                   transition: 'transform 150ms',
@@ -286,7 +286,7 @@ function TailwindTab({
       </div>
 
       {/* 특수 색상 */}
-      <div style={{ display: 'flex', gap: '0.25rem', paddingTop: '0.25rem', borderTop: '1px solid hsl(var(--border))' }}>
+      <div style={{ display: 'flex', gap: '0.25rem', paddingTop: '0.25rem', borderTop: '1px solid var(--color-border)' }}>
         {SPECIAL_COLORS.map((color) => (
           <button
             key={color}
@@ -296,8 +296,8 @@ function TailwindTab({
               width: '1.5rem',
               height: '1.5rem',
               borderRadius: '0.125rem',
-              border: '1px solid hsl(var(--border) / 0.5)',
-              outline: currentColor === color ? '1px solid hsl(var(--ring))' : 'none',
+              border: '1px solid color-mix(in srgb, var(--color-border) 50%, transparent)',
+              outline: currentColor === color ? '1px solid var(--color-ring)' : 'none',
               outlineOffset: currentColor === color ? '1px' : '0',
               cursor: disabled ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
@@ -310,7 +310,7 @@ function TailwindTab({
             title={color}
           />
         ))}
-        <span style={{ flex: 1, fontSize: '0.625rem', color: 'hsl(var(--muted-foreground))', alignSelf: 'center', textAlign: 'right' }}>
+        <span style={{ flex: 1, fontSize: '0.625rem', color: 'var(--color-muted-foreground)', alignSelf: 'center', textAlign: 'right' }}>
           Black / White / Transparent
         </span>
       </div>
@@ -362,7 +362,7 @@ function CustomTab({
             width: '2.5rem',
             height: '2.5rem',
             borderRadius: '0.375rem',
-            border: '1px solid hsl(var(--border))',
+            border: '1px solid var(--color-border)',
             boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
             flexShrink: 0,
             background: currentColor,
@@ -378,8 +378,8 @@ function CustomTab({
             padding: '0.5rem 0.75rem',
             fontSize: '0.875rem',
             borderRadius: '0.375rem',
-            border: isInvalid ? '1px solid hsl(var(--destructive))' : '1px solid hsl(var(--border))',
-            backgroundColor: 'hsl(var(--background))',
+            border: isInvalid ? '1px solid var(--color-destructive)' : '1px solid var(--color-border)',
+            backgroundColor: 'var(--color-background)',
             fontFamily: 'monospace',
             outline: 'none',
             opacity: disabled ? 0.5 : 1,
@@ -391,7 +391,7 @@ function CustomTab({
       </div>
 
       {/* HSL 값 표시 */}
-      <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.625rem', color: 'hsl(var(--muted-foreground))' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.625rem', color: 'var(--color-muted-foreground)' }}>
         <span>H: {h}°</span>
         <span>S: {s}%</span>
         <span>L: {l}%</span>
@@ -477,7 +477,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     return (
       <div ref={ref} style={mergeStyles({ display: 'flex', flexDirection: 'column', gap: '0.5rem' }, dotStyle, style)}>
         {/* 탭 헤더 */}
-        <div style={{ display: 'flex', gap: '0.25rem', padding: '0.125rem', backgroundColor: 'hsl(var(--muted) / 0.5)', borderRadius: '0.375rem' }}>
+        <div style={{ display: 'flex', gap: '0.25rem', padding: '0.125rem', backgroundColor: 'color-mix(in srgb, var(--color-muted) 50%, transparent)', borderRadius: '0.375rem' }}>
           <button
             type="button"
             disabled={disabled}
@@ -491,8 +491,8 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
               border: 'none',
               cursor: disabled ? 'not-allowed' : 'pointer',
               transition: 'colors 150ms',
-              backgroundColor: activeTab === "tailwind" ? 'hsl(var(--background))' : 'transparent',
-              color: activeTab === "tailwind" ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              backgroundColor: activeTab === "tailwind" ? 'var(--color-background)' : 'transparent',
+              color: activeTab === "tailwind" ? 'var(--color-foreground)' : 'var(--color-muted-foreground)',
               boxShadow: activeTab === "tailwind" ? '0 1px 2px 0 rgba(0,0,0,0.05)' : 'none',
               opacity: disabled ? 0.5 : 1,
             }}
@@ -512,8 +512,8 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
               border: 'none',
               cursor: disabled ? 'not-allowed' : 'pointer',
               transition: 'colors 150ms',
-              backgroundColor: activeTab === "custom" ? 'hsl(var(--background))' : 'transparent',
-              color: activeTab === "custom" ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              backgroundColor: activeTab === "custom" ? 'var(--color-background)' : 'transparent',
+              color: activeTab === "custom" ? 'var(--color-foreground)' : 'var(--color-muted-foreground)',
               boxShadow: activeTab === "custom" ? '0 1px 2px 0 rgba(0,0,0,0.05)' : 'none',
               opacity: disabled ? 0.5 : 1,
             }}
@@ -529,7 +529,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
               width: '1.5rem',
               height: '1.5rem',
               borderRadius: '0.25rem',
-              border: '1px solid hsl(var(--border))',
+              border: '1px solid var(--color-border)',
               boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
               flexShrink: 0,
               background: hexInput === "transparent"
@@ -537,7 +537,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
                 : currentColor,
             }}
           />
-          <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'hsl(var(--muted-foreground))', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--color-muted-foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {hexInput === "transparent" ? "transparent" : currentColor}
           </span>
         </div>

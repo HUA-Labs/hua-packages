@@ -190,8 +190,8 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                 width: '100%',
                 maxWidth: '42rem',
                 margin: '0 1rem',
-                backgroundColor: 'hsl(var(--popover))',
-                color: 'hsl(var(--popover-foreground))',
+                backgroundColor: 'var(--color-popover)',
+                color: 'var(--color-popover-foreground)',
                 borderRadius: '0.5rem',
                 overflow: 'hidden',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
@@ -199,7 +199,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ padding: '1rem', borderBottom: '1px solid hsl(var(--border))' }}>
+              <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)' }}>
                 <input
                   ref={inputRef}
                   type="text"
@@ -214,7 +214,7 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                     fontWeight: 500,
                     outline: 'none',
                     border: 'none',
-                    color: 'hsl(var(--foreground))',
+                    color: 'var(--color-foreground)',
                   }}
                 />
               </div>
@@ -274,7 +274,7 @@ const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
           fontSize: '0.875rem',
           outline: 'none',
           border: 'none',
-          color: 'hsl(var(--foreground))',
+          color: 'var(--color-foreground)',
         },
         resolveDot(dotProp),
         style
@@ -345,8 +345,8 @@ const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
             borderRadius: '0.125rem',
             padding: '0.75rem 1rem',
             fontSize: '0.875rem',
-            color: 'hsl(var(--foreground))',
-            backgroundColor: selected ? 'hsl(var(--muted))' : 'transparent',
+            color: 'var(--color-foreground)',
+            backgroundColor: selected ? 'var(--color-muted)' : 'transparent',
             border: 'none',
             cursor: 'pointer',
             transition: 'background-color 150ms',
@@ -359,7 +359,7 @@ const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
         {...props}
       >
         {icon && (
-          <div style={{ flexShrink: 0, width: '1rem', height: '1rem', color: 'hsl(var(--muted-foreground))' }}>
+          <div style={{ flexShrink: 0, width: '1rem', height: '1rem', color: 'var(--color-muted-foreground)' }}>
             {icon}
           </div>
         )}
@@ -386,7 +386,7 @@ const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
   ({ heading, children, dot: dotProp, style, ...props }, ref) => (
     <div ref={ref} style={mergeStyles({ paddingTop: '0.5rem', paddingBottom: '0.5rem' }, resolveDot(dotProp), style)} {...props}>
       {heading && (
-        <div style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'hsl(var(--muted-foreground))', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {heading}
         </div>
       )}
@@ -413,7 +413,7 @@ const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>
     <div
       ref={ref}
       style={mergeStyles(
-        { height: '1px', backgroundColor: 'hsl(var(--border))', margin: '0.5rem 0' },
+        { height: '1px', backgroundColor: 'var(--color-border)', margin: '0.5rem 0' },
         resolveDot(dotProp),
         style
       )}
@@ -438,7 +438,7 @@ const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
     <div
       ref={ref}
       style={mergeStyles(
-        { paddingTop: '2rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.875rem', color: 'hsl(var(--muted-foreground))' },
+        { paddingTop: '2rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--color-muted-foreground)' },
         resolveDot(dotProp),
         style
       )}
