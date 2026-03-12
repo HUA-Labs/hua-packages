@@ -14,16 +14,61 @@
  */
 
 // Accordion
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './components/Accordion';
+export {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "./components/Accordion";
 
 // Tabs
-export { Tabs, TabsList, TabsTrigger, TabsContent, TabsPills, TabsUnderline, TabsCards } from './components/Tabs';
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsPills,
+  TabsUnderline,
+  TabsCards,
+} from "./components/Tabs";
 
 // Menu
-export { Menu, MenuItem, MenuSeparator, MenuLabel, MenuHorizontal, MenuVertical, MenuCompact } from './components/Menu';
+export {
+  Menu,
+  MenuItem,
+  MenuSeparator,
+  MenuLabel,
+  MenuHorizontal,
+  MenuVertical,
+  MenuCompact,
+} from "./components/Menu";
 
 // ContextMenu
-export { ContextMenu, ContextMenuItem, ContextMenuSeparator, ContextMenuLabel, ContextMenuGroup } from './components/ContextMenu';
+export {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+  ContextMenuGroup,
+} from "./components/ContextMenu";
 
 // Command
-export { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandEmpty, CommandDialog } from './components/Command';
+export {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandItem,
+  CommandGroup,
+  CommandSeparator,
+  CommandEmpty,
+  CommandDialog,
+} from "./components/Command";
+
+// Toolbar (promoted from dashboard)
+export { DashboardToolbar as Toolbar } from "./components/dashboard/DashboardToolbar";
+export type {
+  DashboardToolbarProps as ToolbarProps,
+  ToolbarAction,
+  DateRangeConfig,
+  DatePreset,
+} from "./components/dashboard/DashboardToolbar";

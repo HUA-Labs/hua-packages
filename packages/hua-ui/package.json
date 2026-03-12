@@ -76,6 +76,11 @@
       "import": "./dist/interactive.mjs",
       "default": "./dist/interactive.mjs"
     },
+    "./interactive/kanban": {
+      "types": "./dist/interactive/kanban.d.ts",
+      "import": "./dist/interactive-kanban.mjs",
+      "default": "./dist/interactive-kanban.mjs"
+    },
     "./sdui": {
       "types": "./dist/sdui.d.ts",
       "import": "./dist/sdui.mjs",
