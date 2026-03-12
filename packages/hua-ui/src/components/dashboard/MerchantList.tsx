@@ -55,7 +55,10 @@ export interface MerchantListItem {
  * @property {string} [defaultCurrency="KRW"] - 기본 통화 / Default currency
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MerchantListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect' | 'className'> {
+export interface MerchantListProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onSelect" | "className"
+> {
   items: MerchantListItem[];
   isLoading?: boolean;
   filters?: React.ReactNode;
@@ -157,23 +160,32 @@ export const MerchantList: React.FC<MerchantListProps> = ({
           backgroundColor: "var(--color-card, #ffffff)",
         },
         resolveDot(dot),
-        style
+        style,
       )}
       {...props}
     >
       {filters && (
-        <div style={{ borderBottom: "1px solid var(--color-border, #f1f5f9)", padding: "0.75rem 1.5rem" }}>{filters}</div>
+        <div
+          style={{
+            borderBottom: "1px solid var(--color-border, #f1f5f9)",
+            padding: "0.75rem 1.5rem",
+          }}
+        >
+          {filters}
+        </div>
       )}
 
       <div style={{ padding: "1rem 1.5rem" }}>
         {isLoading ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
             {[...Array(3)].map((_, idx) => (
               <Skeleton key={idx} dot="h-20 rounded-2xl" />
             ))}
           </div>
         ) : !hasItems ? (
-          emptyState ?? (
+          (emptyState ?? (
             <DashboardEmptyState
               icon="store"
               title="가맹점이 없습니다"
@@ -181,25 +193,45 @@ export const MerchantList: React.FC<MerchantListProps> = ({
               size="sm"
               style={{ paddingTop: "1.5rem", paddingBottom: "1.5rem" }}
             />
-          )
+          ))
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} role="list" aria-label="가맹점 목록">
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            role="list"
+            aria-label="가맹점 목록"
+          >
             {items.map((merchant) => {
               const approval = formatPercent(merchant.approvalRate);
-              const volume = formatVolume(merchant.volume, merchant.currency ?? defaultCurrency, locale);
-              const healthBadgeStyle = merchant.health ? HEALTH_BADGE_STYLES[merchant.health] : undefined;
-              const healthLabel = merchant.health ? HEALTH_LABELS[merchant.health] : undefined;
+              const volume = formatVolume(
+                merchant.volume,
+                merchant.currency ?? defaultCurrency,
+                locale,
+              );
+              const healthBadgeStyle = merchant.health
+                ? HEALTH_BADGE_STYLES[merchant.health]
+                : undefined;
+              const healthLabel = merchant.health
+                ? HEALTH_LABELS[merchant.health]
+                : undefined;
 
-              const merchantLabel = `${merchant.name}${merchant.status ? `, 상태: ${merchant.status}` : ''}${merchant.health ? `, 건강 상태: ${healthLabel}` : ''}${volume ? `, 거래량: ${volume}` : ''}${approval ? `, 승인률: ${approval}` : ''}`;
+              const merchantLabel = `${merchant.name}${merchant.status ? `, 상태: ${merchant.status}` : ""}${merchant.health ? `, 건강 상태: ${healthLabel}` : ""}${volume ? `, 거래량: ${volume}` : ""}${approval ? `, 승인률: ${approval}` : ""}`;
 
               return (
                 <button
                   key={merchant.id}
                   type="button"
                   role="button"
-                  onClick={onMerchantSelect ? () => onMerchantSelect(merchant) : undefined}
+                  onClick={
+                    onMerchantSelect
+                      ? () => onMerchantSelect(merchant)
+                      : undefined
+                  }
                   disabled={!onMerchantSelect}
-                  aria-label={onMerchantSelect ? `${merchantLabel} - 클릭하여 상세 정보 보기` : merchantLabel}
+                  aria-label={
+                    onMerchantSelect
+                      ? `${merchantLabel} - 클릭하여 상세 정보 보기`
+                      : merchantLabel
+                  }
                   style={{
                     width: "100%",
                     borderRadius: "1rem",
@@ -213,51 +245,134 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                     opacity: onMerchantSelect ? 1 : 0.6,
                   }}
                 >
-                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                    }}
+                  >
                     {merchant.icon && (
-                      <div style={{ borderRadius: "0.75rem", backgroundColor: "var(--color-muted, #f1f5f9)", padding: "0.5rem", color: "#64748b" }}>
+                      <div
+                        style={{
+                          borderRadius: "0.75rem",
+                          backgroundColor: "var(--color-muted, #f1f5f9)",
+                          padding: "0.5rem",
+                          color: "#64748b",
+                        }}
+                      >
                         {typeof merchant.icon === "string" ? (
-                          <Icon name={merchant.icon as IconName} className="h-5 w-5" />
+                          <Icon
+                            name={merchant.icon as IconName}
+                            dot="w-5 h-5"
+                          />
                         ) : (
                           merchant.icon
                         )}
                       </div>
                     )}
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{merchant.name}</p>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "0.875rem",
+                            fontWeight: 600,
+                            color: "var(--color-foreground, #0f172a)",
+                          }}
+                        >
+                          {merchant.name}
+                        </p>
                         {merchant.status && (
                           <Badge dot="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-100">
                             {merchant.status}
                           </Badge>
                         )}
                         {merchant.tag && (
-                          <span style={{ borderRadius: "9999px", backgroundColor: "var(--color-muted, #f8fafc)", padding: "0.125rem 0.5rem", fontSize: "0.6875rem", color: "#64748b" }}>
+                          <span
+                            style={{
+                              borderRadius: "9999px",
+                              backgroundColor: "var(--color-muted, #f8fafc)",
+                              padding: "0.125rem 0.5rem",
+                              fontSize: "0.6875rem",
+                              color: "#64748b",
+                            }}
+                          >
                             {merchant.tag}
                           </span>
                         )}
                         {healthBadgeStyle && (
-                          <span style={{ borderRadius: "9999px", padding: "0.125rem 0.5rem", fontSize: "0.6875rem", fontWeight: 500, ...healthBadgeStyle }}>
+                          <span
+                            style={{
+                              borderRadius: "9999px",
+                              padding: "0.125rem 0.5rem",
+                              fontSize: "0.6875rem",
+                              fontWeight: 500,
+                              ...healthBadgeStyle,
+                            }}
+                          >
                             {healthLabel}
                           </span>
                         )}
                       </div>
                       <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                        {merchant.category ?? "카테고리 미정"} · {merchant.region ?? "지역 정보 없음"}
+                        {merchant.category ?? "카테고리 미정"} ·{" "}
+                        {merchant.region ?? "지역 정보 없음"}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right", fontSize: "0.875rem", color: "var(--color-foreground, #0f172a)" }}>
-                      {volume && <div style={{ fontWeight: 600 }}>{volume}</div>}
-                      {approval && <div style={{ fontSize: "0.75rem", color: "#64748b" }}>승인률 {approval}</div>}
+                    <div
+                      style={{
+                        textAlign: "right",
+                        fontSize: "0.875rem",
+                        color: "var(--color-foreground, #0f172a)",
+                      }}
+                    >
+                      {volume && (
+                        <div style={{ fontWeight: 600 }}>{volume}</div>
+                      )}
+                      {approval && (
+                        <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                          승인률 {approval}
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   {merchant.metadata && merchant.metadata.length > 0 && (
-                    <div style={{ marginTop: "0.75rem", display: "grid", gap: "0.75rem", fontSize: "0.75rem", color: "#64748b", gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+                    <div
+                      style={{
+                        marginTop: "0.75rem",
+                        display: "grid",
+                        gap: "0.75rem",
+                        fontSize: "0.75rem",
+                        color: "#64748b",
+                        gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      }}
+                    >
                       {merchant.metadata.map((meta) => (
-                        <div key={meta.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <div
+                          key={meta.label}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
                           <span style={{ color: "#94a3b8" }}>{meta.label}</span>
-                          <span style={{ color: "var(--color-foreground, #334155)" }}>{meta.value}</span>
+                          <span
+                            style={{
+                              color: "var(--color-foreground, #334155)",
+                            }}
+                          >
+                            {meta.value}
+                          </span>
                         </div>
                       ))}
                     </div>

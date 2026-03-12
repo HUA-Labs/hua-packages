@@ -1,92 +1,104 @@
-import React from "react"
-import { dot as dotFn } from "@hua-labs/dot"
-import { merge } from "../../lib/utils"
+import React, { useId } from "react";
+import { dot as dotFn } from "@hua-labs/dot";
 
-export interface ScrollbarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  children: React.ReactNode
-  dot?: string
-  variant?: "default" | "glass" | "colorful" | "minimal" | "neon"
-  size?: "sm" | "md" | "lg" | "xl"
-  orientation?: "vertical" | "horizontal" | "both"
-  autoHide?: boolean
-  smooth?: boolean
+export interface ScrollbarProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  dot?: string;
+  variant?: "default" | "glass" | "colorful" | "minimal" | "neon";
+  size?: "sm" | "md" | "lg" | "xl";
+  orientation?: "vertical" | "horizontal" | "both";
+  autoHide?: boolean;
+  smooth?: boolean;
 }
 
+// Variant thumb color map (for CSS injection)
+const VARIANT_THUMB_COLOR: Record<string, string> = {
+  glass: "rgba(255,255,255,0.2)",
+  colorful: "rgba(99,102,241,0.8)",
+  minimal: "rgba(203,213,225,0.5)",
+  neon: "rgba(34,211,238,0.6)",
+  default: "rgba(203,213,225,1)",
+};
+
+// Scrollbar width in pixels map
+const SIZE_WIDTH: Record<string, number> = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+};
+
 const Scrollbar = React.forwardRef<HTMLDivElement, ScrollbarProps>(
-  ({
-    dot,
-    variant = "default",
-    size = "md",
-    orientation = "both",
-    autoHide = true,
-    smooth = true,
-    children,
-    style,
-    ...props
-  }, ref) => {
-    
-    const getVariantClasses = () => {
-      switch (variant) {
-        case "glass":
-          return "scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30 backdrop-blur-sm"
-        case "colorful":
-          return "scrollbar-thumb-gradient-to-b scrollbar-thumb-from-indigo-500 scrollbar-thumb-to-purple-500 hover:scrollbar-thumb-from-cyan-600 hover:scrollbar-thumb-to-purple-600"
-        case "minimal":
-          return "scrollbar-thumb-slate-200/50 hover:scrollbar-thumb-slate-300/70 dark:scrollbar-thumb-slate-700/50 dark:hover:scrollbar-thumb-slate-600/70"
-        case "neon":
-          return "scrollbar-thumb-cyan-400/60 hover:scrollbar-thumb-cyan-300/80 scrollbar-thumb-shadow-lg scrollbar-thumb-shadow-cyan-500/25"
-        default:
-          return "scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 dark:hover:scrollbar-thumb-slate-500"
-      }
-    }
+  (
+    {
+      dot,
+      variant = "default",
+      size = "md",
+      orientation = "both",
+      autoHide = true,
+      smooth = true,
+      children,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
+    const uid = useId().replace(/:/g, "");
+    const scrollbarId = `hua-scrollbar-${uid}`;
 
-    const getSizeClasses = () => {
-      switch (size) {
-        case "sm":
-          return "scrollbar-w-1"
-        case "lg":
-          return "scrollbar-w-3"
-        case "xl":
-          return "scrollbar-w-4"
-        default:
-          return "scrollbar-w-2"
-      }
-    }
+    const thumbColor =
+      VARIANT_THUMB_COLOR[variant] ?? VARIANT_THUMB_COLOR.default;
+    const scrollbarWidth = SIZE_WIDTH[size] ?? SIZE_WIDTH.md;
 
-    const getOrientationClasses = () => {
-      switch (orientation) {
-        case "vertical":
-          return "overflow-y-auto overflow-x-hidden"
-        case "horizontal":
-          return "overflow-x-auto overflow-y-hidden"
-        default:
-          return "overflow-auto"
-      }
-    }
+    const overflowStyle: React.CSSProperties =
+      orientation === "vertical"
+        ? { overflowY: "auto", overflowX: "hidden" }
+        : orientation === "horizontal"
+          ? { overflowX: "auto", overflowY: "hidden" }
+          : { overflow: "auto" };
 
-    const baseClasses = merge(
-      "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-full transition-all duration-200",
-      getVariantClasses(),
-      getSizeClasses(),
-      getOrientationClasses(),
-      autoHide && "scrollbar-hide",
-      smooth && "scroll-smooth",
-    )
+    const containerStyle: React.CSSProperties = {
+      ...overflowStyle,
+      scrollbarWidth: autoHide ? "none" : "thin",
+      scrollbarColor: autoHide
+        ? "transparent transparent"
+        : `${thumbColor} transparent`,
+      scrollBehavior: smooth ? "smooth" : "auto",
+      transition: "all 200ms",
+      ...(dot ? (dotFn(dot) as React.CSSProperties) : {}),
+      ...style,
+    };
 
-    const dotStyle = dot ? dotFn(dot) as React.CSSProperties : undefined
+    // Inject webkit-specific pseudo-element scrollbar styles
+    const cssRules = autoHide
+      ? `
+        .${scrollbarId}::-webkit-scrollbar { display: none; }
+      `
+      : `
+        .${scrollbarId}::-webkit-scrollbar { width: ${scrollbarWidth}px; height: ${scrollbarWidth}px; }
+        .${scrollbarId}::-webkit-scrollbar-track { background: transparent; }
+        .${scrollbarId}::-webkit-scrollbar-thumb { background: ${thumbColor}; border-radius: 9999px; }
+        .${scrollbarId}::-webkit-scrollbar-thumb:hover { background: ${thumbColor}; filter: brightness(1.1); }
+      `;
 
     return (
-      <div
-        className={baseClasses}
-        ref={ref}
-        style={dotStyle ? { ...dotStyle, ...style } : style}
-        {...props}
-      >
-        {children}
-      </div>
-    )
-  }
-)
-Scrollbar.displayName = "Scrollbar"
+      <>
+        <style dangerouslySetInnerHTML={{ __html: cssRules }} />
+        <div
+          className={scrollbarId}
+          ref={ref}
+          style={containerStyle}
+          {...props}
+        >
+          {children}
+        </div>
+      </>
+    );
+  },
+);
+Scrollbar.displayName = "Scrollbar";
 
-export { Scrollbar } 
+export { Scrollbar };

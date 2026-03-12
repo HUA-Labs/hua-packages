@@ -6,7 +6,11 @@ import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { DashboardEmptyState } from "./EmptyState";
 
-export type SettlementTimelineStatus = "pending" | "processing" | "completed" | "failed";
+export type SettlementTimelineStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
 
 /**
  * 정산 타임라인 아이템 인터페이스 / SettlementTimelineItem interface
@@ -43,7 +47,10 @@ export interface SettlementTimelineItem {
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface SettlementTimelineProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface SettlementTimelineProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   items: SettlementTimelineItem[];
   highlightedId?: string;
   locale?: string;
@@ -54,7 +61,13 @@ export interface SettlementTimelineProps extends Omit<React.HTMLAttributes<HTMLD
 
 const STATUS_CONFIG: Record<
   SettlementTimelineStatus,
-  { dotColor: string; borderColor: string; textColor: string; label: string; shadow?: string }
+  {
+    dotColor: string;
+    borderColor: string;
+    textColor: string;
+    label: string;
+    shadow?: string;
+  }
 > = {
   completed: {
     dotColor: "#10b981",
@@ -102,7 +115,10 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
   if (!value) return undefined;
   const parsed = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(parsed.getTime())) return undefined;
-  return parsed.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  return parsed.toLocaleString(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 };
 
 /**
@@ -171,110 +187,224 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
           padding: "1rem",
         },
         resolveDot(dot),
-        style
+        style,
       )}
       {...props}
     >
-      <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div
+        style={{
+          marginBottom: "1rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         <div>
-          <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>정산 타임라인</p>
-          <p style={{ fontSize: "0.75rem", color: "#64748b" }}>처리 단계별 상태와 금액을 확인하세요.</p>
+          <p
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "var(--color-foreground, #0f172a)",
+            }}
+          >
+            정산 타임라인
+          </p>
+          <p style={{ fontSize: "0.75rem", color: "#64748b" }}>
+            처리 단계별 상태와 금액을 확인하세요.
+          </p>
         </div>
       </div>
 
-      {!hasItems
-        ? emptyState ?? (
-            <DashboardEmptyState
-              icon="calendar-clock"
-              title="정산 단계가 없습니다"
-              description="정산 요청이 생성되면 자동으로 단계가 채워집니다."
-              size="sm"
-            />
-          )
-        : (
-          <ol style={{ display: "flex", flexDirection: "column", gap: "1rem" }} role="list" aria-label="정산 타임라인">
-            {items.map((item, index) => {
-              const statusConfig = STATUS_CONFIG[item.status];
-              const amount = formatAmount(item.amount, item.currency ?? defaultCurrency, locale);
-              const date = formatDate(item.date, locale);
-              const isHighlighted = highlightedId === item.id;
-              const showConnector = index !== items.length - 1;
+      {!hasItems ? (
+        (emptyState ?? (
+          <DashboardEmptyState
+            icon="calendar-clock"
+            title="정산 단계가 없습니다"
+            description="정산 요청이 생성되면 자동으로 단계가 채워집니다."
+            size="sm"
+          />
+        ))
+      ) : (
+        <ol
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          role="list"
+          aria-label="정산 타임라인"
+        >
+          {items.map((item, index) => {
+            const statusConfig = STATUS_CONFIG[item.status];
+            const amount = formatAmount(
+              item.amount,
+              item.currency ?? defaultCurrency,
+              locale,
+            );
+            const date = formatDate(item.date, locale);
+            const isHighlighted = highlightedId === item.id;
+            const showConnector = index !== items.length - 1;
 
-              const itemLabel = `${item.title}, 상태: ${statusConfig.label}${amount ? `, 금액: ${amount}` : ''}${date ? `, 날짜: ${date}` : ''}`;
+            const itemLabel = `${item.title}, 상태: ${statusConfig.label}${amount ? `, 금액: ${amount}` : ""}${date ? `, 날짜: ${date}` : ""}`;
 
-              return (
-                <li
-                  key={item.id}
-                  role="listitem"
-                  aria-label={itemLabel}
-                  style={{ position: "relative", display: "flex", gap: "1rem" }}
+            return (
+              <li
+                key={item.id}
+                role="listitem"
+                aria-label={itemLabel}
+                style={{ position: "relative", display: "flex", gap: "1rem" }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <span
+                    style={{
+                      zIndex: 10,
+                      height: "0.875rem",
+                      width: "0.875rem",
+                      borderRadius: "9999px",
+                      border: "2px solid",
+                      backgroundColor: statusConfig.dotColor,
+                      borderColor: statusConfig.dotColor,
+                      boxShadow: statusConfig.shadow,
+                      transform: isHighlighted ? "scale(1.1)" : undefined,
+                      flexShrink: 0,
+                    }}
+                    aria-label={`${statusConfig.label} 상태`}
+                  />
+                  {showConnector && (
                     <span
                       style={{
-                        zIndex: 10,
-                        height: "0.875rem",
-                        width: "0.875rem",
-                        borderRadius: "9999px",
-                        border: "2px solid",
-                        backgroundColor: statusConfig.dotColor,
-                        borderColor: statusConfig.dotColor,
-                        boxShadow: statusConfig.shadow,
-                        transform: isHighlighted ? "scale(1.1)" : undefined,
-                        flexShrink: 0,
+                        marginTop: "0.25rem",
+                        flex: 1,
+                        width: "1px",
+                        backgroundColor: "var(--color-border, #e2e8f0)",
                       }}
-                      aria-label={`${statusConfig.label} 상태`}
+                      aria-hidden="true"
                     />
-                    {showConnector && (
-                      <span style={{ marginTop: "0.25rem", flex: 1, width: "1px", backgroundColor: "var(--color-border, #e2e8f0)" }} aria-hidden="true" />
-                    )}
-                  </div>
+                  )}
+                </div>
 
+                <div
+                  style={{
+                    flex: 1,
+                    borderRadius: "0.75rem",
+                    border: isHighlighted ? "2px solid" : "1px solid",
+                    borderColor: statusConfig.borderColor,
+                    padding: "1rem",
+                    marginBottom: "0.5rem",
+                    boxShadow: isHighlighted
+                      ? "0 1px 3px rgba(0,0,0,0.1)"
+                      : undefined,
+                  }}
+                >
                   <div
                     style={{
-                      flex: 1,
-                      borderRadius: "0.75rem",
-                      border: isHighlighted ? "2px solid" : "1px solid",
-                      borderColor: statusConfig.borderColor,
-                      padding: "1rem",
-                      marginBottom: "0.5rem",
-                      boxShadow: isHighlighted ? "0 1px 3px rgba(0,0,0,0.1)" : undefined,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: "0.5rem",
                     }}
                   >
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
-                      <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{item.title}</span>
-                      <span style={{ fontSize: "0.75rem", fontWeight: 500, borderRadius: "9999px", padding: "0.125rem 0.5rem", color: statusConfig.textColor }}>
-                        {statusConfig.label}
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "var(--color-foreground, #0f172a)",
+                      }}
+                    >
+                      {item.title}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        borderRadius: "9999px",
+                        padding: "0.125rem 0.5rem",
+                        color: statusConfig.textColor,
+                      }}
+                    >
+                      {statusConfig.label}
+                    </span>
+                    {item.meta && (
+                      <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                        {item.meta}
                       </span>
-                      {item.meta && (
-                        <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{item.meta}</span>
-                      )}
-                    </div>
-                    {item.description && (
-                      <p style={{ marginTop: "0.25rem", fontSize: "0.875rem", color: "#475569" }}>{item.description}</p>
                     )}
-                    <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "1rem", fontSize: "0.75rem", color: "#64748b" }}>
-                      {amount && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", color: "var(--color-foreground, #334155)" }}>
-                          <Icon name="wallet" className="h-3.5 w-3.5" style={{ color: "#94a3b8" }} />
-                          {amount}
-                        </div>
-                      )}
-                      {date && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                          <Icon name="clock" className="h-3.5 w-3.5" style={{ color: "#94a3b8" }} aria-hidden={true} />
-                          <time dateTime={item.date instanceof Date ? item.date.toISOString() : typeof item.date === 'string' ? item.date : undefined}>
-                            {date}
-                          </time>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                </li>
-              );
-            })}
-          </ol>
-        )}
+                  {item.description && (
+                    <p
+                      style={{
+                        marginTop: "0.25rem",
+                        fontSize: "0.875rem",
+                        color: "#475569",
+                      }}
+                    >
+                      {item.description}
+                    </p>
+                  )}
+                  <div
+                    style={{
+                      marginTop: "0.75rem",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "1rem",
+                      fontSize: "0.75rem",
+                      color: "#64748b",
+                    }}
+                  >
+                    {amount && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                          fontSize: "0.875rem",
+                          color: "var(--color-foreground, #334155)",
+                        }}
+                      >
+                        <Icon
+                          name="wallet"
+                          dot="w-3.5 h-3.5"
+                          style={{ color: "#94a3b8" }}
+                        />
+                        {amount}
+                      </div>
+                    )}
+                    {date && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                        }}
+                      >
+                        <Icon
+                          name="clock"
+                          dot="w-3.5 h-3.5"
+                          style={{ color: "#94a3b8" }}
+                          aria-hidden={true}
+                        />
+                        <time
+                          dateTime={
+                            item.date instanceof Date
+                              ? item.date.toISOString()
+                              : typeof item.date === "string"
+                                ? item.date
+                                : undefined
+                          }
+                        >
+                          {date}
+                        </time>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </div>
   );
 };

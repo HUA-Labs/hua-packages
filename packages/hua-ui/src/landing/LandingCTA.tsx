@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { mergeStyles } from "../hooks/useDotMap";
 import { Container } from "../components/Container";
 import { AnimatedGradient } from "../components/advanced/AnimatedGradient";
@@ -55,7 +56,7 @@ export function LandingCTA({
   background: bgProp,
   gradientColors,
   motion: motionOverride,
-  className,
+  dot: dotProp,
   ...rest
 }: LandingCTAProps) {
   const theme = useLandingTheme();
@@ -63,6 +64,16 @@ export function LandingCTA({
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.cta.motion, ...motionOverride }
     : theme.cta.motion;
+
+  const sectionCls = dotCSS(
+    `relative overflow-hidden py-20 sm:py-28${bg === "dark" ? " bg-gray-950 text-white" : ""}${dotProp ? ` ${dotProp}` : ""}`,
+  );
+  const titleCls = dotCSS(
+    "text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4",
+  );
+  const actionsCls = dotCSS(
+    "flex flex-col sm:flex-row items-center justify-center gap-4",
+  );
 
   const scrollReveal = useScrollReveal?.({
     motionType: motion.type as "fadeIn" | "slideUp" | "bounceIn",
@@ -80,17 +91,15 @@ export function LandingCTA({
   }, [scrollReveal, motion]);
 
   return (
-    <section
-      style={dot(
-        `relative overflow-hidden py-20 sm:py-28${bg === "dark" ? " bg-gray-950 text-white" : ""}${className ? ` ${className}` : ""}`,
-      )}
-      {...rest}
-    >
+    <section className={sectionCls.className} {...rest}>
       {/* Background */}
       {bg === "gradient-soft" && (
         <div
-          style={dot("absolute inset-0")}
-          className="gradient-bg-soft"
+          style={{
+            ...dot("absolute inset-0"),
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, transparent) 0%, color-mix(in srgb, var(--color-accent-foreground) 10%, transparent) 100%)",
+          }}
           aria-hidden="true"
         />
       )}
@@ -120,11 +129,7 @@ export function LandingCTA({
             scrollReveal?.style ?? fallbackStyle,
           )}
         >
-          <h2
-            style={dot("text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4")}
-          >
-            {title}
-          </h2>
+          <h2 className={titleCls.className}>{title}</h2>
 
           {subtitle && (
             <p
@@ -137,11 +142,7 @@ export function LandingCTA({
           )}
 
           {(primaryAction || secondaryAction) && (
-            <div
-              style={dot(
-                "flex flex-col sm:flex-row items-center justify-center gap-4",
-              )}
-            >
+            <div className={actionsCls.className}>
               {primaryAction}
               {secondaryAction}
             </div>
@@ -151,11 +152,7 @@ export function LandingCTA({
 
       <style
         dangerouslySetInnerHTML={{
-          __html: `
-        @keyframes landing-cta-enter {
-          to { opacity: 1; transform: none; }
-        }
-      `,
+          __html: `${sectionCls.css}${titleCls.css}${actionsCls.css}@keyframes landing-cta-enter{to{opacity:1;transform:none}}`,
         }}
       />
     </section>

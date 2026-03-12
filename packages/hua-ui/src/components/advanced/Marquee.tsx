@@ -14,7 +14,10 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
  * @property {string} [gradientColor="var(--color-background)"] - 그라디언트 색상 / Gradient color
  * @property {number} [gradientWidth=100] - 그라디언트 너비 (px) / Gradient width in pixels
  */
-export interface MarqueeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
+export interface MarqueeProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   direction?: "left" | "right" | "up" | "down";
   speed?: number;
   pauseOnHover?: boolean;
@@ -70,7 +73,7 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       onClick,
       ...props
     },
-    ref
+    ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [contentWidth, setContentWidth] = useState(0);
@@ -109,16 +112,14 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
       ? contentWidth / speed
       : contentHeight / speed;
 
-    // Pick animation class name based on direction/pause state
-    const animationClass = isPaused
-      ? "animate-pause"
-      : isHorizontal
+    // Pick animation name based on direction/pause state
+    const animationName = isHorizontal
       ? isReverse
-        ? "animate-marquee-right"
-        : "animate-marquee-left"
+        ? "marquee-right"
+        : "marquee-left"
       : isReverse
-      ? "animate-marquee-down"
-      : "animate-marquee-up";
+        ? "marquee-down"
+        : "marquee-up";
 
     // Container outer style
     const outerStyle = useMemo<React.CSSProperties>(() => {
@@ -126,43 +127,46 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
         position: "relative",
         overflow: "hidden",
       };
-      const gradientVars = gradient
-        ? ({
-            ["--gradient-color" as string]: gradientColor,
-            ["--gradient-width" as string]: `${gradientWidth}px`,
-          } as React.CSSProperties)
-        : {};
-      return mergeStyles(base, gradientVars, resolveDot(dotProp), style);
-    }, [gradient, gradientColor, gradientWidth, dotProp, style]);
+      return mergeStyles(base, resolveDot(dotProp), style);
+    }, [dotProp, style]);
 
-    // Inner track style (flex row or col + animation vars)
+    // Inner track style (flex row or col + animation inline)
     const trackStyle = useMemo<React.CSSProperties>(() => {
       return {
         display: "flex",
         flexDirection: isHorizontal ? "row" : "column",
         ["--marquee-duration" as string]: `${duration}s`,
         ["--marquee-gap" as string]: `${gap}px`,
+        animation: isPaused
+          ? undefined
+          : `${animationName} ${duration}s linear infinite`,
+        animationPlayState: isPaused ? "paused" : "running",
       } as React.CSSProperties;
-    }, [isHorizontal, duration, gap]);
+    }, [isHorizontal, duration, gap, animationName, isPaused]);
 
     // Shared item strip style
-    const stripStyle = useMemo<React.CSSProperties>(() => ({
-      display: "flex",
-      flexShrink: 0,
-      flexDirection: isHorizontal ? "row" : "column",
-      gap,
-    }), [isHorizontal, gap]);
+    const stripStyle = useMemo<React.CSSProperties>(
+      () => ({
+        display: "flex",
+        flexShrink: 0,
+        flexDirection: isHorizontal ? "row" : "column",
+        gap,
+      }),
+      [isHorizontal, gap],
+    );
 
     // Second strip style (offset margin for seamless loop)
-    const stripStyle2 = useMemo<React.CSSProperties>(() => ({
-      ...stripStyle,
-      ...(isHorizontal ? { marginLeft: gap } : { marginTop: gap }),
-    }), [stripStyle, isHorizontal, gap]);
+    const stripStyle2 = useMemo<React.CSSProperties>(
+      () => ({
+        ...stripStyle,
+        ...(isHorizontal ? { marginLeft: gap } : { marginTop: gap }),
+      }),
+      [stripStyle, isHorizontal, gap],
+    );
 
     return (
       <div
         ref={ref}
-        className={gradient ? "marquee-gradient" : undefined}
         style={outerStyle}
         onMouseEnter={(e) => {
           if (pauseOnHover) setIsPaused(true);
@@ -178,65 +182,73 @@ const Marquee = React.forwardRef<HTMLDivElement, MarqueeProps>(
         }}
         {...props}
       >
-        <div
-          ref={containerRef}
-          className={animationClass}
-          style={trackStyle}
-        >
+        <div ref={containerRef} style={trackStyle}>
           {/* Original content */}
-          <div style={stripStyle}>
-            {children}
-          </div>
+          <div style={stripStyle}>{children}</div>
           {/* Duplicated content for seamless loop */}
           <div style={stripStyle2} aria-hidden="true">
             {children}
           </div>
         </div>
 
-        {/* CSS for animations - injected as style element */}
-        <style dangerouslySetInnerHTML={{ __html: `
+        {/* Gradient overlays as DOM elements (replaces ::before/::after) */}
+        {gradient && (
+          <>
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                width: gradientWidth,
+                zIndex: 10,
+                pointerEvents: "none",
+                background: `linear-gradient(to right, ${gradientColor}, transparent)`,
+              }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                right: 0,
+                width: gradientWidth,
+                zIndex: 10,
+                pointerEvents: "none",
+                background: `linear-gradient(to left, ${gradientColor}, transparent)`,
+              }}
+            />
+          </>
+        )}
+
+        {/* CSS keyframe definitions for marquee animations */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
           @keyframes marquee-left {
             from { transform: translateX(0); }
-            to { transform: translateX(calc(-50% - var(--marquee-gap) / 2)); }
+            to { transform: translateX(calc(-50% - ${gap / 2}px)); }
           }
           @keyframes marquee-right {
-            from { transform: translateX(calc(-50% - var(--marquee-gap) / 2)); }
+            from { transform: translateX(calc(-50% - ${gap / 2}px)); }
             to { transform: translateX(0); }
           }
           @keyframes marquee-up {
             from { transform: translateY(0); }
-            to { transform: translateY(calc(-50% - var(--marquee-gap) / 2)); }
+            to { transform: translateY(calc(-50% - ${gap / 2}px)); }
           }
           @keyframes marquee-down {
-            from { transform: translateY(calc(-50% - var(--marquee-gap) / 2)); }
+            from { transform: translateY(calc(-50% - ${gap / 2}px)); }
             to { transform: translateY(0); }
           }
-          .animate-marquee-left { animation: marquee-left var(--marquee-duration) linear infinite; }
-          .animate-marquee-right { animation: marquee-right var(--marquee-duration) linear infinite; }
-          .animate-marquee-up { animation: marquee-up var(--marquee-duration) linear infinite; }
-          .animate-marquee-down { animation: marquee-down var(--marquee-duration) linear infinite; }
-          .animate-pause { animation-play-state: paused !important; }
-          .marquee-gradient::before, .marquee-gradient::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: var(--gradient-width);
-            z-index: 10;
-            pointer-events: none;
-          }
-          .marquee-gradient::before {
-            left: 0;
-            background: linear-gradient(to right, var(--gradient-color), transparent);
-          }
-          .marquee-gradient::after {
-            right: 0;
-            background: linear-gradient(to left, var(--gradient-color), transparent);
-          }
-        `}} />
+        `,
+          }}
+        />
       </div>
     );
-  }
+  },
 );
 
 Marquee.displayName = "Marquee";

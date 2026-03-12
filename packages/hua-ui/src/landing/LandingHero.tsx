@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { mergeStyles } from "../hooks/useDotMap";
 import { Container } from "../components/Container";
 import { AnimatedGradient } from "../components/advanced/AnimatedGradient";
@@ -44,13 +45,27 @@ export function LandingHero({
   gradientColors,
   scrollIndicator = false,
   motion: motionOverride,
-  className,
+  dot: dotProp,
   ...rest
 }: LandingHeroProps) {
   const theme = useLandingTheme();
   const size = sizeProp ?? theme.hero.size;
   const bg = bgProp ?? theme.hero.background;
   const motion = resolveMotion(theme.hero.motion, motionOverride);
+
+  const sectionCls = dotCSS(
+    `relative overflow-hidden flex items-center justify-center ${size === "full" ? "min-h-screen" : "py-28 sm:py-36"}${bg === "dark" ? " bg-gray-950 text-white" : ""}${dotProp ? ` ${dotProp}` : ""}`,
+  );
+  const titleCls = dotCSS(
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6",
+  );
+  const subtitleCls = dotCSS("text-xl sm:text-2xl text-muted-foreground mb-4");
+  const descCls = dotCSS(
+    "text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8",
+  );
+  const actionsCls = dotCSS(
+    "flex flex-col sm:flex-row items-center justify-center gap-4",
+  );
 
   const contentStyle = useMemo<React.CSSProperties>(
     () => ({
@@ -62,17 +77,15 @@ export function LandingHero({
   );
 
   return (
-    <section
-      style={dot(
-        `relative overflow-hidden flex items-center justify-center ${size === "full" ? "min-h-screen" : "py-28 sm:py-36"}${bg === "dark" ? " bg-gray-950 text-white" : ""}${className ? ` ${className}` : ""}`,
-      )}
-      {...rest}
-    >
+    <section className={sectionCls.className} {...rest}>
       {/* Background layer */}
       {bg === "gradient" && (
         <div
-          style={dot("absolute inset-0")}
-          className="gradient-bg-soft"
+          style={{
+            ...dot("absolute inset-0"),
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, transparent) 0%, color-mix(in srgb, var(--color-accent-foreground) 10%, transparent) 100%)",
+          }}
           aria-hidden="true"
         />
       )}
@@ -102,36 +115,14 @@ export function LandingHero({
             contentStyle,
           )}
         >
-          <h1
-            style={dot(
-              "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6",
-            )}
-          >
-            {title}
-          </h1>
+          <h1 className={titleCls.className}>{title}</h1>
 
-          {subtitle && (
-            <p style={dot("text-xl sm:text-2xl text-muted-foreground mb-4")}>
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className={subtitleCls.className}>{subtitle}</p>}
 
-          {description && (
-            <p
-              style={dot(
-                "text-base sm:text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-8",
-              )}
-            >
-              {description}
-            </p>
-          )}
+          {description && <p className={descCls.className}>{description}</p>}
 
           {(primaryAction || secondaryAction) && (
-            <div
-              style={dot(
-                "flex flex-col sm:flex-row items-center justify-center gap-4",
-              )}
-            >
+            <div className={actionsCls.className}>
               {primaryAction}
               {secondaryAction}
             </div>
@@ -166,11 +157,7 @@ export function LandingHero({
       {/* Keyframe injection */}
       <style
         dangerouslySetInnerHTML={{
-          __html: `
-        @keyframes landing-hero-enter {
-          to { opacity: 1; transform: none; }
-        }
-      `,
+          __html: `${sectionCls.css}${titleCls.css}${subtitleCls.css}${descCls.css}${actionsCls.css}@keyframes landing-hero-enter{to{opacity:1;transform:none}}`,
         }}
       />
     </section>

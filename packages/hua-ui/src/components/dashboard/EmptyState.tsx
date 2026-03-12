@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
+import React, { useMemo } from "react";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
@@ -18,7 +18,10 @@ import type { IconName } from "../../lib/icons";
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface DashboardEmptyStateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface DashboardEmptyStateProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   icon?: IconName | React.ReactNode;
   title: string;
   description?: string;
@@ -102,7 +105,10 @@ const sizeConfig = {
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} DashboardEmptyState 컴포넌트 / DashboardEmptyState component
  */
-export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmptyStateProps>(
+export const DashboardEmptyState = React.forwardRef<
+  HTMLDivElement,
+  DashboardEmptyStateProps
+>(
   (
     {
       icon = "inbox",
@@ -117,10 +123,17 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const iconColor = variantIconColor[variant];
     const sizes = sizeConfig[size];
+
+    const dotCls = useMemo(() => {
+      const tokens = ["text-center", `py-[${sizes.paddingY}]`, dot]
+        .filter(Boolean)
+        .join(" ");
+      return dotCSS(tokens);
+    }, [dot, sizes.paddingY]);
 
     const buttonStyle: React.CSSProperties = {
       display: "inline-flex",
@@ -144,7 +157,11 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
             {actionText}
           </a>
         ) : (
-          <button onClick={actionOnClick} aria-label={actionText} style={buttonStyle}>
+          <button
+            onClick={actionOnClick}
+            aria-label={actionText}
+            style={buttonStyle}
+          >
             {actionText}
           </button>
         )}
@@ -152,24 +169,23 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
     );
 
     return (
-      <div
-        ref={ref}
-        style={mergeStyles(
-          {
-            textAlign: "center",
-            paddingTop: sizes.paddingY,
-            paddingBottom: sizes.paddingY,
-          },
-          resolveDot(dot),
-          style
-        )}
-        {...props}
-      >
+      <div ref={ref} className={dotCls.className} style={style} {...props}>
         {/* 아이콘 */}
         {icon && (
-          <div style={{ margin: "0 auto", width: sizes.iconSize, height: sizes.iconSize, marginBottom: sizes.iconMarginBottom, color: iconColor }}>
+          <div
+            style={{
+              margin: "0 auto",
+              width: sizes.iconSize,
+              height: sizes.iconSize,
+              marginBottom: sizes.iconMarginBottom,
+              color: iconColor,
+            }}
+          >
             {typeof icon === "string" ? (
-              <Icon name={icon as IconName} className="w-full h-full" style={{ color: iconColor }} />
+              <Icon
+                name={icon as IconName}
+                style={{ width: "100%", height: "100%", color: iconColor }}
+              />
             ) : (
               icon
             )}
@@ -177,22 +193,38 @@ export const DashboardEmptyState = React.forwardRef<HTMLDivElement, DashboardEmp
         )}
 
         {/* 제목 */}
-        <h3 style={{ fontWeight: 600, marginBottom: "0.5rem", color: "var(--color-foreground, #111827)", fontSize: sizes.titleFontSize }}>
+        <h3
+          style={{
+            fontWeight: 600,
+            marginBottom: "0.5rem",
+            color: "var(--color-foreground, #111827)",
+            fontSize: sizes.titleFontSize,
+          }}
+        >
           {title}
         </h3>
 
         {/* 설명 */}
         {description && (
-          <p style={{ marginBottom: "1rem", color: "var(--color-muted-foreground, #6b7280)", fontSize: sizes.descFontSize }}>
+          <p
+            style={{
+              marginBottom: "1rem",
+              color: "var(--color-muted-foreground, #6b7280)",
+              fontSize: sizes.descFontSize,
+            }}
+          >
             {description}
           </p>
         )}
 
         {/* 액션 버튼 */}
         {actionButton}
+        {dotCls.css && (
+          <style dangerouslySetInnerHTML={{ __html: dotCls.css }} />
+        )}
       </div>
     );
-  }
+  },
 );
 
 DashboardEmptyState.displayName = "DashboardEmptyState";

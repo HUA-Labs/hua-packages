@@ -44,23 +44,23 @@ const VARIANT_EXTRAS: Record<string, CSSProperties> = {
 const VARIANT_FOCUS: Record<string, CSSProperties> = {
   default: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
   },
   outline: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
   },
   filled: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
     backgroundColor: 'var(--color-background)',
   },
   ghost: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-muted-foreground)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-muted-foreground) 40%, transparent)',
     backgroundColor: 'var(--color-muted)',
     borderColor: 'var(--color-border)',
   },
@@ -202,13 +202,16 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const isDisabled = props.disabled ?? false
     const isInvalid = error || (ariaInvalid !== undefined ? Boolean(ariaInvalid) : false)
 
+    const chevronRight = size === 'sm' ? 8 : size === 'lg' ? 14 : 12
+    const paddingRight = size === 'sm' ? 32 : size === 'lg' ? 44 : 40
+
     const computedStyle = useMemo(() => {
       const base = mergeStyles(
         { transition: 'all 200ms', appearance: 'none' as const },
         selectVariantStyles({ variant, size }) as CSSProperties,
         VARIANT_EXTRAS[variant],
         leftIcon ? { paddingLeft: '40px' } : undefined,
-        { paddingRight: '40px' },
+        { paddingRight: `${paddingRight}px` },
       )
 
       if (isDisabled) {
@@ -245,12 +248,12 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
     const chevronStyle = useMemo((): CSSProperties => ({
       position: 'absolute',
-      right: '12px',
+      right: `${chevronRight}px`,
       top: '50%',
       transform: isFocused ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%)',
       pointerEvents: 'none',
       transition: 'transform 200ms ease-out',
-    }), [isFocused])
+    }), [isFocused, chevronRight])
 
     return (
       <div style={{ position: 'relative' }}>

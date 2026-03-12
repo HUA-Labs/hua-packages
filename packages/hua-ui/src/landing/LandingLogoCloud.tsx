@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useMemo } from "react";
+import type { CSSProperties } from "react";
+import { dot as dotFn } from "@hua-labs/dot";
 import { Section } from "../components/Section";
 import { Marquee } from "../components/advanced/Marquee";
 import { useLandingTheme } from "./LandingProvider";
 import type { LandingLogoCloudProps, LandingMotionOverride } from "./types";
+
+const s = (input: string) => dotFn(input) as CSSProperties;
 
 function getInitialTransform(type: string): string {
   switch (type) {
@@ -51,13 +55,12 @@ export function LandingLogoCloud({
   speed: speedProp,
   logoHeight = 40,
   motion: motionOverride,
-  className,
+  dot: dotProp,
   ...rest
 }: LandingLogoCloudProps) {
   const theme = useLandingTheme();
   const variant = variantProp ?? theme.logoCloud.variant;
   const speed = speedProp ?? theme.logoCloud.speed;
-
   // fadeIn motion for the section entrance
   const motion: Required<LandingMotionOverride> = motionOverride
     ? { ...theme.features.motion, ...motionOverride }
@@ -84,8 +87,12 @@ export function LandingLogoCloud({
         key={i}
         src={logo.src}
         alt={logo.alt}
-        className="object-contain opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-        style={{ height: logoHeight, width: "auto" }}
+        style={{
+          ...s("object-contain"),
+          height: logoHeight,
+          width: "auto",
+          opacity: 0.6,
+        }}
       />
     );
     if (logo.href) {
@@ -95,7 +102,7 @@ export function LandingLogoCloud({
           href={logo.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex"
+          style={s("inline-flex")}
         >
           {img}
         </a>
@@ -107,12 +114,7 @@ export function LandingLogoCloud({
   const header = title ? { title, subtitle: undefined } : undefined;
 
   return (
-    <Section
-      header={header}
-      spacing="sm"
-      dot={`py-12 sm:py-16${className ? ` ${className}` : ""}`}
-      {...rest}
-    >
+    <Section header={header} spacing="sm" dot={dotProp} {...rest}>
       <div
         ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
         style={scrollReveal?.style ?? fallbackStyle}
@@ -122,7 +124,7 @@ export function LandingLogoCloud({
             {logoElements}
           </Marquee>
         ) : (
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
+          <div style={s("flex flex-wrap items-center justify-center gap-8")}>
             {logoElements}
           </div>
         )}
@@ -130,11 +132,7 @@ export function LandingLogoCloud({
 
       <style
         dangerouslySetInnerHTML={{
-          __html: `
-        @keyframes landing-logocloud-enter {
-          to { opacity: 1; transform: none; }
-        }
-      `,
+          __html: `@keyframes landing-logocloud-enter{to{opacity:1;transform:none}}`,
         }}
       />
     </Section>

@@ -386,7 +386,6 @@ export function dotCSS(
     return !isPassthrough;
   });
 
-  let className: string;
   if (naming === "atomic") {
     // Atomic: each token gets its own class (Tailwind-like).
     // NOTE: Like Tailwind, per-element class attribute order does NOT determine
