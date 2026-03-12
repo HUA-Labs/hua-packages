@@ -94,15 +94,49 @@ function tokenToClassName(raw: string): string {
 }
 
 // ── Internal state ──
+// Use globalThis to share state between RSC server and client bundles.
+// In Next.js App Router, server components and client components are bundled
+// separately, so module-level variables are NOT shared. globalThis IS shared
+// during SSR/SSG since both run in the same Node.js process.
 
-/** Collected CSS rules (for flush) */
-const collectedRules: string[] = [];
+const G = globalThis as Record<string, unknown>;
 
-/** Track emitted atomic class names to avoid duplicate CSS in collectedRules */
+/** Collected CSS rules (for flush) — shared via globalThis */
+function getCollectedRules(): string[] {
+  if (!G.__dotCollectedCSS) G.__dotCollectedCSS = [];
+  return G.__dotCollectedCSS as string[];
+}
+
+/** Track emitted atomic class names to avoid duplicate CSS */
 const emittedAtomicClasses = new Set<string>();
 
 /** Cache: input string → DotClassResult */
 const classCache = new Map<string, DotClassResult>();
+
+/** Browser-side CSS injection for client navigations */
+function injectBrowserCSS(css: string): void {
+  // Guard: only run in browser (avoid DOM types — package has no 'dom' lib)
+  if (!css || typeof G.document === "undefined") return;
+  if (!G.__dotInjectedCSS) G.__dotInjectedCSS = new Set<string>();
+  const injected = G.__dotInjectedCSS as Set<string>;
+  if (injected.has(css)) return;
+  injected.add(css);
+
+  const doc = G.document as {
+    querySelector(s: string): unknown;
+    createElement(t: string): unknown;
+    head: { appendChild(n: unknown): void };
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let el = doc.querySelector("style[data-dot-dynamic]") as any;
+  if (!el) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    el = doc.createElement("style") as any;
+    el.setAttribute("data-dot-dynamic", "");
+    doc.head.appendChild(el);
+  }
+  el.textContent += "\n" + css;
+}
 
 // ── Shadow/Gradient finalization (mirrored from index.ts for standalone use) ──
 
@@ -372,7 +406,15 @@ export function dotCSS(
 
   const cacheKey = `${options.naming ?? "hash"}:${options.darkMode ?? "class"}:${input}`;
   const cached = classCache.get(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    // Re-collect CSS for SSR (each page render needs its own flush)
+    // and re-inject for browser (handles client navigation to new pages)
+    if (cached.css) {
+      getCollectedRules().push(cached.css);
+      injectBrowserCSS(cached.css);
+    }
+    return cached;
+  }
 
   const tokens = parse(input);
   const naming = options.naming ?? "hash";
@@ -405,7 +447,8 @@ export function dotCSS(
         // Only push to global buffer if not already emitted (dedup)
         if (!emittedAtomicClasses.has(atomicName)) {
           emittedAtomicClasses.add(atomicName);
-          collectedRules.push(css);
+          getCollectedRules().push(css);
+          injectBrowserCSS(css);
         }
       }
     }
@@ -429,7 +472,8 @@ export function dotCSS(
     const rules = buildRules(styleTokens, currentConfig, hashClass, options);
     css = rulesToCSS(rules);
     if (css) {
-      collectedRules.push(css);
+      getCollectedRules().push(css);
+      injectBrowserCSS(css);
     }
   }
 
@@ -451,8 +495,9 @@ export function dotCSS(
  * // <style data-dot>{css}</style>
  */
 export function dotFlush(): string {
-  const css = collectedRules.join("\n");
-  collectedRules.length = 0;
+  const rules = getCollectedRules();
+  const css = rules.join("\n");
+  rules.length = 0;
   return css;
 }
 
@@ -460,7 +505,8 @@ export function dotFlush(): string {
  * Reset all collected CSS and the class cache.
  */
 export function dotReset(): void {
-  collectedRules.length = 0;
+  getCollectedRules().length = 0;
   classCache.clear();
   emittedAtomicClasses.clear();
+  G.__dotInjectedCSS = undefined;
 }
