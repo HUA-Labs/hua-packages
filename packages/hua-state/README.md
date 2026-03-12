@@ -56,19 +56,19 @@ function ThemeToggle() {
 | Export | Type | Description |
 |--------|------|-------------|
 | `createHuaStore` | function | Create a Zustand store with SSR/persistence support |
-| `isStoreRehydrated` | function |  |
-| `onStoreRehydrated` | function |  |
-| `markStoreRehydrated` | function |  |
+| `isStoreRehydrated` | function | Check if a persisted store has completed rehydration from localStorage. Returns false while hydration is pending (SSR safe). |
+| `onStoreRehydrated` | function | Subscribe to a store's rehydration completion event. Calls the callback immediately if the store is already rehydrated. Returns an unsubscribe function. |
+| `markStoreRehydrated` | function | Manually mark a store as rehydrated and fire all pending listeners. Use when integrating a Zustand store created outside of createHuaStore. |
 | `createI18nStore` | function | Create a pre-configured i18n language store |
-| `StoreCreator` | type |  |
-| `StoreConfig` | type |  |
-| `HuaStore` | type |  |
-| `BaseStoreState` | type |  |
-| `UseBoundStore` | type |  |
-| `StoreApi` | type |  |
-| `I18nStoreState` | type |  |
-| `I18nStoreConfig` | type |  |
-| `UseStoreHook` | type |  |
+| `StoreCreator` | type | Type alias for the Zustand state creator function passed to createHuaStore. |
+| `StoreConfig` | type | Configuration object for createHuaStore — persist, persistKey, ssr, partialize. |
+| `HuaStore` | type | Return type of createHuaStore — a bound Zustand store hook. |
+| `BaseStoreState` | type | Base constraint for store state — requires an object type. |
+| `UseBoundStore` | type | Re-exported Zustand UseBoundStore type for typed store hooks. |
+| `StoreApi` | type | Re-exported Zustand StoreApi type for direct store access. |
+| `I18nStoreState` | type | State shape for the i18n store — language, setLanguage, etc. |
+| `I18nStoreConfig` | type | Configuration for createI18nStore — default language, supported languages. |
+| `UseStoreHook` | type | Generic type helper for typed store selector hooks. |
 
 ## Documentation
 

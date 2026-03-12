@@ -60,6 +60,10 @@ function ListItem() {
 
 | Export | Type | Description |
 |--------|------|-------------|
+| `MotionEngine` | class | Zero-dependency pure JavaScript motion engine class |
+| `motionEngine` | variable | Singleton instance of MotionEngine |
+| `TransitionEffects` | class | Transition effect system class (fade, slide, scale, etc.) |
+| `transitionEffects` | variable | Singleton instance of TransitionEffects |
 | `useSimplePageMotion` | hook | Simple fade+slide page entrance animation |
 | `usePageMotions` | hook | Multi-element page entrance orchestration |
 | `useSmartMotion` | hook | Adaptive motion based on device performance |
@@ -88,8 +92,48 @@ function ListItem() {
 | `useWindowSize` | hook | Responsive window size tracking |
 | `useGesture` | hook | Multi-gesture handler (drag, swipe, pinch) |
 | `useGestureMotion` | hook | Gesture-driven motion animation |
+| `useButtonEffect` | hook | Ripple / press feedback effect for buttons |
+| `useVisibilityToggle` | hook | Animate an element in/out based on a boolean visibility flag |
+| `useScrollToggle` | hook | Toggle animation state based on scroll position threshold |
+| `useCardList` | hook | Staggered entrance animation for a list of cards |
+| `useLoadingSpinner` | hook | Continuous rotation animation for loading spinners |
+| `useNavigation` | hook | Slide/fade animation for navigation transitions |
+| `useSkeleton` | hook | Shimmer animation for skeleton loading placeholders |
+| `useTypewriter` | hook | Typewriter character-by-character text reveal animation |
+| `useCustomCursor` | hook | Custom cursor tracking and animation |
+| `useMagneticCursor` | hook | Magnetic cursor attraction effect for interactive elements |
+| `useSmoothScroll` | hook | Smooth programmatic scroll with easing |
+| `useElementProgress` | hook | Track an element's scroll progress as a 0–1 value |
+| `neutral` | variable | Built-in neutral motion profile (minimal, system-respecting) |
+| `hua` | variable | Built-in hua motion profile (expressive, brand-aligned) |
+| `resolveProfile` | function | Resolve a built-in profile name or MotionProfile object to a MotionProfile |
+| `mergeProfileOverrides` | function | Deep-merge overrides into a base MotionProfile |
+| `MotionProfileProvider` | component | React context provider that supplies a MotionProfile to the subtree |
+| `useMotionProfile` | hook | Hook to read the current MotionProfile from context |
+| `observeElement` | function | Shared IntersectionObserver helper — observe an element and invoke a callback on visibility change |
+| `linear` | function | Linear easing (no acceleration) |
+| `easeIn` | function | Ease-in curve (slow start) |
+| `easeOut` | function | Ease-out curve (slow end) |
 | `easeInOut` | function | Smooth ease-in-out curve |
 | `getEasing` | function | Get easing function by name |
+| `applyEasing` | function | Apply an easing function to a raw progress value (throws on invalid) |
+| `safeApplyEasing` | function | Apply an easing function to a progress value, falling back to linear on error |
+| `isValidEasing` | function | Check whether a string is a recognised EasingType name |
+| `getAvailableEasings` | function | Return the list of all registered easing names |
+| `isEasingFunction` | function | Type-guard that checks whether a value is a callable EasingFunction |
+| `easingPresets` | variable | Map of named easing preset strings to EasingFunction objects |
+| `getPresetEasing` | function | Look up an EasingFunction by preset name |
+| `calculateSpring` | function | Pure function that computes spring position/velocity for a given time step |
+| `Motion` | component | React wrapper component that applies a motion hook to its child element via ref |
+| `useCountUp` | hook | Animated counter that counts up to a target number |
+| `useClipReveal` | hook | Clip-path reveal animation (wipe-in effect) |
+| `useBlurIn` | hook | Blur-to-clear entrance animation |
+| `useStagger` | hook | Orchestrate staggered entrance animations across a list of elements |
+| `MOTION_PRESETS` | variable | Built-in preset configurations keyed by element role (hero, title, button, card, text, image) |
+| `PAGE_MOTIONS` | variable | Page-level motion configs keyed by page type (home, dashboard, product, blog) |
+| `mergeWithPreset` | function | Merge a MotionPreset with custom overrides |
+| `getPagePreset` | function | Get PageMotionsConfig for a given PageType |
+| `getMotionPreset` | function | Get a MotionPreset by element role string |
 | `useFadeIn (native)` | hook | Native fade-in using Animated.timing |
 | `useSlideUp (native)` | hook | Native slide-up using Animated.parallel |
 | `useSlideDown (native)` | hook | Native slide-down using Animated.parallel |

@@ -80,4 +80,60 @@ describe('Arbitrary values ([...])', () => {
       });
     });
   });
+
+  describe('security — whitelisted functions allowed', () => {
+    it('rgb()', () => {
+      expect(dot('text-[rgb(0,0,0)]')).toEqual({ color: 'rgb(0,0,0)' });
+    });
+    it('rgba()', () => {
+      expect(dot('bg-[rgba(255,0,0,0.5)]')).toEqual({ backgroundColor: 'rgba(255,0,0,0.5)' });
+    });
+    it('hsl()', () => {
+      expect(dot('bg-[hsl(200,100%,50%)]')).toEqual({ backgroundColor: 'hsl(200,100%,50%)' });
+    });
+    it('var()', () => {
+      expect(dot('bg-[var(--color-card)]')).toEqual({ backgroundColor: 'var(--color-card)' });
+    });
+    it('calc()', () => {
+      expect(dot('w-[calc(100%-32px)]')).toEqual({ width: 'calc(100%-32px)' });
+    });
+    it('cubic-bezier()', () => {
+      expect(dot('ease-[cubic-bezier(0.4,0,0.2,1)]')).toEqual({
+        transitionTimingFunction: 'cubic-bezier(0.4,0,0.2,1)',
+      });
+    });
+  });
+
+  describe('security — injection vectors blocked', () => {
+    it('url() blocked', () => {
+      expect(dot('bg-[url(https://evil.com)]')).toEqual({});
+    });
+    it('expression() blocked', () => {
+      expect(dot('w-[expression(alert(1))]')).toEqual({});
+    });
+    it('javascript: blocked', () => {
+      expect(dot('bg-[javascript:alert(1)]')).toEqual({});
+    });
+    it('</style> HTML breakout blocked', () => {
+      expect(dot('p-[</style><script>alert(1)</script>]')).toEqual({});
+    });
+    it('@import blocked', () => {
+      expect(dot('bg-[@import]')).toEqual({});
+    });
+    it('semicolon injection blocked', () => {
+      expect(dot('p-[16px;background:red]')).toEqual({});
+    });
+    it('backslash escape blocked', () => {
+      expect(dot('p-[\\65xpression(1)]')).toEqual({});
+    });
+    it('curly braces blocked', () => {
+      expect(dot('p-[16px}*{color:red]')).toEqual({});
+    });
+    it('quotes blocked', () => {
+      expect(dot("bg-[url('evil')]")).toEqual({});
+    });
+    it('unknown function blocked', () => {
+      expect(dot('bg-[image-set(evil)]')).toEqual({});
+    });
+  });
 });

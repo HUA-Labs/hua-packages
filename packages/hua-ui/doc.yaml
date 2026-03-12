@@ -143,6 +143,31 @@ apiNotes:
     description: "Theme context hook — { theme, setTheme }"
     kind: "hook"
 
+  # Layout (additional)
+  Section:
+    description: "Page section wrapper with optional header config (title, description, action)"
+    kind: "component"
+  ActionToolbar:
+    description: "Horizontal toolbar that renders a list of icon action buttons"
+    kind: "component"
+  ComponentLayout:
+    description: "Dev/docs layout that renders a component with labelled preview and code slots"
+    kind: "component"
+  Prose:
+    description: "Typography wrapper that applies readable prose styles to raw HTML/markdown content"
+    kind: "component"
+
+  # Primitives (cross-platform)
+  Box:
+    description: "Base block primitive (renders as <div> on web, View on native via .native.tsx)"
+    kind: "component"
+  Text:
+    description: "Base text primitive (renders as <span> on web, Text on native via .native.tsx)"
+    kind: "component"
+  Pressable:
+    description: "Interactive primitive with hover/focus dot styles (renders as <button> on web)"
+    kind: "component"
+
   # Utilities
   cn:
     description: "Class name merging utility (clsx + tailwind-merge). Legacy — prefer dot prop for new code"
@@ -156,3 +181,148 @@ apiNotes:
   ScrollToTop:
     description: "Scroll-to-top floating button"
     kind: "component"
+
+  # Style utilities
+  merge:
+    description: "Merge multiple class strings, filtering falsy values"
+    kind: "function"
+  mergeIf:
+    description: "Conditionally append a class string based on a boolean flag"
+    kind: "function"
+  mergeMap:
+    description: "Map over an object of conditional classes and merge the truthy ones"
+    kind: "function"
+  formatRelativeTime:
+    description: "Format a Date as a human-readable relative time string (e.g. '3 minutes ago')"
+    kind: "function"
+  composeRefs:
+    description: "Compose multiple React refs into a single callback ref"
+    kind: "function"
+  mergeProps:
+    description: "Merge two sets of React props, combining event handlers and class names"
+    kind: "function"
+  createColorStyles:
+    description: "Generate Tailwind color class strings from a ColorStyleConfig"
+    kind: "function"
+  useColorStyles:
+    description: "Hook that returns memoised color class strings from a ColorStyleConfig"
+    kind: "hook"
+
+  # Variant / style factory utilities
+  createVariantStyles:
+    description: "Build a variant→class-string map for a component (e.g. solid, outline, ghost)"
+    kind: "function"
+  createSizeStyles:
+    description: "Build a size→class-string map (xs, sm, md, lg, xl)"
+    kind: "function"
+  createRoundedStyles:
+    description: "Build a rounded→class-string map (none, sm, md, lg, full)"
+    kind: "function"
+  createShadowStyles:
+    description: "Build a shadow level→class-string map"
+    kind: "function"
+  createHoverStyles:
+    description: "Build hover effect→class-string map (scale, brightness, opacity, etc.)"
+    kind: "function"
+
+  # Motion config context
+  MotionConfigProvider:
+    description: "Context provider for per-component motion configuration overrides"
+    kind: "component"
+  useMotionConfig:
+    description: "Read the current MotionConfigContext value"
+    kind: "hook"
+  useComponentMotion:
+    description: "Resolve the merged motion config for a specific component name"
+    kind: "hook"
+  HUA_SPRING_EASING:
+    description: "CSS cubic-bezier string for the HUA brand spring easing"
+    kind: "variable"
+  withDarkMode:
+    description: "Wrap a class string with a dark: variant equivalent"
+    kind: "function"
+
+  # Color utilities
+  createGradient:
+    description: "Generate a Tailwind gradient class string from from/via/to color stops"
+    kind: "function"
+  withOpacity:
+    description: "Append a Tailwind opacity modifier to a color class (e.g. bg-primary/50)"
+    kind: "function"
+  isTextWhite:
+    description: "Return true if a given color variant requires white text for contrast"
+    kind: "function"
+  isGradientVariant:
+    description: "Type-guard that checks whether a color value is a gradient variant string"
+    kind: "function"
+
+  # Responsive / conditional class utilities
+  responsive:
+    description: "Apply breakpoint prefixes to a class string (sm:, md:, lg:, etc.)"
+    kind: "function"
+  conditionalClass:
+    description: "Return a class string only when a condition is true, otherwise empty string"
+    kind: "function"
+
+  # Micro motion system
+  useMicroMotion:
+    description: "Hook that returns CSS class strings for micro-interaction motion states"
+    kind: "hook"
+  getMicroMotionClasses:
+    description: "Pure function that resolves micro-motion class strings from a config without a hook"
+    kind: "function"
+  EASING_FUNCTIONS:
+    description: "Map of named CSS cubic-bezier easing strings used by micro motion"
+    kind: "variable"
+  DURATIONS:
+    description: "Map of semantic duration tokens (fast, normal, slow, etc.) in milliseconds"
+    kind: "variable"
+  COMPONENT_MOTION_DEFAULTS:
+    description: "Default micro-motion configs keyed by component name"
+    kind: "variable"
+
+  # Icon utilities
+  iconNames:
+    description: "Complete list of all icon name strings available in the project"
+    kind: "variable"
+  iconProviderMapping:
+    description: "Map from icon name to its provider (lucide, phosphor, custom, etc.)"
+    kind: "variable"
+  isValidIconName:
+    description: "Type-guard that checks whether a string is a valid icon name"
+    kind: "function"
+  getIconNameForProvider:
+    description: "Resolve the provider-specific icon identifier for a given icon name"
+    kind: "function"
+  ICON_ALIASES:
+    description: "Map of alias strings to canonical icon names"
+    kind: "variable"
+  resolveIconAlias:
+    description: "Resolve an alias to its canonical icon name, returning the input unchanged if not an alias"
+    kind: "function"
+  getIconAliases:
+    description: "Return the list of all registered icon alias strings"
+    kind: "function"
+  registerLucideResolver:
+    description: "Register the Lucide icon resolver so the Icon component can render Lucide icons"
+    kind: "function"
+
+  # Advanced hooks
+  useAnimatedEntrance:
+    description: "Trigger a CSS class-based entrance animation when an element enters the viewport"
+    kind: "hook"
+  useBreakpoint:
+    description: "Track the current responsive breakpoint (sm / md / lg / xl / 2xl)"
+    kind: "hook"
+  useDotEnv:
+    description: "Read dot-engine style tokens from a CSS custom-property environment"
+    kind: "hook"
+  useDotMap:
+    description: "Resolve a DotStyleMap (state→dot-string) to live style objects based on current state"
+    kind: "hook"
+  mergeStyles:
+    description: "Merge two CSSProperties / style objects, with the second taking precedence"
+    kind: "function"
+  resolveDot:
+    description: "Resolve a dot-style string to a CSSProperties object at runtime"
+    kind: "function"

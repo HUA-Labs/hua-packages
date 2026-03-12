@@ -29,13 +29,110 @@ related:
   - "hooks"
 
 apiNotes:
+  # Core
   cn:
     description: "Tailwind-safe class name merging (clsx + tailwind-merge)"
+    kind: "function"
+
+  # Formatters
+  formatDate:
+    description: "Format a Date or date string using Intl.DateTimeFormat with ko-KR locale. Accepts optional Intl.DateTimeFormatOptions."
+    kind: "function"
+  formatNumber:
+    description: "Format a number using Intl.NumberFormat with ko-KR locale. Accepts optional Intl.NumberFormatOptions."
+    kind: "function"
+  formatFileSize:
+    description: "Convert a byte count into a human-readable string (e.g. '1.5 MB')."
+    kind: "function"
+  formatTimeAgo:
+    description: "Return a Korean relative time string for a past date (e.g. '3분 전', '2일 전')."
+    kind: "function"
+
+  # Performance
   debounce:
     description: "Debounce function calls with configurable delay"
+    kind: "function"
   throttle:
-    description: "Throttle function calls"
+    description: "Throttle function calls to execute at most once per interval."
+    kind: "function"
+  memoize:
+    description: "Cache function results by argument key. Accepts optional resolver to compute the cache key."
+    kind: "function"
+  delay:
+    description: "Return a Promise that resolves after the given number of milliseconds."
+    kind: "function"
+  retry:
+    description: "Retry an async function up to maxAttempts times with exponential back-off between attempts."
+    kind: "function"
+
+  # Validation
   validateEmail:
     description: "Email format validation"
+    kind: "function"
+  validatePassword:
+    description: "Validate a password against configurable rules (minLength, uppercase, lowercase, numbers, special chars). Returns { isValid, errors }."
+    kind: "function"
+  validateUrl:
+    description: "Return true if the string is a valid absolute URL (uses URL constructor)."
+    kind: "function"
+  validatePhoneNumber:
+    description: "Validate a Korean mobile phone number (01x-xxxx-xxxx format)."
+    kind: "function"
+  validateNumberRange:
+    description: "Return true if a number is within the inclusive [min, max] range."
+    kind: "function"
+  validateStringLength:
+    description: "Return true if a string length is within the inclusive [min, max] range."
+    kind: "function"
+
+  # String utilities
+  generateId:
+    description: "Generate a unique ID string with optional prefix (default: 'id'). Uses Date.now + random suffix."
+    kind: "function"
+  generateUUID:
+    description: "Generate a random UUID v4 string."
+    kind: "function"
+  slugify:
+    description: "Convert a string into a URL-friendly slug (lowercase, hyphens, no special chars)."
+    kind: "function"
+  truncate:
+    description: "Truncate a string to the given length and append a suffix (default: '...'). Handles multi-byte characters."
+    kind: "function"
+  toCamelCase:
+    description: "Convert a string to camelCase."
+    kind: "function"
+  toPascalCase:
+    description: "Convert a string to PascalCase."
+    kind: "function"
+  toSnakeCase:
+    description: "Convert a string to snake_case."
+    kind: "function"
+  toKebabCase:
+    description: "Convert a string to kebab-case."
+    kind: "function"
+  capitalize:
+    description: "Capitalize the first character and lowercase the rest of a string."
+    kind: "function"
+  titleCase:
+    description: "Capitalize the first character of every word in a string."
+    kind: "function"
+
+  # Sanitization
   sanitizeInput:
     description: "XSS prevention input sanitizer"
+    kind: "function"
+  sanitizeTitle:
+    description: "Sanitize a title string — removes HTML tags and dangerous patterns, enforces optional maxLength (default: 100)."
+    kind: "function"
+  sanitizeEmail:
+    description: "Sanitize an email address — trims whitespace and lowercases."
+    kind: "function"
+  sanitizeName:
+    description: "Sanitize a name string — removes HTML tags and XSS patterns."
+    kind: "function"
+  escapeHtml:
+    description: "Escape HTML special characters (&, <, >, \", '). Intended for email body rendering, not general React output."
+    kind: "function"
+  maskEmailForLog:
+    description: "Mask an email address for safe logging (GDPR/CCPA). Shows only the first N local-part characters (default: 3), e.g. 'use***@***'."
+    kind: "function"
