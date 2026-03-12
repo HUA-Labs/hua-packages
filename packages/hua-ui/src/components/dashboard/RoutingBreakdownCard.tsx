@@ -43,7 +43,10 @@ export interface RoutingBreakdownSegment {
  * @property {(segment: RoutingBreakdownSegment, percentage: number) => React.ReactNode} [formatter] - 커스텀 포맷터 / Custom formatter
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface RoutingBreakdownCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface RoutingBreakdownCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title?: string;
   description?: string;
   segments: RoutingBreakdownSegment[];
@@ -52,11 +55,21 @@ export interface RoutingBreakdownCardProps extends Omit<React.HTMLAttributes<HTM
   highlightId?: string;
   actions?: React.ReactNode;
   emptyState?: React.ReactNode;
-  formatter?: (segment: RoutingBreakdownSegment, percentage: number) => React.ReactNode;
+  formatter?: (
+    segment: RoutingBreakdownSegment,
+    percentage: number,
+  ) => React.ReactNode;
   dot?: string;
 }
 
-const DEFAULT_COLORS = ["#0ea5e9", "#6366f1", "#22c55e", "#f97316", "#a855f7", "#ef4444"];
+const DEFAULT_COLORS = [
+  "#0ea5e9",
+  "#6366f1",
+  "#22c55e",
+  "#f97316",
+  "#a855f7",
+  "#ef4444",
+];
 
 const STATUS_BADGE_STYLES: Record<RoutingStatus, React.CSSProperties> = {
   normal: { backgroundColor: "#ecfdf5", color: "#047857" },
@@ -140,20 +153,38 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
           padding: "1.25rem",
         },
         resolveDot(dot),
-        style
+        style,
       )}
       {...props}
     >
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+        }}
+      >
         <div>
-          <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{title}</p>
+          <p
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "var(--color-foreground, #0f172a)",
+            }}
+          >
+            {title}
+          </p>
           <p style={{ fontSize: "0.75rem", color: "#64748b" }}>{description}</p>
         </div>
-        {actions && <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{actions}</div>}
+        {actions && (
+          <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{actions}</div>
+        )}
       </div>
 
       {!hasSegments ? (
-        emptyState ?? (
+        (emptyState ?? (
           <DashboardEmptyState
             icon="pie-chart"
             title="라우팅 데이터가 없습니다"
@@ -161,14 +192,24 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
             size="sm"
             style={{ marginTop: "1rem" }}
           />
-        )
+        ))
       ) : (
         <>
           <div style={{ marginTop: "1rem" }}>
-            <div style={{ display: "flex", height: "0.75rem", overflow: "hidden", borderRadius: "9999px", backgroundColor: "var(--color-muted, #f1f5f9)" }}>
+            <div
+              style={{
+                display: "flex",
+                height: "0.75rem",
+                overflow: "hidden",
+                borderRadius: "9999px",
+                backgroundColor: "var(--color-muted, #f1f5f9)",
+              }}
+            >
               {segments.map((segment, index) => {
                 const width = total === 0 ? 0 : (segment.value / total) * 100;
-                const color = segment.color ?? DEFAULT_COLORS[index % DEFAULT_COLORS.length];
+                const color =
+                  segment.color ??
+                  DEFAULT_COLORS[index % DEFAULT_COLORS.length];
                 return (
                   <div
                     key={segment.id}
@@ -177,24 +218,44 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                       transition: "all 150ms",
                       width: `${width}%`,
                       backgroundColor: color,
-                      opacity: highlightId && highlightId !== segment.id ? 0.4 : 1,
+                      opacity:
+                        highlightId && highlightId !== segment.id ? 0.4 : 1,
                     }}
                     aria-label={`${segment.label} ${formatPercentage(segment.value, total)}`}
                   />
                 );
               })}
             </div>
-            <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#64748b" }}>
+            <div
+              style={{
+                marginTop: "0.5rem",
+                fontSize: "0.75rem",
+                color: "#64748b",
+              }}
+            >
               {totalLabel}: {totalValue ?? total.toLocaleString()}
             </div>
           </div>
 
-          <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.75rem",
+            }}
+          >
             {segments.map((segment, index) => {
-              const color = segment.color ?? DEFAULT_COLORS[index % DEFAULT_COLORS.length];
-              const percentage = total === 0 ? 0 : (segment.value / total) * 100;
-              const badgeStyle = segment.status ? STATUS_BADGE_STYLES[segment.status] : null;
-              const statusLabel = segment.status ? STATUS_LABELS[segment.status] : null;
+              const color =
+                segment.color ?? DEFAULT_COLORS[index % DEFAULT_COLORS.length];
+              const percentage =
+                total === 0 ? 0 : (segment.value / total) * 100;
+              const badgeStyle = segment.status
+                ? STATUS_BADGE_STYLES[segment.status]
+                : null;
+              const statusLabel = segment.status
+                ? STATUS_LABELS[segment.status]
+                : null;
               const customContent = formatter?.(segment, percentage);
               const isHighlighted = highlightId === segment.id;
 
@@ -207,27 +268,71 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                     alignItems: "center",
                     gap: "0.75rem",
                     borderRadius: "0.75rem",
-                    border: isHighlighted ? "2px solid var(--color-border, #e2e8f0)" : "1px solid var(--color-border, #f1f5f9)",
+                    border: isHighlighted
+                      ? "2px solid var(--color-border, #e2e8f0)"
+                      : "1px solid var(--color-border, #f1f5f9)",
                     padding: "0.75rem",
                     transition: "border-color 150ms",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "3rem" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      minWidth: "3rem",
+                    }}
+                  >
                     {segment.icon && (
-                      <span style={{ borderRadius: "0.5rem", backgroundColor: "var(--color-muted, #f1f5f9)", padding: "0.375rem", color: "#64748b" }}>
-                        <Icon name={segment.icon as IconName} className="h-4 w-4" />
+                      <span
+                        style={{
+                          borderRadius: "0.5rem",
+                          backgroundColor: "var(--color-muted, #f1f5f9)",
+                          padding: "0.375rem",
+                          color: "#64748b",
+                        }}
+                      >
+                        <Icon name={segment.icon as IconName} dot="w-4 h-4" />
                       </span>
                     )}
                     <div
-                      style={{ height: "0.5rem", width: "3rem", borderRadius: "9999px", backgroundColor: color }}
+                      style={{
+                        height: "0.5rem",
+                        width: "3rem",
+                        borderRadius: "9999px",
+                        backgroundColor: color,
+                      }}
                       aria-hidden="true"
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
-                      <span style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>{segment.label}</span>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: 500,
+                          color: "var(--color-foreground, #0f172a)",
+                        }}
+                      >
+                        {segment.label}
+                      </span>
                       {badgeStyle && statusLabel && (
-                        <span style={{ borderRadius: "9999px", padding: "0.125rem 0.5rem", fontSize: "0.6875rem", fontWeight: 500, ...badgeStyle }}>
+                        <span
+                          style={{
+                            borderRadius: "9999px",
+                            padding: "0.125rem 0.5rem",
+                            fontSize: "0.6875rem",
+                            fontWeight: 500,
+                            ...badgeStyle,
+                          }}
+                        >
                           {statusLabel}
                         </span>
                       )}
@@ -237,9 +342,19 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                     </div>
                   </div>
                   {customContent ?? (
-                    <div style={{ textAlign: "right", fontSize: "0.875rem", color: "var(--color-foreground, #334155)" }}>
-                      <div style={{ fontWeight: 600 }}>{segment.value.toLocaleString()}</div>
-                      <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{formatPercentage(segment.value, total)}</div>
+                    <div
+                      style={{
+                        textAlign: "right",
+                        fontSize: "0.875rem",
+                        color: "var(--color-foreground, #334155)",
+                      }}
+                    >
+                      <div style={{ fontWeight: 600 }}>
+                        {segment.value.toLocaleString()}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                        {formatPercentage(segment.value, total)}
+                      </div>
                     </div>
                   )}
                 </div>

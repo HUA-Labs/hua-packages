@@ -2,6 +2,7 @@
 
 import React from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Section } from "../components/Section";
 import { Container } from "../components/Container";
 import { useLandingTheme } from "./LandingProvider";
@@ -34,7 +35,7 @@ export function LandingShowcase({
   subtitle,
   motion: motionOverride,
   staggerDelay: staggerProp,
-  className,
+  dot: dotProp,
   ...rest
 }: LandingShowcaseProps) {
   const theme = useLandingTheme();
@@ -42,6 +43,13 @@ export function LandingShowcase({
     ? { ...theme.showcase.motion, ...motionOverride }
     : theme.showcase.motion;
   const staggerDelay = staggerProp ?? theme.showcase.staggerDelay;
+
+  const containerCls = dotCSS("space-y-16 sm:space-y-24");
+  const itemEvenCls = dotCSS("flex flex-col md:flex-row gap-8 items-center");
+  const itemOddCls = dotCSS(
+    "flex flex-col md:flex-row-reverse gap-8 items-center",
+  );
+  const titleCls = dotCSS("text-2xl sm:text-3xl font-bold");
 
   const stagger = useStagger?.({
     count: items.length,
@@ -55,19 +63,17 @@ export function LandingShowcase({
     title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
   return (
-    <Section header={header} dot={className} {...rest}>
-      <div ref={stagger?.containerRef} style={dot("space-y-16 sm:space-y-24")}>
+    <Section header={header} dot={dotProp} {...rest}>
+      <div ref={stagger?.containerRef} className={containerCls.className}>
         {items.map((item, i) => {
           const isEven = i % 2 === 0;
           return (
             <Container key={i} size="lg" padding="none" dot="px-4">
               <div
-                style={{
-                  ...dot(
-                    `flex flex-col gap-8 items-center ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`,
-                  ),
-                  ...stagger?.styles[i],
-                }}
+                className={
+                  isEven ? itemEvenCls.className : itemOddCls.className
+                }
+                style={stagger?.styles[i]}
               >
                 {/* Image */}
                 <div style={dot("flex-1 w-full")}>
@@ -81,15 +87,21 @@ export function LandingShowcase({
                       alt={item.title}
                       style={dot("w-full h-auto object-cover")}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.2), transparent)",
+                        pointerEvents: "none",
+                      }}
+                    />
                   </div>
                 </div>
 
                 {/* Text */}
                 <div style={dot("flex-1 w-full space-y-4")}>
-                  <h3 style={dot("text-2xl sm:text-3xl font-bold")}>
-                    {item.title}
-                  </h3>
+                  <h3 className={titleCls.className}>{item.title}</h3>
                   <p style={dot("text-muted-foreground leading-relaxed")}>
                     {item.description}
                   </p>
@@ -99,6 +111,11 @@ export function LandingShowcase({
           );
         })}
       </div>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `${containerCls.css}${itemEvenCls.css}${itemOddCls.css}${titleCls.css}`,
+        }}
+      />
     </Section>
   );
 }

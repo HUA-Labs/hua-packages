@@ -8,13 +8,34 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 import { DashboardEmptyState } from "./EmptyState";
 import type { TransactionStatus } from "./TransactionsTable";
 
-const STATUS_STYLES: Record<TransactionStatus, { label: string; badgeStyle: React.CSSProperties }> = {
-  approved: { label: "승인", badgeStyle: { backgroundColor: "#d1fae5", color: "#065f46" } },
-  pending: { label: "대기", badgeStyle: { backgroundColor: "#fef3c7", color: "#92400e" } },
-  failed: { label: "실패", badgeStyle: { backgroundColor: "#ffe4e6", color: "#9f1239" } },
-  refunded: { label: "환불", badgeStyle: { backgroundColor: "#e0f2fe", color: "#075985" } },
-  cancelled: { label: "취소", badgeStyle: { backgroundColor: "#f1f5f9", color: "#334155" } },
-  review: { label: "검토중", badgeStyle: { backgroundColor: "#ede9fe", color: "#5b21b6" } },
+const STATUS_STYLES: Record<
+  TransactionStatus,
+  { label: string; badgeStyle: React.CSSProperties }
+> = {
+  approved: {
+    label: "승인",
+    badgeStyle: { backgroundColor: "#d1fae5", color: "#065f46" },
+  },
+  pending: {
+    label: "대기",
+    badgeStyle: { backgroundColor: "#fef3c7", color: "#92400e" },
+  },
+  failed: {
+    label: "실패",
+    badgeStyle: { backgroundColor: "#ffe4e6", color: "#9f1239" },
+  },
+  refunded: {
+    label: "환불",
+    badgeStyle: { backgroundColor: "#e0f2fe", color: "#075985" },
+  },
+  cancelled: {
+    label: "취소",
+    badgeStyle: { backgroundColor: "#f1f5f9", color: "#334155" },
+  },
+  review: {
+    label: "검토중",
+    badgeStyle: { backgroundColor: "#ede9fe", color: "#5b21b6" },
+  },
 };
 
 /**
@@ -57,7 +78,11 @@ export interface TransactionMetadataItem {
   icon?: IconName;
 }
 
-export type SettlementStatus = "pending" | "processing" | "completed" | "failed";
+export type SettlementStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
 
 /**
  * 정산 정보 인터페이스 / SettlementInfo interface
@@ -134,7 +159,7 @@ export interface TransactionEvent {
  * @property {string} [locale="ko-KR"] - 로케일 / Locale
  * @property {string} [defaultCurrency="KRW"] - 기본 통화 / Default currency
  * @property {React.ReactNode} [emptyState] - 빈 상태 컴포넌트 / Empty state component
- * @property {string} [className] - 추가 클래스명 / Additional class name
+ * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
 export interface TransactionDetailDrawerProps {
   open: boolean;
@@ -150,7 +175,6 @@ export interface TransactionDetailDrawerProps {
   locale?: string;
   defaultCurrency?: string;
   emptyState?: React.ReactNode;
-  className?: string;
   dot?: string;
 }
 
@@ -171,10 +195,15 @@ const formatDate = (date?: string | Date, locale = "ko-KR") => {
   if (!date) return "-";
   const parsed = date instanceof Date ? date : new Date(date);
   if (Number.isNaN(parsed.getTime())) return "-";
-  return parsed.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  return parsed.toLocaleString(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 };
 
-const getEventStyle = (status?: TransactionEvent["status"]): React.CSSProperties => {
+const getEventStyle = (
+  status?: TransactionEvent["status"],
+): React.CSSProperties => {
   switch (status) {
     case "success":
       return { backgroundColor: "#ecfdf5", color: "#047857" };
@@ -187,7 +216,9 @@ const getEventStyle = (status?: TransactionEvent["status"]): React.CSSProperties
   }
 };
 
-const getSettlementBadgeStyle = (status?: SettlementStatus): React.CSSProperties => {
+const getSettlementBadgeStyle = (
+  status?: SettlementStatus,
+): React.CSSProperties => {
   switch (status) {
     case "completed":
       return { backgroundColor: "#ecfdf5", color: "#047857" };
@@ -204,13 +235,13 @@ const getSettlementBadgeStyle = (status?: SettlementStatus): React.CSSProperties
 
 /**
  * TransactionDetailDrawer 컴포넌트
- * 
+ *
  * 거래 상세 정보를 표시하는 드로어 컴포넌트입니다.
  * 거래 정보, 정산 정보, 수수료 내역, 이벤트 로그 등을 포함합니다.
- * 
+ *
  * Drawer component that displays detailed transaction information.
  * Includes transaction details, settlement info, fee breakdown, and event logs.
- * 
+ *
  * @component
  * @example
  * // 기본 사용 / Basic usage
@@ -229,7 +260,7 @@ const getSettlementBadgeStyle = (status?: SettlementStatus): React.CSSProperties
  *     { label: "고객", value: "홍길동", icon: "user" }
  *   ]}
  * />
- * 
+ *
  * @example
  * // 정산 정보 포함 / With settlement info
  * <TransactionDetailDrawer
@@ -247,11 +278,13 @@ const getSettlementBadgeStyle = (status?: SettlementStatus): React.CSSProperties
  *   ]}
  *   events={eventLogs}
  * />
- * 
+ *
  * @param {TransactionDetailDrawerProps} props - TransactionDetailDrawer 컴포넌트의 props / TransactionDetailDrawer component props
  * @returns {JSX.Element} TransactionDetailDrawer 컴포넌트 / TransactionDetailDrawer component
  */
-export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = ({
+export const TransactionDetailDrawer: React.FC<
+  TransactionDetailDrawerProps
+> = ({
   open,
   onClose,
   transaction,
@@ -265,7 +298,6 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   locale = "ko-KR",
   defaultCurrency = "KRW",
   emptyState,
-  className,
   dot: dotProp,
 }) => {
   const statusStyle = transaction && STATUS_STYLES[transaction.status];
@@ -278,62 +310,166 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
   };
 
   return (
-    <Drawer
-      isOpen={open}
-      onClose={onClose}
-      dot={dotProp}
-    >
+    <Drawer isOpen={open} onClose={onClose} dot={dotProp}>
       <DrawerHeader onClose={onClose}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              fontSize: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "#94a3b8",
+            }}
+          >
             <span>거래 상세</span>
             {transaction?.reference && (
-              <span style={{ borderRadius: "9999px", backgroundColor: "#f1f5f9", padding: "0.125rem 0.5rem", color: "#64748b" }}>{transaction.reference}</span>
+              <span
+                style={{
+                  borderRadius: "9999px",
+                  backgroundColor: "#f1f5f9",
+                  padding: "0.125rem 0.5rem",
+                  color: "#64748b",
+                }}
+              >
+                {transaction.reference}
+              </span>
             )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>{transaction?.id ?? "—"}</p>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+          >
+            <p
+              style={{
+                fontSize: "1.125rem",
+                fontWeight: 600,
+                color: "var(--color-foreground, #0f172a)",
+              }}
+            >
+              {transaction?.id ?? "—"}
+            </p>
             {statusStyle && (
-              <span style={{ display: "inline-flex", alignItems: "center", fontWeight: 500, padding: "0.25rem 0.75rem", borderRadius: "9999px", fontSize: "0.75rem", ...statusStyle.badgeStyle }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  fontWeight: 500,
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  fontSize: "0.75rem",
+                  ...statusStyle.badgeStyle,
+                }}
+              >
                 {statusStyle.label}
               </span>
             )}
           </div>
           <p style={{ fontSize: "0.875rem", color: "#64748b" }}>
-            {transaction?.merchant ?? "가맹점 정보 없음"} · {transaction?.method ?? "결제수단 미지정"}
+            {transaction?.merchant ?? "가맹점 정보 없음"} ·{" "}
+            {transaction?.method ?? "결제수단 미지정"}
           </p>
         </div>
       </DrawerHeader>
 
-      <DrawerContent style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      <DrawerContent
+        style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+      >
         {loading ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
             {[...Array(3)].map((_, idx) => (
-              <div key={idx} style={{ height: "5rem", borderRadius: "1rem", border: "1px solid var(--color-border, #f1f5f9)", animation: "pulse 2s infinite", backgroundColor: "var(--color-muted, rgba(248,250,252,0.6))" }} />
+              <div
+                key={idx}
+                style={{
+                  height: "5rem",
+                  borderRadius: "1rem",
+                  border: "1px solid var(--color-border, #f1f5f9)",
+                  animation: "pulse 2s infinite",
+                  backgroundColor: "var(--color-muted, rgba(248,250,252,0.6))",
+                }}
+              />
             ))}
           </div>
         ) : (
           <>
             <section
-              style={{ ...sectionStyle, display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}
+              style={{
+                ...sectionStyle,
+                display: "grid",
+                gap: "1rem",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              }}
               aria-label="거래 요약 정보"
             >
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                <p style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>거래 금액</p>
-                <p style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>
-                  {formatAmount(transaction?.amount, transaction?.currency ?? defaultCurrency, locale)}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.25rem",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    color: "#94a3b8",
+                  }}
+                >
+                  거래 금액
+                </p>
+                <p
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 600,
+                    color: "var(--color-foreground, #0f172a)",
+                  }}
+                >
+                  {formatAmount(
+                    transaction?.amount,
+                    transaction?.currency ?? defaultCurrency,
+                    locale,
+                  )}
                 </p>
                 <p style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
-                  생성 <time dateTime={transaction?.createdAt instanceof Date ? transaction.createdAt.toISOString() : typeof transaction?.createdAt === 'string' ? transaction.createdAt : undefined}>
+                  생성{" "}
+                  <time
+                    dateTime={
+                      transaction?.createdAt instanceof Date
+                        ? transaction.createdAt.toISOString()
+                        : typeof transaction?.createdAt === "string"
+                          ? transaction.createdAt
+                          : undefined
+                    }
+                  >
                     {formatDate(transaction?.createdAt, locale)}
                   </time>
                 </p>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                <p style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>요약</p>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    color: "#94a3b8",
+                  }}
+                >
+                  요약
+                </p>
                 {summary ?? (
                   <p style={{ fontSize: "0.875rem", color: "#475569" }}>
-                    {transaction?.customer ?? "고객 정보 없음"} / {transaction?.method ?? "결제수단 미지정"}
+                    {transaction?.customer ?? "고객 정보 없음"} /{" "}
+                    {transaction?.method ?? "결제수단 미지정"}
                   </p>
                 )}
               </div>
@@ -345,18 +481,58 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                 aria-label="거래 세부 정보"
                 role="region"
               >
-                <h3 style={{ marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>세부 정보</h3>
-                <dl style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+                <h3
+                  style={{
+                    marginBottom: "0.75rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    color: "var(--color-foreground, #0f172a)",
+                  }}
+                >
+                  세부 정보
+                </h3>
+                <dl
+                  style={{
+                    display: "grid",
+                    gap: "1rem",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                  }}
+                >
                   {metadata.map((item) => (
-                    <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                    <div
+                      key={item.label}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                      }}
+                    >
                       {item.icon && (
-                        <span style={{ borderRadius: "0.5rem", backgroundColor: "var(--color-muted, #f1f5f9)", padding: "0.5rem", color: "#64748b" }} aria-hidden="true">
-                          <Icon name={item.icon} className="h-4 w-4" />
+                        <span
+                          style={{
+                            borderRadius: "0.5rem",
+                            backgroundColor: "var(--color-muted, #f1f5f9)",
+                            padding: "0.5rem",
+                            color: "#64748b",
+                          }}
+                          aria-hidden="true"
+                        >
+                          <Icon name={item.icon} dot="w-4 h-4" />
                         </span>
                       )}
                       <div>
-                        <dt style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>{item.label}</dt>
-                        <dd style={{ fontSize: "0.875rem", color: "#334155" }}>{item.value}</dd>
+                        <dt
+                          style={{
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase",
+                            color: "#94a3b8",
+                          }}
+                        >
+                          {item.label}
+                        </dt>
+                        <dd style={{ fontSize: "0.875rem", color: "#334155" }}>
+                          {item.value}
+                        </dd>
                       </div>
                     </div>
                   ))}
@@ -370,32 +546,91 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                 aria-label="정산 정보"
                 role="region"
               >
-                <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div
+                  style={{
+                    marginBottom: "1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <div>
-                    <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>정산 정보</h3>
-                    {settlement.note && <p style={{ fontSize: "0.75rem", color: "#64748b" }}>{settlement.note}</p>}
+                    <h3
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "var(--color-foreground, #0f172a)",
+                      }}
+                    >
+                      정산 정보
+                    </h3>
+                    {settlement.note && (
+                      <p style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                        {settlement.note}
+                      </p>
+                    )}
                   </div>
                   {settlement.status && (
                     <span
-                      style={{ borderRadius: "9999px", padding: "0.25rem 0.75rem", fontSize: "0.75rem", fontWeight: 500, ...getSettlementBadgeStyle(settlement.status) }}
+                      style={{
+                        borderRadius: "9999px",
+                        padding: "0.25rem 0.75rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        ...getSettlementBadgeStyle(settlement.status),
+                      }}
                       aria-label={`정산 상태: ${settlement.status}`}
                     >
                       {settlement.status}
                     </span>
                   )}
                 </div>
-                <dl style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+                <dl
+                  style={{
+                    display: "grid",
+                    gap: "1rem",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                  }}
+                >
                   <div>
-                    <dt style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>정산 금액</dt>
+                    <dt
+                      style={{
+                        fontSize: "0.75rem",
+                        textTransform: "uppercase",
+                        color: "#94a3b8",
+                      }}
+                    >
+                      정산 금액
+                    </dt>
                     <dd style={{ fontSize: "0.875rem", color: "#334155" }}>
-                      {formatAmount(settlement.amount, settlement.currency ?? defaultCurrency, locale)}
+                      {formatAmount(
+                        settlement.amount,
+                        settlement.currency ?? defaultCurrency,
+                        locale,
+                      )}
                     </dd>
                   </div>
                   <div>
-                    <dt style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>예정일</dt>
+                    <dt
+                      style={{
+                        fontSize: "0.75rem",
+                        textTransform: "uppercase",
+                        color: "#94a3b8",
+                      }}
+                    >
+                      예정일
+                    </dt>
                     <dd style={{ fontSize: "0.875rem", color: "#334155" }}>
                       {settlement.scheduledDate && (
-                        <time dateTime={settlement.scheduledDate instanceof Date ? settlement.scheduledDate.toISOString() : typeof settlement.scheduledDate === 'string' ? settlement.scheduledDate : undefined}>
+                        <time
+                          dateTime={
+                            settlement.scheduledDate instanceof Date
+                              ? settlement.scheduledDate.toISOString()
+                              : typeof settlement.scheduledDate === "string"
+                                ? settlement.scheduledDate
+                                : undefined
+                          }
+                        >
                           {formatDate(settlement.scheduledDate, locale)}
                         </time>
                       )}
@@ -403,14 +638,34 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                   </div>
                   {settlement.bankAccount && (
                     <div>
-                      <dt style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>계좌</dt>
-                      <dd style={{ fontSize: "0.875rem", color: "#334155" }}>{settlement.bankAccount}</dd>
+                      <dt
+                        style={{
+                          fontSize: "0.75rem",
+                          textTransform: "uppercase",
+                          color: "#94a3b8",
+                        }}
+                      >
+                        계좌
+                      </dt>
+                      <dd style={{ fontSize: "0.875rem", color: "#334155" }}>
+                        {settlement.bankAccount}
+                      </dd>
                     </div>
                   )}
                   {settlement.expectedPayout && (
                     <div>
-                      <dt style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "#94a3b8" }}>예상 지급</dt>
-                      <dd style={{ fontSize: "0.875rem", color: "#334155" }}>{settlement.expectedPayout}</dd>
+                      <dt
+                        style={{
+                          fontSize: "0.75rem",
+                          textTransform: "uppercase",
+                          color: "#94a3b8",
+                        }}
+                      >
+                        예상 지급
+                      </dt>
+                      <dd style={{ fontSize: "0.875rem", color: "#334155" }}>
+                        {settlement.expectedPayout}
+                      </dd>
                     </div>
                   )}
                 </dl>
@@ -423,15 +678,49 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
                 aria-label="수수료 내역"
                 role="region"
               >
-                <h3 style={{ marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>수수료</h3>
-                <dl style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <h3
+                  style={{
+                    marginBottom: "0.75rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    color: "var(--color-foreground, #0f172a)",
+                  }}
+                >
+                  수수료
+                </h3>
+                <dl
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.75rem",
+                  }}
+                >
                   {fees.map((fee) => (
-                    <div key={fee.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.875rem", color: "#334155" }}>
+                    <div
+                      key={fee.label}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        fontSize: "0.875rem",
+                        color: "#334155",
+                      }}
+                    >
                       <div>
                         <dt style={{ fontWeight: 500 }}>{fee.label}</dt>
-                        {fee.description && <dd style={{ fontSize: "0.75rem", color: "#94a3b8" }}>{fee.description}</dd>}
+                        {fee.description && (
+                          <dd style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                            {fee.description}
+                          </dd>
+                        )}
                       </div>
-                      <dd>{formatAmount(fee.amount, fee.currency ?? defaultCurrency, locale)}</dd>
+                      <dd>
+                        {formatAmount(
+                          fee.amount,
+                          fee.currency ?? defaultCurrency,
+                          locale,
+                        )}
+                      </dd>
                     </div>
                   ))}
                 </dl>
@@ -443,42 +732,97 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
               aria-label="이벤트 로그"
               role="region"
             >
-              <h3 style={{ marginBottom: "1rem", fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>이벤트 로그</h3>
+              <h3
+                style={{
+                  marginBottom: "1rem",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  color: "var(--color-foreground, #0f172a)",
+                }}
+              >
+                이벤트 로그
+              </h3>
               {events.length === 0 ? (
-                emptyState ?? (
+                (emptyState ?? (
                   <DashboardEmptyState
                     icon="activity"
                     title="이벤트가 없습니다"
                     description="승인/정산 등 상태 변화가 발생하면 자동으로 표시됩니다."
                     size="sm"
                   />
-                )
+                ))
               ) : (
-                <ol style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }} role="list" aria-label="이벤트 목록">
+                <ol
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.75rem",
+                  }}
+                  role="list"
+                  aria-label="이벤트 목록"
+                >
                   {events.map((event) => (
                     <li
                       key={event.id}
                       role="listitem"
-                      style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", borderRadius: "0.75rem", border: "1px solid var(--color-border, #f1f5f9)", padding: "0.75rem" }}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "0.75rem",
+                        borderRadius: "0.75rem",
+                        border: "1px solid var(--color-border, #f1f5f9)",
+                        padding: "0.75rem",
+                      }}
                     >
-                      <div style={{ borderRadius: "0.5rem", padding: "0.5rem", ...getEventStyle(event.status) }} aria-hidden="true">
-                        <Icon name={event.icon ?? "activity"} className="h-4 w-4" />
+                      <div
+                        style={{
+                          borderRadius: "0.5rem",
+                          padding: "0.5rem",
+                          ...getEventStyle(event.status),
+                        }}
+                        aria-hidden="true"
+                      >
+                        <Icon name={event.icon ?? "activity"} dot="w-4 h-4" />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.875rem", fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            fontSize: "0.875rem",
+                            fontWeight: 500,
+                            color: "var(--color-foreground, #0f172a)",
+                          }}
+                        >
                           <span>{event.title}</span>
                           <time
-                            dateTime={event.timestamp instanceof Date ? event.timestamp.toISOString() : typeof event.timestamp === 'string' ? event.timestamp : undefined}
+                            dateTime={
+                              event.timestamp instanceof Date
+                                ? event.timestamp.toISOString()
+                                : typeof event.timestamp === "string"
+                                  ? event.timestamp
+                                  : undefined
+                            }
                             style={{ fontSize: "0.75rem", color: "#94a3b8" }}
                           >
                             {formatDate(event.timestamp, locale)}
                           </time>
                         </div>
                         {event.description && (
-                          <p style={{ fontSize: "0.75rem", color: "#64748b" }}>{event.description}</p>
+                          <p style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                            {event.description}
+                          </p>
                         )}
                         {event.actor && (
-                          <p style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.25rem" }} aria-label={`실행자: ${event.actor}`}>
+                          <p
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "#94a3b8",
+                              marginTop: "0.25rem",
+                            }}
+                            aria-label={`실행자: ${event.actor}`}
+                          >
                             by {event.actor}
                           </p>
                         )}
@@ -498,4 +842,3 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
 };
 
 TransactionDetailDrawer.displayName = "TransactionDetailDrawer";
-

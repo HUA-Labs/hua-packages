@@ -66,17 +66,17 @@ const VARIANT_EXTRAS: Record<string, CSSProperties> = {
 const VARIANT_FOCUS: Record<string, CSSProperties> = {
   default: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
   },
   outline: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
   },
   filled: {
     outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-ring)',
+    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
     borderColor: 'var(--color-ring)',
     backgroundColor: 'var(--color-background)',
   },

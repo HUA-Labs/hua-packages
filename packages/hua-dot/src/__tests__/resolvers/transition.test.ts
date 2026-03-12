@@ -110,3 +110,35 @@ describe('resolveTransition — unknown', () => {
     expect(resolveTransition('duration', '999', config)).toEqual({});
   });
 });
+
+describe('resolveTransition — arbitrary values', () => {
+  it('resolves transition-[width]', () => {
+    expect(resolveTransition('transition', '[width]', config)).toEqual({
+      transitionProperty: 'width',
+    });
+  });
+
+  it('resolves transition-[width,transform]', () => {
+    expect(resolveTransition('transition', '[width,transform]', config)).toEqual({
+      transitionProperty: 'width,transform',
+    });
+  });
+
+  it('resolves duration-[300ms]', () => {
+    expect(resolveTransition('duration', '[300ms]', config)).toEqual({
+      transitionDuration: '300ms',
+    });
+  });
+
+  it('resolves ease-[cubic-bezier(0.4,0,0.2,1)]', () => {
+    expect(resolveTransition('ease', '[cubic-bezier(0.4,0,0.2,1)]', config)).toEqual({
+      transitionTimingFunction: 'cubic-bezier(0.4,0,0.2,1)',
+    });
+  });
+
+  it('resolves delay-[150ms]', () => {
+    expect(resolveTransition('delay', '[150ms]', config)).toEqual({
+      transitionDelay: '150ms',
+    });
+  });
+});

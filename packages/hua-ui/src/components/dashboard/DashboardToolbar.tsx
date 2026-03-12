@@ -70,8 +70,10 @@ export interface DateRangeConfig {
  * @property {string} [lastUpdated] - 마지막 업데이트 시간 / Last updated time
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface DashboardToolbarProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'className'> {
+export interface DashboardToolbarProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title" | "className"
+> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   meta?: React.ReactNode;
@@ -96,7 +98,7 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
     <>
       {icon &&
         (typeof icon === "string" ? (
-          <Icon name={icon as IconName} className="h-4 w-4" />
+          <Icon name={icon as IconName} dot="w-4 h-4" />
         ) : (
           icon
         ))}
@@ -190,7 +192,10 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} DashboardToolbar 컴포넌트 / DashboardToolbar component
  */
-export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolbarProps>(
+export const DashboardToolbar = React.forwardRef<
+  HTMLDivElement,
+  DashboardToolbarProps
+>(
   (
     {
       title,
@@ -206,7 +211,7 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const containerStyle: React.CSSProperties = {
       width: "100%",
@@ -219,17 +224,46 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
     };
 
     return (
-      <div ref={ref} style={mergeStyles(containerStyle, resolveDot(dot), style)} {...props}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingLeft: "1.5rem", paddingRight: "1.5rem", paddingTop: "1.25rem", paddingBottom: "1.25rem" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div
+        ref={ref}
+        style={mergeStyles(containerStyle, resolveDot(dot), style)}
+        {...props}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            paddingLeft: "1.5rem",
+            paddingRight: "1.5rem",
+            paddingTop: "1.25rem",
+            paddingBottom: "1.25rem",
+          }}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+          >
             <div>
               {title && (
-                <div style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>
+                <div
+                  style={{
+                    fontSize: "1.25rem",
+                    fontWeight: 600,
+                    color: "var(--color-foreground, #0f172a)",
+                  }}
+                >
                   {title}
                 </div>
               )}
               {description && (
-                <p style={{ fontSize: "0.875rem", color: "var(--color-muted-foreground, #64748b)" }}>{description}</p>
+                <p
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "var(--color-muted-foreground, #64748b)",
+                  }}
+                >
+                  {description}
+                </p>
               )}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
@@ -242,12 +276,14 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
                       dot="gap-2"
                       aria-label={`날짜 범위 선택: ${dateRange.display || "날짜 범위"}`}
                     >
-                      <Icon name="calendar" className="h-4 w-4" />
+                      <Icon name="calendar" dot="w-4 h-4" />
                       {dateRange.display || "날짜 범위"}
                     </Button>
                   }
                 >
-                  <DropdownMenu style={{ maxHeight: '16rem', overflowY: 'auto' }}>
+                  <DropdownMenu
+                    style={{ maxHeight: "16rem", overflowY: "auto" }}
+                  >
                     {dateRange.presets?.map((preset) => (
                       <DropdownItem
                         key={preset.value}
@@ -272,7 +308,7 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
                   onClick={onRefresh}
                   aria-label="데이터 새로고침"
                 >
-                  <Icon name="refresh" className="h-4 w-4" />
+                  <Icon name="refresh" dot="w-4 h-4" />
                   새로고침
                 </Button>
               )}
@@ -280,19 +316,47 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
           </div>
 
           {(filters || meta || lastUpdated) && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "0.75rem" }}>
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem", fontSize: "0.875rem", color: "var(--color-foreground, #475569)" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+                borderTop: "1px solid var(--color-border, #f1f5f9)",
+                paddingTop: "0.75rem",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  fontSize: "0.875rem",
+                  color: "var(--color-foreground, #475569)",
+                }}
+              >
                 {filters}
                 {meta}
               </div>
               {lastUpdated && (
-                <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>업데이트: {lastUpdated}</span>
+                <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                  업데이트: {lastUpdated}
+                </span>
               )}
             </div>
           )}
 
           {actions && actions.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: "0.5rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "1rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                borderTop: "1px solid var(--color-border, #f1f5f9)",
+                paddingTop: "1rem",
+              }}
+            >
               {actions.map((action) => (
                 <ToolbarButton key={action.label} {...action} />
               ))}
@@ -301,7 +365,7 @@ export const DashboardToolbar = React.forwardRef<HTMLDivElement, DashboardToolba
         </div>
       </div>
     );
-  }
+  },
 );
 
 DashboardToolbar.displayName = "DashboardToolbar";

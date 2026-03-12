@@ -20,7 +20,10 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
  * @property {boolean} [showPlayPause=false] - 재생/일시정지 버튼 표시 / Show play/pause button
  * @property {"left" | "right" | "center"} [playPausePosition="right"] - 재생/일시정지 버튼 위치 / Play/pause button position
  */
-export interface CarouselProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className'> {
+export interface CarouselProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "className"
+> {
   children: React.ReactNode[];
   dot?: string;
   style?: React.CSSProperties;
@@ -77,7 +80,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       dot: dotProp,
       ...props
     },
-    ref
+    ref,
   ) => {
     // For slide transition with loop: start at 1 (account for cloned first slide)
     // For fade/scale: always start at 0 (no cloned slides)
@@ -99,16 +102,19 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
     const prefersReducedMotion = useReducedMotion();
 
     // Get actual slide index for display (accounting for cloned slides in loop mode for slide transition)
-    const getActualIndex = useCallback((index: number) => {
-      // For fade/scale transitions, currentIndex is the actual index
-      if (transition !== "slide") return index;
-      // For slide transition without loop, index is actual
-      if (!loop) return index;
-      // For slide transition with loop, account for cloned slides
-      if (index === 0) return slideCount - 1;
-      if (index === slideCount + 1) return 0;
-      return index - 1;
-    }, [loop, slideCount, transition]);
+    const getActualIndex = useCallback(
+      (index: number) => {
+        // For fade/scale transitions, currentIndex is the actual index
+        if (transition !== "slide") return index;
+        // For slide transition without loop, index is actual
+        if (!loop) return index;
+        // For slide transition with loop, account for cloned slides
+        if (index === 0) return slideCount - 1;
+        if (index === slideCount + 1) return 0;
+        return index - 1;
+      },
+      [loop, slideCount, transition],
+    );
 
     // Go to specific slide
     const goToSlide = useCallback(
@@ -130,14 +136,27 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
         if (newIndex !== currentIndex) {
           setIsTransitioning(true);
           setCurrentIndex(newIndex);
-          const actualIndex = loop && transition === "slide"
-            ? (newIndex === 0 ? slideCount - 1 : newIndex === slideCount + 1 ? 0 : newIndex - 1)
-            : newIndex;
+          const actualIndex =
+            loop && transition === "slide"
+              ? newIndex === 0
+                ? slideCount - 1
+                : newIndex === slideCount + 1
+                  ? 0
+                  : newIndex - 1
+              : newIndex;
           onSlideChange?.(actualIndex);
           setTimeout(() => setIsTransitioning(false), transitionDuration);
         }
       },
-      [currentIndex, slideCount, loop, isTransitioning, transitionDuration, transition, onSlideChange]
+      [
+        currentIndex,
+        slideCount,
+        loop,
+        isTransitioning,
+        transitionDuration,
+        transition,
+        onSlideChange,
+      ],
     );
 
     // Handle infinite loop jump (when reaching cloned slides)
@@ -160,7 +179,14 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           setTimeout(() => setNoTransition(false), 50);
         }, transitionDuration);
       }
-    }, [currentIndex, slideCount, loop, isTransitioning, transitionDuration, transition]);
+    }, [
+      currentIndex,
+      slideCount,
+      loop,
+      isTransitioning,
+      transitionDuration,
+      transition,
+    ]);
 
     // Next slide
     const nextSlide = useCallback(() => {
@@ -174,16 +200,24 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
     // Toggle play/pause manually
     const togglePlayPause = useCallback(() => {
-      setIsManuallyPaused(prev => !prev);
+      setIsManuallyPaused((prev) => !prev);
     }, []);
 
     // Auto play
     useEffect(() => {
-      if (!autoPlay || isPaused || isManuallyPaused || prefersReducedMotion) return;
+      if (!autoPlay || isPaused || isManuallyPaused || prefersReducedMotion)
+        return;
 
       const timer = setInterval(nextSlide, interval);
       return () => clearInterval(timer);
-    }, [autoPlay, interval, isPaused, isManuallyPaused, nextSlide, prefersReducedMotion]);
+    }, [
+      autoPlay,
+      interval,
+      isPaused,
+      isManuallyPaused,
+      nextSlide,
+      prefersReducedMotion,
+    ]);
 
     // Touch handlers for swipe
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -229,7 +263,8 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
     // Render slides with transition
     const renderSlides = () => {
-      const duration = prefersReducedMotion || noTransition ? 0 : transitionDuration;
+      const duration =
+        prefersReducedMotion || noTransition ? 0 : transitionDuration;
       const actualIndex = getActualIndex(currentIndex);
 
       switch (transition) {
@@ -238,10 +273,10 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             <div
               key={index}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
-                width: '100%',
-                height: '100%',
+                width: "100%",
+                height: "100%",
                 zIndex: index === actualIndex ? 10 : 0,
                 opacity: index === actualIndex ? 1 : 0,
                 transition: `opacity ${duration}ms ease-in-out`,
@@ -256,10 +291,10 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             <div
               key={index}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
-                width: '100%',
-                height: '100%',
+                width: "100%",
+                height: "100%",
                 zIndex: index === actualIndex ? 10 : 0,
                 opacity: index === actualIndex ? 1 : 0,
                 transform: `scale(${index === actualIndex ? 1 : 0.9})`,
@@ -282,12 +317,14 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             <div
               key={index}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
-                width: '100%',
-                height: '100%',
+                width: "100%",
+                height: "100%",
                 transform: `translateX(${(index - currentIndex) * 100}%)`,
-                transition: noTransition ? 'none' : `transform ${duration}ms ease-in-out`,
+                transition: noTransition
+                  ? "none"
+                  : `transform ${duration}ms ease-in-out`,
               }}
             >
               {child}
@@ -307,15 +344,24 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
       const indicatorContainerStyle: React.CSSProperties = isInside
         ? {
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-            position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 20,
-            ...(isTop ? { top: '1rem' } : { bottom: '1rem' }),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 20,
+            ...(isTop ? { top: "1rem" } : { bottom: "1rem" }),
           }
         : {
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-            marginTop: '1rem',
-            ...(isTop ? { order: -1, marginBottom: '1rem', marginTop: 0 } : {}),
-          }
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            marginTop: "1rem",
+            ...(isTop ? { order: -1, marginBottom: "1rem", marginTop: 0 } : {}),
+          };
 
       // Handle indicator click - go to the correct index accounting for loop mode
       const handleIndicatorClick = (index: number) => {
@@ -338,13 +384,15 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
                     style={{
-                      height: '0.25rem',
-                      borderRadius: '9999px',
-                      transition: 'all 300ms',
-                      border: 'none',
-                      cursor: 'pointer',
-                      width: isActive ? '2rem' : '1rem',
-                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.5)',
+                      height: "0.25rem",
+                      borderRadius: "9999px",
+                      transition: "all 300ms",
+                      border: "none",
+                      cursor: "pointer",
+                      width: isActive ? "2rem" : "1rem",
+                      backgroundColor: isActive
+                        ? "white"
+                        : "rgba(255,255,255,0.5)",
                     }}
                     role="tab"
                     aria-selected={isActive}
@@ -358,16 +406,18 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
                     style={{
-                      width: '2rem',
-                      height: '2rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.875rem',
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "9999px",
+                      fontSize: "0.875rem",
                       fontWeight: 500,
-                      transition: 'all 300ms',
-                      border: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.3)',
-                      color: isActive ? '#111827' : 'white',
+                      transition: "all 300ms",
+                      border: "none",
+                      cursor: "pointer",
+                      backgroundColor: isActive
+                        ? "white"
+                        : "rgba(255,255,255,0.3)",
+                      color: isActive ? "#111827" : "white",
                     }}
                     role="tab"
                     aria-selected={isActive}
@@ -384,14 +434,16 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
                     style={{
-                      width: '0.625rem',
-                      height: '0.625rem',
-                      borderRadius: '9999px',
-                      transition: 'all 300ms',
-                      border: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: isActive ? 'white' : 'rgba(255,255,255,0.5)',
-                      transform: isActive ? 'scale(1.25)' : 'scale(1)',
+                      width: "0.625rem",
+                      height: "0.625rem",
+                      borderRadius: "9999px",
+                      transition: "all 300ms",
+                      border: "none",
+                      cursor: "pointer",
+                      backgroundColor: isActive
+                        ? "white"
+                        : "rgba(255,255,255,0.5)",
+                      transform: isActive ? "scale(1.25)" : "scale(1)",
                     }}
                     role="tab"
                     aria-selected={isActive}
@@ -410,34 +462,38 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
       const isPlaying = !isManuallyPaused;
       const positionMap: Record<string, React.CSSProperties> = {
-        left: { left: '1rem' },
-        center: { left: '50%', transform: 'translateX(-50%)' },
-        right: { right: '1rem' }
+        left: { left: "1rem" },
+        center: { left: "50%", transform: "translateX(-50%)" },
+        right: { right: "1rem" },
       };
 
       return (
         <button
           onClick={togglePlayPause}
           style={{
-            position: 'absolute',
-            bottom: '1rem',
+            position: "absolute",
+            bottom: "1rem",
             zIndex: 20,
-            width: '2rem',
-            height: '2rem',
-            borderRadius: '9999px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(255,255,255,0.8)',
-            color: '#1f2937',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 200ms',
+            width: "2rem",
+            height: "2rem",
+            borderRadius: "9999px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(255,255,255,0.8)",
+            color: "#1f2937",
+            border: "none",
+            cursor: "pointer",
+            transition: "all 200ms",
             ...positionMap[playPausePosition],
           }}
           aria-label={isPlaying ? "일시정지" : "재생"}
         >
-          {isPlaying ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
+          {isPlaying ? (
+            <PauseIcon style={{ width: "1rem", height: "1rem" }} />
+          ) : (
+            <PlayIcon style={{ width: "1rem", height: "1rem" }} />
+          )}
         </button>
       );
     };
@@ -450,69 +506,84 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       const canGoNext = loop || currentIndex < slideCount - 1;
 
       const arrowBaseStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: '50%',
-        transform: 'translateY(-50%)',
+        position: "absolute",
+        top: "50%",
+        transform: "translateY(-50%)",
         zIndex: 20,
-        width: '2.5rem',
-        height: '2.5rem',
-        borderRadius: '9999px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255,255,255,0.8)',
-        color: '#1f2937',
-        border: 'none',
-        cursor: 'pointer',
-        transition: 'all 200ms',
+        width: "2.5rem",
+        height: "2.5rem",
+        borderRadius: "9999px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(255,255,255,0.8)",
+        color: "#1f2937",
+        border: "none",
+        cursor: "pointer",
+        transition: "all 200ms",
       };
 
-      const prevLeft = arrowPosition === "outside" ? '-3.5rem' : '1rem';
-      const nextRight = arrowPosition === "outside" ? '-3.5rem' : '1rem';
+      const prevLeft = arrowPosition === "outside" ? "-3.5rem" : "1rem";
+      const nextRight = arrowPosition === "outside" ? "-3.5rem" : "1rem";
 
       return (
         <>
           <button
             onClick={prevSlide}
             disabled={!canGoPrev}
-            style={{ ...arrowBaseStyle, left: prevLeft, opacity: !canGoPrev ? 0.3 : 1, cursor: !canGoPrev ? 'not-allowed' : 'pointer' }}
+            style={{
+              ...arrowBaseStyle,
+              left: prevLeft,
+              opacity: !canGoPrev ? 0.3 : 1,
+              cursor: !canGoPrev ? "not-allowed" : "pointer",
+            }}
             aria-label="이전 슬라이드"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft style={{ width: "1.25rem", height: "1.25rem" }} />
           </button>
           <button
             onClick={nextSlide}
             disabled={!canGoNext}
-            style={{ ...arrowBaseStyle, right: nextRight, opacity: !canGoNext ? 0.3 : 1, cursor: !canGoNext ? 'not-allowed' : 'pointer' }}
+            style={{
+              ...arrowBaseStyle,
+              right: nextRight,
+              opacity: !canGoNext ? 0.3 : 1,
+              cursor: !canGoNext ? "not-allowed" : "pointer",
+            }}
             aria-label="다음 슬라이드"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight style={{ width: "1.25rem", height: "1.25rem" }} />
           </button>
         </>
       );
     };
 
-    const dotStyle = dotProp ? resolveDot(dotProp) : undefined
+    const dotStyle = dotProp ? resolveDot(dotProp) : undefined;
 
     return (
       <div
         ref={ref}
         style={mergeStyles(
           {
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            ...(arrowPosition === "outside" ? { padding: '0 4rem' } : {}),
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            height: "100%",
+            ...(arrowPosition === "outside" ? { padding: "0 4rem" } : {}),
           },
           dotStyle,
-          style
+          style,
         )}
         {...props}
       >
         <div
           ref={containerRef}
-          style={{ position: 'relative', overflow: 'hidden', width: '100%', flex: 1 }}
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            width: "100%",
+            flex: 1,
+          }}
           onMouseEnter={() => pauseOnHover && setIsPaused(true)}
           onMouseLeave={() => pauseOnHover && setIsPaused(false)}
           onTouchStart={handleTouchStart}
@@ -531,39 +602,49 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
         {!indicatorPosition.includes("inside") && renderIndicators()}
       </div>
     );
-  }
+  },
 );
 
 Carousel.displayName = "Carousel";
 
 // Simple icon components
-function ChevronLeft({ className }: { className?: string }) {
+function ChevronLeft({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M15 19l-7-7 7-7"
+      />
     </svg>
   );
 }
 
-function ChevronRight({ className }: { className?: string }) {
+function ChevronRight({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 5l7 7-7 7"
+      />
     </svg>
   );
 }
 
-function PlayIcon({ className }: { className?: string }) {
+function PlayIcon({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="currentColor" viewBox="0 0 24 24">
       <path d="M8 5v14l11-7z" />
     </svg>
   );
 }
 
-function PauseIcon({ className }: { className?: string }) {
+function PauseIcon({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <svg style={style} fill="currentColor" viewBox="0 0 24 24">
       <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
     </svg>
   );
