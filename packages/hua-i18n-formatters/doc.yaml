@@ -39,9 +39,107 @@ subpathExports:
     description: "Currency utilities only"
 
 apiNotes:
+  # Date — React hooks
   useDateFormatter:
     description: "Date formatting hook — formatDate, formatRelativeTime, monthNames, dayNames"
+    kind: "function"
+
+  # Date — standalone functions
+  formatDate:
+    description: "Format a Date or ISO string into a localized date string. Accepts DateFormatterOptions (pattern, locale, timezone)."
+    kind: "function"
+  formatDateTime:
+    description: "Format a Date or ISO string into a localized date-and-time string."
+    kind: "function"
+  formatRelativeTime:
+    description: "Return a locale-aware relative time string (e.g. '3 minutes ago', '2일 전'). Accepts RelativeTimeOptions."
+    kind: "function"
+  applyTimezoneOffset:
+    description: "Shift a Date by the given timezone offset in minutes and return the adjusted Date."
+    kind: "function"
+  getKoreanDate:
+    description: "Return a Date object adjusted to Korea Standard Time (UTC+9)."
+    kind: "function"
+  getKoreanDateString:
+    description: "Return a YYYY-MM-DD string in Korea Standard Time for the given date."
+    kind: "function"
+  parseDateAsTimezone:
+    description: "Parse a date string as if it were in the given timezone offset."
+    kind: "function"
+  convertToTimezone:
+    description: "Convert a Date from UTC to the target timezone offset and return the adjusted Date."
+    kind: "function"
+  KST_OFFSET:
+    description: "Korea Standard Time UTC offset in minutes (540 = UTC+9)."
+    kind: "constant"
+
+  # Date — types
+  DateFormatterOptions:
+    description: "Options for formatDate / formatDateTime — pattern, locale, timezone offset."
+    kind: "type"
+  TimezoneConfig:
+    description: "Timezone configuration — offset in minutes and optional label."
+    kind: "type"
+  RelativeTimeOptions:
+    description: "Options for formatRelativeTime — locale, numeric style."
+    kind: "type"
+  DateFormatterReturn:
+    description: "Return type of useDateFormatter — formatDate, formatDateTime, formatRelativeTime, monthNames, dayNames."
+    kind: "type"
+
+  # Number — React hooks
   useNumberFormatter:
     description: "Number formatting hook — formatNumber, formatPercent, formatCompact"
+    kind: "function"
+
+  # Number — standalone functions
+  formatNumber:
+    description: "Format a number with locale-aware grouping separators and decimal places. Accepts NumberFormatterOptions."
+    kind: "function"
+  formatCompact:
+    description: "Format a large number using compact notation (e.g. 1K, 1.2M). Accepts NumberFormatterOptions."
+    kind: "function"
+  formatPercent:
+    description: "Format a decimal value as a percentage string (e.g. 0.75 → '75%'). Accepts PercentFormatterOptions."
+    kind: "function"
+
+  # Number — types
+  NumberFormatterOptions:
+    description: "Options for formatNumber / formatCompact — locale, minimumFractionDigits, maximumFractionDigits."
+    kind: "type"
+  PercentFormatterOptions:
+    description: "Options for formatPercent — locale, decimal places."
+    kind: "type"
+  NumberFormatterReturn:
+    description: "Return type of useNumberFormatter — formatNumber, formatPercent, formatCompact."
+    kind: "type"
+
+  # Currency — React hooks
   useCurrencyFormatter:
     description: "Currency formatting hook — formatCurrency with 6 currency support"
+    kind: "function"
+
+  # Currency — standalone functions
+  formatCurrency:
+    description: "Format a number as a currency string (e.g. '₩1,000', '$9.99'). Accepts CurrencyFormatterOptions."
+    kind: "function"
+  getDefaultCurrency:
+    description: "Resolve the default ISO 4217 currency code for a given language code using LANGUAGE_TO_CURRENCY."
+    kind: "function"
+  getCurrencyDecimals:
+    description: "Return the standard number of decimal places for a given ISO 4217 currency code using CURRENCY_DECIMALS."
+    kind: "function"
+  LANGUAGE_TO_CURRENCY:
+    description: "Constant map from BCP 47 language code to ISO 4217 currency code (e.g. 'ko' → 'KRW', 'en' → 'USD')."
+    kind: "constant"
+  CURRENCY_DECIMALS:
+    description: "Constant map from ISO 4217 currency code to standard decimal places (e.g. 'KRW' → 0, 'USD' → 2)."
+    kind: "constant"
+
+  # Currency — types
+  CurrencyFormatterOptions:
+    description: "Options for formatCurrency — currency code, locale, symbol display."
+    kind: "type"
+  CurrencyFormatterReturn:
+    description: "Return type of useCurrencyFormatter — formatCurrency."
+    kind: "type"

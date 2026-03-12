@@ -177,3 +177,9 @@ apiNotes:
     description: "Native subpath entry — dot() and dotMap() pre-bound to target: 'native'. Also auto-resolved via 'react-native' package.json condition in Metro."
   _resetNativeWarnings:
     description: "Reset native adapter warning dedup set. For testing only."
+  semanticVars:
+    description: "Generate semantic color token mappings for use with createDotConfig. Maps token names to CSS variable references (e.g. 'background' → 'var(--color-background)'). Accepts an optional { prefix } object as the first argument to override the default '--color' prefix."
+    kind: "function"
+  DotExplainResult:
+    description: "Interface returned by dotExplain(). Contains styles (resolved style object) and report (DotCapabilityReport with _dropped, _approximated, _capabilities, _details)."
+    kind: "type"

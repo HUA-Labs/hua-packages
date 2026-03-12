@@ -40,7 +40,50 @@ subpathExports:
     description: "createI18nStore for language management"
 
 apiNotes:
+  # Store creation
   createHuaStore:
     description: "Create a Zustand store with SSR/persistence support"
+    kind: "function"
   createI18nStore:
     description: "Create a pre-configured i18n language store"
+    kind: "function"
+
+  # Rehydration utilities
+  isStoreRehydrated:
+    description: "Check if a persisted store has completed rehydration from localStorage. Returns false while hydration is pending (SSR safe)."
+    kind: "function"
+  onStoreRehydrated:
+    description: "Subscribe to a store's rehydration completion event. Calls the callback immediately if the store is already rehydrated. Returns an unsubscribe function."
+    kind: "function"
+  markStoreRehydrated:
+    description: "Manually mark a store as rehydrated and fire all pending listeners. Use when integrating a Zustand store created outside of createHuaStore."
+    kind: "function"
+
+  # Types
+  StoreCreator:
+    description: "Type alias for the Zustand state creator function passed to createHuaStore."
+    kind: "type"
+  StoreConfig:
+    description: "Configuration object for createHuaStore — persist, persistKey, ssr, partialize."
+    kind: "type"
+  HuaStore:
+    description: "Return type of createHuaStore — a bound Zustand store hook."
+    kind: "type"
+  BaseStoreState:
+    description: "Base constraint for store state — requires an object type."
+    kind: "type"
+  UseBoundStore:
+    description: "Re-exported Zustand UseBoundStore type for typed store hooks."
+    kind: "type"
+  StoreApi:
+    description: "Re-exported Zustand StoreApi type for direct store access."
+    kind: "type"
+  I18nStoreState:
+    description: "State shape for the i18n store — language, setLanguage, etc."
+    kind: "type"
+  I18nStoreConfig:
+    description: "Configuration for createI18nStore — default language, supported languages."
+    kind: "type"
+  UseStoreHook:
+    description: "Generic type helper for typed store selector hooks."
+    kind: "type"

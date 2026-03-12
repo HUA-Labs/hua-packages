@@ -114,13 +114,163 @@ apiNotes:
   useWindowSize:
     description: "Responsive window size tracking"
 
+  # Core engine
+  MotionEngine:
+    description: "Zero-dependency pure JavaScript motion engine class"
+    kind: "class"
+  motionEngine:
+    description: "Singleton instance of MotionEngine"
+    kind: "variable"
+  TransitionEffects:
+    description: "Transition effect system class (fade, slide, scale, etc.)"
+    kind: "class"
+  transitionEffects:
+    description: "Singleton instance of TransitionEffects"
+    kind: "variable"
+
+  # Motion profiles
+  neutral:
+    description: "Built-in neutral motion profile (minimal, system-respecting)"
+    kind: "variable"
+  hua:
+    description: "Built-in hua motion profile (expressive, brand-aligned)"
+    kind: "variable"
+  resolveProfile:
+    description: "Resolve a built-in profile name or MotionProfile object to a MotionProfile"
+    kind: "function"
+  mergeProfileOverrides:
+    description: "Deep-merge overrides into a base MotionProfile"
+    kind: "function"
+  MotionProfileProvider:
+    description: "React context provider that supplies a MotionProfile to the subtree"
+    kind: "component"
+  useMotionProfile:
+    description: "Hook to read the current MotionProfile from context"
+    kind: "hook"
+
+  # Light-weight entrance hooks
+  useCountUp:
+    description: "Animated counter that counts up to a target number"
+    kind: "hook"
+  useClipReveal:
+    description: "Clip-path reveal animation (wipe-in effect)"
+    kind: "hook"
+  useBlurIn:
+    description: "Blur-to-clear entrance animation"
+    kind: "hook"
+
+  # Stagger
+  useStagger:
+    description: "Orchestrate staggered entrance animations across a list of elements"
+    kind: "hook"
+
+  # Advanced interaction
+  useButtonEffect:
+    description: "Ripple / press feedback effect for buttons"
+    kind: "hook"
+  useVisibilityToggle:
+    description: "Animate an element in/out based on a boolean visibility flag"
+    kind: "hook"
+  useScrollToggle:
+    description: "Toggle animation state based on scroll position threshold"
+    kind: "hook"
+  useCardList:
+    description: "Staggered entrance animation for a list of cards"
+    kind: "hook"
+  useLoadingSpinner:
+    description: "Continuous rotation animation for loading spinners"
+    kind: "hook"
+  useNavigation:
+    description: "Slide/fade animation for navigation transitions"
+    kind: "hook"
+  useSkeleton:
+    description: "Shimmer animation for skeleton loading placeholders"
+    kind: "hook"
+  useTypewriter:
+    description: "Typewriter character-by-character text reveal animation"
+    kind: "hook"
+  useCustomCursor:
+    description: "Custom cursor tracking and animation"
+    kind: "hook"
+  useMagneticCursor:
+    description: "Magnetic cursor attraction effect for interactive elements"
+    kind: "hook"
+  useSmoothScroll:
+    description: "Smooth programmatic scroll with easing"
+    kind: "hook"
+  useElementProgress:
+    description: "Track an element's scroll progress as a 0–1 value"
+    kind: "hook"
+
+  # Preset system
+  MOTION_PRESETS:
+    description: "Built-in preset configurations keyed by element role (hero, title, button, card, text, image)"
+    kind: "variable"
+  PAGE_MOTIONS:
+    description: "Page-level motion configs keyed by page type (home, dashboard, product, blog)"
+    kind: "variable"
+  mergeWithPreset:
+    description: "Merge a MotionPreset with custom overrides"
+    kind: "function"
+  getPagePreset:
+    description: "Get PageMotionsConfig for a given PageType"
+    kind: "function"
+  getMotionPreset:
+    description: "Get a MotionPreset by element role string"
+    kind: "function"
+
   # Easing functions
+  linear:
+    description: "Linear easing (no acceleration)"
+    kind: "function"
+  easeIn:
+    description: "Ease-in curve (slow start)"
+    kind: "function"
+  easeOut:
+    description: "Ease-out curve (slow end)"
+    kind: "function"
   easeInOut:
     description: "Smooth ease-in-out curve"
+    kind: "function"
+  applyEasing:
+    description: "Apply an easing function to a raw progress value (throws on invalid)"
+    kind: "function"
+  safeApplyEasing:
+    description: "Apply an easing function to a progress value, falling back to linear on error"
+    kind: "function"
+  isValidEasing:
+    description: "Check whether a string is a recognised EasingType name"
+    kind: "function"
+  getAvailableEasings:
+    description: "Return the list of all registered easing names"
+    kind: "function"
+  isEasingFunction:
+    description: "Type-guard that checks whether a value is a callable EasingFunction"
+    kind: "function"
+  easingPresets:
+    description: "Map of named easing preset strings to EasingFunction objects"
+    kind: "variable"
+  getPresetEasing:
+    description: "Look up an EasingFunction by preset name"
     kind: "function"
   getEasing:
     description: "Get easing function by name"
     kind: "function"
+
+  # Spring physics
+  calculateSpring:
+    description: "Pure function that computes spring position/velocity for a given time step"
+    kind: "function"
+
+  # Utilities
+  observeElement:
+    description: "Shared IntersectionObserver helper — observe an element and invoke a callback on visibility change"
+    kind: "function"
+
+  # Motion component
+  Motion:
+    description: "React wrapper component that applies a motion hook to its child element via ref"
+    kind: "component"
 
   # React Native hooks (import from /native)
   useFadeIn (native):
