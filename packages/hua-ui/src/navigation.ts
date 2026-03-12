@@ -14,19 +14,41 @@
  */
 
 // Navigation
-export { Navigation, NavigationList, NavigationItem, NavigationContent } from './components/Navigation';
+export {
+  Navigation,
+  NavigationList,
+  NavigationItem,
+  NavigationContent,
+} from "./components/Navigation";
 
 // Breadcrumb
-export { Breadcrumb, BreadcrumbItem } from './components/Breadcrumb';
-export type { BreadcrumbProps, BreadcrumbItemProps, BreadcrumbItemData } from './components/Breadcrumb';
+export { Breadcrumb, BreadcrumbItem } from "./components/Breadcrumb";
+export type {
+  BreadcrumbProps,
+  BreadcrumbItemProps,
+  BreadcrumbItemData,
+} from "./components/Breadcrumb";
 
 // Pagination
-export { Pagination, PaginationOutlined, PaginationMinimal, PaginationWithInfo } from './components/Pagination';
+export {
+  Pagination,
+  PaginationOutlined,
+  PaginationMinimal,
+  PaginationWithInfo,
+} from "./components/Pagination";
 
 // Page Navigation
-export { PageNavigation } from './components/PageNavigation';
-export type { PageNavigationProps } from './components/PageNavigation';
+export { PageNavigation } from "./components/PageNavigation";
+export type { PageNavigationProps } from "./components/PageNavigation";
 
 // Page Transition
-export { PageTransition } from './components/PageTransition';
-export type { PageTransitionProps } from './components/PageTransition';
+export { PageTransition } from "./components/PageTransition";
+export type { PageTransitionProps } from "./components/PageTransition";
+
+// Sidebar (promoted from dashboard)
+export { DashboardSidebar as Sidebar } from "./components/dashboard/DashboardSidebar";
+export type {
+  DashboardSidebarProps as SidebarProps,
+  SidebarNavItem,
+  SidebarSection,
+} from "./components/dashboard/DashboardSidebar";

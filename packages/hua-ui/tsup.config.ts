@@ -1,46 +1,64 @@
-import { defineConfig } from 'tsup';
-import { readdir, readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { defineConfig } from "tsup";
+import { readdir, readFile, writeFile } from "fs/promises";
+import { join } from "path";
 
 const coreEntry = {
-  index: 'src/index.ts',
-  theme: 'src/theme.ts',
-  advanced: 'src/advanced.ts',
-  'advanced-dashboard': 'src/advanced/dashboard.ts',
-  'advanced-motion': 'src/advanced/motion.ts',
-  'advanced-emotion': 'src/components/advanced/emotion/index.ts',
-  form: 'src/form.ts',
-  navigation: 'src/navigation.ts',
-  feedback: 'src/feedback.ts',
-  overlay: 'src/overlay.ts',
-  data: 'src/data.ts',
-  interactive: 'src/interactive.ts',
-  sdui: 'src/sdui/index.ts',
-  landing: 'src/landing/index.ts',
+  index: "src/index.ts",
+  theme: "src/theme.ts",
+  advanced: "src/advanced.ts",
+  "advanced-dashboard": "src/advanced/dashboard.ts",
+  "advanced-motion": "src/advanced/motion.ts",
+  "advanced-emotion": "src/components/advanced/emotion/index.ts",
+  form: "src/form.ts",
+  navigation: "src/navigation.ts",
+  feedback: "src/feedback.ts",
+  overlay: "src/overlay.ts",
+  data: "src/data.ts",
+  interactive: "src/interactive.ts",
+  "interactive-kanban": "src/interactive/kanban.ts",
+  sdui: "src/sdui/index.ts",
+  landing: "src/landing/index.ts",
 };
 
 const shared = {
   sourcemap: true,
   treeshake: true,
   minify: true,
-  target: 'es2019',
-  external: ['react', 'react-dom', 'clsx', 'tailwind-merge', 'lucide-react', '@phosphor-icons/react', '@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities', '@hua-labs/motion-core'],
+  target: "es2019",
+  external: [
+    "react",
+    "react-dom",
+    "clsx",
+    "tailwind-merge",
+    "lucide-react",
+    "@phosphor-icons/react",
+    "@dnd-kit/core",
+    "@dnd-kit/sortable",
+    "@dnd-kit/utilities",
+    "@hua-labs/motion-core",
+  ],
   esbuildOptions(options: { jsx: string }) {
-    options.jsx = 'automatic';
+    options.jsx = "automatic";
   },
 };
 
 async function addUseClientDirective() {
-  const distDir = join(import.meta.dirname, 'dist');
+  const distDir = join(import.meta.dirname, "dist");
   const files = await readdir(distDir);
   // Only add "use client" to ESM entry points (.mjs), excluding native (RN doesn't use "use client")
-  const esmFiles = files.filter(f => f.endsWith('.mjs') && f !== 'native.mjs');
+  const esmFiles = files.filter(
+    (f) => f.endsWith(".mjs") && f !== "native.mjs",
+  );
 
   for (const file of esmFiles) {
     const filePath = join(distDir, file);
-    const content = await readFile(filePath, 'utf-8');
-    if (content.startsWith('"use client"') || content.startsWith("'use client'")) continue;
-    await writeFile(filePath, '"use client";\n' + content, 'utf-8');
+    const content = await readFile(filePath, "utf-8");
+    if (
+      content.startsWith('"use client"') ||
+      content.startsWith("'use client'")
+    )
+      continue;
+    await writeFile(filePath, '"use client";\n' + content, "utf-8");
   }
 }
 
@@ -54,52 +72,57 @@ export default defineConfig([
         incremental: false,
       },
     },
-    format: ['esm'],
+    format: ["esm"],
     splitting: true,
-    outDir: 'dist',
+    outDir: "dist",
     clean: true,
   },
   // Native primitives (React Native — no "use client")
   {
     ...shared,
-    entry: { native: 'src/native/index.ts' },
+    entry: { native: "src/native/index.ts" },
     dts: {
       compilerOptions: {
         incremental: false,
       },
     },
-    format: ['esm'],
+    format: ["esm"],
     splitting: false,
-    outDir: 'dist',
+    outDir: "dist",
     clean: false,
-    external: [...shared.external, 'react-native', '@hua-labs/dot', '@hua-labs/dot/native'],
+    external: [
+      ...shared.external,
+      "react-native",
+      "@hua-labs/dot",
+      "@hua-labs/dot/native",
+    ],
   },
   // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {
     ...shared,
-    entry: { iconsax: 'src/iconsax.ts' },
+    entry: { iconsax: "src/iconsax.ts" },
     dts: {
       compilerOptions: {
         incremental: false,
       },
     },
-    format: ['esm'],
+    format: ["esm"],
     splitting: false,
-    outDir: 'dist',
+    outDir: "dist",
     clean: false,
   },
   // Iconsax Extended ESM (all icons - for gallery/admin use) — last build, adds "use client"
   {
     ...shared,
-    entry: { 'iconsax-extended': 'src/iconsax-extended.ts' },
+    entry: { "iconsax-extended": "src/iconsax-extended.ts" },
     dts: {
       compilerOptions: {
         incremental: false,
       },
     },
-    format: ['esm'],
+    format: ["esm"],
     splitting: false,
-    outDir: 'dist',
+    outDir: "dist",
     clean: false,
     async onSuccess() {
       await addUseClientDirective();

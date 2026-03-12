@@ -17,14 +17,24 @@
  */
 
 // Toast (requires Provider + CSS)
-export { ToastProvider, useToast, useToastSafe } from './components/Toast';
-export type { Toast } from './components/Toast';
+export { ToastProvider, useToast, useToastSafe } from "./components/Toast";
+export type { Toast } from "./components/Toast";
 
 // Alert
-export { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from './components/Alert';
+export {
+  Alert,
+  AlertSuccess,
+  AlertWarning,
+  AlertError,
+  AlertInfo,
+} from "./components/Alert";
 
 // Loading
-export { LoadingSpinner } from './components/LoadingSpinner';
+export { LoadingSpinner } from "./components/LoadingSpinner";
 
 // Tooltip
-export { Tooltip, TooltipLight, TooltipDark } from './components/Tooltip';
+export { Tooltip, TooltipLight, TooltipDark } from "./components/Tooltip";
+
+// EmptyState (promoted from dashboard)
+export { DashboardEmptyState as EmptyState } from "./components/dashboard/EmptyState";
+export type { DashboardEmptyStateProps as EmptyStateProps } from "./components/dashboard/EmptyState";
