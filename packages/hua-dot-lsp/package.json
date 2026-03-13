@@ -1,0 +1,28 @@
+{
+  "name": "@hua-labs/dot-lsp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LSP server for the dot style engine — autocomplete, hover, diagnostics",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "dot-lsp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --shims",
+    "dev": "tsx src/index.ts --stdio"
+  },
+  "dependencies": {
+    "@hua-labs/dot": "workspace:*",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
