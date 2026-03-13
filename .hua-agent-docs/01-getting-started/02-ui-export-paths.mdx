@@ -19,7 +19,11 @@ related:
 |-----------|-------------|
 | Button, Badge, Card, Input, Modal, Alert, Icon, Avatar, Section, ThemeToggle, ThemeProvider | `@hua-labs/ui` |
 | GlowCard, TiltCard, SpotlightCard, FeatureCard, Carousel, Marquee, Parallax, TextReveal, AnimatedGradient, VideoBackground, HeroSection, InfoCard, Timeline, Bookmark, ChatMessage, LanguageToggle, ScrollIndicator | `@hua-labs/ui/advanced` |
-| SectionHeader, StatsPanel, SummaryCard, ProgressCard, ProfileCard, BarChart, MiniBarChart, TrendChart, StatCard, DashboardGrid, KanbanBoard, ActivityFeed | `@hua-labs/ui/advanced/dashboard` |
+| BarChart, MiniBarChart, TrendChart, YearlyHeatmap, StatCard, MetricCard, SummaryCard, ProgressCard, QuickActionCard, ActivityFeed, NotificationCard, ProfileCard, MembershipBadge, DataTable, DetailDrawer, BreakdownCard, EntityList, SettlementTimeline, DashboardGrid, StatsPanel, SectionHeader | `@hua-labs/ui/data` |
+| EmptyState | `@hua-labs/ui/feedback` |
+| Sidebar | `@hua-labs/ui/navigation` |
+| Toolbar | `@hua-labs/ui/interactive` |
+| KanbanBoard, KanbanColumn, KanbanCard, KanbanProvider, useKanban | `@hua-labs/ui/interactive/kanban` |
 | EmotionMeter, EmotionButton, EmotionSelector, EmotionAnalysis | `@hua-labs/ui/advanced/emotion` |
 | BlogEditor, BlogEditorProvider | `@hua-labs/ui/advanced` |
 | Form, FormField, FormControl, Checkbox, Radio, Select, Slider, DatePicker, Upload, Autocomplete, ColorPicker | `@hua-labs/ui/form` |
@@ -63,19 +67,45 @@ import { GlowCard, TiltCard, SpotlightCard, FeatureCard,
 
 > **Note**: Advanced and Pro components are distributed as **pre-built dist** (not source). Tree-shaking may be limited — import only what you need.
 
-### Advanced Dashboard — `@hua-labs/ui/advanced/dashboard`
+### Data — `@hua-labs/ui/data` (extended)
 
-Dashboard-specific components for admin panels and data visualization.
+Dashboard data-vis, stats, and domain-specific widgets live here alongside Table and CodeBlock.
 
 ```typescript
-import { SectionHeader, StatsPanel, SummaryCard, ProgressCard, ProfileCard,
-         BarChart, MiniBarChart, TrendChart,
-         StatCard, DashboardGrid, DashboardSidebar, DashboardToolbar,
-         ActivityFeed, MembershipBadge, MetricCard, NotificationCard,
-         KanbanBoard, KanbanColumn, KanbanCard,
-         TransactionsTable, TransactionDetailDrawer,
-         YearlyHeatmap, SettlementTimeline, RoutingBreakdownCard, MerchantList } from '@hua-labs/ui/advanced/dashboard'
+import { BarChart, MiniBarChart, TrendChart, YearlyHeatmap,
+         StatCard, MetricCard, SummaryCard, ProgressCard, QuickActionCard,
+         ActivityFeed, NotificationCard, ProfileCard, MembershipBadge,
+         DataTable, DetailDrawer, BreakdownCard, EntityList, SettlementTimeline,
+         DashboardGrid, StatsPanel, SectionHeader } from '@hua-labs/ui/data'
 ```
+
+> **Note**: `DataTable` replaces `TransactionsTable`, `DetailDrawer` replaces `TransactionDetailDrawer`, `BreakdownCard` replaces `RoutingBreakdownCard`, `EntityList` replaces `MerchantList`.
+
+### Sidebar — `@hua-labs/ui/navigation`
+
+```typescript
+import { Sidebar, type SidebarProps } from '@hua-labs/ui/navigation'
+```
+
+### Toolbar — `@hua-labs/ui/interactive`
+
+```typescript
+import { Toolbar, type ToolbarProps } from '@hua-labs/ui/interactive'
+```
+
+### Kanban — `@hua-labs/ui/interactive/kanban`
+
+```typescript
+import { KanbanBoard, KanbanColumn, KanbanCard, KanbanProvider, useKanban } from '@hua-labs/ui/interactive/kanban'
+```
+
+### EmptyState — `@hua-labs/ui/feedback`
+
+```typescript
+import { EmptyState, type EmptyStateProps } from '@hua-labs/ui/feedback'
+```
+
+> **Deprecated**: `@hua-labs/ui/advanced/dashboard` still re-exports all the above for backwards compatibility, but new code should use the semantic subpaths above.
 
 ### Form — `@hua-labs/ui/form`
 

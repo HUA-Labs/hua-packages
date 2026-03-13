@@ -53,17 +53,17 @@ Complete technical reference for the modern React UI component library.
 
 ### Component Categories
 
-| Category | Entry Point | Purpose |
-|----------|-------------|---------|
-| Atomic UI | `@hua-labs/ui` | Buttons, inputs, cards, badges, avatars |
-| Layout | `@hua-labs/ui` | Container, Grid, Stack, Card, Panel |
-| Form | `@hua-labs/ui/form` | Complete form components |
-| Overlay | `@hua-labs/ui/overlay` | Modals, popovers, dropdowns, drawers |
-| Data | `@hua-labs/ui/data` | Tables, code blocks |
-| Interactive | `@hua-labs/ui/interactive` | Accordions, tabs, menus |
-| Navigation | `@hua-labs/ui/navigation` | Navigation, breadcrumbs, pagination |
-| Feedback | `@hua-labs/ui/feedback` | Toast notifications, spinners |
-| Advanced | `@hua-labs/ui/advanced` | Complex domain components |
+| Category    | Entry Point                | Purpose                                 |
+| ----------- | -------------------------- | --------------------------------------- |
+| Atomic UI   | `@hua-labs/ui`             | Buttons, inputs, cards, badges, avatars |
+| Layout      | `@hua-labs/ui`             | Container, Grid, Stack, Card, Panel     |
+| Form        | `@hua-labs/ui/form`        | Complete form components                |
+| Overlay     | `@hua-labs/ui/overlay`     | Modals, popovers, dropdowns, drawers    |
+| Data        | `@hua-labs/ui/data`        | Tables, code blocks                     |
+| Interactive | `@hua-labs/ui/interactive` | Accordions, tabs, menus                 |
+| Navigation  | `@hua-labs/ui/navigation`  | Navigation, breadcrumbs, pagination     |
+| Feedback    | `@hua-labs/ui/feedback`    | Toast notifications, spinners           |
+| Advanced    | `@hua-labs/ui/advanced`    | Complex domain components               |
 
 ---
 
@@ -80,6 +80,7 @@ npm install @hua-labs/ui
 ### Peer Dependencies
 
 Required:
+
 ```json
 {
   "react": ">=19.0.0",
@@ -88,6 +89,7 @@ Required:
 ```
 
 Optional (for drag-and-drop components):
+
 ```json
 {
   "@dnd-kit/core": "^6.3.1",
@@ -107,6 +109,7 @@ HUA UI requires Tailwind CSS v4. Configure your project:
 ```
 
 **Minimal setup (no theme):**
+
 ```css
 @import "tailwindcss";
 @import "@hua-labs/ui/styles/base.css";
@@ -123,6 +126,7 @@ No additional setup required. The library includes comprehensive type definition
 ### Core Export (`@hua-labs/ui`)
 
 **Basic UI:**
+
 - `Button` - Multi-variant button with loading states
 - `Action` - Lightweight button alternative
 - `Input` - Text input with validation
@@ -133,6 +137,7 @@ No additional setup required. The library includes comprehensive type definition
 - `Badge` - Status/label indicator
 
 **Layout:**
+
 - `Container` - Responsive container
 - `Grid` - CSS grid wrapper
 - `Stack` - Flexbox stack (vertical/horizontal)
@@ -142,21 +147,25 @@ No additional setup required. The library includes comprehensive type definition
 - `ActionToolbar` - Action button toolbar
 
 **Feedback:**
+
 - `Alert` - Alert with variants (Success, Warning, Error, Info)
 - `Toast` - Toast notification system (ToastProvider, useToast)
 - `LoadingSpinner` - Loading indicator
 - `Tooltip` - Tooltip with light/dark variants
 
 **Form Elements:**
+
 - `Label` - Form label
 - `Switch` - Toggle switch
 - `Toggle` - Toggle button
 
 **Data Display:**
+
 - `Progress` - Progress bar with variants
 - `Skeleton` - Loading skeletons (Text, Circle, Rectangle, Card, Avatar, Image, UserProfile, List, Table)
 
 **Theme & Scroll:**
+
 - `ThemeProvider` - Theme context provider
 - `ThemeToggle` - Theme switcher
 - `ScrollArea` - Custom scrollbar
@@ -165,10 +174,18 @@ No additional setup required. The library includes comprehensive type definition
 ### Form Export (`@hua-labs/ui/form`)
 
 ```tsx
-import { Form, FormControl, Select, DatePicker, Upload, Autocomplete } from '@hua-labs/ui/form';
+import {
+  Form,
+  FormControl,
+  Select,
+  DatePicker,
+  Upload,
+  Autocomplete,
+} from "@hua-labs/ui/form";
 ```
 
 Components:
+
 - `Form` - Form wrapper with validation
 - `FormControl` - Form field wrapper
 - `Select` - Dropdown select
@@ -184,10 +201,17 @@ Components:
 ### Overlay Export (`@hua-labs/ui/overlay`)
 
 ```tsx
-import { Modal, Drawer, Popover, Dropdown, BottomSheet } from '@hua-labs/ui/overlay';
+import {
+  Modal,
+  Drawer,
+  Popover,
+  Dropdown,
+  BottomSheet,
+} from "@hua-labs/ui/overlay";
 ```
 
 Components:
+
 - `Modal` - Modal dialog
 - `Drawer` - Side drawer
 - `Popover` - Popover overlay
@@ -198,20 +222,22 @@ Components:
 ### Data Export (`@hua-labs/ui/data`)
 
 ```tsx
-import { Table, CodeBlock } from '@hua-labs/ui/data';
+import { Table, CodeBlock } from "@hua-labs/ui/data";
 ```
 
 Components:
+
 - `Table` - Data table
 - `CodeBlock` - Syntax-highlighted code block
 
 ### Interactive Export (`@hua-labs/ui/interactive`)
 
 ```tsx
-import { Accordion, Tabs, Menu, Command } from '@hua-labs/ui/interactive';
+import { Accordion, Tabs, Menu, Command } from "@hua-labs/ui/interactive";
 ```
 
 Components:
+
 - `Accordion` - Collapsible accordion
 - `Tabs` - Tab navigation
 - `Menu` - Menu component
@@ -221,10 +247,11 @@ Components:
 ### Navigation Export (`@hua-labs/ui/navigation`)
 
 ```tsx
-import { Navigation, Breadcrumb, Pagination } from '@hua-labs/ui/navigation';
+import { Navigation, Breadcrumb, Pagination } from "@hua-labs/ui/navigation";
 ```
 
 Components:
+
 - `Navigation` - Navigation component
 - `Breadcrumb` - Breadcrumb trail
 - `Pagination` - Page pagination
@@ -234,9 +261,15 @@ Components:
 ### Advanced Export (`@hua-labs/ui/advanced`)
 
 ```tsx
-import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from '@hua-labs/ui/advanced/motion';
-import { EmotionSelector } from '@hua-labs/ui/advanced/emotion';
+import { StatsPanel, BarChart, DataTable } from "@hua-labs/ui/data";
+import { EmptyState } from "@hua-labs/ui/feedback";
+import { Sidebar } from "@hua-labs/ui/navigation";
+import { Toolbar } from "@hua-labs/ui/interactive";
+import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
+// deprecated barrel (backwards compat):
+// import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
+import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
 Domain-specific advanced components.
@@ -261,6 +294,7 @@ import { Button } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `variant` - "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"
 - `size` - "sm" | "md" | "lg" | "xl" | "icon"
 - `loading` - Show loading spinner
@@ -279,23 +313,29 @@ import { Button } from '@hua-labs/ui';
 Compound component for content cards.
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@hua-labs/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@hua-labs/ui";
 
 <Card>
   <CardHeader>
     <CardTitle>Card Title</CardTitle>
     <CardDescription>Card description goes here</CardDescription>
   </CardHeader>
-  <CardContent>
-    Main content area
-  </CardContent>
+  <CardContent>Main content area</CardContent>
   <CardFooter>
     <Button>Action</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 **Features:**
+
 - Compound component pattern for flexible composition
 - Supports all base HTML div attributes
 - Dark mode ready
@@ -322,6 +362,7 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `name` - Icon name (auto-normalized across providers)
 - `size` - Icon size (number or string)
 - `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
@@ -333,11 +374,13 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 - `bounce` - Bounce animation
 
 **Icon Sets:**
+
 - **Phosphor** (default) - 6 weights, 1200+ icons
 - **Lucide** - Minimalist, 1000+ icons
 - **Iconsax** - 4 variants (line/bold/bulk/broken), 1000+ icons (requires `@hua-labs/ui/iconsax` import)
 
 **Icon Aliases:**
+
 ```tsx
 // Normalized across providers
 <Icon name="trash" />     // → phosphor: Trash, lucide: Trash2, iconsax: trash
@@ -350,7 +393,7 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 Accessible modal dialog with overlay and keyboard handling.
 
 ```tsx
-import { Modal } from '@hua-labs/ui';
+import { Modal } from "@hua-labs/ui";
 
 const [open, setOpen] = useState(false);
 
@@ -362,10 +405,11 @@ const [open, setOpen] = useState(false);
 >
   <p>Modal content</p>
   <Button onClick={() => setOpen(false)}>Close</Button>
-</Modal>
+</Modal>;
 ```
 
 **Props:**
+
 - `open` - Controlled open state
 - `onClose` - Close handler
 - `title` - Modal title
@@ -376,6 +420,7 @@ const [open, setOpen] = useState(false);
 - `showCloseButton` - Show close button (default: true)
 
 **Accessibility:**
+
 - Traps focus within modal
 - Closes on Escape key
 - ARIA attributes for screen readers
@@ -386,7 +431,7 @@ const [open, setOpen] = useState(false);
 Text input with validation states and custom styling.
 
 ```tsx
-import { Input, Label } from '@hua-labs/ui';
+import { Input, Label } from "@hua-labs/ui";
 
 <div>
   <Label htmlFor="email">Email</Label>
@@ -396,10 +441,11 @@ import { Input, Label } from '@hua-labs/ui';
     placeholder="Enter your email"
     error="Invalid email"
   />
-</div>
+</div>;
 ```
 
 **Props:**
+
 - All standard input attributes
 - `error` - Error message (shows red border)
 - `success` - Success state (shows green border)
@@ -423,6 +469,7 @@ import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-l
 ```
 
 **Props:**
+
 - `variant` - "success" | "warning" | "error" | "info"
 - `title` - Alert title (optional)
 - `children` - Alert content
@@ -433,13 +480,13 @@ import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-l
 Toast notification system with context provider.
 
 ```tsx
-import { ToastProvider, useToast } from '@hua-labs/ui';
-import '@hua-labs/ui/styles/toast.css';
+import { ToastProvider, useToast } from "@hua-labs/ui";
+import "@hua-labs/ui/styles/toast.css";
 
 // Wrap your app
 <ToastProvider>
   <App />
-</ToastProvider>
+</ToastProvider>;
 
 // In component
 function Component() {
@@ -450,7 +497,7 @@ function Component() {
       title: "Success",
       description: "Operation completed",
       variant: "success",
-      duration: 3000
+      duration: 3000,
     });
   };
 
@@ -459,6 +506,7 @@ function Component() {
 ```
 
 **Toast Options:**
+
 - `title` - Toast title
 - `description` - Toast description
 - `variant` - "default" | "success" | "warning" | "error" | "info"
@@ -466,6 +514,7 @@ function Component() {
 - `action` - Action button config
 
 **Safe Hook:**
+
 ```tsx
 // Use in components that might not have ToastProvider
 const toast = useToastSafe();
@@ -486,6 +535,7 @@ import { Badge } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `variant` - "default" | "success" | "warning" | "error" | "outline" | "secondary"
 - `size` - "sm" | "md" | "lg"
 - `children` - Badge content
@@ -510,6 +560,7 @@ import { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo
 ```
 
 **Props:**
+
 - `value` - Current value
 - `max` - Maximum value (default: 100)
 - `variant` - "default" | "success" | "warning" | "error" | "info"
@@ -532,6 +583,7 @@ import { Skeleton, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonAvatar, S
 ```
 
 **Variants:**
+
 - `Skeleton` - Base skeleton
 - `SkeletonText` - Text lines skeleton
 - `SkeletonCircle` - Circle skeleton
@@ -573,6 +625,7 @@ function CustomThemeControl() {
 ```
 
 **Props:**
+
 - `defaultTheme` - "light" | "dark" | "system" (default: "system")
 - `storageKey` - localStorage key (default: "ui-theme")
 - `children` - App content
@@ -598,30 +651,30 @@ dot('p-4 rounded-lg bg-primary-500')
 ### dotVariants and dotMap
 
 ```tsx
-import { dotVariants, dotMap } from '@hua-labs/dot';
+import { dotVariants, dotMap } from "@hua-labs/dot";
 
 // Variant-based styles (replaces CVA)
 const buttonStyles = dotVariants({
-  base: 'inline-flex items-center justify-center rounded-md',
+  base: "inline-flex items-center justify-center rounded-md",
   variants: {
     variant: {
-      primary: 'bg-primary-500 text-white',
-      outline: 'border border-gray-300',
+      primary: "bg-primary-500 text-white",
+      outline: "border border-gray-300",
     },
     size: {
-      sm: 'text-sm px-3 py-1.5',
-      md: 'text-base px-4 py-2',
+      sm: "text-sm px-3 py-1.5",
+      md: "text-base px-4 py-2",
     },
   },
-  defaultVariants: { variant: 'primary', size: 'md' },
+  defaultVariants: { variant: "primary", size: "md" },
 });
 
 // State-based styles (hover, focus, active)
 const interactiveStyles = dotMap({
-  default: 'bg-gray-100',
-  hover: 'bg-gray-200',
-  focus: 'ring-2 ring-primary-500',
-  active: 'bg-gray-300',
+  default: "bg-gray-100",
+  hover: "bg-gray-200",
+  focus: "ring-2 ring-primary-500",
+  active: "bg-gray-300",
 });
 ```
 
@@ -682,17 +735,17 @@ HUA UI uses CSS variables for theming:
 Built-in micro-interactions:
 
 ```tsx
-import { useMicroMotion, getMicroMotionClasses } from '@hua-labs/ui';
+import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // Hook-based
 function Component() {
-  const motion = useMicroMotion('button-press');
+  const motion = useMicroMotion("button-press");
   return <button {...motion.props}>Click me</button>;
 }
 
 // Style-based
-const motionStyle = getMicroMotionClasses('hover-lift');
-<div style={motionStyle}>Hover me</div>
+const motionStyle = getMicroMotionClasses("hover-lift");
+<div style={motionStyle}>Hover me</div>;
 
 // Available presets:
 // 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
@@ -707,17 +760,19 @@ const motionStyle = getMicroMotionClasses('hover-lift');
 HUA UI supports three icon providers:
 
 **1. Phosphor Icons (Default)**
+
 ```tsx
-import { Icon, IconProvider } from '@hua-labs/ui';
+import { Icon, IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="phosphor" weight="regular">
   <Icon name="heart" />
-</IconProvider>
+</IconProvider>;
 ```
 
 Weights: `thin`, `light`, `regular`, `bold`, `fill`, `duotone`
 
 **2. Lucide Icons**
+
 ```tsx
 <IconProvider set="lucide">
   <Icon name="heart" />
@@ -727,13 +782,14 @@ Weights: `thin`, `light`, `regular`, `bold`, `fill`, `duotone`
 Minimalist design, consistent stroke width.
 
 **3. Iconsax Icons**
+
 ```tsx
 // Must import iconsax entry first
-import '@hua-labs/ui/iconsax';
+import "@hua-labs/ui/iconsax";
 
 <IconProvider set="iconsax" iconsaxVariant="bold">
   <Icon name="heart" />
-</IconProvider>
+</IconProvider>;
 ```
 
 Variants: `line`, `bold`, `bulk`, `broken`
@@ -741,18 +797,18 @@ Variants: `line`, `bold`, `bulk`, `broken`
 ### Icon Configuration
 
 ```tsx
-import { IconProvider, defaultIconConfig } from '@hua-labs/ui';
+import { IconProvider, defaultIconConfig } from "@hua-labs/ui";
 
 <IconProvider
-  set="phosphor"           // Icon provider
-  size={24}                // Default size
-  color="currentColor"     // Default color
-  weight="regular"         // Phosphor weight
-  strokeWidth={1.5}        // Lucide stroke width
-  iconsaxVariant="line"    // Iconsax variant
+  set="phosphor" // Icon provider
+  size={24} // Default size
+  color="currentColor" // Default color
+  weight="regular" // Phosphor weight
+  strokeWidth={1.5} // Lucide stroke width
+  iconsaxVariant="line" // Iconsax variant
 >
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 ### Emotion & Status Icons
@@ -804,17 +860,17 @@ Common icon names are aliased across providers:
 ### ThemeProvider Setup
 
 ```tsx
-import { ThemeProvider } from '@hua-labs/ui';
+import { ThemeProvider } from "@hua-labs/ui";
 
 <ThemeProvider defaultTheme="system" storageKey="app-theme">
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ### useTheme Hook
 
 ```tsx
-import { useTheme } from '@hua-labs/ui';
+import { useTheme } from "@hua-labs/ui";
 
 function CustomThemeControl() {
   const { theme, setTheme, systemTheme, resolvedTheme } = useTheme();
@@ -825,9 +881,9 @@ function CustomThemeControl() {
       <p>System theme: {systemTheme}</p>
       <p>Resolved theme: {resolvedTheme}</p>
 
-      <button onClick={() => setTheme('light')}>Light</button>
-      <button onClick={() => setTheme('dark')}>Dark</button>
-      <button onClick={() => setTheme('system')}>System</button>
+      <button onClick={() => setTheme("light")}>Light</button>
+      <button onClick={() => setTheme("dark")}>Dark</button>
+      <button onClick={() => setTheme("system")}>System</button>
     </div>
   );
 }
@@ -836,19 +892,19 @@ function CustomThemeControl() {
 ### Theme Toggle
 
 ```tsx
-import { ThemeToggle } from '@hua-labs/ui';
+import { ThemeToggle } from "@hua-labs/ui";
 
 // Preset toggle button
-<ThemeToggle />
+<ThemeToggle />;
 
 // Custom implementation
 function CustomToggle() {
   const { theme, setTheme } = useTheme();
-  const nextTheme = theme === 'light' ? 'dark' : 'light';
+  const nextTheme = theme === "light" ? "dark" : "light";
 
   return (
     <button onClick={() => setTheme(nextTheme)}>
-      {theme === 'light' ? '🌙' : '☀️'}
+      {theme === "light" ? "🌙" : "☀️"}
     </button>
   );
 }
@@ -858,13 +914,13 @@ function CustomToggle() {
 
 ```tsx
 // Conditional dark mode styles
-className="bg-white dark:bg-slate-900"
-className="text-gray-900 dark:text-gray-100"
-className="border-gray-200 dark:border-gray-700"
+className = "bg-white dark:bg-slate-900";
+className = "text-gray-900 dark:text-gray-100";
+className = "border-gray-200 dark:border-gray-700";
 
 // Using CSS variables (theme-aware)
-className="bg-background text-foreground"
-className="border-border"
+className = "bg-background text-foreground";
+className = "border-border";
 ```
 
 ---
@@ -876,19 +932,15 @@ className="border-border"
 Detect when element enters viewport.
 
 ```tsx
-import { useInView } from '@hua-labs/ui';
+import { useInView } from "@hua-labs/ui";
 
 function Component() {
   const { ref, inView } = useInView({
     threshold: 0.5,
-    triggerOnce: true
+    triggerOnce: true,
   });
 
-  return (
-    <div ref={ref}>
-      {inView ? 'Visible' : 'Hidden'}
-    </div>
-  );
+  return <div ref={ref}>{inView ? "Visible" : "Hidden"}</div>;
 }
 ```
 
@@ -897,7 +949,7 @@ function Component() {
 Track scroll progress as percentage.
 
 ```tsx
-import { useScrollProgress } from '@hua-labs/ui';
+import { useScrollProgress } from "@hua-labs/ui";
 
 function ScrollIndicator() {
   const { progress } = useScrollProgress();
@@ -907,7 +959,7 @@ function ScrollIndicator() {
       style={{
         width: `${progress}%`,
         height: 4,
-        background: 'blue'
+        background: "blue",
       }}
     />
   );
@@ -919,7 +971,7 @@ function ScrollIndicator() {
 Track mouse position.
 
 ```tsx
-import { useMouse } from '@hua-labs/ui';
+import { useMouse } from "@hua-labs/ui";
 
 function Component() {
   const { x, y, elementX, elementY, elementW, elementH } = useMouse();
@@ -937,16 +989,12 @@ function Component() {
 Detect reduced motion preference.
 
 ```tsx
-import { useReducedMotion } from '@hua-labs/ui';
+import { useReducedMotion } from "@hua-labs/ui";
 
 function Component() {
   const reducedMotion = useReducedMotion();
 
-  return (
-    <div className={reducedMotion ? '' : 'animate-bounce'}>
-      Content
-    </div>
-  );
+  return <div className={reducedMotion ? "" : "animate-bounce"}>Content</div>;
 }
 ```
 
@@ -955,7 +1003,7 @@ function Component() {
 Track window dimensions.
 
 ```tsx
-import { useWindowSize } from '@hua-labs/ui';
+import { useWindowSize } from "@hua-labs/ui";
 
 function Component() {
   const { width, height, isMobile, isTablet, isDesktop } = useWindowSize();
@@ -976,7 +1024,13 @@ function Component() {
 ### Compound Components
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@hua-labs/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@hua-labs/ui";
 
 <Card>
   <CardHeader>
@@ -988,7 +1042,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@hua-labs/
   <CardFooter>
     <Button>Edit</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 ### Slot Pattern (Polymorphic Components)
@@ -1031,7 +1085,7 @@ import { Button, merge } from '@hua-labs/ui';
 
 ```tsx
 // Server Component (no 'use client')
-import { Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
+import { Card, CardHeader, CardTitle, CardContent } from "@hua-labs/ui";
 
 export default function ServerComponent() {
   return (
@@ -1039,31 +1093,25 @@ export default function ServerComponent() {
       <CardHeader>
         <CardTitle>Server-rendered Card</CardTitle>
       </CardHeader>
-      <CardContent>
-        This renders on the server
-      </CardContent>
+      <CardContent>This renders on the server</CardContent>
     </Card>
   );
 }
 
 // Client Component (interactive)
-'use client';
+("use client");
 
-import { Button } from '@hua-labs/ui';
+import { Button } from "@hua-labs/ui";
 
 export default function ClientComponent() {
-  return (
-    <Button onClick={() => console.log('clicked')}>
-      Click me
-    </Button>
-  );
+  return <Button onClick={() => console.log("clicked")}>Click me</Button>;
 }
 ```
 
 ### Form Validation
 
 ```tsx
-import { Form, FormControl, Input, Button } from '@hua-labs/ui/form';
+import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -1077,20 +1125,12 @@ function LoginForm() {
     <Form onSubmit={handleSubmit}>
       <FormControl>
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          error={errors.email}
-        />
+        <Input id="email" type="email" error={errors.email} />
       </FormControl>
 
       <FormControl>
         <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          error={errors.password}
-        />
+        <Input id="password" type="password" error={errors.password} />
       </FormControl>
 
       <Button type="submit">Login</Button>
@@ -1116,6 +1156,7 @@ function LoginForm() {
 ```
 
 Without the theme, use standard Tailwind colors:
+
 ```tsx
 <Button className="bg-blue-500">Button</Button>
 ```
@@ -1129,16 +1170,17 @@ Without the theme, use standard Tailwind colors:
 **Solution:** Wrap your app with `ThemeProvider`:
 
 ```tsx
-import { ThemeProvider } from '@hua-labs/ui';
+import { ThemeProvider } from "@hua-labs/ui";
 
 <ThemeProvider>
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 Ensure dark mode classes are used:
+
 ```tsx
-className="bg-white dark:bg-slate-900"
+className = "bg-white dark:bg-slate-900";
 ```
 
 ---
@@ -1150,9 +1192,9 @@ className="bg-white dark:bg-slate-900"
 **Solution:** Add `'use client'` directive for interactive components:
 
 ```tsx
-'use client';
+"use client";
 
-import { Button } from '@hua-labs/ui';
+import { Button } from "@hua-labs/ui";
 
 export default function Component() {
   return <Button onClick={() => {}}>Click</Button>;
@@ -1170,27 +1212,30 @@ Non-interactive components (Card, Badge, etc.) can remain server components.
 **Solution:**
 
 1. Check icon provider setup:
+
 ```tsx
-import { IconProvider } from '@hua-labs/ui';
+import { IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="phosphor">
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 2. For Iconsax, import the entry point:
+
 ```tsx
-import '@hua-labs/ui/iconsax';
-import { IconProvider } from '@hua-labs/ui';
+import "@hua-labs/ui/iconsax";
+import { IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="iconsax">
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 3. Verify icon name is valid. Check available icons:
+
 ```tsx
-import { iconNames } from '@hua-labs/ui';
+import { iconNames } from "@hua-labs/ui";
 console.log(iconNames);
 ```
 
@@ -1204,10 +1249,10 @@ console.log(iconNames);
 
 ```tsx
 const buttonRef = useRef<HTMLButtonElement>(null);
-<Button ref={buttonRef}>Button</Button>
+<Button ref={buttonRef}>Button</Button>;
 
 const divRef = useRef<HTMLDivElement>(null);
-<Card ref={divRef}>Card</Card>
+<Card ref={divRef}>Card</Card>;
 ```
 
 ---
@@ -1219,22 +1264,25 @@ const divRef = useRef<HTMLDivElement>(null);
 **Solution:**
 
 1. Import toast CSS:
+
 ```css
 @import "@hua-labs/ui/styles/toast.css";
 ```
 
 2. Wrap app with ToastProvider:
+
 ```tsx
-import { ToastProvider } from '@hua-labs/ui';
+import { ToastProvider } from "@hua-labs/ui";
 
 <ToastProvider>
   <App />
-</ToastProvider>
+</ToastProvider>;
 ```
 
 3. Use the hook:
+
 ```tsx
-import { useToast } from '@hua-labs/ui';
+import { useToast } from "@hua-labs/ui";
 
 function Component() {
   const { toast } = useToast();
@@ -1252,14 +1300,15 @@ function Component() {
 
 ```tsx
 // Bad: Imports entire package
-import { Form, Select, DatePicker } from '@hua-labs/ui';
+import { Form, Select, DatePicker } from "@hua-labs/ui";
 
 // Good: Tree-shakeable
-import { Button, Card } from '@hua-labs/ui';
-import { Form, Select } from '@hua-labs/ui/form';
+import { Button, Card } from "@hua-labs/ui";
+import { Form, Select } from "@hua-labs/ui/form";
 ```
 
 Analyze bundle:
+
 ```bash
 pnpm run build:analyze
 ```
@@ -1276,8 +1325,8 @@ pnpm run build:analyze
 // tailwind.config.js
 export default {
   content: [
-    './app/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@hua-labs/ui/dist/**/*.{js,mjs}',
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@hua-labs/ui/dist/**/*.{js,mjs}",
   ],
   // ...
 };
@@ -1333,17 +1382,17 @@ export default {
 
 ### 컴포넌트 카테고리
 
-| 카테고리 | 진입점 | 목적 |
-|---------|--------|------|
-| 원자 UI | `@hua-labs/ui` | 버튼, 인풋, 카드, 뱃지, 아바타 |
-| 레이아웃 | `@hua-labs/ui` | Container, Grid, Stack, Card, Panel |
-| 폼 | `@hua-labs/ui/form` | 완전한 폼 컴포넌트 |
-| 오버레이 | `@hua-labs/ui/overlay` | 모달, 팝오버, 드롭다운, 드로어 |
-| 데이터 | `@hua-labs/ui/data` | 테이블, 코드 블록 |
-| 인터랙티브 | `@hua-labs/ui/interactive` | 아코디언, 탭, 메뉴 |
-| 내비게이션 | `@hua-labs/ui/navigation` | 내비게이션, 브레드크럼, 페이지네이션 |
-| 피드백 | `@hua-labs/ui/feedback` | 토스트 알림, 스피너 |
-| 고급 | `@hua-labs/ui/advanced` | 복잡한 도메인 컴포넌트 |
+| 카테고리   | 진입점                     | 목적                                 |
+| ---------- | -------------------------- | ------------------------------------ |
+| 원자 UI    | `@hua-labs/ui`             | 버튼, 인풋, 카드, 뱃지, 아바타       |
+| 레이아웃   | `@hua-labs/ui`             | Container, Grid, Stack, Card, Panel  |
+| 폼         | `@hua-labs/ui/form`        | 완전한 폼 컴포넌트                   |
+| 오버레이   | `@hua-labs/ui/overlay`     | 모달, 팝오버, 드롭다운, 드로어       |
+| 데이터     | `@hua-labs/ui/data`        | 테이블, 코드 블록                    |
+| 인터랙티브 | `@hua-labs/ui/interactive` | 아코디언, 탭, 메뉴                   |
+| 내비게이션 | `@hua-labs/ui/navigation`  | 내비게이션, 브레드크럼, 페이지네이션 |
+| 피드백     | `@hua-labs/ui/feedback`    | 토스트 알림, 스피너                  |
+| 고급       | `@hua-labs/ui/advanced`    | 복잡한 도메인 컴포넌트               |
 
 ---
 
@@ -1360,6 +1409,7 @@ npm install @hua-labs/ui
 ### Peer Dependencies
 
 필수:
+
 ```json
 {
   "react": ">=19.0.0",
@@ -1368,6 +1418,7 @@ npm install @hua-labs/ui
 ```
 
 선택 (드래그 앤 드롭 컴포넌트용):
+
 ```json
 {
   "@dnd-kit/core": "^6.3.1",
@@ -1387,6 +1438,7 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 ```
 
 **최소 설정 (테마 없이):**
+
 ```css
 @import "tailwindcss";
 @import "@hua-labs/ui/styles/base.css";
@@ -1403,6 +1455,7 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 ### 코어 Export (`@hua-labs/ui`)
 
 **기본 UI:**
+
 - `Button` - 로딩 상태를 지원하는 다중 변형 버튼
 - `Action` - 경량 버튼 대안
 - `Input` - 유효성 검증을 지원하는 텍스트 입력
@@ -1413,6 +1466,7 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 - `Badge` - 상태/라벨 표시기
 
 **레이아웃:**
+
 - `Container` - 반응형 컨테이너
 - `Grid` - CSS grid 래퍼
 - `Stack` - Flexbox 스택 (수직/수평)
@@ -1422,21 +1476,25 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 - `ActionToolbar` - 액션 버튼 툴바
 
 **피드백:**
+
 - `Alert` - 변형이 있는 알림 (Success, Warning, Error, Info)
 - `Toast` - 토스트 알림 시스템 (ToastProvider, useToast)
 - `LoadingSpinner` - 로딩 표시기
 - `Tooltip` - 라이트/다크 변형이 있는 툴팁
 
 **폼 요소:**
+
 - `Label` - 폼 라벨
 - `Switch` - 토글 스위치
 - `Toggle` - 토글 버튼
 
 **데이터 디스플레이:**
+
 - `Progress` - 변형이 있는 프로그레스 바
 - `Skeleton` - 로딩 스켈레톤 (Text, Circle, Rectangle, Card, Avatar, Image, UserProfile, List, Table)
 
 **테마 & 스크롤:**
+
 - `ThemeProvider` - 테마 컨텍스트 프로바이더
 - `ThemeToggle` - 테마 전환기
 - `ScrollArea` - 커스텀 스크롤바
@@ -1445,10 +1503,18 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 ### Form Export (`@hua-labs/ui/form`)
 
 ```tsx
-import { Form, FormControl, Select, DatePicker, Upload, Autocomplete } from '@hua-labs/ui/form';
+import {
+  Form,
+  FormControl,
+  Select,
+  DatePicker,
+  Upload,
+  Autocomplete,
+} from "@hua-labs/ui/form";
 ```
 
 컴포넌트:
+
 - `Form` - 유효성 검증이 있는 폼 래퍼
 - `FormControl` - 폼 필드 래퍼
 - `Select` - 드롭다운 선택
@@ -1464,10 +1530,17 @@ import { Form, FormControl, Select, DatePicker, Upload, Autocomplete } from '@hu
 ### Overlay Export (`@hua-labs/ui/overlay`)
 
 ```tsx
-import { Modal, Drawer, Popover, Dropdown, BottomSheet } from '@hua-labs/ui/overlay';
+import {
+  Modal,
+  Drawer,
+  Popover,
+  Dropdown,
+  BottomSheet,
+} from "@hua-labs/ui/overlay";
 ```
 
 컴포넌트:
+
 - `Modal` - 모달 다이얼로그
 - `Drawer` - 사이드 드로어
 - `Popover` - 팝오버 오버레이
@@ -1478,20 +1551,22 @@ import { Modal, Drawer, Popover, Dropdown, BottomSheet } from '@hua-labs/ui/over
 ### Data Export (`@hua-labs/ui/data`)
 
 ```tsx
-import { Table, CodeBlock } from '@hua-labs/ui/data';
+import { Table, CodeBlock } from "@hua-labs/ui/data";
 ```
 
 컴포넌트:
+
 - `Table` - 데이터 테이블
 - `CodeBlock` - 구문 강조 코드 블록
 
 ### Interactive Export (`@hua-labs/ui/interactive`)
 
 ```tsx
-import { Accordion, Tabs, Menu, Command } from '@hua-labs/ui/interactive';
+import { Accordion, Tabs, Menu, Command } from "@hua-labs/ui/interactive";
 ```
 
 컴포넌트:
+
 - `Accordion` - 접을 수 있는 아코디언
 - `Tabs` - 탭 내비게이션
 - `Menu` - 메뉴 컴포넌트
@@ -1501,10 +1576,11 @@ import { Accordion, Tabs, Menu, Command } from '@hua-labs/ui/interactive';
 ### Navigation Export (`@hua-labs/ui/navigation`)
 
 ```tsx
-import { Navigation, Breadcrumb, Pagination } from '@hua-labs/ui/navigation';
+import { Navigation, Breadcrumb, Pagination } from "@hua-labs/ui/navigation";
 ```
 
 컴포넌트:
+
 - `Navigation` - 내비게이션 컴포넌트
 - `Breadcrumb` - 브레드크럼 트레일
 - `Pagination` - 페이지 페이지네이션
@@ -1514,9 +1590,15 @@ import { Navigation, Breadcrumb, Pagination } from '@hua-labs/ui/navigation';
 ### Advanced Export (`@hua-labs/ui/advanced`)
 
 ```tsx
-import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from '@hua-labs/ui/advanced/motion';
-import { EmotionSelector } from '@hua-labs/ui/advanced/emotion';
+import { StatsPanel, BarChart, DataTable } from "@hua-labs/ui/data";
+import { EmptyState } from "@hua-labs/ui/feedback";
+import { Sidebar } from "@hua-labs/ui/navigation";
+import { Toolbar } from "@hua-labs/ui/interactive";
+import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
+// deprecated barrel (backwards compat):
+// import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
+import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
 도메인별 고급 컴포넌트.
@@ -1541,6 +1623,7 @@ import { Button } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `variant` - "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"
 - `size` - "sm" | "md" | "lg" | "xl" | "icon"
 - `loading` - 로딩 스피너 표시
@@ -1559,23 +1642,29 @@ import { Button } from '@hua-labs/ui';
 콘텐츠 카드를 위한 복합 컴포넌트.
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@hua-labs/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@hua-labs/ui";
 
 <Card>
   <CardHeader>
     <CardTitle>카드 제목</CardTitle>
     <CardDescription>카드 설명이 여기에 들어갑니다</CardDescription>
   </CardHeader>
-  <CardContent>
-    메인 콘텐츠 영역
-  </CardContent>
+  <CardContent>메인 콘텐츠 영역</CardContent>
   <CardFooter>
     <Button>액션</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 **특징:**
+
 - 유연한 구성을 위한 복합 컴포넌트 패턴
 - 모든 기본 HTML div 속성 지원
 - 다크 모드 지원
@@ -1602,6 +1691,7 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `name` - 아이콘 이름 (프로바이더 간 자동 정규화)
 - `size` - 아이콘 크기 (숫자 또는 문자열)
 - `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
@@ -1613,11 +1703,13 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 - `bounce` - 바운스 애니메이션
 
 **아이콘 세트:**
+
 - **Phosphor** (기본) - 6가지 굵기, 1200개 이상 아이콘
 - **Lucide** - 미니멀리스트, 1000개 이상 아이콘
 - **Iconsax** - 4가지 변형 (line/bold/bulk/broken), 1000개 이상 아이콘 (`@hua-labs/ui/iconsax` import 필요)
 
 **아이콘 별칭:**
+
 ```tsx
 // 프로바이더 간 정규화
 <Icon name="trash" />     // → phosphor: Trash, lucide: Trash2, iconsax: trash
@@ -1630,7 +1722,7 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 오버레이와 키보드 처리가 있는 접근 가능한 모달 다이얼로그.
 
 ```tsx
-import { Modal } from '@hua-labs/ui';
+import { Modal } from "@hua-labs/ui";
 
 const [open, setOpen] = useState(false);
 
@@ -1642,10 +1734,11 @@ const [open, setOpen] = useState(false);
 >
   <p>모달 콘텐츠</p>
   <Button onClick={() => setOpen(false)}>닫기</Button>
-</Modal>
+</Modal>;
 ```
 
 **Props:**
+
 - `open` - 제어된 열림 상태
 - `onClose` - 닫기 핸들러
 - `title` - 모달 제목
@@ -1656,6 +1749,7 @@ const [open, setOpen] = useState(false);
 - `showCloseButton` - 닫기 버튼 표시 (기본값: true)
 
 **접근성:**
+
 - 모달 내에서 포커스 트랩
 - Escape 키로 닫기
 - 스크린 리더를 위한 ARIA 속성
@@ -1666,7 +1760,7 @@ const [open, setOpen] = useState(false);
 유효성 검증 상태와 커스텀 스타일링을 지원하는 텍스트 입력.
 
 ```tsx
-import { Input, Label } from '@hua-labs/ui';
+import { Input, Label } from "@hua-labs/ui";
 
 <div>
   <Label htmlFor="email">이메일</Label>
@@ -1676,10 +1770,11 @@ import { Input, Label } from '@hua-labs/ui';
     placeholder="이메일을 입력하세요"
     error="잘못된 이메일"
   />
-</div>
+</div>;
 ```
 
 **Props:**
+
 - 모든 표준 입력 속성
 - `error` - 에러 메시지 (빨간 테두리 표시)
 - `success` - 성공 상태 (초록 테두리 표시)
@@ -1703,6 +1798,7 @@ import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-l
 ```
 
 **Props:**
+
 - `variant` - "success" | "warning" | "error" | "info"
 - `title` - 알림 제목 (선택)
 - `children` - 알림 콘텐츠
@@ -1713,13 +1809,13 @@ import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-l
 컨텍스트 프로바이더가 있는 토스트 알림 시스템.
 
 ```tsx
-import { ToastProvider, useToast } from '@hua-labs/ui';
-import '@hua-labs/ui/styles/toast.css';
+import { ToastProvider, useToast } from "@hua-labs/ui";
+import "@hua-labs/ui/styles/toast.css";
 
 // 앱 래핑
 <ToastProvider>
   <App />
-</ToastProvider>
+</ToastProvider>;
 
 // 컴포넌트 내에서
 function Component() {
@@ -1730,7 +1826,7 @@ function Component() {
       title: "성공",
       description: "작업 완료",
       variant: "success",
-      duration: 3000
+      duration: 3000,
     });
   };
 
@@ -1739,6 +1835,7 @@ function Component() {
 ```
 
 **토스트 옵션:**
+
 - `title` - 토스트 제목
 - `description` - 토스트 설명
 - `variant` - "default" | "success" | "warning" | "error" | "info"
@@ -1746,6 +1843,7 @@ function Component() {
 - `action` - 액션 버튼 설정
 
 **안전 훅:**
+
 ```tsx
 // ToastProvider가 없을 수 있는 컴포넌트에서 사용
 const toast = useToastSafe();
@@ -1766,6 +1864,7 @@ import { Badge } from '@hua-labs/ui';
 ```
 
 **Props:**
+
 - `variant` - "default" | "success" | "warning" | "error" | "outline" | "secondary"
 - `size` - "sm" | "md" | "lg"
 - `children` - 뱃지 콘텐츠
@@ -1790,6 +1889,7 @@ import { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo
 ```
 
 **Props:**
+
 - `value` - 현재 값
 - `max` - 최대 값 (기본값: 100)
 - `variant` - "default" | "success" | "warning" | "error" | "info"
@@ -1812,6 +1912,7 @@ import { Skeleton, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonAvatar, S
 ```
 
 **변형:**
+
 - `Skeleton` - 기본 스켈레톤
 - `SkeletonText` - 텍스트 라인 스켈레톤
 - `SkeletonCircle` - 원형 스켈레톤
@@ -1853,6 +1954,7 @@ function CustomThemeControl() {
 ```
 
 **Props:**
+
 - `defaultTheme` - "light" | "dark" | "system" (기본값: "system")
 - `storageKey` - localStorage 키 (기본값: "ui-theme")
 - `children` - 앱 콘텐츠
@@ -1864,24 +1966,24 @@ function CustomThemeControl() {
 ### 유틸리티 함수
 
 ```tsx
-import { merge, mergeIf, mergeMap, cn } from '@hua-labs/ui';
+import { merge, mergeIf, mergeMap, cn } from "@hua-labs/ui";
 
 // 스마트 클래스 병합 (clsx + tailwind-merge)
-merge("px-2 py-1", "px-4") // → "py-1 px-4"
+merge("px-2 py-1", "px-4"); // → "py-1 px-4"
 
 // 조건부 병합
-mergeIf(isActive, "bg-blue-500", "bg-gray-200")
+mergeIf(isActive, "bg-blue-500", "bg-gray-200");
 
 // 객체 기반 병합
 mergeMap({
   "bg-blue-500": isPrimary,
   "bg-gray-500": !isPrimary,
   "text-white": true,
-  "opacity-50": isDisabled
-})
+  "opacity-50": isDisabled,
+});
 
 // merge 별칭 (하위 호환성)
-cn("text-lg", "font-bold")
+cn("text-lg", "font-bold");
 ```
 
 ### 스타일 생성기
@@ -1893,13 +1995,13 @@ import {
   createSizeStyles,
   createRoundedStyles,
   createShadowStyles,
-  createHoverStyles
-} from '@hua-labs/ui';
+  createHoverStyles,
+} from "@hua-labs/ui";
 
 // 색상 스타일
 const colorStyles = createColorStyles({
   primary: "bg-blue-500 text-white",
-  secondary: "bg-gray-200 text-gray-800"
+  secondary: "bg-gray-200 text-gray-800",
 });
 
 // CVA를 사용한 변형 스타일
@@ -1908,17 +2010,17 @@ const buttonVariants = createVariantStyles({
   variants: {
     variant: {
       default: "bg-primary text-primary-foreground",
-      destructive: "bg-destructive text-destructive-foreground"
+      destructive: "bg-destructive text-destructive-foreground",
     },
     size: {
       sm: "text-sm px-3 py-1.5",
-      md: "text-base px-4 py-2"
-    }
+      md: "text-base px-4 py-2",
+    },
   },
   defaultVariants: {
     variant: "default",
-    size: "md"
-  }
+    size: "md",
+  },
 });
 ```
 
@@ -1960,17 +2062,17 @@ HUA UI는 테마를 위해 CSS 변수를 사용합니다:
 
 ```tsx
 // 배경 색상
-className="bg-background text-foreground"
-className="bg-primary text-primary-foreground"
-className="bg-card text-card-foreground"
+className = "bg-background text-foreground";
+className = "bg-primary text-primary-foreground";
+className = "bg-card text-card-foreground";
 
 // 테두리
-className="border border-border"
-className="ring-2 ring-ring"
+className = "border border-border";
+className = "ring-2 ring-ring";
 
 // 다크 모드
-className="bg-white dark:bg-slate-900"
-className="text-gray-900 dark:text-gray-100"
+className = "bg-white dark:bg-slate-900";
+className = "text-gray-900 dark:text-gray-100";
 ```
 
 ### 마이크로 모션
@@ -1978,17 +2080,17 @@ className="text-gray-900 dark:text-gray-100"
 내장 마이크로 인터랙션:
 
 ```tsx
-import { useMicroMotion, getMicroMotionClasses } from '@hua-labs/ui';
+import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // 훅 기반
 function Component() {
-  const motion = useMicroMotion('button-press');
+  const motion = useMicroMotion("button-press");
   return <button {...motion.props}>클릭하세요</button>;
 }
 
 // 클래스 기반
-const classes = getMicroMotionClasses('hover-lift');
-<div className={classes}>호버하세요</div>
+const classes = getMicroMotionClasses("hover-lift");
+<div className={classes}>호버하세요</div>;
 
 // 사용 가능한 프리셋:
 // 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
@@ -2003,17 +2105,19 @@ const classes = getMicroMotionClasses('hover-lift');
 HUA UI는 세 가지 아이콘 프로바이더를 지원합니다:
 
 **1. Phosphor Icons (기본)**
+
 ```tsx
-import { Icon, IconProvider } from '@hua-labs/ui';
+import { Icon, IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="phosphor" weight="regular">
   <Icon name="heart" />
-</IconProvider>
+</IconProvider>;
 ```
 
 굵기: `thin`, `light`, `regular`, `bold`, `fill`, `duotone`
 
 **2. Lucide Icons**
+
 ```tsx
 <IconProvider set="lucide">
   <Icon name="heart" />
@@ -2023,13 +2127,14 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 미니멀리스트 디자인, 일관된 선 굵기.
 
 **3. Iconsax Icons**
+
 ```tsx
 // 먼저 iconsax entry를 import해야 함
-import '@hua-labs/ui/iconsax';
+import "@hua-labs/ui/iconsax";
 
 <IconProvider set="iconsax" iconsaxVariant="bold">
   <Icon name="heart" />
-</IconProvider>
+</IconProvider>;
 ```
 
 변형: `line`, `bold`, `bulk`, `broken`
@@ -2037,18 +2142,18 @@ import '@hua-labs/ui/iconsax';
 ### 아이콘 설정
 
 ```tsx
-import { IconProvider, defaultIconConfig } from '@hua-labs/ui';
+import { IconProvider, defaultIconConfig } from "@hua-labs/ui";
 
 <IconProvider
-  set="phosphor"           // 아이콘 프로바이더
-  size={24}                // 기본 크기
-  color="currentColor"     // 기본 색상
-  weight="regular"         // Phosphor 굵기
-  strokeWidth={1.5}        // Lucide 선 굵기
-  iconsaxVariant="line"    // Iconsax 변형
+  set="phosphor" // 아이콘 프로바이더
+  size={24} // 기본 크기
+  color="currentColor" // 기본 색상
+  weight="regular" // Phosphor 굵기
+  strokeWidth={1.5} // Lucide 선 굵기
+  iconsaxVariant="line" // Iconsax 변형
 >
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 ### 감정 & 상태 아이콘
@@ -2100,17 +2205,17 @@ import { HeartBold, UserBold, SettingsBold } from '@hua-labs/ui/icons-bold';
 ### ThemeProvider 설정
 
 ```tsx
-import { ThemeProvider } from '@hua-labs/ui';
+import { ThemeProvider } from "@hua-labs/ui";
 
 <ThemeProvider defaultTheme="system" storageKey="app-theme">
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ### useTheme 훅
 
 ```tsx
-import { useTheme } from '@hua-labs/ui';
+import { useTheme } from "@hua-labs/ui";
 
 function CustomThemeControl() {
   const { theme, setTheme, systemTheme, resolvedTheme } = useTheme();
@@ -2121,9 +2226,9 @@ function CustomThemeControl() {
       <p>시스템 테마: {systemTheme}</p>
       <p>해석된 테마: {resolvedTheme}</p>
 
-      <button onClick={() => setTheme('light')}>라이트</button>
-      <button onClick={() => setTheme('dark')}>다크</button>
-      <button onClick={() => setTheme('system')}>시스템</button>
+      <button onClick={() => setTheme("light")}>라이트</button>
+      <button onClick={() => setTheme("dark")}>다크</button>
+      <button onClick={() => setTheme("system")}>시스템</button>
     </div>
   );
 }
@@ -2132,19 +2237,19 @@ function CustomThemeControl() {
 ### 테마 토글
 
 ```tsx
-import { ThemeToggle } from '@hua-labs/ui';
+import { ThemeToggle } from "@hua-labs/ui";
 
 // 프리셋 토글 버튼
-<ThemeToggle />
+<ThemeToggle />;
 
 // 커스텀 구현
 function CustomToggle() {
   const { theme, setTheme } = useTheme();
-  const nextTheme = theme === 'light' ? 'dark' : 'light';
+  const nextTheme = theme === "light" ? "dark" : "light";
 
   return (
     <button onClick={() => setTheme(nextTheme)}>
-      {theme === 'light' ? '🌙' : '☀️'}
+      {theme === "light" ? "🌙" : "☀️"}
     </button>
   );
 }
@@ -2154,13 +2259,13 @@ function CustomToggle() {
 
 ```tsx
 // 조건부 다크 모드 스타일
-className="bg-white dark:bg-slate-900"
-className="text-gray-900 dark:text-gray-100"
-className="border-gray-200 dark:border-gray-700"
+className = "bg-white dark:bg-slate-900";
+className = "text-gray-900 dark:text-gray-100";
+className = "border-gray-200 dark:border-gray-700";
 
 // CSS 변수 사용 (테마 인식)
-className="bg-background text-foreground"
-className="border-border"
+className = "bg-background text-foreground";
+className = "border-border";
 ```
 
 ---
@@ -2172,19 +2277,15 @@ className="border-border"
 요소가 뷰포트에 진입할 때 감지.
 
 ```tsx
-import { useInView } from '@hua-labs/ui';
+import { useInView } from "@hua-labs/ui";
 
 function Component() {
   const { ref, inView } = useInView({
     threshold: 0.5,
-    triggerOnce: true
+    triggerOnce: true,
   });
 
-  return (
-    <div ref={ref}>
-      {inView ? '보임' : '숨김'}
-    </div>
-  );
+  return <div ref={ref}>{inView ? "보임" : "숨김"}</div>;
 }
 ```
 
@@ -2193,7 +2294,7 @@ function Component() {
 스크롤 진행률을 백분율로 추적.
 
 ```tsx
-import { useScrollProgress } from '@hua-labs/ui';
+import { useScrollProgress } from "@hua-labs/ui";
 
 function ScrollIndicator() {
   const { progress } = useScrollProgress();
@@ -2203,7 +2304,7 @@ function ScrollIndicator() {
       style={{
         width: `${progress}%`,
         height: 4,
-        background: 'blue'
+        background: "blue",
       }}
     />
   );
@@ -2215,7 +2316,7 @@ function ScrollIndicator() {
 마우스 위치 추적.
 
 ```tsx
-import { useMouse } from '@hua-labs/ui';
+import { useMouse } from "@hua-labs/ui";
 
 function Component() {
   const { x, y, elementX, elementY, elementW, elementH } = useMouse();
@@ -2233,16 +2334,12 @@ function Component() {
 모션 감소 선호도 감지.
 
 ```tsx
-import { useReducedMotion } from '@hua-labs/ui';
+import { useReducedMotion } from "@hua-labs/ui";
 
 function Component() {
   const reducedMotion = useReducedMotion();
 
-  return (
-    <div className={reducedMotion ? '' : 'animate-bounce'}>
-      콘텐츠
-    </div>
-  );
+  return <div className={reducedMotion ? "" : "animate-bounce"}>콘텐츠</div>;
 }
 ```
 
@@ -2251,7 +2348,7 @@ function Component() {
 윈도우 크기 추적.
 
 ```tsx
-import { useWindowSize } from '@hua-labs/ui';
+import { useWindowSize } from "@hua-labs/ui";
 
 function Component() {
   const { width, height, isMobile, isTablet, isDesktop } = useWindowSize();
@@ -2272,7 +2369,13 @@ function Component() {
 ### 복합 컴포넌트
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@hua-labs/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@hua-labs/ui";
 
 <Card>
   <CardHeader>
@@ -2284,7 +2387,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@hua-labs/
   <CardFooter>
     <Button>수정</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 ### Slot 패턴 (다형적 컴포넌트)
@@ -2327,7 +2430,7 @@ import { Button, merge } from '@hua-labs/ui';
 
 ```tsx
 // 서버 컴포넌트 ('use client' 없음)
-import { Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
+import { Card, CardHeader, CardTitle, CardContent } from "@hua-labs/ui";
 
 export default function ServerComponent() {
   return (
@@ -2335,31 +2438,25 @@ export default function ServerComponent() {
       <CardHeader>
         <CardTitle>서버 렌더링 카드</CardTitle>
       </CardHeader>
-      <CardContent>
-        서버에서 렌더링됩니다
-      </CardContent>
+      <CardContent>서버에서 렌더링됩니다</CardContent>
     </Card>
   );
 }
 
 // 클라이언트 컴포넌트 (인터랙티브)
-'use client';
+("use client");
 
-import { Button } from '@hua-labs/ui';
+import { Button } from "@hua-labs/ui";
 
 export default function ClientComponent() {
-  return (
-    <Button onClick={() => console.log('클릭됨')}>
-      클릭하세요
-    </Button>
-  );
+  return <Button onClick={() => console.log("클릭됨")}>클릭하세요</Button>;
 }
 ```
 
 ### 폼 유효성 검증
 
 ```tsx
-import { Form, FormControl, Input, Button } from '@hua-labs/ui/form';
+import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -2373,20 +2470,12 @@ function LoginForm() {
     <Form onSubmit={handleSubmit}>
       <FormControl>
         <Label htmlFor="email">이메일</Label>
-        <Input
-          id="email"
-          type="email"
-          error={errors.email}
-        />
+        <Input id="email" type="email" error={errors.email} />
       </FormControl>
 
       <FormControl>
         <Label htmlFor="password">비밀번호</Label>
-        <Input
-          id="password"
-          type="password"
-          error={errors.password}
-        />
+        <Input id="password" type="password" error={errors.password} />
       </FormControl>
 
       <Button type="submit">로그인</Button>
@@ -2412,6 +2501,7 @@ function LoginForm() {
 ```
 
 테마 없이는 표준 Tailwind 색상을 사용하세요:
+
 ```tsx
 <Button className="bg-blue-500">버튼</Button>
 ```
@@ -2425,16 +2515,17 @@ function LoginForm() {
 **해결:** 앱을 `ThemeProvider`로 래핑하세요:
 
 ```tsx
-import { ThemeProvider } from '@hua-labs/ui';
+import { ThemeProvider } from "@hua-labs/ui";
 
 <ThemeProvider>
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 다크 모드 클래스가 사용되는지 확인하세요:
+
 ```tsx
-className="bg-white dark:bg-slate-900"
+className = "bg-white dark:bg-slate-900";
 ```
 
 ---
@@ -2446,9 +2537,9 @@ className="bg-white dark:bg-slate-900"
 **해결:** 인터랙티브 컴포넌트에 `'use client'` 지시어를 추가하세요:
 
 ```tsx
-'use client';
+"use client";
 
-import { Button } from '@hua-labs/ui';
+import { Button } from "@hua-labs/ui";
 
 export default function Component() {
   return <Button onClick={() => {}}>클릭</Button>;
@@ -2466,27 +2557,30 @@ export default function Component() {
 **해결:**
 
 1. 아이콘 프로바이더 설정 확인:
+
 ```tsx
-import { IconProvider } from '@hua-labs/ui';
+import { IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="phosphor">
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 2. Iconsax의 경우 진입점을 import:
+
 ```tsx
-import '@hua-labs/ui/iconsax';
-import { IconProvider } from '@hua-labs/ui';
+import "@hua-labs/ui/iconsax";
+import { IconProvider } from "@hua-labs/ui";
 
 <IconProvider set="iconsax">
   <App />
-</IconProvider>
+</IconProvider>;
 ```
 
 3. 아이콘 이름이 유효한지 확인. 사용 가능한 아이콘 확인:
+
 ```tsx
-import { iconNames } from '@hua-labs/ui';
+import { iconNames } from "@hua-labs/ui";
 console.log(iconNames);
 ```
 
@@ -2500,10 +2594,10 @@ console.log(iconNames);
 
 ```tsx
 const buttonRef = useRef<HTMLButtonElement>(null);
-<Button ref={buttonRef}>버튼</Button>
+<Button ref={buttonRef}>버튼</Button>;
 
 const divRef = useRef<HTMLDivElement>(null);
-<Card ref={divRef}>카드</Card>
+<Card ref={divRef}>카드</Card>;
 ```
 
 ---
@@ -2515,22 +2609,25 @@ const divRef = useRef<HTMLDivElement>(null);
 **해결:**
 
 1. 토스트 CSS를 import:
+
 ```css
 @import "@hua-labs/ui/styles/toast.css";
 ```
 
 2. 앱을 ToastProvider로 래핑:
+
 ```tsx
-import { ToastProvider } from '@hua-labs/ui';
+import { ToastProvider } from "@hua-labs/ui";
 
 <ToastProvider>
   <App />
-</ToastProvider>
+</ToastProvider>;
 ```
 
 3. 훅 사용:
+
 ```tsx
-import { useToast } from '@hua-labs/ui';
+import { useToast } from "@hua-labs/ui";
 
 function Component() {
   const { toast } = useToast();
@@ -2548,14 +2645,15 @@ function Component() {
 
 ```tsx
 // 나쁨: 전체 패키지를 import
-import { Form, Select, DatePicker } from '@hua-labs/ui';
+import { Form, Select, DatePicker } from "@hua-labs/ui";
 
 // 좋음: 트리쉐이킹 가능
-import { Button, Card } from '@hua-labs/ui';
-import { Form, Select } from '@hua-labs/ui/form';
+import { Button, Card } from "@hua-labs/ui";
+import { Form, Select } from "@hua-labs/ui/form";
 ```
 
 번들 분석:
+
 ```bash
 pnpm run build:analyze
 ```
@@ -2572,8 +2670,8 @@ pnpm run build:analyze
 // tailwind.config.js
 export default {
   content: [
-    './app/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@hua-labs/ui/dist/**/*.{js,mjs}',
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@hua-labs/ui/dist/**/*.{js,mjs}",
   ],
   // ...
 };

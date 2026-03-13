@@ -11,7 +11,7 @@
  *   useKanban,
  *   type KanbanColumn as KanbanColumnType,
  *   type KanbanCard as KanbanCardType,
- * } from '@hua-labs/ui/advanced/dashboard';
+ * } from '@hua-labs/ui/interactive/kanban';
  */
 
 // Main components

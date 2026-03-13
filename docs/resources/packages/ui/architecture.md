@@ -1,7 +1,7 @@
 # hua-ui Architecture
 
-**작성일**: 2026-03-13
-**버전**: 2.2.0
+**작성일**: 2026-02-06
+**버전**: 1.2.0
 
 ---
 
@@ -56,39 +56,31 @@ HUA UI는 다음 원칙에 따라 설계되었습니다:
 packages/hua-ui/
 ├── src/
 │   ├── index.ts              # Core 엔트리 포인트
-│   ├── native.ts             # React Native 프리미티브
-│   ├── theme.ts              # 경량 ThemeProvider
-│   ├── form.ts               # Form 서브패키지
-│   ├── overlay.ts            # Overlay 서브패키지
-│   ├── data.ts               # Data 서브패키지
-│   ├── navigation.ts         # Navigation 서브패키지
-│   ├── feedback.ts           # Feedback 서브패키지
-│   ├── interactive.ts        # Interactive 서브패키지
-│   ├── sdui.ts               # SDUI 렌더러
-│   ├── landing.ts            # 랜딩 섹션 컴포넌트
-│   ├── iconsax.ts            # Iconsax 아이콘
-│   ├── iconsax-extended.ts   # Iconsax 전체 확장
-│   ├── advanced.ts           # Advanced 엔트리 포인트
+│   ├── iconsax.ts            # Iconsax 전용 엔트리 포인트
+│   ├── form.ts                # Form 서브패키지
+│   ├── navigation.ts          # Navigation 서브패키지
+│   ├── feedback.ts            # Feedback 서브패키지
+│   ├── advanced.ts            # Advanced 엔트리 포인트
 │   ├── advanced/
-│   │   ├── dashboard.ts     # Dashboard (deprecated)
-│   │   ├── motion.ts        # Motion 서브패키지
-│   │   └── emotion.ts       # 감정 분석 컴포넌트
-│   ├── interactive/
-│   │   └── kanban.ts        # Kanban 서브패키지
-│   ├── components/           # 컴포넌트 소스 (77개 root + advanced + dashboard)
-│   │   ├── dashboard/       # Dashboard 컴포넌트 (20+)
-│   │   ├── advanced/        # Advanced 컴포넌트 (15+)
-│   │   │   ├── emotion/    # EmotionMeter, EmotionTier 등
-│   │   │   └── blog-editor/ # 다국어 블로그 에디터
+│   │   ├── dashboard.ts      # Dashboard 서브패키지
+│   │   └── motion.ts         # Motion 서브패키지
+│   ├── components/           # 컴포넌트 소스
+│   │   ├── dashboard/       # Dashboard 컴포넌트
+│   │   ├── advanced/        # Advanced 컴포넌트
 │   │   └── Icon/            # Icon 시스템
-│   ├── landing/              # 랜딩 섹션 컴포넌트 (14개)
 │   ├── lib/                  # 유틸리티 및 헬퍼
+│   │   ├── utils.ts         # 공용 유틸리티
+│   │   ├── icons.ts         # 아이콘 정의
+│   │   ├── icon-providers.ts # 아이콘 프로바이더
+│   │   └── styles/          # 스타일 유틸리티
 │   ├── hooks/                # 커스텀 훅
 │   └── styles/              # CSS 파일
 ├── dist/                     # 빌드 출력
+├── docs/                     # 문서
+├── scripts/                  # 빌드 스크립트
 ├── package.json
-├── tsup.config.ts
-└── tsconfig.json
+├── tsup.config.ts           # 빌드 설정
+└── tsconfig.json            # TypeScript 설정
 ```
 
 ---
@@ -101,18 +93,16 @@ packages/hua-ui/
 
 **포함 내용**:
 
-- 프리미티브 (Box, Text, Pressable — `dot` prop 기반 크로스플랫폼)
 - UI 핵심 요소 (Button, Input, Select, Link, Icon, Avatar)
-- 레이아웃 (Container, Grid, Stack, Divider, Card, Panel, Section)
-- 확장 컴포넌트 (Action, ActionToolbar, Toggle, NumberInput)
-- 데이터 표시 (Badge, Progress, Skeleton)
-- 피드백 (Alert, Tooltip, LoadingSpinner, MotionConfigProvider, MicroMotion)
+- 레이아웃 (Container, Grid, Stack, Divider, Card, Panel)
+- 데이터 표시 (Table, Badge, Progress, Skeleton)
+- 피드백 (Alert, Tooltip, LoadingSpinner)
+- 오버레이 (Modal, Popover, Dropdown, Drawer, BottomSheet)
+- 인터랙티브 (Tabs, Accordion, Menu, Command, ContextMenu)
+- 네비게이션 (Breadcrumb, Pagination, Navigation)
 - 스크롤 (ScrollArea, ScrollToTop, ScrollIndicator, ScrollProgress)
 - 테마 (ThemeProvider, ThemeToggle)
-- 유틸리티 (merge, formatRelativeTime, Slot, composeRefs, mergeProps 등)
-- 훅 (useBreakpoint, useDotMap, mergeStyles, resolveDot)
-
-> **참고**: Overlay, Interactive, Navigation, Data 컴포넌트는 각자의 서브패키지로 분리됨. Core에서 일부 재export되지만 직접 서브패키지 import를 권장.
+- 유틸리티 (merge, formatRelativeTime 등)
 
 **특징**:
 
@@ -178,13 +168,32 @@ packages/hua-ui/
 
 **서브패키지**:
 
-#### Dashboard (`@hua-labs/ui/advanced/dashboard`)
+#### Data / Dashboard (`@hua-labs/ui/data`)
 
-- StatCard, MetricCard, SummaryCard
-- TransactionsTable, TrendChart, BarChart
-- DashboardSidebar, DashboardToolbar
-- ActivityFeed, NotificationCard
-- 기타 Dashboard 위젯
+- StatCard, MetricCard, SummaryCard, ProgressCard, QuickActionCard
+- DataTable (was TransactionsTable), TrendChart, BarChart, MiniBarChart, YearlyHeatmap
+- DetailDrawer (was TransactionDetailDrawer), BreakdownCard (was RoutingBreakdownCard)
+- EntityList (was MerchantList), SettlementTimeline
+- ActivityFeed, NotificationCard, ProfileCard, MembershipBadge
+- DashboardGrid, StatsPanel, SectionHeader
+
+#### Feedback (`@hua-labs/ui/feedback`)
+
+- EmptyState (was DashboardEmptyState), ToastProvider, useToast, Alert, LoadingSpinner
+
+#### Navigation (`@hua-labs/ui/navigation`)
+
+- Sidebar (was DashboardSidebar), Navigation, Breadcrumb, Pagination
+
+#### Interactive (`@hua-labs/ui/interactive`)
+
+- Toolbar (was DashboardToolbar), Accordion, Tabs, Menu, Command
+
+#### Interactive / Kanban (`@hua-labs/ui/interactive/kanban`)
+
+- KanbanBoard, KanbanColumn, KanbanCard, KanbanProvider, useKanban
+
+> **Deprecated**: `@hua-labs/ui/advanced/dashboard` — kept for backwards compatibility only.
 
 #### Motion (`@hua-labs/ui/advanced/motion`)
 
@@ -192,96 +201,10 @@ packages/hua-ui/
 - usePageTransition
 - usePageTransitionManager
 
-#### Emotion (`@hua-labs/ui/advanced/emotion`)
-
-- EmotionMeter, EmotionTier, EmotionBadge 등 감정 분석 컴포넌트
-
 **특징**:
 
 - 특수 도메인에 특화된 컴포넌트
 - 일반적인 앱에서는 필요 없을 수 있음
-
----
-
-### Overlay (`@hua-labs/ui/overlay`)
-
-**목적**: 레이어 위에 렌더링되는 오버레이 컴포넌트
-
-**포함 내용**:
-
-- Modal, ConfirmModal
-- Popover, Dropdown
-- Drawer, BottomSheet
-
----
-
-### Data (`@hua-labs/ui/data`)
-
-**목적**: 데이터 시각화 및 테이블 컴포넌트
-
-**포함 내용**:
-
-- Table, CodeBlock
-- Dashboard 데이터 컴포넌트 (StatCard, MetricCard, TrendChart, BarChart 등)
-
----
-
-### Interactive (`@hua-labs/ui/interactive`)
-
-**목적**: 사용자 인터랙션 중심 컴포넌트
-
-**포함 내용**:
-
-- Accordion, Tabs
-- Menu, Command, ContextMenu
-- Toolbar
-
----
-
-### Theme (`@hua-labs/ui/theme`)
-
-**목적**: ThemeProvider만 필요한 경우 경량 import
-
-**포함 내용**:
-
-- ThemeProvider (경량)
-
----
-
-### SDUI (`@hua-labs/ui/sdui`)
-
-**목적**: Server-Driven UI 렌더러
-
-**포함 내용**:
-
-- SDUI 렌더러 및 관련 타입
-
----
-
-### Landing (`@hua-labs/ui/landing`)
-
-**목적**: 랜딩 페이지 섹션 컴포넌트
-
-**포함 내용**:
-
-- 랜딩 섹션 컴포넌트 14개 (Hero, Feature, Pricing 등)
-
----
-
-### Native (`@hua-labs/ui/native`)
-
-**목적**: React Native 환경에서 동작하는 크로스플랫폼 프리미티브
-
-**포함 내용**:
-
-- Box (`<View>` 대응)
-- Text (RN `<Text>` 대응)
-- Pressable (RN `<Pressable>` 대응)
-
-**특징**:
-
-- `dot` prop으로 스타일 지정 (`@hua-labs/dot` 엔진 사용)
-- 웹/네이티브 소비자 코드 변경 없이 동일 API
 
 ---
 
@@ -519,12 +442,10 @@ import { SomeIcon } from "@hua-labs/ui/iconsax";
 
 **특징**:
 
-- ESM 전용 (CJS 제거됨)
+- ESM + CJS 이중 빌드
 - Tree-shaking 지원
 - TypeScript 타입 정의 자동 생성
 - 코드 스플리팅 (ESM)
-
-> `"use client"` directive는 post-build 스크립트로 각 엔트리 파일 상단에 자동 주입됨
 
 ### 빌드 설정
 
@@ -537,12 +458,13 @@ const entry = {
   navigation: "src/navigation.ts",
   feedback: "src/feedback.ts",
   advanced: "src/advanced.ts",
-  "advanced-dashboard": "src/advanced/dashboard.ts",
+  "advanced-dashboard": "src/advanced/dashboard.ts", // deprecated barrel
+  "interactive-kanban": "src/interactive/kanban.ts",
   "advanced-motion": "src/advanced/motion.ts",
 };
 ```
 
-> post-build 스크립트로 `"use client"` directive 자동 주입 (각 엔트리 파일 상단)
+> `"use client"` directive는 tsup의 `banner` 옵션으로 자동 추가됨 (별도 post-build 스크립트 불필요)
 
 ### 빌드 명령어
 
@@ -569,10 +491,7 @@ pnpm build:analyze
 ### 내부 의존성
 
 - `@phosphor-icons/react` - 기본 아이콘 라이브러리
-- `@hua-labs/motion-core` - 모션 애니메이션 (Advanced 컴포넌트)
-- `@hua-labs/dot` - 크로스플랫폼 스타일 엔진
-- `@floating-ui/react` - Popover/Tooltip 포지셔닝
-- `sugar-high` - 코드 하이라이팅
+- `@hua-labs/motion` - 모션 애니메이션 (Advanced 컴포넌트)
 - `clsx` - 클래스 병합
 - `tailwind-merge` - Tailwind 클래스 병합
 
@@ -638,4 +557,4 @@ pnpm test:coverage
 ---
 
 **작성자**: Auto (AI Assistant)
-**최종 업데이트**: 2026-03-13
+**최종 업데이트**: 2026-02-06
