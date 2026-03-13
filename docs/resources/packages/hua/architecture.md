@@ -1,271 +1,159 @@
-# hua Architecture
+# hua 프레임워크 아키텍처
 
-> Last updated: 2026-01-18
+**작성일**: 2026-03-13
+**버전**: 1.1.0
 
-## Overview
+---
 
-A **layered architecture** designed to satisfy both traditional developers and vibe coders.
+## 목차
 
-## Architecture Layers
+1. [개요](#개요)
+2. [아키텍처 레이어](#아키텍처-레이어)
+3. [Export 경로](#export-경로)
+4. [의존 관계](#의존-관계)
+5. [사용 패턴](#사용-패턴)
+6. [설계 원칙](#설계-원칙)
 
-```
-+-----------------------------------------+
-|  Top: AI Context & CLI                  |
-|  (Vibe coding interface)                |
-|  - .cursorrules, ai-context.md          |
-|  - create-hua (-> create-hua)        |
-+-----------------------------------------+
-                    |
-+-----------------------------------------+
-|  Middle: Framework & Config             |
-|  (AI / Vibe coder layer)               |
-|  - @hua-labs/hua/framework           |
-|  - @hua-labs/hua/presets             |
-|  - @hua-labs/hua/pro                 |
-+-----------------------------------------+
-                    |
-+-----------------------------------------+
-|  Bottom: Core & Types                   |
-|  (Traditional developer layer)          |
-|  - @hua-labs/hua/ui                  |
-|  - @hua-labs/hua/motion              |
-|  - @hua-labs/hua/i18n                |
-|  - @hua-labs/hua/state               |
-+-----------------------------------------+
-```
+---
 
-## Subpath Exports Structure
+## 개요
+
+`@hua-labs/hua`는 UI + motion + i18n + state + dot을 하나로 묶는 프레임워크 통합 레이어. 단일 패키지에서 18개의 서브패스 export를 제공하며, 각 기능을 독립적으로 또는 통합해서 사용할 수 있다.
+
+---
+
+## 아키텍처 레이어
 
 ```
-@hua-labs/hua
-|-- .                     -> Full integration (UI+Motion+i18n+State+Pro)
-|
-|-- /framework            -> Framework layer
-|   |-- HuaProvider       -> Provider auto-setup
-|   |-- HuaPage         -> Page wrapper (motion + i18n)
-|   |-- WelcomePage       -> Start page
-|   |-- defineConfig       -> Declarative config
-|   |-- useMotion          -> Unified motion hook
-|   |-- BrandedButton/Card
-|   |-- a11y/, loading/, branding/
-|   |-- plugins/
-|   +-- seo/geo/
-|
-|-- /presets              -> Presets (product, marketing)
-|
-|-- /ui                   -> UI components (from @hua-labs/ui)
-|-- /i18n                 -> i18n (from @hua-labs/i18n-core + zustand)
-|-- /motion               -> Motion (from @hua-labs/motion-core)
-|-- /state                -> State (from @hua-labs/state)
-|
-+-- /pro                  -> Pro features (advanced motion hooks)
+┌─────────────────────────────────────────┐
+│  Top: AI Context & CLI                  │
+│  .cursorrules, ai-context.md            │
+│  create-hua (CLI scaffolder)            │
+├─────────────────────────────────────────┤
+│  Middle: Framework & Config             │
+│  @hua-labs/hua/framework                │
+│  @hua-labs/hua/presets                   │
+│  @hua-labs/hua/pro                      │
+├─────────────────────────────────────────┤
+│  Bottom: Core & Types                   │
+│  @hua-labs/hua/ui                       │
+│  @hua-labs/hua/motion                   │
+│  @hua-labs/hua/i18n                     │
+│  @hua-labs/hua/state                    │
+│  @hua-labs/hua/dot                      │
+└─────────────────────────────────────────┘
 ```
 
-## Layer Details
+- **Bottom**: 개별 패키지 직접 제어 (시니어 개발자)
+- **Middle**: 선언적 설정 + Provider 자동 구성 (빠른 프로토타이핑)
+- **Top**: AI 도구 연동 (Cursor, Claude Code)
 
-### Bottom Layer: Core (Subpath Exports)
+---
 
-**Target**: Traditional developers, senior developers
+## Export 경로
 
-**Features**:
-- Precise TypeScript types
-- Low-level API direct control
-- Granular per-feature imports
+| 경로                  | 소스 패키지                   | 설명                                                       |
+| --------------------- | ----------------------------- | ---------------------------------------------------------- |
+| `.`                   | 통합                          | 전체 통합 (UI+Motion+i18n+State+Pro)                       |
+| `./framework`         | 자체                          | HuaProvider, HuaPage, WelcomePage, defineConfig, useMotion |
+| `./framework/shared`  | 자체                          | 프레임워크 공용 유틸리티                                   |
+| `./framework/server`  | 자체                          | 서버 전용 (SSR 번역 등)                                    |
+| `./framework/config`  | 자체                          | 설정 시스템                                                |
+| `./framework/seo/geo` | 자체                          | SEO/지역 최적화                                            |
+| `./presets`           | 자체                          | product, marketing 프리셋                                  |
+| `./ui`                | @hua-labs/ui                  | UI 컴포넌트 re-export                                      |
+| `./i18n`              | @hua-labs/i18n-core + zustand | i18n re-export                                             |
+| `./motion`            | @hua-labs/motion-core         | 모션 훅 re-export                                          |
+| `./state`             | @hua-labs/state               | 상태관리 re-export                                         |
+| `./pro`               | @hua-labs/hua-pro             | Pro 기능 (optional, private)                               |
+| `./formatters`        | @hua-labs/i18n-formatters     | 포매터 re-export                                           |
+| `./utils`             | 자체                          | 공용 유틸리티                                              |
+| `./hooks`             | 자체                          | 공용 훅                                                    |
+| `./loaders`           | @hua-labs/i18n-loaders        | 로더 re-export                                             |
+| `./dot`               | @hua-labs/dot                 | 스타일 엔진 re-export                                      |
+| `./dot/react`         | @hua-labs/dot                 | dot React 바인딩                                           |
 
-**Usage**:
-```typescript
-// UI components
-import { Button, Card, Modal } from '@hua-labs/hua/ui';
+---
 
-// i18n
-import { useTranslation, useLanguageChange } from '@hua-labs/hua/i18n';
-import { createZustandI18n } from '@hua-labs/hua/i18n';
+## 의존 관계
 
-// Motion
-import { useFadeIn, useSlideUp, useScrollReveal } from '@hua-labs/hua/motion';
-
-// State
-import { createHuaStore, createI18nStore } from '@hua-labs/hua/state';
+```
+@hua-labs/hua (v1.1.0)
+├── @hua-labs/ui (v2.2.0)
+├── @hua-labs/motion-core (v2.3.0)
+├── @hua-labs/i18n-core (v2.1.0)
+├── @hua-labs/i18n-core-zustand (v2.1.0)
+├── @hua-labs/i18n-formatters (v2.1.0)
+├── @hua-labs/i18n-loaders (v2.1.0)
+├── @hua-labs/state
+├── @hua-labs/dot (v0.1.0)
+├── @hua-labs/hooks
+├── @hua-labs/utils
+└── @hua-labs/hua-pro (optional, private)
 ```
 
-**Value**:
-- Import exactly what you need
-- Bundle size optimization (tree-shaking)
-- Each feature can be used independently
+---
 
-### Middle Layer: Framework & Config
+## 사용 패턴
 
-**Target**: Vibe coders, junior developers, AI
+### 1. 빠른 시작 (Framework 레이어)
 
-**Features**:
-- Declarative config (`defineConfig`)
-- Auto Provider setup (`HuaProvider`)
-- Preset system
+```tsx
+import { HuaProvider, HuaPage } from "@hua-labs/hua/framework";
+import { defineConfig } from "@hua-labs/hua/framework";
 
-**Usage**:
-```typescript
-// Framework components
-import { HuaProvider, HuaPage, WelcomePage } from '@hua-labs/hua/framework';
-import { defineConfig } from '@hua-labs/hua/framework';
-import { useMotion } from '@hua-labs/hua/framework';
-
-// Presets
-import { productPreset, marketingPreset } from '@hua-labs/hua/presets';
-
-// Config file (hua.config.ts)
 export default defineConfig({
-  preset: 'product',
-  branding: {
-    primaryColor: '#3B82F6',
-  },
+  preset: "product",
+  branding: { primaryColor: "#3B82F6" },
 });
 ```
 
-**Value**:
-- Start immediately without complex configuration
-- AI can recommend settings and generate code
-- Fast prototyping
+### 2. 세밀한 제어 (Core 레이어)
 
-### Pro Layer
-
-**Target**: Projects requiring advanced animations/interactions
-
-**Features**:
-- Advanced motion hooks (orchestration, auto-animations)
-- Performance monitoring
-
-**Usage**:
-```typescript
-import {
-  useAutoSlide,
-  useAutoFade,
-  useOrchestration,
-  useSequence,
-  usePerformanceMonitor,
-  useGameLoop,
-} from '@hua-labs/hua/pro';
+```tsx
+import { Button, Card } from "@hua-labs/hua/ui";
+import { useTranslation } from "@hua-labs/hua/i18n";
+import { useFadeIn } from "@hua-labs/hua/motion";
+import { dot } from "@hua-labs/hua/dot";
 ```
 
-### Top Layer: AI Context & CLI
+### 3. 단일 진입점
 
-**Target**: Vibe coders, AI tools (Cursor, Claude, etc.)
-
-**Features**:
-- AI understands the project structure completely
-- Code generation from natural language commands alone
-
-**Provided files**:
-```
-project/
-|-- .cursorrules          -> Cursor AI guidelines
-|-- ai-context.md         -> AI context
-|-- .claude/
-|   |-- project-context.md
-|   +-- skills/
-|       +-- hua-framework/SKILL.md
+```tsx
+// tree-shaking 지원
+import { Button, useTranslation, useFadeIn, HuaProvider } from "@hua-labs/hua";
 ```
 
-## Import Guide
+### 4. 직접 패키지 사용 (Escape Hatch)
 
-### Recommended: Framework Subpath
-
-```typescript
-// Recommended - framework subpath
-import { HuaProvider, useMotion } from '@hua-labs/hua/framework';
-import { Button, Card } from '@hua-labs/hua/ui';
-import { useTranslation } from '@hua-labs/hua/i18n';
-import { useFadeIn } from '@hua-labs/hua/motion';
-import { createI18nStore } from '@hua-labs/hua/state';
+```tsx
+import { Button } from "@hua-labs/ui";
+import { useTranslation } from "@hua-labs/i18n-core";
+import { useFadeIn } from "@hua-labs/motion-core";
+import { dot } from "@hua-labs/dot";
 ```
 
-### Allowed: Main Entry Point
+---
 
-```typescript
-// Allowed - full integration (tree-shaking supported)
-import { Button, useTranslation, useFadeIn, HuaProvider } from '@hua-labs/hua';
-```
+## 설계 원칙
 
-### Advanced: Direct Package Usage
+### 1. 단일 패키지, 멀티 진입점
 
-```typescript
-// Advanced users - individual packages directly
-import { Button } from '@hua-labs/ui';
-import { useTranslation } from '@hua-labs/i18n-core';
-import { useFadeIn } from '@hua-labs/motion-core';
-import { createHuaStore } from '@hua-labs/state';
-```
+하나의 `@hua-labs/hua`에서 서브패스 export로 기능 분리. tree-shaking으로 번들 최적화.
 
-## Moving Between Layers
+### 2. Escape Hatch
 
-### Vibe Coder -> Traditional Developer
+모든 레이어에서 하위 레이어로 내려갈 수 있어야 함:
 
-As the service grows, move down the layers:
+- Framework → Core subpaths
+- Config → 직접 제어
+- Preset → 커스텀 설정
 
-```typescript
-// Vibe mode (middle layer)
-import { useMotion } from '@hua-labs/hua/framework';
-const motion = useMotion({ type: 'fadeIn' });
+### 3. className 주의
 
-// When deep dive is needed (bottom layer)
-import { useFadeIn, useSlideUp } from '@hua-labs/hua/motion';
-const fadeIn = useFadeIn({ duration: 300, delay: 100 });
-```
+hua-ui 컴포넌트들이 `Omit<..., 'className'>` 사용 중. hua 래퍼에서 className 대신 `dot` 또는 `style` prop 사용할 것.
 
-### Traditional Developer -> Vibe Coder
+---
 
-For simple tasks or fast prototyping:
-
-```typescript
-// Traditional mode (bottom layer)
-const fadeIn = useFadeIn({ duration: 300 });
-const slideUp = useSlideUp({ distance: 20 });
-
-// When speed is needed (middle layer)
-const motion = useMotion({ type: 'fadeIn' });  // one line
-```
-
-## Design Principles
-
-### 1. Single Package, Multiple Entry Points
-
-- One `@hua-labs/hua` package
-- Subpath exports by purpose
-- Bundle optimization via tree-shaking
-
-### 2. Escape Hatch Required
-
-All layers must be able to drop down to lower layers:
-- Framework -> Core subpaths
-- Config -> Direct control
-- Preset -> Custom settings
-
-### 3. Dual Documentation
-
-- **README.md**: API reference
-- **.cursorrules**: AI guidebook
-- **ai-context.md**: AI context
-
-## Package Structure
-
-```
-packages/
-|-- hua              -> Framework (integrated)
-|-- hua-ui              -> UI components
-|-- hua-motion-core     -> Motion hooks
-|-- hua-state           -> State management
-|-- hua-pro             -> Pro features (private)
-|-- hua-i18n-core       -> i18n core
-|-- hua-i18n-core-zustand
-|-- hua-i18n-formatters
-|-- hua-i18n-loaders
-+-- create-hua       -> CLI
-```
-
-## CLI
-
-```bash
-# Create project
-npx create-hua my-app
-# or
-npx create-hua my-app
-```
+**작성자**: Auto (AI Assistant)
+**최종 업데이트**: 2026-03-13
