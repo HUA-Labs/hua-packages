@@ -921,11 +921,44 @@ function gridEntries(): CompletionEntry[] {
     label: "grid-cols-none",
     detail: "gridTemplateColumns: none",
   });
+  entries.push({
+    label: "grid-cols-subgrid",
+    detail: "gridTemplateColumns: subgrid",
+  });
   entries.push({ label: "grid-rows-none", detail: "gridTemplateRows: none" });
+  entries.push({
+    label: "grid-rows-subgrid",
+    detail: "gridTemplateRows: subgrid",
+  });
   entries.push({ label: "col-auto", detail: "gridColumn: auto" });
   entries.push({ label: "col-span-full", detail: "gridColumn: 1 / -1" });
   entries.push({ label: "row-auto", detail: "gridRow: auto" });
   entries.push({ label: "row-span-full", detail: "gridRow: 1 / -1" });
+  // col-start / col-end (1–13) and row-start / row-end (1–7)
+  for (let i = 1; i <= 13; i++) {
+    entries.push({
+      label: `col-start-${i}`,
+      detail: `gridColumnStart: ${i}`,
+    });
+    entries.push({
+      label: `col-end-${i}`,
+      detail: `gridColumnEnd: ${i}`,
+    });
+  }
+  entries.push({ label: "col-start-auto", detail: "gridColumnStart: auto" });
+  entries.push({ label: "col-end-auto", detail: "gridColumnEnd: auto" });
+  for (let i = 1; i <= 7; i++) {
+    entries.push({
+      label: `row-start-${i}`,
+      detail: `gridRowStart: ${i}`,
+    });
+    entries.push({
+      label: `row-end-${i}`,
+      detail: `gridRowEnd: ${i}`,
+    });
+  }
+  entries.push({ label: "row-start-auto", detail: "gridRowStart: auto" });
+  entries.push({ label: "row-end-auto", detail: "gridRowEnd: auto" });
   for (const flow of ["row", "col", "dense", "row-dense", "col-dense"]) {
     entries.push({
       label: `grid-flow-${flow}`,
@@ -1215,6 +1248,40 @@ function transitionEntries(): CompletionEntry[] {
     label: "ease-in-out",
     detail: "transitionTimingFunction: cubic-bezier(0.4, 0, 0.2, 1)",
   });
+  entries.push({
+    label: "ease-spring",
+    detail: "transitionTimingFunction: cubic-bezier(0.34, 1.56, 0.64, 1)",
+  });
+  entries.push({
+    label: "ease-bounce",
+    detail: "transitionTimingFunction: cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+  });
+  entries.push({
+    label: "ease-snap",
+    detail: "transitionTimingFunction: cubic-bezier(0.2, 0.8, 0.2, 1)",
+  });
+  return entries;
+}
+
+function animationEntries(): CompletionEntry[] {
+  const entries: CompletionEntry[] = [];
+  entries.push({ label: "animate-none", detail: "animation: none" });
+  entries.push({
+    label: "animate-spin",
+    detail: "animation: spin 1s linear infinite",
+  });
+  entries.push({
+    label: "animate-ping",
+    detail: "animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+  });
+  entries.push({
+    label: "animate-pulse",
+    detail: "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+  });
+  entries.push({
+    label: "animate-bounce",
+    detail: "animation: bounce 1s infinite",
+  });
   return entries;
 }
 
@@ -1253,6 +1320,56 @@ function transformEntries(): CompletionEntry[] {
     entries.push({
       label: `-translate-y-${val}`,
       detail: `transform: translateY(-${cssVal})`,
+    });
+  }
+  // scale-x / scale-y
+  for (const v of [0, 50, 75, 90, 95, 100, 105, 110, 125, 150]) {
+    entries.push({
+      label: `scale-x-${v}`,
+      detail: `transform: scaleX(${v / 100})`,
+    });
+    entries.push({
+      label: `scale-y-${v}`,
+      detail: `transform: scaleY(${v / 100})`,
+    });
+  }
+  // skew
+  for (const deg of [0, 1, 2, 3, 6, 12]) {
+    entries.push({
+      label: `skew-x-${deg}`,
+      detail: `transform: skewX(${deg}deg)`,
+    });
+    entries.push({
+      label: `skew-y-${deg}`,
+      detail: `transform: skewY(${deg}deg)`,
+    });
+    if (deg !== 0) {
+      entries.push({
+        label: `-skew-x-${deg}`,
+        detail: `transform: skewX(-${deg}deg)`,
+      });
+      entries.push({
+        label: `-skew-y-${deg}`,
+        detail: `transform: skewY(-${deg}deg)`,
+      });
+    }
+  }
+  // transform-origin
+  const TRANSFORM_ORIGIN: Record<string, string> = {
+    center: "center",
+    top: "top",
+    "top-right": "top right",
+    right: "right",
+    "bottom-right": "bottom right",
+    bottom: "bottom",
+    "bottom-left": "bottom left",
+    left: "left",
+    "top-left": "top left",
+  };
+  for (const [k, v] of Object.entries(TRANSFORM_ORIGIN)) {
+    entries.push({
+      label: `origin-${k}`,
+      detail: `transformOrigin: ${v}`,
     });
   }
   return entries;
@@ -1296,6 +1413,131 @@ function filterEntries(): CompletionEntry[] {
   entries.push({ label: "invert-0", detail: "filter: invert(0)" });
   entries.push({ label: "sepia", detail: "filter: sepia(100%)" });
   entries.push({ label: "sepia-0", detail: "filter: sepia(0)" });
+
+  // hue-rotate
+  for (const deg of [0, 15, 30, 60, 90, 180]) {
+    entries.push({
+      label: `hue-rotate-${deg}`,
+      detail: `filter: hue-rotate(${deg}deg)`,
+    });
+  }
+
+  // drop-shadow presets
+  entries.push({
+    label: "drop-shadow-sm",
+    detail: "filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05))",
+  });
+  entries.push({
+    label: "drop-shadow",
+    detail:
+      "filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06))",
+  });
+  entries.push({
+    label: "drop-shadow-md",
+    detail:
+      "filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))",
+  });
+  entries.push({
+    label: "drop-shadow-lg",
+    detail:
+      "filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1))",
+  });
+  entries.push({
+    label: "drop-shadow-xl",
+    detail:
+      "filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))",
+  });
+  entries.push({
+    label: "drop-shadow-2xl",
+    detail: "filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15))",
+  });
+  entries.push({
+    label: "drop-shadow-none",
+    detail: "filter: drop-shadow(0 0 0 transparent)",
+  });
+
+  // mix-blend-mode
+  for (const mode of [
+    "normal",
+    "multiply",
+    "screen",
+    "overlay",
+    "darken",
+    "lighten",
+    "color-dodge",
+    "color-burn",
+    "hard-light",
+    "soft-light",
+    "difference",
+    "exclusion",
+    "hue",
+    "saturation",
+    "color",
+    "luminosity",
+    "plus-lighter",
+  ]) {
+    entries.push({
+      label: `mix-blend-${mode}`,
+      detail: `mixBlendMode: ${mode}`,
+    });
+  }
+
+  // backdrop filter variants (non-blur) — each matches its own token table
+  for (const v of [0, 50, 75, 90, 95, 100, 105, 110, 125, 150, 200]) {
+    entries.push({
+      label: `backdrop-brightness-${v}`,
+      detail: `backdropFilter: brightness(${v / 100})`,
+    });
+  }
+  for (const v of [0, 50, 75, 100, 125, 150, 200]) {
+    entries.push({
+      label: `backdrop-contrast-${v}`,
+      detail: `backdropFilter: contrast(${v / 100})`,
+    });
+  }
+  for (const v of [0, 50, 100, 150, 200]) {
+    entries.push({
+      label: `backdrop-saturate-${v}`,
+      detail: `backdropFilter: saturate(${v / 100})`,
+    });
+  }
+  entries.push({
+    label: "backdrop-grayscale",
+    detail: "backdropFilter: grayscale(100%)",
+  });
+  entries.push({
+    label: "backdrop-grayscale-0",
+    detail: "backdropFilter: grayscale(0)",
+  });
+  entries.push({
+    label: "backdrop-invert",
+    detail: "backdropFilter: invert(100%)",
+  });
+  entries.push({
+    label: "backdrop-invert-0",
+    detail: "backdropFilter: invert(0)",
+  });
+  entries.push({
+    label: "backdrop-sepia",
+    detail: "backdropFilter: sepia(100%)",
+  });
+  entries.push({
+    label: "backdrop-sepia-0",
+    detail: "backdropFilter: sepia(0)",
+  });
+  for (const deg of [0, 15, 30, 60, 90, 180]) {
+    entries.push({
+      label: `backdrop-hue-rotate-${deg}`,
+      detail: `backdropFilter: hue-rotate(${deg}deg)`,
+    });
+  }
+  for (const v of [0, 5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 100]) {
+    entries.push({
+      label: `backdrop-opacity-${v}`,
+      detail: `backdropFilter: opacity(${v / 100})`,
+    });
+  }
+
   return entries;
 }
 
@@ -1424,6 +1666,7 @@ export function getAllCompletions(): CompletionEntry[] {
     ...transitionEntries(),
     ...transformEntries(),
     ...filterEntries(),
+    ...animationEntries(),
     ...interactivityEntries(),
   ];
 
