@@ -164,4 +164,32 @@ describe("dotExplain() — extended coverage", () => {
       expect(result.report._approximated).toBeUndefined();
     });
   });
+
+  describe("class-mode-only tokens", () => {
+    it("divide-y reports as unsupported on native", () => {
+      const result = dotExplain("divide-y", { target: "native" });
+      expect(result.report._dropped).toBeDefined();
+      expect(result.report._dropped!.some((d) => d.includes("divide"))).toBe(
+        true,
+      );
+    });
+
+    it("divide-x-2 reports as unsupported on flutter", () => {
+      const result = dotExplain("divide-x-2", { target: "flutter" });
+      expect(result.report._dropped).toBeDefined();
+      expect(result.report._dropped!.some((d) => d.includes("divide"))).toBe(
+        true,
+      );
+    });
+
+    it("divide-y mixed with supported token", () => {
+      const result = dotExplain("p-4 divide-y", { target: "native" });
+      expect(result.report._dropped).toBeDefined();
+      expect(result.report._dropped!.some((d) => d.includes("divide"))).toBe(
+        true,
+      );
+      // p-4 should NOT be in dropped
+      expect(result.report._dropped).not.toContain("padding");
+    });
+  });
 });

@@ -12,17 +12,32 @@ const DIVIDE_WIDTHS: Record<string, string> = {
 /**
  * Resolve divide tokens.
  *
- * divide-{color}   → borderColor
+ * divide-{color}   → borderColor (inline style)
  *
- * NOTE: divide-x / divide-y (width utilities) are NOT supported.
- * Tailwind uses `> * + *` child combinator selectors for divide widths,
- * which cannot be expressed as inline styles on a single element.
- * Use CSS classes or a wrapper component for divide spacing.
+ * divide-y / divide-x → internal marker `__dot_divideY` / `__dot_divideX`.
+ *   These use CSS child combinator selectors (`> * + *`) which cannot be
+ *   expressed as inline styles. The class adapter (class.ts) converts these
+ *   markers into proper CSS rules. Web/native adapters strip them silently.
+ *
+ * divide-y-reverse / divide-x-reverse → `__dot_divideYReverse` / `__dot_divideXReverse`.
  */
 export function resolveDivide(prefix: string, value: string, config: DotConfig): StyleObject {
-  // divide-y, divide-x — unsupported (requires child combinator selector)
-  if (prefix === 'divide-y' || prefix === 'divide-x') {
-    return {};
+  // divide-y-reverse / divide-x-reverse
+  if (prefix === 'divide-y' && value === 'reverse') {
+    return { __dot_divideYReverse: '1' };
+  }
+  if (prefix === 'divide-x' && value === 'reverse') {
+    return { __dot_divideXReverse: '1' };
+  }
+
+  // divide-y / divide-x — return internal marker for class adapter
+  if (prefix === 'divide-y') {
+    const width = DIVIDE_WIDTHS[value] ?? '1px';
+    return { __dot_divideY: width };
+  }
+  if (prefix === 'divide-x') {
+    const width = DIVIDE_WIDTHS[value] ?? '1px';
+    return { __dot_divideX: width };
   }
 
   // divide-{color}: divide-gray-200, divide-white, divide-primary-500/50

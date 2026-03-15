@@ -120,6 +120,8 @@ const STANDALONE_TOKENS = new Set<string>([
   // class-mode marker tokens (group/peer — pass through as className, no style output)
   'group',
   'peer',
+  // typography plugin passthrough (prose bare form — prose-* variants handled via prefix)
+  'prose',
 ]);
 
 /**
@@ -219,6 +221,16 @@ const MULTI_SEGMENT_PREFIXES = [
   // divide (before plain 'divide' to avoid prefix shadowing)
   'divide-x',
   'divide-y',
+  // tailwindcss-animate: slide-in-from-{direction} (longest first to avoid shadowing)
+  'slide-in-from-bottom',
+  'slide-in-from-right',
+  'slide-in-from-left',
+  'slide-in-from-top',
+  // tailwindcss-animate: slide-out-to-{direction}
+  'slide-out-to-bottom',
+  'slide-out-to-right',
+  'slide-out-to-left',
+  'slide-out-to-top',
 ] as const;
 
 /**

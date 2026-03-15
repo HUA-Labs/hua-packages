@@ -35,8 +35,23 @@ const GRADIENT_KEYS = new Set([
   "__dot_gradientToPos",
 ]);
 
-/** All internal keys (shadow + gradient) */
-const INTERNAL_KEYS = new Set([...SHADOW_LAYER_KEYS, ...GRADIENT_KEYS]);
+/**
+ * Internal divide keys — class adapter turns these into child-combinator CSS.
+ * Silently stripped in inline-style (web/native) mode.
+ */
+const DIVIDE_KEYS = new Set([
+  "__dot_divideY",
+  "__dot_divideX",
+  "__dot_divideYReverse",
+  "__dot_divideXReverse",
+]);
+
+/** All internal keys (shadow + gradient + divide) */
+const INTERNAL_KEYS = new Set([
+  ...SHADOW_LAYER_KEYS,
+  ...GRADIENT_KEYS,
+  ...DIVIDE_KEYS,
+]);
 
 /** Merge resolved styles, accumulating transform/filter/backdropFilter instead of overwriting */
 function mergeStyle(target: StyleObject, source: StyleObject): void {
@@ -65,9 +80,19 @@ function finalizeStyle(style: StyleObject): StyleObject {
   const hasGradient =
     style.__dot_gradientDirection !== undefined ||
     style.__dot_gradientFrom !== undefined;
+  const hasDivide =
+    style.__dot_divideY !== undefined ||
+    style.__dot_divideX !== undefined ||
+    style.__dot_divideYReverse !== undefined ||
+    style.__dot_divideXReverse !== undefined;
 
   // Fast path: no internal keys
-  if (ringLayer === undefined && shadowLayer === undefined && !hasGradient)
+  if (
+    ringLayer === undefined &&
+    shadowLayer === undefined &&
+    !hasGradient &&
+    !hasDivide
+  )
     return style;
 
   const result: StyleObject = {};
@@ -410,8 +435,24 @@ export function dotExplain(
   const approximated: string[] = [];
   const capabilities: Record<string, CapabilityLevel> = {};
 
+  // Detect class-mode-only tokens that produce no inline styles on ANY target.
+  // These resolve to internal markers (__dot_divide*) which get stripped by finalizeStyle,
+  // resulting in empty webStyles — so the property-level loop below can't detect them.
+  const CLASS_MODE_ONLY_PATTERNS = /\bdivide-[xy](?:-\d+|-reverse|(?=\s|$))/;
+  if (CLASS_MODE_ONLY_PATTERNS.test(input)) {
+    dropped.push("divide-y/x (class-mode-only)");
+    capabilities["divide-y/x"] = "unsupported";
+  }
+
   for (const prop of Object.keys(webStyles)) {
     const propValue = String(webStyles[prop]);
+
+    // CSS custom properties (--tw-*, --dot-*) are web-only
+    if (prop.startsWith("--")) {
+      dropped.push(prop);
+      capabilities[prop] = "unsupported";
+      continue;
+    }
 
     // CSS variable values are unsupported on non-web targets
     // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)

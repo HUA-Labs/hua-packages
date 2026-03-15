@@ -127,10 +127,9 @@ function injectBrowserCSS(css: string): void {
     createElement(t: string): unknown;
     head: { appendChild(n: unknown): void };
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   let el = doc.querySelector("style[data-dot-dynamic]") as any;
   if (!el) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     el = doc.createElement("style") as any;
     el.setAttribute("data-dot-dynamic", "");
     doc.head.appendChild(el);
@@ -151,7 +150,17 @@ const GRADIENT_KEYS = new Set([
   "__dot_gradientTo",
   "__dot_gradientToPos",
 ]);
-const INTERNAL_KEYS = new Set([...SHADOW_LAYER_KEYS, ...GRADIENT_KEYS]);
+const DIVIDE_KEYS = new Set([
+  "__dot_divideY",
+  "__dot_divideX",
+  "__dot_divideYReverse",
+  "__dot_divideXReverse",
+]);
+const INTERNAL_KEYS = new Set([
+  ...SHADOW_LAYER_KEYS,
+  ...GRADIENT_KEYS,
+  ...DIVIDE_KEYS,
+]);
 
 function stripImportant(val: string | number): [string, boolean] {
   if (typeof val !== "string") return [String(val), false];
@@ -190,8 +199,18 @@ function finalizeStyle(style: StyleObject): StyleObject {
   const hasGradient =
     style.__dot_gradientDirection !== undefined ||
     style.__dot_gradientFrom !== undefined;
+  const hasDivide =
+    style.__dot_divideY !== undefined ||
+    style.__dot_divideX !== undefined ||
+    style.__dot_divideYReverse !== undefined ||
+    style.__dot_divideXReverse !== undefined;
 
-  if (ringLayer === undefined && shadowLayer === undefined && !hasGradient)
+  if (
+    ringLayer === undefined &&
+    shadowLayer === undefined &&
+    !hasGradient &&
+    !hasDivide
+  )
     return style;
 
   const result: StyleObject = {};
@@ -255,8 +274,16 @@ function finalizeStyle(style: StyleObject): StyleObject {
 
 // ── Passthrough tokens (class-mode-only markers) ──
 
-/** Tokens that pass through as literal class names with no style output. */
-const PASSTHROUGH_CLASS_TOKENS = new Set<string>(['group', 'peer']);
+/** Standalone tokens (prefix === '') that pass through as literal class names with no style output. */
+const PASSTHROUGH_CLASS_TOKENS = new Set<string>(["group", "peer", "prose"]);
+
+/**
+ * Prefix-based passthrough tokens.
+ * When a token's prefix is in this set, the full original utility (raw without
+ * variants/important) is emitted as a literal class name with no style output.
+ * e.g. prose-gray, prose-lg, prose-slate → class names passed through as-is.
+ */
+const PASSTHROUGH_PREFIX_TOKENS = new Set<string>(["prose"]);
 
 // ── Core ──
 
@@ -304,44 +331,105 @@ function buildRules(
     mergeStyle(bucket.styles, resolved);
   }
 
-  // Convert buckets to CSS rules
-  for (const bucket of buckets) {
-    const finalized = finalizeStyle(bucket.styles);
-    const declarations = styleToDeclarations(finalized);
-    if (!declarations) continue;
+  // ── Pre-scan: check if ANY bucket has divide markers ──
+  const hasDivideAnywhere = buckets.some(
+    (b) =>
+      b.styles.__dot_divideY !== undefined ||
+      b.styles.__dot_divideX !== undefined,
+  );
 
-    if (bucket.variants.length === 0) {
-      // Base rule
-      rules.push({ selector: `.${className}`, declarations });
-      continue;
-    }
-
-    // Process variants — accumulate into one final selector + media wrapper
-    let selector = className;
-    let mediaWrapper: string | undefined;
-
-    for (const variant of bucket.variants) {
+  // Helper: resolve variant list → selector + media wrapper
+  function resolveVariants(
+    variants: string[],
+    baseClassName: string,
+  ): { selectorStr: string; mediaWrapper?: string } {
+    let sel = baseClassName;
+    let mw: string | undefined;
+    for (const variant of variants) {
       if (variant === "dark") {
         if (options.darkMode === "media") {
-          mediaWrapper = "@media (prefers-color-scheme: dark)";
+          mw = "@media (prefers-color-scheme: dark)";
         } else {
-          selector = `dark .${selector}`;
+          sel = `dark .${sel}`;
         }
       } else if (bpSet.has(variant)) {
         const width = config.breakpointWidths[variant];
-        if (width) {
-          mediaWrapper = `@media (min-width: ${width})`;
-        }
+        if (width) mw = `@media (min-width: ${width})`;
       } else if (SELECTOR_MAP[variant]) {
-        const built = SELECTOR_MAP[variant](selector);
-        selector = built.startsWith(".") ? built.slice(1) : built;
+        const built = SELECTOR_MAP[variant](sel);
+        sel = built.startsWith(".") ? built.slice(1) : built;
       }
-      // Unknown variant: skip silently
+    }
+    const selectorStr = sel.startsWith(".") ? sel : `.${sel}`;
+    return { selectorStr, mediaWrapper: mw };
+  }
+
+  // Convert buckets to CSS rules
+  for (const bucket of buckets) {
+    // ── Extract divide markers before finalization ──
+    const divideY = bucket.styles.__dot_divideY;
+    const divideX = bucket.styles.__dot_divideX;
+    const divideYReverse = bucket.styles.__dot_divideYReverse;
+    const divideXReverse = bucket.styles.__dot_divideXReverse;
+
+    const finalized = finalizeStyle(bucket.styles);
+    const declarations = styleToDeclarations(finalized);
+
+    const { selectorStr: baseSelectorStr, mediaWrapper } = resolveVariants(
+      bucket.variants,
+      className,
+    );
+
+    // ── Regular style declarations ──
+    if (declarations) {
+      rules.push({ selector: baseSelectorStr, declarations, mediaWrapper });
     }
 
-    // Push exactly one rule per bucket
-    const selectorStr = selector.startsWith(".") ? selector : `.${selector}`;
-    rules.push({ selector: selectorStr, declarations, mediaWrapper });
+    // ── Divide child-combinator rules ──
+    const divideColor = finalized.borderColor
+      ? `; border-color: ${finalized.borderColor}`
+      : "";
+
+    // divide-y: border-top on .cls > * + *
+    if (divideY !== undefined) {
+      const width = String(divideY);
+      const isReverse = divideYReverse !== undefined;
+      const prop = isReverse ? "border-bottom-width" : "border-top-width";
+      rules.push({
+        selector: `${baseSelectorStr} > * + *`,
+        declarations: `${prop}: ${width}; border-style: solid${divideColor}`,
+        mediaWrapper,
+      });
+    }
+
+    // divide-x: border-left on .cls > * + *
+    if (divideX !== undefined) {
+      const width = String(divideX);
+      const isReverse = divideXReverse !== undefined;
+      const prop = isReverse ? "border-right-width" : "border-left-width";
+      rules.push({
+        selector: `${baseSelectorStr} > * + *`,
+        declarations: `${prop}: ${width}; border-style: solid${divideColor}`,
+        mediaWrapper,
+      });
+    }
+
+    // ── Cross-bucket divide color propagation ──
+    // When this bucket has borderColor but NO divide markers, AND another bucket
+    // has divide markers, emit a child rule with just border-color.
+    // Handles: divide-y hover:divide-gray-200, divide-y md:divide-gray-200
+    if (
+      hasDivideAnywhere &&
+      divideY === undefined &&
+      divideX === undefined &&
+      finalized.borderColor
+    ) {
+      rules.push({
+        selector: `${baseSelectorStr} > * + *`,
+        declarations: `border-color: ${finalized.borderColor}`,
+        mediaWrapper,
+      });
+    }
   }
 
   return rules;
@@ -419,13 +507,25 @@ export function dotCSS(
   const tokens = parse(input);
   const naming = options.naming ?? "hash";
 
-  // Separate passthrough tokens (group/peer) from style tokens
+  // Separate passthrough tokens (group/peer/prose/prose-*) from style tokens
   const passthroughClasses: string[] = [];
   const styleTokens = tokens.filter((token) => {
-    const isPassthrough =
+    // Standalone passthrough: prefix === '' and value is in PASSTHROUGH_CLASS_TOKENS
+    const isStandalonePassthrough =
       token.prefix === "" && PASSTHROUGH_CLASS_TOKENS.has(token.value);
-    if (isPassthrough) passthroughClasses.push(token.value);
-    return !isPassthrough;
+    if (isStandalonePassthrough) {
+      // Preserve full raw token including variant prefixes (e.g. dark:group)
+      passthroughClasses.push(token.raw);
+      return false;
+    }
+    // Prefix-based passthrough: e.g. prose-gray, prose-lg, dark:prose-invert
+    const isPrefixPassthrough = PASSTHROUGH_PREFIX_TOKENS.has(token.prefix);
+    if (isPrefixPassthrough) {
+      // Preserve full raw token including variant prefixes
+      passthroughClasses.push(token.raw);
+      return false;
+    }
+    return true;
   });
 
   if (naming === "atomic") {

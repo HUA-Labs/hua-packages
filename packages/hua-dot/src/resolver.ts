@@ -10,7 +10,7 @@ import { resolveShadow } from './resolvers/shadow';
 import { resolveOpacity } from './resolvers/opacity';
 import { resolveTransform } from './resolvers/transform';
 import { resolveTransition } from './resolvers/transition';
-import { resolveAnimation } from './resolvers/animation';
+import { resolveAnimation, resolveFadeAnimation, resolveZoomAnimation, resolveSlideIn, resolveSlideOut } from './resolvers/animation';
 import { resolveBackdrop } from './resolvers/backdrop';
 import { resolvePositioning } from './resolvers/positioning';
 import { resolveGrid } from './resolvers/grid';
@@ -128,6 +128,24 @@ const PREFIX_RESOLVER_MAP: Record<string, ResolverFn> = {
 
   // Phase 2: animation
   animate: resolveAnimation,
+
+  // tailwindcss-animate: fade-in / fade-out opacity variable
+  fade: resolveFadeAnimation,
+
+  // tailwindcss-animate: zoom-in / zoom-out scale variable
+  zoom: resolveZoomAnimation,
+
+  // tailwindcss-animate: slide-in-from-{direction}
+  'slide-in-from-top': resolveSlideIn,
+  'slide-in-from-bottom': resolveSlideIn,
+  'slide-in-from-left': resolveSlideIn,
+  'slide-in-from-right': resolveSlideIn,
+
+  // tailwindcss-animate: slide-out-to-{direction}
+  'slide-out-to-top': resolveSlideOut,
+  'slide-out-to-bottom': resolveSlideOut,
+  'slide-out-to-left': resolveSlideOut,
+  'slide-out-to-right': resolveSlideOut,
 
   // Phase 2: backdrop
   'backdrop-blur': resolveBackdrop,

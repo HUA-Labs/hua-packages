@@ -63,7 +63,7 @@ export { SHADOWS } from './shadows';
 export { OPACITY } from './opacity';
 export { ROTATE, SCALE, SKEW, TRANSFORM_ORIGIN } from './transforms';
 export { TRANSITION_PROPERTY, DURATION, TIMING } from './transitions';
-export { ANIMATION } from './animations';
+export { ANIMATION, ANIMATE_ENTER_EXIT, FADE_OPACITY_STEPS, SLIDE_SPACING_STEPS } from './animations';
 export { BREAKPOINT_ORDER, BREAKPOINT_SET } from './breakpoints';
 export { CURSOR, USER_SELECT, RESIZE, POINTER_EVENTS, APPEARANCE, WHITESPACE, WORD_BREAK, TOUCH_ACTION, WILL_CHANGE } from './interactivity';
 export { RING_WIDTHS, RING_OFFSETS, RING_DEFAULT_COLOR, buildRingShadow } from './rings';
