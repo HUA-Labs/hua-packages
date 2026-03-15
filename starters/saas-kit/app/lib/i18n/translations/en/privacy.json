@@ -1,0 +1,48 @@
+{
+  "title": "Privacy Policy",
+  "_notice": "PLACEHOLDER — Replace with your own privacy policy before launching.",
+
+  "effective_date": "Effective: [DATE]",
+  "intro": "This Privacy Policy describes how [Your Company] (\"Company\", \"we\", \"us\") collects, uses, and protects your information when you use [Your App] (\"Service\").",
+
+  "section1_title": "1. Information We Collect",
+  "section1_desc": "We collect the following types of information:",
+  "section1_items": [
+    "Account information (email, name, profile image) via OAuth providers",
+    "Usage data (login history, feature usage, error logs)",
+    "Payment information (processed by third-party payment providers)",
+    "[Add your specific data collection items]"
+  ],
+
+  "section2_title": "2. How We Use Your Information",
+  "section2_desc": "We use your information for:",
+  "section2_items": [
+    "Providing and maintaining the Service",
+    "User authentication and account management",
+    "Processing payments and managing subscriptions",
+    "Service improvement and analytics",
+    "Customer support",
+    "Legal compliance"
+  ],
+
+  "section3_title": "3. Data Security",
+  "section3_desc": "We implement industry-standard security measures including encryption at rest and in transit, access controls, and regular security audits.",
+
+  "section4_title": "4. Data Sharing",
+  "section4_desc": "We do not sell your personal information. We may share data with third-party service providers (payment processors, hosting, analytics) who are bound by confidentiality agreements.",
+
+  "section5_title": "5. Data Retention",
+  "section5_desc": "We retain your data for as long as your account is active. Upon account deletion, data is permanently removed within 30 days, subject to legal retention requirements.",
+
+  "section6_title": "6. Your Rights",
+  "section6_desc": "You have the right to access, correct, export, and delete your personal data. Contact us to exercise these rights.",
+
+  "section7_title": "7. Cookies",
+  "section7_desc": "We use essential cookies for authentication and session management. We do not use third-party tracking cookies.",
+
+  "section8_title": "8. Changes to This Policy",
+  "section8_desc": "We may update this policy from time to time. We will notify you of significant changes via the Service or email.",
+
+  "section9_title": "9. Contact",
+  "section9_desc": "For privacy-related inquiries, contact us at [privacy@example.com]."
+}

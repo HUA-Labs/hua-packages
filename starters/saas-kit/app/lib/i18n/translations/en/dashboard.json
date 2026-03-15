@@ -1,0 +1,109 @@
+{
+  "title": "Hey, {name}",
+  "titleFallback": "Hey there",
+  "greetings": {
+    "morning": [
+      "Good morning! How are you feeling today?",
+      "Rise and shine — ready to jot something down?",
+      "A fresh start. What's on your mind?"
+    ],
+    "afternoon": [
+      "How's your day going so far?",
+      "Take a moment to check in with yourself.",
+      "Afternoon pause — anything worth noting?"
+    ],
+    "evening": [
+      "How was your day? Let's reflect a bit.",
+      "Wind down and capture today's moments.",
+      "A good evening to look back on your day."
+    ],
+    "night": [
+      "Late night thoughts? Write them down.",
+      "Before you sleep, leave a note for tomorrow.",
+      "Quiet night — perfect for a quick entry."
+    ]
+  },
+  "stats": {
+    "totalDiaries": {
+      "title": "Total Entries",
+      "description": "All your entries"
+    },
+    "consecutiveDays": {
+      "title": "Writing Streak",
+      "descriptionBest": "Personal best: {days} days",
+      "descriptionContinue": "Keep going!",
+      "descriptionFirst": "Start your first entry"
+    },
+    "thisMonth": {
+      "title": "This Month",
+      "description": "Entries written this month"
+    },
+    "dayCount": "{{count}} days"
+  },
+  "quickActions": {
+    "newDiary": {
+      "title": "Write New Entry",
+      "description": "Capture today's feelings"
+    },
+    "viewDiaries": {
+      "title": "View Entries",
+      "description": "All your entries"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Entries at a glance"
+    },
+    "report": {
+      "title": "AI Emotion Report",
+      "description": "Your emotion trends",
+      "comingSoon": "Coming Soon"
+    }
+  },
+  "chart": {
+    "title": "Recent Writing Activity"
+  },
+  "weeklyRate": {
+    "title": "This Week",
+    "days": "{written}/{total} days",
+    "mostActiveDay": "Most active day: {day}"
+  },
+  "heatmap": {
+    "title": "Activity",
+    "totalDays": "{entries} entries · {days} days",
+    "tooltip": {
+      "one": "{date}: {count} entry",
+      "other": "{date}: {count} entries"
+    },
+    "less": "Less",
+    "more": "More"
+  },
+  "announcement": {
+    "close": "Close"
+  },
+  "recentDiaries": {
+    "title": "Recent Entries",
+    "viewAll": "View All Entries",
+    "noTitle": "Untitled"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{days} days ago"
+  },
+  "emptyState": {
+    "title": "Write your first entry!",
+    "description": "Let AI analyze your emotions and help you grow",
+    "action": "Start Writing"
+  },
+  "breathingProgress": {
+    "title": "Weekly Sum-up",
+    "description": "Write 3+ days to unlock your weekly report",
+    "unlocked": "Weekly report unlocked!",
+    "unit": "days"
+  },
+  "errors": {
+    "fetchFailed": "Failed to load entry data.",
+    "loadFailed": "Failed to load dashboard.",
+    "loadFailedTitle": "Loading Error"
+  }
+}

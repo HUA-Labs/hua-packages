@@ -1,0 +1,17 @@
+{
+  "about": "소개",
+  "diary": "기록",
+  "calendar": "캘린더",
+  "write": "기록하기",
+  "analysis": "마음 읽기",
+  "write_diary": "기록하기",
+  "try_it": "시작하기",
+  "menu": "메뉴",
+  "admin": "관리자",
+  "kakao_account": "카카오 계정",
+  "google_account": "구글 계정",
+  "email_account": "이메일 계정",
+  "social_login": "소셜 로그인",
+  "line_account": "LINE 계정",
+  "blog": "블로그"
+}

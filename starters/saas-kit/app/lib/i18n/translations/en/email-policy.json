@@ -1,0 +1,66 @@
+{
+  "title": "Email Collection Refusal Policy",
+  "warning_title": "Unauthorized Email Collection Prohibited",
+  "warning_desc": "We refuse the unauthorized collection of email addresses posted on this website through email harvesting programs or other technical means. Please note that violations may result in criminal penalties under Korean information and communications law.",
+
+  "sec1_title": "1. Email Address Protection Policy",
+  "sec1_desc": "HUA-Labs prohibits unauthorized collection of email addresses in accordance with Article 50-2 of the Act on Promotion of Information and Communications Network Utilization and Information Protection.",
+
+  "sec2_title": "2. Prohibited Activities",
+  "sec2_desc": "The following activities are prohibited:",
+  "sec2_items": [
+    "Automatic collection of email addresses using email harvesting programs",
+    "Collection of email addresses through web crawling, scraping, etc.",
+    "Unauthorized email collection using other technical means",
+    "Commercial use of collected email addresses",
+    "Collection of email addresses for spam distribution"
+  ],
+
+  "sec3_title": "3. Legal Basis",
+  "sec3_desc": "Unauthorized email collection may be punished under the following laws:",
+  "sec3_items": [
+    "**Act on Promotion of Information and Communications Network Utilization and Information Protection** Article 50-2",
+    "**Personal Information Protection Act** Article 71",
+    "**Copyright Act** Article 136"
+  ],
+
+  "sec4_title": "4. Penalties",
+  "sec4_desc": "Violations may result in the following penalties:",
+  "sec4_items": [
+    "**Criminal Penalty:** Up to 1 year imprisonment or fine up to 10 million KRW",
+    "**Administrative Fine:** Up to 30 million KRW",
+    "**Civil Liability:** Compensation for damages to victims"
+  ],
+
+  "sec5_title": "5. Legitimate Email Collection Methods",
+  "sec5_desc": "If you wish to collect email addresses, you must use the following methods:",
+  "sec5_items": [
+    "With explicit consent from the data subject",
+    "When directly provided by the data subject",
+    "When collecting publicly available information through legitimate means"
+  ],
+
+  "sec6_title": "6. Reports and Inquiries",
+  "sec6_desc": "If you discover unauthorized email collection, please report it to:",
+  "sec6_items": [
+    "**Contact:** contact@hua-labs.com",
+    "**Processing Time:** Within 7 days of report",
+    "**Action:** Legal measures and technical blocking"
+  ],
+
+  "sec7_title": "7. Technical Protection Measures",
+  "sec7_desc": "We implement the following technical measures to protect email addresses:",
+  "sec7_items": [
+    "Email address encryption",
+    "Detection and blocking of automated collection tools",
+    "Rate limiting to prevent excessive access",
+    "Monitoring of suspicious access patterns"
+  ],
+
+  "info_title": "Legitimate Contact Method",
+  "info_desc": "For service-related inquiries, please contact us directly at contact@hua-labs.com. We will respond sincerely to legitimate inquiries.",
+
+  "disclaimer_notice": "Notice:",
+  "disclaimer_text": "This is a reference translation. The Korean version is the legally binding document.",
+  "disclaimer_link": "View Korean version"
+}

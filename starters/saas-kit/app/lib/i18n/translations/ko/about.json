@@ -1,0 +1,87 @@
+{
+  "hero": {
+    "tagline": "마음이 숨 쉬는 공간",
+    "title": "숨다",
+    "subtitle": "AI가 당신의 감정을 읽어드려요"
+  },
+  "privacy": {
+    "badge": "Privacy First",
+    "title": "당신의 이야기는 안전하게",
+    "description": "모든 기록은 암호화되어 저장됩니다. 오직 당신만이 읽을 수 있어요."
+  },
+  "features": {
+    "title": "기록, 더 자유롭게",
+    "analysis": {
+      "title": "AI 감정 분석",
+      "description": "글을 쓰면 AI가 감정의 흐름을 읽고 인사이트를 전해드려요"
+    },
+    "delayed": {
+      "title": "나중 기록",
+      "description": "어제 못 쓴 기록도 괜찮아요. 밀린 날짜에 기록할 수 있어요"
+    },
+    "future": {
+      "title": "미래 기록",
+      "description": "다짐과 계획을 적고, 그날이 오면 수정해서 분석받아요"
+    }
+  },
+  "autosave": {
+    "title": "자동 저장",
+    "description": "쓰다가 꺼져도 걱정 없어요. 임시저장이 지켜드릴게요."
+  },
+  "journey": {
+    "title": "숨다의 여정",
+    "launch": {
+      "title": "서비스 출시",
+      "description": "Your App 웹 버전 런칭"
+    },
+    "ai": {
+      "title": "AI 감정 분석",
+      "description": "HUA 분석 엔진 탑재"
+    },
+    "i18n": {
+      "title": "다국어 지원",
+      "description": "한국어, 영어, 일본어 동시 지원"
+    },
+    "pwa": {
+      "title": "PWA 지원",
+      "description": "모바일에서도 앱처럼 사용"
+    },
+    "native": {
+      "title": "네이티브 앱",
+      "description": "iOS, Android 앱 출시 예정"
+    }
+  },
+  "stats": {
+    "title": "숨다와 함께한 숫자들",
+    "languages": {
+      "label": "지원 언어",
+      "value": "3개국어"
+    },
+    "encryption": {
+      "label": "데이터 보호",
+      "value": "E2E 암호화"
+    },
+    "analysis": {
+      "label": "AI 분석",
+      "value": "실시간"
+    },
+    "uptime": {
+      "label": "서비스 안정성",
+      "value": "99.9%"
+    }
+  },
+  "tech": {
+    "title": "기술 스택"
+  },
+  "platform": {
+    "badge": "Coming Soon",
+    "title": "어디서든 함께",
+    "description": "지금은 웹에서, 곧 앱으로도 만나요",
+    "pwa": "PWA 지원 중",
+    "native": "네이티브 앱 준비 중"
+  },
+  "cta": {
+    "title": "오늘의 감정을 기록해볼까요?",
+    "button": "시작하기"
+  }
+}

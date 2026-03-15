@@ -1,0 +1,106 @@
+{
+  "title": "안녕, {name}",
+  "titleFallback": "안녕",
+  "greetings": {
+    "morning": [
+      "좋은 아침이야, 오늘은 어떤 하루가 될까?",
+      "일어났구나, 오늘 기분은 어때?",
+      "상쾌한 아침! 오늘도 한 줄 남겨볼까?"
+    ],
+    "afternoon": [
+      "오늘 하루 어떻게 보내고 있어?",
+      "잠깐 쉬면서 마음을 정리해볼까?",
+      "오후도 힘내, 한 줄이라도 남겨봐"
+    ],
+    "evening": [
+      "오늘 하루 수고했어, 어떤 하루였어?",
+      "하루를 돌아보며 기록해볼까?",
+      "편안한 저녁이야, 오늘의 마음을 남겨봐"
+    ],
+    "night": [
+      "늦은 밤까지 수고했어",
+      "오늘 하루도 잘 보냈지? 기록하고 자자",
+      "조용한 밤, 오늘의 이야기를 남겨봐"
+    ]
+  },
+  "stats": {
+    "totalDiaries": {
+      "title": "총 기록 수",
+      "description": "전체 작성한 기록"
+    },
+    "consecutiveDays": {
+      "title": "연속 작성일",
+      "descriptionBest": "최고 기록: {days}일",
+      "descriptionContinue": "계속해서 작성 중",
+      "descriptionFirst": "첫 기록을 작성해보세요"
+    },
+    "thisMonth": {
+      "title": "이번 달 기록",
+      "description": "이번 달 작성한 기록"
+    },
+    "dayCount": "{{count}}일"
+  },
+  "quickActions": {
+    "newDiary": {
+      "title": "새 기록 쓰기",
+      "description": "오늘의 마음을 남겨봐"
+    },
+    "viewDiaries": {
+      "title": "내 기록 보기",
+      "description": "지금까지 쓴 기록들"
+    },
+    "calendar": {
+      "title": "캘린더",
+      "description": "날짜별로 한눈에"
+    },
+    "report": {
+      "title": "AI 감정 리포트",
+      "description": "내 감정 흐름 분석",
+      "comingSoon": "준비중"
+    }
+  },
+  "chart": {
+    "title": "최근 기록 작성 추이"
+  },
+  "weeklyRate": {
+    "title": "이번 주 작성률",
+    "days": "{written}/{total}일",
+    "mostActiveDay": "가장 많이 쓰는 요일: {day}"
+  },
+  "heatmap": {
+    "title": "작성 현황",
+    "totalDays": "{entries}개 · {days}일 작성",
+    "tooltip": { "other": "{date}: {count}개" },
+    "less": "적음",
+    "more": "많음"
+  },
+  "announcement": {
+    "close": "닫기"
+  },
+  "recentDiaries": {
+    "title": "최근 기록",
+    "viewAll": "모든 기록 보기",
+    "noTitle": "제목 없음"
+  },
+  "time": {
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgo": "{days}일 전"
+  },
+  "emptyState": {
+    "title": "첫 기록을 작성해보세요!",
+    "description": "AI가 당신의 감정을 분석하고 성장을 도와드릴게요",
+    "action": "기록하기"
+  },
+  "breathingProgress": {
+    "title": "이번 주 숨고르기",
+    "description": "주 3일 이상 작성하면 주간 리포트가 열려요",
+    "unlocked": "이번 주 숨고르기 달성!",
+    "unit": "일"
+  },
+  "errors": {
+    "fetchFailed": "기록 데이터를 불러오지 못했습니다.",
+    "loadFailed": "대시보드 정보를 불러오는데 실패했어요.",
+    "loadFailedTitle": "데이터 로딩 실패"
+  }
+}

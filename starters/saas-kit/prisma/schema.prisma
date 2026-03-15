@@ -1,0 +1,1020 @@
+// ==============================
+// HUA SaaS Starter Kit Schema v1.0
+// Provider-agnostic payment + Auth + Admin + GDPR
+// Based on my-app production schema
+// ==============================
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./generated/client"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["user", "admin"]
+}
+
+// ==============================
+// Enums
+// ==============================
+
+enum UserState {
+  @@schema("user")
+  active
+  inactive
+  resigned
+  banned
+}
+
+enum UserRole {
+  @@schema("user")
+  USER
+  ADMIN
+}
+
+enum NotificationType {
+  @@schema("user")
+  notice
+  system
+  event
+  announcement
+}
+
+enum ErrorSeverity {
+  @@schema("user")
+  info
+  warn
+  error
+  fatal
+}
+
+enum ModerationAction {
+  @@schema("user")
+  delete
+  block
+  restore
+  flag
+}
+
+enum AlertType {
+  @@schema("user")
+  CRISIS
+  ABUSE
+}
+
+enum AbusePattern {
+  @@schema("user")
+  RAPID_REQUESTS
+  REPETITIVE_CONTENT
+  SUSPICIOUS_PROMPTS
+  TOKEN_ABUSE
+  MULTI_ACCOUNT
+  API_SCRAPING
+}
+
+enum PenaltyLevel {
+  @@schema("user")
+  WARNING
+  RATE_LIMIT
+  TEMPORARY_BAN
+  PERMANENT_BAN
+}
+
+enum AbuseAlertStatus {
+  @@schema("user")
+  PENDING
+  REVIEWED
+  FALSE_POSITIVE
+  ACTION_TAKEN
+  DISMISSED
+}
+
+enum SubscriptionStatus {
+  @@schema("user")
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  SUSPENDED
+}
+
+enum PaymentStatus {
+  @@schema("user")
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  @@schema("user")
+  LEMONSQUEEZY
+  STRIPE
+  TOSS
+  PADDLE
+}
+
+enum InviteCodeType {
+  AMBASSADOR
+  BETA_TESTER
+  PROMOTION
+  REFERRAL
+
+  @@schema("user")
+}
+
+enum CouponType {
+  @@schema("user")
+  TRIAL_EXTEND
+  DISCOUNT_PERCENT
+  DISCOUNT_FIXED
+  FREE_MONTHS
+}
+
+enum ContactInquiryStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+
+  @@schema("admin")
+}
+
+// ==============================
+// Core Models (user schema)
+// ==============================
+
+model User {
+  @@schema("user")
+  id            String    @id @default(uuid()) @db.Uuid
+  image         String?
+  profile_image String?
+  state         UserState @default(active)
+  role          UserRole  @default(USER)
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @updatedAt @db.Timestamptz(6)
+
+  // Encrypted PII fields
+  email_enc    Bytes?
+  nickname_enc Bytes?
+
+  // Hash fields for search/dedup (SHA-256)
+  email_hash    String?   @unique @db.VarChar(64)
+  nickname_hash String?   @unique @db.VarChar(64)
+
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  login_logs        LoginLog[]
+  notifications     Notification[]
+  attendances       EventAttendance[]
+  api_logs          ApiLog[]
+  settings          UserSettings?
+  quota             UserQuota?
+  export_requests   DataExportRequest[]
+  deletion_requests AccountDeletionRequest[]
+  consents          UserConsent[]
+  abuse_alerts      AbuseAlert[] @relation("AbuseAlertUser")
+  subscription      Subscription?
+  payments          Payment[]
+  payment_methods   PaymentMethod[]
+  notificationStatuses UserNotificationStatus[]
+  acquisition          UserAcquisition?
+
+  @@index([email_hash])
+  @@index([nickname_hash])
+  @@index([state])
+  @@index([role])
+  @@index([created_at])
+}
+
+// ==============================
+// Authentication & Sessions
+// ==============================
+
+model Account {
+  @@schema("user")
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  @@schema("user")
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model VerificationToken {
+  @@schema("user")
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==============================
+// Rate Limiting & Quota Management
+// ==============================
+
+model UserQuota {
+  @@schema("user")
+  id              String   @id @default(uuid()) @db.Uuid
+  user_id         String   @unique @db.Uuid
+
+  // Resource limits (customize per your domain)
+  daily_resource_limit   Int @default(10)
+  monthly_resource_limit Int @default(300)
+
+  // API call limits
+  daily_api_limit   Int @default(10)
+  monthly_api_limit Int @default(300)
+
+  // Current usage
+  daily_resource_count   Int @default(0)
+  monthly_resource_count Int @default(0)
+  daily_api_count   Int @default(0)
+  monthly_api_count Int @default(0)
+
+  // Reset timestamps
+  daily_reset_at   DateTime @db.Timestamptz(6)
+  monthly_reset_at DateTime @db.Timestamptz(6)
+
+  // Subscription link
+  is_premium Boolean @default(false)
+  subscription_id String? @db.Uuid
+
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscription_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([daily_reset_at])
+  @@index([monthly_reset_at])
+  @@index([subscription_id])
+}
+
+// ==============================
+// Invite Code System
+// ==============================
+
+model InviteCode {
+  @@schema("user")
+  id            String          @id @default(uuid()) @db.Uuid
+  code          String          @unique
+  type          InviteCodeType  @default(BETA_TESTER)
+  description   String?
+
+  // Quota settings applied on signup
+  is_premium    Boolean         @default(true)
+  daily_limit   Int?
+  monthly_limit Int?
+
+  // Usage limits
+  max_uses      Int?
+  used_count    Int             @default(0)
+  expires_at    DateTime?       @db.Timestamptz(6)
+
+  // Status
+  is_active     Boolean         @default(true)
+
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  created_by    String?         @db.Uuid
+
+  @@index([code])
+  @@index([type, is_active])
+  @@index([expires_at])
+  @@map("invite_codes")
+}
+
+// ==============================
+// GDPR Compliance
+// ==============================
+
+model DataExportRequest {
+  @@schema("user")
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  status     String
+  file_url   String?
+  expires_at DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  completed_at DateTime? @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, status])
+  @@index([expires_at])
+  @@index([status, created_at])
+}
+
+model AccountDeletionRequest {
+  @@schema("user")
+  id           String    @id @default(uuid()) @db.Uuid
+  user_id      String    @db.Uuid
+  reason       String?
+  status       String
+  scheduled_at DateTime? @db.Timestamptz(6)
+  deleted_at   DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([status, scheduled_at])
+  @@index([scheduled_at])
+}
+
+model UserConsent {
+  @@schema("user")
+  id            String   @id @default(uuid()) @db.Uuid
+  user_id       String   @db.Uuid
+  consent_type  String
+  version       String
+  granted       Boolean
+  granted_at    DateTime @db.Timestamptz(6)
+  revoked_at    DateTime? @db.Timestamptz(6)
+  ip_address    String?
+  user_agent    String?
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, consent_type])
+  @@index([consent_type, granted])
+  @@unique([user_id, consent_type, version])
+}
+
+// ==============================
+// Logging & Monitoring
+// ==============================
+
+model LoginLog {
+  @@schema("user")
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String?  @db.Uuid
+  is_guest   Boolean  @default(false)
+  ip         String?
+  device     String?
+  ua         String?  @map("user_agent")
+  action     String?
+  success    Boolean?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  user       User?    @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, created_at])
+  @@index([is_guest, created_at])
+  @@index([ip, created_at])
+  @@index([ip, action, created_at])
+  @@index([action, created_at])
+  @@index([success, created_at])
+}
+
+model ErrorLog {
+  @@schema("user")
+  id         String         @id @default(uuid()) @db.Uuid
+  severity   ErrorSeverity?
+  message    String?
+  stack      String?
+  service    String?
+  ref_table  String?
+  ref_id     String?
+  extra      Json?
+  created_at DateTime       @default(now()) @db.Timestamptz(6)
+
+  @@index([service, created_at])
+  @@index([severity, created_at])
+  @@index([extra], type: Gin)
+}
+
+model ApiLog {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String?  @db.Uuid
+  method      String?
+  endpoint    String?
+  status_code Int?
+  latency_ms  Int?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  user        User?    @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, created_at])
+  @@index([method, endpoint, created_at])
+  @@index([endpoint, created_at])
+  @@index([status_code])
+  @@index([status_code, created_at])
+  @@index([latency_ms])
+}
+
+model ContentModerationLog {
+  @@schema("admin")
+  id         String            @id @default(uuid()) @db.Uuid
+  content_id String?           @db.Uuid
+  action     ModerationAction?
+  reason     String?
+  admin_id   String?           @db.Uuid
+  created_at DateTime          @default(now()) @db.Timestamptz(6)
+
+  @@index([content_id, created_at])
+  @@index([action, created_at])
+  @@index([admin_id, created_at])
+}
+
+// ==============================
+// Communication & Events
+// ==============================
+
+model Notification {
+  @@schema("user")
+  id              String            @id @default(uuid()) @db.Uuid
+  user_id         String?           @db.Uuid
+  type            NotificationType?
+  title           String?
+  message         String?
+  title_en        String?
+  message_en      String?
+  title_ja        String?
+  message_ja      String?
+  read            Boolean           @default(false)
+  visible_from    DateTime?         @db.Timestamptz(6)
+  visible_to      DateTime?         @db.Timestamptz(6)
+  announcement_id String?           @db.Uuid
+  event_id        String?           @db.Uuid
+  title_snapshot  String?
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  announcement    Announcement?     @relation(fields: [announcement_id], references: [id])
+  event           Event?            @relation(fields: [event_id], references: [id])
+  user            User?             @relation(fields: [user_id], references: [id])
+  userStatuses    UserNotificationStatus[]
+
+  @@index([user_id, created_at])
+  @@index([user_id, read, created_at])
+  @@index([visible_from, visible_to])
+  @@index([type, created_at])
+  @@index([read])
+  @@index([created_at])
+  @@index([type])
+}
+
+model UserNotificationStatus {
+  @@schema("user")
+  id              String       @id @default(uuid()) @db.Uuid
+  user_id         String       @db.Uuid
+  notification_id String       @db.Uuid
+  read            Boolean      @default(false)
+  deleted         Boolean      @default(false)
+  read_at         DateTime?    @db.Timestamptz(6)
+  deleted_at      DateTime?    @db.Timestamptz(6)
+  created_at      DateTime     @default(now()) @db.Timestamptz(6)
+
+  user            User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  notification    Notification @relation(fields: [notification_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, notification_id])
+  @@index([user_id, deleted])
+  @@index([user_id, read, deleted])
+  @@index([notification_id])
+}
+
+model Announcement {
+  @@schema("user")
+  id            String         @id @default(uuid()) @db.Uuid
+  title         String?
+  body          String?
+  title_en      String?
+  body_en       String?
+  title_ja      String?
+  body_ja       String?
+  tags          String[]
+  published_at  DateTime?      @db.Timestamptz(6)
+  expires_at    DateTime?      @db.Timestamptz(6)
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime?      @db.Timestamptz(6)
+  deleted_at    DateTime?      @db.Timestamptz(6)
+  notifications Notification[]
+
+  @@index([published_at, expires_at])
+  @@index([tags])
+  @@index([created_at])
+}
+
+model BlogPost {
+  @@schema("user")
+  id            String    @id @default(uuid()) @db.Uuid
+  slug          String    @unique
+  title         String
+  content       String
+  excerpt       String?
+  title_en      String?
+  content_en    String?
+  excerpt_en    String?
+  title_ja      String?
+  content_ja    String?
+  excerpt_ja    String?
+  tags          String[]
+  cover_image   String?
+  author_id     String?   @db.Uuid
+  view_count    Int       @default(0)
+  published_at  DateTime? @db.Timestamptz(6)
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime? @db.Timestamptz(6)
+  deleted_at    DateTime? @db.Timestamptz(6)
+
+  @@index([slug])
+  @@index([published_at])
+  @@index([tags])
+  @@index([created_at])
+}
+
+model Event {
+  @@schema("user")
+  id            String            @id @default(uuid()) @db.Uuid
+  title         String?
+  description   String?
+  start_date    DateTime?         @db.Timestamptz(6)
+  end_date      DateTime?         @db.Timestamptz(6)
+  created_at    DateTime          @default(now()) @db.Timestamptz(6)
+  attendances   EventAttendance[]
+  notifications Notification[]
+
+  @@index([start_date, end_date])
+  @@index([created_at])
+}
+
+model EventAttendance {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  event_id    String?  @db.Uuid
+  date        DateTime @db.Timestamptz(6)
+  streak      Int?
+  reward_code String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  event       Event?   @relation(fields: [event_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+  @@index([user_id, event_id, date])
+  @@index([date])
+}
+
+// ==============================
+// User Settings
+// ==============================
+
+model UserSettings {
+  @@schema("user")
+  id      String @id @default(uuid()) @db.Uuid
+  user_id String @unique @db.Uuid
+
+  // Notification settings
+  email_notifications          Boolean @default(true)
+  push_notifications           Boolean @default(true)
+  notification_preferences     Json?
+
+  // Personalization
+  language        String         @default("ko")
+  theme_style     String         @default("paper")
+  theme_mode      String         @default("system")
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+// ==============================
+// Abuse Detection (admin schema)
+// ==============================
+
+model AbuseAlert {
+  @@schema("admin")
+  id                 String  @id @default(uuid()) @db.Uuid
+  user_id            String  @db.Uuid
+
+  // Detection info
+  alert_type     AlertType        @default(ABUSE)
+  abuse_patterns AbusePattern[]
+  penalty_level  PenaltyLevel     @default(WARNING)
+  status         AbuseAlertStatus @default(PENDING)
+
+  // Detection results
+  content_flags         String[]
+  detected_patterns     String[]
+  exclude_from_analysis Boolean  @default(false)
+
+  // Content excerpt (anonymized)
+  content_excerpt String? @db.Text
+
+  // Admin review
+  reviewed_by  String?   @db.Uuid
+  reviewed_at  DateTime? @db.Timestamptz(6)
+  admin_notes  String?   @db.Text
+  action_taken String?
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  // Relations
+  user User? @relation("AbuseAlertUser", fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([status])
+  @@index([status, created_at])
+  @@index([penalty_level])
+  @@index([user_id, penalty_level, created_at])
+  @@index([alert_type])
+  @@index([alert_type, status])
+  @@index([created_at])
+  @@index([abuse_patterns])
+  @@index([reviewed_by])
+}
+
+// ==============================
+// Audit Trail (admin schema)
+// ==============================
+
+model AuditLog {
+  @@schema("admin")
+  id          String   @id @default(uuid()) @db.Uuid
+  actor_id    String   @db.Uuid
+  actor_type  String
+  action      String
+  resource    String
+  resource_id String   @db.Uuid
+  changes     Json?
+  reason      String?
+  ip_address  String
+  user_agent  String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([actor_id, created_at])
+  @@index([resource, resource_id])
+  @@index([action, created_at])
+  @@index([created_at])
+  @@index([actor_type, action])
+}
+
+// ==============================
+// GDPR Article 30 (admin schema)
+// ==============================
+
+model PersonalDataProcessingLog {
+  @@schema("admin")
+  id             String   @id @default(uuid()) @db.Uuid
+  user_id        String   @db.Uuid
+  processing_type String
+  data_type      String
+  target_id      String?  @db.Uuid
+  purpose        String
+  admin_id       String?  @db.Uuid
+  ip_address     String
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([user_id, created_at])
+  @@index([processing_type, created_at])
+  @@index([admin_id, created_at])
+  @@index([data_type, created_at])
+}
+
+// ==============================
+// Exchange Rate (admin schema)
+// ==============================
+
+model ExchangeRate {
+  @@schema("admin")
+  id         String   @id @default(uuid()) @db.Uuid
+  date       String   @unique
+  usd_to_krw Decimal  @db.Decimal(10, 4)
+  source     String   @default("open.er-api.com")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([date])
+}
+
+// ==============================
+// Backup & Recovery (admin schema)
+// ==============================
+
+model BackupRecord {
+  @@schema("admin")
+  id            String   @id @default(uuid()) @db.Uuid
+  backup_type   String
+  status        String
+  file_size_mb  Float?
+  storage_path  String?
+  checksum      String?
+  retention_until DateTime @db.Timestamptz(6)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  completed_at  DateTime? @db.Timestamptz(6)
+
+  @@index([backup_type, created_at])
+  @@index([status])
+  @@index([retention_until])
+}
+
+// ==============================
+// Monthly Access Stats (admin schema)
+// ==============================
+
+model MonthlyAccessStats {
+  @@schema("admin")
+  id              String   @id @default(uuid()) @db.Uuid
+  period          String
+  total_logins    Int      @default(0)
+  unique_users    Int      @default(0)
+  failed_logins   Int      @default(0)
+  signups         Int      @default(0)
+  by_provider     Json?
+  by_device       Json?
+  avg_dau         Float?   @db.DoublePrecision
+  peak_dau        Int?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([period])
+  @@index([created_at])
+}
+
+// ==============================
+// Contact Inquiry (admin schema)
+// ==============================
+
+model ContactInquiry {
+  id          String                 @id @default(uuid()) @db.Uuid
+  user_id     String?                @db.Uuid
+  name        String
+  email       String
+  subject     String
+  message     String                 @db.Text
+  status      ContactInquiryStatus   @default(PENDING)
+  ip_address  String
+  user_agent  String?
+  admin_note  String?                @db.Text
+  resolved_at DateTime?              @db.Timestamptz(6)
+  created_at  DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime               @updatedAt @db.Timestamptz(6)
+
+  @@index([status, created_at])
+  @@index([email, created_at])
+  @@index([user_id, created_at])
+  @@index([created_at])
+  @@index([ip_address, created_at])
+  @@schema("admin")
+}
+
+// ==============================
+// Payment System (provider-agnostic)
+// ==============================
+
+model Plan {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  display_name String
+  description String?  @db.Text
+
+  // Quota (generic)
+  daily_resource_limit   Int @default(10)
+  monthly_resource_limit Int @default(300)
+  daily_api_limit   Int @default(10)
+  monthly_api_limit Int @default(300)
+
+  // Pricing
+  price_monthly Decimal @db.Decimal(10, 2)
+  price_yearly Decimal? @db.Decimal(10, 2)
+  price_monthly_usd Decimal? @db.Decimal(10, 2)
+  price_yearly_usd  Decimal? @db.Decimal(10, 2)
+
+  // Feature flags
+  features Json?
+
+  // Status
+  is_active Boolean @default(true)
+  is_public Boolean @default(true)
+
+  sort_order Int @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+
+  @@unique([name])
+  @@index([is_active, is_public])
+  @@index([sort_order])
+}
+
+model Subscription {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @unique @db.Uuid
+
+  plan_id     String   @db.Uuid
+  plan        Plan     @relation(fields: [plan_id], references: [id])
+
+  // Provider-agnostic
+  provider                 PaymentProvider?
+  provider_subscription_id String?
+  provider_customer_id     String?
+
+  status SubscriptionStatus @default(ACTIVE)
+
+  // Period
+  started_at   DateTime @db.Timestamptz(6)
+  current_period_start DateTime @db.Timestamptz(6)
+  current_period_end   DateTime @db.Timestamptz(6)
+  cancel_at    DateTime? @db.Timestamptz(6)
+  cancelled_at DateTime? @db.Timestamptz(6)
+
+  // Billing
+  billing_cycle String @default("monthly")
+  amount        Decimal @db.Decimal(10, 2)
+  currency      String  @default("KRW")
+  auto_renew    Boolean @default(true)
+
+  // Trial
+  is_trial     Boolean   @default(false)
+  trial_start  DateTime? @db.Timestamptz(6)
+  trial_end    DateTime? @db.Timestamptz(6)
+
+  coupon_id    String?   @db.Uuid
+
+  cancel_reason String?
+  cancel_requested_at DateTime? @db.Timestamptz(6)
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  payments Payment[]
+  quotas UserQuota[]
+  coupon Coupon? @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([status])
+  @@index([current_period_end])
+  @@index([cancel_at])
+  @@index([provider, provider_subscription_id])
+  @@index([is_trial])
+  @@index([trial_end])
+  @@index([coupon_id])
+}
+
+model Payment {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  subscription_id String? @db.Uuid
+
+  // Provider-agnostic
+  provider            PaymentProvider?
+  provider_payment_id String?
+  provider_order_id   String?
+  method              String?
+  method_type         String?
+
+  // Payment info
+  amount      Decimal @db.Decimal(10, 2)
+  currency    String  @default("KRW")
+  status      PaymentStatus @default(PENDING)
+
+  description String?
+  order_name  String?
+  customer_email String?
+  customer_name String?
+  metadata    Json?
+
+  // Refund
+  refund_amount Decimal? @db.Decimal(10, 2)
+  refund_reason String?
+  refunded_at   DateTime? @db.Timestamptz(6)
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  paid_at    DateTime? @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscription_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id, created_at])
+  @@index([subscription_id])
+  @@index([status])
+  @@unique([provider, provider_payment_id])
+  @@index([provider_order_id])
+  @@index([paid_at])
+}
+
+model PaymentMethod {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+
+  // Provider-agnostic
+  provider             PaymentProvider
+  provider_billing_key String
+  provider_customer_id String?
+  method               String
+  method_type          String?
+
+  // Card info (masked)
+  card_company String?
+  card_number  String?
+
+  is_default Boolean @default(false)
+  is_active Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([is_default])
+  @@index([is_active])
+  @@unique([provider, provider_billing_key])
+}
+
+// ==============================
+// Coupon & Promotion
+// ==============================
+
+model Coupon {
+  @@schema("user")
+  id             String     @id @default(uuid()) @db.Uuid
+  code           String     @unique
+  type           CouponType
+  value          Int
+  description    String?
+
+  max_uses       Int?
+  used_count     Int        @default(0)
+  expires_at     DateTime?  @db.Timestamptz(6)
+  is_active      Boolean    @default(true)
+
+  applicable_plans String[]
+
+  created_by     String?    @db.Uuid
+  created_at     DateTime   @default(now()) @db.Timestamptz(6)
+
+  redemptions    CouponRedemption[]
+  subscriptions  Subscription[]
+
+  @@index([code])
+  @@index([is_active, expires_at])
+  @@index([type])
+}
+
+model CouponRedemption {
+  @@schema("user")
+  id          String   @id @default(uuid()) @db.Uuid
+  coupon_id   String   @db.Uuid
+  user_id     String   @db.Uuid
+  applied_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  coupon      Coupon   @relation(fields: [coupon_id], references: [id])
+
+  @@unique([coupon_id, user_id])
+  @@index([user_id])
+  @@index([coupon_id])
+  @@index([applied_at])
+}
+
+// ==============================
+// User Acquisition (admin schema)
+// ==============================
+
+model UserAcquisition {
+  @@schema("admin")
+  id           String   @id @default(uuid()) @db.Uuid
+  user_id      String   @unique @db.Uuid
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  utm_source   String?
+  utm_medium   String?
+  utm_campaign String?
+  referrer     String?  @db.Text
+  landing_url  String?  @db.Text
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([utm_source])
+  @@index([created_at])
+}

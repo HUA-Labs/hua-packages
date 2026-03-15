@@ -1,0 +1,17 @@
+{
+  "hero_tagline": "지금도 듣고 있어요, 당신의 이야기를",
+  "hero_title": "Your App",
+  "cta_try": "기록 시작하기",
+  "cta_learn_more": "더 알아보기",
+  "cta_start": "무료로 시작하기",
+  "cta_login": "로그인",
+  "social_login": "소셜 로그인으로 간편하게 시작하기",
+  "kakao_login": "카카오 로그인",
+  "google_login": "구글 로그인",
+  "feature_ai_title": "사생활 보호 우선",
+  "feature_ai_desc": "모든 데이터는 암호화되어 오직 당신만이 열어보도록",
+  "feature_privacy_title": "안전하게 기록",
+  "feature_privacy_desc": "임시저장·오프라인 모드로 어디서나 기록하기",
+  "feature_insight_title": "감정 흐름 저널",
+  "feature_insight_desc": "감정의 흐름과 오늘의 질문을 통해 나의 마음을 돌아보기"
+}

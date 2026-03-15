@@ -1,0 +1,42 @@
+{
+  "title": "Terms of Service",
+  "_notice": "PLACEHOLDER — Replace with your own legal terms before launching.",
+
+  "effective_date": "Effective: [DATE]",
+  "intro": "These Terms of Service (\"Terms\") govern your access to and use of [Your App] (\"Service\") provided by [Your Company] (\"Company\", \"we\", \"us\").",
+
+  "section1_title": "1. Acceptance of Terms",
+  "section1_desc": "By accessing or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.",
+
+  "section2_title": "2. Description of Service",
+  "section2_desc": "The Service provides [describe your SaaS product]. We reserve the right to modify, suspend, or discontinue the Service at any time.",
+  "section2_items": [
+    "[Your core feature 1]",
+    "[Your core feature 2]",
+    "[Your core feature 3]"
+  ],
+
+  "section3_title": "3. User Accounts",
+  "section3_desc": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.",
+
+  "section4_title": "4. Payment & Subscriptions",
+  "section4_desc": "Paid features are billed in advance on a monthly or annual basis. Refund policies are described in the billing section of the Service.",
+
+  "section5_title": "5. User Obligations",
+  "section5_desc": "You agree not to misuse the Service, attempt unauthorized access, or violate applicable laws.",
+
+  "section6_title": "6. Intellectual Property",
+  "section6_desc": "The Service and its content are protected by copyright, trademark, and other laws. Your content remains yours; you grant us a license to operate the Service.",
+
+  "section7_title": "7. Limitation of Liability",
+  "section7_desc": "THE SERVICE IS PROVIDED \"AS IS\" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COMPANY SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES.",
+
+  "section8_title": "8. Termination",
+  "section8_desc": "We may suspend or terminate your access at any time for violation of these Terms. You may cancel your account at any time.",
+
+  "section9_title": "9. Governing Law",
+  "section9_desc": "These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction].",
+
+  "section10_title": "10. Contact",
+  "section10_desc": "For questions about these Terms, contact us at [your-email@example.com]."
+}

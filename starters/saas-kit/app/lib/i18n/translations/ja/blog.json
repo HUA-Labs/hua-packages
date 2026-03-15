@@ -1,0 +1,10 @@
+{
+  "title": "ブログ",
+  "description": "Your Appのストーリーとアップデート",
+  "readMore": "続きを読む",
+  "backToList": "一覧に戻る",
+  "notFound": "記事が見つかりません",
+  "notFoundDescription": "お探しの記事は存在しないか、削除されました。",
+  "empty": "まだブログ記事がありません",
+  "emptyDescription": "もうすぐ新しい記事が公開されます！"
+}

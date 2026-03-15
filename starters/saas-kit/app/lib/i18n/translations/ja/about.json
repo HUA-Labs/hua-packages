@@ -1,0 +1,87 @@
+{
+  "hero": {
+    "tagline": "心が澄む場所",
+    "title": "スムダ",
+    "subtitle": "AIがあなたの気持ちを読み取るよ"
+  },
+  "privacy": {
+    "badge": "Privacy First",
+    "title": "あなたの物語は安全に",
+    "description": "すべての記録は暗号化されて保存されるよ。読めるのはあなただけ。"
+  },
+  "features": {
+    "title": "記録を、もっと自由に",
+    "analysis": {
+      "title": "AI感情分析",
+      "description": "書くと、AIが感情の流れを読んでインサイトを届けるよ"
+    },
+    "delayed": {
+      "title": "あと記録",
+      "description": "昨日書けなくても大丈夫。過去の日付にも記録できるよ"
+    },
+    "future": {
+      "title": "未来記録",
+      "description": "決意や計画を書いて、その日が来たら編集して分析してもらおう"
+    }
+  },
+  "autosave": {
+    "title": "自動保存",
+    "description": "書いてる途中で閉じても大丈夫。下書きが守ってくれるよ。"
+  },
+  "journey": {
+    "title": "スムダの歩み",
+    "launch": {
+      "title": "サービス開始",
+      "description": "Your App ウェブ版ローンチ"
+    },
+    "ai": {
+      "title": "AI感情分析",
+      "description": "HUA分析エンジン搭載"
+    },
+    "i18n": {
+      "title": "多言語対応",
+      "description": "韓国語、英語、日本語に対応"
+    },
+    "pwa": {
+      "title": "PWA対応",
+      "description": "モバイルでもアプリのように使える"
+    },
+    "native": {
+      "title": "ネイティブアプリ",
+      "description": "iOS、Androidアプリ近日公開"
+    }
+  },
+  "stats": {
+    "title": "スムダの数字",
+    "languages": {
+      "label": "対応言語",
+      "value": "3カ国語"
+    },
+    "encryption": {
+      "label": "データ保護",
+      "value": "E2E暗号化"
+    },
+    "analysis": {
+      "label": "AI分析",
+      "value": "リアルタイム"
+    },
+    "uptime": {
+      "label": "稼働率",
+      "value": "99.9%"
+    }
+  },
+  "tech": {
+    "title": "技術スタック"
+  },
+  "platform": {
+    "badge": "Coming Soon",
+    "title": "いつでもどこでも",
+    "description": "今はウェブで、もうすぐアプリでも会えるよ",
+    "pwa": "PWA対応中",
+    "native": "ネイティブアプリ準備中"
+  },
+  "cta": {
+    "title": "今日の気持ちを記録してみない？",
+    "button": "始める"
+  }
+}

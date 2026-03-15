@@ -1,0 +1,30 @@
+{
+  "title": "Security Policy",
+  "_notice": "PLACEHOLDER — Replace with your own security policy before launching.",
+
+  "intro": "We take the security of your data seriously. This document outlines our security practices and how to report vulnerabilities.",
+
+  "section1_title": "1. Data Encryption",
+  "section1_desc": "All sensitive data is encrypted at rest using AES-256 and in transit using TLS 1.3. Encryption keys are managed via KMS with automatic rotation.",
+
+  "section2_title": "2. Access Control",
+  "section2_desc": "We enforce role-based access control (RBAC). Administrative actions are logged in an audit trail. Access to production data requires multi-factor authentication.",
+
+  "section3_title": "3. Infrastructure",
+  "section3_desc": "The Service is hosted on industry-leading cloud platforms with SOC 2 compliance. We perform regular backups and maintain disaster recovery procedures.",
+
+  "section4_title": "4. Vulnerability Reporting",
+  "section4_desc": "We follow responsible disclosure practices. To report a vulnerability:",
+  "section4_items": [
+    "Email: [security@example.com]",
+    "Include: detailed description, reproduction steps, and impact assessment",
+    "Response time: initial acknowledgment within 7 days",
+    "Patch target: within 30 days of confirmation"
+  ],
+
+  "section5_title": "5. Incident Response",
+  "section5_desc": "In the event of a security incident, we will notify affected users within 72 hours, investigate the root cause, and implement remediation measures.",
+
+  "section6_title": "6. Contact",
+  "section6_desc": "For security-related inquiries, contact [security@example.com]."
+}

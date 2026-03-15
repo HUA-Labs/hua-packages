@@ -1,0 +1,87 @@
+{
+  "hero": {
+    "tagline": "A space where your heart breathes",
+    "title": "Your App",
+    "subtitle": "AI reads your emotions"
+  },
+  "privacy": {
+    "badge": "Privacy First",
+    "title": "Your stories, safely kept",
+    "description": "All entries are encrypted. Only you can read them."
+  },
+  "features": {
+    "title": "Journaling, reimagined",
+    "analysis": {
+      "title": "AI Emotion Analysis",
+      "description": "Write, and AI reads the flow of your emotions to deliver insights"
+    },
+    "delayed": {
+      "title": "Later Entry",
+      "description": "Missed yesterday? No problem. Write for past dates anytime"
+    },
+    "future": {
+      "title": "Future Entries",
+      "description": "Set intentions, then edit and analyze when the day comes"
+    }
+  },
+  "autosave": {
+    "title": "Auto-save",
+    "description": "Close accidentally? Don't worry. Drafts have you covered."
+  },
+  "journey": {
+    "title": "Our Journey",
+    "launch": {
+      "title": "Launch",
+      "description": "Your App web version launched"
+    },
+    "ai": {
+      "title": "AI Analysis",
+      "description": "HUA analysis engine integrated"
+    },
+    "i18n": {
+      "title": "Multilingual",
+      "description": "Korean, English, Japanese supported"
+    },
+    "pwa": {
+      "title": "PWA Support",
+      "description": "Use it like an app on mobile"
+    },
+    "native": {
+      "title": "Native App",
+      "description": "iOS & Android apps coming soon"
+    }
+  },
+  "stats": {
+    "title": "Your App in Numbers",
+    "languages": {
+      "label": "Languages",
+      "value": "3 Languages"
+    },
+    "encryption": {
+      "label": "Data Protection",
+      "value": "E2E Encrypted"
+    },
+    "analysis": {
+      "label": "AI Analysis",
+      "value": "Real-time"
+    },
+    "uptime": {
+      "label": "Uptime",
+      "value": "99.9%"
+    }
+  },
+  "tech": {
+    "title": "Tech Stack"
+  },
+  "platform": {
+    "badge": "Coming Soon",
+    "title": "Always with you",
+    "description": "Web now, native app soon",
+    "pwa": "PWA Available",
+    "native": "Native App Coming"
+  },
+  "cta": {
+    "title": "Ready to capture today's emotions?",
+    "button": "Get Started"
+  }
+}

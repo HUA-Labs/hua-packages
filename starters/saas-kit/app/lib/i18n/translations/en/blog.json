@@ -1,0 +1,10 @@
+{
+  "title": "Blog",
+  "description": "Stories and Updates from Your App",
+  "readMore": "Read more",
+  "backToList": "Back to list",
+  "notFound": "Post not found",
+  "notFoundDescription": "The post you requested doesn't exist or has been deleted.",
+  "empty": "No blog posts yet",
+  "emptyDescription": "New posts are coming soon!"
+}

@@ -1,0 +1,106 @@
+{
+  "title": "おかえり、{name}",
+  "titleFallback": "おかえり",
+  "greetings": {
+    "morning": [
+      "おはよう！今日はどんな一日になるかな？",
+      "朝だよ、今日の気分はどう？",
+      "さわやかな朝！一言残してみない？"
+    ],
+    "afternoon": [
+      "今日はどう過ごしてる？",
+      "ちょっと休憩して気持ちを整理しよう",
+      "午後もがんばろう、一言書いてみて"
+    ],
+    "evening": [
+      "今日もお疲れさま、どんな一日だった？",
+      "一日を振り返って記録してみよう",
+      "穏やかな夜、今日の気持ちを残そう"
+    ],
+    "night": [
+      "遅くまでお疲れさま",
+      "今日も頑張ったね、書いてから寝よう",
+      "静かな夜、今日の話を残そう"
+    ]
+  },
+  "stats": {
+    "totalDiaries": {
+      "title": "記録の数",
+      "description": "これまで書いた記録"
+    },
+    "consecutiveDays": {
+      "title": "連続記録",
+      "descriptionBest": "最高記録: {days}日",
+      "descriptionContinue": "いい調子だね！",
+      "descriptionFirst": "最初の記録を書いてみよう"
+    },
+    "thisMonth": {
+      "title": "今月の記録",
+      "description": "今月書いた記録"
+    },
+    "dayCount": "{{count}}日"
+  },
+  "quickActions": {
+    "newDiary": {
+      "title": "新しい記録を書く",
+      "description": "今日の気持ちを残そう"
+    },
+    "viewDiaries": {
+      "title": "記録を見る",
+      "description": "これまでの記録"
+    },
+    "calendar": {
+      "title": "カレンダー",
+      "description": "日付ごとに一覧"
+    },
+    "report": {
+      "title": "AI感情レポート",
+      "description": "感情の流れを分析",
+      "comingSoon": "準備中"
+    }
+  },
+  "chart": {
+    "title": "最近の執筆推移"
+  },
+  "weeklyRate": {
+    "title": "今週の記録率",
+    "days": "{written}/{total}日",
+    "mostActiveDay": "一番書く曜日: {day}"
+  },
+  "heatmap": {
+    "title": "記録状況",
+    "totalDays": "{entries}件 · {days}日記録",
+    "tooltip": { "other": "{date}: {count}件" },
+    "less": "少",
+    "more": "多"
+  },
+  "announcement": {
+    "close": "閉じる"
+  },
+  "recentDiaries": {
+    "title": "最近の記録",
+    "viewAll": "すべての記録を見る",
+    "noTitle": "タイトルなし"
+  },
+  "time": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{days}日前"
+  },
+  "emptyState": {
+    "title": "最初の記録を書いてみよう！",
+    "description": "AIがあなたの気持ちを分析して成長をサポートするよ",
+    "action": "記録を書く"
+  },
+  "breathingProgress": {
+    "title": "今週のすみ記",
+    "description": "週3日以上書くと週間レポートが開くよ",
+    "unlocked": "今週のすみ記達成！",
+    "unit": "日"
+  },
+  "errors": {
+    "fetchFailed": "記録データの読み込みに失敗したよ。",
+    "loadFailed": "ダッシュボードの読み込みに失敗したよ。",
+    "loadFailedTitle": "読み込みエラー"
+  }
+}
