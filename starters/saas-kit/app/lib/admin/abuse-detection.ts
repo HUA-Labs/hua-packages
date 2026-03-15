@@ -279,7 +279,7 @@ export async function createAbuseAlertAsync(input: {
 
     notifyAbuseAlert({
       userId: input.userId,
-      contentId: input.contentId,
+      resourceId: input.contentId,
       abusePatterns: input.abusePatterns,
       penaltyLevel: input.penaltyLevel,
     });
