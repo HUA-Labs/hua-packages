@@ -6,7 +6,13 @@
  * JSON 스키마를 받아서 실제 React 컴포넌트로 렌더링
  */
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import type {
   SDUINode,
   SDUIPageSchema,
@@ -51,10 +57,7 @@ function ScopedDataProvider({
   children: React.ReactNode;
 }) {
   const parentCtx = useSDUI();
-  const scopedCtx = useMemo(
-    () => ({ ...parentCtx, data }),
-    [parentCtx, data]
-  );
+  const scopedCtx = useMemo(() => ({ ...parentCtx, data }), [parentCtx, data]);
   return (
     <SDUIContextInternal.Provider value={scopedCtx}>
       {children}
@@ -65,16 +68,18 @@ function ScopedDataProvider({
 /**
  * constraints → HTML 속성 매핑
  */
-function resolveConstraints(
-  constraints: SDUIConstraints
-): { attrs: Record<string, unknown>; style: React.CSSProperties } {
+function resolveConstraints(constraints: SDUIConstraints): {
+  attrs: Record<string, unknown>;
+  style: React.CSSProperties;
+} {
   const attrs: Record<string, unknown> = {};
   const style: React.CSSProperties = {};
 
   if (constraints.role) attrs.role = constraints.role;
   if (constraints.label) attrs["aria-label"] = constraints.label;
   if (constraints.level !== undefined) attrs["aria-level"] = constraints.level;
-  if (constraints.hidden !== undefined) attrs["aria-hidden"] = constraints.hidden;
+  if (constraints.hidden !== undefined)
+    attrs["aria-hidden"] = constraints.hidden;
 
   if (constraints.minTapTarget !== undefined) {
     style.minWidth = constraints.minTapTarget;
@@ -136,7 +141,16 @@ function NodeRendererInner({ node, registry }: NodeRendererProps) {
   if (!Component) {
     console.warn(`[SDUI] Unknown component type: ${node.type}`);
     return (
-      <div style={{ padding: 16, border: "1px solid #ef4444", borderRadius: 4, fontSize: 14, color: "#ef4444", backgroundColor: "rgba(239,68,68,0.1)" }}>
+      <div
+        style={{
+          padding: 16,
+          border: "1px solid #ef4444",
+          borderRadius: 4,
+          fontSize: 14,
+          color: "#ef4444",
+          backgroundColor: "rgba(239,68,68,0.1)",
+        }}
+      >
         Unknown component: {node.type}
       </div>
     );
@@ -152,10 +166,15 @@ function NodeRendererInner({ node, registry }: NodeRendererProps) {
 
   // constraints → aria-* + style 매핑
   if (node.constraints) {
-    const { attrs, style: constraintStyle } = resolveConstraints(node.constraints);
+    const { attrs, style: constraintStyle } = resolveConstraints(
+      node.constraints,
+    );
     Object.assign(resolvedProps, attrs);
     if (Object.keys(constraintStyle).length > 0) {
-      resolvedProps.style = { ...(resolvedProps.style as React.CSSProperties || {}), ...constraintStyle };
+      resolvedProps.style = {
+        ...((resolvedProps.style as React.CSSProperties) || {}),
+        ...constraintStyle,
+      };
     }
   }
 
@@ -190,7 +209,25 @@ function NodeRendererInner({ node, registry }: NodeRendererProps) {
   }
 
   // void 엘리먼트는 children을 받지 않음
-  const voidElements = ['Divider', 'Input', 'Textarea', 'Checkbox', 'Switch', 'Progress', 'Skeleton', 'Image', 'ScrollProgress'];
+  const voidElements = [
+    "Divider",
+    "Input",
+    "Textarea",
+    "Checkbox",
+    "Switch",
+    "Progress",
+    "Skeleton",
+    "Image",
+    "ScrollProgress",
+    // Batch A2/A3 void elements
+    "PageNavigation",
+    "DotNav",
+    "StatsPanel",
+    "LanguageToggle",
+    "ThemeToggle",
+    "SectionHeader",
+    "Pagination",
+  ];
   const isVoidElement = voidElements.includes(node.type);
 
   if (isVoidElement || children === null) {
@@ -216,7 +253,9 @@ export function SDUIRenderer({
 }: SDUIRendererProps) {
   // 페이지 스키마인지 노드인지 확인
   const isPageSchema = "root" in schema;
-  const rootNode = isPageSchema ? (schema as SDUIPageSchema).root : (schema as SDUINode);
+  const rootNode = isPageSchema
+    ? (schema as SDUIPageSchema).root
+    : (schema as SDUINode);
   const schemaData = isPageSchema ? (schema as SDUIPageSchema).data : {};
 
   // 데이터 상태
@@ -228,7 +267,7 @@ export function SDUIRenderer({
   // 레지스트리 병합
   const registry = useMemo(
     () => ({ ...defaultRegistry, ...components }),
-    [components]
+    [components],
   );
 
   // 데이터 업데이트
@@ -245,7 +284,7 @@ export function SDUIRenderer({
         window.location.href = path;
       }
     },
-    [onNavigate]
+    [onNavigate],
   );
 
   // 액션 핸들러
@@ -271,7 +310,7 @@ export function SDUIRenderer({
           onAction?.(action);
       }
     },
-    [navigate, setData, onAction]
+    [navigate, setData, onAction],
   );
 
   // Context 값
@@ -282,7 +321,7 @@ export function SDUIRenderer({
       handleAction,
       navigate,
     }),
-    [data, setData, handleAction, navigate]
+    [data, setData, handleAction, navigate],
   );
 
   return (
@@ -304,9 +343,18 @@ export function SDUIFromJSON({
     return <SDUIRenderer schema={schema} {...props} />;
   } catch (error) {
     return (
-      <div style={{ padding: 16, border: "1px solid #ef4444", borderRadius: 4, backgroundColor: "rgba(239,68,68,0.1)" }}>
+      <div
+        style={{
+          padding: 16,
+          border: "1px solid #ef4444",
+          borderRadius: 4,
+          backgroundColor: "rgba(239,68,68,0.1)",
+        }}
+      >
         <p style={{ fontWeight: 600, color: "#ef4444" }}>SDUI Parse Error</p>
-        <pre style={{ fontSize: 14, marginTop: 8, color: "rgba(239,68,68,0.8)" }}>
+        <pre
+          style={{ fontSize: 14, marginTop: 8, color: "rgba(239,68,68,0.8)" }}
+        >
           {(error as Error).message}
         </pre>
       </div>
