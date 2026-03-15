@@ -17,7 +17,14 @@ import { Text as PrimitiveText } from "../components/Text";
 
 // 기본 컴포넌트들
 import { Button } from "../components/Button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../components/Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "../components/Card";
 import { Badge } from "../components/Badge";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/Avatar";
 import { Container } from "../components/Container";
@@ -37,6 +44,36 @@ import type { IconName } from "../lib/icons";
 // Advanced 컴포넌트들
 import { HeroSection } from "../components/HeroSection";
 import { ScrollProgress } from "../components/ScrollProgress";
+
+// Batch A1 — Layout
+import { Stack } from "../components/Stack";
+import { Panel } from "../components/Panel";
+import { SectionHeader } from "../components/SectionHeader";
+import { ComponentLayout } from "../components/ComponentLayout";
+import { Pressable } from "../components/Pressable";
+
+// Batch A2 — Navigation
+import { Breadcrumb } from "../components/Breadcrumb";
+import { Pagination } from "../components/Pagination";
+import { Navigation } from "../components/Navigation";
+import { PageNavigation } from "../components/PageNavigation";
+import { DotNav } from "../components/advanced/DotNav";
+import type { DotNavItem } from "../components/advanced/DotNav";
+
+// Batch A3 — Display
+import { FeatureCard } from "../components/FeatureCard";
+import { InfoCard } from "../components/InfoCard";
+import { StatsPanel } from "../components/StatsPanel";
+import type { StatsPanelItem } from "../components/StatsPanel";
+import { LanguageToggle } from "../components/LanguageToggle";
+import { ThemeToggle } from "../components/ThemeToggle";
+
+// Batch A4 — Overlay
+import { Modal } from "../components/Modal";
+import { Tooltip } from "../components/Tooltip";
+import { Popover } from "../components/Popover";
+import { Drawer } from "../components/Drawer";
+import { BottomSheet } from "../components/BottomSheet";
 
 // Interactive 컴포넌트들
 import {
@@ -85,12 +122,20 @@ function buildCustomStyle(
 ): React.CSSProperties | undefined {
   const s: React.CSSProperties = {
     ...base,
-    ...(overrides.backgroundColor && { backgroundColor: overrides.backgroundColor }),
+    ...(overrides.backgroundColor && {
+      backgroundColor: overrides.backgroundColor,
+    }),
     ...(overrides.padding !== undefined && {
-      padding: typeof overrides.padding === "number" ? `${overrides.padding}px` : overrides.padding,
+      padding:
+        typeof overrides.padding === "number"
+          ? `${overrides.padding}px`
+          : overrides.padding,
     }),
     ...(overrides.margin !== undefined && {
-      margin: typeof overrides.margin === "number" ? `${overrides.margin}px` : overrides.margin,
+      margin:
+        typeof overrides.margin === "number"
+          ? `${overrides.margin}px`
+          : overrides.margin,
     }),
     ...(overrides.borderRadius !== undefined && {
       borderRadius:
@@ -157,15 +202,27 @@ const Box: React.FC<{
       align && alignDot[align],
       dotProp,
     )}
-    style={buildCustomStyle(style, { backgroundColor, padding, margin, borderRadius, border })}
+    style={buildCustomStyle(style, {
+      backgroundColor,
+      padding,
+      margin,
+      borderRadius,
+      border,
+    })}
     {...rest}
   >
     {children}
   </PrimitiveBox>
 );
 
-const Spacer: React.FC<{ size?: number; dot?: string }> = ({ size = 16, dot: dotProp }) => (
-  <PrimitiveBox dot={buildDot("shrink-0", dotProp)} style={{ width: size, height: size }} />
+const Spacer: React.FC<{ size?: number; dot?: string }> = ({
+  size = 16,
+  dot: dotProp,
+}) => (
+  <PrimitiveBox
+    dot={buildDot("shrink-0", dotProp)}
+    style={{ width: size, height: size }}
+  />
 );
 
 const Flex: React.FC<{
@@ -225,7 +282,12 @@ const Grid: React.FC<{
   ...rest
 }) => (
   <PrimitiveBox
-    dot={buildDot("grid", `grid-cols-${cols}`, gap > 0 && `gap-${gap}`, dotProp)}
+    dot={buildDot(
+      "grid",
+      `grid-cols-${cols}`,
+      gap > 0 && `gap-${gap}`,
+      dotProp,
+    )}
     style={buildCustomStyle(style, { backgroundColor, padding })}
     {...rest}
   >
@@ -247,7 +309,10 @@ const Divider: React.FC<{
   dot?: string;
   style?: React.CSSProperties;
 }> = ({ dot: dotProp, style, ...rest }) => (
-  <hr style={mergeStyles(resolveDot(buildDot("border-border", dotProp)), style)} {...rest} />
+  <hr
+    style={mergeStyles(resolveDot(buildDot("border-border", dotProp)), style)}
+    {...rest}
+  />
 );
 
 // ── Typography ──────────────────────────────────────────
@@ -281,7 +346,12 @@ const Text: React.FC<
   <PrimitiveText
     as="p"
     dot={buildDot(variantDotMap[variant], textAlignDot[align], dotProp)}
-    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    style={buildTypoStyle(style, {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      letterSpacing,
+    })}
     {...rest}
   >
     {children}
@@ -309,7 +379,12 @@ const H1: React.FC<HeadingProps> = ({
   <PrimitiveText
     as="h1"
     dot={buildDot("text-4xl font-bold", textAlignDot[align], dotProp)}
-    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    style={buildTypoStyle(style, {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      letterSpacing,
+    })}
     {...rest}
   >
     {children}
@@ -330,7 +405,12 @@ const H2: React.FC<HeadingProps> = ({
   <PrimitiveText
     as="h2"
     dot={buildDot("text-3xl font-bold", textAlignDot[align], dotProp)}
-    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    style={buildTypoStyle(style, {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      letterSpacing,
+    })}
     {...rest}
   >
     {children}
@@ -351,7 +431,12 @@ const H3: React.FC<HeadingProps> = ({
   <PrimitiveText
     as="h3"
     dot={buildDot("text-2xl font-semibold", textAlignDot[align], dotProp)}
-    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    style={buildTypoStyle(style, {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      letterSpacing,
+    })}
     {...rest}
   >
     {children}
@@ -372,7 +457,12 @@ const H4: React.FC<HeadingProps> = ({
   <PrimitiveText
     as="h4"
     dot={buildDot("text-xl font-semibold", textAlignDot[align], dotProp)}
-    style={buildTypoStyle(style, { fontSize, lineHeight, fontWeight, letterSpacing })}
+    style={buildTypoStyle(style, {
+      fontSize,
+      lineHeight,
+      fontWeight,
+      letterSpacing,
+    })}
     {...rest}
   >
     {children}
@@ -410,7 +500,11 @@ const Image: React.FC<{
 }> = ({ alt = "", dot: dotProp, style, ...rest }) => (
   <img
     alt={alt}
-    style={mergeStyles({ maxWidth: "100%", height: "auto" }, resolveDot(dotProp), style)}
+    style={mergeStyles(
+      { maxWidth: "100%", height: "auto" },
+      resolveDot(dotProp),
+      style,
+    )}
     {...rest}
   />
 );
@@ -468,7 +562,11 @@ const Header: React.FC<{
  */
 
 // Uncontrolled Checkbox - 클릭하면 상태 토글
-const SDUICheckbox: React.FC<CheckboxProps> = ({ defaultChecked = false, onChange, ...props }) => {
+const SDUICheckbox: React.FC<CheckboxProps> = ({
+  defaultChecked = false,
+  onChange,
+  ...props
+}) => {
   const [checked, setChecked] = useState(defaultChecked);
   return (
     <Checkbox
@@ -483,7 +581,11 @@ const SDUICheckbox: React.FC<CheckboxProps> = ({ defaultChecked = false, onChang
 };
 
 // Uncontrolled Switch - 클릭하면 상태 토글
-const SDUISwitch: React.FC<SwitchProps> = ({ defaultChecked = false, onChange, ...props }) => {
+const SDUISwitch: React.FC<SwitchProps> = ({
+  defaultChecked = false,
+  onChange,
+  ...props
+}) => {
   const [checked, setChecked] = useState(defaultChecked);
   return (
     <Switch
@@ -498,7 +600,11 @@ const SDUISwitch: React.FC<SwitchProps> = ({ defaultChecked = false, onChange, .
 };
 
 // Uncontrolled Input - 자체 상태 관리
-const SDUIInput: React.FC<InputProps> = ({ defaultValue = "", onChange, ...props }) => {
+const SDUIInput: React.FC<InputProps> = ({
+  defaultValue = "",
+  onChange,
+  ...props
+}) => {
   const [value, setValue] = useState(defaultValue);
   return (
     <Input
@@ -513,7 +619,12 @@ const SDUIInput: React.FC<InputProps> = ({ defaultValue = "", onChange, ...props
 };
 
 // Uncontrolled Textarea - 자체 상태 관리 + resize 지원
-const SDUITextarea: React.FC<TextareaProps> = ({ defaultValue = "", onChange, resize = "vertical", ...props }) => {
+const SDUITextarea: React.FC<TextareaProps> = ({
+  defaultValue = "",
+  onChange,
+  resize = "vertical",
+  ...props
+}) => {
   const [value, setValue] = useState(defaultValue);
   return (
     <Textarea
@@ -542,12 +653,7 @@ const SDUIAccordion: React.FC<{
   type?: "single" | "multiple";
   collapsible?: boolean;
   defaultValue?: string;
-}> = ({
-  items = [],
-  type = "single",
-  collapsible = true,
-  defaultValue,
-}) => {
+}> = ({ items = [], type = "single", collapsible = true, defaultValue }) => {
   return (
     <Accordion
       type={type}
@@ -580,18 +686,11 @@ const SDUITabs: React.FC<{
   tabs?: SimpleTabItem[];
   defaultValue?: string;
   variant?: "default" | "pills" | "underline" | "cards";
-}> = ({
-  tabs = [],
-  defaultValue,
-  variant = "default",
-}) => {
+}> = ({ tabs = [], defaultValue, variant = "default" }) => {
   const firstValue = tabs[0]?.value || "tab-0";
 
   return (
-    <Tabs
-      defaultValue={defaultValue || firstValue}
-      variant={variant}
-    >
+    <Tabs defaultValue={defaultValue || firstValue} variant={variant}>
       <TabsList>
         {tabs.map((tab, index) => {
           const value = tab.value || `tab-${index}`;
@@ -611,6 +710,595 @@ const SDUITabs: React.FC<{
         );
       })}
     </Tabs>
+  );
+};
+
+// ── Batch A1 — Layout SDUI wrappers ─────────────────────────────────────────
+
+const SDUIStack: React.FC<{
+  direction?: "vertical" | "horizontal";
+  spacing?: "none" | "sm" | "md" | "lg" | "xl";
+  align?: "start" | "center" | "end" | "stretch";
+  justify?: "start" | "center" | "end" | "between" | "around" | "evenly";
+  wrap?: boolean;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  direction = "vertical",
+  spacing = "md",
+  align = "start",
+  justify = "start",
+  wrap = false,
+  dot: dotProp,
+  ...rest
+}) => (
+  <Stack
+    direction={direction}
+    spacing={spacing}
+    align={align}
+    justify={justify}
+    wrap={wrap}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </Stack>
+);
+
+const SDUIPanel: React.FC<{
+  style?:
+    | "default"
+    | "solid"
+    | "glass"
+    | "outline"
+    | "elevated"
+    | "neon"
+    | "holographic"
+    | "cyberpunk"
+    | "minimal"
+    | "luxury";
+  effect?: "none" | "glow" | "shadow" | "gradient" | "animated";
+  padding?:
+    | "none"
+    | "small"
+    | "sm"
+    | "medium"
+    | "md"
+    | "large"
+    | "lg"
+    | "xl"
+    | "custom";
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full" | "custom";
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  style: panelStyle = "default",
+  effect = "none",
+  padding = "md",
+  rounded = "lg",
+  dot: dotProp,
+  ...rest
+}) => (
+  <Panel
+    style={panelStyle}
+    effect={effect}
+    padding={padding}
+    rounded={rounded}
+    dot={dotProp}
+    {...(rest as Omit<React.HTMLAttributes<HTMLDivElement>, "style">)}
+  >
+    {children}
+  </Panel>
+);
+
+const SDUISectionHeader: React.FC<{
+  title?: string;
+  description?: string;
+  dot?: string;
+  [key: string]: unknown;
+}> = ({ title = "Section", description, dot: dotProp, ...rest }) => (
+  <SectionHeader
+    title={title}
+    description={description}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  />
+);
+
+const SDUIComponentLayout: React.FC<{
+  title?: string;
+  description?: string;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  title = "Component",
+  description = "",
+  dot: dotProp,
+  ...rest
+}) => (
+  <ComponentLayout
+    title={title}
+    description={description}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </ComponentLayout>
+);
+
+const SDUIPressable: React.FC<{
+  dot?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({ children, dot: dotProp, disabled, ...rest }) => (
+  <Pressable
+    dot={dotProp}
+    disabled={disabled}
+    {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+  >
+    {children}
+  </Pressable>
+);
+
+// ── Batch A2 — Navigation SDUI wrappers ─────────────────────────────────────
+
+const SDUIBreadcrumb: React.FC<{
+  items?: Array<{ label: string; href?: string }>;
+  showHomeIcon?: boolean;
+  variant?: "default" | "subtle" | "transparent" | "glass";
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  items,
+  showHomeIcon,
+  variant = "default",
+  dot: dotProp,
+  children,
+  ...rest
+}) => (
+  <Breadcrumb
+    items={items}
+    showHomeIcon={showHomeIcon}
+    variant={variant}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </Breadcrumb>
+);
+
+const SDUIPagination: React.FC<{
+  totalPages?: number;
+  variant?: "default" | "outlined" | "minimal";
+  size?: "sm" | "md" | "lg";
+  shape?: "square" | "circle";
+  dot?: string;
+  [key: string]: unknown;
+}> = ({
+  totalPages = 10,
+  variant = "default",
+  size = "md",
+  shape = "square",
+  dot: dotProp,
+  ...rest
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  return (
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+      variant={variant}
+      size={size}
+      shape={shape}
+      dot={dotProp}
+      {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+    />
+  );
+};
+
+const SDUINavigation: React.FC<{
+  defaultValue?: string;
+  variant?: "pills" | "underline" | "cards";
+  scale?: "small" | "medium" | "large";
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  defaultValue,
+  variant = "pills",
+  scale = "medium",
+  dot: dotProp,
+  ...rest
+}) => (
+  <Navigation
+    defaultValue={defaultValue}
+    variant={variant}
+    scale={scale}
+    dot={dotProp}
+    {...(rest as Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue">)}
+  >
+    {children}
+  </Navigation>
+);
+
+const SDUIPageNavigation: React.FC<{
+  prevPage?: { title: string; href: string };
+  nextPage?: { title: string; href: string };
+  showOnMobile?: boolean;
+  dot?: string;
+  [key: string]: unknown;
+}> = ({ prevPage, nextPage, showOnMobile = true, dot: dotProp, ...rest }) => (
+  <PageNavigation
+    prevPage={prevPage}
+    nextPage={nextPage}
+    showOnMobile={showOnMobile}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  />
+);
+
+const SDUIDotNav: React.FC<{
+  items?: DotNavItem[];
+  position?: "left" | "right";
+  dot?: string;
+  [key: string]: unknown;
+}> = ({ items = [], position = "right", dot: dotProp, ...rest }) => (
+  <DotNav
+    items={items}
+    position={position}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLElement>)}
+  />
+);
+
+// ── Batch A3 — Display SDUI wrappers ────────────────────────────────────────
+
+const SDUIFeatureCard: React.FC<{
+  title?: string;
+  description?: string;
+  icon?: string;
+  variant?: "default" | "gradient" | "glass" | "neon";
+  size?: "sm" | "md" | "lg";
+  hover?: "scale" | "glow" | "slide" | "none";
+  gradient?: "blue" | "purple" | "green" | "orange" | "pink" | "custom";
+  dot?: string;
+  [key: string]: unknown;
+}> = ({
+  title = "Feature",
+  description = "",
+  icon,
+  variant = "default",
+  size = "md",
+  hover = "scale",
+  gradient = "blue",
+  dot: dotProp,
+  ...rest
+}) => (
+  <FeatureCard
+    title={title}
+    description={description}
+    icon={icon as Parameters<typeof FeatureCard>[0]["icon"]}
+    variant={variant}
+    size={size}
+    hover={hover}
+    gradient={gradient}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  />
+);
+
+const SDUIInfoCard: React.FC<{
+  title?: string;
+  icon?: string;
+  tone?: "blue" | "purple" | "green" | "orange";
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  title = "Info",
+  icon = "info",
+  tone = "blue",
+  dot: dotProp,
+  ...rest
+}) => (
+  <InfoCard
+    title={title}
+    icon={icon as Parameters<typeof InfoCard>[0]["icon"]}
+    tone={tone}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </InfoCard>
+);
+
+const SDUIStatsPanel: React.FC<{
+  title?: string;
+  items?: StatsPanelItem[];
+  columns?: 1 | 2 | 3 | 4;
+  loading?: boolean;
+  dot?: string;
+  [key: string]: unknown;
+}> = ({
+  title,
+  items = [],
+  columns = 4,
+  loading = false,
+  dot: dotProp,
+  ...rest
+}) => (
+  <StatsPanel
+    title={title}
+    items={items}
+    columns={columns}
+    loading={loading}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  />
+);
+
+const SDUILanguageToggle: React.FC<{
+  size?: "sm" | "md" | "lg";
+  variant?: "button" | "icon" | "dropdown";
+  showLabel?: boolean;
+  currentLanguage?: string;
+  dot?: string;
+  [key: string]: unknown;
+}> = ({
+  size = "md",
+  variant = "button",
+  showLabel = false,
+  currentLanguage = "ko",
+  dot: dotProp,
+  ...rest
+}) => {
+  const [lang, setLang] = useState(currentLanguage);
+  return (
+    <LanguageToggle
+      size={size}
+      variant={variant}
+      showLabel={showLabel}
+      currentLanguage={lang}
+      onLanguageChange={setLang}
+      dot={dotProp}
+      {...(rest as React.HTMLAttributes<HTMLElement>)}
+    />
+  );
+};
+
+const SDUIThemeToggle: React.FC<{
+  size?: "sm" | "md" | "lg";
+  variant?: "button" | "icon" | "switch";
+  showLabel?: boolean;
+  dot?: string;
+  [key: string]: unknown;
+}> = ({
+  size = "md",
+  variant = "button",
+  showLabel = false,
+  dot: dotProp,
+  ...rest
+}) => (
+  <ThemeToggle
+    size={size}
+    variant={variant}
+    showLabel={showLabel}
+    dot={dotProp}
+    {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+  />
+);
+
+// ── Batch A4 — Overlay SDUI wrappers ────────────────────────────────────────
+
+const SDUIModal: React.FC<{
+  title?: string;
+  description?: string;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+  triggerLabel?: string;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  title,
+  description,
+  size = "md",
+  triggerLabel = "Open Modal",
+  dot: dotProp,
+  ...rest
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { style: restStyle, ...restWithoutStyle } =
+    rest as React.HTMLAttributes<HTMLDivElement>;
+  return (
+    <div {...restWithoutStyle} style={{ display: "contents", ...restStyle }}>
+      <button
+        onClick={() => setIsOpen(true)}
+        style={mergeStyles(
+          resolveDot(
+            "inline-flex items-center justify-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-pointer border-none",
+          ),
+          {},
+        )}
+      >
+        {triggerLabel}
+      </button>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title={title}
+        description={description}
+        size={size}
+        dot={dotProp}
+      >
+        {children}
+      </Modal>
+    </div>
+  );
+};
+
+const SDUITooltip: React.FC<{
+  content?: string;
+  position?: "top" | "bottom" | "left" | "right";
+  variant?: "default" | "light" | "dark";
+  delay?: number;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  content = "Tooltip",
+  position = "top",
+  variant = "default",
+  delay = 300,
+  dot: dotProp,
+  ...rest
+}) => (
+  <Tooltip
+    content={content}
+    position={position}
+    variant={variant}
+    delay={delay}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </Tooltip>
+);
+
+const SDUIPopover: React.FC<{
+  triggerLabel?: string;
+  position?: "top" | "bottom" | "left" | "right";
+  align?: "start" | "center" | "end";
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  triggerLabel = "Open",
+  position = "bottom",
+  align = "center",
+  dot: dotProp,
+  ...rest
+}) => (
+  <Popover
+    trigger={
+      <button
+        style={mergeStyles(
+          resolveDot(
+            "inline-flex items-center justify-center px-3 py-2 rounded-md border border-border bg-background text-sm cursor-pointer",
+          ),
+          {},
+        )}
+      >
+        {triggerLabel}
+      </button>
+    }
+    position={position}
+    align={align}
+    dot={dotProp}
+    {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+  >
+    {children}
+  </Popover>
+);
+
+const SDUIDrawer: React.FC<{
+  side?: "left" | "right" | "top" | "bottom";
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  triggerLabel?: string;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  side = "right",
+  size = "md",
+  triggerLabel = "Open Drawer",
+  dot: dotProp,
+  ...rest
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { style: restStyle, ...restWithoutStyle } =
+    rest as React.HTMLAttributes<HTMLDivElement>;
+  return (
+    <div {...restWithoutStyle} style={{ display: "contents", ...restStyle }}>
+      <button
+        onClick={() => setIsOpen(true)}
+        style={mergeStyles(
+          resolveDot(
+            "inline-flex items-center justify-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-pointer border-none",
+          ),
+          {},
+        )}
+      >
+        {triggerLabel}
+      </button>
+      <Drawer
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        side={side}
+        size={size}
+        dot={dotProp}
+      >
+        {children}
+      </Drawer>
+    </div>
+  );
+};
+
+const SDUIBottomSheet: React.FC<{
+  height?: "sm" | "md" | "lg" | "xl" | "full";
+  triggerLabel?: string;
+  showDragHandle?: boolean;
+  dot?: string;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}> = ({
+  children,
+  height = "md",
+  triggerLabel = "Open Sheet",
+  showDragHandle = true,
+  dot: dotProp,
+  ...rest
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { style: restStyle, ...restWithoutStyle } =
+    rest as React.HTMLAttributes<HTMLDivElement>;
+  return (
+    <div {...restWithoutStyle} style={{ display: "contents", ...restStyle }}>
+      <button
+        onClick={() => setIsOpen(true)}
+        style={mergeStyles(
+          resolveDot(
+            "inline-flex items-center justify-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-pointer border-none",
+          ),
+          {},
+        )}
+      >
+        {triggerLabel}
+      </button>
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        height={height}
+        showDragHandle={showDragHandle}
+        dot={dotProp}
+      >
+        {children}
+      </BottomSheet>
+    </div>
   );
 };
 
@@ -672,13 +1360,41 @@ export const defaultRegistry: SDUIComponentRegistry = {
   // Interactive (Pro)
   Accordion: SDUIAccordion,
   Tabs: SDUITabs,
+
+  // Batch A1 — Layout
+  Stack: SDUIStack,
+  Panel: SDUIPanel,
+  SectionHeader: SDUISectionHeader,
+  ComponentLayout: SDUIComponentLayout,
+  Pressable: SDUIPressable,
+
+  // Batch A2 — Navigation
+  Breadcrumb: SDUIBreadcrumb,
+  Pagination: SDUIPagination,
+  Navigation: SDUINavigation,
+  PageNavigation: SDUIPageNavigation,
+  DotNav: SDUIDotNav,
+
+  // Batch A3 — Display
+  FeatureCard: SDUIFeatureCard,
+  InfoCard: SDUIInfoCard,
+  StatsPanel: SDUIStatsPanel,
+  LanguageToggle: SDUILanguageToggle,
+  ThemeToggle: SDUIThemeToggle,
+
+  // Batch A4 — Overlay
+  Modal: SDUIModal,
+  Tooltip: SDUITooltip,
+  Popover: SDUIPopover,
+  Drawer: SDUIDrawer,
+  BottomSheet: SDUIBottomSheet,
 };
 
 /**
  * 레지스트리 확장 헬퍼
  */
 export function extendRegistry(
-  customComponents: SDUIComponentRegistry
+  customComponents: SDUIComponentRegistry,
 ): SDUIComponentRegistry {
   return {
     ...defaultRegistry,
@@ -689,6 +1405,9 @@ export function extendRegistry(
 /**
  * 컴포넌트 존재 여부 확인
  */
-export function hasComponent(registry: SDUIComponentRegistry, type: string): boolean {
-  return type in registry;
+export function hasComponent(
+  registry: SDUIComponentRegistry,
+  type: string,
+): boolean {
+  return Object.prototype.hasOwnProperty.call(registry, type);
 }

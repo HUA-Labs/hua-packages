@@ -8,7 +8,7 @@
 export interface ValidationError {
   field: string;
   message: string;
-  severity: 'error' | 'warning';
+  severity: "error" | "warning";
 }
 
 export interface ValidationResult {
@@ -24,88 +24,116 @@ export function validateJsonLd(jsonLd: any): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
 
+  // Guard: null, undefined, or non-object inputs
+  if (
+    jsonLd === null ||
+    jsonLd === undefined ||
+    typeof jsonLd !== "object" ||
+    Array.isArray(jsonLd)
+  ) {
+    return {
+      valid: false,
+      errors: [
+        {
+          field: "root",
+          message: "JSON-LD must be a non-null object",
+          severity: "error",
+        },
+      ],
+      warnings: [],
+    };
+  }
+
   // Required fields
-  if (!jsonLd['@context']) {
+  if (!jsonLd["@context"]) {
     errors.push({
-      field: '@context',
-      message: '@context is required',
-      severity: 'error',
+      field: "@context",
+      message: "@context is required",
+      severity: "error",
     });
-  } else if (jsonLd['@context'] !== 'https://schema.org') {
+  } else if (jsonLd["@context"] !== "https://schema.org") {
     errors.push({
-      field: '@context',
+      field: "@context",
       message: '@context must be "https://schema.org"',
-      severity: 'error',
+      severity: "error",
     });
   }
 
-  if (!jsonLd['@type']) {
+  if (!jsonLd["@type"]) {
     errors.push({
-      field: '@type',
-      message: '@type is required',
-      severity: 'error',
+      field: "@type",
+      message: "@type is required",
+      severity: "error",
     });
   }
 
   if (!jsonLd.name) {
     errors.push({
-      field: 'name',
-      message: 'name is required',
-      severity: 'error',
+      field: "name",
+      message: "name is required",
+      severity: "error",
     });
-  } else if (typeof jsonLd.name !== 'string' || jsonLd.name.length === 0) {
+  } else if (typeof jsonLd.name !== "string" || jsonLd.name.length === 0) {
     errors.push({
-      field: 'name',
-      message: 'name must be a non-empty string',
-      severity: 'error',
+      field: "name",
+      message: "name must be a non-empty string",
+      severity: "error",
     });
   }
 
   if (!jsonLd.description) {
     errors.push({
-      field: 'description',
-      message: 'description is required',
-      severity: 'error',
+      field: "description",
+      message: "description is required",
+      severity: "error",
     });
-  } else if (typeof jsonLd.description !== 'string' || jsonLd.description.length < 10) {
+  } else if (
+    typeof jsonLd.description !== "string" ||
+    jsonLd.description.length < 10
+  ) {
     warnings.push({
-      field: 'description',
-      message: 'description should be at least 10 characters for better AI understanding',
-      severity: 'warning',
+      field: "description",
+      message:
+        "description should be at least 10 characters for better AI understanding",
+      severity: "warning",
     });
   }
 
   // Type-specific validation
-  if (jsonLd['@type'] === 'SoftwareApplication') {
+  if (jsonLd["@type"] === "SoftwareApplication") {
     validateSoftwareApplication(jsonLd, errors, warnings);
-  } else if (jsonLd['@type'] === 'WebSite') {
+  } else if (jsonLd["@type"] === "WebSite") {
     validateWebSite(jsonLd, errors, warnings);
   }
 
   // URL validation
   if (jsonLd.url && !isValidUrl(jsonLd.url)) {
     errors.push({
-      field: 'url',
-      message: 'url must be a valid HTTP(S) URL',
-      severity: 'error',
+      field: "url",
+      message: "url must be a valid HTTP(S) URL",
+      severity: "error",
     });
   }
 
   // Author validation
   if (jsonLd.author) {
-    if (typeof jsonLd.author === 'object') {
-      if (!jsonLd.author.name) {
+    if (typeof jsonLd.author === "object") {
+      if (
+        !jsonLd.author.name ||
+        (typeof jsonLd.author.name === "string" &&
+          jsonLd.author.name.trim() === "")
+      ) {
         errors.push({
-          field: 'author.name',
-          message: 'author.name is required when author is an object',
-          severity: 'error',
+          field: "author.name",
+          message: "author.name is required when author is an object",
+          severity: "error",
         });
       }
-    } else if (typeof jsonLd.author !== 'string') {
+    } else if (typeof jsonLd.author !== "string") {
       errors.push({
-        field: 'author',
-        message: 'author must be a string or object',
-        severity: 'error',
+        field: "author",
+        message: "author must be a string or object",
+        severity: "error",
       });
     }
   }
@@ -123,76 +151,79 @@ export function validateJsonLd(jsonLd: any): ValidationResult {
 function validateSoftwareApplication(
   jsonLd: any,
   errors: ValidationError[],
-  warnings: ValidationError[]
+  warnings: ValidationError[],
 ) {
   // applicationCategory
-  if (jsonLd.applicationCategory && typeof jsonLd.applicationCategory !== 'string') {
+  if (
+    jsonLd.applicationCategory &&
+    typeof jsonLd.applicationCategory !== "string"
+  ) {
     errors.push({
-      field: 'applicationCategory',
-      message: 'applicationCategory must be a string',
-      severity: 'error',
+      field: "applicationCategory",
+      message: "applicationCategory must be a string",
+      severity: "error",
     });
   }
 
   // softwareVersion
-  if (jsonLd.softwareVersion && typeof jsonLd.softwareVersion !== 'string') {
+  if (jsonLd.softwareVersion && typeof jsonLd.softwareVersion !== "string") {
     errors.push({
-      field: 'softwareVersion',
-      message: 'softwareVersion must be a string',
-      severity: 'error',
+      field: "softwareVersion",
+      message: "softwareVersion must be a string",
+      severity: "error",
     });
   }
 
   // offers
   if (jsonLd.offers) {
-    if (typeof jsonLd.offers !== 'object') {
+    if (typeof jsonLd.offers !== "object") {
       errors.push({
-        field: 'offers',
-        message: 'offers must be an object',
-        severity: 'error',
+        field: "offers",
+        message: "offers must be an object",
+        severity: "error",
       });
     } else {
-      if (jsonLd.offers['@type'] !== 'Offer') {
+      if (jsonLd.offers["@type"] !== "Offer") {
         errors.push({
-          field: 'offers.@type',
+          field: "offers.@type",
           message: 'offers.@type must be "Offer"',
-          severity: 'error',
+          severity: "error",
         });
       }
 
       if (!jsonLd.offers.price) {
         warnings.push({
-          field: 'offers.price',
-          message: 'offers.price is recommended',
-          severity: 'warning',
+          field: "offers.price",
+          message: "offers.price is recommended",
+          severity: "warning",
         });
       }
     }
   }
 
   // operatingSystem
-  if (jsonLd.operatingSystem && typeof jsonLd.operatingSystem !== 'string') {
+  if (jsonLd.operatingSystem && typeof jsonLd.operatingSystem !== "string") {
     errors.push({
-      field: 'operatingSystem',
-      message: 'operatingSystem must be a string',
-      severity: 'error',
+      field: "operatingSystem",
+      message: "operatingSystem must be a string",
+      severity: "error",
     });
   }
 
   // Warnings for recommended fields
   if (!jsonLd.applicationCategory) {
     warnings.push({
-      field: 'applicationCategory',
-      message: 'applicationCategory is recommended for better categorization',
-      severity: 'warning',
+      field: "applicationCategory",
+      message: "applicationCategory is recommended for better categorization",
+      severity: "warning",
     });
   }
 
   if (!jsonLd.offers) {
     warnings.push({
-      field: 'offers',
-      message: 'offers is recommended to indicate pricing',
-      severity: 'warning',
+      field: "offers",
+      message: "offers is recommended to indicate pricing",
+      severity: "warning",
     });
   }
 }
@@ -200,20 +231,24 @@ function validateSoftwareApplication(
 /**
  * Validate WebSite specific fields
  */
-function validateWebSite(jsonLd: any, errors: ValidationError[], _warnings: ValidationError[]) {
+function validateWebSite(
+  jsonLd: any,
+  errors: ValidationError[],
+  _warnings: ValidationError[],
+) {
   if (!jsonLd.url) {
     errors.push({
-      field: 'url',
-      message: 'url is required for WebSite',
-      severity: 'error',
+      field: "url",
+      message: "url is required for WebSite",
+      severity: "error",
     });
   }
 
   if (!jsonLd.name) {
     errors.push({
-      field: 'name',
-      message: 'name is required for WebSite',
-      severity: 'error',
+      field: "name",
+      message: "name is required for WebSite",
+      severity: "error",
     });
   }
 }
@@ -224,7 +259,7 @@ function validateWebSite(jsonLd: any, errors: ValidationError[], _warnings: Vali
 function isValidUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
   } catch {
     return false;
   }
@@ -242,9 +277,9 @@ export function validateGEOMetadata(jsonLdArray: any[]): ValidationResult {
       valid: false,
       errors: [
         {
-          field: 'root',
-          message: 'GEO metadata must be an array of JSON-LD objects',
-          severity: 'error',
+          field: "root",
+          message: "GEO metadata must be an array of JSON-LD objects",
+          severity: "error",
         },
       ],
       warnings: [],
@@ -256,9 +291,9 @@ export function validateGEOMetadata(jsonLdArray: any[]): ValidationResult {
       valid: false,
       errors: [
         {
-          field: 'root',
-          message: 'GEO metadata must contain at least one JSON-LD object',
-          severity: 'error',
+          field: "root",
+          message: "GEO metadata must contain at least one JSON-LD object",
+          severity: "error",
         },
       ],
       warnings: [],
@@ -298,24 +333,24 @@ export function formatValidationResult(result: ValidationResult): string {
   const lines: string[] = [];
 
   if (result.valid) {
-    lines.push('✅ GEO metadata is valid');
+    lines.push("✅ GEO metadata is valid");
   } else {
-    lines.push('❌ GEO metadata validation failed');
+    lines.push("❌ GEO metadata validation failed");
   }
 
   if (result.errors.length > 0) {
-    lines.push('\nErrors:');
+    lines.push("\nErrors:");
     result.errors.forEach((error) => {
       lines.push(`  - ${error.field}: ${error.message}`);
     });
   }
 
   if (result.warnings.length > 0) {
-    lines.push('\nWarnings:');
+    lines.push("\nWarnings:");
     result.warnings.forEach((warning) => {
       lines.push(`  - ${warning.field}: ${warning.message}`);
     });
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
