@@ -71,6 +71,12 @@ export function resolveColor(prefix: string, value: string, config: DotConfig): 
     const opacityKey = value.slice(slashIdx + 1);
     const opacityNum = parseInt(opacityKey, 10);
     if (!isNaN(opacityNum) && opacityNum >= 0 && opacityNum <= 100) {
+      // Check arbitrary value first: bg-[var(--surface-muted)]/80
+      const arbitraryColor = parseArbitrary(colorValue);
+      if (arbitraryColor !== undefined) {
+        return { [prop]: `color-mix(in srgb, ${arbitraryColor} ${opacityNum}%, transparent)` };
+      }
+
       const hex = lookupColor(colorValue, colors, semanticColors);
       if (hex && hex.startsWith('#')) {
         const rgb = hexToRgb(hex, opacityNum / 100);

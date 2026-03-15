@@ -75,14 +75,10 @@ describe('Opacity modifier (/50)', () => {
       // left-1/2 goes to positioning resolver, not color
       expect(dot('left-1/2')).toEqual({ left: '50%' });
     });
-    it('bg-[#ff0000]/50 → arbitrary wins, opacity ignored', () => {
-      // arbitrary check runs before slash parsing
-      // The parser sees "bg-[#ff0000]/50" — bracket doesn't contain the slash
-      // so value is "[#ff0000]/50" which is NOT a valid bracket notation
-      // This actually falls through to slash split: "[#ff0000]" / "50"
-      // "[#ff0000]" is not a valid color lookup → empty
-      // This is the intended behavior: use either arbitrary OR opacity, not both
-      expect(dot('bg-[#ff0000]/50')).toEqual({});
+    it('bg-[#ff0000]/50 → arbitrary color with opacity via color-mix', () => {
+      expect(dot('bg-[#ff0000]/50')).toEqual({
+        backgroundColor: 'color-mix(in srgb, #ff0000 50%, transparent)',
+      });
     });
     it('invalid opacity number → no match', () => {
       expect(dot('bg-primary-500/abc')).toEqual({});

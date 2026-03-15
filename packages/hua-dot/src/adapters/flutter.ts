@@ -157,6 +157,12 @@ export function adaptFlutter(webStyle: StyleObject, options?: AdaptFlutterOption
       continue;
     }
 
+    // Skip CSS custom property declarations (e.g. --tw-enter-opacity) — not supported in Flutter
+    if (key.startsWith('--')) {
+      dropped.push(key);
+      continue;
+    }
+
     // Skip CSS variable values — not supported in Flutter
     // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
     if (typeof sv === 'string' && sv.includes('var(')) {

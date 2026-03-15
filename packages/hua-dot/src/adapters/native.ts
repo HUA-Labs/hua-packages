@@ -12,6 +12,11 @@ export type { AdaptNativeOptions } from './native-types';
 
 /** Properties to silently drop (unsupported in RN) */
 const SKIP_PROPS = new Set([
+  // Internal dot markers (child-combinator divide — class mode only)
+  '__dot_divideY',
+  '__dot_divideX',
+  '__dot_divideYReverse',
+  '__dot_divideXReverse',
   'animation',
   'animationName',
   'animationDuration',
@@ -317,6 +322,12 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
     // Skip unsupported
     if (SKIP_PROPS.has(key)) {
       if (warn) warnOnce(key);
+      continue;
+    }
+
+    // Skip CSS custom property declarations (e.g. --tw-enter-opacity) — not supported in RN
+    if (key.startsWith('--')) {
+      if (warn) warnOnce(key, 'CSS custom property not supported in RN');
       continue;
     }
 
