@@ -43,7 +43,10 @@ export interface ActivityItem {
  * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface ActivityFeedProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface ActivityFeedProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title?: string;
   items: ActivityItem[];
   emptyMessage?: string;
@@ -59,69 +62,69 @@ export interface ActivityFeedProps extends Omit<React.HTMLAttributes<HTMLDivElem
 // ── Static style constants ────────────────────────────────────────────────────
 
 const CONTAINER_BASE: React.CSSProperties = {
-  backgroundColor: 'var(--activity-feed-bg)',
-  borderRadius: '1rem',
-  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-  border: '1px solid var(--activity-feed-border)',
-  overflow: 'hidden',
+  backgroundColor: "var(--activity-feed-bg)",
+  borderRadius: "1rem",
+  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+  border: "1px solid var(--activity-feed-border)",
+  overflow: "hidden",
 };
 
 const HEADER_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '1.5rem',
-  borderBottom: '1px solid var(--activity-feed-divider)',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  ...resolveDot("p-6"),
+  borderBottom: "1px solid var(--activity-feed-divider)",
 };
 
 const HEADER_TITLE_STYLE: React.CSSProperties = {
-  fontSize: '1.25rem',
+  fontSize: "1.25rem",
   fontWeight: 700,
-  color: 'var(--activity-feed-title)',
-  display: 'flex',
-  alignItems: 'center',
+  color: "var(--activity-feed-title)",
+  display: "flex",
+  alignItems: "center",
 };
 
 const LINK_BASE: React.CSSProperties = {
-  color: 'var(--activity-feed-link)',
+  color: "var(--activity-feed-link)",
   fontWeight: 500,
-  fontSize: '0.875rem',
-  transition: 'color 150ms ease',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
+  fontSize: "0.875rem",
+  transition: "color 150ms ease",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
   padding: 0,
 };
 
 const LINK_HOVER: React.CSSProperties = {
-  color: 'var(--activity-feed-link-hover)',
+  color: "var(--activity-feed-link-hover)",
 };
 
 const LIST_STYLE: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
 };
 
 const ITEM_BASE: React.CSSProperties = {
-  padding: '1rem',
-  transition: 'background-color 150ms ease',
-  borderBottom: '1px solid var(--activity-feed-divider)',
+  ...resolveDot("p-4"),
+  transition: "background-color 150ms ease",
+  borderBottom: "1px solid var(--activity-feed-divider)",
 };
 
 const ITEM_HOVER: React.CSSProperties = {
-  backgroundColor: 'var(--activity-feed-item-hover-bg)',
-  cursor: 'pointer',
+  backgroundColor: "var(--activity-feed-item-hover-bg)",
+  cursor: "pointer",
 };
 
 const ITEM_LAST_BORDER: React.CSSProperties = {
-  borderBottom: 'none',
+  borderBottom: "none",
 };
 
 const ITEM_ROW_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
-  marginBottom: '0.5rem',
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
+  ...resolveDot("mb-2"),
 };
 
 const FLEX_1_MIN0: React.CSSProperties = {
@@ -130,116 +133,118 @@ const FLEX_1_MIN0: React.CSSProperties = {
 };
 
 const ICON_ROW_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: '0.75rem',
+  display: "flex",
+  alignItems: "flex-start",
+  ...resolveDot("gap-3"),
 };
 
 const ICON_WRAP_STYLE: React.CSSProperties = {
-  width: '2rem',
-  height: '2rem',
-  borderRadius: '0.5rem',
-  backgroundColor: 'var(--activity-feed-icon-bg)',
-  color: 'var(--activity-feed-icon-color)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  width: "2rem",
+  height: "2rem",
+  ...resolveDot("rounded-lg"),
+  backgroundColor: "var(--activity-feed-icon-bg)",
+  color: "var(--activity-feed-icon-color)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexShrink: 0,
-  marginTop: '0.125rem',
+  marginTop: "0.125rem",
 };
 
 const ITEM_TITLE_STYLE: React.CSSProperties = {
-  fontSize: '1rem',
+  fontSize: "1rem",
   fontWeight: 600,
-  color: 'var(--activity-feed-title-text)',
-  marginBottom: '0.25rem',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  color: "var(--activity-feed-title-text)",
+  ...resolveDot("mb-1"),
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
 
 const ITEM_DESC_STYLE: React.CSSProperties = {
-  fontSize: '0.875rem',
-  color: 'var(--activity-feed-desc-text)',
-  display: '-webkit-box',
+  fontSize: "0.875rem",
+  color: "var(--activity-feed-desc-text)",
+  display: "-webkit-box",
   WebkitLineClamp: 2,
-  WebkitBoxOrient: 'vertical',
-  overflow: 'hidden',
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
 };
 
 const BADGE_SHRINK: React.CSSProperties = {
-  marginLeft: '0.5rem',
+  ...resolveDot("ml-2"),
   flexShrink: 0,
 };
 
 const BADGE_STRING_STYLE: React.CSSProperties = {
-  padding: '0.25rem 0.5rem',
-  borderRadius: '9999px',
-  fontSize: '0.75rem',
+  ...resolveDot("py-1 px-2"),
+  borderRadius: "9999px",
+  fontSize: "0.75rem",
   fontWeight: 500,
-  backgroundColor: 'var(--activity-feed-badge-bg)',
-  color: 'var(--activity-feed-badge-text)',
+  backgroundColor: "var(--activity-feed-badge-bg)",
+  color: "var(--activity-feed-badge-text)",
 };
 
 const META_WRAP_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.25rem',
-  flexWrap: 'wrap',
-  marginTop: '0.5rem',
+  display: "flex",
+  alignItems: "center",
+  ...resolveDot("gap-1"),
+  flexWrap: "wrap",
+  ...resolveDot("mt-2"),
 };
 
 const META_CHIP_STYLE: React.CSSProperties = {
-  fontSize: '0.75rem',
-  backgroundColor: 'var(--activity-feed-meta-bg)',
-  color: 'var(--activity-feed-meta-text)',
-  padding: '0.125rem 0.5rem',
-  borderRadius: '0.25rem',
+  fontSize: "0.75rem",
+  backgroundColor: "var(--activity-feed-meta-bg)",
+  color: "var(--activity-feed-meta-text)",
+  paddingTop: "0.125rem",
+  paddingBottom: "0.125rem",
+  ...resolveDot("px-2"),
+  ...resolveDot("rounded-md"),
 };
 
 const TIMESTAMP_STYLE: React.CSSProperties = {
-  fontSize: '0.75rem',
-  color: 'var(--activity-feed-timestamp)',
-  marginTop: '0.5rem',
+  fontSize: "0.75rem",
+  color: "var(--activity-feed-timestamp)",
+  ...resolveDot("mt-2"),
 };
 
 const MORE_WRAP_STYLE: React.CSSProperties = {
-  padding: '1rem',
-  textAlign: 'center',
-  borderTop: '1px solid var(--activity-feed-divider)',
+  ...resolveDot("p-4"),
+  textAlign: "center",
+  borderTop: "1px solid var(--activity-feed-divider)",
 };
 
 const MORE_BTN_BASE: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  fontSize: '0.875rem',
-  color: 'var(--activity-feed-link)',
+  display: "inline-flex",
+  alignItems: "center",
+  fontSize: "0.875rem",
+  color: "var(--activity-feed-link)",
   fontWeight: 500,
-  transition: 'color 150ms ease',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
+  transition: "color 150ms ease",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
   padding: 0,
 };
 
 const MORE_BTN_HOVER: React.CSSProperties = {
-  color: 'var(--activity-feed-link-hover)',
+  color: "var(--activity-feed-link-hover)",
 };
 
 const EMPTY_WRAP_STYLE: React.CSSProperties = {
-  textAlign: 'center',
-  padding: '2rem 0',
+  textAlign: "center",
+  ...resolveDot("py-8"),
 };
 
 const EMPTY_ICON_STYLE: React.CSSProperties = {
-  fontSize: '2.25rem',
-  marginBottom: '0.75rem',
-  display: 'block',
+  fontSize: "2.25rem",
+  ...resolveDot("mb-3"),
+  display: "block",
 };
 
 const EMPTY_TEXT_STYLE: React.CSSProperties = {
-  color: 'var(--activity-feed-empty-text)',
-  fontSize: '0.875rem',
+  color: "var(--activity-feed-empty-text)",
+  fontSize: "0.875rem",
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -253,11 +258,15 @@ const ActivityItemRow: React.FC<ActivityItemRowProps> = ({ item, isLast }) => {
   const [isHovered, setIsHovered] = useState(false);
   const clickable = Boolean(item.onClick);
 
-  const rowStyle = useMemo<React.CSSProperties>(() => mergeStyles(
-    ITEM_BASE,
-    isLast ? ITEM_LAST_BORDER : undefined,
-    clickable && isHovered ? ITEM_HOVER : undefined,
-  ), [isLast, clickable, isHovered]);
+  const rowStyle = useMemo<React.CSSProperties>(
+    () =>
+      mergeStyles(
+        ITEM_BASE,
+        isLast ? ITEM_LAST_BORDER : undefined,
+        clickable && isHovered ? ITEM_HOVER : undefined,
+      ),
+    [isLast, clickable, isHovered],
+  );
 
   return (
     <div
@@ -265,9 +274,15 @@ const ActivityItemRow: React.FC<ActivityItemRowProps> = ({ item, isLast }) => {
       onClick={item.onClick}
       onMouseEnter={clickable ? () => setIsHovered(true) : undefined}
       onMouseLeave={clickable ? () => setIsHovered(false) : undefined}
-      role={clickable ? 'button' : undefined}
+      role={clickable ? "button" : undefined}
       tabIndex={clickable ? 0 : undefined}
-      onKeyDown={clickable && item.onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') item.onClick!(); } : undefined}
+      onKeyDown={
+        clickable && item.onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") item.onClick!();
+            }
+          : undefined
+      }
     >
       <div style={ITEM_ROW_STYLE}>
         <div style={FLEX_1_MIN0}>
@@ -324,9 +339,9 @@ const ActivityItemRow: React.FC<ActivityItemRowProps> = ({ item, isLast }) => {
           dateTime={
             item.timestamp instanceof Date
               ? item.timestamp.toISOString()
-              : typeof item.timestamp === 'string'
-              ? item.timestamp
-              : undefined
+              : typeof item.timestamp === "string"
+                ? item.timestamp
+                : undefined
           }
         >
           {formatRelativeTime(item.timestamp)}
@@ -391,7 +406,7 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [viewAllHovered, setViewAllHovered] = useState(false);
     const [moreHovered, setMoreHovered] = useState(false);
@@ -401,17 +416,18 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
 
     const containerStyle = useMemo(
       () => mergeStyles(CONTAINER_BASE, resolveDot(dotProp), style),
-      [dotProp, style]
+      [dotProp, style],
     );
 
     const viewAllStyle = useMemo<React.CSSProperties>(
       () => mergeStyles(LINK_BASE, viewAllHovered ? LINK_HOVER : undefined),
-      [viewAllHovered]
+      [viewAllHovered],
     );
 
     const moreBtnStyle = useMemo<React.CSSProperties>(
-      () => mergeStyles(MORE_BTN_BASE, moreHovered ? MORE_BTN_HOVER : undefined),
-      [moreHovered]
+      () =>
+        mergeStyles(MORE_BTN_BASE, moreHovered ? MORE_BTN_HOVER : undefined),
+      [moreHovered],
     );
 
     return (
@@ -456,8 +472,10 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
                   onMouseLeave={() => setMoreHovered(false)}
                 >
                   <span>더 많은 활동 보기</span>
-                  <span style={{ marginLeft: '0.25rem' }}>({items.length - (maxItems || 0)}개 더)</span>
-                  <span style={{ marginLeft: '0.25rem' }}>→</span>
+                  <span style={{ ...resolveDot("ml-1") }}>
+                    ({items.length - (maxItems || 0)}개 더)
+                  </span>
+                  <span style={{ ...resolveDot("ml-1") }}>→</span>
                 </button>
               </div>
             )}
@@ -472,7 +490,7 @@ export const ActivityFeed = React.forwardRef<HTMLDivElement, ActivityFeedProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 ActivityFeed.displayName = "ActivityFeed";

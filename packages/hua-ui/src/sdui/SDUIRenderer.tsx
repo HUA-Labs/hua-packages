@@ -23,6 +23,7 @@ import type {
   SDUIConstraints,
 } from "./types";
 import { defaultRegistry } from "./registry";
+import { resolveDot } from "../hooks/useDotMap";
 import {
   evaluateCondition,
   resolveProps,
@@ -143,9 +144,9 @@ function NodeRendererInner({ node, registry }: NodeRendererProps) {
     return (
       <div
         style={{
-          padding: 16,
+          ...resolveDot("p-4"),
           border: "1px solid #ef4444",
-          borderRadius: 4,
+          ...resolveDot("rounded"),
           fontSize: 14,
           color: "#ef4444",
           backgroundColor: "rgba(239,68,68,0.1)",
@@ -345,15 +346,19 @@ export function SDUIFromJSON({
     return (
       <div
         style={{
-          padding: 16,
+          ...resolveDot("p-4"),
           border: "1px solid #ef4444",
-          borderRadius: 4,
+          ...resolveDot("rounded"),
           backgroundColor: "rgba(239,68,68,0.1)",
         }}
       >
         <p style={{ fontWeight: 600, color: "#ef4444" }}>SDUI Parse Error</p>
         <pre
-          style={{ fontSize: 14, marginTop: 8, color: "rgba(239,68,68,0.8)" }}
+          style={{
+            fontSize: 14,
+            ...resolveDot("mt-2"),
+            color: "rgba(239,68,68,0.8)",
+          }}
         >
           {(error as Error).message}
         </pre>

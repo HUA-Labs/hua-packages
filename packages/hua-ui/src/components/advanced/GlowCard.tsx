@@ -14,7 +14,10 @@ import { useMotionConfig } from "../../context/MotionConfigContext";
  * @property {string} [borderColor] - 보더 색상 (기본: glowColor) / Border color (default: glowColor)
  * @property {string} [dot] - dot utility string for additional styles
  */
-export interface GlowCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface GlowCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   glowColor?: string;
   glowSize?: number;
   glowOpacity?: number;
@@ -28,10 +31,10 @@ export interface GlowCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 const BASE_STYLE: React.CSSProperties = {
   position: "relative",
   overflow: "hidden",
-  borderRadius: "0.75rem",
+  ...resolveDot("rounded-xl"),
   backgroundColor: "var(--color-card, var(--card))",
   border: "1px solid var(--color-border, var(--border))",
-  padding: "1.5rem",
+  ...resolveDot("p-6"),
   transition: "all 300ms ease",
 };
 
@@ -75,7 +78,7 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -94,15 +97,19 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
           y: e.clientY - rect.top,
         });
       },
-      [motionDisabled]
+      [motionDisabled],
     );
 
-    const cardStyle = useMemo(() => mergeStyles(
-      BASE_STYLE,
-      isHovered ? HOVERED_STYLE : undefined,
-      resolveDot(dotProp),
-      style,
-    ), [isHovered, dotProp, style]);
+    const cardStyle = useMemo(
+      () =>
+        mergeStyles(
+          BASE_STYLE,
+          isHovered ? HOVERED_STYLE : undefined,
+          resolveDot(dotProp),
+          style,
+        ),
+      [isHovered, dotProp, style],
+    );
 
     const glowStyle: React.CSSProperties = {
       position: "absolute",
@@ -149,19 +156,23 @@ const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(
         <div style={glowStyle} aria-hidden="true" />
 
         {/* Border glow */}
-        {border && <div style={borderStyle as React.CSSProperties} aria-hidden="true" />}
+        {border && (
+          <div style={borderStyle as React.CSSProperties} aria-hidden="true" />
+        )}
 
         {/* Content */}
         <div style={CONTENT_STYLE}>{children}</div>
       </div>
     );
-  }
+  },
 );
 
 GlowCard.displayName = "GlowCard";
 
 // Utility to merge refs
-function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
+function mergeRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
   return (value) => {
     refs.forEach((ref) => {
       if (typeof ref === "function") {

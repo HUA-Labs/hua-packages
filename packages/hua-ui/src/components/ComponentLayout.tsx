@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import { useWindowSize } from "../hooks/useWindowSize"
-import { Breadcrumb, BreadcrumbItem } from "./Breadcrumb"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { useWindowSize } from "../hooks/useWindowSize";
+import { Breadcrumb, BreadcrumbItem } from "./Breadcrumb";
 
 /**
  * ComponentLayout 컴포넌트의 props / ComponentLayout component props
@@ -23,187 +23,190 @@ import { Breadcrumb, BreadcrumbItem } from "./Breadcrumb"
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline styles
  */
-export interface ComponentLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  title: string
-  description: string
-  children: React.ReactNode
+export interface ComponentLayoutProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  title: string;
+  description: string;
+  children: React.ReactNode;
   prevPage?: {
-    title: string
-    href: string
-  }
+    title: string;
+    href: string;
+  };
   nextPage?: {
-    title: string
-    href: string
-  }
+    title: string;
+    href: string;
+  };
   breadcrumbItems?: Array<{
-    label: string
-    href?: string
-  }>
-  dot?: string
-  style?: React.CSSProperties
+    label: string;
+    href?: string;
+  }>;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ── Static styles (never change) ────────────────────────────
 
 const S_OUTER: React.CSSProperties = {
-  position: 'relative',
-  minHeight: '100vh',
-}
+  position: "relative",
+  minHeight: "100vh",
+};
 
 const S_NAV_TOP_LG: React.CSSProperties = {
-  position: 'fixed',
-  right: '1rem',
-  top: '1rem',
+  position: "fixed",
+  right: "1rem",
+  top: "1rem",
   zIndex: 50,
-  display: 'block',
-}
+  display: "block",
+};
 
 const S_NAV_BOTTOM: React.CSSProperties = {
-  position: 'fixed',
-  right: '1rem',
-  bottom: '1rem',
+  position: "fixed",
+  right: "1rem",
+  bottom: "1rem",
   zIndex: 50,
-  display: 'block',
-}
+  display: "block",
+};
 
 const S_FLEX_COL: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-}
+  display: "flex",
+  flexDirection: "column",
+  ...resolveDot("gap-4"),
+};
 
 const S_NAV_LINK_BASE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '0.75rem',
-  backgroundColor: 'rgba(255,255,255,0.8)',
-  backdropFilter: 'blur(4px)',
-  WebkitBackdropFilter: 'blur(4px)',
-  border: '1px solid var(--color-border)',
-  borderRadius: '9999px',
-  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-  transition: 'all 200ms ease-in-out',
-  cursor: 'pointer',
-  textDecoration: 'none',
-}
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  ...resolveDot("p-3"),
+  backgroundColor: "rgba(255,255,255,0.8)",
+  backdropFilter: "blur(4px)",
+  WebkitBackdropFilter: "blur(4px)",
+  border: "1px solid var(--color-border)",
+  borderRadius: "9999px",
+  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+  transition: "all 200ms ease-in-out",
+  cursor: "pointer",
+  textDecoration: "none",
+};
 
 const S_NAV_LINK_HOVER: React.CSSProperties = {
-  backgroundColor: 'rgba(255,255,255,0.9)',
-  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
-}
+  backgroundColor: "rgba(255,255,255,0.9)",
+  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+};
 
 const S_NAV_LINK_ACTIVE: React.CSSProperties = {
-  transform: 'scale(0.95)',
-}
+  transform: "scale(0.95)",
+};
 
 const S_SVG_BASE: React.CSSProperties = {
-  width: '1.25rem',
-  height: '1.25rem',
-  color: 'var(--color-muted-foreground)',
-  transition: 'color 200ms ease-in-out',
-}
+  width: "1.25rem",
+  height: "1.25rem",
+  color: "var(--color-muted-foreground)",
+  transition: "color 200ms ease-in-out",
+};
 
 const S_SVG_HOVER: React.CSSProperties = {
-  color: '#4f46e5',
-}
+  color: "#4f46e5",
+};
 
 const S_MAIN: React.CSSProperties = {
-  width: '100%',
-  maxWidth: '80rem',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  paddingLeft: '1rem',
-  paddingRight: '1rem',
-  paddingTop: '2rem',
-  paddingBottom: '2rem',
-}
+  width: "100%",
+  maxWidth: "80rem",
+  marginLeft: "auto",
+  marginRight: "auto",
+  ...resolveDot("px-4 py-8"),
+};
 
 const S_INNER: React.CSSProperties = {
-  maxWidth: '56rem',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-}
+  maxWidth: "56rem",
+  marginLeft: "auto",
+  marginRight: "auto",
+};
 
 const S_BREADCRUMB_MARGIN: React.CSSProperties = {
-  marginBottom: '1.5rem',
-}
+  ...resolveDot("mb-6"),
+};
 
 const S_HEADER: React.CSSProperties = {
-  marginBottom: '2rem',
-}
+  ...resolveDot("mb-8"),
+};
 
 const S_H1: React.CSSProperties = {
-  fontSize: '2.25rem',
+  fontSize: "2.25rem",
   fontWeight: 700,
   lineHeight: 1.2,
-  marginBottom: '1rem',
-}
+  ...resolveDot("mb-4"),
+};
 
 const S_DESCRIPTION: React.CSSProperties = {
-  fontSize: '1.125rem',
-  color: 'var(--color-muted-foreground)',
-}
+  fontSize: "1.125rem",
+  color: "var(--color-muted-foreground)",
+};
 
 const S_CONTENT: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2rem',
-}
+  display: "flex",
+  flexDirection: "column",
+  ...resolveDot("gap-8"),
+};
 
 const S_MOBILE_NAV: React.CSSProperties = {
-  marginTop: '3rem',
-}
+  ...resolveDot("mt-12"),
+};
 
 const S_MOBILE_NAV_INNER: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  paddingTop: '1rem',
-  paddingBottom: '1rem',
-  borderTop: '1px solid var(--color-border)',
-}
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  ...resolveDot("py-4"),
+  borderTop: "1px solid var(--color-border)",
+};
 
 const S_MOBILE_LINK_BASE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  fontSize: '0.875rem',
-  color: 'var(--color-muted-foreground)',
-  transition: 'color 200ms ease-in-out',
-  textDecoration: 'none',
-}
+  display: "flex",
+  alignItems: "center",
+  fontSize: "0.875rem",
+  color: "var(--color-muted-foreground)",
+  transition: "color 200ms ease-in-out",
+  textDecoration: "none",
+};
 
 const S_MOBILE_LINK_HOVER: React.CSSProperties = {
-  color: 'var(--color-foreground)',
-}
+  color: "var(--color-foreground)",
+};
 
 const S_SMALL_SVG: React.CSSProperties = {
-  width: '1rem',
-  height: '1rem',
-}
+  width: "1rem",
+  height: "1rem",
+};
 
 // ── NavButton sub-component ─────────────────────────────────
 
 interface NavButtonProps {
-  href: string
-  title: string
-  arrowUp?: boolean
+  href: string;
+  title: string;
+  arrowUp?: boolean;
 }
 
 const NavButton: React.FC<NavButtonProps> = ({ href, title, arrowUp }) => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isActive, setIsActive] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
-  const linkStyle = useMemo(() => mergeStyles(
-    S_NAV_LINK_BASE,
-    isHovered ? S_NAV_LINK_HOVER : undefined,
-    isActive ? S_NAV_LINK_ACTIVE : undefined,
-  ), [isHovered, isActive])
+  const linkStyle = useMemo(
+    () =>
+      mergeStyles(
+        S_NAV_LINK_BASE,
+        isHovered ? S_NAV_LINK_HOVER : undefined,
+        isActive ? S_NAV_LINK_ACTIVE : undefined,
+      ),
+    [isHovered, isActive],
+  );
 
-  const svgStyle = useMemo(() => mergeStyles(
-    S_SVG_BASE,
-    isHovered ? S_SVG_HOVER : undefined,
-  ), [isHovered])
+  const svgStyle = useMemo(
+    () => mergeStyles(S_SVG_BASE, isHovered ? S_SVG_HOVER : undefined),
+    [isHovered],
+  );
 
   return (
     <a
@@ -211,7 +214,10 @@ const NavButton: React.FC<NavButtonProps> = ({ href, title, arrowUp }) => {
       style={linkStyle}
       title={title}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => { setIsHovered(false); setIsActive(false) }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsActive(false);
+      }}
       onMouseDown={() => setIsActive(true)}
       onMouseUp={() => setIsActive(false)}
     >
@@ -221,30 +227,49 @@ const NavButton: React.FC<NavButtonProps> = ({ href, title, arrowUp }) => {
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        {arrowUp
-          ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        }
+        {arrowUp ? (
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 15l7-7 7 7"
+          />
+        ) : (
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        )}
       </svg>
     </a>
-  )
-}
+  );
+};
 
 // ── MobileNavLink sub-component ─────────────────────────────
 
 interface MobileNavLinkProps {
-  href: string
-  label: string
-  arrowLeft?: boolean
+  href: string;
+  label: string;
+  arrowLeft?: boolean;
 }
 
-const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, label, arrowLeft }) => {
-  const [isHovered, setIsHovered] = useState(false)
+const MobileNavLink: React.FC<MobileNavLinkProps> = ({
+  href,
+  label,
+  arrowLeft,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
 
-  const linkStyle = useMemo(() => mergeStyles(
-    S_MOBILE_LINK_BASE,
-    isHovered ? S_MOBILE_LINK_HOVER : undefined,
-  ), [isHovered])
+  const linkStyle = useMemo(
+    () =>
+      mergeStyles(
+        S_MOBILE_LINK_BASE,
+        isHovered ? S_MOBILE_LINK_HOVER : undefined,
+      ),
+    [isHovered],
+  );
 
   return (
     <a
@@ -254,19 +279,39 @@ const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, label, arrowLeft })
       onMouseLeave={() => setIsHovered(false)}
     >
       {arrowLeft && (
-        <svg style={{ ...S_SMALL_SVG, marginRight: '0.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          style={{ ...S_SMALL_SVG, ...resolveDot("mr-2") }}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       )}
       {label}
       {!arrowLeft && (
-        <svg style={{ ...S_SMALL_SVG, marginLeft: '0.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          style={{ ...S_SMALL_SVG, ...resolveDot("ml-2") }}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       )}
     </a>
-  )
-}
+  );
+};
 
 // ── ComponentLayout ─────────────────────────────────────────
 
@@ -305,26 +350,26 @@ const MobileNavLink: React.FC<MobileNavLinkProps> = ({ href, label, arrowLeft })
  * @returns {JSX.Element} ComponentLayout 컴포넌트 / ComponentLayout component
  */
 const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
-  ({
-    dot: dotProp,
-    style,
-    title,
-    description,
-    children,
-    prevPage,
-    nextPage,
-    breadcrumbItems = [
-      { label: "Components", href: "/components" }
-    ],
-    ...props
-  }, ref) => {
-    const { isDesktop } = useWindowSize()
-
-    const mainStyle = useMemo(() => mergeStyles(
-      S_MAIN,
-      resolveDot(dotProp),
+  (
+    {
+      dot: dotProp,
       style,
-    ), [dotProp, style])
+      title,
+      description,
+      children,
+      prevPage,
+      nextPage,
+      breadcrumbItems = [{ label: "Components", href: "/components" }],
+      ...props
+    },
+    ref,
+  ) => {
+    const { isDesktop } = useWindowSize();
+
+    const mainStyle = useMemo(
+      () => mergeStyles(S_MAIN, resolveDot(dotProp), style),
+      [dotProp, style],
+    );
 
     return (
       <div style={S_OUTER}>
@@ -358,11 +403,7 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
         )}
 
         {/* 메인 콘텐츠 */}
-        <div
-          ref={ref}
-          style={mainStyle}
-          {...props}
-        >
+        <div ref={ref} style={mainStyle} {...props}>
           <div style={S_INNER}>
             {/* 브레드크럼 */}
             <Breadcrumb style={S_BREADCRUMB_MARGIN}>
@@ -380,15 +421,11 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
             {/* 페이지 헤더 */}
             <div style={S_HEADER}>
               <h1 style={S_H1}>{title}</h1>
-              <p style={S_DESCRIPTION}>
-                {description}
-              </p>
+              <p style={S_DESCRIPTION}>{description}</p>
             </div>
 
             {/* 페이지 콘텐츠 */}
-            <div style={S_CONTENT}>
-              {children}
-            </div>
+            <div style={S_CONTENT}>{children}</div>
 
             {/* 모바일 페이지 네비게이션 */}
             <div style={S_MOBILE_NAV}>
@@ -401,19 +438,16 @@ const ComponentLayout = React.forwardRef<HTMLDivElement, ComponentLayoutProps>(
                   />
                 )}
                 {nextPage && (
-                  <MobileNavLink
-                    href={nextPage.href}
-                    label={nextPage.title}
-                  />
+                  <MobileNavLink href={nextPage.href} label={nextPage.title} />
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
-)
-ComponentLayout.displayName = "ComponentLayout"
+    );
+  },
+);
+ComponentLayout.displayName = "ComponentLayout";
 
-export { ComponentLayout }
+export { ComponentLayout };

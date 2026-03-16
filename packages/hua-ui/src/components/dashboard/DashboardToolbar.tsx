@@ -109,12 +109,9 @@ const ToolbarButton: React.FC<ToolbarAction> = ({
   const baseStyle: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
-    gap: "0.5rem",
-    borderRadius: "0.5rem",
-    paddingLeft: "0.75rem",
-    paddingRight: "0.75rem",
-    paddingTop: "0.5rem",
-    paddingBottom: "0.5rem",
+    ...resolveDot("gap-2"),
+    ...resolveDot("rounded-lg"),
+    ...resolveDot("px-3 py-2"),
     fontSize: "0.875rem",
     fontWeight: 500,
     transition: "colors 150ms",
@@ -233,15 +230,16 @@ export const DashboardToolbar = React.forwardRef<
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "1rem",
-            paddingLeft: "1.5rem",
-            paddingRight: "1.5rem",
-            paddingTop: "1.25rem",
-            paddingBottom: "1.25rem",
+            ...resolveDot("gap-4"),
+            ...resolveDot("px-6 py-5"),
           }}
         >
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              ...resolveDot("gap-2"),
+            }}
           >
             <div>
               {title && (
@@ -266,7 +264,13 @@ export const DashboardToolbar = React.forwardRef<
                 </p>
               )}
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                ...resolveDot("gap-2"),
+              }}
+            >
               {dateRange && (
                 <Dropdown
                   trigger={

@@ -33,14 +33,25 @@ export interface BarChartData {
  * @property {boolean} [showTooltip] - 툴팁 표시 여부 / Show tooltip
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface BarChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface BarChartProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   data: BarChartData[];
   title?: string;
   height?: number;
   showValues?: boolean;
   showLabels?: boolean;
   maxValue?: number;
-  colorScheme?: "blue" | "purple" | "green" | "orange" | "red" | "indigo" | "pink" | "gray";
+  colorScheme?:
+    | "blue"
+    | "purple"
+    | "green"
+    | "orange"
+    | "red"
+    | "indigo"
+    | "pink"
+    | "gray";
   variant?: "default" | "gradient";
   showGrid?: boolean;
   showTooltip?: boolean;
@@ -146,7 +157,7 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const colors = colorSchemeValues[colorScheme];
 
@@ -180,27 +191,46 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
             border: "1px solid var(--color-border, #e5e7eb)",
           },
           resolveDot(dot),
-          style
+          style,
         )}
         {...props}
       >
         {title && (
-          <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "1rem", color: "var(--color-foreground, #111827)" }}>
+          <h3
+            style={{
+              fontSize: "1.125rem",
+              fontWeight: 600,
+              ...resolveDot("mb-4"),
+              color: "var(--color-foreground, #111827)",
+            }}
+          >
             {title}
           </h3>
         )}
 
-        <div style={{ position: "relative", height: `${height}px` }} aria-hidden="true">
+        <div
+          style={{ position: "relative", height: `${height}px` }}
+          aria-hidden="true"
+        >
           {/* 그리드 라인 */}
           {showGrid && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
               {[0, 25, 50, 75, 100].map((percent) => (
                 <div
                   key={percent}
                   style={{
                     borderTop: "1px solid var(--color-border, #e5e7eb)",
                     opacity: 0.3,
-                    marginTop: percent === 0 ? 0 : `${(percent / 100) * height - 1}px`,
+                    marginTop:
+                      percent === 0 ? 0 : `${(percent / 100) * height - 1}px`,
                   }}
                 />
               ))}
@@ -208,20 +238,38 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
           )}
 
           {/* 막대 그래프 */}
-          <div style={{ position: "relative", height: "100%", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "0.5rem", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
+          <div
+            style={{
+              position: "relative",
+              height: "100%",
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              ...resolveDot("gap-2 px-2"),
+            }}
+          >
             {data.map((item, index) => {
-              const barHeight = max > 0 ? (item.value / max) * (height - 40) : 0;
+              const barHeight =
+                max > 0 ? (item.value / max) * (height - 40) : 0;
               const isHighlighted = item.highlight || hoveredIndex === index;
               const barColor = item.color
                 ? item.color
                 : variant === "gradient"
-                ? (isHighlighted ? colors.highlight[0] : colors.gradient[0])
-                : colors.default;
+                  ? isHighlighted
+                    ? colors.highlight[0]
+                    : colors.gradient[0]
+                  : colors.default;
 
               return (
                 <div
                   key={index}
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    flex: 1,
+                    position: "relative",
+                  }}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
@@ -233,12 +281,12 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                         bottom: "100%",
                         left: "50%",
                         transform: "translateX(-50%)",
-                        marginBottom: "0.5rem",
-                        padding: "0.25rem 0.5rem",
+                        ...resolveDot("mb-2"),
+                        ...resolveDot("py-1 px-2"),
                         backgroundColor: "#111827",
                         color: "#ffffff",
                         fontSize: "0.75rem",
-                        borderRadius: "0.25rem",
+                        ...resolveDot("rounded-md"),
                         opacity: hoveredIndex === index ? 1 : 0,
                         transition: "opacity 200ms",
                         pointerEvents: "none",
@@ -247,7 +295,19 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                       }}
                     >
                       {item.label}: {item.value.toLocaleString()}
-                      <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #111827" }} />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "100%",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: 0,
+                          height: 0,
+                          borderLeft: "4px solid transparent",
+                          borderRight: "4px solid transparent",
+                          borderTop: "4px solid #111827",
+                        }}
+                      />
                     </div>
                   )}
 
@@ -257,10 +317,13 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 500,
-                        marginBottom: "0.25rem",
+                        ...resolveDot("mb-1"),
                         transition: "opacity 200ms",
                         opacity: hoveredIndex === index ? 1 : 0,
-                        color: hoveredIndex === index ? "var(--color-foreground, #111827)" : "var(--color-muted-foreground, #6b7280)",
+                        color:
+                          hoveredIndex === index
+                            ? "var(--color-foreground, #111827)"
+                            : "var(--color-muted-foreground, #6b7280)",
                       }}
                     >
                       {item.value.toLocaleString()}
@@ -268,23 +331,44 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                   )}
 
                   {/* 막대 */}
-                  <div style={{ position: "relative", width: "100%", flex: 1, display: "flex", alignItems: "flex-end" }}>
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "flex-end",
+                    }}
+                  >
                     <div
                       style={{
                         width: "100%",
-                        borderTopLeftRadius: "0.5rem",
-                        borderTopRightRadius: "0.5rem",
+                        ...resolveDot("rounded-tl-lg rounded-tr-lg"),
                         transition: "all 500ms ease-out",
                         backgroundColor: barColor,
                         height: `${Math.max(barHeight, 4)}px`,
                         minHeight: "4px",
-                        boxShadow: isHighlighted ? "0 10px 15px -3px rgba(0,0,0,0.1)" : undefined,
+                        boxShadow: isHighlighted
+                          ? "0 10px 15px -3px rgba(0,0,0,0.1)"
+                          : undefined,
                         transform: isHighlighted ? "scaleX(1.05)" : undefined,
                       }}
                     >
                       {/* 막대 위 점 */}
                       {item.value > 0 && (
-                        <div style={{ position: "absolute", top: "-4px", left: "50%", transform: "translateX(-50%)", width: "8px", height: "8px", backgroundColor: "var(--color-background, #ffffff)", borderRadius: "50%", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }} />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-4px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: "8px",
+                            height: "8px",
+                            backgroundColor: "var(--color-background, #ffffff)",
+                            borderRadius: "50%",
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                          }}
+                        />
                       )}
                     </div>
                   </div>
@@ -295,9 +379,11 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 500,
-                        marginTop: "0.5rem",
+                        ...resolveDot("mt-2"),
                         transition: "color 200ms",
-                        color: isHighlighted ? "#9333ea" : "var(--color-muted-foreground, #6b7280)",
+                        color: isHighlighted
+                          ? "#9333ea"
+                          : "var(--color-muted-foreground, #6b7280)",
                       }}
                     >
                       {item.label}
@@ -311,14 +397,25 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
 
         {/* 하단 통계 */}
         {data.length > 0 && (
-          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
+          <div
+            style={{
+              ...resolveDot("mt-4"),
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "0.75rem",
+              color: "var(--color-muted-foreground, #6b7280)",
+              ...resolveDot("px-2"),
+            }}
+          >
             <div>
-              총: {data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+              총:{" "}
+              {data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
             </div>
             <div>
               평균:{" "}
               {Math.round(
-                data.reduce((sum, item) => sum + item.value, 0) / data.length
+                data.reduce((sum, item) => sum + item.value, 0) / data.length,
               ).toLocaleString()}
             </div>
             <div>최고: {max.toLocaleString()}</div>
@@ -326,7 +423,7 @@ export const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 BarChart.displayName = "BarChart";

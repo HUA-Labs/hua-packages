@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ─── Style constants ────────────────────────────────────────────────────────
 
@@ -9,115 +9,113 @@ const SIZE_STYLES: Record<string, React.CSSProperties> = {
   sm: { height: 40, width: 40 },
   md: { height: 48, width: 48 },
   lg: { height: 56, width: 56 },
-}
+};
 
 const BASE_BUTTON: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: 8,
   border: "none",
   background: "none",
   cursor: "pointer",
   transition: "background-color 200ms ease-in-out",
   outline: "none",
   padding: 0,
-}
+  ...resolveDot("rounded-lg"),
+};
 
 const BASE_LABELED_BUTTON: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
-  gap: 12,
-  borderRadius: 8,
   border: "none",
   background: "none",
   cursor: "pointer",
-  padding: "12px 16px",
   fontSize: 14,
   fontWeight: 500,
   transition: "background-color 200ms ease-in-out",
   outline: "none",
-}
+  ...resolveDot("rounded-lg gap-3 pt-3 pb-3 pl-4 pr-4"),
+};
 
 const HOVER_BG: React.CSSProperties = {
   backgroundColor: "var(--color-muted)",
-}
+};
 
 const FOCUS_RING: React.CSSProperties = {
   boxShadow: "0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)",
-}
+};
 
 const DROPDOWN_CONTAINER: React.CSSProperties = {
   position: "relative",
-}
+};
 
 const DROPDOWN_MENU: React.CSSProperties = {
   position: "absolute",
   top: "100%",
   right: 0,
-  marginTop: 8,
   width: 192,
   backgroundColor: "var(--color-background)",
-  borderRadius: 8,
   boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)",
   border: "1px solid var(--color-border)",
-  paddingTop: 8,
-  paddingBottom: 8,
   zIndex: 50,
-}
+  ...resolveDot("rounded-lg mt-2 pt-2 pb-2"),
+};
 
 const DROPDOWN_ITEM_BASE: React.CSSProperties = {
   width: "100%",
-  padding: "12px 16px",
   textAlign: "left",
   display: "flex",
   alignItems: "center",
-  gap: 12,
   border: "none",
   background: "none",
   cursor: "pointer",
   transition: "background-color 200ms ease-in-out",
-}
+  ...resolveDot("pt-3 pb-3 pl-4 pr-4 gap-3"),
+};
 
 const DROPDOWN_ITEM_ACTIVE: React.CSSProperties = {
   backgroundColor: "color-mix(in srgb, var(--color-primary) 10%, transparent)",
   color: "var(--color-primary)",
-}
+};
 
 const FLAG_TEXT: React.CSSProperties = {
   fontSize: 18,
   lineHeight: 1,
-}
+};
 
 const LABEL_TEXT: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 500,
   color: "var(--color-foreground)",
-}
+};
 
 const CHEVRON_BASE: React.CSSProperties = {
   width: 16,
   height: 16,
   transition: "transform 200ms ease-in-out",
   flexShrink: 0,
-}
+};
 
 // ─── DropdownItem — extracted to avoid per-loop useState ────────────────────
 
 interface DropdownItemProps {
-  language: { code: string; name: string; flag?: string }
-  isActive: boolean
-  onSelect: (code: string) => void
+  language: { code: string; name: string; flag?: string };
+  isActive: boolean;
+  onSelect: (code: string) => void;
 }
 
 function DropdownItem({ language, isActive, onSelect }: DropdownItemProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
-  const itemStyle = useMemo(() => mergeStyles(
-    DROPDOWN_ITEM_BASE,
-    isActive ? DROPDOWN_ITEM_ACTIVE : undefined,
-    isHovered && !isActive ? HOVER_BG : undefined,
-  ), [isActive, isHovered])
+  const itemStyle = useMemo(
+    () =>
+      mergeStyles(
+        DROPDOWN_ITEM_BASE,
+        isActive ? DROPDOWN_ITEM_ACTIVE : undefined,
+        isHovered && !isActive ? HOVER_BG : undefined,
+      ),
+    [isActive, isHovered],
+  );
 
   return (
     <button
@@ -129,7 +127,7 @@ function DropdownItem({ language, isActive, onSelect }: DropdownItemProps) {
       <span style={FLAG_TEXT}>{language.flag}</span>
       <span style={LABEL_TEXT}>{language.name}</span>
     </button>
-  )
+  );
 }
 
 // ─── Props ──────────────────────────────────────────────────────────────────
@@ -149,20 +147,22 @@ function DropdownItem({ language, isActive, onSelect }: DropdownItemProps) {
  * @property {string} [dot] - dot 유틸리티 스타일 문자열 / dot utility style string
  * @property {React.CSSProperties} [style] - 추가 인라인 스타일 / Additional inline style
  */
-export interface LanguageToggleProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
-  size?: "sm" | "md" | "lg"
-  variant?: "button" | "icon" | "dropdown"
-  showLabel?: boolean
+export interface LanguageToggleProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "className"
+> {
+  size?: "sm" | "md" | "lg";
+  variant?: "button" | "icon" | "dropdown";
+  showLabel?: boolean;
   languages?: Array<{
-    code: string
-    name: string
-    flag?: string
-  }>
-  currentLanguage?: string
-  onLanguageChange?: (language: string) => void
-  dot?: string
-  style?: React.CSSProperties
+    code: string;
+    name: string;
+    flag?: string;
+  }>;
+  currentLanguage?: string;
+  onLanguageChange?: (language: string) => void;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -213,13 +213,13 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
     },
     _ref,
   ) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const [isButtonHovered, setIsButtonHovered] = useState(false)
-    const [isButtonFocused, setIsButtonFocused] = useState(false)
-    const dropdownRef = React.useRef<HTMLDivElement>(null)
+    const [isOpen, setIsOpen] = useState(false);
+    const [isButtonHovered, setIsButtonHovered] = useState(false);
+    const [isButtonFocused, setIsButtonFocused] = useState(false);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
 
     const currentLang =
-      languages.find((lang) => lang.code === currentLanguage) || languages[0]
+      languages.find((lang) => lang.code === currentLanguage) || languages[0];
 
     // Close on outside click
     React.useEffect(() => {
@@ -228,21 +228,21 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           dropdownRef.current &&
           !dropdownRef.current.contains(event.target as Node)
         ) {
-          setIsOpen(false)
+          setIsOpen(false);
         }
-      }
+      };
       if (isOpen) {
-        document.addEventListener("mousedown", handleClickOutside)
+        document.addEventListener("mousedown", handleClickOutside);
       }
       return () => {
-        document.removeEventListener("mousedown", handleClickOutside)
-      }
-    }, [isOpen])
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [isOpen]);
 
     const handleLanguageChange = (languageCode: string) => {
-      onLanguageChange?.(languageCode)
-      setIsOpen(false)
-    }
+      onLanguageChange?.(languageCode);
+      setIsOpen(false);
+    };
 
     // icon-button shared style (square, centered)
     const iconButtonStyle = useMemo(
@@ -256,7 +256,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           style,
         ),
       [size, isButtonHovered, isButtonFocused, dotProp, style],
-    )
+    );
 
     // labeled-button shared style (gap, padding)
     const labeledButtonStyle = useMemo(
@@ -269,14 +269,14 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           style,
         ),
       [isButtonHovered, isButtonFocused, dotProp, style],
-    )
+    );
 
     const buttonHandlers = {
       onMouseEnter: () => setIsButtonHovered(true),
       onMouseLeave: () => setIsButtonHovered(false),
       onFocus: () => setIsButtonFocused(true),
       onBlur: () => setIsButtonFocused(false),
-    }
+    };
 
     // ── icon variant ─────────────────────────────────────────────────────────
     if (variant === "icon") {
@@ -311,7 +311,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
             </div>
           )}
         </div>
-      )
+      );
     }
 
     // ── dropdown variant ─────────────────────────────────────────────────────
@@ -360,7 +360,7 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
             </div>
           )}
         </div>
-      )
+      );
     }
 
     // ── default button variant ────────────────────────────────────────────────
@@ -370,9 +370,9 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
         onClick={() => {
           const currentIndex = languages.findIndex(
             (lang) => lang.code === currentLanguage,
-          )
-          const nextIndex = (currentIndex + 1) % languages.length
-          onLanguageChange?.(languages[nextIndex].code)
+          );
+          const nextIndex = (currentIndex + 1) % languages.length;
+          onLanguageChange?.(languages[nextIndex].code);
         }}
         {...buttonHandlers}
         {...props}
@@ -384,9 +384,9 @@ const LanguageToggle = React.forwardRef<HTMLDivElement, LanguageToggleProps>(
           </span>
         )}
       </button>
-    )
+    );
   },
-)
-LanguageToggle.displayName = "LanguageToggle"
+);
+LanguageToggle.displayName = "LanguageToggle";
 
-export { LanguageToggle }
+export { LanguageToggle };

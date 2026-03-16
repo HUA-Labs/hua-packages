@@ -10,7 +10,10 @@ export interface DotNavItem {
   label?: string;
 }
 
-export interface DotNavProps extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
+export interface DotNavProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "className"
+> {
   /** 섹션 목록 */
   items: DotNavItem[];
   /** 위치 @default 'right' */
@@ -33,23 +36,23 @@ const NAV_BASE_STYLE: React.CSSProperties = {
   zIndex: 40,
   display: "flex",
   flexDirection: "column",
-  gap: "12px",
+  ...resolveDot("gap-3"),
 };
 
 const NAV_POSITION: Record<"left" | "right", React.CSSProperties> = {
-  left: { left: "16px" },
-  right: { right: "16px" },
+  left: { ...resolveDot("left-4") },
+  right: { ...resolveDot("right-4") },
 };
 
 const DOT_BASE_STYLE: React.CSSProperties = {
   position: "relative",
-  width: "12px",
-  height: "12px",
+  ...resolveDot("w-3 h-3"),
   borderRadius: "9999px",
   border: "none",
   cursor: "pointer",
   padding: 0,
-  transition: "transform 300ms ease, background-color 300ms ease, opacity 300ms ease",
+  transition:
+    "transform 300ms ease, background-color 300ms ease, opacity 300ms ease",
 };
 
 const DOT_ACTIVE_STYLE: React.CSSProperties = {
@@ -72,9 +75,9 @@ const LABEL_BASE_STYLE: React.CSSProperties = {
   top: "50%",
   transform: "translateY(-50%)",
   whiteSpace: "nowrap",
-  padding: "4px 8px",
+  ...resolveDot("px-2 py-1"),
   fontSize: "12px",
-  borderRadius: "4px",
+  ...resolveDot("rounded"),
   backgroundColor: "var(--color-popover, #ffffff)",
   color: "var(--color-popover-foreground, #0f172a)",
   boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
@@ -112,8 +115,8 @@ const DotButton = React.memo<DotButtonProps>(
     const labelStyle = useMemo<React.CSSProperties>(() => {
       const positionOffset: React.CSSProperties =
         position === "right"
-          ? { right: "100%", marginRight: "8px" }
-          : { left: "100%", marginLeft: "8px" };
+          ? { right: "100%", ...resolveDot("mr-2") }
+          : { left: "100%", ...resolveDot("ml-2") };
       return mergeStyles(LABEL_BASE_STYLE, positionOffset, {
         opacity: isHovered ? 1 : 0,
       });
@@ -128,14 +131,10 @@ const DotButton = React.memo<DotButtonProps>(
         aria-label={item.label || item.id}
         aria-current={isActive ? "true" : undefined}
       >
-        {item.label && (
-          <span style={labelStyle}>
-            {item.label}
-          </span>
-        )}
+        {item.label && <span style={labelStyle}>{item.label}</span>}
       </button>
     );
-  }
+  },
 );
 DotButton.displayName = "DotButton";
 
@@ -162,7 +161,7 @@ const DotNav = React.forwardRef<HTMLElement, DotNavProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -199,8 +198,14 @@ const DotNav = React.forwardRef<HTMLElement, DotNavProps>(
     }, []);
 
     const navStyle = useMemo<React.CSSProperties>(
-      () => mergeStyles(NAV_BASE_STYLE, NAV_POSITION[position], resolveDot(dotProp), style),
-      [position, dotProp, style]
+      () =>
+        mergeStyles(
+          NAV_BASE_STYLE,
+          NAV_POSITION[position],
+          resolveDot(dotProp),
+          style,
+        ),
+      [position, dotProp, style],
     );
 
     return (
@@ -223,7 +228,7 @@ const DotNav = React.forwardRef<HTMLElement, DotNavProps>(
         ))}
       </nav>
     );
-  }
+  },
 );
 
 DotNav.displayName = "DotNav";
