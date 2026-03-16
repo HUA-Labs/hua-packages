@@ -1,10 +1,16 @@
-'use client'
+"use client";
 
-import React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../Card';
-import { Badge } from '../../Badge';
-import { mergeStyles, resolveDot } from '../../../hooks/useDotMap';
-import { EmotionMeter } from "./EmotionMeter"
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../Card";
+import { Badge } from "../../Badge";
+import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
+import { EmotionMeter } from "./EmotionMeter";
 
 /**
  * EmotionAnalysis 컴포넌트의 props / EmotionAnalysis component props
@@ -28,45 +34,48 @@ import { EmotionMeter } from "./EmotionMeter"
  * @property {"compact" | "detailed" | "card"} [layout="detailed"] - 레이아웃 타입 / Layout type
  * @extends {React.HTMLAttributes<HTMLDivElement>}
  */
-interface EmotionAnalysisProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+interface EmotionAnalysisProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   primaryEmotion?: {
-    name: string
-    intensity: number
-    color?: string
-  }
+    name: string;
+    intensity: number;
+    color?: string;
+  };
   emotionDistribution?: Array<{
-    emotion: string
-    percentage: number
-    color: string
-  }>
-  keywords?: string[]
-  intensity?: number
-  positivity?: number
-  energy?: number
-  showMeter?: boolean
-  showDistribution?: boolean
-  showKeywords?: boolean
-  showMetrics?: boolean
-  layout?: "compact" | "detailed" | "card"
-  dot?: string
-  style?: React.CSSProperties
+    emotion: string;
+    percentage: number;
+    color: string;
+  }>;
+  keywords?: string[];
+  intensity?: number;
+  positivity?: number;
+  energy?: number;
+  showMeter?: boolean;
+  showDistribution?: boolean;
+  showKeywords?: boolean;
+  showMetrics?: boolean;
+  layout?: "compact" | "detailed" | "card";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // Maps the color token from emotionDistribution to an inline background color
 const colorTokenToStyle = (token: string): React.CSSProperties => {
   const map: Record<string, string> = {
-    yellow: 'rgb(234 179 8)',
-    green: 'rgb(34 197 94)',
-    blue: 'rgb(59 130 246)',
-    red: 'rgb(239 68 68)',
-    purple: 'rgb(168 85 247)',
-    orange: 'rgb(249 115 22)',
-    indigo: 'rgb(99 102 241)',
-    pink: 'rgb(236 72 153)',
-    gray: 'rgb(107 114 128)',
-  }
-  return { backgroundColor: map[token] ?? map.gray }
-}
+    yellow: "rgb(234 179 8)",
+    green: "rgb(34 197 94)",
+    blue: "rgb(59 130 246)",
+    red: "rgb(239 68 68)",
+    purple: "rgb(168 85 247)",
+    orange: "rgb(249 115 22)",
+    indigo: "rgb(99 102 241)",
+    pink: "rgb(236 72 153)",
+    gray: "rgb(107 114 128)",
+  };
+  return { backgroundColor: map[token] ?? map.gray };
+};
 
 /**
  * EmotionAnalysis 컴포넌트 / EmotionAnalysis component
@@ -105,59 +114,83 @@ const colorTokenToStyle = (token: string): React.CSSProperties => {
  * @returns {JSX.Element} EmotionAnalysis 컴포넌트 / EmotionAnalysis component
  */
 const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
-  ({
-    dot: dotProp,
-    style,
-    primaryEmotion,
-    emotionDistribution = [],
-    keywords = [],
-    intensity = 50,
-    positivity = 70,
-    energy = 60,
-    showMeter = true,
-    showDistribution = true,
-    showKeywords = true,
-    showMetrics = true,
-    layout = "detailed",
-    ...props
-  }, ref) => {
+  (
+    {
+      dot: dotProp,
+      style,
+      primaryEmotion,
+      emotionDistribution = [],
+      keywords = [],
+      intensity = 50,
+      positivity = 70,
+      energy = 60,
+      showMeter = true,
+      showDistribution = true,
+      showKeywords = true,
+      showMetrics = true,
+      layout = "detailed",
+      ...props
+    },
+    ref,
+  ) => {
     const getIntensityLabel = (value: number) => {
-      if (value < 30) return "약함"
-      if (value < 70) return "보통"
-      return "강함"
-    }
+      if (value < 30) return "약함";
+      if (value < 70) return "보통";
+      return "강함";
+    };
 
     const getPositivityLabel = (value: number) => {
-      if (value < 30) return "부정적"
-      if (value < 70) return "중립적"
-      return "긍정적"
-    }
+      if (value < 30) return "부정적";
+      if (value < 70) return "중립적";
+      return "긍정적";
+    };
 
     const getEnergyLabel = (value: number) => {
-      if (value < 30) return "낮음"
-      if (value < 70) return "보통"
-      return "높음"
-    }
+      if (value < 30) return "낮음";
+      if (value < 70) return "보통";
+      return "높음";
+    };
 
-    const mutedFg: React.CSSProperties = { color: 'var(--color-muted-foreground, rgb(107 114 128))' }
-    const spaceY3: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '0.75rem' }
-    const spaceY4: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '1rem' }
-    const spaceY2: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '0.5rem' }
-    const flexBetween: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'space-between' }
-    const textSm: React.CSSProperties = { fontSize: '0.875rem' }
-    const textSmMedium: React.CSSProperties = { fontSize: '0.875rem', fontWeight: 500 }
-    const textSmMuted: React.CSSProperties = { ...textSm, ...mutedFg }
+    const mutedFg: React.CSSProperties = {
+      color: "var(--color-muted-foreground, rgb(107 114 128))",
+    };
+    const spaceY3: React.CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
+      ...resolveDot("gap-3"),
+    };
+    const spaceY4: React.CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
+      ...resolveDot("gap-4"),
+    };
+    const spaceY2: React.CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
+      ...resolveDot("gap-2"),
+    };
+    const flexBetween: React.CSSProperties = {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    };
+    const textSm: React.CSSProperties = { fontSize: "0.875rem" };
+    const textSmMedium: React.CSSProperties = {
+      fontSize: "0.875rem",
+      fontWeight: 500,
+    };
+    const textSmMuted: React.CSSProperties = { ...textSm, ...mutedFg };
     const progressTrack: React.CSSProperties = {
-      width: '100%',
-      backgroundColor: 'var(--color-muted, rgb(229 231 235))',
-      borderRadius: '9999px',
-      height: '0.5rem',
-    }
+      width: "100%",
+      backgroundColor: "var(--color-muted, rgb(229 231 235))",
+      borderRadius: "9999px",
+      height: "0.5rem",
+    };
     const progressBar: React.CSSProperties = {
-      height: '0.5rem',
-      borderRadius: '9999px',
-      transition: 'all 300ms ease',
-    }
+      height: "0.5rem",
+      borderRadius: "9999px",
+      transition: "all 300ms ease",
+    };
 
     if (layout === "compact") {
       return (
@@ -169,7 +202,13 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
           {primaryEmotion && (
             <div style={flexBetween}>
               <span style={textSmMedium}>주요 감정:</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  ...resolveDot("gap-2"),
+                }}
+              >
                 <span style={textSmMuted}>
                   {primaryEmotion.name} ({primaryEmotion.intensity}%)
                 </span>
@@ -188,9 +227,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             <>
               <div style={flexBetween}>
                 <span style={textSmMedium}>감정 강도:</span>
-                <span style={textSmMuted}>
-                  {getIntensityLabel(intensity)}
-                </span>
+                <span style={textSmMuted}>{getIntensityLabel(intensity)}</span>
               </div>
               <div style={flexBetween}>
                 <span style={textSmMedium}>긍정성:</span>
@@ -200,9 +237,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
               </div>
               <div style={flexBetween}>
                 <span style={textSmMedium}>에너지:</span>
-                <span style={textSmMuted}>
-                  {getEnergyLabel(energy)}
-                </span>
+                <span style={textSmMuted}>{getEnergyLabel(energy)}</span>
               </div>
             </>
           )}
@@ -210,7 +245,14 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
           {showKeywords && keywords.length > 0 && (
             <div>
               <span style={textSmMedium}>키워드:</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.25rem' }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  ...resolveDot("gap-1"),
+                  ...resolveDot("mt-1"),
+                }}
+              >
                 {keywords.map((keyword) => (
                   <Badge key={keyword} variant="secondary" dot="text-xs">
                     {keyword}
@@ -220,37 +262,32 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             </div>
           )}
         </div>
-      )
+      );
     }
 
     if (layout === "card") {
       return (
-        <Card
-          ref={ref}
-          dot={dotProp}
-          style={style}
-          {...props}
-        >
+        <Card ref={ref} dot={dotProp} style={style} {...props}>
           <CardHeader>
             <CardTitle dot="flex items-center">
-              <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>✨</span>
+              <span style={{ fontSize: "1.5rem", ...resolveDot("mr-2") }}>
+                ✨
+              </span>
               AI 분석
             </CardTitle>
-            <CardDescription>
-              감정 분석 결과
-            </CardDescription>
+            <CardDescription>감정 분석 결과</CardDescription>
           </CardHeader>
           <CardContent dot="space-y-4">
             {primaryEmotion && (
               <div style={spaceY3}>
                 <div style={textSm}>
                   <span style={{ fontWeight: 500 }}>주요 감정:</span>
-                  <span style={{ marginLeft: '0.5rem', ...mutedFg }}>
+                  <span style={{ ...resolveDot("ml-2"), ...mutedFg }}>
                     {primaryEmotion.name} ({primaryEmotion.intensity}%)
                   </span>
                 </div>
                 {showMeter && (
-                  <div style={resolveDot('flex justify-center')}>
+                  <div style={resolveDot("flex justify-center")}>
                     <EmotionMeter
                       value={primaryEmotion.intensity}
                       size="md"
@@ -265,19 +302,19 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
               <>
                 <div style={textSm}>
                   <span style={{ fontWeight: 500 }}>감정 강도:</span>
-                  <span style={{ marginLeft: '0.5rem', ...mutedFg }}>
+                  <span style={{ ...resolveDot("ml-2"), ...mutedFg }}>
                     {getIntensityLabel(intensity)}
                   </span>
                 </div>
                 <div style={textSm}>
                   <span style={{ fontWeight: 500 }}>긍정성:</span>
-                  <span style={{ marginLeft: '0.5rem', ...mutedFg }}>
+                  <span style={{ ...resolveDot("ml-2"), ...mutedFg }}>
                     {getPositivityLabel(positivity)}
                   </span>
                 </div>
                 <div style={textSm}>
                   <span style={{ fontWeight: 500 }}>에너지:</span>
-                  <span style={{ marginLeft: '0.5rem', ...mutedFg }}>
+                  <span style={{ ...resolveDot("ml-2"), ...mutedFg }}>
                     {getEnergyLabel(energy)}
                   </span>
                 </div>
@@ -287,7 +324,14 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             {showKeywords && keywords.length > 0 && (
               <div style={textSm}>
                 <span style={{ fontWeight: 500 }}>키워드:</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.25rem' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    ...resolveDot("gap-1"),
+                    ...resolveDot("mt-1"),
+                  }}
+                >
                   {keywords.map((keyword) => (
                     <Badge key={keyword} variant="secondary" dot="text-xs">
                       {keyword}
@@ -298,27 +342,43 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             )}
           </CardContent>
         </Card>
-      )
+      );
     }
 
     // detailed layout (default)
     return (
       <div
         ref={ref}
-        style={mergeStyles({ display: 'flex', flexDirection: 'column', gap: '1.5rem' }, resolveDot(dotProp), style)}
+        style={mergeStyles(
+          { display: "flex", flexDirection: "column", ...resolveDot("gap-6") },
+          resolveDot(dotProp),
+          style,
+        )}
         {...props}
       >
         {primaryEmotion && (
           <div style={spaceY4}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>주요 감정</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-primary, rgb(99 102 241))' }}>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
+              주요 감정
+            </h3>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                ...resolveDot("gap-4"),
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 700,
+                    color: "var(--color-primary, rgb(99 102 241))",
+                  }}
+                >
                   {primaryEmotion.name}
                 </div>
-                <div style={textSmMuted}>
-                  {primaryEmotion.intensity}% 강도
-                </div>
+                <div style={textSmMuted}>{primaryEmotion.intensity}% 강도</div>
               </div>
               {showMeter && (
                 <EmotionMeter
@@ -333,19 +393,23 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
 
         {showDistribution && emotionDistribution.length > 0 && (
           <div style={spaceY4}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>감정 분포</h3>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
+              감정 분포
+            </h3>
             <div style={spaceY3}>
               {emotionDistribution.map((item, index) => (
                 <div key={index} style={spaceY2}>
                   <div style={flexBetween}>
                     <span style={textSmMedium}>{item.emotion}</span>
-                    <span style={textSmMuted}>
-                      {item.percentage}%
-                    </span>
+                    <span style={textSmMuted}>{item.percentage}%</span>
                   </div>
                   <div style={progressTrack}>
                     <div
-                      style={mergeStyles(progressBar, colorTokenToStyle(item.color), { width: `${item.percentage}%` })}
+                      style={mergeStyles(
+                        progressBar,
+                        colorTokenToStyle(item.color),
+                        { width: `${item.percentage}%` },
+                      )}
                     />
                   </div>
                 </div>
@@ -356,38 +420,79 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
 
         {showMetrics && (
           <div style={spaceY4}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>분석 지표</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', gap: '1rem' }}>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
+              분석 지표
+            </h3>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(1, minmax(0, 1fr))",
+                ...resolveDot("gap-4"),
+              }}
+            >
               <div style={spaceY2}>
                 <div style={textSmMedium}>감정 강도</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-primary, rgb(99 102 241))' }}>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 700,
+                    color: "var(--color-primary, rgb(99 102 241))",
+                  }}
+                >
                   {getIntensityLabel(intensity)}
                 </div>
                 <div style={progressTrack}>
                   <div
-                    style={mergeStyles(progressBar, { backgroundColor: 'var(--color-primary, rgb(99 102 241))' }, { width: `${intensity}%` })}
+                    style={mergeStyles(
+                      progressBar,
+                      {
+                        backgroundColor:
+                          "var(--color-primary, rgb(99 102 241))",
+                      },
+                      { width: `${intensity}%` },
+                    )}
                   />
                 </div>
               </div>
               <div style={spaceY2}>
                 <div style={textSmMedium}>긍정성</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'rgb(22 163 74)' }}>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 700,
+                    color: "rgb(22 163 74)",
+                  }}
+                >
                   {getPositivityLabel(positivity)}
                 </div>
                 <div style={progressTrack}>
                   <div
-                    style={mergeStyles(progressBar, { backgroundColor: 'rgb(34 197 94)' }, { width: `${positivity}%` })}
+                    style={mergeStyles(
+                      progressBar,
+                      { backgroundColor: "rgb(34 197 94)" },
+                      { width: `${positivity}%` },
+                    )}
                   />
                 </div>
               </div>
               <div style={spaceY2}>
                 <div style={textSmMedium}>에너지</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'rgb(234 88 12)' }}>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 700,
+                    color: "rgb(234 88 12)",
+                  }}
+                >
                   {getEnergyLabel(energy)}
                 </div>
                 <div style={progressTrack}>
                   <div
-                    style={mergeStyles(progressBar, { backgroundColor: 'rgb(249 115 22)' }, { width: `${energy}%` })}
+                    style={mergeStyles(
+                      progressBar,
+                      { backgroundColor: "rgb(249 115 22)" },
+                      { width: `${energy}%` },
+                    )}
                   />
                 </div>
               </div>
@@ -397,8 +502,10 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
 
         {showKeywords && keywords.length > 0 && (
           <div style={spaceY4}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>감정 키워드</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
+              감정 키워드
+            </h3>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {keywords.map((keyword) => (
                 <Badge key={keyword} variant="outline" dot="text-sm">
                   {keyword}
@@ -408,11 +515,11 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
           </div>
         )}
       </div>
-    )
-  }
-)
+    );
+  },
+);
 
-EmotionAnalysis.displayName = "EmotionAnalysis"
+EmotionAnalysis.displayName = "EmotionAnalysis";
 
-export { EmotionAnalysis }
-export type { EmotionAnalysisProps }
+export { EmotionAnalysis };
+export type { EmotionAnalysisProps };

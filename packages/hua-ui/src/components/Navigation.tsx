@@ -1,118 +1,117 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ---------------------------------------------------------------------------
 // Static style constants
 // ---------------------------------------------------------------------------
 
 const WRAPPER_BASE: React.CSSProperties = {
-  width: '100%',
-}
+  width: "100%",
+};
 
 // --- NavigationList ---
 
 const LIST_BASE: React.CSSProperties = {
-  display: 'flex',
-}
+  display: "flex",
+};
 
 const LIST_VARIANT: Record<string, React.CSSProperties> = {
   pills: {
-    backgroundColor: 'var(--color-muted)',
-    padding: '4px',
-    borderRadius: '0.75rem',
+    backgroundColor: "var(--color-muted)",
+    ...resolveDot("p-1 rounded-xl"),
   },
   underline: {
-    borderBottom: '1px solid var(--color-border)',
+    borderBottom: "1px solid var(--color-border)",
   },
   cards: {
-    backgroundColor: 'color-mix(in srgb, var(--color-muted) 50%, transparent)',
-    padding: '4px',
-    borderRadius: '0.75rem',
+    backgroundColor: "color-mix(in srgb, var(--color-muted) 50%, transparent)",
+    ...resolveDot("p-1 rounded-xl"),
   },
-}
+};
 
 const LIST_SCALE_GAP: Record<string, React.CSSProperties> = {
-  small: { gap: '4px' },
-  medium: { gap: '8px' },
-  large: { gap: '12px' },
-}
+  small: resolveDot("gap-1"),
+  medium: resolveDot("gap-2"),
+  large: resolveDot("gap-3"),
+};
 
 // --- NavigationItem ---
 
 const ITEM_BASE: React.CSSProperties = {
-  borderRadius: '0.5rem',
-  fontSize: '0.875rem',
+  ...resolveDot("rounded-lg"),
+  fontSize: "0.875rem",
   fontWeight: 500,
-  transition: 'all 200ms ease-in-out',
-  cursor: 'pointer',
-  outline: 'none',
-  border: 'none',
-  background: 'none',
+  transition: "all 200ms ease-in-out",
+  cursor: "pointer",
+  outline: "none",
+  border: "none",
+  background: "none",
   lineHeight: 1.25,
-}
+};
 
 /** Active state styles per variant */
 const ITEM_ACTIVE: Record<string, React.CSSProperties> = {
   pills: {
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-foreground)',
-    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+    backgroundColor: "var(--color-background)",
+    color: "var(--color-foreground)",
+    boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
   },
   underline: {
-    borderBottom: '2px solid var(--color-primary)',
-    color: 'var(--color-primary)',
+    borderBottom: "2px solid var(--color-primary)",
+    color: "var(--color-primary)",
     borderRadius: 0,
-    paddingBottom: 'calc(0.5rem - 2px)', // compensate for border
+    paddingBottom: "calc(0.5rem - 2px)", // compensate for border
   },
   cards: {
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-foreground)',
-    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
-    border: '1px solid var(--color-border)',
+    backgroundColor: "var(--color-background)",
+    color: "var(--color-foreground)",
+    boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
+    border: "1px solid var(--color-border)",
   },
-}
+};
 
 /** Idle state styles per variant */
 const ITEM_IDLE: Record<string, React.CSSProperties> = {
   pills: {
-    color: 'var(--color-muted-foreground)',
+    color: "var(--color-muted-foreground)",
   },
   underline: {
-    borderBottom: '2px solid transparent',
-    color: 'var(--color-muted-foreground)',
+    borderBottom: "2px solid transparent",
+    color: "var(--color-muted-foreground)",
     borderRadius: 0,
-    paddingBottom: 'calc(0.5rem - 2px)',
+    paddingBottom: "calc(0.5rem - 2px)",
   },
   cards: {
-    color: 'var(--color-muted-foreground)',
+    color: "var(--color-muted-foreground)",
   },
-}
+};
 
 /** Hover overlay for idle items */
 const ITEM_HOVER_IDLE: React.CSSProperties = {
-  color: 'var(--color-foreground)',
-}
+  color: "var(--color-foreground)",
+};
 
 /** Scale-based padding/font-size per scale */
 const ITEM_SCALE: Record<string, React.CSSProperties> = {
-  small: { fontSize: '0.75rem', padding: '4px 8px' },
-  medium: { fontSize: '0.875rem', padding: '8px 12px' },
-  large: { fontSize: '1rem', padding: '12px 16px' },
-}
+  small: { fontSize: "0.75rem", ...resolveDot("py-1 px-2") },
+  medium: { fontSize: "0.875rem", ...resolveDot("py-2 px-3") },
+  large: { fontSize: "1rem", ...resolveDot("py-3 px-4") },
+};
 
 /** Focus ring style */
 const ITEM_FOCUS: React.CSSProperties = {
-  outline: 'none',
-  boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px color-mix(in srgb, var(--color-ring) 30%, transparent)',
-}
+  outline: "none",
+  boxShadow:
+    "0 0 0 1px var(--color-ring), 0 0 0 3px color-mix(in srgb, var(--color-ring) 30%, transparent)",
+};
 
 // --- NavigationContent ---
 
 const CONTENT_BASE: React.CSSProperties = {
-  marginTop: '16px',
-}
+  ...resolveDot("mt-4"),
+};
 
 // ---------------------------------------------------------------------------
 // Props interfaces
@@ -130,14 +129,17 @@ const CONTENT_BASE: React.CSSProperties = {
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'>}
  */
-export interface NavigationProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'> {
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
-  variant?: "pills" | "underline" | "cards"
-  scale?: "small" | "medium" | "large"
-  dot?: string
-  style?: React.CSSProperties
+export interface NavigationProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className" | "style"
+> {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  variant?: "pills" | "underline" | "cards";
+  scale?: "small" | "medium" | "large";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -151,13 +153,16 @@ export interface NavigationProps extends Omit<React.HTMLAttributes<HTMLDivElemen
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'>}
  */
-export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'> {
-  value?: string
-  onValueChange?: (value: string) => void
-  variant?: "pills" | "underline" | "cards"
-  scale?: "small" | "medium" | "large"
-  dot?: string
-  style?: React.CSSProperties
+export interface NavigationListProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className" | "style"
+> {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  variant?: "pills" | "underline" | "cards";
+  scale?: "small" | "medium" | "large";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -171,14 +176,17 @@ export interface NavigationListProps extends Omit<React.HTMLAttributes<HTMLDivEl
  * @property {string} [dot] - dot 유틸리티 문자열 / dot utility string
  * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'style'>}
  */
-export interface NavigationItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'style'> {
-  value: string
-  onValueChange?: (value: string) => void
-  variant?: "pills" | "underline" | "cards"
-  scale?: "small" | "medium" | "large"
-  active?: boolean
-  dot?: string
-  style?: React.CSSProperties
+export interface NavigationItemProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "className" | "style"
+> {
+  value: string;
+  onValueChange?: (value: string) => void;
+  variant?: "pills" | "underline" | "cards";
+  scale?: "small" | "medium" | "large";
+  active?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -190,11 +198,14 @@ export interface NavigationItemProps extends Omit<React.ButtonHTMLAttributes<HTM
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'>}
  */
-export interface NavigationContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className' | 'style'> {
-  value: string
-  active?: boolean
-  dot?: string
-  style?: React.CSSProperties
+export interface NavigationContentProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className" | "style"
+> {
+  value: string;
+  active?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ---------------------------------------------------------------------------
@@ -226,143 +237,151 @@ export interface NavigationContentProps extends Omit<React.HTMLAttributes<HTMLDi
  * @returns {JSX.Element} Navigation 컴포넌트 / Navigation component
  */
 const Navigation = React.forwardRef<HTMLDivElement, NavigationProps>(
-  ({
-    dot: dotProp,
-    style,
-    value,
-    defaultValue,
-    onValueChange,
-    variant = "pills",
-    scale = "medium",
-    children,
-    ...props
-  }, ref) => {
-    const [activeTab, setActiveTab] = useState(value || defaultValue || "")
-    const isControlled = value !== undefined
-    const currentValue = isControlled ? value : activeTab
+  (
+    {
+      dot: dotProp,
+      style,
+      value,
+      defaultValue,
+      onValueChange,
+      variant = "pills",
+      scale = "medium",
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const [activeTab, setActiveTab] = useState(value || defaultValue || "");
+    const isControlled = value !== undefined;
+    const currentValue = isControlled ? value : activeTab;
 
     const _handleTabChange = (newValue: string) => {
       if (!isControlled) {
-        setActiveTab(newValue)
+        setActiveTab(newValue);
       }
-      onValueChange?.(newValue)
-    }
+      onValueChange?.(newValue);
+    };
 
     React.useEffect(() => {
       if (value !== undefined) {
-        setActiveTab(value)
+        setActiveTab(value);
       }
-    }, [value])
+    }, [value]);
 
-    const computedStyle = useMemo(() => mergeStyles(
-      WRAPPER_BASE,
-      resolveDot(dotProp),
-      style,
-    ), [dotProp, style])
+    const computedStyle = useMemo(
+      () => mergeStyles(WRAPPER_BASE, resolveDot(dotProp), style),
+      [dotProp, style],
+    );
 
     return (
-      <div
-        ref={ref}
-        style={computedStyle}
-        {...props}
-      >
+      <div ref={ref} style={computedStyle} {...props}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               value: currentValue,
               variant,
-              scale
-            } as Partial<NavigationListProps | NavigationItemProps>)
+              scale,
+            } as Partial<NavigationListProps | NavigationItemProps>);
           }
-          return child
+          return child;
         })}
       </div>
-    )
-  }
-)
-Navigation.displayName = "Navigation"
+    );
+  },
+);
+Navigation.displayName = "Navigation";
 
 // ---------------------------------------------------------------------------
 // NavigationList
 // ---------------------------------------------------------------------------
 
 const NavigationList = React.forwardRef<HTMLDivElement, NavigationListProps>(
-  ({
-    dot: dotProp,
-    style,
-    value,
-    onValueChange: _onValueChange,
-    variant = "pills",
-    scale = "medium",
-    children,
-    ...props
-  }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      LIST_BASE,
-      LIST_VARIANT[variant] ?? LIST_VARIANT.pills,
-      LIST_SCALE_GAP[scale] ?? LIST_SCALE_GAP.medium,
-      resolveDot(dotProp),
+  (
+    {
+      dot: dotProp,
       style,
-    ), [variant, scale, dotProp, style])
+      value,
+      onValueChange: _onValueChange,
+      variant = "pills",
+      scale = "medium",
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(
+          LIST_BASE,
+          LIST_VARIANT[variant] ?? LIST_VARIANT.pills,
+          LIST_SCALE_GAP[scale] ?? LIST_SCALE_GAP.medium,
+          resolveDot(dotProp),
+          style,
+        ),
+      [variant, scale, dotProp, style],
+    );
 
     return (
-      <div
-        ref={ref}
-        style={computedStyle}
-        {...props}
-      >
+      <div ref={ref} style={computedStyle} {...props}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               value,
               variant,
-              scale
-            } as Partial<NavigationItemProps>)
+              scale,
+            } as Partial<NavigationItemProps>);
           }
-          return child
+          return child;
         })}
       </div>
-    )
-  }
-)
-NavigationList.displayName = "NavigationList"
+    );
+  },
+);
+NavigationList.displayName = "NavigationList";
 
 // ---------------------------------------------------------------------------
 // NavigationItem
 // ---------------------------------------------------------------------------
 
 const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
-  ({
-    dot: dotProp,
-    style,
-    value,
-    onValueChange,
-    variant = "pills",
-    scale = "medium",
-    active = false,
-    children,
-    onClick,
-    ...props
-  }, ref) => {
-    const [isHovered, setIsHovered] = useState(false)
-    const [isFocused, setIsFocused] = useState(false)
-
-    const computedStyle = useMemo((): React.CSSProperties => mergeStyles(
-      ITEM_BASE,
-      ITEM_SCALE[scale] ?? ITEM_SCALE.medium,
-      active
-        ? (ITEM_ACTIVE[variant] ?? ITEM_ACTIVE.pills)
-        : (ITEM_IDLE[variant] ?? ITEM_IDLE.pills),
-      isHovered && !active ? ITEM_HOVER_IDLE : undefined,
-      isFocused ? ITEM_FOCUS : undefined,
-      resolveDot(dotProp),
+  (
+    {
+      dot: dotProp,
       style,
-    ), [variant, scale, active, isHovered, isFocused, dotProp, style])
+      value,
+      onValueChange,
+      variant = "pills",
+      scale = "medium",
+      active = false,
+      children,
+      onClick,
+      ...props
+    },
+    ref,
+  ) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+
+    const computedStyle = useMemo(
+      (): React.CSSProperties =>
+        mergeStyles(
+          ITEM_BASE,
+          ITEM_SCALE[scale] ?? ITEM_SCALE.medium,
+          active
+            ? (ITEM_ACTIVE[variant] ?? ITEM_ACTIVE.pills)
+            : (ITEM_IDLE[variant] ?? ITEM_IDLE.pills),
+          isHovered && !active ? ITEM_HOVER_IDLE : undefined,
+          isFocused ? ITEM_FOCUS : undefined,
+          resolveDot(dotProp),
+          style,
+        ),
+      [variant, scale, active, isHovered, isFocused, dotProp, style],
+    );
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      onValueChange?.(value)
-      onClick?.(e)
-    }
+      onValueChange?.(value);
+      onClick?.(e);
+    };
 
     return (
       <button
@@ -378,49 +397,47 @@ const NavigationItem = React.forwardRef<HTMLButtonElement, NavigationItemProps>(
       >
         {children}
       </button>
-    )
-  }
-)
-NavigationItem.displayName = "NavigationItem"
+    );
+  },
+);
+NavigationItem.displayName = "NavigationItem";
 
 // ---------------------------------------------------------------------------
 // NavigationContent
 // ---------------------------------------------------------------------------
 
-const NavigationContent = React.forwardRef<HTMLDivElement, NavigationContentProps>(
-  ({ dot: dotProp, style, active = false, ...props }, ref) => {
-    if (!active) return null
+const NavigationContent = React.forwardRef<
+  HTMLDivElement,
+  NavigationContentProps
+>(({ dot: dotProp, style, active = false, ...props }, ref) => {
+  if (!active) return null;
 
-    const computedStyle = mergeStyles(
-      CONTENT_BASE,
-      resolveDot(dotProp),
-      style,
-    )
+  const computedStyle = mergeStyles(CONTENT_BASE, resolveDot(dotProp), style);
 
-    return (
-      <div
-        ref={ref}
-        style={computedStyle}
-        {...props}
-      />
-    )
-  }
-)
-NavigationContent.displayName = "NavigationContent"
+  return <div ref={ref} style={computedStyle} {...props} />;
+});
+NavigationContent.displayName = "NavigationContent";
 
 // ---------------------------------------------------------------------------
 // Compound component
 // ---------------------------------------------------------------------------
 
-export interface NavigationComponent extends React.ForwardRefExoticComponent<NavigationProps & React.RefAttributes<HTMLDivElement>> {
-  List: typeof NavigationList
-  Item: typeof NavigationItem
-  Content: typeof NavigationContent
+export interface NavigationComponent extends React.ForwardRefExoticComponent<
+  NavigationProps & React.RefAttributes<HTMLDivElement>
+> {
+  List: typeof NavigationList;
+  Item: typeof NavigationItem;
+  Content: typeof NavigationContent;
 }
 
-const NavigationComponent = Navigation as NavigationComponent
-NavigationComponent.List = NavigationList
-NavigationComponent.Item = NavigationItem
-NavigationComponent.Content = NavigationContent
+const NavigationComponent = Navigation as NavigationComponent;
+NavigationComponent.List = NavigationList;
+NavigationComponent.Item = NavigationItem;
+NavigationComponent.Content = NavigationContent;
 
-export { NavigationComponent as Navigation, NavigationList, NavigationItem, NavigationContent }
+export {
+  NavigationComponent as Navigation,
+  NavigationList,
+  NavigationItem,
+  NavigationContent,
+};

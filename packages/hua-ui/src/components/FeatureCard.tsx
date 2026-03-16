@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import { composeRefs } from "../lib/Slot"
-import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance"
-import { Icon } from "./Icon"
-import type { AllIconName } from "../lib/icon-names"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { composeRefs } from "../lib/Slot";
+import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance";
+import { Icon } from "./Icon";
+import type { AllIconName } from "../lib/icon-names";
 
 /**
  * FeatureCard 아이콘 타입 / FeatureCard icon type
  * - AllIconName: icons.ts + PROJECT_ICONS의 모든 아이콘 / All icons from icons.ts + PROJECT_ICONS
  * - `http${string}`: 이미지 URL / Image URL
  */
-type FeatureCardIconType = AllIconName | `http${string}`
+type FeatureCardIconType = AllIconName | `http${string}`;
 
 /**
  * FeatureCard 컴포넌트의 props / FeatureCard component props
@@ -29,50 +29,56 @@ type FeatureCardIconType = AllIconName | `http${string}`
  * @property {React.CSSProperties} [style] - inline style overrides
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface FeatureCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
-  icon?: FeatureCardIconType
-  title: string
-  description: string
-  variant?: "default" | "gradient" | "glass" | "neon"
-  size?: "sm" | "md" | "lg"
-  hover?: "scale" | "glow" | "slide" | "none"
-  gradient?: "blue" | "purple" | "green" | "orange" | "pink" | "custom"
-  customGradient?: string
+export interface FeatureCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  icon?: FeatureCardIconType;
+  title: string;
+  description: string;
+  variant?: "default" | "gradient" | "glass" | "neon";
+  size?: "sm" | "md" | "lg";
+  hover?: "scale" | "glow" | "slide" | "none";
+  gradient?: "blue" | "purple" | "green" | "orange" | "pink" | "custom";
+  customGradient?: string;
   /** Enable preset entrance animation (reads from MotionConfigContext) */
-  animated?: boolean
-  dot?: string
-  style?: React.CSSProperties
+  animated?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ─── Size styles ──────────────────────────────────────────────────────────────
 
-const SIZE_PADDING: Record<"sm" | "md" | "lg", React.CSSProperties> = {
-  sm: { padding: "1rem" },
-  md: { padding: "1.5rem" },
-  lg: { padding: "2rem" },
-}
+const SIZE_PADDING_DOT: Record<"sm" | "md" | "lg", string> = {
+  sm: "p-4",
+  md: "p-6",
+  lg: "p-8",
+};
 
 const ICON_PX: Record<"sm" | "md" | "lg", number> = {
   sm: 30,
   md: 36,
   lg: 48,
-}
+};
 
 const TITLE_SIZE: Record<"sm" | "md" | "lg", React.CSSProperties> = {
   sm: { fontSize: "1.125rem" },
   md: { fontSize: "1.25rem" },
   lg: { fontSize: "1.5rem" },
-}
+};
 
 const DESC_SIZE: Record<"sm" | "md" | "lg", React.CSSProperties> = {
   sm: { fontSize: "0.875rem" },
   md: { fontSize: "0.875rem" },
   lg: { fontSize: "1rem" },
-}
+};
 
 // ─── Variant base styles ──────────────────────────────────────────────────────
 
-const VARIANT_BASE: Record<"default" | "gradient" | "glass" | "neon", React.CSSProperties> = {
+const VARIANT_BASE: Record<
+  "default" | "gradient" | "glass" | "neon",
+  React.CSSProperties
+> = {
   default: {
     backgroundColor: "var(--color-background, hsl(210 20% 98% / 0.9))",
     backdropFilter: "blur(4px)",
@@ -93,7 +99,7 @@ const VARIANT_BASE: Record<"default" | "gradient" | "glass" | "neon", React.CSSP
     border: "1px solid rgba(34, 211, 238, 0.3)",
     boxShadow: "0 10px 15px -3px rgba(34, 211, 238, 0.2)",
   },
-}
+};
 
 // ─── Gradient backgrounds ─────────────────────────────────────────────────────
 
@@ -103,28 +109,32 @@ const GRADIENT_BACKGROUNDS: Record<string, string> = {
   green: "linear-gradient(135deg, #22c55e, #10b981, #16a34a)",
   orange: "linear-gradient(135deg, #f97316, #ef4444, #ea580c)",
   pink: "linear-gradient(135deg, #ec4899, #f43f5e, #db2777)",
-}
+};
 
 // ─── Hover effect styles ──────────────────────────────────────────────────────
 
-const HOVER_EFFECTS: Record<"scale" | "glow" | "slide" | "none", React.CSSProperties> = {
+const HOVER_EFFECTS: Record<
+  "scale" | "glow" | "slide" | "none",
+  React.CSSProperties
+> = {
   scale: { transform: "scale(1.05)" },
   glow: { boxShadow: "0 25px 50px -12px rgba(34, 211, 238, 0.25)" },
   slide: { transform: "translateY(-0.5rem)" },
   none: {},
-}
+};
 
 // ─── Shared card base ─────────────────────────────────────────────────────────
 
 const CARD_BASE: React.CSSProperties = {
   borderRadius: "1rem",
-  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+  boxShadow:
+    "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   textAlign: "center",
   transition: "all 300ms ease-in-out",
-}
+};
 
 /**
  * FeatureCard 컴포넌트 / FeatureCard component
@@ -177,24 +187,30 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
     },
     ref,
   ) => {
-    const entrance = useAnimatedEntrance<HTMLDivElement>({ role: "card", enabled: animated })
-    const [isHovered, setIsHovered] = useState(false)
+    const entrance = useAnimatedEntrance<HTMLDivElement>({
+      role: "card",
+      enabled: animated,
+    });
+    const [isHovered, setIsHovered] = useState(false);
 
     const gradientBackground = useMemo<React.CSSProperties | undefined>(() => {
-      if (variant !== "gradient") return undefined
-      const bg = customGradient ?? GRADIENT_BACKGROUNDS[gradient] ?? GRADIENT_BACKGROUNDS.blue
-      return { background: bg }
-    }, [variant, gradient, customGradient])
+      if (variant !== "gradient") return undefined;
+      const bg =
+        customGradient ??
+        GRADIENT_BACKGROUNDS[gradient] ??
+        GRADIENT_BACKGROUNDS.blue;
+      return { background: bg };
+    }, [variant, gradient, customGradient]);
 
     const entranceWillChange = entrance.className
       ? ({ willChange: "opacity, transform" } as React.CSSProperties)
-      : undefined
+      : undefined;
 
     const computedStyle = useMemo(
       () =>
         mergeStyles(
           CARD_BASE,
-          SIZE_PADDING[size],
+          resolveDot(SIZE_PADDING_DOT[size]),
           VARIANT_BASE[variant],
           gradientBackground,
           hover !== "none" && isHovered ? HOVER_EFFECTS[hover] : undefined,
@@ -203,8 +219,18 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
           resolveDot(dotProp),
           style,
         ),
-      [size, variant, gradientBackground, hover, isHovered, entranceWillChange, entrance.style, dotProp, style],
-    )
+      [
+        size,
+        variant,
+        gradientBackground,
+        hover,
+        isHovered,
+        entranceWillChange,
+        entrance.style,
+        dotProp,
+        style,
+      ],
+    );
 
     // Icon color: neon → cyan, gradient → white, others → inherit
     const iconColor: React.CSSProperties =
@@ -212,17 +238,17 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
         ? { color: "rgb(34, 211, 238)" }
         : variant === "gradient"
           ? { color: "rgba(255, 255, 255, 0.9)" }
-          : {}
+          : {};
 
     const titleColor: React.CSSProperties =
       variant === "gradient"
         ? { color: "#ffffff" }
-        : { color: "var(--color-foreground, hsl(210 10% 10%))" }
+        : { color: "var(--color-foreground, hsl(210 10% 10%))" };
 
     const descColor: React.CSSProperties =
       variant === "gradient"
         ? { color: "rgba(255, 255, 255, 0.9)" }
-        : { color: "var(--color-muted-foreground, hsl(210 10% 40%))" }
+        : { color: "var(--color-muted-foreground, hsl(210 10% 40%))" };
 
     return (
       <div
@@ -235,12 +261,16 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
         {icon && (
           <div
             style={{
-              marginBottom: "1rem",
+              ...resolveDot("mb-4"),
               ...iconColor,
             }}
           >
             {typeof icon === "string" && icon.startsWith("http") ? (
-              <img src={icon} alt={title} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+              <img
+                src={icon}
+                alt={title}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
             ) : (
               <Icon name={icon as AllIconName} size={ICON_PX[size]} />
             )}
@@ -249,7 +279,7 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
 
         <h3
           style={mergeStyles(
-            { fontWeight: 700, marginBottom: "0.5rem" },
+            { fontWeight: 700, ...resolveDot("mb-2") },
             TITLE_SIZE[size],
             titleColor,
           )}
@@ -259,10 +289,10 @@ const FeatureCard = React.forwardRef<HTMLDivElement, FeatureCardProps>(
 
         <p style={mergeStyles(DESC_SIZE[size], descColor)}>{description}</p>
       </div>
-    )
+    );
   },
-)
+);
 
-FeatureCard.displayName = "FeatureCard"
+FeatureCard.displayName = "FeatureCard";
 
-export { FeatureCard }
+export { FeatureCard };

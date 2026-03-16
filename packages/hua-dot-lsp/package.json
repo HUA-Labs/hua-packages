@@ -27,6 +27,14 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/hua-packages.git",
+    "directory": "packages/hua-dot-lsp"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/hua-packages/issues"
+  },
   "publishConfig": {
     "access": "public"
   }

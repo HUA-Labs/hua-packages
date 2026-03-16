@@ -347,20 +347,24 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.5rem",
+            ...resolveDot("gap-2"),
             position: "absolute",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 20,
-            ...(isTop ? { top: "1rem" } : { bottom: "1rem" }),
+            ...(isTop
+              ? { ...resolveDot("top-4") }
+              : { ...resolveDot("bottom-4") }),
           }
         : {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.5rem",
-            marginTop: "1rem",
-            ...(isTop ? { order: -1, marginBottom: "1rem", marginTop: 0 } : {}),
+            ...resolveDot("gap-2"),
+            ...resolveDot("mt-4"),
+            ...(isTop
+              ? { order: -1, ...resolveDot("mb-4"), marginTop: 0 }
+              : {}),
           };
 
       // Handle indicator click - go to the correct index accounting for loop mode
@@ -406,8 +410,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
                     style={{
-                      width: "2rem",
-                      height: "2rem",
+                      ...resolveDot("w-8 h-8"),
                       borderRadius: "9999px",
                       fontSize: "0.875rem",
                       fontWeight: 500,
@@ -462,9 +465,9 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 
       const isPlaying = !isManuallyPaused;
       const positionMap: Record<string, React.CSSProperties> = {
-        left: { left: "1rem" },
+        left: { ...resolveDot("left-4") },
         center: { left: "50%", transform: "translateX(-50%)" },
-        right: { right: "1rem" },
+        right: { ...resolveDot("right-4") },
       };
 
       return (
@@ -472,10 +475,9 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           onClick={togglePlayPause}
           style={{
             position: "absolute",
-            bottom: "1rem",
+            ...resolveDot("bottom-4"),
             zIndex: 20,
-            width: "2rem",
-            height: "2rem",
+            ...resolveDot("w-8 h-8"),
             borderRadius: "9999px",
             display: "flex",
             alignItems: "center",
@@ -490,9 +492,9 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
           aria-label={isPlaying ? "일시정지" : "재생"}
         >
           {isPlaying ? (
-            <PauseIcon style={{ width: "1rem", height: "1rem" }} />
+            <PauseIcon style={{ ...resolveDot("w-4 h-4") }} />
           ) : (
-            <PlayIcon style={{ width: "1rem", height: "1rem" }} />
+            <PlayIcon style={{ ...resolveDot("w-4 h-4") }} />
           )}
         </button>
       );
@@ -510,8 +512,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
         top: "50%",
         transform: "translateY(-50%)",
         zIndex: 20,
-        width: "2.5rem",
-        height: "2.5rem",
+        ...resolveDot("w-10 h-10"),
         borderRadius: "9999px",
         display: "flex",
         alignItems: "center",
@@ -539,7 +540,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             }}
             aria-label="이전 슬라이드"
           >
-            <ChevronLeft style={{ width: "1.25rem", height: "1.25rem" }} />
+            <ChevronLeft style={{ ...resolveDot("w-5 h-5") }} />
           </button>
           <button
             onClick={nextSlide}
@@ -552,7 +553,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
             }}
             aria-label="다음 슬라이드"
           >
-            <ChevronRight style={{ width: "1.25rem", height: "1.25rem" }} />
+            <ChevronRight style={{ ...resolveDot("w-5 h-5") }} />
           </button>
         </>
       );

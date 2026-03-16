@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React, { useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ─── Shared design tokens ─────────────────────────────────────────────────────
 
@@ -11,11 +11,11 @@ const BASE_PANEL: React.CSSProperties = {
   backgroundColor: "var(--color-popover, var(--background))",
   color: "var(--color-popover-foreground, var(--foreground))",
   border: "1px solid var(--color-border)",
-  borderRadius: "0.5rem",
-  boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-  padding: "1rem",
+  ...resolveDot("rounded-lg p-4"),
+  boxShadow:
+    "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
   minWidth: "200px",
-}
+};
 
 // ─── Position helpers ─────────────────────────────────────────────────────────
 
@@ -25,13 +25,13 @@ function getPanelPositionStyle(
 ): React.CSSProperties {
   switch (position) {
     case "top":
-      return { bottom: "100%", marginBottom: offset }
+      return { bottom: "100%", marginBottom: offset };
     case "bottom":
-      return { top: "100%", marginTop: offset }
+      return { top: "100%", marginTop: offset };
     case "left":
-      return { right: "100%", marginRight: offset }
+      return { right: "100%", marginRight: offset };
     case "right":
-      return { left: "100%", marginLeft: offset }
+      return { left: "100%", marginLeft: offset };
   }
 }
 
@@ -39,18 +39,18 @@ function getPanelAlignStyle(
   position: "top" | "bottom" | "left" | "right",
   align: "start" | "center" | "end",
 ): React.CSSProperties {
-  const isVertical = position === "top" || position === "bottom"
+  const isVertical = position === "top" || position === "bottom";
 
   if (align === "start") {
-    return isVertical ? { left: 0 } : { top: 0 }
+    return isVertical ? { left: 0 } : { top: 0 };
   }
   if (align === "end") {
-    return isVertical ? { right: 0 } : { bottom: 0 }
+    return isVertical ? { right: 0 } : { bottom: 0 };
   }
   // center
   return isVertical
     ? { left: "50%", transform: "translateX(-50%)" }
-    : { top: "50%", transform: "translateY(-50%)" }
+    : { top: "50%", transform: "translateY(-50%)" };
 }
 
 /** CSS border-trick arrow pointing toward the trigger */
@@ -62,9 +62,9 @@ function getArrowStyle(
     width: 0,
     height: 0,
     border: "5px solid transparent",
-  }
+  };
 
-  const color = "var(--color-border)"
+  const color = "var(--color-border)";
 
   switch (position) {
     case "top":
@@ -76,7 +76,7 @@ function getArrowStyle(
         transform: "translateX(-50%)",
         borderTopColor: color,
         borderBottom: "none",
-      }
+      };
     case "bottom":
       // Arrow points up (above the panel, toward trigger)
       return {
@@ -86,7 +86,7 @@ function getArrowStyle(
         transform: "translateX(-50%)",
         borderBottomColor: color,
         borderTop: "none",
-      }
+      };
     case "left":
       // Arrow points right (toward trigger on the right)
       return {
@@ -96,7 +96,7 @@ function getArrowStyle(
         transform: "translateY(-50%)",
         borderLeftColor: color,
         borderRight: "none",
-      }
+      };
     case "right":
       // Arrow points left (toward trigger on the left)
       return {
@@ -106,7 +106,7 @@ function getArrowStyle(
         transform: "translateY(-50%)",
         borderRightColor: color,
         borderLeft: "none",
-      }
+      };
   }
 }
 
@@ -129,23 +129,26 @@ function getArrowStyle(
  * @property {string} [dot] - dot utility string for wrapper / 래퍼 dot 유틸리티
  * @property {React.CSSProperties} [style] - inline style for wrapper / 래퍼 인라인 스타일
  */
-export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
-  children: React.ReactNode
-  trigger: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  position?: "top" | "bottom" | "left" | "right"
-  align?: "start" | "center" | "end"
-  offset?: number
-  disabled?: boolean
+export interface PopoverProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  trigger: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  position?: "top" | "bottom" | "left" | "right";
+  align?: "start" | "center" | "end";
+  offset?: number;
+  disabled?: boolean;
   /** dot utility string for popover content panel */
-  contentDot?: string
+  contentDot?: string;
   /** inline style overrides for popover content panel */
-  contentStyle?: React.CSSProperties
+  contentStyle?: React.CSSProperties;
   /** Render trigger as full-width (DatePicker etc.) */
-  fullWidth?: boolean
-  dot?: string
-  style?: React.CSSProperties
+  fullWidth?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -183,39 +186,45 @@ export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
  * @returns {JSX.Element} Popover 컴포넌트 / Popover component
  */
 const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
-  ({
-    dot: dotProp,
-    style,
-    children,
-    trigger,
-    open: controlledOpen,
-    onOpenChange,
-    position = "bottom",
-    align = "center",
-    offset = 8,
-    disabled = false,
-    contentDot,
-    contentStyle,
-    fullWidth = false,
-    ...props
-  }, ref) => {
-    const [internalOpen, setInternalOpen] = React.useState(false)
-    const triggerRef = React.useRef<HTMLDivElement>(null)
-    const popoverRef = React.useRef<HTMLDivElement>(null)
-    const isControlled = controlledOpen !== undefined
-    const isOpen = isControlled ? controlledOpen : internalOpen
+  (
+    {
+      dot: dotProp,
+      style,
+      children,
+      trigger,
+      open: controlledOpen,
+      onOpenChange,
+      position = "bottom",
+      align = "center",
+      offset = 8,
+      disabled = false,
+      contentDot,
+      contentStyle,
+      fullWidth = false,
+      ...props
+    },
+    ref,
+  ) => {
+    const [internalOpen, setInternalOpen] = React.useState(false);
+    const triggerRef = React.useRef<HTMLDivElement>(null);
+    const popoverRef = React.useRef<HTMLDivElement>(null);
+    const isControlled = controlledOpen !== undefined;
+    const isOpen = isControlled ? controlledOpen : internalOpen;
 
-    const handleOpenChange = React.useCallback((newOpen: boolean) => {
-      if (disabled) return
-      if (!isControlled) {
-        setInternalOpen(newOpen)
-      }
-      onOpenChange?.(newOpen)
-    }, [disabled, isControlled, onOpenChange])
+    const handleOpenChange = React.useCallback(
+      (newOpen: boolean) => {
+        if (disabled) return;
+        if (!isControlled) {
+          setInternalOpen(newOpen);
+        }
+        onOpenChange?.(newOpen);
+      },
+      [disabled, isControlled, onOpenChange],
+    );
 
     const handleTriggerClick = () => {
-      handleOpenChange(!isOpen)
-    }
+      handleOpenChange(!isOpen);
+    };
 
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -225,26 +234,22 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
           !triggerRef.current.contains(event.target as Node) &&
           !popoverRef.current.contains(event.target as Node)
         ) {
-          handleOpenChange(false)
+          handleOpenChange(false);
         }
-      }
+      };
 
       if (isOpen) {
-        document.addEventListener("mousedown", handleClickOutside)
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-          document.removeEventListener("mousedown", handleClickOutside)
-        }
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
       }
-    }, [isOpen, handleOpenChange])
+    }, [isOpen, handleOpenChange]);
 
     const wrapperStyle = useMemo(
-      () => mergeStyles(
-        { position: "relative" },
-        resolveDot(dotProp),
-        style,
-      ),
+      () => mergeStyles({ position: "relative" }, resolveDot(dotProp), style),
       [dotProp, style],
-    )
+    );
 
     const triggerWrapperStyle: React.CSSProperties = useMemo(
       () => ({
@@ -253,20 +258,21 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
         cursor: "pointer",
       }),
       [fullWidth],
-    )
+    );
 
     const panelStyle = useMemo(
-      () => mergeStyles(
-        BASE_PANEL,
-        getPanelPositionStyle(position, offset),
-        getPanelAlignStyle(position, align),
-        resolveDot(contentDot),
-        contentStyle,
-      ),
+      () =>
+        mergeStyles(
+          BASE_PANEL,
+          getPanelPositionStyle(position, offset),
+          getPanelAlignStyle(position, align),
+          resolveDot(contentDot),
+          contentStyle,
+        ),
       [position, offset, align, contentDot, contentStyle],
-    )
+    );
 
-    const arrowStyle = useMemo(() => getArrowStyle(position), [position])
+    const arrowStyle = useMemo(() => getArrowStyle(position), [position]);
 
     return (
       <div ref={ref} style={wrapperStyle} {...props}>
@@ -294,65 +300,68 @@ const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(
             <div aria-hidden="true" style={arrowStyle} />
 
             {/* 내용 */}
-            <div style={{ position: "relative", zIndex: 10 }}>
-              {children}
-            </div>
+            <div style={{ position: "relative", zIndex: 10 }}>{children}</div>
           </div>
         )}
       </div>
-    )
+    );
   },
-)
-Popover.displayName = "Popover"
+);
+Popover.displayName = "Popover";
 
 // ─── Convenience sub-components ───────────────────────────────────────────────
 
-export interface PopoverTriggerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
-  dot?: string
-  style?: React.CSSProperties
+export interface PopoverTriggerProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-export const PopoverTrigger = React.forwardRef<HTMLDivElement, PopoverTriggerProps>(
-  ({ dot: dotProp, style, children, ...props }, ref) => {
-    const computedStyle = useMemo(
-      () => mergeStyles(
+export const PopoverTrigger = React.forwardRef<
+  HTMLDivElement,
+  PopoverTriggerProps
+>(({ dot: dotProp, style, children, ...props }, ref) => {
+  const computedStyle = useMemo(
+    () =>
+      mergeStyles(
         { display: "inline-block", cursor: "pointer" },
         resolveDot(dotProp),
         style,
       ),
-      [dotProp, style],
-    )
-    return (
-      <div ref={ref} style={computedStyle} {...props}>
-        {children}
-      </div>
-    )
-  },
-)
-PopoverTrigger.displayName = "PopoverTrigger"
+    [dotProp, style],
+  );
+  return (
+    <div ref={ref} style={computedStyle} {...props}>
+      {children}
+    </div>
+  );
+});
+PopoverTrigger.displayName = "PopoverTrigger";
 
-export interface PopoverContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
-  dot?: string
-  style?: React.CSSProperties
+export interface PopoverContentProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  ({ dot: dotProp, style, children, ...props }, ref) => {
-    const computedStyle = useMemo(
-      () => mergeStyles(
-        BASE_PANEL,
-        resolveDot(dotProp),
-        style,
-      ),
-      [dotProp, style],
-    )
-    return (
-      <div ref={ref} style={computedStyle} {...props}>
-        {children}
-      </div>
-    )
-  },
-)
-PopoverContent.displayName = "PopoverContent"
+export const PopoverContent = React.forwardRef<
+  HTMLDivElement,
+  PopoverContentProps
+>(({ dot: dotProp, style, children, ...props }, ref) => {
+  const computedStyle = useMemo(
+    () => mergeStyles(BASE_PANEL, resolveDot(dotProp), style),
+    [dotProp, style],
+  );
+  return (
+    <div ref={ref} style={computedStyle} {...props}>
+      {children}
+    </div>
+  );
+});
+PopoverContent.displayName = "PopoverContent";
 
-export { Popover }
+export { Popover };

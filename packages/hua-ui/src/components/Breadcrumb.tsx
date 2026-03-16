@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Icon } from "./Icon"
-import type { IconName } from "../lib/icons"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { Icon } from "./Icon";
+import type { IconName } from "../lib/icons";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * Breadcrumb 항목 타입 / Breadcrumb item type
  */
 export interface BreadcrumbItemData {
-  label: string
-  href?: string
-  icon?: IconName
+  label: string;
+  href?: string;
+  icon?: IconName;
 }
 
 /**
@@ -26,18 +26,21 @@ export interface BreadcrumbItemData {
  * @property {'default' | 'subtle' | 'transparent' | 'glass'} [variant='default'] - Breadcrumb 스타일 변형 / Breadcrumb style variant
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface BreadcrumbProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  children?: React.ReactNode
-  items?: BreadcrumbItemData[]
-  maxItems?: number
-  showHomeIcon?: boolean
-  homeLabel?: string
-  separator?: React.ReactNode
-  variant?: 'default' | 'subtle' | 'transparent' | 'glass'
+export interface BreadcrumbProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  children?: React.ReactNode;
+  items?: BreadcrumbItemData[];
+  maxItems?: number;
+  showHomeIcon?: boolean;
+  homeLabel?: string;
+  separator?: React.ReactNode;
+  variant?: "default" | "subtle" | "transparent" | "glass";
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
+  dot?: string;
   /** 추가 인라인 스타일 / Additional inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
 }
 
 /**
@@ -49,11 +52,11 @@ export interface BreadcrumbProps extends Omit<React.HTMLAttributes<HTMLDivElemen
  * @property {string} [className] - 추가 CSS 클래스 / Additional CSS class
  */
 export interface BreadcrumbItemProps {
-  href?: string
-  isCurrent?: boolean
-  children: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+  href?: string;
+  isCurrent?: boolean;
+  children: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -86,67 +89,95 @@ export interface BreadcrumbItemProps {
  * @returns {JSX.Element} Breadcrumb 컴포넌트 / Breadcrumb component
  */
 const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
-  ({
-    children,
-    items,
-    maxItems,
-    showHomeIcon,
-    homeLabel = "Home",
-    separator = <Icon name="chevronRight" dot="w-3 h-3 text-muted-foreground flex-shrink-0" />,
-    variant = 'default',
-    dot: dotProp,
-    style,
-    ...props
-  }, ref) => {
+  (
+    {
+      children,
+      items,
+      maxItems,
+      showHomeIcon,
+      homeLabel = "Home",
+      separator = (
+        <Icon
+          name="chevronRight"
+          dot="w-3 h-3 text-muted-foreground flex-shrink-0"
+        />
+      ),
+      variant = "default",
+      dot: dotProp,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     const variantStyles: Record<string, React.CSSProperties> = {
-      default: { display: 'inline-flex', alignItems: 'center', fontSize: '0.875rem', width: 'fit-content' },
+      default: {
+        display: "inline-flex",
+        alignItems: "center",
+        fontSize: "0.875rem",
+        width: "fit-content",
+      },
       subtle: {
-        display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem',
-        backgroundColor: 'color-mix(in srgb, var(--color-background) 40%, transparent)', backdropFilter: 'blur(12px)',
-        borderRadius: '0.375rem', padding: '0.5rem 0.75rem',
-        border: '1px solid color-mix(in srgb, var(--color-border) 30%, transparent)', width: 'fit-content',
-        boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+        display: "inline-flex",
+        alignItems: "center",
+        fontSize: "0.75rem",
+        backgroundColor:
+          "color-mix(in srgb, var(--color-background) 40%, transparent)",
+        backdropFilter: "blur(12px)",
+        ...resolveDot("rounded-md py-2 px-3"),
+        border:
+          "1px solid color-mix(in srgb, var(--color-border) 30%, transparent)",
+        width: "fit-content",
+        boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
       },
-      transparent: { display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem', width: 'fit-content' },
+      transparent: {
+        display: "inline-flex",
+        alignItems: "center",
+        fontSize: "0.75rem",
+        width: "fit-content",
+      },
       glass: {
-        display: 'inline-flex', alignItems: 'center', fontSize: '0.75rem',
-        backgroundColor: 'color-mix(in srgb, var(--color-background) 30%, transparent)', backdropFilter: 'blur(16px)',
-        borderRadius: '0.5rem', padding: '0.5rem 1rem',
-        border: '1px solid color-mix(in srgb, var(--color-border) 25%, transparent)', width: 'fit-content',
-        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+        display: "inline-flex",
+        alignItems: "center",
+        fontSize: "0.75rem",
+        backgroundColor:
+          "color-mix(in srgb, var(--color-background) 30%, transparent)",
+        backdropFilter: "blur(16px)",
+        ...resolveDot("rounded-lg py-2 px-4"),
+        border:
+          "1px solid color-mix(in srgb, var(--color-border) 25%, transparent)",
+        width: "fit-content",
+        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
       },
-    }
+    };
 
     // items prop이 있으면 BreadcrumbItem으로 변환
     const renderItems = () => {
       if (items) {
-        let displayItems = [...items]
+        let displayItems = [...items];
 
         // maxItems 처리
         if (maxItems && displayItems.length > maxItems) {
-          const firstItem = displayItems[0]
-          const lastItems = displayItems.slice(-(maxItems - 1))
-          displayItems = [firstItem, { label: '...', href: undefined }, ...lastItems]
+          const firstItem = displayItems[0];
+          const lastItems = displayItems.slice(-(maxItems - 1));
+          displayItems = [
+            firstItem,
+            { label: "...", href: undefined },
+            ...lastItems,
+          ];
         }
 
         // 마지막 항목은 isCurrent로 표시
         return displayItems.map((item, index) => {
-          const isLast = index === displayItems.length - 1
-          const isCurrent = isLast && !item.href
+          const isLast = index === displayItems.length - 1;
+          const isCurrent = isLast && !item.href;
 
           return (
-            <BreadcrumbItem
-              key={index}
-              href={item.href}
-              isCurrent={isCurrent}
-            >
-              {item.icon && (
-                <Icon name={item.icon} dot="w-4 h-4 mr-1" />
-              )}
+            <BreadcrumbItem key={index} href={item.href} isCurrent={isCurrent}>
+              {item.icon && <Icon name={item.icon} dot="w-4 h-4 mr-1" />}
               {item.label}
             </BreadcrumbItem>
-          )
-        })
+          );
+        });
       }
 
       // children이 있으면 그대로 사용
@@ -154,25 +185,38 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
         return React.Children.map(children, (child, index) => {
           if (React.isValidElement(child)) {
             return (
-              <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
+              <li key={index} style={{ display: "flex", alignItems: "center" }}>
                 {child}
                 {index < React.Children.count(children) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
+                  <span
+                    style={{
+                      ...resolveDot("mx-3"),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "var(--color-muted-foreground)",
+                    }}
+                    aria-hidden="true"
+                  >
                     {separator}
                   </span>
                 )}
               </li>
-            )
+            );
           }
-          return child
-        })
+          return child;
+        });
       }
 
-      return null
-    }
+      return null;
+    };
 
-    const renderedItems = renderItems()
-    const itemsCount = items ? items.length : (children ? React.Children.count(children) : 0)
+    const renderedItems = renderItems();
+    const itemsCount = items
+      ? items.length
+      : children
+        ? React.Children.count(children)
+        : 0;
 
     return (
       <nav
@@ -181,40 +225,59 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
         style={mergeStyles(variantStyles[variant], resolveDot(dotProp), style)}
         {...props}
       >
-        <ol style={{ display: 'inline-flex', alignItems: 'center' }}>
+        <ol style={{ display: "inline-flex", alignItems: "center" }}>
           {showHomeIcon && (
-            <li style={{ display: 'flex', alignItems: 'center' }}>
+            <li style={{ display: "flex", alignItems: "center" }}>
               <BreadcrumbItem href="/">
                 <Icon name="home" dot="w-4 h-4 mr-1" />
                 {homeLabel}
               </BreadcrumbItem>
               {itemsCount > 0 && (
-                <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
+                <span
+                  style={{
+                    margin: "0 0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--color-muted-foreground)",
+                  }}
+                  aria-hidden="true"
+                >
                   {separator}
                 </span>
               )}
             </li>
           )}
-          {items ? (
-            renderedItems?.map((item, index) => (
-              <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                {item}
-                {index < (renderedItems?.length || 0) - 1 && (
-                  <span style={{ margin: '0 0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted-foreground)' }} aria-hidden="true">
-                    {separator}
-                  </span>
-                )}
-              </li>
-            ))
-          ) : (
-            renderedItems
-          )}
+          {items
+            ? renderedItems?.map((item, index) => (
+                <li
+                  key={index}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  {item}
+                  {index < (renderedItems?.length || 0) - 1 && (
+                    <span
+                      style={{
+                        ...resolveDot("mx-3"),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--color-muted-foreground)",
+                      }}
+                      aria-hidden="true"
+                    >
+                      {separator}
+                    </span>
+                  )}
+                </li>
+              ))
+            : renderedItems}
         </ol>
       </nav>
-    )
-  }
-)
-Breadcrumb.displayName = "Breadcrumb"
+    );
+  },
+);
+Breadcrumb.displayName = "Breadcrumb";
 
 /**
  * BreadcrumbItem 컴포넌트
@@ -226,20 +289,30 @@ Breadcrumb.displayName = "Breadcrumb"
  * @returns {JSX.Element} BreadcrumbItem 컴포넌트
  */
 const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
-  ({ dot: dotProp, style, href, isCurrent = false, children, ...props }, ref) => {
-    const baseStyle: React.CSSProperties = { color: 'var(--color-muted-foreground)' }
+  (
+    { dot: dotProp, style, href, isCurrent = false, children, ...props },
+    ref,
+  ) => {
+    const baseStyle: React.CSSProperties = {
+      color: "var(--color-muted-foreground)",
+    };
 
     if (isCurrent) {
       return (
         <span
           ref={ref}
           aria-current="page"
-          style={mergeStyles(baseStyle, { fontWeight: 500 }, resolveDot(dotProp), style)}
+          style={mergeStyles(
+            baseStyle,
+            { fontWeight: 500 },
+            resolveDot(dotProp),
+            style,
+          )}
           {...props}
         >
           {children}
         </span>
-      )
+      );
     }
 
     if (href) {
@@ -251,7 +324,7 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
         >
           {children}
         </a>
-      )
+      );
     }
 
     return (
@@ -262,9 +335,9 @@ const BreadcrumbItem = React.forwardRef<HTMLLIElement, BreadcrumbItemProps>(
       >
         {children}
       </span>
-    )
-  }
-)
-BreadcrumbItem.displayName = "BreadcrumbItem"
+    );
+  },
+);
+BreadcrumbItem.displayName = "BreadcrumbItem";
 
-export { Breadcrumb, BreadcrumbItem }
+export { Breadcrumb, BreadcrumbItem };

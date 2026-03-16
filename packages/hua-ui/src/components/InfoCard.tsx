@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import React, { useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import { Icon } from "./Icon"
-import type { IconName } from "../lib/icons"
+import React, { useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { Icon } from "./Icon";
+import type { IconName } from "../lib/icons";
 
 /**
  * InfoCard tone CSS variables — injected once into <head>.
  * Light values are on :root, dark values on .dark (next-themes convention).
  */
-const INFO_CARD_STYLE_ID = "hua-info-card-vars"
+const INFO_CARD_STYLE_ID = "hua-info-card-vars";
 
 function ensureInfoCardVars() {
-  if (typeof document === "undefined") return
-  if (document.getElementById(INFO_CARD_STYLE_ID)) return
-  const style = document.createElement("style")
-  style.id = INFO_CARD_STYLE_ID
+  if (typeof document === "undefined") return;
+  if (document.getElementById(INFO_CARD_STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = INFO_CARD_STYLE_ID;
   style.textContent = `
 :root {
   --ic-blue-bg: linear-gradient(to right, #eef2ff, #eef2ff);
@@ -53,18 +53,41 @@ function ensureInfoCardVars() {
   --ic-orange-icon: #fdba74;
   --ic-orange-title: #ffedd5;
 }
-`
-  document.head.appendChild(style)
+`;
+  document.head.appendChild(style);
 }
 
-type Tone = "blue" | "purple" | "green" | "orange"
+type Tone = "blue" | "purple" | "green" | "orange";
 
-const TONE_VARS: Record<Tone, { bg: string; border: string; icon: string; title: string }> = {
-  blue:   { bg: "var(--ic-blue-bg)",   border: "var(--ic-blue-border)",   icon: "var(--ic-blue-icon)",   title: "var(--ic-blue-title)"   },
-  purple: { bg: "var(--ic-purple-bg)", border: "var(--ic-purple-border)", icon: "var(--ic-purple-icon)", title: "var(--ic-purple-title)" },
-  green:  { bg: "var(--ic-green-bg)",  border: "var(--ic-green-border)",  icon: "var(--ic-green-icon)",  title: "var(--ic-green-title)"  },
-  orange: { bg: "var(--ic-orange-bg)", border: "var(--ic-orange-border)", icon: "var(--ic-orange-icon)", title: "var(--ic-orange-title)" },
-}
+const TONE_VARS: Record<
+  Tone,
+  { bg: string; border: string; icon: string; title: string }
+> = {
+  blue: {
+    bg: "var(--ic-blue-bg)",
+    border: "var(--ic-blue-border)",
+    icon: "var(--ic-blue-icon)",
+    title: "var(--ic-blue-title)",
+  },
+  purple: {
+    bg: "var(--ic-purple-bg)",
+    border: "var(--ic-purple-border)",
+    icon: "var(--ic-purple-icon)",
+    title: "var(--ic-purple-title)",
+  },
+  green: {
+    bg: "var(--ic-green-bg)",
+    border: "var(--ic-green-border)",
+    icon: "var(--ic-green-icon)",
+    title: "var(--ic-green-title)",
+  },
+  orange: {
+    bg: "var(--ic-orange-bg)",
+    border: "var(--ic-orange-border)",
+    icon: "var(--ic-orange-icon)",
+    title: "var(--ic-orange-title)",
+  },
+};
 
 /**
  * InfoCard 컴포넌트의 props / InfoCard component props
@@ -75,12 +98,15 @@ const TONE_VARS: Record<Tone, { bg: string; border: string; icon: string; title:
  * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface InfoCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
-  title: string
-  icon: IconName
-  tone?: "blue" | "purple" | "green" | "orange"
-  dot?: string
-  style?: React.CSSProperties
+export interface InfoCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  title: string;
+  icon: IconName;
+  tone?: "blue" | "purple" | "green" | "orange";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -114,61 +140,68 @@ export interface InfoCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>
  * @returns {JSX.Element} InfoCard 컴포넌트 / InfoCard component
  */
 export const InfoCard = React.forwardRef<HTMLDivElement, InfoCardProps>(
-  ({ dot: dotProp, style, title, icon, tone = "blue", children, ...props }, ref) => {
-    const vars = TONE_VARS[tone]
+  (
+    { dot: dotProp, style, title, icon, tone = "blue", children, ...props },
+    ref,
+  ) => {
+    const vars = TONE_VARS[tone];
 
     // Inject CSS variable definitions on first render (client-side only)
     React.useEffect(() => {
-      ensureInfoCardVars()
-    }, [])
+      ensureInfoCardVars();
+    }, []);
 
     const containerStyle = useMemo<React.CSSProperties>(
       () =>
         mergeStyles(
           {
             background: vars.bg,
-            borderRadius: "0.5rem",
-            padding: "1rem",
             border: `1px solid ${vars.border}`,
+            ...resolveDot("rounded-lg p-4"),
           },
           resolveDot(dotProp),
           style,
         ),
       [vars, dotProp, style],
-    )
+    );
 
     const iconStyle = useMemo<React.CSSProperties>(
       () => ({
         height: "1.25rem",
         width: "1.25rem",
         color: vars.icon,
-        marginRight: "0.75rem",
-        marginTop: "0.125rem",
         flexShrink: 0,
+        ...resolveDot("mr-3 mt-0.5"),
       }),
       [vars.icon],
-    )
+    );
 
     const titleStyle = useMemo<React.CSSProperties>(
       () => ({
         fontSize: "0.875rem",
         fontWeight: 500,
         color: vars.title,
-        marginBottom: "0.5rem",
         display: "block",
+        ...resolveDot("mb-2"),
       }),
       [vars.title],
-    )
+    );
 
     const bodyStyle: React.CSSProperties = {
       color: "var(--color-foreground, inherit)",
       fontSize: "0.875rem",
       lineHeight: "1.625",
-    }
+    };
 
     return (
       <div ref={ref} style={containerStyle} {...props}>
-        <div style={{ display: "flex", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            ...resolveDot("mb-2"),
+          }}
+        >
           <span style={iconStyle}>
             <Icon name={icon} dot="h-full w-full" />
           </span>
@@ -178,10 +211,10 @@ export const InfoCard = React.forwardRef<HTMLDivElement, InfoCardProps>(
           </div>
         </div>
       </div>
-    )
+    );
   },
-)
+);
 
-InfoCard.displayName = "InfoCard"
+InfoCard.displayName = "InfoCard";
 
-export default InfoCard
+export default InfoCard;

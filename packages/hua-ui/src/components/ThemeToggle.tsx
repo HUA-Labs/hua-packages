@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import { Icon } from "./Icon"
-import { useTheme } from "./ThemeProvider"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { Icon } from "./Icon";
+import { useTheme } from "./ThemeProvider";
 
 // ---- size tokens --------------------------------------------------------
 
@@ -11,13 +11,13 @@ const SIZE_STYLES: Record<"sm" | "md" | "lg", React.CSSProperties> = {
   sm: { height: 40, width: 40 },
   md: { height: 48, width: 48 },
   lg: { height: 56, width: 56 },
-}
+};
 
 const ICON_SIZES: Record<"sm" | "md" | "lg", number> = {
   sm: 16,
   md: 20,
   lg: 24,
-}
+};
 
 // ---- shared base styles -------------------------------------------------
 
@@ -25,50 +25,53 @@ const BASE_BUTTON: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: "0.5rem",
   border: "none",
   background: "transparent",
   cursor: "pointer",
   outline: "none",
-}
+  ...resolveDot("rounded-lg"),
+};
 
 const HOVER_BG: React.CSSProperties = {
   backgroundColor: "var(--color-muted)",
-}
+};
 
 const FOCUS_RING: React.CSSProperties = {
   outline: "none",
   boxShadow: "0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)",
-}
+};
 
 const SWITCH_BG_LIGHT: React.CSSProperties = {
   backgroundColor: "var(--color-muted)",
-}
+};
 
 const SWITCH_BG_DARK: React.CSSProperties = {
   backgroundColor: "var(--color-primary)",
-}
+};
 
 /**
  * ThemeToggle component props
  */
-export interface ThemeToggleProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+export interface ThemeToggleProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "className"
+> {
   /** dot style utility string for the root element */
-  dot?: string
+  dot?: string;
   /** Additional inline style for the root element */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
   /** Toggle size */
-  size?: "sm" | "md" | "lg"
+  size?: "sm" | "md" | "lg";
   /** Toggle style variant */
-  variant?: "button" | "icon" | "switch"
+  variant?: "button" | "icon" | "switch";
   /** Whether to show a text label */
-  showLabel?: boolean
+  showLabel?: boolean;
   /** Custom label text */
   label?: {
-    light?: string
-    dark?: string
-    system?: string
-  }
+    light?: string;
+    dark?: string;
+    system?: string;
+  };
 }
 
 /**
@@ -109,11 +112,11 @@ export function ThemeToggle({
   },
   ...props
 }: ThemeToggleProps) {
-  const { theme, setTheme, resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
-  const [isHovered, setIsHovered] = useState(false)
-  const [isFocused, setIsFocused] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   // Compute all variant styles unconditionally (rules of hooks)
   const iconButtonStyle = useMemo(
@@ -127,7 +130,7 @@ export function ThemeToggle({
         style,
       ),
     [size, isHovered, isFocused, dotProp, style],
-  )
+  );
 
   const switchTrackStyle = useMemo(
     () =>
@@ -150,22 +153,18 @@ export function ThemeToggle({
         style,
       ),
     [isDark, isFocused, dotProp, style],
-  )
+  );
 
   const buttonStyle = useMemo(
     () =>
       mergeStyles(
         BASE_BUTTON,
         {
-          gap: 12,
-          paddingLeft: 16,
-          paddingRight: 16,
-          paddingTop: 12,
-          paddingBottom: 12,
           fontSize: "0.875rem",
           fontWeight: 500,
           justifyContent: "flex-start",
           transition: "background-color 300ms ease",
+          ...resolveDot("gap-3 pl-4 pr-4 pt-3 pb-3"),
         },
         isHovered ? HOVER_BG : undefined,
         isFocused ? FOCUS_RING : undefined,
@@ -173,25 +172,25 @@ export function ThemeToggle({
         style,
       ),
     [isHovered, isFocused, dotProp, style],
-  )
+  );
 
   const interactionHandlers = {
     onMouseEnter: () => setIsHovered(true),
     onMouseLeave: () => setIsHovered(false),
     onFocus: () => setIsFocused(true),
     onBlur: () => setIsFocused(false),
-  }
+  };
 
   const handleClick = () => {
     if (theme === "system") {
-      setTheme("light")
+      setTheme("light");
     } else if (theme === "light") {
-      setTheme("dark")
+      setTheme("dark");
     } else {
       // dark → light
-      setTheme("light")
+      setTheme("light");
     }
-  }
+  };
 
   // ---- icon variant -------------------------------------------------------
 
@@ -205,7 +204,7 @@ export function ThemeToggle({
       transition: "transform 300ms ease, opacity 300ms ease",
       transform: isDark ? "rotate(0deg)" : "rotate(90deg)",
       opacity: isDark ? 1 : 0,
-    }
+    };
 
     const sunStyle: React.CSSProperties = {
       position: "absolute",
@@ -216,7 +215,7 @@ export function ThemeToggle({
       transition: "transform 300ms ease, opacity 300ms ease",
       transform: isDark ? "rotate(90deg)" : "rotate(0deg)",
       opacity: isDark ? 0 : 1,
-    }
+    };
 
     return (
       <button
@@ -236,14 +235,22 @@ export function ThemeToggle({
           }}
         >
           <div style={moonStyle}>
-            <Icon name="moon" size={ICON_SIZES[size]} dot="text-[rgb(99,102,241)]" />
+            <Icon
+              name="moon"
+              size={ICON_SIZES[size]}
+              dot="text-[rgb(99,102,241)]"
+            />
           </div>
           <div style={sunStyle}>
-            <Icon name="sun" size={ICON_SIZES[size]} dot={isDark ? "text-[rgb(234,179,8)]" : "text-[rgb(217,119,6)]"} />
+            <Icon
+              name="sun"
+              size={ICON_SIZES[size]}
+              dot={isDark ? "text-[rgb(234,179,8)]" : "text-[rgb(217,119,6)]"}
+            />
           </div>
         </div>
       </button>
-    )
+    );
   }
 
   // ---- switch variant -----------------------------------------------------
@@ -255,10 +262,11 @@ export function ThemeToggle({
       width: 16,
       borderRadius: "50%",
       backgroundColor: "white",
-      boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+      boxShadow:
+        "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
       transition: "transform 300ms ease",
       transform: isDark ? "translateX(24px)" : "translateX(4px)",
-    }
+    };
 
     return (
       <button
@@ -275,29 +283,28 @@ export function ThemeToggle({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingLeft: 6,
-            paddingRight: 6,
+            ...resolveDot("pl-1.5 pr-1.5"),
           }}
         >
           <Icon name="sun" size={12} dot="text-[rgb(217,119,6)] opacity-0" />
           <Icon name="moon" size={12} dot="text-[rgb(99,102,241)] opacity-0" />
         </div>
       </button>
-    )
+    );
   }
 
   // ---- default button variant --------------------------------------------
 
   const renderIcon = () => {
     if (theme === "system") {
-      return <Icon name="monitor" size={ICON_SIZES[size]} />
+      return <Icon name="monitor" size={ICON_SIZES[size]} />;
     }
     return resolvedTheme === "dark" ? (
       <Icon name="moon" size={ICON_SIZES[size]} />
     ) : (
       <Icon name="sun" size={ICON_SIZES[size]} dot="text-[rgb(217,119,6)]" />
-    )
-  }
+    );
+  };
 
   return (
     <button
@@ -317,5 +324,5 @@ export function ThemeToggle({
         </span>
       )}
     </button>
-  )
+  );
 }

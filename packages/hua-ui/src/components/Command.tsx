@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * Command 컴포넌트의 props / Command component props
@@ -15,16 +15,19 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {boolean} [disabled=false] - Command 비활성화 여부 / Disable command
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  children: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  placeholder?: string
-  searchValue?: string
-  onSearchChange?: (value: string) => void
-  disabled?: boolean
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  placeholder?: string;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  disabled?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -68,138 +71,158 @@ export interface CommandProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
  * @returns {JSX.Element} Command 컴포넌트 / Command component
  */
 const Command = React.forwardRef<HTMLDivElement, CommandProps>(
-  ({
-    children,
-    open: controlledOpen,
-    onOpenChange,
-    placeholder = "명령어를 검색하세요...",
-    searchValue: controlledSearchValue,
-    onSearchChange,
-    disabled = false,
-    dot: dotProp,
-    style,
-    ...props
-  }, ref) => {
-    const [internalOpen, setInternalOpen] = React.useState(false)
-    const [internalSearchValue, setInternalSearchValue] = React.useState("")
-    const [selectedIndex, setSelectedIndex] = React.useState(0)
-    const commandRef = React.useRef<HTMLDivElement>(null)
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    const listRef = React.useRef<HTMLDivElement>(null)
+  (
+    {
+      children,
+      open: controlledOpen,
+      onOpenChange,
+      placeholder = "명령어를 검색하세요...",
+      searchValue: controlledSearchValue,
+      onSearchChange,
+      disabled = false,
+      dot: dotProp,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
+    const [internalOpen, setInternalOpen] = React.useState(false);
+    const [internalSearchValue, setInternalSearchValue] = React.useState("");
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
+    const commandRef = React.useRef<HTMLDivElement>(null);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const listRef = React.useRef<HTMLDivElement>(null);
 
-    const isControlled = controlledOpen !== undefined
-    const isOpen = isControlled ? controlledOpen : internalOpen
-    const searchValue = controlledSearchValue !== undefined ? controlledSearchValue : internalSearchValue
+    const isControlled = controlledOpen !== undefined;
+    const isOpen = isControlled ? controlledOpen : internalOpen;
+    const searchValue =
+      controlledSearchValue !== undefined
+        ? controlledSearchValue
+        : internalSearchValue;
 
-    const handleOpenChange = React.useCallback((newOpen: boolean) => {
-      if (disabled) return
+    const handleOpenChange = React.useCallback(
+      (newOpen: boolean) => {
+        if (disabled) return;
 
-      if (!isControlled) {
-        setInternalOpen(newOpen)
-      }
-      onOpenChange?.(newOpen)
-    }, [disabled, isControlled, onOpenChange])
+        if (!isControlled) {
+          setInternalOpen(newOpen);
+        }
+        onOpenChange?.(newOpen);
+      },
+      [disabled, isControlled, onOpenChange],
+    );
 
     const handleSearchChange = (value: string) => {
       if (!isControlled) {
-        setInternalSearchValue(value)
+        setInternalSearchValue(value);
       }
-      onSearchChange?.(value)
-      setSelectedIndex(0)
-    }
+      onSearchChange?.(value);
+      setSelectedIndex(0);
+    };
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
-      if (disabled) return
+      if (disabled) return;
 
-      const items = listRef.current?.querySelectorAll('[data-command-item]')
-      const itemCount = items?.length || 0
+      const items = listRef.current?.querySelectorAll("[data-command-item]");
+      const itemCount = items?.length || 0;
 
       switch (event.key) {
-        case 'ArrowDown':
-          event.preventDefault()
-          setSelectedIndex((prev) => (prev + 1) % itemCount)
-          break
-        case 'ArrowUp':
-          event.preventDefault()
-          setSelectedIndex((prev) => (prev - 1 + itemCount) % itemCount)
-          break
-        case 'Enter': {
-          event.preventDefault()
-          const selectedItem = items?.[selectedIndex] as HTMLElement
-          selectedItem?.click()
-          break
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) => (prev + 1) % itemCount);
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => (prev - 1 + itemCount) % itemCount);
+          break;
+        case "Enter": {
+          event.preventDefault();
+          const selectedItem = items?.[selectedIndex] as HTMLElement;
+          selectedItem?.click();
+          break;
         }
-        case 'Escape':
-          event.preventDefault()
-          handleOpenChange(false)
-          break
+        case "Escape":
+          event.preventDefault();
+          handleOpenChange(false);
+          break;
       }
-    }
+    };
 
     React.useEffect(() => {
       if (isOpen) {
-        inputRef.current?.focus()
-        setSelectedIndex(0)
+        inputRef.current?.focus();
+        setSelectedIndex(0);
       }
-    }, [isOpen])
+    }, [isOpen]);
 
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-          event.preventDefault()
-          handleOpenChange(!isOpen)
+        if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
+          event.preventDefault();
+          handleOpenChange(!isOpen);
         }
         // 전역 ESC 키 처리
-        if (event.key === 'Escape' && isOpen) {
-          event.preventDefault()
-          handleOpenChange(false)
+        if (event.key === "Escape" && isOpen) {
+          event.preventDefault();
+          handleOpenChange(false);
         }
-      }
+      };
 
-      document.addEventListener('keydown', handleKeyDown)
+      document.addEventListener("keydown", handleKeyDown);
       return () => {
-        document.removeEventListener('keydown', handleKeyDown)
-      }
-    }, [isOpen, handleOpenChange])
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [isOpen, handleOpenChange]);
 
     React.useEffect(() => {
-      const selectedItem = listRef.current?.querySelector(`[data-command-item]:nth-child(${selectedIndex + 1})`) as HTMLElement
-      selectedItem?.scrollIntoView({ block: 'nearest' })
-    }, [selectedIndex])
+      const selectedItem = listRef.current?.querySelector(
+        `[data-command-item]:nth-child(${selectedIndex + 1})`,
+      ) as HTMLElement;
+      selectedItem?.scrollIntoView({ block: "nearest" });
+    }, [selectedIndex]);
 
     return (
-      <div ref={ref} style={mergeStyles(resolveDot('relative'), resolveDot(dotProp), style)} {...props}>
+      <div
+        ref={ref}
+        style={mergeStyles(resolveDot("relative"), resolveDot(dotProp), style)}
+        {...props}
+      >
         {isOpen && (
           <div
             ref={commandRef}
             style={{
-              position: 'fixed',
+              position: "fixed",
               inset: 0,
               zIndex: 50,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              paddingTop: '4rem',
+              backgroundColor: "rgba(0,0,0,0.5)",
+              backdropFilter: "blur(4px)",
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "center",
+              ...resolveDot("pt-16"),
             }}
             onClick={() => handleOpenChange(false)}
           >
             <div
               style={{
-                width: '100%',
-                maxWidth: '42rem',
-                margin: '0 1rem',
-                backgroundColor: 'var(--color-popover)',
-                color: 'var(--color-popover-foreground)',
-                borderRadius: '0.5rem',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                border: 'none',
+                width: "100%",
+                maxWidth: "42rem",
+                margin: "0 1rem",
+                backgroundColor: "var(--color-popover)",
+                color: "var(--color-popover-foreground)",
+                borderRadius: "0.5rem",
+                overflow: "hidden",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                border: "none",
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)' }}>
+              <div
+                style={{
+                  ...resolveDot("p-4"),
+                  borderBottom: "1px solid var(--color-border)",
+                }}
+              >
                 <input
                   ref={inputRef}
                   type="text"
@@ -208,55 +231,65 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
                   onChange={(e) => handleSearchChange(e.target.value)}
                   onKeyDown={handleKeyDown}
                   style={{
-                    width: '100%',
-                    backgroundColor: 'transparent',
-                    fontSize: '1.125rem',
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    fontSize: "1.125rem",
                     fontWeight: 500,
-                    outline: 'none',
-                    border: 'none',
-                    color: 'var(--color-foreground)',
+                    outline: "none",
+                    border: "none",
+                    color: "var(--color-foreground)",
                   }}
                 />
               </div>
 
               <div
                 ref={listRef}
-                style={{ maxHeight: '24rem', overflowY: 'auto', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}
+                style={{
+                  maxHeight: "24rem",
+                  overflowY: "auto",
+                  ...resolveDot("py-2"),
+                }}
               >
                 {React.Children.map(children, (child, index) => {
                   if (React.isValidElement<CommandItemProps>(child)) {
                     // Fragment나 다른 컴포넌트에 selected prop 전달 방지
-                    if (child.type === React.Fragment || typeof child.type === 'symbol') {
-                      return child
+                    if (
+                      child.type === React.Fragment ||
+                      typeof child.type === "symbol"
+                    ) {
+                      return child;
                     }
                     return React.cloneElement(child, {
                       selected: index === selectedIndex,
                       onSelect: () => {
-                        child.props.onSelect?.()
-                        handleOpenChange(false)
-                      }
-                    })
+                        child.props.onSelect?.();
+                        handleOpenChange(false);
+                      },
+                    });
                   }
-                  return child
+                  return child;
                 })}
               </div>
             </div>
           </div>
         )}
       </div>
-    )
-  }
-)
-Command.displayName = "Command"
+    );
+  },
+);
+Command.displayName = "Command";
 
 /**
  * CommandInput 컴포넌트의 props / CommandInput component props
  * @typedef {Object} CommandInputProps
  * @extends {Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>}
  */
-export interface CommandInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'> {
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
@@ -265,29 +298,32 @@ const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
       ref={ref}
       style={mergeStyles(
         {
-          display: 'flex',
-          height: '2.5rem',
-          width: '100%',
-          borderRadius: '0.375rem',
-          backgroundColor: 'transparent',
-          padding: '0.5rem 0.75rem',
-          fontSize: '0.875rem',
-          outline: 'none',
-          border: 'none',
-          color: 'var(--color-foreground)',
+          display: "flex",
+          height: "2.5rem",
+          width: "100%",
+          borderRadius: "0.375rem",
+          backgroundColor: "transparent",
+          ...resolveDot("py-2 px-3"),
+          fontSize: "0.875rem",
+          outline: "none",
+          border: "none",
+          color: "var(--color-foreground)",
         },
         resolveDot(dotProp),
-        style
+        style,
       )}
       {...props}
     />
-  )
-)
-CommandInput.displayName = "CommandInput"
+  ),
+);
+CommandInput.displayName = "CommandInput";
 
-export interface CommandListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandListProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
@@ -295,15 +331,15 @@ const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
     <div
       ref={ref}
       style={mergeStyles(
-        { maxHeight: '24rem', overflowY: 'auto', paddingTop: '0.5rem', paddingBottom: '0.5rem' },
+        { maxHeight: "24rem", overflowY: "auto", ...resolveDot("py-2") },
         resolveDot(dotProp),
-        style
+        style,
       )}
       {...props}
     />
-  )
-)
-CommandList.displayName = "CommandList"
+  ),
+);
+CommandList.displayName = "CommandList";
 
 /**
  * CommandItem 컴포넌트의 props / CommandItem component props
@@ -313,62 +349,75 @@ CommandList.displayName = "CommandList"
  * @property {() => void} [onSelect] - 선택 시 콜백 / Selection callback
  * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>}
  */
-export interface CommandItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
-  icon?: React.ReactNode
-  selected?: boolean
-  onSelect?: () => void
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandItemProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "className"
+> {
+  icon?: React.ReactNode;
+  selected?: boolean;
+  onSelect?: () => void;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const CommandItem = React.forwardRef<HTMLButtonElement, CommandItemProps>(
-  ({
-    icon,
-    selected = false,
-    onSelect,
-    children,
-    dot: dotProp,
-    style,
-    ...props
-  }, ref) => {
+  (
+    {
+      icon,
+      selected = false,
+      onSelect,
+      children,
+      dot: dotProp,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     return (
       <button
         ref={ref}
         data-command-item
         style={mergeStyles(
           {
-            position: 'relative',
-            display: 'flex',
-            width: '100%',
-            alignItems: 'center',
-            gap: '0.75rem',
-            borderRadius: '0.125rem',
-            padding: '0.75rem 1rem',
-            fontSize: '0.875rem',
-            color: 'var(--color-foreground)',
-            backgroundColor: selected ? 'var(--color-muted)' : 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'background-color 150ms',
-            textAlign: 'left',
+            position: "relative",
+            display: "flex",
+            width: "100%",
+            alignItems: "center",
+            ...resolveDot("gap-3"),
+            borderRadius: "0.125rem",
+            ...resolveDot("py-3 px-4"),
+            fontSize: "0.875rem",
+            color: "var(--color-foreground)",
+            backgroundColor: selected ? "var(--color-muted)" : "transparent",
+            border: "none",
+            cursor: "pointer",
+            transition: "background-color 150ms",
+            textAlign: "left",
           },
           resolveDot(dotProp),
-          style
+          style,
         )}
         onClick={onSelect}
         {...props}
       >
         {icon && (
-          <div style={{ flexShrink: 0, width: '1rem', height: '1rem', color: 'var(--color-muted-foreground)' }}>
+          <div
+            style={{
+              flexShrink: 0,
+              width: "1rem",
+              height: "1rem",
+              color: "var(--color-muted-foreground)",
+            }}
+          >
             {icon}
           </div>
         )}
-        <span style={{ flex: 1, textAlign: 'left' }}>{children}</span>
+        <span style={{ flex: 1, textAlign: "left" }}>{children}</span>
       </button>
-    )
-  }
-)
-CommandItem.displayName = "CommandItem"
+    );
+  },
+);
+CommandItem.displayName = "CommandItem";
 
 /**
  * CommandGroup 컴포넌트의 props / CommandGroup component props
@@ -376,61 +425,94 @@ CommandItem.displayName = "CommandItem"
  * @property {React.ReactNode} [heading] - 그룹 제목 / Group heading
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  heading?: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandGroupProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  heading?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
   ({ heading, children, dot: dotProp, style, ...props }, ref) => (
-    <div ref={ref} style={mergeStyles({ paddingTop: '0.5rem', paddingBottom: '0.5rem' }, resolveDot(dotProp), style)} {...props}>
+    <div
+      ref={ref}
+      style={mergeStyles(resolveDot("py-2"), resolveDot(dotProp), style)}
+      {...props}
+    >
       {heading && (
-        <div style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div
+          style={{
+            ...resolveDot("py-2 px-4"),
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            color: "var(--color-muted-foreground)",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
           {heading}
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          ...resolveDot("gap-1"),
+        }}
+      >
         {children}
       </div>
     </div>
-  )
-)
-CommandGroup.displayName = "CommandGroup"
+  ),
+);
+CommandGroup.displayName = "CommandGroup";
 
 /**
  * CommandSeparator 컴포넌트의 props / CommandSeparator component props
  * @typedef {Object} CommandSeparatorProps
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandSeparatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandSeparatorProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>(
-  ({ dot: dotProp, style, ...props }, ref) => (
-    <div
-      ref={ref}
-      style={mergeStyles(
-        { height: '1px', backgroundColor: 'var(--color-border)', margin: '0.5rem 0' },
-        resolveDot(dotProp),
-        style
-      )}
-      {...props}
-    />
-  )
-)
-CommandSeparator.displayName = "CommandSeparator"
+const CommandSeparator = React.forwardRef<
+  HTMLDivElement,
+  CommandSeparatorProps
+>(({ dot: dotProp, style, ...props }, ref) => (
+  <div
+    ref={ref}
+    style={mergeStyles(
+      {
+        height: "1px",
+        backgroundColor: "var(--color-border)",
+        ...resolveDot("my-2"),
+      },
+      resolveDot(dotProp),
+      style,
+    )}
+    {...props}
+  />
+));
+CommandSeparator.displayName = "CommandSeparator";
 
 /**
  * CommandEmpty 컴포넌트의 props / CommandEmpty component props
  * @typedef {Object} CommandEmptyProps
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface CommandEmptyProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  dot?: string
-  style?: React.CSSProperties
+export interface CommandEmptyProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
@@ -438,24 +520,37 @@ const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
     <div
       ref={ref}
       style={mergeStyles(
-        { paddingTop: '2rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--color-muted-foreground)' },
+        {
+          ...resolveDot("py-8"),
+          textAlign: "center",
+          fontSize: "0.875rem",
+          color: "var(--color-muted-foreground)",
+        },
         resolveDot(dotProp),
-        style
+        style,
       )}
       {...props}
     >
       {children}
     </div>
-  )
-)
-CommandEmpty.displayName = "CommandEmpty"
+  ),
+);
+CommandEmpty.displayName = "CommandEmpty";
 
 // 편의 컴포넌트들
 export const CommandDialog = React.forwardRef<HTMLDivElement, CommandProps>(
   ({ dot: dotProp, style, ...props }, ref) => (
     <Command ref={ref} dot={dotProp} style={style} {...props} />
-  )
-)
-CommandDialog.displayName = "CommandDialog"
+  ),
+);
+CommandDialog.displayName = "CommandDialog";
 
-export { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandEmpty }
+export {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandItem,
+  CommandGroup,
+  CommandSeparator,
+  CommandEmpty,
+};

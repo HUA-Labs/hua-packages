@@ -1,145 +1,171 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useState, useMemo } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ---------------------------------------------------------------------------
 // Style constants (no Tailwind strings)
 // ---------------------------------------------------------------------------
 
 const BASE_WRAPPER: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '4px',
-}
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  ...resolveDot("gap-1"),
+};
 
 const BASE_BUTTON: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   fontWeight: 500,
-  transition: 'background-color 150ms ease-in-out, color 150ms ease-in-out, opacity 150ms ease-in-out, border-color 150ms ease-in-out',
-  cursor: 'pointer',
-  outline: 'none',
-  border: 'none',
-  background: 'none',
+  transition:
+    "background-color 150ms ease-in-out, color 150ms ease-in-out, opacity 150ms ease-in-out, border-color 150ms ease-in-out",
+  cursor: "pointer",
+  outline: "none",
+  border: "none",
+  background: "none",
   padding: 0,
-  userSelect: 'none',
-}
+  userSelect: "none",
+};
 
 const DISABLED_BUTTON: React.CSSProperties = {
-  pointerEvents: 'none',
+  pointerEvents: "none",
   opacity: 0.5,
-}
+};
 
 // Size styles
 const SIZE_STYLES: Record<"sm" | "md" | "lg", React.CSSProperties> = {
-  sm: { height: '32px', minWidth: '32px', padding: '0 8px', fontSize: '14px' },
-  md: { height: '40px', minWidth: '40px', padding: '0 12px', fontSize: '14px' },
-  lg: { height: '48px', minWidth: '48px', padding: '0 16px', fontSize: '16px' },
-}
+  sm: {
+    height: "32px",
+    minWidth: "32px",
+    ...resolveDot("px-2"),
+    fontSize: "14px",
+  },
+  md: {
+    height: "40px",
+    minWidth: "40px",
+    ...resolveDot("px-3"),
+    fontSize: "14px",
+  },
+  lg: {
+    height: "48px",
+    minWidth: "48px",
+    ...resolveDot("px-4"),
+    fontSize: "16px",
+  },
+};
 
 // Shape styles
 const SHAPE_STYLES: Record<"square" | "circle", React.CSSProperties> = {
-  square: { borderRadius: '6px' },
-  circle: { borderRadius: '9999px', aspectRatio: '1 / 1', padding: '0' },
-}
+  square: { borderRadius: "6px" },
+  circle: { borderRadius: "9999px", aspectRatio: "1 / 1", padding: "0" },
+};
 
 // Variant × active state base styles
-const VARIANT_INACTIVE: Record<"default" | "outlined" | "minimal", React.CSSProperties> = {
+const VARIANT_INACTIVE: Record<
+  "default" | "outlined" | "minimal",
+  React.CSSProperties
+> = {
   default: {
-    border: 'none',
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-foreground)',
+    border: "none",
+    backgroundColor: "var(--color-background)",
+    color: "var(--color-foreground)",
   },
   outlined: {
-    border: '1px solid var(--color-border)',
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-foreground)',
+    border: "1px solid var(--color-border)",
+    backgroundColor: "var(--color-background)",
+    color: "var(--color-foreground)",
   },
   minimal: {
-    border: 'none',
-    backgroundColor: 'transparent',
-    color: 'var(--color-foreground)',
+    border: "none",
+    backgroundColor: "transparent",
+    color: "var(--color-foreground)",
   },
-}
+};
 
-const VARIANT_ACTIVE: Record<"default" | "outlined" | "minimal", React.CSSProperties> = {
+const VARIANT_ACTIVE: Record<
+  "default" | "outlined" | "minimal",
+  React.CSSProperties
+> = {
   default: {
-    border: 'none',
-    backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-primary-foreground)',
+    border: "none",
+    backgroundColor: "var(--color-primary)",
+    color: "var(--color-primary-foreground)",
   },
   outlined: {
-    border: '1px solid var(--color-primary)',
-    backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-primary-foreground)',
+    border: "1px solid var(--color-primary)",
+    backgroundColor: "var(--color-primary)",
+    color: "var(--color-primary-foreground)",
   },
   minimal: {
-    border: 'none',
-    backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)',
-    color: 'var(--color-primary)',
+    border: "none",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-primary) 10%, transparent)",
+    color: "var(--color-primary)",
   },
-}
+};
 
 // Hover overlays for inactive buttons
-const VARIANT_HOVER: Record<"default" | "outlined" | "minimal", React.CSSProperties> = {
-  default: { backgroundColor: 'var(--color-muted)' },
-  outlined: { backgroundColor: 'var(--color-muted)' },
-  minimal: { backgroundColor: 'var(--color-muted)' },
-}
+const VARIANT_HOVER: Record<
+  "default" | "outlined" | "minimal",
+  React.CSSProperties
+> = {
+  default: { backgroundColor: "var(--color-muted)" },
+  outlined: { backgroundColor: "var(--color-muted)" },
+  minimal: { backgroundColor: "var(--color-muted)" },
+};
 
 // Focus ring
 const FOCUS_RING: React.CSSProperties = {
-  outline: 'none',
-  boxShadow: '0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)',
-}
+  outline: "none",
+  boxShadow: "0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)",
+};
 
 const ELLIPSIS_STYLE: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '0 12px',
-  fontSize: '14px',
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  ...resolveDot("px-3"),
+  fontSize: "14px",
   fontWeight: 500,
-  color: 'var(--color-muted-foreground)',
-  userSelect: 'none',
-}
+  color: "var(--color-muted-foreground)",
+  userSelect: "none",
+};
 
 const SVG_STYLE: React.CSSProperties = {
-  width: '16px',
-  height: '16px',
+  width: "16px",
+  height: "16px",
   flexShrink: 0,
-}
+};
 
 const INFO_WRAPPER: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '16px',
-}
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "space-between",
+  ...resolveDot("gap-4"),
+};
 
 const INFO_TEXT: React.CSSProperties = {
-  fontSize: '14px',
-  color: 'var(--color-foreground)',
-}
+  fontSize: "14px",
+  color: "var(--color-foreground)",
+};
 
 // ---------------------------------------------------------------------------
 // Internal PageButton (manages its own hover/focus state)
 // ---------------------------------------------------------------------------
 
 interface PageButtonProps {
-  onClick: () => void
-  isActive?: boolean
-  disabled?: boolean
-  variant: "default" | "outlined" | "minimal"
-  size: "sm" | "md" | "lg"
-  shape: "square" | "circle"
-  'aria-label'?: string
-  'aria-current'?: React.AriaAttributes['aria-current']
-  children: React.ReactNode
+  onClick: () => void;
+  isActive?: boolean;
+  disabled?: boolean;
+  variant: "default" | "outlined" | "minimal";
+  size: "sm" | "md" | "lg";
+  shape: "square" | "circle";
+  "aria-label"?: string;
+  "aria-current"?: React.AriaAttributes["aria-current"];
+  children: React.ReactNode;
 }
 
 const PageButton = React.memo(function PageButton({
@@ -152,11 +178,13 @@ const PageButton = React.memo(function PageButton({
   children,
   ...aria
 }: PageButtonProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isFocused, setIsFocused] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const computedStyle = useMemo((): React.CSSProperties => {
-    const variantBase = isActive ? VARIANT_ACTIVE[variant] : VARIANT_INACTIVE[variant]
+    const variantBase = isActive
+      ? VARIANT_ACTIVE[variant]
+      : VARIANT_INACTIVE[variant];
     return mergeStyles(
       BASE_BUTTON,
       SIZE_STYLES[size],
@@ -165,8 +193,8 @@ const PageButton = React.memo(function PageButton({
       disabled ? DISABLED_BUTTON : undefined,
       !isActive && isHovered ? VARIANT_HOVER[variant] : undefined,
       isFocused ? FOCUS_RING : undefined,
-    )
-  }, [variant, size, shape, isActive, disabled, isHovered, isFocused])
+    );
+  }, [variant, size, shape, isActive, disabled, isHovered, isFocused]);
 
   return (
     <button
@@ -174,7 +202,9 @@ const PageButton = React.memo(function PageButton({
       style={computedStyle}
       onClick={onClick}
       disabled={disabled}
-      onMouseEnter={() => { if (!disabled) setIsHovered(true) }}
+      onMouseEnter={() => {
+        if (!disabled) setIsHovered(true);
+      }}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
@@ -182,8 +212,8 @@ const PageButton = React.memo(function PageButton({
     >
       {children}
     </button>
-  )
-})
+  );
+});
 
 // ---------------------------------------------------------------------------
 // PaginationProps
@@ -204,18 +234,21 @@ const PageButton = React.memo(function PageButton({
  * @property {string} [dot] - dot utility string for additional styles
  * @property {React.CSSProperties} [style] - Inline style overrides
  */
-export interface PaginationProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  showFirstLast?: boolean
-  showPrevNext?: boolean
-  maxVisiblePages?: number
-  size?: "sm" | "md" | "lg"
-  variant?: "default" | "outlined" | "minimal"
-  shape?: "square" | "circle"
-  dot?: string
-  style?: React.CSSProperties
+export interface PaginationProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  showFirstLast?: boolean;
+  showPrevNext?: boolean;
+  maxVisiblePages?: number;
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "outlined" | "minimal";
+  shape?: "square" | "circle";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ---------------------------------------------------------------------------
@@ -259,71 +292,73 @@ export interface PaginationProps extends Omit<React.HTMLAttributes<HTMLDivElemen
  * @returns {JSX.Element} Pagination 컴포넌트 / Pagination component
  */
 const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
-  ({
-    dot: dotProp,
-    style,
-    currentPage,
-    totalPages,
-    onPageChange,
-    showFirstLast = true,
-    showPrevNext = true,
-    maxVisiblePages = 5,
-    size = "md",
-    variant = "default",
-    shape = "square",
-    ...props
-  }, ref) => {
-
+  (
+    {
+      dot: dotProp,
+      style,
+      currentPage,
+      totalPages,
+      onPageChange,
+      showFirstLast = true,
+      showPrevNext = true,
+      maxVisiblePages = 5,
+      size = "md",
+      variant = "default",
+      shape = "square",
+      ...props
+    },
+    ref,
+  ) => {
     const getVisiblePages = (): (number | string)[] => {
-      const pages: (number | string)[] = []
-      const halfVisible = Math.floor(maxVisiblePages / 2)
+      const pages: (number | string)[] = [];
+      const halfVisible = Math.floor(maxVisiblePages / 2);
 
-      let start = Math.max(1, currentPage - halfVisible)
-      let end = Math.min(totalPages, currentPage + halfVisible)
+      let start = Math.max(1, currentPage - halfVisible);
+      let end = Math.min(totalPages, currentPage + halfVisible);
 
       if (end - start + 1 < maxVisiblePages) {
         if (start === 1) {
-          end = Math.min(totalPages, start + maxVisiblePages - 1)
+          end = Math.min(totalPages, start + maxVisiblePages - 1);
         } else {
-          start = Math.max(1, end - maxVisiblePages + 1)
+          start = Math.max(1, end - maxVisiblePages + 1);
         }
       }
 
       if (start > 1) {
-        pages.push(1)
-        if (start > 2) pages.push("...")
+        pages.push(1);
+        if (start > 2) pages.push("...");
       }
 
       for (let i = start; i <= end; i++) {
-        pages.push(i)
+        pages.push(i);
       }
 
       if (end < totalPages) {
-        if (end < totalPages - 1) pages.push("...")
-        pages.push(totalPages)
+        if (end < totalPages - 1) pages.push("...");
+        pages.push(totalPages);
       }
 
-      return pages
-    }
+      return pages;
+    };
 
     const handlePageClick = (page: number) => {
       if (page >= 1 && page <= totalPages && page !== currentPage) {
-        onPageChange(page)
+        onPageChange(page);
       }
-    }
+    };
 
-    const visiblePages = getVisiblePages()
+    const visiblePages = getVisiblePages();
 
     const wrapperStyle = useMemo(
       () => mergeStyles(BASE_WRAPPER, resolveDot(dotProp), style),
       [dotProp, style],
-    )
+    );
 
     // Ellipsis height mirrors the button size
     const ellipsisStyle = useMemo(
       () => mergeStyles(ELLIPSIS_STYLE, { height: SIZE_STYLES[size].height }),
       [size],
-    )
+    );
 
     return (
       <div ref={ref} style={wrapperStyle} {...props}>
@@ -336,8 +371,18 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             shape={shape}
             aria-label="첫 페이지로 이동"
           >
-            <svg style={SVG_STYLE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M19 19l-7-7 7-7" />
+            <svg
+              style={SVG_STYLE}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 19l-7-7 7-7M19 19l-7-7 7-7"
+              />
             </svg>
           </PageButton>
         )}
@@ -351,8 +396,18 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             shape={shape}
             aria-label="이전 페이지로 이동"
           >
-            <svg style={SVG_STYLE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              style={SVG_STYLE}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </PageButton>
         )}
@@ -387,8 +442,18 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             shape={shape}
             aria-label="다음 페이지로 이동"
           >
-            <svg style={SVG_STYLE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              style={SVG_STYLE}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </PageButton>
         )}
@@ -402,55 +467,73 @@ const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             shape={shape}
             aria-label="마지막 페이지로 이동"
           >
-            <svg style={SVG_STYLE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            <svg
+              style={SVG_STYLE}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              />
             </svg>
           </PageButton>
         )}
       </div>
-    )
-  }
-)
-Pagination.displayName = "Pagination"
+    );
+  },
+);
+Pagination.displayName = "Pagination";
 
 // ---------------------------------------------------------------------------
 // Convenience wrappers
 // ---------------------------------------------------------------------------
 
-export const PaginationOutlined = React.forwardRef<HTMLDivElement, Omit<PaginationProps, "variant">>(
-  (props, ref) => <Pagination ref={ref} variant="outlined" {...props} />
-)
-PaginationOutlined.displayName = "PaginationOutlined"
+export const PaginationOutlined = React.forwardRef<
+  HTMLDivElement,
+  Omit<PaginationProps, "variant">
+>((props, ref) => <Pagination ref={ref} variant="outlined" {...props} />);
+PaginationOutlined.displayName = "PaginationOutlined";
 
-export const PaginationMinimal = React.forwardRef<HTMLDivElement, Omit<PaginationProps, "variant">>(
-  (props, ref) => <Pagination ref={ref} variant="minimal" {...props} />
-)
-PaginationMinimal.displayName = "PaginationMinimal"
+export const PaginationMinimal = React.forwardRef<
+  HTMLDivElement,
+  Omit<PaginationProps, "variant">
+>((props, ref) => <Pagination ref={ref} variant="minimal" {...props} />);
+PaginationMinimal.displayName = "PaginationMinimal";
 
 // ---------------------------------------------------------------------------
 // PaginationWithInfo
 // ---------------------------------------------------------------------------
 
-export const PaginationWithInfo = React.forwardRef<HTMLDivElement, PaginationProps & {
-  totalItems?: number
-  itemsPerPage?: number
-  showInfo?: boolean
-}>(
-  ({
-    totalItems = 0,
-    itemsPerPage = 10,
-    showInfo = true,
-    dot: dotProp,
-    style,
-    ...props
-  }, ref) => {
-    const startItem = (props.currentPage - 1) * itemsPerPage + 1
-    const endItem = Math.min(props.currentPage * itemsPerPage, totalItems)
+export const PaginationWithInfo = React.forwardRef<
+  HTMLDivElement,
+  PaginationProps & {
+    totalItems?: number;
+    itemsPerPage?: number;
+    showInfo?: boolean;
+  }
+>(
+  (
+    {
+      totalItems = 0,
+      itemsPerPage = 10,
+      showInfo = true,
+      dot: dotProp,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
+    const startItem = (props.currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(props.currentPage * itemsPerPage, totalItems);
 
     const wrapperStyle = useMemo(
       () => mergeStyles(INFO_WRAPPER, resolveDot(dotProp), style),
       [dotProp, style],
-    )
+    );
 
     return (
       <div style={wrapperStyle}>
@@ -472,9 +555,9 @@ export const PaginationWithInfo = React.forwardRef<HTMLDivElement, PaginationPro
         )}
         <Pagination ref={ref} {...props} />
       </div>
-    )
-  }
-)
-PaginationWithInfo.displayName = "PaginationWithInfo"
+    );
+  },
+);
+PaginationWithInfo.displayName = "PaginationWithInfo";
 
-export { Pagination }
+export { Pagination };
