@@ -261,22 +261,6 @@ entries:
       test: true
       lint: false
 
-  - name: "@hua-labs/ui-dashboard"
-    path: "packages/hua-ui-dashboard"
-    kind: package
-    tier: support
-    accessClass: private-internal
-    lifecycle: freeze-candidate
-    release:
-      mode: private-workspace
-    publicMirror:
-      mode: exclude
-    ci:
-      build: true
-      typeCheck: true
-      test: true
-      lint: false
-
   - name: "@hua-labs/docs-engine"
     path: "packages/my-docs-engine"
     kind: package

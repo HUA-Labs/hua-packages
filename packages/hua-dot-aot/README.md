@@ -30,29 +30,41 @@ pnpm add @hua-labs/dot-aot
 
 ```tsx
 // Vite
-import dotAot from '@hua-labs/dot-aot/vite';
+import dotAot from "@hua-labs/dot-aot/vite";
 export default defineConfig({ plugins: [dotAot()] });
 
 // Babel / Metro / Next.js
-module.exports = { plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]] };
+module.exports = {
+  plugins: [["@hua-labs/dot-aot/babel", { target: "native" }]],
+};
 
 // Before build:
-const style = dot('p-4 flex items-center bg-primary-500');
+const style = dot("p-4 flex items-center bg-primary-500");
 
 // After build (inlined by plugin):
-const style = ({padding: "16px", display: "flex", alignItems: "center", backgroundColor: "var(--color-primary-500)"});
-
+const style = {
+  padding: "16px",
+  display: "flex",
+  alignItems: "center",
+  backgroundColor: "var(--color-primary-500)",
+};
 ```
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `extractStaticCalls` | function | Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' | 'native' | 'flutter' } |
-| `transformSource` | function | Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline. |
-| `styleToObjectLiteral` | function | Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets. |
-| `type ExtractedCall` | function |  |
-| `type ExtractOptions` | function |  |
+| Export                                | Type     | Description                                                                                                                                                    |
+| ------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extractStaticCalls`                  | function | Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' \| 'native' \| 'flutter' } |
+| `transformSource`                     | function | Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline.                           |
+| `styleToObjectLiteral`                | function | Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets.         |
+| `ExtractedCall`                       | type     | { start: number; end: number; input: string; options?: DotOptions; result: Record<string, unknown> }                                                           |
+| `ExtractOptions`                      | type     | { functionNames?: string[]; target?: 'web' \| 'native' \| 'flutter' }                                                                                          |
+| **`@hua-labs/dot-aot/vite` subpath**  |          |                                                                                                                                                                |
+| `dotAotVite` (default)                | function | Vite plugin factory. Returns a Vite plugin with enforce: 'pre'. Options: DotAotViteOptions.                                                                    |
+| `DotAotViteOptions`                   | type     | Extends ExtractOptions. { include?: string[]; exclude?: string[] } — file extensions to include/exclude.                                                       |
+| **`@hua-labs/dot-aot/babel` subpath** |          |                                                                                                                                                                |
+| `dotAotBabel` (default)               | function | Babel plugin factory. Returns a Babel plugin with CallExpression visitor. Options: DotAotBabelOptions.                                                         |
+| `DotAotBabelOptions`                  | type     | { functionNames?: string[]; target?: DotTarget }                                                                                                               |
 
 ## Related Packages
 

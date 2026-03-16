@@ -12,128 +12,145 @@ export {
   motionEngine,
   type MotionFrame,
   type MotionOptions,
-  type Motion as MotionInstance
-} from './core/MotionEngine'
+  type Motion as MotionInstance,
+} from "./core/MotionEngine";
 
 // TransitionEffects - 전환 효과 시스템
-export { 
-  TransitionEffects, 
+export {
+  TransitionEffects,
   transitionEffects,
   type TransitionType,
-  type TransitionOptions
-} from './core/TransitionEffects'
-
+  type TransitionOptions,
+} from "./core/TransitionEffects";
 
 // ========================================
 // 3단계 추상화 (Core 패키지 핵심)
 // ========================================
 
 // 1단계: useSimplePageMotion (프리셋 기반)
-export { useSimplePageMotion } from './hooks/useSimplePageMotion'
+export { useSimplePageMotion } from "./hooks/useSimplePageMotion";
 
 // 2단계: usePageMotions (페이지 레벨)
-export { usePageMotions } from './hooks/usePageMotions'
+export { usePageMotions } from "./hooks/usePageMotions";
 
 // 3단계: useSmartMotion (개별 요소) - 기존 호환성 유지
-export { useSmartMotion } from './hooks/useSmartMotion'
+export { useSmartMotion } from "./hooks/useSmartMotion";
 
 // 통합 Motion Hook (단일 타입으로 여러 hook 중 선택)
-export { useUnifiedMotion } from './hooks/useUnifiedMotion'
-export type { UseUnifiedMotionOptions, MotionEffects } from './hooks/useUnifiedMotion'
+export { useUnifiedMotion } from "./hooks/useUnifiedMotion";
+export type {
+  UseUnifiedMotionOptions,
+  MotionEffects,
+} from "./hooks/useUnifiedMotion";
 
 // ========================================
 // 기본 모션 훅들 (Core 패키지 범위)
 // ========================================
 
 // 기본 모션 (fade, slide, scale, bounce, pulse)
-export { useFadeIn } from './hooks/useFadeIn'
-export { useSlideUp } from './hooks/useSlideUp'
-export { useSlideLeft } from './hooks/useSlideLeft'
-export { useSlideRight } from './hooks/useSlideRight'
-export { useScaleIn } from './hooks/useScaleIn'
-export { useBounceIn } from './hooks/useBounceIn'
-export { usePulse } from './hooks/usePulse'
-export { useSpringMotion } from './hooks/useSpringMotion'
-export { useGradient } from './hooks/useGradient'
+export { useFadeIn } from "./hooks/useFadeIn";
+export { useSlideUp } from "./hooks/useSlideUp";
+export { useSlideLeft } from "./hooks/useSlideLeft";
+export { useSlideRight } from "./hooks/useSlideRight";
+export { useScaleIn } from "./hooks/useScaleIn";
+export { useBounceIn } from "./hooks/useBounceIn";
+export { usePulse } from "./hooks/usePulse";
+export { useSpringMotion } from "./hooks/useSpringMotion";
+export { useGradient } from "./hooks/useGradient";
 
 // 기본 인터랙션 (hover, click, focus)
-export { useHoverMotion } from './hooks/useHoverMotion'
-export { useClickToggle } from './hooks/useClickToggle'
-export { useFocusToggle } from './hooks/useFocusToggle'
+export { useHoverMotion } from "./hooks/useHoverMotion";
+export { useClickToggle } from "./hooks/useClickToggle";
+export { useFocusToggle } from "./hooks/useFocusToggle";
 
 // 기본 스크롤 (reveal, progress)
-export { useScrollReveal } from './hooks/useScrollReveal'
-export { useScrollProgress } from './hooks/useScrollProgress'
+export { useScrollReveal } from "./hooks/useScrollReveal";
+export { useScrollProgress } from "./hooks/useScrollProgress";
 
 // 기본 유틸리티 (state, repeat, toggle)
-export { useMotionState } from './hooks/useMotionState'
-export { useRepeat } from './hooks/useRepeat'
-export { useToggleMotion } from './hooks/useToggleMotion'
+export { useMotionState } from "./hooks/useMotionState";
+export { useRepeat } from "./hooks/useRepeat";
+export { useToggleMotion } from "./hooks/useToggleMotion";
 
 // ========================================
 // 슬라이드 방향 훅 (추가)
-export { useSlideDown } from './hooks/useSlideDown'
+export { useSlideDown } from "./hooks/useSlideDown";
 
 // 유틸리티 훅들 (신규 export)
-export { useInView } from './hooks/useInView'
-export { useMouse } from './hooks/useMouse'
-export { useReducedMotion } from './hooks/useReducedMotion'
-export { useWindowSize } from './hooks/useWindowSize'
+export { useInView } from "./hooks/useInView";
+export { useMouse } from "./hooks/useMouse";
+export { useReducedMotion } from "./hooks/useReducedMotion";
+export { useWindowSize } from "./hooks/useWindowSize";
 
 // 기본 제스처 훅들 (Core 패키지 범위)
 // ========================================
 
 // 기본 제스처 (gesture, gestureMotion)
-export { useGesture } from './hooks/useGesture'
-export { useGestureMotion } from './hooks/useGestureMotion'
+export { useGesture } from "./hooks/useGesture";
+export { useGestureMotion } from "./hooks/useGestureMotion";
 
 // ========================================
 // 고급 인터랙션 훅들 (Phase E)
 // ========================================
 
-export { useButtonEffect } from './hooks/useButtonEffect'
-export type { ButtonEffectOptions } from './hooks/useButtonEffect'
+export { useButtonEffect } from "./hooks/useButtonEffect";
+export type { ButtonEffectOptions } from "./hooks/useButtonEffect";
 
-export { useVisibilityToggle } from './hooks/useVisibilityToggle'
-export type { VisibilityToggleOptions } from './hooks/useVisibilityToggle'
+export { useVisibilityToggle } from "./hooks/useVisibilityToggle";
+export type { VisibilityToggleOptions } from "./hooks/useVisibilityToggle";
 
 // 스크롤 기반
-export { useScrollToggle } from './hooks/useScrollToggle'
-export type { ScrollToggleOptions } from './hooks/useScrollToggle'
+export { useScrollToggle } from "./hooks/useScrollToggle";
+export type { ScrollToggleOptions } from "./hooks/useScrollToggle";
 
 // 레이아웃 모션 (카드, 스켈레톤, 스피너, 네비게이션)
-export { useCardList } from './hooks/useCardList'
-export type { CardListOptions } from './hooks/useCardList'
+export { useCardList } from "./hooks/useCardList";
+export type { CardListOptions } from "./hooks/useCardList";
 
-export { useLoadingSpinner } from './hooks/useLoadingSpinner'
-export type { LoadingSpinnerOptions } from './hooks/useLoadingSpinner'
+export { useLoadingSpinner } from "./hooks/useLoadingSpinner";
+export type { LoadingSpinnerOptions } from "./hooks/useLoadingSpinner";
 
-export { useNavigation } from './hooks/useNavigation'
-export type { NavigationOptions } from './hooks/useNavigation'
+export { useNavigation } from "./hooks/useNavigation";
+export type { NavigationOptions } from "./hooks/useNavigation";
 
-export { useSkeleton } from './hooks/useSkeleton'
-export type { SkeletonOptions } from './hooks/useSkeleton'
+export { useSkeleton } from "./hooks/useSkeleton";
+export type { SkeletonOptions } from "./hooks/useSkeleton";
 
-export { useTypewriter } from './hooks/useTypewriter'
-export type { TypewriterOptions, TypewriterReturn } from './hooks/useTypewriter'
+export { useTypewriter } from "./hooks/useTypewriter";
+export type {
+  TypewriterOptions,
+  TypewriterReturn,
+} from "./hooks/useTypewriter";
 
-export { useCustomCursor } from './hooks/useCustomCursor'
-export type { CustomCursorOptions, CustomCursorReturn } from './hooks/useCustomCursor'
+export { useCustomCursor } from "./hooks/useCustomCursor";
+export type {
+  CustomCursorOptions,
+  CustomCursorReturn,
+} from "./hooks/useCustomCursor";
 
-export { useMagneticCursor } from './hooks/useMagneticCursor'
-export type { MagneticCursorOptions, MagneticCursorReturn } from './hooks/useMagneticCursor'
+export { useMagneticCursor } from "./hooks/useMagneticCursor";
+export type {
+  MagneticCursorOptions,
+  MagneticCursorReturn,
+} from "./hooks/useMagneticCursor";
 
-export { useSmoothScroll } from './hooks/useSmoothScroll'
-export type { SmoothScrollOptions, SmoothScrollReturn } from './hooks/useSmoothScroll'
+export { useSmoothScroll } from "./hooks/useSmoothScroll";
+export type {
+  SmoothScrollOptions,
+  SmoothScrollReturn,
+} from "./hooks/useSmoothScroll";
 
-export { useElementProgress } from './hooks/useElementProgress'
-export type { ElementProgressOptions, ElementProgressReturn } from './hooks/useElementProgress'
+export { useElementProgress } from "./hooks/useElementProgress";
+export type {
+  ElementProgressOptions,
+  ElementProgressReturn,
+} from "./hooks/useElementProgress";
 
 // ========================================
 // 프리셋 시스템 (Core 패키지 범위)
 // ========================================
 
-export * from './presets'
+export * from "./presets";
 
 // ========================================
 // 모션 프로필 시스템
@@ -146,7 +163,7 @@ export {
   mergeProfileOverrides,
   MotionProfileProvider,
   useMotionProfile,
-} from './profiles'
+} from "./profiles";
 
 export type {
   MotionProfile,
@@ -159,63 +176,156 @@ export type {
   BuiltInProfileName,
   MotionProfileProviderProps,
   DeepPartial,
-} from './profiles'
+} from "./profiles";
 
 // ========================================
 // 공유 유틸리티
 // ========================================
 
-export { observeElement } from './utils/sharedIntersectionObserver'
+export { observeElement } from "./utils/sharedIntersectionObserver";
 
 // ========================================
 // 기본 이징 함수들 (Core 패키지 범위)
 // ========================================
 
 export {
-  linear, easeIn, easeOut, easeInOut,
-  easeInQuad, easeOutQuad, easeInOutQuad,
-  type EasingFunction, type EasingType
-} from './utils/easing'
+  linear,
+  easeIn,
+  easeOut,
+  easeInOut,
+  easeInQuad,
+  easeOutQuad,
+  easeInOutQuad,
+  type EasingFunction,
+  type EasingType,
+} from "./utils/easing";
 
 export {
-  getEasing, applyEasing, safeApplyEasing, isValidEasing,
-  getAvailableEasings, isEasingFunction, easingPresets, getPresetEasing
-} from './utils/easing'
+  getEasing,
+  applyEasing,
+  safeApplyEasing,
+  isValidEasing,
+  getAvailableEasings,
+  isEasingFunction,
+  easingPresets,
+  getPresetEasing,
+} from "./utils/easing";
 
 // 스프링 물리 계산 (순수 함수)
-export { calculateSpring } from './utils/springPhysics'
-export type { SpringConfig as SpringPhysicsConfig, SpringResult } from './utils/springPhysics'
+export { calculateSpring } from "./utils/springPhysics";
+export type {
+  SpringConfig as SpringPhysicsConfig,
+  SpringResult,
+} from "./utils/springPhysics";
 
 // ========================================
 // 기본 타입들 (Core 패키지 범위)
 // ========================================
 
 // ========================================
+// Pro 훅들 (hua-pro 흡수)
+// ========================================
+
+// Auto — 자동 재생/애니메이션
+export { useAutoFade } from "./hooks/useAutoFade";
+export type { AutoFadeConfig } from "./hooks/useAutoFade";
+
+export { useAutoPlay } from "./hooks/useAutoPlay";
+export type { AutoPlayConfig } from "./hooks/useAutoPlay";
+
+export { useAutoScale } from "./hooks/useAutoScale";
+export type { AutoScaleConfig } from "./hooks/useAutoScale";
+
+export { useAutoSlide } from "./hooks/useAutoSlide";
+export type { AutoSlideConfig } from "./hooks/useAutoSlide";
+
+// Orchestration — 모션 오케스트레이션
+export { useMotionOrchestra } from "./hooks/useMotionOrchestra";
+export { useOrchestration } from "./hooks/useOrchestration";
+export type { OrchestrationConfig as UseOrchestrationConfig } from "./hooks/useOrchestration";
+export { useSequence } from "./hooks/useSequence";
+export type { SequenceConfig } from "./hooks/useSequence";
+
+// Interaction — 인터랙션 훅들
+export {
+  useLayoutMotion,
+  createLayoutTransition,
+} from "./hooks/useLayoutMotion";
+export type { LayoutMotionConfig, LayoutState } from "./hooks/useLayoutMotion";
+
+export { useKeyboardToggle } from "./hooks/useKeyboardToggle";
+export type { KeyboardToggleConfig } from "./hooks/useKeyboardToggle";
+
+export { useScrollDirection } from "./hooks/useScrollDirection";
+export type { ScrollDirectionConfig } from "./hooks/useScrollDirection";
+
+export { useStickyToggle } from "./hooks/useStickyToggle";
+export type { StickyToggleConfig } from "./hooks/useStickyToggle";
+
+export { useInteractive } from "./hooks/useInteractive";
+export type {
+  InteractiveConfig,
+  InteractiveState,
+} from "./hooks/useInteractive";
+
+// Specialized — 특수 목적 훅들
+export { usePerformanceMonitor } from "./hooks/usePerformanceMonitor";
+export type {
+  PerformanceMonitorConfig,
+  PerformanceMonitorState,
+} from "./hooks/usePerformanceMonitor";
+
+export { useLanguageAwareMotion } from "./hooks/useLanguageAwareMotion";
+export type { LanguageConfig } from "./hooks/useLanguageAwareMotion";
+
+export { useGameLoop } from "./hooks/useGameLoop";
+export type { GameLoopConfig, GameState } from "./hooks/useGameLoop";
+
+export { useMotion } from "./hooks/useMotion";
+export type {
+  MotionConfig as UseMotionConfig,
+  AutoMotionConfig,
+  MotionFromToConfig,
+} from "./hooks/useMotion";
+
+// Renamed (collision avoidance)
+// useViewportToggle — IntersectionObserver 기반 뷰포트 감지 (구 pro useVisibilityToggle)
+export { useViewportToggle } from "./hooks/useViewportToggle";
+export type { ViewportToggleConfig } from "./hooks/useViewportToggle";
+
+// useScrollPositionToggle — pageYOffset 기반 스크롤 위치 감지 (구 pro useScrollToggle)
+export { useScrollPositionToggle } from "./hooks/useScrollPositionToggle";
+export type { ScrollPositionToggleConfig } from "./hooks/useScrollPositionToggle";
+
+// ========================================
 // 컴포넌트 (래퍼)
 // ========================================
 
-export { Motion } from './components'
-export type { MotionProps } from './components'
+export { Motion } from "./components";
+export type { MotionProps } from "./components";
 
 // ========================================
 // 경량 모션 훅 (active 기반 트리거)
 // ========================================
 
-export { useCountUp } from './hooks/useCountUp'
-export type { CountUpOptions, CountUpReturn } from './hooks/useCountUp'
+export { useCountUp } from "./hooks/useCountUp";
+export type { CountUpOptions, CountUpReturn } from "./hooks/useCountUp";
 
-export { useClipReveal } from './hooks/useClipReveal'
-export type { ClipRevealOptions, ClipRevealReturn } from './hooks/useClipReveal'
+export { useClipReveal } from "./hooks/useClipReveal";
+export type {
+  ClipRevealOptions,
+  ClipRevealReturn,
+} from "./hooks/useClipReveal";
 
-export { useBlurIn } from './hooks/useBlurIn'
-export type { BlurInOptions, BlurInReturn } from './hooks/useBlurIn'
+export { useBlurIn } from "./hooks/useBlurIn";
+export type { BlurInOptions, BlurInReturn } from "./hooks/useBlurIn";
 
 // ========================================
 // Stagger 훅
 // ========================================
 
-export { useStagger } from './hooks/useStagger'
-export type { UseStaggerOptions, UseStaggerReturn } from './hooks/useStagger'
+export { useStagger } from "./hooks/useStagger";
+export type { UseStaggerOptions, UseStaggerReturn } from "./hooks/useStagger";
 
 export type {
   // 3단계 추상화 타입들
@@ -228,21 +338,21 @@ export type {
   PageMotionRef,
   // SmartMotionOptions 제거 (useMotion으로 대체)
   // SmartMotionReturn 제거 (useMotion으로 대체)
-  
+
   // 공통 타입들
   BaseMotionOptions,
   BaseMotionReturn,
   MotionElement, // MotionElement 추가
-  
+
   // 프리셋 시스템
   MotionPreset,
   PresetConfig,
-  
+
   // 고급 모션 타입들
   SpringConfig,
   GestureConfig,
   OrchestrationConfig,
-  
+
   // 훅별 확장 옵션 타입들
   FadeInOptions,
   SlideOptions,
@@ -278,5 +388,5 @@ export type {
   MotionTrigger,
   MotionCallback,
   MotionProgressCallback,
-  MotionStateCallback
-} from './types'
+  MotionStateCallback,
+} from "./types";

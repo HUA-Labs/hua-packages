@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
+### Patch Changes
+
+- Updated dependencies
+  - @hua-labs/ui@3.0.0
+  - @hua-labs/motion-core@2.4.0
+  - @hua-labs/i18n-core@2.2.0
+  - @hua-labs/i18n-core-zustand@2.2.0
+  - @hua-labs/i18n-formatters@2.2.0
+  - @hua-labs/i18n-loaders@2.2.0
+  - @hua-labs/utils@1.1.4
+  - @hua-labs/hooks@1.1.4
+  - @hua-labs/state@1.0.4
+
 ## 1.1.0
 
 ### Minor Changes
@@ -71,16 +97,13 @@
 - d997d6b: # npm Provenance & Documentation Improvements
 
   ## npm Provenance (출처증명)
-
   - Add npm provenance support for all packages
   - Configure `.npmrc` with `provenance=true`
   - Add `id-token: write` permission to release workflow
   - Enhance supply chain security with package attestations
 
   ## Documentation Enhancements
-
   - **Badges**: Standardize badges across all package READMEs
-
     - Add npm downloads badge to all packages
     - Add TypeScript badge to all packages
     - Ensure consistent badge formatting
@@ -93,7 +116,6 @@
   ## Affected Packages
 
   All 9 packages receive patch updates for documentation and provenance:
-
   - @hua-labs/hua-ux
   - @hua-labs/ui
   - @hua-labs/motion-core
@@ -118,7 +140,6 @@
 - a061538: feat: add comprehensive automation for quality and reliability
 
   ## create-hua-ux
-
   - Add template validation script that runs before every build
   - Validate Next.js 16 async API patterns in templates
   - Add version checker CLI to detect npx cache issues
@@ -126,14 +147,12 @@
   - Prevent outdated templates from reaching users
 
   ## @hua-labs/hua-ux
-
   - Add GEO metadata validator for Schema.org compliance
   - Validate JSON-LD structure and required fields
   - Provide clear validation errors and warnings
   - Export validator functions from framework/seo/geo
 
   ## Infrastructure
-
   - Add PR validation workflow (changeset checks, package name validation)
   - Add E2E testing workflow (6 OS/package-manager combinations)
   - Add dependency monitoring workflow (weekly updates for Next.js, React, TypeScript)
@@ -150,7 +169,6 @@
   Adds Next.js 16 Server Component optimized GEO (Generative Engine Optimization) helpers to make AI search engines (ChatGPT, Claude, Gemini, Perplexity) easily discover and recommend your app.
 
   **Key Features:**
-
   - ✅ Full Next.js 16 async API support (`headers()`, `params`, `searchParams`)
   - ✅ Seamless integration with Next.js Metadata API
   - ✅ App-level + page-level GEO merging
@@ -158,7 +176,6 @@
   - ✅ Type-safe with full TypeScript support
 
   **create-hua-ux update:**
-
   - Updated Next.js templates to use the new Next.js 16 async APIs and GEO helpers.
 
 ## 0.1.0-alpha.8
@@ -168,7 +185,6 @@
 - 50db3b9: feat(create-hua-ux): enhance template with Next.js 16 compatibility and improved UX
 
   **create-hua-ux:**
-
   - Fix Next.js 16 async APIs (`await headers()`, `await params`)
   - Add LanguageToggle component with Globe icon and fade-in-up motion
   - Replace basic template with WelcomePage component featuring:
@@ -182,17 +198,14 @@
   - Enhance metadata with keywords, authors, OpenGraph
 
   **@hua-labs/hua-ux:**
-
   - Add `framework/seo/geo` export path for server-side GEO support (preparation for future release)
 
   **Fixes:**
-
   - Resolves "headersList.get is not a function" runtime error
   - Resolves "params must be unwrapped with await" API route error
   - Resolves template validation failures
 
   **Compatibility:**
-
   - Next.js 16.1.1+
   - React 19.2.3+
   - Full backward compatibility maintained
@@ -202,7 +215,6 @@
 ### Patch Changes
 
 - ce1a089: fix(hua-ux): add 'use client' directive to framework/index.ts
-
   - Fixes "createContext only works in Client Components" error when importing from @hua-labs/hua-ux/framework
   - Next.js requires 'use client' in files that re-export Client Components
   - Critical fix for create-hua-ux generated projects
@@ -212,7 +224,6 @@
 ### Patch Changes
 
 - f7d08f1: chore: align external dependency versions across all packages
-
   - Introduce syncpack for automated dependency version management
   - Align @types/node to ^25.0.3 across all packages
   - Align TypeScript to ^5.9.3 across all packages
@@ -222,7 +233,6 @@
   This ensures consistent behavior across the monorepo and prevents version conflicts.
 
 - f7d08f1: fix(hua-ux, state): improve type safety and remove 'as any' assertions
-
   - Remove all 'as any' type assertions from hua-ux framework
   - Export zustand types (UseBoundStore, StoreApi) from @hua-labs/state for proper type inference
   - Fix LicenseFeature type handling for dynamic plugin features
@@ -260,13 +270,11 @@
 ### Patch Changes
 
 - d11a13c: fix(hua-ux): Fix critical framework issues
-
   - Export WelcomePage component and types from framework index
   - Fix package.json exports to point to dist instead of src for production builds
   - Remove middleware from tsconfig exclude to include it in build output
 
   These fixes resolve:
-
   1. Missing WelcomePage export (breaking change for users)
   2. Import inconsistencies between dev and production environments
   3. Middleware not being included in TypeScript compilation
@@ -282,7 +290,6 @@
 ### Patch Changes
 
 - Public alpha release with complete documentation
-
   - Complete README standardization across all packages
   - Comprehensive DETAILED_GUIDE documentation for each package
   - Optimized npm keywords for better discoverability
@@ -301,7 +308,6 @@
 ### Minor Changes
 
 - 31920d5: Introduce complete UX framework package (v0.1.0 alpha)
-
   - Added framework layer with HuaUxLayout and HuaUxPage components
   - GEO (AI search engine optimization) support built-in
   - Accessibility features and loading optimization

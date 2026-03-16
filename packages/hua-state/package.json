@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/state",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "HUA State - Unified state management for hua framework with SSR support and integrations",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",

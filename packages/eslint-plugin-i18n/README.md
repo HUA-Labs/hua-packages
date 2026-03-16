@@ -29,43 +29,64 @@ pnpm add @hua-labs/eslint-plugin-i18n
 
 ```js
 // eslint.config.mjs (flat config)
-import i18nPlugin from '@hua-labs/eslint-plugin-i18n';
+import i18nPlugin from "@hua-labs/eslint-plugin-i18n";
 
 export default [
   {
     plugins: { i18n: i18nPlugin },
     rules: {
-      'i18n/no-missing-key': ['error', {
-        keysFile: './types/i18n-types.generated.ts'
-      }],
-      'i18n/no-raw-text': ['warn', {
-        translationsDir: './lib/translations',
-      }],
-      'i18n/no-dynamic-key': 'warn',
-      'i18n/prefer-common-key': ['warn', {
-        translationsDir: './lib/translations',
-      }],
+      "i18n/no-missing-key": [
+        "error",
+        {
+          keysFile: "./types/i18n-types.generated.ts",
+        },
+      ],
+      "i18n/no-raw-text": [
+        "warn",
+        {
+          translationsDir: "./lib/translations",
+        },
+      ],
+      "i18n/no-dynamic-key": "warn",
+      "i18n/prefer-common-key": [
+        "warn",
+        {
+          translationsDir: "./lib/translations",
+        },
+      ],
     },
   },
   // Metadata files — ensure description/label/value use i18n keys
   {
-    files: ['registry/**/*.ts'],
+    files: ["registry/**/*.ts"],
     plugins: { i18n: i18nPlugin },
     rules: {
-      'i18n/no-unlocalized-field': ['warn', {
-        fields: ['description', 'label', 'value'],
-        ignoreParentProperties: ['codeExamples'],
-      }],
+      "i18n/no-unlocalized-field": [
+        "warn",
+        {
+          fields: ["description", "label", "value"],
+          ignoreParentProperties: ["codeExamples"],
+        },
+      ],
     },
   },
 ];
-
 ```
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
+| Export                          | Type   | Description                                                                                                                                                        |
+| ------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `default`                       | plugin | Full plugin object with `rules` and `configs` properties                                                                                                           |
+| `rules`                         | object | All 6 rule implementations keyed by rule name                                                                                                                      |
+| `configs`                       | object | Named configs — `recommended`                                                                                                                                      |
+| `rules['no-missing-key']`       | rule   | Error on `t()` keys not found in generated types; suggests up to 3 similar keys (Levenshtein)                                                                      |
+| `rules['no-unused-key']`        | rule   | Warn on translation keys that appear unused (basic single-file detection; CLI recommended for project-wide)                                                        |
+| `rules['no-raw-text']`          | rule   | Warn on hardcoded CJK text in JSX and checkable attributes (aria-label, placeholder, title, alt, label); suggests matching i18n keys when `translationsDir` is set |
+| `rules['no-dynamic-key']`       | rule   | Warn on non-literal arguments to `t()` / `tArray()` that bypass type checking                                                                                      |
+| `rules['no-unlocalized-field']` | rule   | Warn on object property values (e.g. `description`, `label`) that contain string literals instead of i18n key patterns                                             |
+| `rules['prefer-common-key']`    | rule   | Suggest replacing a namespace-specific key with a `common:` key when the same translation value exists there; includes autofix                                     |
+| `configs.recommended`           | config | Enables no-missing-key (error), no-raw-text (warn), no-dynamic-key (warn); others off                                                                              |
 
 ## Related Packages
 

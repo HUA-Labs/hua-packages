@@ -1,5 +1,23 @@
 # @hua-labs/i18n-formatters
 
+## 2.2.0
+
+### Minor Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
+### Patch Changes
+
+- Updated dependencies
+  - @hua-labs/i18n-core@2.2.0
+
 ## 2.1.0
 
 ### Patch Changes

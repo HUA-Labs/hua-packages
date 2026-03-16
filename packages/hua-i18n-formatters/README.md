@@ -28,8 +28,8 @@ pnpm add @hua-labs/i18n-formatters
 ## Quick Start
 
 ```tsx
-import { useDateFormatter } from '@hua-labs/i18n-formatters/date';
-import { useCurrencyFormatter } from '@hua-labs/i18n-formatters/currency';
+import { useDateFormatter } from "@hua-labs/i18n-formatters/date";
+import { useCurrencyFormatter } from "@hua-labs/i18n-formatters/currency";
 
 function PriceCard({ date, amount }: { date: Date; amount: number }) {
   const { formatRelativeTime } = useDateFormatter();
@@ -42,42 +42,45 @@ function PriceCard({ date, amount }: { date: Date; amount: number }) {
     </div>
   );
 }
-
 ```
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `useDateFormatter` | function | Date formatting hook — formatDate, formatRelativeTime, monthNames, dayNames |
-| `formatDate` | function | Format a Date or ISO string into a localized date string. Accepts DateFormatterOptions (pattern, locale, timezone). |
-| `formatDateTime` | function | Format a Date or ISO string into a localized date-and-time string. |
-| `formatRelativeTime` | function | Return a locale-aware relative time string (e.g. '3 minutes ago', '2일 전'). Accepts RelativeTimeOptions. |
-| `applyTimezoneOffset` | function | Shift a Date by the given timezone offset in minutes and return the adjusted Date. |
-| `getKoreanDate` | function | Return a Date object adjusted to Korea Standard Time (UTC+9). |
-| `getKoreanDateString` | function | Return a YYYY-MM-DD string in Korea Standard Time for the given date. |
-| `parseDateAsTimezone` | function | Parse a date string as if it were in the given timezone offset. |
-| `convertToTimezone` | function | Convert a Date from UTC to the target timezone offset and return the adjusted Date. |
-| `KST_OFFSET` | constant | Korea Standard Time UTC offset in minutes (540 = UTC+9). |
-| `useNumberFormatter` | function | Number formatting hook — formatNumber, formatPercent, formatCompact |
-| `formatNumber` | function | Format a number with locale-aware grouping separators and decimal places. Accepts NumberFormatterOptions. |
-| `formatCompact` | function | Format a large number using compact notation (e.g. 1K, 1.2M). Accepts NumberFormatterOptions. |
-| `formatPercent` | function | Format a decimal value as a percentage string (e.g. 0.75 → '75%'). Accepts PercentFormatterOptions. |
-| `useCurrencyFormatter` | function | Currency formatting hook — formatCurrency with 6 currency support |
-| `formatCurrency` | function | Format a number as a currency string (e.g. '₩1,000', '$9.99'). Accepts CurrencyFormatterOptions. |
-| `getDefaultCurrency` | function | Resolve the default ISO 4217 currency code for a given language code using LANGUAGE_TO_CURRENCY. |
-| `getCurrencyDecimals` | function | Return the standard number of decimal places for a given ISO 4217 currency code using CURRENCY_DECIMALS. |
-| `LANGUAGE_TO_CURRENCY` | constant | Constant map from BCP 47 language code to ISO 4217 currency code (e.g. 'ko' → 'KRW', 'en' → 'USD'). |
-| `CURRENCY_DECIMALS` | constant | Constant map from ISO 4217 currency code to standard decimal places (e.g. 'KRW' → 0, 'USD' → 2). |
-| `DateFormatterOptions` | type | Options for formatDate / formatDateTime — pattern, locale, timezone offset. |
-| `TimezoneConfig` | type | Timezone configuration — offset in minutes and optional label. |
-| `RelativeTimeOptions` | type | Options for formatRelativeTime — locale, numeric style. |
-| `DateFormatterReturn` | type | Return type of useDateFormatter — formatDate, formatDateTime, formatRelativeTime, monthNames, dayNames. |
-| `NumberFormatterOptions` | type | Options for formatNumber / formatCompact — locale, minimumFractionDigits, maximumFractionDigits. |
-| `PercentFormatterOptions` | type | Options for formatPercent — locale, decimal places. |
-| `NumberFormatterReturn` | type | Return type of useNumberFormatter — formatNumber, formatPercent, formatCompact. |
-| `CurrencyFormatterOptions` | type | Options for formatCurrency — currency code, locale, symbol display. |
-| `CurrencyFormatterReturn` | type | Return type of useCurrencyFormatter — formatCurrency. |
+| Export                       | Type     | Description                                                                                                                                                                                      |
+| ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `useDateFormatter`           | function | Date formatting hook — formatDate, formatRelativeTime, monthNames, dayNames                                                                                                                      |
+| `formatDate`                 | function | Format a Date or ISO string into a localized date string. Accepts DateFormatterOptions (pattern, locale, timezone).                                                                              |
+| `formatDateTime`             | function | Format a Date or ISO string into a localized date-and-time string.                                                                                                                               |
+| `formatRelativeTime`         | function | Return a locale-aware relative time string (e.g. '3 minutes ago', '2일 전'). Accepts RelativeTimeOptions.                                                                                        |
+| `formatDateLocalized`        | function | Format a Date using the native Intl.DateTimeFormat for the given locale (e.g. 'ko-KR' → '2025년 1월 25일'). Accepts LocaleDateFormatterOptions (dateStyle, timeZone).                            |
+| `formatDateTimeLocalized`    | function | Format a Date as a localized date-and-time string using Intl.DateTimeFormat (e.g. 'en-US' → 'January 25, 2025 at 3:30 PM'). Accepts LocaleDateFormatterOptions (dateStyle, timeStyle, timeZone). |
+| `getLocaleFromLanguage`      | function | Map a BCP 47 language code to a full locale code (e.g. 'ko' → 'ko-KR', 'en' → 'en-US'). Falls back to 'en-US' for unknown codes.                                                                 |
+| `applyTimezoneOffset`        | function | Shift a Date by the given timezone offset in minutes and return the adjusted Date.                                                                                                               |
+| `getKoreanDate`              | function | Return a Date object adjusted to Korea Standard Time (UTC+9).                                                                                                                                    |
+| `getKoreanDateString`        | function | Return a YYYY-MM-DD string in Korea Standard Time for the given date.                                                                                                                            |
+| `parseDateAsTimezone`        | function | Parse a date string as if it were in the given timezone offset.                                                                                                                                  |
+| `convertToTimezone`          | function | Convert a Date from UTC to the target timezone offset and return the adjusted Date.                                                                                                              |
+| `KST_OFFSET`                 | constant | Korea Standard Time UTC offset in minutes (540 = UTC+9).                                                                                                                                         |
+| `useNumberFormatter`         | function | Number formatting hook — formatNumber, formatPercent, formatCompact                                                                                                                              |
+| `formatNumber`               | function | Format a number with locale-aware grouping separators and decimal places. Accepts NumberFormatterOptions.                                                                                        |
+| `formatCompact`              | function | Format a large number using compact notation (e.g. 1K, 1.2M). Accepts NumberFormatterOptions.                                                                                                    |
+| `formatPercent`              | function | Format a decimal value as a percentage string (e.g. 0.75 → '75%'). Accepts PercentFormatterOptions.                                                                                              |
+| `useCurrencyFormatter`       | function | Currency formatting hook — formatCurrency with 6 currency support                                                                                                                                |
+| `formatCurrency`             | function | Format a number as a currency string (e.g. '₩1,000', '$9.99'). Accepts CurrencyFormatterOptions.                                                                                                 |
+| `getDefaultCurrency`         | function | Resolve the default ISO 4217 currency code for a given language code using LANGUAGE_TO_CURRENCY.                                                                                                 |
+| `getCurrencyDecimals`        | function | Return the standard number of decimal places for a given ISO 4217 currency code using CURRENCY_DECIMALS.                                                                                         |
+| `LANGUAGE_TO_CURRENCY`       | constant | Constant map from BCP 47 language code to ISO 4217 currency code (e.g. 'ko' → 'KRW', 'en' → 'USD').                                                                                              |
+| `CURRENCY_DECIMALS`          | constant | Constant map from ISO 4217 currency code to standard decimal places (e.g. 'KRW' → 0, 'USD' → 2).                                                                                                 |
+| `DateFormatterOptions`       | type     | Options for formatDate / formatDateTime — pattern, locale, timezone offset.                                                                                                                      |
+| `LocaleDateFormatterOptions` | type     | Options for formatDateLocalized / formatDateTimeLocalized — dateStyle, timeStyle, timeZone.                                                                                                      |
+| `TimezoneConfig`             | type     | Timezone configuration — offset in minutes and optional label.                                                                                                                                   |
+| `RelativeTimeOptions`        | type     | Options for formatRelativeTime — locale, numeric style.                                                                                                                                          |
+| `DateFormatterReturn`        | type     | Return type of useDateFormatter — formatDate, formatDateTime, formatRelativeTime, monthNames, dayNames.                                                                                          |
+| `NumberFormatterOptions`     | type     | Options for formatNumber / formatCompact — locale, minimumFractionDigits, maximumFractionDigits.                                                                                                 |
+| `PercentFormatterOptions`    | type     | Options for formatPercent — locale, decimal places.                                                                                                                                              |
+| `NumberFormatterReturn`      | type     | Return type of useNumberFormatter — formatNumber, formatPercent, formatCompact.                                                                                                                  |
+| `CurrencyFormatterOptions`   | type     | Options for formatCurrency — currency code, locale, symbol display.                                                                                                                              |
+| `CurrencyFormatterReturn`    | type     | Return type of useCurrencyFormatter — formatCurrency.                                                                                                                                            |
 
 ## Documentation
 

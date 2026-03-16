@@ -1,5 +1,23 @@
 # @hua-labs/i18n-loaders
 
+## 2.2.0
+
+### Minor Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
+### Patch Changes
+
+- Updated dependencies
+  - @hua-labs/i18n-core@2.2.0
+
 ## 2.1.0
 
 ### Patch Changes
@@ -28,7 +46,6 @@
 ### Minor Changes
 
 - dd9d4b2: Release alpha versions of i18n packages with React 19 support and type safety improvements.
-
   - @hua-labs/i18n-core-zustand: 2.0.0-alpha.3 (major bump due to Zustand v5 breaking changes)
   - @hua-labs/i18n-beginner: 2.1.0-alpha.3
   - @hua-labs/i18n-loaders: 1.1.0-alpha.3
@@ -42,16 +59,13 @@
 - d997d6b: # npm Provenance & Documentation Improvements
 
   ## npm Provenance (출처증명)
-
   - Add npm provenance support for all packages
   - Configure `.npmrc` with `provenance=true`
   - Add `id-token: write` permission to release workflow
   - Enhance supply chain security with package attestations
 
   ## Documentation Enhancements
-
   - **Badges**: Standardize badges across all package READMEs
-
     - Add npm downloads badge to all packages
     - Add TypeScript badge to all packages
     - Ensure consistent badge formatting
@@ -64,7 +78,6 @@
   ## Affected Packages
 
   All 9 packages receive patch updates for documentation and provenance:
-
   - @hua-labs/hua-ux
   - @hua-labs/ui
   - @hua-labs/motion-core
@@ -83,7 +96,6 @@
 ### Patch Changes
 
 - f7d08f1: chore: align external dependency versions across all packages
-
   - Introduce syncpack for automated dependency version management
   - Align @types/node to ^25.0.3 across all packages
   - Align TypeScript to ^5.9.3 across all packages
@@ -100,7 +112,6 @@
 ### Minor Changes
 
 - Public alpha release with complete documentation
-
   - Complete README standardization across all packages
   - Comprehensive DETAILED_GUIDE documentation for each package
   - Optimized npm keywords for better discoverability
@@ -117,7 +128,6 @@
 ### Major Changes
 
 - a475818: Initial release of i18n packages:
-
   - **@hua-labs/i18n-core**: Core i18n library with SSR/CSR support, zero flickering on language changes, and state management integration
   - **@hua-labs/i18n-core-zustand**: Zustand adapter for seamless state management integration
   - **@hua-labs/i18n-loaders**: Production-ready translation loaders with caching, preloading, and default translation merging
@@ -134,7 +144,6 @@
 ### Minor Changes
 
 - Initial release of @hua-labs/i18n-loaders
-
   - Production-ready API translation loader
   - Built-in TTL caching and global cache
   - Duplicate request prevention
