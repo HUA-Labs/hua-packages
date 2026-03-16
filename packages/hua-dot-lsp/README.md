@@ -1,5 +1,10 @@
 # @hua-labs/dot-lsp
 
+[![npm version](https://img.shields.io/npm/v/@hua-labs/dot-lsp.svg)](https://www.npmjs.com/package/@hua-labs/dot-lsp)
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot-lsp.svg)](https://www.npmjs.com/package/@hua-labs/dot-lsp)
+[![license](https://img.shields.io/npm/l/@hua-labs/dot-lsp.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+
 Language Server Protocol (LSP) server for the [@hua-labs/dot](../hua-dot) style engine.
 Provides autocomplete, hover documentation, and diagnostic warnings inside any editor
 that supports LSP.
@@ -165,6 +170,13 @@ Node.js 20 or later is required.
 - Node.js >= 20.0.0
 - `@hua-labs/dot` (peer, resolved automatically when installed via npm)
 
+## Related Packages
+
+- [`@hua-labs/dot`](https://www.npmjs.com/package/@hua-labs/dot) — Core style engine
+- [`@hua-labs/dot-vscode`](https://marketplace.visualstudio.com/items?itemName=hua-labs.dot-vscode) — VS Code extension (uses this LSP)
+- [`@hua-labs/dot-aot`](https://www.npmjs.com/package/@hua-labs/dot-aot) — Build-time static extraction
+- [`@hua-labs/dot-mcp`](https://www.npmjs.com/package/@hua-labs/dot-mcp) — MCP server for AI assistants
+
 ## License
 
-MIT
+MIT — [HUA Labs](https://hua-labs.com)
