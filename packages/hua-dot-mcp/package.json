@@ -27,6 +27,14 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HUA-Labs/hua-packages.git",
+    "directory": "packages/hua-dot-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/HUA-Labs/hua-packages/issues"
+  },
   "engines": {
     "node": ">=20.0.0"
   }

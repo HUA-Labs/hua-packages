@@ -1,5 +1,10 @@
 # @hua-labs/dot-mcp
 
+[![npm version](https://img.shields.io/npm/v/@hua-labs/dot-mcp.svg)](https://www.npmjs.com/package/@hua-labs/dot-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot-mcp.svg)](https://www.npmjs.com/package/@hua-labs/dot-mcp)
+[![license](https://img.shields.io/npm/l/@hua-labs/dot-mcp.svg)](https://github.com/HUA-Labs/hua-packages/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+
 MCP (Model Context Protocol) server for the [dot style engine](https://github.com/HUA-Labs/hua-packages). Exposes four tools that let AI assistants resolve, explain, complete, and validate dot utility strings across web, React Native, and Flutter targets.
 
 ## Installation
@@ -233,10 +238,17 @@ Validate a dot utility string. Checks whether each token resolves to at least on
 }
 ```
 
+## Related Packages
+
+- [`@hua-labs/dot`](https://www.npmjs.com/package/@hua-labs/dot) — Core style engine
+- [`@hua-labs/dot-lsp`](https://www.npmjs.com/package/@hua-labs/dot-lsp) — LSP server for editor integration
+- [`@hua-labs/dot-aot`](https://www.npmjs.com/package/@hua-labs/dot-aot) — Build-time static extraction
+- [`@hua-labs/dot-vscode`](https://marketplace.visualstudio.com/items?itemName=hua-labs.dot-vscode) — VS Code extension
+
 ## Requirements
 
 - Node.js >= 20.0.0
 
 ## License
 
-MIT
+MIT — [HUA Labs](https://hua-labs.com)
