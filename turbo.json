@@ -1,12 +1,27 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
-  "globalPassThroughEnv": ["PATH", "NODE"],
-  "globalEnv": ["DATABASE_URL", "NODE_ENV", "DIRECT_URL"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
+  "globalPassThroughEnv": [
+    "PATH",
+    "NODE"
+  ],
+  "globalEnv": [
+    "DATABASE_URL",
+    "NODE_ENV",
+    "DIRECT_URL"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ],
       "env": [
         "NODE_ENV",
         "DATABASE_URL",
@@ -36,8 +51,12 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
     },
     "lint": {
       "outputs": []
@@ -46,44 +65,72 @@
       "cache": false
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": []
     },
     "@hua-labs/ui#build": {
-      "dependsOn": ["@hua-labs/dot#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/dot#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/motion-core#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/utils#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-core-zustand#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-loaders#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/i18n-formatters#build": {
-      "dependsOn": ["@hua-labs/i18n-core#build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "@hua-labs/i18n-core#build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/hooks#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     },
     "@hua-labs/state#build": {
       "dependsOn": [],
-      "outputs": ["dist/**"]
+      "outputs": [
+        "dist/**"
+      ]
     }
   }
 }

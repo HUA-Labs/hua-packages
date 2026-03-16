@@ -229,13 +229,6 @@ entries:
       test: true
       lint: false
 
-  - name: "@hua-labs/pro"
-    path: "packages/hua-pro"
-    kind: package
-    tier: bundle-internal
-    accessClass: framework-entitled
-    lifecycle: reserved
-    release:
       mode: private-workspace
     publicMirror:
       mode: exclude
@@ -261,13 +254,6 @@ entries:
       test: true
       lint: false
 
-  - name: "@hua-labs/docs-engine"
-    path: "packages/my-docs-engine"
-    kind: package
-    tier: support
-    accessClass: public-oss
-    lifecycle: maintain
-    release:
       mode: public-npm
     publicMirror:
       mode: defer
@@ -277,13 +263,6 @@ entries:
       test: true
       lint: false
 
-  - name: "@hua-labs/codemod"
-    path: "packages/hua-codemod"
-    kind: package
-    tier: tooling
-    accessClass: public-oss
-    lifecycle: freeze-candidate
-    release:
       mode: public-npm
     publicMirror:
       mode: include
@@ -309,13 +288,6 @@ entries:
       test: true
       lint: false
 
-  - name: "my-app"
-    path: "apps/my-app"
-    kind: app
-    tier: product
-    accessClass: private-app
-    lifecycle: grow
-    release:
       mode: app-deploy
     publicMirror:
       mode: exclude
@@ -325,13 +297,6 @@ entries:
       test: false
       lint: true
 
-  - name: "my-app-app"
-    path: "apps/my-app-app"
-    kind: app
-    tier: product
-    accessClass: private-app
-    lifecycle: grow
-    release:
       mode: app-deploy
     publicMirror:
       mode: exclude
@@ -341,13 +306,6 @@ entries:
       test: false
       lint: false
 
-  - name: "hue"
-    path: "apps/hue"
-    kind: app
-    tier: product
-    accessClass: hosted-only
-    lifecycle: grow
-    release:
       mode: private-app
     publicMirror:
       mode: exclude
@@ -357,13 +315,6 @@ entries:
       test: false
       lint: false
 
-  - name: "my-docs"
-    path: "apps/my-docs"
-    kind: app
-    tier: internal-site
-    accessClass: private-app
-    lifecycle: maintain
-    release:
       mode: app-deploy
     publicMirror:
       mode: exclude
@@ -373,13 +324,6 @@ entries:
       test: false
       lint: false
 
-  - name: "my-site"
-    path: "apps/my-site"
-    kind: app
-    tier: internal-site
-    accessClass: private-app
-    lifecycle: maintain
-    release:
       mode: app-deploy
     publicMirror:
       mode: exclude
@@ -389,13 +333,6 @@ entries:
       test: false
       lint: false
 
-  - name: "slides"
-    path: "apps/slides"
-    kind: app
-    tier: internal-site
-    accessClass: private-app
-    lifecycle: maintain
-    release:
       mode: app-deploy
     publicMirror:
       mode: exclude
