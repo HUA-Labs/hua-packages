@@ -1,7 +1,10 @@
 {
   "name": "@hua-labs/dot-mcp",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "MCP server for the dot style engine",
   "type": "module",
   "bin": {
@@ -9,7 +12,9 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --target es2022",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hua-labs/dot": "workspace:*",
@@ -19,7 +24,8 @@
   "devDependencies": {
     "tsup": "^8.0.0",
     "tsx": "^4.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=20.0.0"

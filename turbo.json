@@ -1,20 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalPassThroughEnv": ["PATH", "NODE"],
   "globalEnv": ["DATABASE_URL", "NODE_ENV", "DIRECT_URL"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "NODE_ENV",
         "DATABASE_URL",
@@ -44,12 +36,8 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
     },
     "lint": {
       "outputs": []
@@ -58,17 +46,11 @@
       "cache": false
     },
     "type-check": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "@hua-labs/ui#build": {
       "dependsOn": ["@hua-labs/dot#build"],
-      "outputs": ["dist/**"]
-    },
-    "@hua-labs/ui-dashboard#build": {
-      "dependsOn": ["@hua-labs/ui#build"],
       "outputs": ["dist/**"]
     },
     "@hua-labs/i18n-core#build": {

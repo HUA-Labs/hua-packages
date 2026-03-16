@@ -25,78 +25,87 @@ Unified security toolkit with Free/Pro tiers. Free tier provides encryption (AES
 pnpm add @hua-labs/security
 ```
 
-> Peer dependencies: @google-cloud/kms ^5.3.0, next >=14.0.0
+> Peer dependencies: @google-cloud/kms ^5.3.0 (optional — KMS features only), next >=14.0.0 (optional — Next.js middleware only)
 
 ## Quick Start
 
 ```typescript
 import {
-  encryptSmart, decryptSmart,
-  createMemoryRateLimiter, createStorageRateLimiter,
+  encryptSmart,
+  decryptSmart,
+  createMemoryRateLimiter,
+  createStorageRateLimiter,
   RATE_LIMIT_PRESETS,
-} from '@hua-labs/security';
-import { createRedisAdapter } from '@hua-labs/security/adapters';
+} from "@hua-labs/security";
+import { createRedisAdapter } from "@hua-labs/security/adapters";
 
 // Encrypt (uses KMS if available, otherwise PBKDF2)
-const encrypted = await encryptSmart('sensitive data');
+const encrypted = await encryptSmart("sensitive data");
 const decrypted = await decryptSmart(encrypted);
 
 // Rate limiting (in-memory)
 const limiter = createMemoryRateLimiter();
-const result = await limiter.checkRateLimit('user-123', '1.2.3.4', RATE_LIMIT_PRESETS.auth);
+const result = await limiter.checkRateLimit(
+  "user-123",
+  "1.2.3.4",
+  RATE_LIMIT_PRESETS.auth,
+);
 
 // Rate limiting (Redis-backed)
 const adapter = createRedisAdapter({ client: redis });
 const distributed = createStorageRateLimiter(adapter);
-const res = await distributed.checkRateLimit('user-123', '1.2.3.4', RATE_LIMIT_PRESETS.analyze);
-
+const res = await distributed.checkRateLimit(
+  "user-123",
+  "1.2.3.4",
+  RATE_LIMIT_PRESETS.analyze,
+);
 ```
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `ENCRYPTION_CONSTANTS` | component |  |
-| `encryptSmart` | function | Encrypt with best available method (KMS or PBKDF2) |
-| `decryptSmart` | function | Decrypt with auto-format detection |
-| `getEncryptionMethod` | function |  |
-| `pbkdf2Encrypt` | function |  |
-| `pbkdf2Decrypt` | function |  |
-| `isPBKDF2Format` | function |  |
-| `generateSecureKey` | function |  |
-| `checkKeyStrength` | function |  |
-| `hashSHA256` | function |  |
-| `hashSHA512` | function |  |
-| `createHMAC` | function |  |
-| `verifyHMAC` | function |  |
-| `secureCompare` | function |  |
-| `hashUserData` | function |  |
-| `isKMSEnabled` | function |  |
-| `envelopeEncrypt` | function | Direct KMS envelope encryption |
-| `envelopeDecrypt` | function | Direct KMS envelope decryption |
-| `isEnvelopeFormat` | function |  |
-| `resetKMSClient` | function |  |
-| `createMemoryRateLimiter` | function | Create in-memory rate limiter instance |
-| `RateLimitExceededError` | component |  |
-| `createStorageRateLimiter` | function | Create storage-backed rate limiter (Redis, DB) |
-| `RATE_LIMIT_PRESETS` | const | Built-in presets (default, auth, diary, search, analyze, sensitive) |
-| `validatePassword` | function | Validate password strength with bilingual messages |
-| `getClientIP` | function | Extract client IP from request headers |
-| `getUserAgent` | function | Extract user agent from request headers |
-| `isAllowedBot` | function |  |
-| `isNormalMobileUserAgent` | function |  |
-| `isSuspiciousUserAgent` | function |  |
-| `KeyManager` | class | Config-based encryption key manager |
-| `EncryptionConfig` | type |  |
-| `EncryptedPayload` | type |  |
-| `RateLimitResult` | type |  |
-| `MemoryRateLimiterConfig` | type |  |
-| `RateLimitPreset` | type |  |
-| `RateLimitPresetName` | type |  |
-| `RequestWithHeaders` | type |  |
-| `KeyType` | type |  |
-| `KeyInfo` | type |  |
-| `KeyManagerConfig` | type |  |
+| Export                     | Type     | Description                                                         |
+| -------------------------- | -------- | ------------------------------------------------------------------- |
+| `ENCRYPTION_CONSTANTS`     | const    | Encryption algorithm constants (algorithm, key length, IV length)   |
+| `encryptSmart`             | function | Encrypt with best available method (KMS or PBKDF2)                  |
+| `decryptSmart`             | function | Decrypt with auto-format detection                                  |
+| `getEncryptionMethod`      | function |                                                                     |
+| `pbkdf2Encrypt`            | function |                                                                     |
+| `pbkdf2Decrypt`            | function |                                                                     |
+| `isPBKDF2Format`           | function |                                                                     |
+| `generateSecureKey`        | function |                                                                     |
+| `checkKeyStrength`         | function |                                                                     |
+| `hashSHA256`               | function |                                                                     |
+| `hashSHA512`               | function |                                                                     |
+| `createHMAC`               | function |                                                                     |
+| `verifyHMAC`               | function |                                                                     |
+| `secureCompare`            | function |                                                                     |
+| `hashUserData`             | function |                                                                     |
+| `isKMSEnabled`             | function |                                                                     |
+| `envelopeEncrypt`          | function | Direct KMS envelope encryption                                      |
+| `envelopeDecrypt`          | function | Direct KMS envelope decryption                                      |
+| `isEnvelopeFormat`         | function |                                                                     |
+| `resetKMSClient`           | function |                                                                     |
+| `createMemoryRateLimiter`  | function | Create in-memory rate limiter instance                              |
+| `RateLimitExceededError`   | class    | Error thrown when rate limit is exceeded                            |
+| `createStorageRateLimiter` | function | Create storage-backed rate limiter (Redis, DB)                      |
+| `RATE_LIMIT_PRESETS`       | const    | Built-in presets (default, auth, diary, search, analyze, sensitive) |
+| `validatePassword`         | function | Validate password strength with bilingual messages                  |
+| `getClientIP`              | function | Extract client IP from request headers                              |
+| `getUserAgent`             | function | Extract user agent from request headers                             |
+| `isAllowedBot`             | function |                                                                     |
+| `isNormalMobileUserAgent`  | function |                                                                     |
+| `isSuspiciousUserAgent`    | function |                                                                     |
+| `KeyManager`               | class    | Config-based encryption key manager                                 |
+| `EncryptionConfig`         | type     |                                                                     |
+| `EncryptedPayload`         | type     |                                                                     |
+| `RateLimitResult`          | type     |                                                                     |
+| `MemoryRateLimiterConfig`  | type     |                                                                     |
+| `RateLimitPreset`          | type     |                                                                     |
+| `RateLimitPresetName`      | type     |                                                                     |
+| `RequestWithHeaders`       | type     |                                                                     |
+| `KeyType`                  | type     |                                                                     |
+| `KeyInfo`                  | type     |                                                                     |
+| `KeyManagerConfig`         | type     |                                                                     |
 
 ## Related Packages
 

@@ -1,6 +1,6 @@
 # @hua-labs/motion-core
 
-A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API.
+A collection of 55+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
@@ -10,12 +10,13 @@ A collection of 35+ React animation hooks built on a ref-based engine. Direct DO
 
 ## Features
 
-- **35+ animation hooks — Fade, slide, scale, scroll, interactions, gestures**
+- **55+ animation hooks — Fade, slide, scale, scroll, interactions, gestures, orchestration**
 - **Zero dependencies — Pure JavaScript motion engine**
 - **Ref-based — Direct DOM manipulation for consistent performance**
 - **SSR compatible — Works with Next.js, Remix, and SSR frameworks**
 - **React Native — 10 native hooks via Animated API (separate entry point)**
 - **Fully tested — Comprehensive test coverage**
+- **Pro hooks included — 18 advanced hooks absorbed from @hua-labs/pro (auto-play, orchestration, game loop, and more)**
 
 ## Installation
 
@@ -28,7 +29,7 @@ pnpm add @hua-labs/motion-core
 ## Quick Start
 
 ```tsx
-import { useFadeIn, useSlideUp } from '@hua-labs/motion-core';
+import { useFadeIn, useSlideUp } from "@hua-labs/motion-core";
 
 function Hero() {
   const fadeIn = useFadeIn({ duration: 800 });
@@ -36,14 +37,18 @@ function Hero() {
 
   return (
     <div>
-      <h1 ref={fadeIn.ref} style={fadeIn.style}>Welcome</h1>
-      <p ref={slideUp.ref} style={slideUp.style}>Animated content</p>
+      <h1 ref={fadeIn.ref} style={fadeIn.style}>
+        Welcome
+      </h1>
+      <p ref={slideUp.ref} style={slideUp.style}>
+        Animated content
+      </p>
     </div>
   );
 }
 
 // React Native — import from /native
-import { useFadeIn, useStagger } from '@hua-labs/motion-core/native';
+import { useFadeIn, useStagger } from "@hua-labs/motion-core/native";
 
 function ListItem() {
   const fadeIn = useFadeIn({ duration: 400 });
@@ -53,97 +58,114 @@ function ListItem() {
     </Animated.View>
   );
 }
-
 ```
 
 ## API
 
-| Export | Type | Description |
-|--------|------|-------------|
-| `MotionEngine` | class | Zero-dependency pure JavaScript motion engine class |
-| `motionEngine` | variable | Singleton instance of MotionEngine |
-| `TransitionEffects` | class | Transition effect system class (fade, slide, scale, etc.) |
-| `transitionEffects` | variable | Singleton instance of TransitionEffects |
-| `useSimplePageMotion` | hook | Simple fade+slide page entrance animation |
-| `usePageMotions` | hook | Multi-element page entrance orchestration |
-| `useSmartMotion` | hook | Adaptive motion based on device performance |
-| `useUnifiedMotion` | hook | All-in-one motion hook with presets |
-| `useFadeIn` | hook | Fade-in animation hook |
-| `useSlideUp` | hook | Slide-up entrance animation |
-| `useSlideLeft` | hook | Slide-left entrance animation |
-| `useSlideRight` | hook | Slide-right entrance animation |
-| `useScaleIn` | hook | Scale-in entrance animation |
-| `useBounceIn` | hook | Bounce-in entrance animation |
-| `usePulse` | hook | Repeating pulse animation |
-| `useSpringMotion` | hook | Spring physics animation |
-| `useGradient` | hook | Animated gradient background |
-| `useHoverMotion` | hook | Hover interaction animation |
-| `useClickToggle` | hook | Click-triggered toggle animation |
-| `useFocusToggle` | hook | Focus-triggered toggle animation |
-| `useScrollReveal` | hook | Scroll-triggered reveal animation |
-| `useScrollProgress` | hook | Scroll position as 0-1 progress value |
-| `useMotionState` | hook | Animation state tracking (idle, running, complete) |
-| `useRepeat` | hook | Repeating animation with configurable count |
-| `useToggleMotion` | hook | Toggle between two animation states |
-| `useSlideDown` | hook | Slide-down entrance animation |
-| `useInView` | hook | IntersectionObserver-based visibility detection |
-| `useMouse` | hook | Mouse position tracking |
-| `useReducedMotion` | hook | Detect prefers-reduced-motion setting |
-| `useWindowSize` | hook | Responsive window size tracking |
-| `useGesture` | hook | Multi-gesture handler (drag, swipe, pinch) |
-| `useGestureMotion` | hook | Gesture-driven motion animation |
-| `useButtonEffect` | hook | Ripple / press feedback effect for buttons |
-| `useVisibilityToggle` | hook | Animate an element in/out based on a boolean visibility flag |
-| `useScrollToggle` | hook | Toggle animation state based on scroll position threshold |
-| `useCardList` | hook | Staggered entrance animation for a list of cards |
-| `useLoadingSpinner` | hook | Continuous rotation animation for loading spinners |
-| `useNavigation` | hook | Slide/fade animation for navigation transitions |
-| `useSkeleton` | hook | Shimmer animation for skeleton loading placeholders |
-| `useTypewriter` | hook | Typewriter character-by-character text reveal animation |
-| `useCustomCursor` | hook | Custom cursor tracking and animation |
-| `useMagneticCursor` | hook | Magnetic cursor attraction effect for interactive elements |
-| `useSmoothScroll` | hook | Smooth programmatic scroll with easing |
-| `useElementProgress` | hook | Track an element's scroll progress as a 0–1 value |
-| `neutral` | variable | Built-in neutral motion profile (minimal, system-respecting) |
-| `hua` | variable | Built-in hua motion profile (expressive, brand-aligned) |
-| `resolveProfile` | function | Resolve a built-in profile name or MotionProfile object to a MotionProfile |
-| `mergeProfileOverrides` | function | Deep-merge overrides into a base MotionProfile |
-| `MotionProfileProvider` | component | React context provider that supplies a MotionProfile to the subtree |
-| `useMotionProfile` | hook | Hook to read the current MotionProfile from context |
-| `observeElement` | function | Shared IntersectionObserver helper — observe an element and invoke a callback on visibility change |
-| `linear` | function | Linear easing (no acceleration) |
-| `easeIn` | function | Ease-in curve (slow start) |
-| `easeOut` | function | Ease-out curve (slow end) |
-| `easeInOut` | function | Smooth ease-in-out curve |
-| `getEasing` | function | Get easing function by name |
-| `applyEasing` | function | Apply an easing function to a raw progress value (throws on invalid) |
-| `safeApplyEasing` | function | Apply an easing function to a progress value, falling back to linear on error |
-| `isValidEasing` | function | Check whether a string is a recognised EasingType name |
-| `getAvailableEasings` | function | Return the list of all registered easing names |
-| `isEasingFunction` | function | Type-guard that checks whether a value is a callable EasingFunction |
-| `easingPresets` | variable | Map of named easing preset strings to EasingFunction objects |
-| `getPresetEasing` | function | Look up an EasingFunction by preset name |
-| `calculateSpring` | function | Pure function that computes spring position/velocity for a given time step |
-| `Motion` | component | React wrapper component that applies a motion hook to its child element via ref |
-| `useCountUp` | hook | Animated counter that counts up to a target number |
-| `useClipReveal` | hook | Clip-path reveal animation (wipe-in effect) |
-| `useBlurIn` | hook | Blur-to-clear entrance animation |
-| `useStagger` | hook | Orchestrate staggered entrance animations across a list of elements |
-| `MOTION_PRESETS` | variable | Built-in preset configurations keyed by element role (hero, title, button, card, text, image) |
-| `PAGE_MOTIONS` | variable | Page-level motion configs keyed by page type (home, dashboard, product, blog) |
-| `mergeWithPreset` | function | Merge a MotionPreset with custom overrides |
-| `getPagePreset` | function | Get PageMotionsConfig for a given PageType |
-| `getMotionPreset` | function | Get a MotionPreset by element role string |
-| `useFadeIn (native)` | hook | Native fade-in using Animated.timing |
-| `useSlideUp (native)` | hook | Native slide-up using Animated.parallel |
-| `useSlideDown (native)` | hook | Native slide-down using Animated.parallel |
-| `useSlideLeft (native)` | hook | Native slide-left using Animated.parallel |
-| `useSlideRight (native)` | hook | Native slide-right using Animated.parallel |
-| `useScaleIn (native)` | hook | Native scale-in using Animated.parallel |
-| `useBounceIn (native)` | hook | Native bounce-in using Animated.spring |
-| `useSpringMotion (native)` | hook | Native generic spring animation with animateTo() |
-| `usePulse (native)` | hook | Native looping pulse using Animated.loop |
-| `useStagger (native)` | hook | Native staggered list animation using Animated.stagger |
+| Export                     | Type      | Description                                                                                                                                                                    |
+| -------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `MotionEngine`             | class     | Zero-dependency pure JavaScript motion engine class                                                                                                                            |
+| `motionEngine`             | variable  | Singleton instance of MotionEngine                                                                                                                                             |
+| `TransitionEffects`        | class     | Transition effect system class (fade, slide, scale, etc.)                                                                                                                      |
+| `transitionEffects`        | variable  | Singleton instance of TransitionEffects                                                                                                                                        |
+| `useSimplePageMotion`      | hook      | Simple fade+slide page entrance animation                                                                                                                                      |
+| `usePageMotions`           | hook      | Multi-element page entrance orchestration                                                                                                                                      |
+| `useSmartMotion`           | hook      | Adaptive motion based on device performance                                                                                                                                    |
+| `useUnifiedMotion`         | hook      | All-in-one motion hook with presets                                                                                                                                            |
+| `useFadeIn`                | hook      | Fade-in animation hook                                                                                                                                                         |
+| `useSlideUp`               | hook      | Slide-up entrance animation                                                                                                                                                    |
+| `useSlideLeft`             | hook      | Slide-left entrance animation                                                                                                                                                  |
+| `useSlideRight`            | hook      | Slide-right entrance animation                                                                                                                                                 |
+| `useScaleIn`               | hook      | Scale-in entrance animation                                                                                                                                                    |
+| `useBounceIn`              | hook      | Bounce-in entrance animation                                                                                                                                                   |
+| `usePulse`                 | hook      | Repeating pulse animation                                                                                                                                                      |
+| `useSpringMotion`          | hook      | Spring physics animation                                                                                                                                                       |
+| `useGradient`              | hook      | Animated gradient background                                                                                                                                                   |
+| `useHoverMotion`           | hook      | Hover interaction animation                                                                                                                                                    |
+| `useClickToggle`           | hook      | Click-triggered toggle animation                                                                                                                                               |
+| `useFocusToggle`           | hook      | Focus-triggered toggle animation                                                                                                                                               |
+| `useScrollReveal`          | hook      | Scroll-triggered reveal animation                                                                                                                                              |
+| `useScrollProgress`        | hook      | Scroll position as 0-1 progress value                                                                                                                                          |
+| `useMotionState`           | hook      | Animation state tracking (idle, running, complete)                                                                                                                             |
+| `useRepeat`                | hook      | Repeating animation with configurable count                                                                                                                                    |
+| `useToggleMotion`          | hook      | Toggle between two animation states                                                                                                                                            |
+| `useSlideDown`             | hook      | Slide-down entrance animation                                                                                                                                                  |
+| `useInView`                | hook      | IntersectionObserver-based visibility detection                                                                                                                                |
+| `useMouse`                 | hook      | Mouse position tracking                                                                                                                                                        |
+| `useReducedMotion`         | hook      | Detect prefers-reduced-motion setting                                                                                                                                          |
+| `useWindowSize`            | hook      | Responsive window size tracking                                                                                                                                                |
+| `useGesture`               | hook      | Multi-gesture handler (drag, swipe, pinch)                                                                                                                                     |
+| `useGestureMotion`         | hook      | Gesture-driven motion animation                                                                                                                                                |
+| `useButtonEffect`          | hook      | Ripple / press feedback effect for buttons                                                                                                                                     |
+| `useVisibilityToggle`      | hook      | Animate an element in/out based on a boolean visibility flag                                                                                                                   |
+| `useScrollToggle`          | hook      | Toggle animation state based on scroll position threshold                                                                                                                      |
+| `useCardList`              | hook      | Staggered entrance animation for a list of cards                                                                                                                               |
+| `useLoadingSpinner`        | hook      | Continuous rotation animation for loading spinners                                                                                                                             |
+| `useNavigation`            | hook      | Slide/fade animation for navigation transitions                                                                                                                                |
+| `useSkeleton`              | hook      | Shimmer animation for skeleton loading placeholders                                                                                                                            |
+| `useTypewriter`            | hook      | Typewriter character-by-character text reveal animation                                                                                                                        |
+| `useCustomCursor`          | hook      | Custom cursor tracking and animation                                                                                                                                           |
+| `useMagneticCursor`        | hook      | Magnetic cursor attraction effect for interactive elements                                                                                                                     |
+| `useSmoothScroll`          | hook      | Smooth programmatic scroll with easing                                                                                                                                         |
+| `useElementProgress`       | hook      | Track an element's scroll progress as a 0–1 value                                                                                                                              |
+| `useAutoFade`              | hook      | Auto-playing opacity animation with repeat, loop, and manual fadeIn/fadeOut controls                                                                                           |
+| `useAutoPlay`              | hook      | Interval-driven step counter with pause-on-hover, pause-on-blur, and repeat controls                                                                                           |
+| `useAutoScale`             | hook      | Auto-playing scale animation with bounce/elastic easing and manual scaleIn/scaleOut controls                                                                                   |
+| `useAutoSlide`             | hook      | Auto-playing translate animation across eight directional presets with repeat and toggle                                                                                       |
+| `useMotionOrchestra`       | hook      | Coordinate multiple named motion steps in sequential, parallel, or stagger playback mode                                                                                       |
+| `useOrchestration`         | hook      | Timeline-based motion orchestration with seek, variable speed, reverse, and per-step callbacks                                                                                 |
+| `useSequence`              | hook      | Run an ordered array of motion hooks one after another with optional delay and loop                                                                                            |
+| `useLayoutMotion`          | hook      | Animate layout properties (width, height, flex, grid) between two style states                                                                                                 |
+| `useKeyboardToggle`        | hook      | Toggle a boolean state with configurable key bindings, combos, and optional auto-reset                                                                                         |
+| `useScrollDirection`       | hook      | Detect current scroll direction (up / down / idle) with a configurable threshold                                                                                               |
+| `useStickyToggle`          | hook      | Boolean flag that becomes true once the page scrolls past a given pixel offset                                                                                                 |
+| `useInteractive`           | hook      | Scale state machine for hover and click interactions with configurable scale values                                                                                            |
+| `usePerformanceMonitor`    | hook      | Measure real-time FPS via requestAnimationFrame and flag low-performance conditions                                                                                            |
+| `useLanguageAwareMotion`   | hook      | Scroll-reveal animation that pauses or restarts when the active locale changes                                                                                                 |
+| `useGameLoop`              | hook      | Fixed-timestep requestAnimationFrame loop with FPS tracking, pause, and update/render callbacks                                                                                |
+| `useMotion`                | hook      | General-purpose from/to animation hook supporting fade, slide, scale, and rotate presets                                                                                       |
+| `useViewportToggle`        | hook      | IntersectionObserver-based viewport enter/exit detection with once and trigger-mode options (absorbed from @hua-labs/pro; renamed from useVisibilityToggle to avoid collision) |
+| `useScrollPositionToggle`  | hook      | Toggle visibility based on a window.pageYOffset threshold, with a scrollToTop helper (absorbed from @hua-labs/pro; renamed from useScrollToggle to avoid collision)            |
+| `neutral`                  | variable  | Built-in neutral motion profile (minimal, system-respecting)                                                                                                                   |
+| `hua`                      | variable  | Built-in hua motion profile (expressive, brand-aligned)                                                                                                                        |
+| `resolveProfile`           | function  | Resolve a built-in profile name or MotionProfile object to a MotionProfile                                                                                                     |
+| `mergeProfileOverrides`    | function  | Deep-merge overrides into a base MotionProfile                                                                                                                                 |
+| `MotionProfileProvider`    | component | React context provider that supplies a MotionProfile to the subtree                                                                                                            |
+| `useMotionProfile`         | hook      | Hook to read the current MotionProfile from context                                                                                                                            |
+| `observeElement`           | function  | Shared IntersectionObserver helper — observe an element and invoke a callback on visibility change                                                                             |
+| `linear`                   | function  | Linear easing (no acceleration)                                                                                                                                                |
+| `easeIn`                   | function  | Ease-in curve (slow start)                                                                                                                                                     |
+| `easeOut`                  | function  | Ease-out curve (slow end)                                                                                                                                                      |
+| `easeInOut`                | function  | Smooth ease-in-out curve                                                                                                                                                       |
+| `getEasing`                | function  | Get easing function by name                                                                                                                                                    |
+| `applyEasing`              | function  | Apply an easing function to a raw progress value (throws on invalid)                                                                                                           |
+| `safeApplyEasing`          | function  | Apply an easing function to a progress value, falling back to linear on error                                                                                                  |
+| `isValidEasing`            | function  | Check whether a string is a recognised EasingType name                                                                                                                         |
+| `getAvailableEasings`      | function  | Return the list of all registered easing names                                                                                                                                 |
+| `isEasingFunction`         | function  | Type-guard that checks whether a value is a callable EasingFunction                                                                                                            |
+| `easingPresets`            | variable  | Map of named easing preset strings to EasingFunction objects                                                                                                                   |
+| `getPresetEasing`          | function  | Look up an EasingFunction by preset name                                                                                                                                       |
+| `calculateSpring`          | function  | Pure function that computes spring position/velocity for a given time step                                                                                                     |
+| `Motion`                   | component | React wrapper component that applies a motion hook to its child element via ref                                                                                                |
+| `useCountUp`               | hook      | Animated counter that counts up to a target number                                                                                                                             |
+| `useClipReveal`            | hook      | Clip-path reveal animation (wipe-in effect)                                                                                                                                    |
+| `useBlurIn`                | hook      | Blur-to-clear entrance animation                                                                                                                                               |
+| `useStagger`               | hook      | Orchestrate staggered entrance animations across a list of elements                                                                                                            |
+| `MOTION_PRESETS`           | variable  | Built-in preset configurations keyed by element role (hero, title, button, card, text, image)                                                                                  |
+| `PAGE_MOTIONS`             | variable  | Page-level motion configs keyed by page type (home, dashboard, product, blog)                                                                                                  |
+| `mergeWithPreset`          | function  | Merge a MotionPreset with custom overrides                                                                                                                                     |
+| `getPagePreset`            | function  | Get PageMotionsConfig for a given PageType                                                                                                                                     |
+| `getMotionPreset`          | function  | Get a MotionPreset by element role string                                                                                                                                      |
+| `useFadeIn (native)`       | hook      | Native fade-in using Animated.timing                                                                                                                                           |
+| `useSlideUp (native)`      | hook      | Native slide-up using Animated.parallel                                                                                                                                        |
+| `useSlideDown (native)`    | hook      | Native slide-down using Animated.parallel                                                                                                                                      |
+| `useSlideLeft (native)`    | hook      | Native slide-left using Animated.parallel                                                                                                                                      |
+| `useSlideRight (native)`   | hook      | Native slide-right using Animated.parallel                                                                                                                                     |
+| `useScaleIn (native)`      | hook      | Native scale-in using Animated.parallel                                                                                                                                        |
+| `useBounceIn (native)`     | hook      | Native bounce-in using Animated.spring                                                                                                                                         |
+| `useSpringMotion (native)` | hook      | Native generic spring animation with animateTo()                                                                                                                               |
+| `usePulse (native)`        | hook      | Native looping pulse using Animated.loop                                                                                                                                       |
+| `useStagger (native)`      | hook      | Native staggered list animation using Animated.stagger                                                                                                                         |
 
 ## Documentation
 

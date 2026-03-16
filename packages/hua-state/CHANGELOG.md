@@ -1,5 +1,18 @@
 # @hua-labs/state
 
+## 1.0.4
+
+### Patch Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
 ## 1.0.3
 
 ### Patch Changes
@@ -32,16 +45,13 @@
 - d997d6b: # npm Provenance & Documentation Improvements
 
   ## npm Provenance (출처증명)
-
   - Add npm provenance support for all packages
   - Configure `.npmrc` with `provenance=true`
   - Add `id-token: write` permission to release workflow
   - Enhance supply chain security with package attestations
 
   ## Documentation Enhancements
-
   - **Badges**: Standardize badges across all package READMEs
-
     - Add npm downloads badge to all packages
     - Add TypeScript badge to all packages
     - Ensure consistent badge formatting
@@ -54,7 +64,6 @@
   ## Affected Packages
 
   All 9 packages receive patch updates for documentation and provenance:
-
   - @hua-labs/hua-ux
   - @hua-labs/ui
   - @hua-labs/motion-core
@@ -73,7 +82,6 @@
 ### Patch Changes
 
 - f7d08f1: chore: align external dependency versions across all packages
-
   - Introduce syncpack for automated dependency version management
   - Align @types/node to ^25.0.3 across all packages
   - Align TypeScript to ^5.9.3 across all packages
@@ -83,7 +91,6 @@
   This ensures consistent behavior across the monorepo and prevents version conflicts.
 
 - f7d08f1: fix(hua-ux, state): improve type safety and remove 'as any' assertions
-
   - Remove all 'as any' type assertions from hua-ux framework
   - Export zustand types (UseBoundStore, StoreApi) from @hua-labs/state for proper type inference
   - Fix LicenseFeature type handling for dynamic plugin features
@@ -100,13 +107,11 @@
 - a1aa8e9: fix: Fix package.json exports to use dist instead of src
 
   Fixed exports configuration in @hua-labs/state and @hua-labs/ui:
-
   - Changed all import/require paths from src/_.ts to dist/_.js
   - Fixed module field to point to dist/_.js instead of dist/_.mjs
   - This resolves "Module not found" and "Missing module type" errors in Next.js projects
 
   Affected packages:
-
   - @hua-labs/state: Fixed main entry and integrations/i18n exports
   - @hua-labs/ui: Fixed main entry and all subpath exports (advanced, form, navigation, feedback, components)
 
@@ -115,7 +120,6 @@
 ### Minor Changes
 
 - Public alpha release with complete documentation
-
   - Complete README standardization across all packages
   - Comprehensive DETAILED_GUIDE documentation for each package
   - Optimized npm keywords for better discoverability
@@ -127,7 +131,6 @@
 ### Minor Changes
 
 - 31920d5: Introduce unified state management package with SSR support
-
   - Zustand v5 based state management
   - SSR support for Next.js App Router
   - i18n integration store included

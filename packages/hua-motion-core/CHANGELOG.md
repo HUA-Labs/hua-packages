@@ -1,5 +1,18 @@
 # @hua-labs/motion-core
 
+## 2.4.0
+
+### Minor Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
 ## 2.3.0
 
 ### Minor Changes
@@ -25,16 +38,13 @@
 - d997d6b: # npm Provenance & Documentation Improvements
 
   ## npm Provenance (출처증명)
-
   - Add npm provenance support for all packages
   - Configure `.npmrc` with `provenance=true`
   - Add `id-token: write` permission to release workflow
   - Enhance supply chain security with package attestations
 
   ## Documentation Enhancements
-
   - **Badges**: Standardize badges across all package READMEs
-
     - Add npm downloads badge to all packages
     - Add TypeScript badge to all packages
     - Ensure consistent badge formatting
@@ -47,7 +57,6 @@
   ## Affected Packages
 
   All 9 packages receive patch updates for documentation and provenance:
-
   - @hua-labs/hua-ux
   - @hua-labs/ui
   - @hua-labs/motion-core
@@ -63,7 +72,6 @@
 ### Patch Changes
 
 - f7d08f1: chore: align external dependency versions across all packages
-
   - Introduce syncpack for automated dependency version management
   - Align @types/node to ^25.0.3 across all packages
   - Align TypeScript to ^5.9.3 across all packages
@@ -77,7 +85,6 @@
 ### Minor Changes
 
 - Public alpha release with complete documentation
-
   - Complete README standardization across all packages
   - Comprehensive DETAILED_GUIDE documentation for each package
   - Optimized npm keywords for better discoverability
@@ -89,7 +96,6 @@
 ### Minor Changes
 
 - 31920d5: Update motion-core with latest hooks and improvements
-
   - Added `useUnifiedMotion` hook for streamlined animation API
   - Enhanced type definitions for better TypeScript support
   - Improved animation performance and stability
@@ -102,7 +108,6 @@
 - 950a40d: # HUA Motion Core v2.0.0 - React 19 compatibility and essential motion hooks
 
   **React 19 Migration:**
-
   - Updated peerDependencies to React >=19.0.0
   - Refactored type definitions for React 19 compatibility
   - Updated ref handling to work with React 19's stricter element types
@@ -110,19 +115,16 @@
   - Updated style types to support React 19's new CSS properties
 
   **Breaking Changes:**
-
   - Minimum React version: 19.0.0 (previously >=16.8.0)
   - Type definitions updated for React 19's stricter typing
 
   **Migration Guide:**
-
   - If you're using React 18 or earlier, stay on v1.x
   - For React 19 projects, upgrade to v2.x
   - No code changes required for most use cases
   - TypeScript users may need to update type annotations if using custom element types
 
   **Other Changes:**
-
   - 25 essential motion hooks for React applications
   - Full TypeScript support with comprehensive type definitions
   - Zero external dependencies, lightweight and performant

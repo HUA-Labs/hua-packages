@@ -1,5 +1,18 @@
 # @hua-labs/i18n-core
 
+## 2.2.0
+
+### Minor Changes
+
+- Package consolidation for public release.
+  - **ui**: className → dot prop migration (MIGRATION NOTE: components no longer accept className), dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
+  - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)
+  - **hua**: remove pro re-exports, update umbrella exports for motion-core absorption
+  - **i18n**: I18nPlatformAdapter, legal document migration, dependency updates
+  - **utils/hooks/state**: dependency updates
+  - **security**: remove private flag, public release preparation
+  - **eslint-plugin-i18n**: public release with documented API
+
 ## 2.1.0
 
 ### Minor Changes
@@ -23,7 +36,6 @@
 ### Minor Changes
 
 - **feat(i18n): tPlural — ICU plural support via Intl.PluralRules**
-
   - Add `tPlural(key, count, params?, language?)` to Translator, useI18n, useTranslation
   - Add `PluralCategory`, `PluralValue`, `isPluralValue` types and type guard
   - Add `ResolvePluralKey` conditional type for type-safe plural keys
@@ -40,16 +52,13 @@
 - d997d6b: # npm Provenance & Documentation Improvements
 
   ## npm Provenance (출처증명)
-
   - Add npm provenance support for all packages
   - Configure `.npmrc` with `provenance=true`
   - Add `id-token: write` permission to release workflow
   - Enhance supply chain security with package attestations
 
   ## Documentation Enhancements
-
   - **Badges**: Standardize badges across all package READMEs
-
     - Add npm downloads badge to all packages
     - Add TypeScript badge to all packages
     - Ensure consistent badge formatting
@@ -62,7 +71,6 @@
   ## Affected Packages
 
   All 9 packages receive patch updates for documentation and provenance:
-
   - @hua-labs/hua-ux
   - @hua-labs/ui
   - @hua-labs/motion-core
@@ -78,7 +86,6 @@
 ### Patch Changes
 
 - f7d08f1: chore: align external dependency versions across all packages
-
   - Introduce syncpack for automated dependency version management
   - Align @types/node to ^25.0.3 across all packages
   - Align TypeScript to ^5.9.3 across all packages
@@ -92,7 +99,6 @@
 ### Minor Changes
 
 - Public alpha release with complete documentation
-
   - Complete README standardization across all packages
   - Comprehensive DETAILED_GUIDE documentation for each package
   - Optimized npm keywords for better discoverability
@@ -104,7 +110,6 @@
 ### Major Changes
 
 - a475818: Initial release of i18n packages:
-
   - **@hua-labs/i18n-core**: Core i18n library with SSR/CSR support, zero flickering on language changes, and state management integration
   - **@hua-labs/i18n-core-zustand**: Zustand adapter for seamless state management integration
   - **@hua-labs/i18n-loaders**: Production-ready translation loaders with caching, preloading, and default translation merging
@@ -116,7 +121,6 @@
 ### Major Changes
 
 - Initial release of @hua-labs/i18n-core
-
   - Type-safe i18n library with SSR/CSR support
   - Zero flickering on language changes
   - Built-in hydration handling

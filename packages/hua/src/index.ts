@@ -429,7 +429,6 @@ export {
   // Advanced interaction / scroll / layout motion (motion-core)
   useButtonEffect,
   useScrollToggle,
-  // Note: useVisibilityToggle is exported from @hua-labs/pro, not re-exported here from motion-core
   useCardList,
   useLoadingSpinner,
   useNavigation,
@@ -584,49 +583,3 @@ export type {
   I18nStoreConfig,
   UseStoreHook,
 } from "@hua-labs/state";
-
-// Re-export Pro features (named exports — useMotion/useScrollToggle 제외, framework 버전과 충돌)
-// Pro의 useMotion/useScrollToggle은 @hua-labs/hua/pro에서만 접근
-// Pro package is dist-only (source not included in npm)
-export {
-  useAutoSlide,
-  useAutoScale,
-  useAutoFade,
-  useAutoPlay,
-  useMotionOrchestra,
-  useOrchestration,
-  useSequence,
-  useLayoutMotion,
-  useKeyboardToggle,
-  useScrollDirection,
-  useStickyToggle,
-  useVisibilityToggle,
-  useInteractive,
-  usePerformanceMonitor,
-  useLanguageAwareMotion,
-  useGameLoop,
-  PRO_VERSION,
-} from "@hua-labs/pro";
-export type {
-  ProOrchestrationConfig,
-  SequenceConfig,
-  LayoutMotionConfig,
-  KeyboardToggleConfig,
-  ScrollDirectionConfig,
-  StickyToggleConfig,
-  ScrollToggleConfig,
-  VisibilityToggleConfig,
-  InteractiveConfig,
-  ProPerformanceConfig,
-  ProPerformanceMetrics,
-  LanguageConfig,
-  GameLoopConfig,
-  GameState,
-  ProAutoMotionConfig,
-  ProMotionConfig,
-  ProMotionState,
-  AutoSlideConfig,
-  AutoScaleConfig,
-  AutoFadeConfig,
-  AutoPlayConfig,
-} from "@hua-labs/pro";
