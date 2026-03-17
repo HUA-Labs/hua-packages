@@ -156,10 +156,12 @@ const DIVIDE_KEYS = new Set([
   "__dot_divideYReverse",
   "__dot_divideXReverse",
 ]);
+const SPACE_KEYS = new Set(["__dot_spaceY", "__dot_spaceX"]);
 const INTERNAL_KEYS = new Set([
   ...SHADOW_LAYER_KEYS,
   ...GRADIENT_KEYS,
   ...DIVIDE_KEYS,
+  ...SPACE_KEYS,
 ]);
 
 function stripImportant(val: string | number): [string, boolean] {
@@ -204,12 +206,16 @@ function finalizeStyle(style: StyleObject): StyleObject {
     style.__dot_divideX !== undefined ||
     style.__dot_divideYReverse !== undefined ||
     style.__dot_divideXReverse !== undefined;
+  const hasSpaceY = style.__dot_spaceY !== undefined;
+  const hasSpaceX = style.__dot_spaceX !== undefined;
 
   if (
     ringLayer === undefined &&
     shadowLayer === undefined &&
     !hasGradient &&
-    !hasDivide
+    !hasDivide &&
+    !hasSpaceY &&
+    !hasSpaceX
   )
     return style;
 
@@ -266,6 +272,24 @@ function finalizeStyle(style: StyleObject): StyleObject {
       result.backgroundImage =
         `linear-gradient(${direction}, ${stops.join(", ")})` +
         (anyImp ? " !important" : "");
+    }
+  }
+
+  // Auto-inject flex layout for space-y/x (mirrors index.ts finalizeStyle)
+  if ((hasSpaceY || hasSpaceX) && result.display === undefined) {
+    const hasGridProps = Object.keys(result).some(
+      (k) =>
+        k.startsWith("gridTemplate") ||
+        k.startsWith("gridAuto") ||
+        k === "gridGap",
+    );
+    if (hasGridProps) {
+      result.display = "grid";
+    } else {
+      result.display = "flex";
+      if (hasSpaceY && result.flexDirection === undefined) {
+        result.flexDirection = "column";
+      }
     }
   }
 

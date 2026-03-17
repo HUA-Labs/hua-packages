@@ -46,11 +46,15 @@ const DIVIDE_KEYS = new Set([
   "__dot_divideXReverse",
 ]);
 
-/** All internal keys (shadow + gradient + divide) */
+/** Internal space-y/x markers for auto-flex injection */
+const SPACE_KEYS = new Set(["__dot_spaceY", "__dot_spaceX"]);
+
+/** All internal keys (shadow + gradient + divide + space) */
 const INTERNAL_KEYS = new Set([
   ...SHADOW_LAYER_KEYS,
   ...GRADIENT_KEYS,
   ...DIVIDE_KEYS,
+  ...SPACE_KEYS,
 ]);
 
 /** Merge resolved styles, accumulating transform/filter/backdropFilter instead of overwriting */
@@ -73,7 +77,8 @@ function stripImportant(val: string | number): [string, boolean] {
   return [val, false];
 }
 
-/** Finalize style: merge shadow layers into boxShadow, gradient into backgroundImage, remove internal keys */
+/** Finalize style: merge shadow layers into boxShadow, gradient into backgroundImage, remove internal keys,
+ *  auto-inject flex layout for space-y/x when no explicit display is set */
 function finalizeStyle(style: StyleObject): StyleObject {
   const ringLayer = style.__dot_ringLayer;
   const shadowLayer = style.__dot_shadowLayer;
@@ -85,13 +90,17 @@ function finalizeStyle(style: StyleObject): StyleObject {
     style.__dot_divideX !== undefined ||
     style.__dot_divideYReverse !== undefined ||
     style.__dot_divideXReverse !== undefined;
+  const hasSpaceY = style.__dot_spaceY !== undefined;
+  const hasSpaceX = style.__dot_spaceX !== undefined;
 
   // Fast path: no internal keys
   if (
     ringLayer === undefined &&
     shadowLayer === undefined &&
     !hasGradient &&
-    !hasDivide
+    !hasDivide &&
+    !hasSpaceY &&
+    !hasSpaceX
   )
     return style;
 
@@ -150,6 +159,27 @@ function finalizeStyle(style: StyleObject): StyleObject {
       result.backgroundImage =
         `linear-gradient(${direction}, ${stops.join(", ")})` +
         (anyImportant ? " !important" : "");
+    }
+  }
+
+  // Auto-inject flex layout for space-y / space-x when no explicit display is set.
+  // space-y → flex-column (rowGap needs flex/grid), space-x → flex-row (default).
+  // If the user already set display (flex, grid, inline-flex, etc.), we don't override.
+  // If grid properties exist (gridTemplateColumns, gridAutoFlow, etc.), inject grid instead.
+  if ((hasSpaceY || hasSpaceX) && result.display === undefined) {
+    const hasGridProps = Object.keys(result).some(
+      (k) =>
+        k.startsWith("gridTemplate") ||
+        k.startsWith("gridAuto") ||
+        k === "gridGap",
+    );
+    if (hasGridProps) {
+      result.display = "grid";
+    } else {
+      result.display = "flex";
+      if (hasSpaceY && result.flexDirection === undefined) {
+        result.flexDirection = "column";
+      }
     }
   }
 

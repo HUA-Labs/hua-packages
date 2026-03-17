@@ -6,17 +6,6 @@ import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 import { Tooltip } from "../Tooltip";
 
-/**
- * 사이드바 네비게이션 아이템 인터페이스 / SidebarNavItem interface
- * @typedef {Object} SidebarNavItem
- * @property {string} id - 아이템 고유 ID / Item unique ID
- * @property {string} label - 아이템 라벨 / Item label
- * @property {string} [href] - 링크 URL / Link URL
- * @property {IconName | React.ReactNode} [icon] - 아이콘 / Icon
- * @property {React.ReactNode} [badge] - 배지 / Badge
- * @property {boolean} [active] - 활성 상태 / Active state
- * @property {() => void} [onClick] - 클릭 핸들러 / Click handler
- */
 export interface SidebarNavItem {
   id: string;
   label: string;
@@ -27,36 +16,18 @@ export interface SidebarNavItem {
   onClick?: () => void;
 }
 
-/**
- * 사이드바 섹션 인터페이스 / SidebarSection interface
- * @typedef {Object} SidebarSection
- * @property {string} id - 섹션 고유 ID / Section unique ID
- * @property {string} [label] - 섹션 라벨 / Section label
- * @property {SidebarNavItem[]} items - 섹션 내 아이템 배열 / Items array in section
- */
 export interface SidebarSection {
   id: string;
   label?: string;
   items: SidebarNavItem[];
+  /** Default collapsed state for this section */
+  defaultCollapsed?: boolean;
 }
 
-/**
- * DashboardSidebar 컴포넌트의 props / DashboardSidebar component props
- * @typedef {Object} DashboardSidebarProps
- * @property {React.ReactNode} [logo] - 로고 컴포넌트 / Logo component
- * @property {React.ReactNode} [productSwitcher] - 제품 전환 컴포넌트 / Product switcher component
- * @property {SidebarSection[]} sections - 사이드바 섹션 배열 / Sidebar sections array
- * @property {React.ReactNode} [footerActions] - 푸터 액션 컴포넌트 / Footer actions component
- * @property {boolean} [isCollapsed] - 접힘 상태 (제어) / Collapsed state (controlled)
- * @property {boolean} [defaultCollapsed=false] - 기본 접힘 상태 / Default collapsed state
- * @property {(collapsed: boolean) => void} [onToggleCollapsed] - 접힘 상태 변경 핸들러 / Collapsed state change handler
- * @property {number} [collapsedWidth=72] - 접힘 상태 너비 (px) / Collapsed width (px)
- * @property {number} [expandedWidth=264] - 펼침 상태 너비 (px) / Expanded width (px)
- * @property {number} [mobileBreakpoint=1024] - 모바일 브레이크포인트 (px) / Mobile breakpoint (px)
- * @property {string} [overlayBackground] - 모바일 오버레이 배경색 / Mobile overlay background color
- * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
- */
-export interface DashboardSidebarProps extends Omit<React.HTMLAttributes<HTMLElement>, 'className'> {
+export interface DashboardSidebarProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "className"
+> {
   logo?: React.ReactNode;
   productSwitcher?: React.ReactNode;
   sections: SidebarSection[];
@@ -68,71 +39,34 @@ export interface DashboardSidebarProps extends Omit<React.HTMLAttributes<HTMLEle
   expandedWidth?: number;
   mobileBreakpoint?: number;
   overlayBackground?: string;
-  /** 사이드바 스타일 변형 / Sidebar style variant */
   variant?: "default" | "transparent";
-  /** 토글 버튼 숨기기 / Hide collapse toggle button */
+  /** @deprecated Edge handle replaces toggle button */
   hideToggle?: boolean;
-  /** 아이템 기본 dot 스타일 오버라이드 / Item base dot style override */
   itemDot?: string;
-  /** 활성 아이템 dot 스타일 오버라이드 / Active item dot style override */
   activeDot?: string;
   /** @deprecated Use itemDot instead */
   itemClassName?: string;
   /** @deprecated Use activeDot instead */
   activeClassName?: string;
-  /** 모바일 열림 상태 (제어) / Mobile open state (controlled) */
   isMobileOpen?: boolean;
-  /** 모바일 열림 상태 변경 핸들러 / Mobile open state change handler */
   onMobileOpenChange?: (open: boolean) => void;
-  /** 모바일 토글 버튼 숨기기 (외부에서 제어할 때) / Hide mobile toggle button (when controlled externally) */
   hideMobileToggle?: boolean;
+  /** Pinned item IDs — shown when sidebar is collapsed */
+  pinnedItems?: string[];
+  /** Default pinned items (used when pinnedItems is not controlled) */
+  defaultPinnedItems?: string[];
+  /** Called when pinned items change */
+  onPinnedChange?: (pinnedIds: string[]) => void;
   dot?: string;
 }
 
 const DEFAULT_COLLAPSED = 72;
 const DEFAULT_EXPANDED = 264;
 
-/**
- * DashboardSidebar 컴포넌트
- *
- * 대시보드용 사이드바 네비게이션 컴포넌트입니다.
- * 접기/펼치기 기능과 모바일 반응형을 지원하며, 섹션별로 네비게이션 아이템을 구성할 수 있습니다.
- *
- * Sidebar navigation component for dashboards.
- * Supports collapse/expand functionality and mobile responsiveness, with section-based navigation items.
- *
- * @component
- * @example
- * // 기본 사용 / Basic usage
- * <DashboardSidebar
- *   logo={<Logo />}
- *   sections={[
- *     {
- *       id: "main",
- *       label: "메인",
- *       items: [
- *         { id: "dashboard", label: "대시보드", href: "/dashboard", icon: "layout" },
- *         { id: "transactions", label: "거래", href: "/transactions", icon: "creditCard" }
- *       ]
- *     }
- *   ]}
- * />
- *
- * @example
- * // 접힘 상태 제어 / Collapse state control
- * <DashboardSidebar
- *   sections={sections}
- *   isCollapsed={collapsed}
- *   onToggleCollapsed={setCollapsed}
- *   collapsedWidth={80}
- *   expandedWidth={280}
- * />
- *
- * @param {DashboardSidebarProps} props - DashboardSidebar 컴포넌트의 props / DashboardSidebar component props
- * @param {React.Ref<HTMLElement>} ref - aside 요소 ref / aside element ref
- * @returns {JSX.Element} DashboardSidebar 컴포넌트 / DashboardSidebar component
- */
-export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarProps>(
+export const DashboardSidebar = React.forwardRef<
+  HTMLElement,
+  DashboardSidebarProps
+>(
   (
     {
       logo,
@@ -155,29 +89,78 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       isMobileOpen: externalMobileOpen,
       onMobileOpenChange,
       hideMobileToggle = false,
+      pinnedItems: externalPinned,
+      defaultPinnedItems,
+      onPinnedChange,
       dot,
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
-    // Backwards compat: itemClassName/activeClassName fall back to itemDot/activeDot
     const itemDot = itemDotProp ?? itemClassName;
     const activeDot = activeDotProp ?? activeClassName;
 
-    const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed);
+    const [internalCollapsed, setInternalCollapsed] =
+      React.useState(defaultCollapsed);
     const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
     const [isMobile, setIsMobile] = React.useState(false);
-    const collapsed = typeof isCollapsed === "boolean" ? isCollapsed : internalCollapsed;
+    const [handleHovered, setHandleHovered] = React.useState(false);
+    const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(
+      null,
+    );
+    const [collapsedSections, setCollapsedSections] = React.useState<
+      Set<string>
+    >(() => {
+      const initial = new Set<string>();
+      for (const s of sections) {
+        if (s.defaultCollapsed) initial.add(s.id);
+      }
+      return initial;
+    });
+    const [internalPinned, setInternalPinned] = React.useState<Set<string>>(
+      () => {
+        if (defaultPinnedItems) return new Set(defaultPinnedItems);
+        // Smart default: pin first section's items
+        const first = sections[0];
+        return first ? new Set(first.items.map((i) => i.id)) : new Set();
+      },
+    );
+    const collapsed =
+      typeof isCollapsed === "boolean" ? isCollapsed : internalCollapsed;
+    const pinnedSet = externalPinned ? new Set(externalPinned) : internalPinned;
 
-    const isMobileOpen = typeof externalMobileOpen === "boolean" ? externalMobileOpen : internalMobileOpen;
+    const togglePin = (itemId: string) => {
+      const next = new Set(pinnedSet);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      if (!externalPinned) setInternalPinned(next);
+      onPinnedChange?.(Array.from(next));
+    };
+
+    const isItemPinned = (itemId: string) => pinnedSet.has(itemId);
+
+    const toggleSection = (sectionId: string) => {
+      setCollapsedSections((prev) => {
+        const next = new Set(prev);
+        if (next.has(sectionId)) next.delete(sectionId);
+        else next.add(sectionId);
+        return next;
+      });
+    };
+
+    const isMobileOpen =
+      typeof externalMobileOpen === "boolean"
+        ? externalMobileOpen
+        : internalMobileOpen;
     const setIsMobileOpen = (open: boolean) => {
       onMobileOpenChange?.(open);
       if (typeof externalMobileOpen !== "boolean") setInternalMobileOpen(open);
     };
 
     React.useEffect(() => {
-      const checkMobile = () => setIsMobile(window.innerWidth <= mobileBreakpoint);
+      const checkMobile = () =>
+        setIsMobile(window.innerWidth <= mobileBreakpoint);
       checkMobile();
       window.addEventListener("resize", checkMobile);
       return () => window.removeEventListener("resize", checkMobile);
@@ -191,7 +174,171 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
 
     const widthStyle = collapsed ? collapsedWidth : expandedWidth;
 
+    // ── Shared item renderer ──
+    const renderItem = (item: SidebarNavItem) => {
+      const pinned = isItemPinned(item.id);
+      const isHovered = hoveredItemId === item.id;
+      const activeStyle: React.CSSProperties = activeDot
+        ? resolveDot(activeDot)
+        : {
+            backgroundColor: "var(--color-accent, #eef2ff)",
+            color: "var(--color-accent-foreground, #4338ca)",
+          };
+      const defaultItemStyle: React.CSSProperties = itemDot
+        ? resolveDot(itemDot)
+        : { color: "var(--color-muted-foreground, #475569)" };
+      const baseStyle: React.CSSProperties = {
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: collapsed ? "center" : undefined,
+        borderRadius: "0.5rem",
+        paddingLeft: collapsed ? "0.5rem" : "0.75rem",
+        paddingRight: collapsed ? "0.5rem" : "0.75rem",
+        paddingTop: "0.5rem",
+        paddingBottom: "0.5rem",
+        fontSize: "0.875rem",
+        fontWeight: 500,
+        transition: "background-color 150ms",
+        cursor: "pointer",
+        border: "none",
+        textAlign: "left",
+        background: "transparent",
+        textDecoration: "none",
+        ...(item.active ? activeStyle : defaultItemStyle),
+      };
+
+      const content = (
+        <>
+          {item.icon && (
+            <span
+              style={{ marginRight: collapsed ? 0 : "0.75rem", flexShrink: 0 }}
+            >
+              {typeof item.icon === "string" ? (
+                <Icon
+                  name={item.icon as IconName}
+                  dot="h-5 w-5"
+                  variant="inherit"
+                />
+              ) : (
+                item.icon
+              )}
+            </span>
+          )}
+          {!collapsed && (
+            <>
+              <span
+                style={{
+                  flex: 1,
+                  textAlign: "left",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item.label}
+              </span>
+              {item.badge && !isHovered && (
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-muted-foreground, #94a3b8)",
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </>
+          )}
+        </>
+      );
+
+      const handleItemClick = () => {
+        if (isMobile) setIsMobileOpen(false);
+      };
+
+      const wrapWithHover = (node: React.ReactElement) => (
+        <div
+          key={item.id}
+          style={{ position: "relative" }}
+          onMouseEnter={() => setHoveredItemId(item.id)}
+          onMouseLeave={() => setHoveredItemId(null)}
+        >
+          {node}
+          {/* Pin button — always visible when pinned, on hover when not */}
+          {!collapsed && (pinned || isHovered) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                togglePin(item.id);
+              }}
+              aria-label={pinned ? "Unpin" : "Pin"}
+              style={{
+                position: "absolute",
+                right: "0.5rem",
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "1.25rem",
+                height: "1.25rem",
+                borderRadius: "0.25rem",
+                border: "none",
+                background: "transparent",
+                color: pinned
+                  ? "var(--color-accent-foreground, #4338ca)"
+                  : "var(--color-muted-foreground, #94a3b8)",
+                cursor: "pointer",
+                opacity: pinned ? 0.8 : 0.4,
+              }}
+            >
+              <Icon name={pinned ? "bookmark" : "bookmark"} dot="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      );
+
+      const itemNode = item.href ? (
+        <a
+          href={item.href}
+          style={baseStyle}
+          aria-current={item.active ? "page" : undefined}
+          onClick={handleItemClick}
+        >
+          {content}
+        </a>
+      ) : (
+        <button
+          type="button"
+          onClick={() => {
+            item.onClick?.();
+            handleItemClick();
+          }}
+          style={baseStyle}
+          aria-pressed={item.active}
+        >
+          {content}
+        </button>
+      );
+
+      if (collapsed) {
+        return (
+          <Tooltip key={item.id} content={item.label}>
+            {itemNode}
+          </Tooltip>
+        );
+      }
+
+      return wrapWithHover(itemNode);
+    };
+
+    // ── Sidebar content ──
     const sidebarBaseStyle: React.CSSProperties = {
+      position: "relative",
       display: "flex",
       height: "100%",
       flexDirection: "column",
@@ -203,164 +350,185 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
       transition: "width 200ms",
       width: widthStyle,
       minWidth: widthStyle,
-      borderRight: variant === "transparent"
-        ? "1px solid var(--color-border, rgba(226, 232, 240, 0.4))"
-        : "1px solid var(--color-border, rgba(226, 232, 240, 0.6))",
-      backgroundColor: variant === "transparent" ? undefined : "var(--color-background, rgba(255, 255, 255, 0.95))",
-      boxShadow: variant === "transparent" ? undefined : "0 1px 3px rgba(0,0,0,0.1)",
+      borderRight:
+        variant === "transparent"
+          ? "1px solid var(--color-border, rgba(226, 232, 240, 0.4))"
+          : "1px solid var(--color-border, rgba(226, 232, 240, 0.6))",
+      backgroundColor:
+        variant === "transparent"
+          ? undefined
+          : "var(--color-background, rgba(255, 255, 255, 0.95))",
+      boxShadow:
+        variant === "transparent" ? undefined : "0 1px 3px rgba(0,0,0,0.1)",
     };
 
     const sidebarContent = (
       <aside
         ref={ref}
         role="navigation"
-        aria-label="대시보드 네비게이션"
+        aria-label="Dashboard navigation"
         style={mergeStyles(sidebarBaseStyle, resolveDot(dot), style)}
         {...props}
       >
-        <div style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", paddingLeft: "0.25rem", paddingRight: "0.25rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            {logo}
-            {!collapsed && productSwitcher}
-          </div>
-          {!hideToggle && (
-            <button
-              type="button"
-              onClick={toggleCollapsed}
-              aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
-              aria-expanded={!collapsed}
+        {/* Logo */}
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start",
+            gap: "0.5rem",
+            paddingLeft: "0.25rem",
+            paddingRight: "0.25rem",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {logo}
+          {!collapsed && productSwitcher}
+        </div>
+
+        {/* Sections */}
+        <div style={{ flex: 1, overflowY: collapsed ? "hidden" : "auto" }}>
+          {collapsed ? (
+            /* Collapsed: show only pinned + active items, no sections */
+            <nav
               style={{
-                display: "inline-flex",
-                height: "2rem",
-                width: "2rem",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "9999px",
-                border: "1px solid var(--color-border, #e2e8f0)",
-                color: "var(--color-muted-foreground, #64748b)",
-                transition: "colors 200ms",
-                cursor: "pointer",
-                background: "transparent",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.25rem",
               }}
             >
-              <Icon name={collapsed ? "chevronRight" : "chevronLeft"} dot="h-4 w-4" />
-              <span style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>사이드바 토글</span>
-            </button>
+              {sections
+                .flatMap((s) => s.items)
+                .filter((item) => isItemPinned(item.id) || item.active)
+                .map(renderItem)}
+            </nav>
+          ) : (
+            /* Expanded: full section view with collapsible groups */
+            sections.map((section) => {
+              const isSectionCollapsed = collapsedSections.has(section.id);
+
+              return (
+                <div key={section.id} style={{ marginBottom: "1.5rem" }}>
+                  {section.label && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.id)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        padding: "0.25rem 0.75rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: "var(--color-muted-foreground, #94a3b8)",
+                        marginBottom: isSectionCollapsed ? 0 : "0.5rem",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        borderRadius: "0.25rem",
+                      }}
+                      aria-expanded={!isSectionCollapsed}
+                    >
+                      <span>{section.label}</span>
+                      <Icon
+                        name={
+                          isSectionCollapsed ? "chevronRight" : "chevronDown"
+                        }
+                        dot="h-3 w-3"
+                        style={{ opacity: 0.5 }}
+                      />
+                    </button>
+                  )}
+
+                  {!isSectionCollapsed && (
+                    <nav
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.25rem",
+                      }}
+                      aria-label={section.label || "Navigation"}
+                    >
+                      {section.items.map(renderItem)}
+                    </nav>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {sections.map((section) => (
-            <div key={section.id} style={{ marginBottom: "1.5rem" }}>
-              {!collapsed && section.label && (
-                <div
-                  style={{ paddingLeft: "0.75rem", paddingRight: "0.75rem", fontSize: "0.75rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-muted-foreground, #94a3b8)", marginBottom: "0.5rem" }}
-                  role="heading"
-                  aria-level={2}
-                >
-                  {section.label}
-                </div>
-              )}
-              <nav style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }} aria-label={section.label || "네비게이션"}>
-                {section.items.map((item) => {
-                  const activeStyle: React.CSSProperties = activeDot
-                    ? resolveDot(activeDot)
-                    : { backgroundColor: "var(--color-accent, #eef2ff)", color: "var(--color-accent-foreground, #4338ca)" };
-                  const defaultItemStyle: React.CSSProperties = itemDot
-                    ? resolveDot(itemDot)
-                    : { color: "var(--color-muted-foreground, #475569)" };
-                  const baseStyle: React.CSSProperties = {
-                    display: "flex",
-                    width: "100%",
-                    alignItems: "center",
-                    borderRadius: "0.5rem",
-                    paddingLeft: "0.75rem",
-                    paddingRight: "0.75rem",
-                    paddingTop: "0.5rem",
-                    paddingBottom: "0.5rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    transition: "background-color 150ms",
-                    cursor: "pointer",
-                    border: "none",
-                    textAlign: "left",
-                    background: "transparent",
-                    ...(item.active ? activeStyle : defaultItemStyle),
-                  };
-
-                  const content = (
-                    <>
-                      {item.icon && (
-                        <span style={{ marginRight: collapsed ? 0 : "0.75rem" }}>
-                          {typeof item.icon === "string" ? (
-                            <Icon name={item.icon as IconName} dot="h-5 w-5" variant="inherit" />
-                          ) : (
-                            item.icon
-                          )}
-                        </span>
-                      )}
-                      {!collapsed && (
-                        <>
-                          <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
-                          {item.badge && <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #94a3b8)" }}>{item.badge}</span>}
-                        </>
-                      )}
-                    </>
-                  );
-
-                  const handleItemClick = () => {
-                    if (isMobile) setIsMobileOpen(false);
-                  };
-
-                  const itemNode = item.href ? (
-                    <a
-                      key={item.id}
-                      href={item.href}
-                      style={baseStyle}
-                      aria-current={item.active ? "page" : undefined}
-                      onClick={handleItemClick}
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        item.onClick?.();
-                        handleItemClick();
-                      }}
-                      style={baseStyle}
-                      aria-pressed={item.active}
-                    >
-                      {content}
-                    </button>
-                  );
-
-                  if (collapsed) {
-                    return (
-                      <Tooltip key={item.id} content={item.label}>
-                        {itemNode}
-                      </Tooltip>
-                    );
-                  }
-
-                  return itemNode;
-                })}
-              </nav>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: "1rem", borderTop: "1px solid var(--color-border, #f1f5f9)", paddingTop: "1rem" }}>
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: "1rem",
+            borderTop: "1px solid var(--color-border, #f1f5f9)",
+            paddingTop: "1rem",
+            overflow: "hidden",
+          }}
+        >
           {footerActions}
-          <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "var(--color-muted-foreground, #94a3b8)" }}>
-            <span>ⓒ HUA Labs</span>
-          </div>
+          {!collapsed && (
+            <div
+              style={{
+                marginTop: "0.5rem",
+                fontSize: "0.75rem",
+                color: "var(--color-muted-foreground, #94a3b8)",
+              }}
+            >
+              <span>&copy; HUA Labs</span>
+            </div>
+          )}
         </div>
+
+        {/* Edge handle — right side, vertically centered */}
+        {!hideToggle && !isMobile && (
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            onMouseEnter={() => setHandleHovered(true)}
+            onMouseLeave={() => setHandleHovered(false)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translate(50%, -50%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "1.25rem",
+              height: "2.5rem",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--color-border, #e2e8f0)",
+              backgroundColor: handleHovered
+                ? "var(--color-accent, #f1f5f9)"
+                : "var(--color-background, #ffffff)",
+              color: "var(--color-muted-foreground, #64748b)",
+              cursor: "pointer",
+              zIndex: 10,
+              transition: "background-color 150ms, opacity 150ms",
+              opacity: handleHovered ? 1 : 0.6,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+            }}
+          >
+            <Icon
+              name={collapsed ? "chevronRight" : "chevronLeft"}
+              dot="h-3 w-3"
+            />
+          </button>
+        )}
       </aside>
     );
 
+    // ── Mobile / Desktop render ──
     return (
       <>
         {isMobile ? (
@@ -389,12 +557,30 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
               </button>
             )}
             {isMobileOpen && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 40, display: "flex" }}>
+              <div
+                style={{
+                  position: "fixed",
+                  inset: 0,
+                  zIndex: 40,
+                  display: "flex",
+                }}
+              >
                 <div
-                  style={{ position: "absolute", inset: 0, backgroundColor: overlayBackground }}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundColor: overlayBackground,
+                  }}
                   onClick={() => setIsMobileOpen(false)}
                 />
-                <div style={{ position: "relative", zIndex: 50, height: "100%", backgroundColor: "var(--color-background, #ffffff)" }}>
+                <div
+                  style={{
+                    position: "relative",
+                    zIndex: 50,
+                    height: "100%",
+                    backgroundColor: "var(--color-background, #ffffff)",
+                  }}
+                >
                   {sidebarContent}
                   <button
                     style={{
@@ -426,7 +612,7 @@ export const DashboardSidebar = React.forwardRef<HTMLElement, DashboardSidebarPr
         )}
       </>
     );
-  }
+  },
 );
 
 DashboardSidebar.displayName = "DashboardSidebar";
