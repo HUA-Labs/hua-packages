@@ -18,7 +18,8 @@ export type Color =
   | "indigo"
   | "pink"
   | "gray"
-  | "cyan";
+  | "cyan"
+  | "primary";
 
 /**
  * 공통 크기 타입
@@ -45,25 +46,25 @@ export type CardVariant = ExtendedVariant;
 /**
  * 버튼 컴포넌트용 Variant
  */
-export type ButtonVariant = 
-  | "default" 
-  | "destructive" 
-  | "outline" 
-  | "secondary" 
-  | "ghost" 
-  | "link" 
-  | "gradient" 
-  | "neon" 
+export type ButtonVariant =
+  | "default"
+  | "destructive"
+  | "outline"
+  | "secondary"
+  | "ghost"
+  | "link"
+  | "gradient"
+  | "neon"
   | "glass";
 
 /**
  * 배지 컴포넌트용 Variant
  */
-export type BadgeVariant = 
-  | "default" 
-  | "secondary" 
-  | "destructive" 
-  | "outline" 
+export type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "outline"
   | "glass";
 
 /**
@@ -99,9 +100,8 @@ export interface VariantProps<T extends string = BaseVariant> {
 /**
  * 색상과 Variant를 모두 포함하는 Props
  */
-export interface ColorVariantProps<T extends string = BaseVariant> 
-  extends ColorProps, 
-          VariantProps<T> {}
+export interface ColorVariantProps<T extends string = BaseVariant>
+  extends ColorProps, VariantProps<T> {}
 
 /**
  * 로딩 상태 Props
@@ -163,4 +163,3 @@ export interface LayoutProps {
 export interface FullWidthProps {
   fullWidth?: boolean;
 }
-
