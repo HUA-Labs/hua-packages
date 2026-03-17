@@ -7,13 +7,23 @@ import type { Color } from "../../lib/types/common";
 /**
  * 색상 단계 매핑 — CSS 값 기반
  */
-const colorSteps: Record<Color, {
-  empty: string;
-  s1: string;
-  s2: string;
-  s3: string;
-  todayBorder: string;
-}> = {
+const colorSteps: Record<
+  Color,
+  {
+    empty: string;
+    s1: string;
+    s2: string;
+    s3: string;
+    todayBorder: string;
+  }
+> = {
+  primary: {
+    empty: "rgba(0,0,0,0.1)",
+    s1: "color-mix(in srgb, var(--color-primary, #22d3ee) 30%, transparent)",
+    s2: "color-mix(in srgb, var(--color-primary, #22d3ee) 60%, transparent)",
+    s3: "var(--color-primary, #0891b2)",
+    todayBorder: "var(--color-primary, #22d3ee)",
+  },
   cyan: {
     empty: "rgba(0,0,0,0.1)",
     s1: "#a5f3fc",
@@ -92,7 +102,10 @@ export interface YearlyHeatmapLabels {
   tooltip?: (dateStr: string, count: number) => string;
 }
 
-export interface YearlyHeatmapProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface YearlyHeatmapProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   /** 날짜별 데이터 (키: "YYYY-MM-DD", 값: count) */
   data: Record<string, number>;
   /** 색상 테마 */
@@ -159,7 +172,9 @@ export function YearlyHeatmap({
       if (weekHasFirstOfMonth && firstOfMonthDate) {
         lastMonth = firstOfMonthDate.getMonth();
         monthLabels.push({
-          label: firstOfMonthDate.toLocaleDateString(locale, { month: "short" }),
+          label: firstOfMonthDate.toLocaleDateString(locale, {
+            month: "short",
+          }),
           colIndex: weeks.length,
         });
       }
@@ -198,11 +213,20 @@ export function YearlyHeatmap({
   const getTooltip = (date: Date | null): string => {
     if (!date) return "";
     const count = data[getDateKey(date)] || 0;
-    const dateStr = date.toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" });
-    return labels.tooltip ? labels.tooltip(dateStr, count) : `${dateStr}: ${count}`;
+    const dateStr = date.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    return labels.tooltip
+      ? labels.tooltip(dateStr, count)
+      : `${dateStr}: ${count}`;
   };
 
-  const totalDays = useMemo(() => Object.values(data).filter((v) => v > 0).length, [data]);
+  const totalDays = useMemo(
+    () => Object.values(data).filter((v) => v > 0).length,
+    [data],
+  );
 
   return (
     <div
@@ -213,18 +237,40 @@ export function YearlyHeatmap({
           padding: "1rem",
         },
         resolveDot(dot),
-        style
+        style,
       )}
       {...props}
     >
       {/* 헤더 */}
       {(labels.title || labels.totalDays) && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "0.75rem",
+          }}
+        >
           {labels.title && (
-            <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-foreground, #111827)" }}>{labels.title}</h3>
+            <h3
+              style={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "var(--color-foreground, #111827)",
+              }}
+            >
+              {labels.title}
+            </h3>
           )}
           {labels.totalDays && (
-            <span style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)" }}>{labels.totalDays}</span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-muted-foreground, #6b7280)",
+              }}
+            >
+              {labels.totalDays}
+            </span>
           )}
         </div>
       )}
@@ -238,7 +284,13 @@ export function YearlyHeatmap({
             return (
               <div key={wi} style={{ flex: 1, minWidth: "10px" }}>
                 {ml && (
-                  <span style={{ fontSize: "9px", color: "var(--color-muted-foreground, #6b7280)", whiteSpace: "nowrap" }}>
+                  <span
+                    style={{
+                      fontSize: "9px",
+                      color: "var(--color-muted-foreground, #6b7280)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     {ml.label}
                   </span>
                 )}
@@ -250,7 +302,16 @@ export function YearlyHeatmap({
         {/* 셀 그리드 */}
         <div style={{ display: "flex", gap: "2px" }}>
           {weeks.map((week, wi) => (
-            <div key={wi} style={{ flex: 1, minWidth: "10px", display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div
+              key={wi}
+              style={{
+                flex: 1,
+                minWidth: "10px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px",
+              }}
+            >
               {week.map((date, di) => (
                 <div
                   key={di}
@@ -268,12 +329,50 @@ export function YearlyHeatmap({
       </div>
 
       {/* 범례 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "6px", marginTop: "0.75rem", fontSize: "10px", color: "var(--color-muted-foreground, #6b7280)" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          gap: "6px",
+          marginTop: "0.75rem",
+          fontSize: "10px",
+          color: "var(--color-muted-foreground, #6b7280)",
+        }}
+      >
         <span>{labels.less || "Less"}</span>
-        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.empty }} />
-        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s1 }} />
-        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s2 }} />
-        <div style={{ width: "0.75rem", height: "0.75rem", borderRadius: "2px", backgroundColor: steps.s3 }} />
+        <div
+          style={{
+            width: "0.75rem",
+            height: "0.75rem",
+            borderRadius: "2px",
+            backgroundColor: steps.empty,
+          }}
+        />
+        <div
+          style={{
+            width: "0.75rem",
+            height: "0.75rem",
+            borderRadius: "2px",
+            backgroundColor: steps.s1,
+          }}
+        />
+        <div
+          style={{
+            width: "0.75rem",
+            height: "0.75rem",
+            borderRadius: "2px",
+            backgroundColor: steps.s2,
+          }}
+        />
+        <div
+          style={{
+            width: "0.75rem",
+            height: "0.75rem",
+            borderRadius: "2px",
+            backgroundColor: steps.s3,
+          }}
+        />
         <span>{labels.more || "More"}</span>
       </div>
     </div>
