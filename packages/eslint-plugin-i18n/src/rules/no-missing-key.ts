@@ -32,31 +32,68 @@ function loadKeys(keysFilePath: string): Set<string> | null {
     keys.add(match[1]);
   }
 
-  // 방법 2: I18nKeys 인터페이스에서 namespace별 키 추출 후 조합
-  // 패턴: `namespace: { strings: 'key1' | 'key2' | ...; ... }`
-  const nsBlockRegex = /['"]?([a-zA-Z0-9_-]+)['"]?\s*:\s*\{[^}]*strings\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
-  let nsMatch;
-  while ((nsMatch = nsBlockRegex.exec(content)) !== null) {
-    const namespace = nsMatch[1];
-    const keysStr = nsMatch[2];
-    const keyMatches = keysStr.matchAll(/'([^']+)'/g);
-    for (const km of keyMatches) {
-      if (km[1] !== 'never') {
-        keys.add(`${namespace}:${km[1]}`);
-      }
-    }
-  }
+  // 방법 2: I18nKeys 인터페이스에서 namespace별 키 추출 (줄 단위 파싱)
+  // 작은따옴표/쌍따옴표 모두 지원, 긴 네임스페이스도 안전하게 처리
+  const lines = content.split('\n');
+  let currentNs: string | null = null;
+  let inStrings = false;
+  let inArrays = false;
 
-  // 방법 2b: arrays 키도 추출
-  const nsArrayRegex = /['"]?([a-zA-Z0-9_-]+)['"]?\s*:\s*\{[^}]*arrays\s*:\s*((?:'[^']*'(?:\s*\|\s*)?)+)/g;
-  let arrMatch;
-  while ((arrMatch = nsArrayRegex.exec(content)) !== null) {
-    const namespace = arrMatch[1];
-    const keysStr = arrMatch[2];
-    const keyMatches = keysStr.matchAll(/'([^']+)'/g);
-    for (const km of keyMatches) {
-      if (km[1] !== 'never') {
-        keys.add(`${namespace}:${km[1]}`);
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // 네임스페이스 시작: `admin: {` 또는 `'docs-cards': {` 또는 `"docs-cards": {`
+    const nsStart = trimmed.match(/^['"]?([a-zA-Z0-9_-]+)['"]?\s*:\s*\{/);
+    if (nsStart) {
+      currentNs = nsStart[1];
+      inStrings = false;
+      inArrays = false;
+      continue;
+    }
+
+    // strings/arrays 섹션 감지 — inline union 전체 파싱
+    if (trimmed.startsWith('strings:') || trimmed === 'strings:') {
+      inStrings = true;
+      inArrays = false;
+      // inline union: strings: 'welcome' | 'goodbye' | 'save'; 전체 파싱
+      const inlineAll = trimmed.matchAll(/['"]([^'"]+)['"]/g);
+      for (const im of inlineAll) {
+        if (currentNs && im[1] !== 'never') {
+          keys.add(`${currentNs}:${im[1]}`);
+        }
+      }
+      continue;
+    }
+    if (trimmed.startsWith('arrays:') || trimmed === 'arrays:') {
+      inArrays = true;
+      inStrings = false;
+      const inlineAll = trimmed.matchAll(/['"]([^'"]+)['"]/g);
+      for (const im of inlineAll) {
+        if (currentNs && im[1] !== 'never') {
+          keys.add(`${currentNs}:${im[1]}`);
+        }
+      }
+      continue;
+    }
+    if (trimmed.startsWith('plurals:')) {
+      inStrings = false;
+      inArrays = false;
+      continue;
+    }
+
+    // 네임스페이스 블록 종료: `};`
+    if (trimmed === '};') {
+      currentNs = null;
+      inStrings = false;
+      inArrays = false;
+      continue;
+    }
+
+    // 키 추출: `| "sidebar.title"` 또는 `| 'sidebar.title'`
+    if (currentNs && (inStrings || inArrays)) {
+      const keyMatch = trimmed.match(/\|\s*['"]([^'"]+)['"]/);
+      if (keyMatch && keyMatch[1] !== 'never') {
+        keys.add(`${currentNs}:${keyMatch[1]}`);
       }
     }
   }
