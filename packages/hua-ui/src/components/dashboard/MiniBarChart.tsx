@@ -18,7 +18,10 @@ import type { Color } from "../../lib/types/common";
  * @property {number} [todayIndex] - 오늘 인덱스 (기본값: 마지막 항목)
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MiniBarChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface MiniBarChartProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   data: number[];
   labels?: string[];
   maxValue?: number;
@@ -32,44 +35,49 @@ export interface MiniBarChartProps extends Omit<React.HTMLAttributes<HTMLDivElem
 }
 
 // Chart colors as actual CSS values
-const chartColorValues: Record<Color, { default: string; highlight: string }> = {
-  blue: {
-    default: "#6366f1",
-    highlight: "#0891b2",
-  },
-  purple: {
-    default: "#a855f7",
-    highlight: "#9333ea",
-  },
-  green: {
-    default: "#22c55e",
-    highlight: "#16a34a",
-  },
-  orange: {
-    default: "#f97316",
-    highlight: "#ea580c",
-  },
-  red: {
-    default: "#ef4444",
-    highlight: "#dc2626",
-  },
-  indigo: {
-    default: "#6366f1",
-    highlight: "#4f46e5",
-  },
-  pink: {
-    default: "#ec4899",
-    highlight: "#db2777",
-  },
-  gray: {
-    default: "#6b7280",
-    highlight: "#4b5563",
-  },
-  cyan: {
-    default: "#06b6d4",
-    highlight: "#0891b2",
-  },
-};
+const chartColorValues: Record<Color, { default: string; highlight: string }> =
+  {
+    primary: {
+      default: "var(--color-primary, #06b6d4)",
+      highlight: "var(--color-primary, #0891b2)",
+    },
+    blue: {
+      default: "#6366f1",
+      highlight: "#0891b2",
+    },
+    purple: {
+      default: "#a855f7",
+      highlight: "#9333ea",
+    },
+    green: {
+      default: "#22c55e",
+      highlight: "#16a34a",
+    },
+    orange: {
+      default: "#f97316",
+      highlight: "#ea580c",
+    },
+    red: {
+      default: "#ef4444",
+      highlight: "#dc2626",
+    },
+    indigo: {
+      default: "#6366f1",
+      highlight: "#4f46e5",
+    },
+    pink: {
+      default: "#ec4899",
+      highlight: "#db2777",
+    },
+    gray: {
+      default: "#6b7280",
+      highlight: "#4b5563",
+    },
+    cyan: {
+      default: "#06b6d4",
+      highlight: "#0891b2",
+    },
+  };
 
 /**
  * MiniBarChart 컴포넌트
@@ -118,7 +126,7 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const colors = chartColorValues[color] || chartColorValues.blue;
     const calculatedMax = maxValue || Math.max(...data, 1);
@@ -135,9 +143,10 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
     const max = Math.max(...data);
 
     const _chartId = React.useId();
-    const chartLabel = labels && labels.length > 0
-      ? `미니 막대 그래프 - ${labels.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`
-      : `미니 막대 그래프 - ${data.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`;
+    const chartLabel =
+      labels && labels.length > 0
+        ? `미니 막대 그래프 - ${labels.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`
+        : `미니 막대 그래프 - ${data.length}개 항목, 최대값 ${max.toLocaleString()}, 평균 ${average.toLocaleString()}`;
 
     const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
 
@@ -163,7 +172,16 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
           }}
         >
           {/* 기준선 */}
-          <div style={{ position: "absolute", left: "0.5rem", right: "0.5rem", bottom: "2rem", borderTop: "1px solid var(--color-border, #e5e7eb)", opacity: 0.5 }} />
+          <div
+            style={{
+              position: "absolute",
+              left: "0.5rem",
+              right: "0.5rem",
+              bottom: "2rem",
+              borderTop: "1px solid var(--color-border, #e5e7eb)",
+              opacity: 0.5,
+            }}
+          />
 
           {data.map((value, index) => {
             const isToday = highlightToday && index === todayIdx;
@@ -174,48 +192,78 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
             return (
               <div
                 key={index}
-                style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  flex: 1,
+                  position: "relative",
+                }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
                 {/* 툴팁 */}
                 {showTooltip && (
-                  <div style={{
-                    position: "absolute",
-                    bottom: "100%",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    marginBottom: "0.5rem",
-                    padding: "0.25rem 0.5rem",
-                    backgroundColor: "#111827",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    borderRadius: "0.25rem",
-                    opacity: isHovered ? 1 : 0,
-                    transition: "opacity 200ms",
-                    pointerEvents: "none",
-                    whiteSpace: "nowrap",
-                    zIndex: 10,
-                  }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "100%",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      marginBottom: "0.5rem",
+                      padding: "0.25rem 0.5rem",
+                      backgroundColor: "#111827",
+                      color: "#ffffff",
+                      fontSize: "0.75rem",
+                      borderRadius: "0.25rem",
+                      opacity: isHovered ? 1 : 0,
+                      transition: "opacity 200ms",
+                      pointerEvents: "none",
+                      whiteSpace: "nowrap",
+                      zIndex: 10,
+                    }}
+                  >
                     {value}개
-                    <div style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #111827" }} />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: 0,
+                        height: 0,
+                        borderLeft: "4px solid transparent",
+                        borderRight: "4px solid transparent",
+                        borderTop: "4px solid #111827",
+                      }}
+                    />
                   </div>
                 )}
 
                 {/* 값 표시 (호버 시) */}
-                <div style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 500,
-                  color: "var(--color-foreground, #374151)",
-                  marginBottom: "0.25rem",
-                  opacity: isHovered ? 1 : 0,
-                  transition: "opacity 200ms",
-                }}>
+                <div
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                    color: "var(--color-foreground, #374151)",
+                    marginBottom: "0.25rem",
+                    opacity: isHovered ? 1 : 0,
+                    transition: "opacity 200ms",
+                  }}
+                >
                   {value}
                 </div>
 
                 {/* 막대 */}
-                <div style={{ position: "relative", width: "100%", flex: 1, display: "flex", alignItems: "flex-end" }}>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "flex-end",
+                  }}
+                >
                   <div
                     style={{
                       width: "100%",
@@ -230,20 +278,36 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
                   >
                     {/* 막대 위 점 */}
                     {value > 0 && (
-                      <div style={{ position: "absolute", top: "-4px", left: "50%", transform: "translateX(-50%)", width: "8px", height: "8px", backgroundColor: "var(--color-background, #ffffff)", borderRadius: "50%", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }} />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-4px",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: "8px",
+                          height: "8px",
+                          backgroundColor: "var(--color-background, #ffffff)",
+                          borderRadius: "50%",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                        }}
+                      />
                     )}
                   </div>
                 </div>
 
                 {/* 라벨 */}
                 {labels && labels[index] && (
-                  <div style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 500,
-                    marginTop: "0.5rem",
-                    transition: "color 200ms",
-                    color: isToday ? "#9333ea" : "var(--color-muted-foreground, #6b7280)",
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      marginTop: "0.5rem",
+                      transition: "color 200ms",
+                      color: isToday
+                        ? "#9333ea"
+                        : "var(--color-muted-foreground, #6b7280)",
+                    }}
+                  >
                     {labels[index]}
                   </div>
                 )}
@@ -254,7 +318,18 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
 
         {/* 통계 정보 */}
         {showStats && (
-          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", color: "var(--color-muted-foreground, #6b7280)", paddingLeft: "0.5rem", paddingRight: "0.5rem" }}>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "0.75rem",
+              color: "var(--color-muted-foreground, #6b7280)",
+              paddingLeft: "0.5rem",
+              paddingRight: "0.5rem",
+            }}
+          >
             <div>총: {total}</div>
             <div>평균: {average}</div>
             <div>최고: {max}</div>
@@ -262,7 +337,7 @@ export const MiniBarChart = React.forwardRef<HTMLDivElement, MiniBarChartProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 MiniBarChart.displayName = "MiniBarChart";

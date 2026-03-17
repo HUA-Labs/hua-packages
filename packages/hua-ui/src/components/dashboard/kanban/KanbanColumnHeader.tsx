@@ -19,6 +19,7 @@ const colorDotStyleMap: Record<Color, React.CSSProperties> = {
   pink: { backgroundColor: "#ec4899" },
   gray: { backgroundColor: "#6b7280" },
   cyan: { backgroundColor: "#06b6d4" },
+  primary: { backgroundColor: "var(--color-primary, #06b6d4)" },
 };
 
 /**
@@ -34,6 +35,10 @@ const colorBadgeStyleMap: Record<Color, React.CSSProperties> = {
   pink: { backgroundColor: "rgba(253,242,248,0.3)", color: "#be185d" },
   gray: { backgroundColor: "rgba(249,250,251,0.3)", color: "#374151" },
   cyan: { backgroundColor: "rgba(236,254,255,0.3)", color: "#0e7490" },
+  primary: {
+    backgroundColor: "rgba(var(--color-primary-rgb, 6,182,212),0.1)",
+    color: "var(--color-primary, #0e7490)",
+  },
 };
 
 /**
@@ -42,7 +47,10 @@ const colorBadgeStyleMap: Record<Color, React.CSSProperties> = {
  * 칸반 컬럼의 헤더를 렌더링합니다.
  * 제목 편집, 삭제, 접기/펼치기 기능을 제공합니다.
  */
-export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnHeaderProps>(
+export const KanbanColumnHeader = React.forwardRef<
+  HTMLDivElement,
+  KanbanColumnHeaderProps
+>(
   (
     {
       column,
@@ -55,7 +63,7 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(column.title);
@@ -64,7 +72,10 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
     const color: Color = column.color || "gray";
     const dotStyle = colorDotStyleMap[color];
     const badgeStyle = colorBadgeStyleMap[color];
-    const wipBadgeStyle: React.CSSProperties = { backgroundColor: "#fef3c7", color: "#b45309" };
+    const wipBadgeStyle: React.CSSProperties = {
+      backgroundColor: "#fef3c7",
+      color: "#b45309",
+    };
 
     // Focus input when editing starts
     useEffect(() => {
@@ -119,7 +130,7 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               borderRadius: "0.75rem",
             },
             resolveDot(dot),
-            style
+            style,
           )}
           {...props}
         >
@@ -147,17 +158,15 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               transition: "background-color 150ms",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(229,231,235,0.5)";
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "rgba(229,231,235,0.5)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "transparent";
             }}
           >
-            <Icon
-              name="chevronRight"
-              size={16}
-              style={{ color: "#9ca3af" }}
-            />
+            <Icon name="chevronRight" size={16} style={{ color: "#9ca3af" }} />
             <span
               style={{
                 fontSize: "0.875rem",
@@ -205,7 +214,7 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
             borderBottom: "1px solid #e5e7eb",
           },
           resolveDot(dot),
-          style
+          style,
         )}
         {...props}
       >
@@ -233,13 +242,19 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               }}
               title="드래그하여 컬럼 이동"
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor = "#e5e7eb";
+                (e.currentTarget as HTMLDivElement).style.backgroundColor =
+                  "#e5e7eb";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+                (e.currentTarget as HTMLDivElement).style.backgroundColor =
+                  "transparent";
               }}
             >
-              <Icon name="moreVertical" size={16} style={{ color: "#9ca3af" }} />
+              <Icon
+                name="moreVertical"
+                size={16}
+                style={{ color: "#9ca3af" }}
+              />
             </div>
           )}
 
@@ -296,7 +311,8 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               onClick={handleTitleClick}
               onMouseEnter={(e) => {
                 if (onTitleChange) {
-                  (e.currentTarget as HTMLHeadingElement).style.color = "#4f46e5";
+                  (e.currentTarget as HTMLHeadingElement).style.color =
+                    "#4f46e5";
                 }
               }}
               onMouseLeave={(e) => {
@@ -317,7 +333,9 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               paddingBottom: "0.125rem",
               borderRadius: "9999px",
               flexShrink: 0,
-              ...(column.limit && cardCount >= column.limit ? wipBadgeStyle : badgeStyle),
+              ...(column.limit && cardCount >= column.limit
+                ? wipBadgeStyle
+                : badgeStyle),
             }}
           >
             {cardCount}
@@ -354,17 +372,15 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               }}
               aria-label="컬럼 접기"
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#e5e7eb";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#e5e7eb";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "transparent";
               }}
             >
-              <Icon
-                name="chevronLeft"
-                size={14}
-                style={{ color: "#9ca3af" }}
-              />
+              <Icon name="chevronLeft" size={14} style={{ color: "#9ca3af" }} />
             </button>
           )}
 
@@ -388,13 +404,19 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
               }}
               aria-label="컬럼 삭제"
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#fee2e2";
-                const icon = (e.currentTarget as HTMLButtonElement).querySelector("[data-icon]");
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#fee2e2";
+                const icon = (
+                  e.currentTarget as HTMLButtonElement
+                ).querySelector("[data-icon]");
                 if (icon) (icon as HTMLElement).style.color = "#ef4444";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
-                const icon = (e.currentTarget as HTMLButtonElement).querySelector("[data-icon]");
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "transparent";
+                const icon = (
+                  e.currentTarget as HTMLButtonElement
+                ).querySelector("[data-icon]");
                 if (icon) (icon as HTMLElement).style.color = "#9ca3af";
               }}
             >
@@ -408,7 +430,7 @@ export const KanbanColumnHeader = React.forwardRef<HTMLDivElement, KanbanColumnH
         </div>
       </div>
     );
-  }
+  },
 );
 
 KanbanColumnHeader.displayName = "KanbanColumnHeader";

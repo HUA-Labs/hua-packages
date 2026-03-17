@@ -26,7 +26,10 @@ import type { Color } from "../../lib/types/common";
  * @property {boolean} [showChart] - 차트 표시 여부 / Show chart
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MetricCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface MetricCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title: string;
   value: string | number;
   description?: string;
@@ -46,15 +49,18 @@ export interface MetricCardProps extends Omit<React.HTMLAttributes<HTMLDivElemen
 }
 
 // Color token maps for variants
-const colorTokens: Record<Color, {
-  gradientBg: string;
-  defaultBorder: string;
-  defaultBg: string;
-  iconBg: string;
-  iconText: string;
-  badgeBg: string;
-  badgeText: string;
-}> = {
+const colorTokens: Record<
+  Color,
+  {
+    gradientBg: string;
+    defaultBorder: string;
+    defaultBg: string;
+    iconBg: string;
+    iconText: string;
+    badgeBg: string;
+    badgeText: string;
+  }
+> = {
   blue: {
     gradientBg: "linear-gradient(135deg, #3b82f6, #2563eb)",
     defaultBorder: "#bfdbfe",
@@ -136,6 +142,16 @@ const colorTokens: Record<Color, {
     badgeBg: "rgba(236,254,255,0.3)",
     badgeText: "#0e7490",
   },
+  primary: {
+    gradientBg:
+      "linear-gradient(135deg, var(--color-primary, #06b6d4), var(--color-primary, #0891b2))",
+    defaultBorder: "var(--color-primary, #a5f3fc)",
+    defaultBg: "rgba(var(--color-primary-rgb, 6,182,212),0.05)",
+    iconBg: "rgba(var(--color-primary-rgb, 6,182,212),0.15)",
+    iconText: "var(--color-primary, #0891b2)",
+    badgeBg: "rgba(var(--color-primary-rgb, 6,182,212),0.1)",
+    badgeText: "var(--color-primary, #0e7490)",
+  },
 };
 
 /**
@@ -190,7 +206,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const tokens = colorTokens[color] || colorTokens.blue;
     const isGradient = variant === "gradient";
@@ -248,19 +264,30 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
         style={mergeStyles(containerStyle, resolveDot(dot), style)}
         {...props}
       >
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            marginBottom: "1rem",
+          }}
+        >
           {/* 아이콘 */}
           {icon && (
-            <div style={{
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "0.5rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              backgroundColor: isGradient ? "rgba(255,255,255,0.2)" : tokens.iconBg,
-            }}>
+            <div
+              style={{
+                width: "3rem",
+                height: "3rem",
+                borderRadius: "0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                backgroundColor: isGradient
+                  ? "rgba(255,255,255,0.2)"
+                  : tokens.iconBg,
+              }}
+            >
               {typeof icon === "string" ? (
                 <Icon
                   name={icon as IconName}
@@ -275,14 +302,18 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
           {/* 배지 */}
           {title && (
-            <span style={{
-              fontSize: "0.875rem",
-              padding: "0.25rem 0.75rem",
-              borderRadius: "9999px",
-              fontWeight: 500,
-              backgroundColor: isGradient ? "rgba(255,255,255,0.2)" : tokens.badgeBg,
-              color: isGradient ? "#ffffff" : tokens.badgeText,
-            }}>
+            <span
+              style={{
+                fontSize: "0.875rem",
+                padding: "0.25rem 0.75rem",
+                borderRadius: "9999px",
+                fontWeight: 500,
+                backgroundColor: isGradient
+                  ? "rgba(255,255,255,0.2)"
+                  : tokens.badgeBg,
+                color: isGradient ? "#ffffff" : tokens.badgeText,
+              }}
+            >
               {title}
             </span>
           )}
@@ -290,25 +321,41 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
         {/* 값 */}
         {loading ? (
-          <div style={{ height: "2.5rem", backgroundColor: "#e5e7eb", borderRadius: "0.25rem", animation: "pulse 2s infinite", marginBottom: "0.5rem" }} />
+          <div
+            style={{
+              height: "2.5rem",
+              backgroundColor: "#e5e7eb",
+              borderRadius: "0.25rem",
+              animation: "pulse 2s infinite",
+              marginBottom: "0.5rem",
+            }}
+          />
         ) : (
-          <h3 style={{
-            fontSize: "1.875rem",
-            fontWeight: 700,
-            marginBottom: "0.25rem",
-            color: isGradient ? "#ffffff" : "var(--color-foreground, #1f2937)",
-          }}>
+          <h3
+            style={{
+              fontSize: "1.875rem",
+              fontWeight: 700,
+              marginBottom: "0.25rem",
+              color: isGradient
+                ? "#ffffff"
+                : "var(--color-foreground, #1f2937)",
+            }}
+          >
             {formatValue(value)}
           </h3>
         )}
 
         {/* 설명 */}
         {description && (
-          <p style={{
-            fontSize: "0.875rem",
-            marginBottom: "0.75rem",
-            color: isGradient ? "rgba(255,255,255,0.9)" : "var(--color-muted-foreground, #4b5563)",
-          }}>
+          <p
+            style={{
+              fontSize: "0.875rem",
+              marginBottom: "0.75rem",
+              color: isGradient
+                ? "rgba(255,255,255,0.9)"
+                : "var(--color-muted-foreground, #4b5563)",
+            }}
+          >
             {description}
           </p>
         )}
@@ -328,25 +375,38 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 
         {/* 트렌드 */}
         {trend && !loading && (
-          <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
-            <span style={{
-              fontSize: "0.75rem",
-              fontWeight: 500,
-              color: trend.positive !== false ? "#16a34a" : "#dc2626",
-            }}>
+          <div
+            style={{
+              marginTop: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                color: trend.positive !== false ? "#16a34a" : "#dc2626",
+              }}
+            >
               {trend.positive !== false ? "↑" : "↓"} {Math.abs(trend.value)}%
             </span>
-            <span style={{
-              fontSize: "0.75rem",
-              color: isGradient ? "rgba(255,255,255,0.7)" : "var(--color-muted-foreground, #6b7280)",
-            }}>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                color: isGradient
+                  ? "rgba(255,255,255,0.7)"
+                  : "var(--color-muted-foreground, #6b7280)",
+              }}
+            >
               {trend.label}
             </span>
           </div>
         )}
       </div>
     );
-  }
+  },
 );
 
 MetricCard.displayName = "MetricCard";

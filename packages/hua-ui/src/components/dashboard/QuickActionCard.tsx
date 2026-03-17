@@ -35,15 +35,117 @@ function useIsDark(): boolean {
 // ─── Color palette (hex) ────────────────────────────────────────
 
 const PALETTE: Record<Color, Record<string, string>> = {
-  blue:   { "50":"#eff6ff","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a" },
-  purple: { "50":"#faf5ff","200":"#e9d5ff","300":"#d8b4fe","400":"#c084fc","500":"#a855f7","600":"#9333ea","700":"#7e22ce","800":"#6b21a8","900":"#581c87" },
-  green:  { "50":"#f0fdf4","200":"#bbf7d0","300":"#86efac","400":"#4ade80","500":"#22c55e","600":"#16a34a","700":"#15803d","800":"#166534","900":"#14532d" },
-  orange: { "50":"#fff7ed","200":"#fed7aa","300":"#fdba74","400":"#fb923c","500":"#f97316","600":"#ea580c","700":"#c2410c","800":"#9a3412","900":"#7c2d12" },
-  red:    { "50":"#fef2f2","200":"#fecaca","300":"#fca5a5","400":"#f87171","500":"#ef4444","600":"#dc2626","700":"#b91c1c","800":"#991b1b","900":"#7f1d1d" },
-  indigo: { "50":"#eef2ff","200":"#c7d2fe","300":"#a5b4fc","400":"#818cf8","500":"#6366f1","600":"#4f46e5","700":"#4338ca","800":"#3730a3","900":"#312e81" },
-  pink:   { "50":"#fdf2f8","200":"#fbcfe8","300":"#f9a8d4","400":"#f472b6","500":"#ec4899","600":"#db2777","700":"#be185d","800":"#9d174d","900":"#831843" },
-  gray:   { "50":"#f9fafb","200":"#e5e7eb","300":"#d1d5db","400":"#9ca3af","500":"#6b7280","600":"#4b5563","700":"#374151","800":"#1f2937","900":"#111827" },
-  cyan:   { "50":"#ecfeff","200":"#a5f3fc","300":"#67e8f9","400":"#22d3ee","500":"#06b6d4","600":"#0891b2","700":"#0e7490","800":"#155e75","900":"#164e63" },
+  blue: {
+    "50": "#eff6ff",
+    "200": "#bfdbfe",
+    "300": "#93c5fd",
+    "400": "#60a5fa",
+    "500": "#3b82f6",
+    "600": "#2563eb",
+    "700": "#1d4ed8",
+    "800": "#1e40af",
+    "900": "#1e3a8a",
+  },
+  purple: {
+    "50": "#faf5ff",
+    "200": "#e9d5ff",
+    "300": "#d8b4fe",
+    "400": "#c084fc",
+    "500": "#a855f7",
+    "600": "#9333ea",
+    "700": "#7e22ce",
+    "800": "#6b21a8",
+    "900": "#581c87",
+  },
+  green: {
+    "50": "#f0fdf4",
+    "200": "#bbf7d0",
+    "300": "#86efac",
+    "400": "#4ade80",
+    "500": "#22c55e",
+    "600": "#16a34a",
+    "700": "#15803d",
+    "800": "#166534",
+    "900": "#14532d",
+  },
+  orange: {
+    "50": "#fff7ed",
+    "200": "#fed7aa",
+    "300": "#fdba74",
+    "400": "#fb923c",
+    "500": "#f97316",
+    "600": "#ea580c",
+    "700": "#c2410c",
+    "800": "#9a3412",
+    "900": "#7c2d12",
+  },
+  red: {
+    "50": "#fef2f2",
+    "200": "#fecaca",
+    "300": "#fca5a5",
+    "400": "#f87171",
+    "500": "#ef4444",
+    "600": "#dc2626",
+    "700": "#b91c1c",
+    "800": "#991b1b",
+    "900": "#7f1d1d",
+  },
+  indigo: {
+    "50": "#eef2ff",
+    "200": "#c7d2fe",
+    "300": "#a5b4fc",
+    "400": "#818cf8",
+    "500": "#6366f1",
+    "600": "#4f46e5",
+    "700": "#4338ca",
+    "800": "#3730a3",
+    "900": "#312e81",
+  },
+  pink: {
+    "50": "#fdf2f8",
+    "200": "#fbcfe8",
+    "300": "#f9a8d4",
+    "400": "#f472b6",
+    "500": "#ec4899",
+    "600": "#db2777",
+    "700": "#be185d",
+    "800": "#9d174d",
+    "900": "#831843",
+  },
+  gray: {
+    "50": "#f9fafb",
+    "200": "#e5e7eb",
+    "300": "#d1d5db",
+    "400": "#9ca3af",
+    "500": "#6b7280",
+    "600": "#4b5563",
+    "700": "#374151",
+    "800": "#1f2937",
+    "900": "#111827",
+  },
+  cyan: {
+    "50": "#ecfeff",
+    "200": "#a5f3fc",
+    "300": "#67e8f9",
+    "400": "#22d3ee",
+    "500": "#06b6d4",
+    "600": "#0891b2",
+    "700": "#0e7490",
+    "800": "#155e75",
+    "900": "#164e63",
+  },
+  primary: {
+    "50": "var(--color-primary, #ecfeff)",
+    "100": "var(--color-primary, #cffafe)",
+    "200": "var(--color-primary, #a5f3fc)",
+    "300": "var(--color-primary, #67e8f9)",
+    "400": "var(--color-primary, #22d3ee)",
+    "500": "var(--color-primary, #06b6d4)",
+    "600": "var(--color-primary, #0891b2)",
+    "700": "var(--color-primary, #0e7490)",
+    "800": "var(--color-primary, #155e75)",
+    "900": "var(--color-primary, #164e63)",
+  },
 };
 
 function px(color: Color, shade: string): string {
@@ -86,7 +188,8 @@ function getOutlineStyle(color: Color, isDark: boolean): React.CSSProperties {
 
 function getOutlineHoverStyle(): React.CSSProperties {
   return {
-    boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
+    boxShadow:
+      "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
   };
 }
 
@@ -100,7 +203,8 @@ function getSolidStyle(color: Color): React.CSSProperties {
 function getSolidHoverStyle(color: Color): React.CSSProperties {
   return {
     backgroundColor: px(color, "700"),
-    boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
+    boxShadow:
+      "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.08)",
   };
 }
 
@@ -160,11 +264,10 @@ const BASE_LAYOUT: React.CSSProperties = {
 /**
  * QuickActionCard component props
  */
-export interface QuickActionCardProps
-  extends Omit<
-    React.HTMLAttributes<HTMLAnchorElement | HTMLButtonElement>,
-    "className"
-  > {
+export interface QuickActionCardProps extends Omit<
+  React.HTMLAttributes<HTMLAnchorElement | HTMLButtonElement>,
+  "className"
+> {
   /** Card title */
   title: string;
   /** Card description */
@@ -238,7 +341,7 @@ export const QuickActionCard = React.forwardRef<
       style: styleProp,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isHovered, setIsHovered] = useState(false);
     const isDark = useIsDark();
@@ -381,7 +484,7 @@ export const QuickActionCard = React.forwardRef<
         {content}
       </button>
     );
-  }
+  },
 );
 
 QuickActionCard.displayName = "QuickActionCard";

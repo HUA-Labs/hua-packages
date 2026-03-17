@@ -27,8 +27,10 @@ const s = (input: string) => dotFn(input) as React.CSSProperties;
  * @property {string} [dot] - dot 스타일 유틸리티 문자열 / dot utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface ProgressCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
+export interface ProgressCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title: string;
   current: number;
   total: number;
@@ -147,6 +149,15 @@ const COLOR_TOKENS: Record<Color, ColorTokens> = {
     gradFrom: "#06b6d4",
     gradTo: "#0891b2",
   },
+  primary: {
+    accent: "var(--color-primary, #06b6d4)",
+    accentLight: "var(--color-primary, #06b6d4)",
+    border: "var(--color-primary, #06b6d4)",
+    bgLight: "rgba(var(--color-primary-rgb, 6,182,212),0.05)",
+    iconBg: "rgba(var(--color-primary-rgb, 6,182,212),0.15)",
+    gradFrom: "var(--color-primary, #06b6d4)",
+    gradTo: "var(--color-primary, #0891b2)",
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -242,7 +253,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const tokens = COLOR_TOKENS[color];
     const sizes = SIZE_TOKENS[size];
@@ -301,81 +312,105 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
     // ------------------------------------------------------------------
     // Icon container style
     // ------------------------------------------------------------------
-    const iconContainerStyle = useMemo((): React.CSSProperties => ({
-      ...sizes.iconBox,
-      borderRadius: "0.5rem",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-      background: isGradient ? "rgba(255,255,255,0.2)" : tokens.iconBg,
-    }), [sizes.iconBox, isGradient, tokens.iconBg]);
+    const iconContainerStyle = useMemo(
+      (): React.CSSProperties => ({
+        ...sizes.iconBox,
+        borderRadius: "0.5rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        background: isGradient ? "rgba(255,255,255,0.2)" : tokens.iconBg,
+      }),
+      [sizes.iconBox, isGradient, tokens.iconBg],
+    );
 
     // ------------------------------------------------------------------
     // Text colors derived from variant / dark-mode via CSS vars
     // ------------------------------------------------------------------
-    const titleStyle = useMemo((): React.CSSProperties => ({
-      ...sizes.titleSize,
-      fontWeight: 600,
-      marginBottom: "0.25rem",
-      color: isGradient ? "#ffffff" : "var(--color-foreground, #1f2937)",
-    }), [sizes.titleSize, isGradient]);
+    const titleStyle = useMemo(
+      (): React.CSSProperties => ({
+        ...sizes.titleSize,
+        fontWeight: 600,
+        marginBottom: "0.25rem",
+        color: isGradient ? "#ffffff" : "var(--color-foreground, #1f2937)",
+      }),
+      [sizes.titleSize, isGradient],
+    );
 
-    const descriptionStyle = useMemo((): React.CSSProperties => ({
-      fontSize: "0.875rem",
-      color: isGradient
-        ? "rgba(255,255,255,0.9)"
-        : "var(--color-muted-foreground, #6b7280)",
-    }), [isGradient]);
+    const descriptionStyle = useMemo(
+      (): React.CSSProperties => ({
+        fontSize: "0.875rem",
+        color: isGradient
+          ? "rgba(255,255,255,0.9)"
+          : "var(--color-muted-foreground, #6b7280)",
+      }),
+      [isGradient],
+    );
 
-    const valueStyle = useMemo((): React.CSSProperties => ({
-      ...sizes.valueSize,
-      fontWeight: 700,
-      color: isGradient ? "#ffffff" : tokens.accent,
-    }), [sizes.valueSize, isGradient, tokens.accent]);
+    const valueStyle = useMemo(
+      (): React.CSSProperties => ({
+        ...sizes.valueSize,
+        fontWeight: 700,
+        color: isGradient ? "#ffffff" : tokens.accent,
+      }),
+      [sizes.valueSize, isGradient, tokens.accent],
+    );
 
-    const totalLabelStyle = useMemo((): React.CSSProperties => ({
-      fontSize: "0.875rem",
-      color: isGradient
-        ? "rgba(255,255,255,0.8)"
-        : "var(--color-muted-foreground, #6b7280)",
-    }), [isGradient]);
+    const totalLabelStyle = useMemo(
+      (): React.CSSProperties => ({
+        fontSize: "0.875rem",
+        color: isGradient
+          ? "rgba(255,255,255,0.8)"
+          : "var(--color-muted-foreground, #6b7280)",
+      }),
+      [isGradient],
+    );
 
-    const percentageLabelStyle = useMemo((): React.CSSProperties => ({
-      fontSize: "0.75rem",
-      fontWeight: 600,
-      color: isGradient ? "rgba(255,255,255,0.9)" : tokens.accent,
-    }), [isGradient, tokens.accent]);
+    const percentageLabelStyle = useMemo(
+      (): React.CSSProperties => ({
+        fontSize: "0.75rem",
+        fontWeight: 600,
+        color: isGradient ? "rgba(255,255,255,0.9)" : tokens.accent,
+      }),
+      [isGradient, tokens.accent],
+    );
 
     // ------------------------------------------------------------------
     // Progress bar track + fill
     // ------------------------------------------------------------------
-    const progressTrackStyle = useMemo((): React.CSSProperties => ({
-      width: "100%",
-      height: sizes.progressHeight,
-      borderRadius: 9999,
-      overflow: "hidden",
-      background: isGradient
-        ? "rgba(255,255,255,0.25)"
-        : "var(--color-muted, #e5e7eb)",
-    }), [sizes.progressHeight, isGradient]);
+    const progressTrackStyle = useMemo(
+      (): React.CSSProperties => ({
+        width: "100%",
+        height: sizes.progressHeight,
+        borderRadius: 9999,
+        overflow: "hidden",
+        background: isGradient
+          ? "rgba(255,255,255,0.25)"
+          : "var(--color-muted, #e5e7eb)",
+      }),
+      [sizes.progressHeight, isGradient],
+    );
 
-    const progressFillStyle = useMemo((): React.CSSProperties => ({
-      height: "100%",
-      borderRadius: 9999,
-      transition: "width 500ms ease-in-out",
-      width: `${percentage}%`,
-      background: isGradient
-        ? `linear-gradient(90deg, rgba(255,255,255,0.7), rgba(255,255,255,0.9))`
-        : tokens.accent,
-    }), [percentage, isGradient, tokens.accent]);
+    const progressFillStyle = useMemo(
+      (): React.CSSProperties => ({
+        height: "100%",
+        borderRadius: 9999,
+        transition: "width 500ms ease-in-out",
+        width: `${percentage}%`,
+        background: isGradient
+          ? `linear-gradient(90deg, rgba(255,255,255,0.7), rgba(255,255,255,0.9))`
+          : tokens.accent,
+      }),
+      [percentage, isGradient, tokens.accent],
+    );
 
     // ------------------------------------------------------------------
     // Merge final container style with dot prop + consumer style override
     // ------------------------------------------------------------------
     const computedStyle = useMemo(
       () => mergeStyles(containerStyle, resolveDot(dotProp), style),
-      [containerStyle, dotProp, style]
+      [containerStyle, dotProp, style],
     );
 
     // Icon dot style for size
@@ -392,7 +427,9 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
                 <Icon
                   name={icon as IconName}
                   dot={iconDot}
-                  style={isGradient ? { color: "#ffffff" } : { color: tokens.accent }}
+                  style={
+                    isGradient ? { color: "#ffffff" } : { color: tokens.accent }
+                  }
                 />
               ) : (
                 icon
@@ -401,17 +438,22 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
           )}
 
           {/* Title + description */}
-          <div style={mergeStyles(s("flex-1"), icon ? { marginLeft: "1rem" } : undefined)}>
-            <h3 style={titleStyle}>{title}</h3>
-            {description && (
-              <p style={descriptionStyle}>{description}</p>
+          <div
+            style={mergeStyles(
+              s("flex-1"),
+              icon ? { marginLeft: "1rem" } : undefined,
             )}
+          >
+            <h3 style={titleStyle}>{title}</h3>
+            {description && <p style={descriptionStyle}>{description}</p>}
           </div>
         </div>
 
         {/* Progress section */}
         {loading ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+          >
             <div
               style={{
                 height: "1rem",
@@ -468,7 +510,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 ProgressCard.displayName = "ProgressCard";
