@@ -81,7 +81,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     // SSR hydration fix: only render DndContext after mount
     const [isMounted, setIsMounted] = useState(false);
@@ -97,12 +97,14 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
 
     // Drag state
     const [activeId, setActiveId] = useState<string | null>(null);
-    const [activeType, setActiveType] = useState<"card" | "column" | null>(null);
+    const [activeType, setActiveType] = useState<"card" | "column" | null>(
+      null,
+    );
 
     // Determine controlled vs uncontrolled
     const isControlled = controlledColumns !== undefined;
     const columns = isControlled ? controlledColumns : internalColumns;
-    const cards = isControlled ? controlledCards ?? [] : internalCards;
+    const cards = isControlled ? (controlledCards ?? []) : internalCards;
 
     // Is dragging?
     const isDragging = activeId !== null;
@@ -113,7 +115,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
       useSensor(PointerSensor, {
         activationConstraint: { distance: 8 },
       }),
-      useSensor(KeyboardSensor)
+      useSensor(KeyboardSensor),
     );
 
     // Handle column changes
@@ -124,7 +126,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         }
         onColumnsChange?.(newColumns);
       },
-      [isControlled, onColumnsChange]
+      [isControlled, onColumnsChange],
     );
 
     // Handle card changes
@@ -135,7 +137,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         }
         onCardsChange?.(newCards);
       },
-      [isControlled, onCardsChange]
+      [isControlled, onCardsChange],
     );
 
     // Get cards for a specific column (sorted by order)
@@ -145,7 +147,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           .filter((card) => card.columnId === columnId)
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       },
-      [cards]
+      [cards],
     );
 
     // Find which column a card belongs to
@@ -154,7 +156,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         const card = cards.find((c) => c.id === cardId);
         return card?.columnId ?? null;
       },
-      [cards]
+      [cards],
     );
 
     // Check if item is a column
@@ -162,7 +164,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
       (id: string): boolean => {
         return columns.some((col) => col.id === id);
       },
-      [columns]
+      [columns],
     );
 
     // Drag start handler
@@ -176,7 +178,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         setActiveType(type);
         onKanbanDragStart?.(type, id);
       },
-      [isColumn, onKanbanDragStart]
+      [isColumn, onKanbanDragStart],
     );
 
     // Drag over handler (for moving cards between columns)
@@ -192,7 +194,9 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         if (isColumn(activeId)) return;
 
         const activeColumnId = findColumnByCardId(activeId);
-        const overColumnId = isColumn(overId) ? overId : findColumnByCardId(overId);
+        const overColumnId = isColumn(overId)
+          ? overId
+          : findColumnByCardId(overId);
 
         if (!activeColumnId || !overColumnId) return;
 
@@ -234,7 +238,14 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           handleCardsChange(reorderedCards);
         }
       },
-      [cards, columns, findColumnByCardId, getColumnCards, handleCardsChange, isColumn]
+      [
+        cards,
+        columns,
+        findColumnByCardId,
+        getColumnCards,
+        handleCardsChange,
+        isColumn,
+      ],
     );
 
     // Drag end handler
@@ -273,7 +284,9 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
 
         // Card drag within same column
         const activeColumnId = findColumnByCardId(activeIdStr);
-        const overColumnId = isColumn(overId) ? overId : findColumnByCardId(overId);
+        const overColumnId = isColumn(overId)
+          ? overId
+          : findColumnByCardId(overId);
 
         if (!activeColumnId || !overColumnId) return;
 
@@ -285,12 +298,18 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
             : columnCards.findIndex((c) => c.id === overId);
 
           if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
-            const reorderedColumnCards = arrayMove(columnCards, oldIndex, newIndex);
+            const reorderedColumnCards = arrayMove(
+              columnCards,
+              oldIndex,
+              newIndex,
+            );
 
             // Update order for all cards in this column
             const newCards = cards.map((card) => {
               if (card.columnId === activeColumnId) {
-                const newOrder = reorderedColumnCards.findIndex((c) => c.id === card.id);
+                const newOrder = reorderedColumnCards.findIndex(
+                  (c) => c.id === card.id,
+                );
                 return { ...card, order: newOrder };
               }
               return card;
@@ -327,7 +346,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         onCardMove,
         onColumnMove,
         onKanbanDragEnd,
-      ]
+      ],
     );
 
     // Active item for overlay
@@ -345,9 +364,8 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     const boardBaseStyle = useMemo((): React.CSSProperties => {
       const base: React.CSSProperties = {
         display: "flex",
-        gap: "1rem",
+        ...resolveDot("gap-4 pb-4"),
         overflowX: "auto",
-        paddingBottom: "1rem",
         minHeight: "400px",
       };
 
@@ -355,22 +373,19 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         case "gradient":
           return {
             ...base,
-            padding: "1rem",
-            borderRadius: "1rem",
+            ...resolveDot("p-4 rounded-xl"),
             background: "linear-gradient(135deg, #f3f4f6, #e5e7eb)",
           };
         case "outline":
           return {
             ...base,
-            padding: "1rem",
-            borderRadius: "1rem",
+            ...resolveDot("p-4 rounded-xl"),
             border: "2px dashed #d1d5db",
           };
         case "elevated":
           return {
             ...base,
-            padding: "1rem",
-            borderRadius: "1rem",
+            ...resolveDot("p-4 rounded-xl"),
             backgroundColor: "rgba(249,250,251,0.5)",
           };
         default:
@@ -382,9 +397,12 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     const columnIds = useMemo(() => columns.map((c) => c.id), [columns]);
 
     // Drag overlay styles
-    const cardOverlayStyle = useMemo(() => ({
-      transform: `rotate(${dragRotation}deg) scale(${dragScale})`,
-    }), [dragRotation, dragScale]);
+    const cardOverlayStyle = useMemo(
+      () => ({
+        transform: `rotate(${dragRotation}deg) scale(${dragScale})`,
+      }),
+      [dragRotation, dragScale],
+    );
 
     // SSR placeholder - prevents hydration mismatch from @dnd-kit's aria-describedby
     if (!isMounted) {
@@ -402,17 +420,24 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
               style={{
                 flexShrink: 0,
                 backgroundColor: "#f3f4f6",
-                borderRadius: "0.75rem",
-                padding: "0.75rem",
+                ...resolveDot("rounded-xl p-3"),
                 minWidth: columnMinWidth,
                 maxWidth: columnMaxWidth,
               }}
             >
               <Skeleton variant="text" dot="h-8 mb-3" />
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                {getColumnCards(column.id).slice(0, 3).map((card) => (
-                  <Skeleton key={card.id} variant="rounded" dot="h-20" />
-                ))}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  ...resolveDot("gap-2"),
+                }}
+              >
+                {getColumnCards(column.id)
+                  .slice(0, 3)
+                  .map((card) => (
+                    <Skeleton key={card.id} variant="rounded" dot="h-20" />
+                  ))}
               </div>
             </div>
           ))}
@@ -461,7 +486,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
                   zIndex: 40,
                   transition: "opacity 200ms",
                 },
-                dragOverlayStyle
+                dragOverlayStyle,
               )}
               aria-hidden="true"
             />
@@ -475,7 +500,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
               boardBaseStyle,
               isDragging ? { position: "relative", zIndex: 50 } : undefined,
               resolveDot(dot),
-              style
+              style,
             )}
             {...props}
           >
@@ -489,10 +514,14 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
                   column={column}
                   cards={getColumnCards(column.id)}
                   index={index}
-                  style={column.collapsed ? undefined : {
-                    minWidth: columnMinWidth,
-                    maxWidth: columnMaxWidth,
-                  }}
+                  style={
+                    column.collapsed
+                      ? undefined
+                      : {
+                          minWidth: columnMinWidth,
+                          maxWidth: columnMaxWidth,
+                        }
+                  }
                 />
               ))}
             </SortableContext>
@@ -509,10 +538,12 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
           </div>
 
           {/* Drag Overlay */}
-          <DragOverlay dropAnimation={{
-            duration: 200,
-            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
-          }}>
+          <DragOverlay
+            dropAnimation={{
+              duration: 200,
+              easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+            }}
+          >
             {activeCard && (
               <div
                 style={{
@@ -520,11 +551,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
                   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
                 }}
               >
-                <KanbanCard
-                  card={activeCard}
-                  index={0}
-                  isDragging
-                />
+                <KanbanCard card={activeCard} index={0} isDragging />
               </div>
             )}
             {activeColumnData && (
@@ -548,7 +575,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         </DndContext>
       </KanbanProvider>
     );
-  }
+  },
 );
 
 KanbanBoard.displayName = "KanbanBoard";

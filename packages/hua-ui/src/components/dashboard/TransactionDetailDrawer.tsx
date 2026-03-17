@@ -303,23 +303,26 @@ export const TransactionDetailDrawer: React.FC<
   const statusStyle = transaction && STATUS_STYLES[transaction.status];
 
   const sectionStyle: React.CSSProperties = {
-    borderRadius: "1rem",
+    ...resolveDot("rounded-xl p-4"),
     border: "1px solid var(--color-border, #f1f5f9)",
     backgroundColor: "var(--color-card, rgba(255,255,255,0.4))",
-    padding: "1rem",
   };
 
   return (
     <Drawer isOpen={open} onClose={onClose} dot={dotProp}>
       <DrawerHeader onClose={onClose}>
         <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            ...resolveDot("gap-1"),
+          }}
         >
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "0.5rem",
+              ...resolveDot("gap-2"),
               fontSize: "0.75rem",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -341,7 +344,11 @@ export const TransactionDetailDrawer: React.FC<
             )}
           </div>
           <div
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              ...resolveDot("gap-3"),
+            }}
           >
             <p
               style={{
@@ -376,18 +383,25 @@ export const TransactionDetailDrawer: React.FC<
       </DrawerHeader>
 
       <DrawerContent
-        style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          ...resolveDot("gap-6"),
+        }}
       >
         {loading ? (
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              ...resolveDot("gap-4"),
+            }}
           >
             {[...Array(3)].map((_, idx) => (
               <div
                 key={idx}
                 style={{
-                  height: "5rem",
-                  borderRadius: "1rem",
+                  ...resolveDot("h-20 rounded-xl"),
                   border: "1px solid var(--color-border, #f1f5f9)",
                   animation: "pulse 2s infinite",
                   backgroundColor: "var(--color-muted, rgba(248,250,252,0.6))",
@@ -401,7 +415,7 @@ export const TransactionDetailDrawer: React.FC<
               style={{
                 ...sectionStyle,
                 display: "grid",
-                gap: "1rem",
+                ...resolveDot("gap-4"),
                 gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
               }}
               aria-label="거래 요약 정보"
@@ -410,7 +424,7 @@ export const TransactionDetailDrawer: React.FC<
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "0.25rem",
+                  ...resolveDot("gap-1"),
                 }}
               >
                 <p
@@ -454,7 +468,7 @@ export const TransactionDetailDrawer: React.FC<
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "0.5rem",
+                  ...resolveDot("gap-2"),
                 }}
               >
                 <p
@@ -483,7 +497,7 @@ export const TransactionDetailDrawer: React.FC<
               >
                 <h3
                   style={{
-                    marginBottom: "0.75rem",
+                    ...resolveDot("mb-3"),
                     fontSize: "0.875rem",
                     fontWeight: 600,
                     color: "var(--color-foreground, #0f172a)",
@@ -494,7 +508,7 @@ export const TransactionDetailDrawer: React.FC<
                 <dl
                   style={{
                     display: "grid",
-                    gap: "1rem",
+                    ...resolveDot("gap-4"),
                     gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                   }}
                 >
@@ -504,15 +518,14 @@ export const TransactionDetailDrawer: React.FC<
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.75rem",
+                        ...resolveDot("gap-3"),
                       }}
                     >
                       {item.icon && (
                         <span
                           style={{
-                            borderRadius: "0.5rem",
+                            ...resolveDot("rounded-lg p-2"),
                             backgroundColor: "var(--color-muted, #f1f5f9)",
-                            padding: "0.5rem",
                             color: "#64748b",
                           }}
                           aria-hidden="true"
@@ -548,7 +561,7 @@ export const TransactionDetailDrawer: React.FC<
               >
                 <div
                   style={{
-                    marginBottom: "1rem",
+                    ...resolveDot("mb-4"),
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
@@ -564,6 +577,7 @@ export const TransactionDetailDrawer: React.FC<
                     >
                       정산 정보
                     </h3>
+
                     {settlement.note && (
                       <p style={{ fontSize: "0.75rem", color: "#64748b" }}>
                         {settlement.note}
@@ -588,7 +602,7 @@ export const TransactionDetailDrawer: React.FC<
                 <dl
                   style={{
                     display: "grid",
-                    gap: "1rem",
+                    ...resolveDot("gap-4"),
                     gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                   }}
                 >
@@ -680,7 +694,7 @@ export const TransactionDetailDrawer: React.FC<
               >
                 <h3
                   style={{
-                    marginBottom: "0.75rem",
+                    ...resolveDot("mb-3"),
                     fontSize: "0.875rem",
                     fontWeight: 600,
                     color: "var(--color-foreground, #0f172a)",
@@ -692,7 +706,7 @@ export const TransactionDetailDrawer: React.FC<
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "0.75rem",
+                    ...resolveDot("gap-3"),
                   }}
                 >
                   {fees.map((fee) => (
@@ -734,7 +748,7 @@ export const TransactionDetailDrawer: React.FC<
             >
               <h3
                 style={{
-                  marginBottom: "1rem",
+                  ...resolveDot("mb-4"),
                   fontSize: "0.875rem",
                   fontWeight: 600,
                   color: "var(--color-foreground, #0f172a)",
@@ -756,7 +770,7 @@ export const TransactionDetailDrawer: React.FC<
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "0.75rem",
+                    ...resolveDot("gap-3"),
                   }}
                   role="list"
                   aria-label="이벤트 목록"
@@ -768,16 +782,13 @@ export const TransactionDetailDrawer: React.FC<
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
-                        gap: "0.75rem",
-                        borderRadius: "0.75rem",
+                        ...resolveDot("gap-3 rounded-xl p-3"),
                         border: "1px solid var(--color-border, #f1f5f9)",
-                        padding: "0.75rem",
                       }}
                     >
                       <div
                         style={{
-                          borderRadius: "0.5rem",
-                          padding: "0.5rem",
+                          ...resolveDot("rounded-lg p-2"),
                           ...getEventStyle(event.status),
                         }}
                         aria-hidden="true"
@@ -819,7 +830,7 @@ export const TransactionDetailDrawer: React.FC<
                             style={{
                               fontSize: "0.75rem",
                               color: "#94a3b8",
-                              marginTop: "0.25rem",
+                              ...resolveDot("mt-1"),
                             }}
                             aria-label={`실행자: ${event.actor}`}
                           >

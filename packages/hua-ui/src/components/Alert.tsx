@@ -258,7 +258,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const iconWrapStyle = useMemo(
       () =>
         mergeStyles(
-          { flexShrink: 0, marginTop: "2px" } as React.CSSProperties,
+          { flexShrink: 0, ...resolveDot("mt-0.5") } as React.CSSProperties,
           VARIANT_ICON[variant],
         ),
       [variant],

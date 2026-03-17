@@ -12,8 +12,22 @@ import type { KanbanAddCardProps } from "./types";
  * 새 카드를 추가하는 인라인 폼입니다.
  * 버튼 클릭 시 입력 폼이 나타나고, Enter로 추가합니다.
  */
-export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps>(
-  ({ columnId, onAdd, onCancel, placeholder = "카드 제목 입력...", dot, style, ...props }, ref) => {
+export const KanbanAddCard = React.forwardRef<
+  HTMLDivElement,
+  KanbanAddCardProps
+>(
+  (
+    {
+      columnId,
+      onAdd,
+      onCancel,
+      placeholder = "카드 제목 입력...",
+      dot,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     const { addCard } = useKanban();
     const [isAdding, setIsAdding] = useState(false);
     const [title, setTitle] = useState("");
@@ -73,14 +87,13 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
           ref={ref}
           style={mergeStyles(
             {
-              borderRadius: "0.5rem",
+              ...resolveDot("rounded-lg p-2"),
               backgroundColor: "#ffffff",
               boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
               border: "1px solid #e5e7eb",
-              padding: "0.5rem",
             },
             resolveDot(dot),
-            style
+            style,
           )}
           {...props}
         >
@@ -101,10 +114,7 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
             placeholder={placeholder}
             style={{
               width: "100%",
-              paddingLeft: "0.5rem",
-              paddingRight: "0.5rem",
-              paddingTop: "0.375rem",
-              paddingBottom: "0.375rem",
+              ...resolveDot("px-2 py-1.5"),
               fontSize: "0.875rem",
               backgroundColor: "transparent",
               border: "none",
@@ -117,18 +127,14 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-end",
-              gap: "0.25rem",
-              marginTop: "0.5rem",
+              ...resolveDot("gap-1 mt-2"),
             }}
           >
             <button
               type="button"
               onClick={handleCancel}
               style={{
-                paddingLeft: "0.5rem",
-                paddingRight: "0.5rem",
-                paddingTop: "0.25rem",
-                paddingBottom: "0.25rem",
+                ...resolveDot("px-2 py-1"),
                 fontSize: "0.75rem",
                 color: "#6b7280",
                 background: "none",
@@ -145,13 +151,9 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
               style={
                 title.trim()
                   ? {
-                      paddingLeft: "0.75rem",
-                      paddingRight: "0.75rem",
-                      paddingTop: "0.25rem",
-                      paddingBottom: "0.25rem",
+                      ...resolveDot("px-3 py-1 rounded"),
                       fontSize: "0.75rem",
                       fontWeight: 500,
-                      borderRadius: "0.25rem",
                       backgroundColor: "#6366f1",
                       color: "#ffffff",
                       border: "none",
@@ -159,13 +161,9 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
                       transition: "background-color 150ms",
                     }
                   : {
-                      paddingLeft: "0.75rem",
-                      paddingRight: "0.75rem",
-                      paddingTop: "0.25rem",
-                      paddingBottom: "0.25rem",
+                      ...resolveDot("px-3 py-1 rounded"),
                       fontSize: "0.75rem",
                       fontWeight: 500,
-                      borderRadius: "0.25rem",
                       backgroundColor: "#e5e7eb",
                       color: "#9ca3af",
                       border: "none",
@@ -191,21 +189,16 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
             width: "100%",
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
-            paddingLeft: "0.75rem",
-            paddingRight: "0.75rem",
-            paddingTop: "0.5rem",
-            paddingBottom: "0.5rem",
+            ...resolveDot("gap-2 px-3 py-2 rounded-lg"),
             fontSize: "0.875rem",
             color: "#6b7280",
             background: "none",
             border: "none",
-            borderRadius: "0.5rem",
             cursor: "pointer",
             transition: "background-color 150ms, color 150ms",
           },
           resolveDot(dot),
-          style
+          style,
         )}
         {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >
@@ -213,7 +206,7 @@ export const KanbanAddCard = React.forwardRef<HTMLDivElement, KanbanAddCardProps
         <span>카드 추가</span>
       </button>
     );
-  }
+  },
 );
 
 KanbanAddCard.displayName = "KanbanAddCard";

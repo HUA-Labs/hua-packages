@@ -2,7 +2,10 @@
 
 import React, { useMemo, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { useKanban } from "./KanbanContext";
@@ -46,7 +49,10 @@ const columnVariantStyles: Record<string, React.CSSProperties> = {
   default: { backgroundColor: "rgba(243,244,246,0.5)" },
   gradient: { background: "linear-gradient(to bottom, #f3f4f6, #ffffff)" },
   outline: { backgroundColor: "transparent", border: "2px solid #e5e7eb" },
-  elevated: { backgroundColor: "#ffffff", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)" },
+  elevated: {
+    backgroundColor: "#ffffff",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+  },
 };
 
 /**
@@ -88,15 +94,18 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
       {
         transform: CSS.Transform.toString(transform),
         transition,
-        animation: isDragging ? "none" : "kanban-column-enter 0.25s ease-out both",
+        animation: isDragging
+          ? "none"
+          : "kanban-column-enter 0.25s ease-out both",
         animationDelay: isDragging ? "0ms" : `${index * 50}ms`,
       },
       style,
-      dotStyle
+      dotStyle,
     );
 
     // WIP limit check
-    const isAtLimit = column.limit !== undefined && cards.length >= column.limit;
+    const isAtLimit =
+      column.limit !== undefined && cards.length >= column.limit;
 
     // Card IDs for SortableContext
     const cardIds = useMemo(() => cards.map((c) => c.id), [cards]);
@@ -115,13 +124,14 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
     };
 
     // Variant base style
-    const variantStyle = columnVariantStyles[variant] ?? columnVariantStyles.elevated;
+    const variantStyle =
+      columnVariantStyles[variant] ?? columnVariantStyles.elevated;
 
     const columnStyle: React.CSSProperties = mergeStyles(
       {
         display: "flex",
         flexDirection: "column",
-        borderRadius: "0.75rem",
+        ...resolveDot("rounded-xl"),
         transition: "all 300ms ease-out",
         opacity: isDragging ? 0.4 : 1,
         ...(column.collapsed
@@ -129,7 +139,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
           : { flexShrink: 0 }),
       },
       variantStyle,
-      sortableStyle
+      sortableStyle,
     );
 
     return (
@@ -161,9 +171,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
           <div
             style={{
               flex: 1,
-              paddingLeft: "0.5rem",
-              paddingRight: "0.5rem",
-              paddingBottom: "0.5rem",
+              ...resolveDot("px-2 pb-2"),
               overflowY: "auto",
               overflowX: "hidden",
               minHeight: "100px",
@@ -171,13 +179,12 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
             role="list"
             aria-label={`${column.title} 카드 목록`}
           >
-            <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={cardIds}
+              strategy={verticalListSortingStrategy}
+            >
               {cards.map((card, cardIndex) => (
-                <KanbanCard
-                  key={card.id}
-                  card={card}
-                  index={cardIndex}
-                />
+                <KanbanCard key={card.id} card={card} index={cardIndex} />
               ))}
             </SortableContext>
 
@@ -201,7 +208,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
 
         {/* Add Card Button */}
         {!column.collapsed && allowAddCard && !readOnly && !isAtLimit && (
-          <div style={{ paddingLeft: "0.5rem", paddingRight: "0.5rem", paddingBottom: "0.5rem" }}>
+          <div style={{ ...resolveDot("px-2 pb-2") }}>
             <KanbanAddCard columnId={column.id} />
           </div>
         )}
@@ -210,9 +217,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
         {!column.collapsed && isAtLimit && (
           <div
             style={{
-              paddingLeft: "0.5rem",
-              paddingRight: "0.5rem",
-              paddingBottom: "0.5rem",
+              ...resolveDot("px-2 pb-2"),
               fontSize: "0.75rem",
               textAlign: "center",
               color: "#d97706",
@@ -223,7 +228,7 @@ export const KanbanColumn = React.forwardRef<HTMLDivElement, KanbanColumnProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 KanbanColumn.displayName = "KanbanColumn";

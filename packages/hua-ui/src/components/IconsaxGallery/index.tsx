@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "../Tabs";
 import * as LineIcons from "../icons";
 import * as BoldIcons from "../icons-bold";
 import { dot as dotFn } from "@hua-labs/dot";
-import { mergeStyles } from "../../hooks/useDotMap";
+import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
 
 // Iconsax icon names (331 icons)
 export const ICONSAX_ICON_NAMES = [
@@ -428,7 +428,7 @@ function IconCell({ name, index, variant, isCopied, onClick }: IconCellProps) {
         style={{
           fontSize: "0.625rem",
           color: "var(--color-muted-foreground)",
-          marginBottom: "0.25rem",
+          ...resolveDot("mb-1"),
           fontFamily: "monospace",
         }}
       >
@@ -436,7 +436,7 @@ function IconCell({ name, index, variant, isCopied, onClick }: IconCellProps) {
       </div>
       <div
         style={{
-          marginBottom: "0.5rem",
+          ...resolveDot("mb-2"),
           color: "var(--color-foreground)",
           position: "relative",
           width: "2rem",
@@ -550,7 +550,7 @@ export function IconsaxGallery({
   const gridStyle: React.CSSProperties | undefined = columns
     ? {
         display: "grid",
-        gap: "1rem",
+        ...resolveDot("gap-4"),
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
       }
     : undefined;

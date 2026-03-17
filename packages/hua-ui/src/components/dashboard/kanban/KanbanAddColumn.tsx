@@ -12,8 +12,21 @@ import type { KanbanAddColumnProps } from "./types";
  * 새 컬럼을 추가하는 UI입니다.
  * 버튼 클릭 시 입력 폼이 나타나고, Enter로 추가합니다.
  */
-export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnProps>(
-  ({ onAdd, onCancel, placeholder = "컬럼 제목 입력...", dot, style, ...props }, ref) => {
+export const KanbanAddColumn = React.forwardRef<
+  HTMLDivElement,
+  KanbanAddColumnProps
+>(
+  (
+    {
+      onAdd,
+      onCancel,
+      placeholder = "컬럼 제목 입력...",
+      dot,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     const { addColumn, variant } = useKanban();
     const [isAdding, setIsAdding] = useState(false);
     const [title, setTitle] = useState("");
@@ -69,7 +82,10 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
     const variantBaseStyle: React.CSSProperties = (() => {
       switch (variant) {
         case "gradient":
-          return { background: "linear-gradient(to bottom, rgba(243,244,246,0.5), rgba(255,255,255,0.5))" };
+          return {
+            background:
+              "linear-gradient(to bottom, rgba(243,244,246,0.5), rgba(255,255,255,0.5))",
+          };
         case "outline":
           return { border: "2px dashed #d1d5db", background: "transparent" };
         case "elevated":
@@ -85,10 +101,10 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
         <div
           ref={ref}
           style={mergeStyles(
-            { flexShrink: 0, borderRadius: "0.75rem", padding: "0.75rem" },
+            { flexShrink: 0, ...resolveDot("rounded-xl p-3") },
             variantBaseStyle,
             resolveDot(dot),
-            style
+            style,
           )}
           {...props}
         >
@@ -101,14 +117,10 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
             placeholder={placeholder}
             style={{
               width: "100%",
-              paddingLeft: "0.75rem",
-              paddingRight: "0.75rem",
-              paddingTop: "0.5rem",
-              paddingBottom: "0.5rem",
+              ...resolveDot("px-3 py-2 rounded-lg"),
               fontSize: "0.875rem",
               backgroundColor: "#ffffff",
               border: "1px solid #e5e7eb",
-              borderRadius: "0.5rem",
               outline: "none",
               color: "#1f2937",
               boxSizing: "border-box",
@@ -119,18 +131,14 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-end",
-              gap: "0.5rem",
-              marginTop: "0.75rem",
+              ...resolveDot("gap-2 mt-3"),
             }}
           >
             <button
               type="button"
               onClick={handleCancel}
               style={{
-                paddingLeft: "0.75rem",
-                paddingRight: "0.75rem",
-                paddingTop: "0.375rem",
-                paddingBottom: "0.375rem",
+                ...resolveDot("px-3 py-1.5"),
                 fontSize: "0.875rem",
                 color: "#6b7280",
                 background: "none",
@@ -147,13 +155,9 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
               style={
                 title.trim()
                   ? {
-                      paddingLeft: "1rem",
-                      paddingRight: "1rem",
-                      paddingTop: "0.375rem",
-                      paddingBottom: "0.375rem",
+                      ...resolveDot("px-4 py-1.5 rounded-lg"),
                       fontSize: "0.875rem",
                       fontWeight: 500,
-                      borderRadius: "0.5rem",
                       backgroundColor: "#6366f1",
                       color: "#ffffff",
                       border: "none",
@@ -161,13 +165,9 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
                       transition: "background-color 150ms",
                     }
                   : {
-                      paddingLeft: "1rem",
-                      paddingRight: "1rem",
-                      paddingTop: "0.375rem",
-                      paddingBottom: "0.375rem",
+                      ...resolveDot("px-4 py-1.5 rounded-lg"),
                       fontSize: "0.875rem",
                       fontWeight: 500,
-                      borderRadius: "0.5rem",
                       backgroundColor: "#e5e7eb",
                       color: "#9ca3af",
                       border: "none",
@@ -195,8 +195,7 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: "0.75rem",
-            borderRadius: "0.75rem",
+            ...resolveDot("gap-3 rounded-xl"),
             border: "2px dashed #d1d5db",
             color: "#9ca3af",
             background: "none",
@@ -205,15 +204,13 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
             minHeight: 300,
           },
           resolveDot(dot),
-          style
+          style,
         )}
         {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
       >
         <div
           style={{
-            width: "3rem",
-            height: "3rem",
-            borderRadius: "9999px",
+            ...resolveDot("w-12 h-12 rounded-full"),
             border: "2px dashed currentColor",
             display: "flex",
             alignItems: "center",
@@ -223,10 +220,12 @@ export const KanbanAddColumn = React.forwardRef<HTMLDivElement, KanbanAddColumnP
         >
           <Icon name="add" size={24} />
         </div>
-        <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>새 컬럼 추가</span>
+        <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>
+          새 컬럼 추가
+        </span>
       </button>
     );
-  }
+  },
 );
 
 KanbanAddColumn.displayName = "KanbanAddColumn";

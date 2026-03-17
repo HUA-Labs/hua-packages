@@ -235,7 +235,7 @@ const Breadcrumb = React.forwardRef<HTMLDivElement, BreadcrumbProps>(
               {itemsCount > 0 && (
                 <span
                   style={{
-                    margin: "0 0.75rem",
+                    ...resolveDot("mx-3"),
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

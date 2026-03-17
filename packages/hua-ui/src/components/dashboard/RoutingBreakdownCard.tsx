@@ -147,10 +147,9 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
     <div
       style={mergeStyles(
         {
-          borderRadius: "1rem",
+          ...resolveDot("rounded-xl p-5"),
           border: "1px solid var(--color-border, #f1f5f9)",
           backgroundColor: "var(--color-card, rgba(255,255,255,0.6))",
-          padding: "1.25rem",
         },
         resolveDot(dot),
         style,
@@ -163,7 +162,7 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "0.75rem",
+          ...resolveDot("gap-3"),
         }}
       >
         <div>
@@ -190,16 +189,16 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
             title="라우팅 데이터가 없습니다"
             description="PG 라우팅 혹은 결제수단 정보가 수집되면 자동으로 표시됩니다."
             size="sm"
-            style={{ marginTop: "1rem" }}
+            style={{ ...resolveDot("mt-4") }}
           />
         ))
       ) : (
         <>
-          <div style={{ marginTop: "1rem" }}>
+          <div style={{ ...resolveDot("mt-4") }}>
             <div
               style={{
                 display: "flex",
-                height: "0.75rem",
+                ...resolveDot("h-3"),
                 overflow: "hidden",
                 borderRadius: "9999px",
                 backgroundColor: "var(--color-muted, #f1f5f9)",
@@ -228,7 +227,7 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
             </div>
             <div
               style={{
-                marginTop: "0.5rem",
+                ...resolveDot("mt-2"),
                 fontSize: "0.75rem",
                 color: "#64748b",
               }}
@@ -239,10 +238,9 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
 
           <div
             style={{
-              marginTop: "1rem",
+              ...resolveDot("mt-4 gap-3"),
               display: "flex",
               flexDirection: "column",
-              gap: "0.75rem",
             }}
           >
             {segments.map((segment, index) => {
@@ -266,12 +264,10 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                     display: "flex",
                     flexWrap: "wrap",
                     alignItems: "center",
-                    gap: "0.75rem",
-                    borderRadius: "0.75rem",
+                    ...resolveDot("gap-3 rounded-xl p-3"),
                     border: isHighlighted
                       ? "2px solid var(--color-border, #e2e8f0)"
                       : "1px solid var(--color-border, #f1f5f9)",
-                    padding: "0.75rem",
                     transition: "border-color 150ms",
                   }}
                 >
@@ -279,16 +275,15 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "0.5rem",
+                      ...resolveDot("gap-2"),
                       minWidth: "3rem",
                     }}
                   >
                     {segment.icon && (
                       <span
                         style={{
-                          borderRadius: "0.5rem",
+                          ...resolveDot("rounded-lg p-1.5"),
                           backgroundColor: "var(--color-muted, #f1f5f9)",
-                          padding: "0.375rem",
                           color: "#64748b",
                         }}
                       >
@@ -297,9 +292,7 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                     )}
                     <div
                       style={{
-                        height: "0.5rem",
-                        width: "3rem",
-                        borderRadius: "9999px",
+                        ...resolveDot("h-2 w-12 rounded-full"),
                         backgroundColor: color,
                       }}
                       aria-hidden="true"
@@ -311,7 +304,7 @@ export const RoutingBreakdownCard: React.FC<RoutingBreakdownCardProps> = ({
                         display: "flex",
                         flexWrap: "wrap",
                         alignItems: "center",
-                        gap: "0.5rem",
+                        ...resolveDot("gap-2"),
                       }}
                     >
                       <span

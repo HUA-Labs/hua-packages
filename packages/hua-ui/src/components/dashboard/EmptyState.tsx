@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { dotCSS } from "@hua-labs/dot/class";
+import { resolveDot } from "../../hooks/useDotMap";
 import { Icon } from "../Icon";
 import type { IconName } from "../../lib/icons";
 
@@ -139,7 +140,7 @@ export const DashboardEmptyState = React.forwardRef<
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: "0.5rem",
+      ...resolveDot("rounded-lg"),
       fontWeight: 500,
       backgroundColor: "var(--color-muted, #f3f4f6)",
       color: "var(--color-foreground, #374151)",
@@ -151,7 +152,7 @@ export const DashboardEmptyState = React.forwardRef<
     };
 
     const actionButton = actionText && (actionHref || actionOnClick) && (
-      <div style={{ marginTop: "1.5rem" }}>
+      <div style={{ ...resolveDot("mt-6") }}>
         {actionHref ? (
           <a href={actionHref} aria-label={actionText} style={buttonStyle}>
             {actionText}
@@ -196,7 +197,7 @@ export const DashboardEmptyState = React.forwardRef<
         <h3
           style={{
             fontWeight: 600,
-            marginBottom: "0.5rem",
+            ...resolveDot("mb-2"),
             color: "var(--color-foreground, #111827)",
             fontSize: sizes.titleFontSize,
           }}
@@ -208,7 +209,7 @@ export const DashboardEmptyState = React.forwardRef<
         {description && (
           <p
             style={{
-              marginBottom: "1rem",
+              ...resolveDot("mb-4"),
               color: "var(--color-muted-foreground, #6b7280)",
               fontSize: sizes.descFontSize,
             }}

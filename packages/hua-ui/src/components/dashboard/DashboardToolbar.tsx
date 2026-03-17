@@ -213,7 +213,7 @@ export const DashboardToolbar = React.forwardRef<
     const containerStyle: React.CSSProperties = {
       width: "100%",
       ...(variant === "cards" && {
-        borderRadius: "1rem",
+        ...resolveDot("rounded-xl"),
         border: "1px solid rgba(226,232,240,0.7)",
         backgroundColor: "var(--color-card, #ffffff)",
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -324,9 +324,8 @@ export const DashboardToolbar = React.forwardRef<
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "0.75rem",
+                ...resolveDot("gap-3 pt-3"),
                 borderTop: "1px solid var(--color-border, #f1f5f9)",
-                paddingTop: "0.75rem",
               }}
             >
               <div
@@ -334,7 +333,7 @@ export const DashboardToolbar = React.forwardRef<
                   display: "flex",
                   flexWrap: "wrap",
                   alignItems: "center",
-                  gap: "0.75rem",
+                  ...resolveDot("gap-3"),
                   fontSize: "0.875rem",
                   color: "var(--color-foreground, #475569)",
                 }}
@@ -356,9 +355,8 @@ export const DashboardToolbar = React.forwardRef<
                 display: "flex",
                 flexWrap: "wrap",
                 justifyContent: "flex-end",
-                gap: "0.5rem",
+                ...resolveDot("gap-2 pt-4"),
                 borderTop: "1px solid var(--color-border, #f1f5f9)",
-                paddingTop: "1rem",
               }}
             >
               {actions.map((action) => (

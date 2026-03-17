@@ -32,7 +32,10 @@ export interface TrendSeries {
  * @property {boolean} [showTooltip=false] - 툴팁 표시 여부 / Show tooltip
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface TrendChartProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface TrendChartProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   series: TrendSeries[];
   categories: string[];
   palette?: TrendSeriesPalette;
@@ -104,9 +107,10 @@ export const TrendChart: React.FC<TrendChartProps> = ({
   const maxValue = Math.max(...series.flatMap((s) => s.data), 10);
 
   const _chartId = React.useId();
-  const chartLabel = series.length > 0
-    ? `트렌드 차트 - ${series.length}개 시리즈, ${safeCategories.length}개 카테고리, 최대값 ${maxValue.toLocaleString()}`
-    : `트렌드 차트 - ${safeCategories.length}개 카테고리`;
+  const chartLabel =
+    series.length > 0
+      ? `트렌드 차트 - ${series.length}개 시리즈, ${safeCategories.length}개 카테고리, 최대값 ${maxValue.toLocaleString()}`
+      : `트렌드 차트 - ${safeCategories.length}개 카테고리`;
 
   return (
     <div
@@ -114,13 +118,12 @@ export const TrendChart: React.FC<TrendChartProps> = ({
       aria-label={chartLabel}
       style={mergeStyles(
         {
-          borderRadius: "1rem",
+          ...resolveDot("rounded-xl p-4"),
           border: "1px solid var(--color-border, #f1f5f9)",
           backgroundColor: "var(--color-card, #ffffff)",
-          padding: "1rem",
         },
         resolveDot(dot),
-        style
+        style,
       )}
       {...props}
     >
@@ -131,7 +134,10 @@ export const TrendChart: React.FC<TrendChartProps> = ({
             x: (i / denominator) * 100,
             y: 100 - (point / maxValue) * 100,
             value: point,
-            label: safeCategories[i] ?? safeCategories[safeCategories.length - 1] ?? "",
+            label:
+              safeCategories[i] ??
+              safeCategories[safeCategories.length - 1] ??
+              "",
           }));
 
           if (points.length === 0) {
@@ -149,15 +155,15 @@ export const TrendChart: React.FC<TrendChartProps> = ({
               key={s.label}
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
-              style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                height: "100%",
+                width: "100%",
+              }}
             >
               {s.area && (
-                <path
-                  d={areaData}
-                  fill={color}
-                  opacity={0.08}
-                  stroke="none"
-                />
+                <path d={areaData} fill={color} opacity={0.08} stroke="none" />
               )}
               <path
                 d={pathData}
@@ -188,7 +194,17 @@ export const TrendChart: React.FC<TrendChartProps> = ({
             </svg>
           );
         })}
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "flex", fontSize: "0.625rem", color: "#94a3b8" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            fontSize: "0.625rem",
+            color: "#94a3b8",
+          }}
+        >
           {safeCategories.map((label, _idx) => (
             <div key={label} style={{ flex: 1, textAlign: "center" }}>
               {label}
@@ -199,28 +215,43 @@ export const TrendChart: React.FC<TrendChartProps> = ({
 
       {showLegend && (
         <div
-          style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "1rem", fontSize: "0.875rem", color: "var(--color-muted-foreground, #475569)" }}
+          style={{
+            ...resolveDot("mt-4 gap-4"),
+            display: "flex",
+            flexWrap: "wrap",
+            fontSize: "0.875rem",
+            color: "var(--color-muted-foreground, #475569)",
+          }}
           role="list"
           aria-label="차트 범례"
         >
           {series.map((s, index) => {
-            const color = s.color || paletteColors[index % paletteColors.length];
+            const color =
+              s.color || paletteColors[index % paletteColors.length];
             return (
               <div
                 key={s.label}
                 role="listitem"
-                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  ...resolveDot("gap-2"),
+                }}
                 tabIndex={0}
                 aria-label={`${s.label} 시리즈`}
                 onKeyDown={(e) => {
                   // 키보드 네비게이션 지원
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                   }
                 }}
               >
                 <span
-                  style={{ display: "inline-block", height: "0.5rem", width: "0.5rem", borderRadius: "9999px", backgroundColor: color }}
+                  style={{
+                    display: "inline-block",
+                    ...resolveDot("w-2 h-2 rounded-full"),
+                    backgroundColor: color,
+                  }}
                   aria-hidden="true"
                 />
                 <span>{s.label}</span>

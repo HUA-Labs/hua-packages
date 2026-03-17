@@ -366,11 +366,10 @@ function SaturationLightnessPicker({
   return (
     <div
       ref={boxRef}
-      style={{
+      style={mergeStyles(resolveDot("rounded-md"), {
         position: "relative",
         width: "100%",
         height: "7rem",
-        borderRadius: "0.375rem",
         overflow: "hidden",
         cursor: disabled ? "not-allowed" : "crosshair",
         opacity: disabled ? 0.5 : 1,
@@ -378,7 +377,7 @@ function SaturationLightnessPicker({
           linear-gradient(to top, #000, transparent),
           linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%))
         `,
-      }}
+      })}
       onMouseDown={handleMouseDown}
     >
       <div
@@ -458,7 +457,12 @@ function TailwindTab({
   disabled?: boolean;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+    <div
+      style={mergeStyles(resolveDot("gap-2"), {
+        display: "flex",
+        flexDirection: "column",
+      })}
+    >
       {/* 팔레트 그리드 */}
       <div
         style={{ display: "flex", flexDirection: "column", gap: "0.125rem" }}
@@ -501,12 +505,10 @@ function TailwindTab({
 
       {/* 특수 색상 */}
       <div
-        style={{
+        style={mergeStyles(resolveDot("gap-1 pt-1"), {
           display: "flex",
-          gap: "0.25rem",
-          paddingTop: "0.25rem",
           borderTop: "1px solid var(--color-border)",
-        }}
+        })}
       >
         {SPECIAL_COLORS.map((color) => (
           <button
@@ -574,7 +576,12 @@ function CustomTab({
   const isInvalid = !isValidColor(hexInput);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+    <div
+      style={mergeStyles(resolveDot("gap-3"), {
+        display: "flex",
+        flexDirection: "column",
+      })}
+    >
       {/* Saturation/Lightness 박스 */}
       <SaturationLightnessPicker
         hue={h}
@@ -592,28 +599,30 @@ function CustomTab({
       />
 
       {/* 프리뷰 + HEX 입력 */}
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+      <div
+        style={mergeStyles(resolveDot("gap-2"), {
+          display: "flex",
+          alignItems: "center",
+        })}
+      >
         <div
-          style={{
+          style={mergeStyles(resolveDot("rounded-md"), {
             width: "2.5rem",
             height: "2.5rem",
-            borderRadius: "0.375rem",
             border: "1px solid var(--color-border)",
             boxShadow: "inset 0 2px 4px 0 rgba(0,0,0,0.06)",
             flexShrink: 0,
             background: currentColor,
-          }}
+          })}
         />
         <input
           type="text"
           value={hexInput}
           onChange={onHexInputChange}
           disabled={disabled}
-          style={{
+          style={mergeStyles(resolveDot("rounded-md py-2 px-3"), {
             flex: 1,
-            padding: "0.5rem 0.75rem",
             fontSize: "0.875rem",
-            borderRadius: "0.375rem",
             border: isInvalid
               ? "1px solid var(--color-destructive)"
               : "1px solid var(--color-border)",
@@ -622,7 +631,7 @@ function CustomTab({
             outline: "none",
             opacity: disabled ? 0.5 : 1,
             cursor: disabled ? "not-allowed" : "text",
-          }}
+          })}
           placeholder="#000000"
           maxLength={7}
         />
@@ -630,12 +639,11 @@ function CustomTab({
 
       {/* HSL 값 표시 */}
       <div
-        style={{
+        style={mergeStyles(resolveDot("gap-2"), {
           display: "flex",
-          gap: "0.5rem",
           fontSize: "0.625rem",
           color: "var(--color-muted-foreground)",
-        }}
+        })}
       >
         <span>H: {h}°</span>
         <span>S: {s}%</span>
@@ -723,29 +731,27 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
       <div
         ref={ref}
         style={mergeStyles(
-          { display: "flex", flexDirection: "column", gap: "0.5rem" },
+          resolveDot("gap-2"),
+          { display: "flex", flexDirection: "column" },
           dotStyle,
           style,
         )}
       >
         {/* 탭 헤더 */}
         <div
-          style={{
+          style={mergeStyles(resolveDot("gap-1 rounded-md"), {
             display: "flex",
-            gap: "0.25rem",
             padding: "0.125rem",
             backgroundColor:
               "color-mix(in srgb, var(--color-muted) 50%, transparent)",
-            borderRadius: "0.375rem",
-          }}
+          })}
         >
           <button
             type="button"
             disabled={disabled}
             onClick={() => setActiveTab("tailwind")}
-            style={{
+            style={mergeStyles(resolveDot("py-1 px-2"), {
               flex: 1,
-              padding: "0.25rem 0.5rem",
               fontSize: "0.75rem",
               fontWeight: 500,
               borderRadius: "0.25rem",
@@ -765,7 +771,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
                   ? "0 1px 2px 0 rgba(0,0,0,0.05)"
                   : "none",
               opacity: disabled ? 0.5 : 1,
-            }}
+            })}
           >
             Tailwind
           </button>
@@ -773,9 +779,8 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
             type="button"
             disabled={disabled}
             onClick={() => setActiveTab("custom")}
-            style={{
+            style={mergeStyles(resolveDot("py-1 px-2"), {
               flex: 1,
-              padding: "0.25rem 0.5rem",
               fontSize: "0.75rem",
               fontWeight: 500,
               borderRadius: "0.25rem",
@@ -795,7 +800,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
                   ? "0 1px 2px 0 rgba(0,0,0,0.05)"
                   : "none",
               opacity: disabled ? 0.5 : 1,
-            }}
+            })}
           >
             Custom
           </button>
@@ -803,12 +808,11 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
 
         {/* 현재 색상 미리보기 */}
         <div
-          style={{
+          style={mergeStyles(resolveDot("gap-2"), {
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
             padding: "0 0.25rem",
-          }}
+          })}
         >
           <div
             style={{

@@ -155,7 +155,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
     <div
       style={mergeStyles(
         {
-          borderRadius: "1rem",
+          ...resolveDot("rounded-xl"),
           border: "1px solid var(--color-border, #f1f5f9)",
           backgroundColor: "var(--color-card, #ffffff)",
         },
@@ -168,17 +168,21 @@ export const MerchantList: React.FC<MerchantListProps> = ({
         <div
           style={{
             borderBottom: "1px solid var(--color-border, #f1f5f9)",
-            padding: "0.75rem 1.5rem",
+            ...resolveDot("py-3 px-6"),
           }}
         >
           {filters}
         </div>
       )}
 
-      <div style={{ padding: "1rem 1.5rem" }}>
+      <div style={{ ...resolveDot("p-4 px-6") }}>
         {isLoading ? (
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              ...resolveDot("gap-3"),
+            }}
           >
             {[...Array(3)].map((_, idx) => (
               <Skeleton key={idx} dot="h-20 rounded-2xl" />
@@ -191,12 +195,16 @@ export const MerchantList: React.FC<MerchantListProps> = ({
               title="가맹점이 없습니다"
               description="검색어를 변경하거나 새로운 가맹점을 온보딩하세요."
               size="sm"
-              style={{ paddingTop: "1.5rem", paddingBottom: "1.5rem" }}
+              style={{ ...resolveDot("py-6") }}
             />
           ))
         ) : (
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              ...resolveDot("gap-3"),
+            }}
             role="list"
             aria-label="가맹점 목록"
           >
@@ -234,10 +242,9 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                   }
                   style={{
                     width: "100%",
-                    borderRadius: "1rem",
+                    ...resolveDot("rounded-xl p-4"),
                     border: "1px solid var(--color-border, #f1f5f9)",
                     backgroundColor: "var(--color-card, rgba(255,255,255,0.9))",
-                    padding: "1rem",
                     textAlign: "left",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     transition: "border-color 150ms",
@@ -250,15 +257,14 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                       display: "flex",
                       flexWrap: "wrap",
                       alignItems: "center",
-                      gap: "0.75rem",
+                      ...resolveDot("gap-3"),
                     }}
                   >
                     {merchant.icon && (
                       <div
                         style={{
-                          borderRadius: "0.75rem",
+                          ...resolveDot("rounded-xl p-2"),
                           backgroundColor: "var(--color-muted, #f1f5f9)",
-                          padding: "0.5rem",
                           color: "#64748b",
                         }}
                       >
@@ -278,7 +284,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                           display: "flex",
                           flexWrap: "wrap",
                           alignItems: "center",
-                          gap: "0.5rem",
+                          ...resolveDot("gap-2"),
                         }}
                       >
                         <p
@@ -348,9 +354,8 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                   {merchant.metadata && merchant.metadata.length > 0 && (
                     <div
                       style={{
-                        marginTop: "0.75rem",
+                        ...resolveDot("mt-3 gap-3"),
                         display: "grid",
-                        gap: "0.75rem",
                         fontSize: "0.75rem",
                         color: "#64748b",
                         gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -362,7 +367,7 @@ export const MerchantList: React.FC<MerchantListProps> = ({
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "0.5rem",
+                            ...resolveDot("gap-2"),
                           }}
                         >
                           <span style={{ color: "#94a3b8" }}>{meta.label}</span>

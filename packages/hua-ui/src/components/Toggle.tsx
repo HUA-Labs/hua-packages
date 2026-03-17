@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { dotVariants } from "@hua-labs/dot"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useState, useMemo } from "react";
+import { dotVariants } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ---------------------------------------------------------------------------
 // Variant styles via dotVariants
@@ -20,106 +20,116 @@ export const toggleVariantStyles = dotVariants({
   defaultVariants: {
     size: "md",
   },
-})
+});
 
 // ---------------------------------------------------------------------------
 // Static style constants
 // ---------------------------------------------------------------------------
 
 const BASE_EXTRAS: React.CSSProperties = {
-  gap: '0.5rem',
-  transition: 'all 200ms ease-in-out',
-  userSelect: 'none',
-  cursor: 'pointer',
-  outline: 'none',
-  border: 'none',
-  background: 'none',
-}
+  ...resolveDot("gap-2"),
+  transition: "all 200ms ease-in-out",
+  userSelect: "none",
+  cursor: "pointer",
+  outline: "none",
+  border: "none",
+  background: "none",
+};
 
 /** Pressed + not-pressed background/foreground per variant */
 const VARIANT_PRESSED: Record<string, React.CSSProperties> = {
   default: {
-    backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-primary-foreground)',
+    backgroundColor: "var(--color-primary)",
+    color: "var(--color-primary-foreground)",
   },
   outline: {
-    border: '2px solid var(--color-primary)',
-    backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)',
-    color: 'var(--color-primary)',
+    border: "2px solid var(--color-primary)",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-primary) 10%, transparent)",
+    color: "var(--color-primary)",
   },
   filled: {
-    backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-primary-foreground)',
+    backgroundColor: "var(--color-primary)",
+    color: "var(--color-primary-foreground)",
   },
   ghost: {
-    backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)',
-    color: 'var(--color-primary)',
+    backgroundColor:
+      "color-mix(in srgb, var(--color-primary) 10%, transparent)",
+    color: "var(--color-primary)",
   },
   glass: {
-    backgroundColor: 'rgba(255, 255, 255, 0.20)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    border: '1px solid rgba(255, 255, 255, 0.30)',
-    color: 'white',
+    backgroundColor: "rgba(255, 255, 255, 0.20)",
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+    border: "1px solid rgba(255, 255, 255, 0.30)",
+    color: "white",
   },
-}
+};
 
 const VARIANT_IDLE: Record<string, React.CSSProperties> = {
   default: {
-    backgroundColor: 'var(--color-muted)',
-    color: 'var(--color-foreground)',
+    backgroundColor: "var(--color-muted)",
+    color: "var(--color-foreground)",
   },
   outline: {
-    border: '2px solid var(--color-border)',
-    backgroundColor: 'transparent',
-    color: 'var(--color-foreground)',
+    border: "2px solid var(--color-border)",
+    backgroundColor: "transparent",
+    color: "var(--color-foreground)",
   },
   filled: {
-    backgroundColor: 'color-mix(in srgb, var(--color-muted) 50%, transparent)',
-    color: 'var(--color-foreground)',
+    backgroundColor: "color-mix(in srgb, var(--color-muted) 50%, transparent)",
+    color: "var(--color-foreground)",
   },
   ghost: {
-    backgroundColor: 'transparent',
-    color: 'var(--color-foreground)',
+    backgroundColor: "transparent",
+    color: "var(--color-foreground)",
   },
   glass: {
-    backgroundColor: 'rgba(255, 255, 255, 0.10)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    border: '1px solid rgba(255, 255, 255, 0.20)',
-    color: 'white',
+    backgroundColor: "rgba(255, 255, 255, 0.10)",
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+    border: "1px solid rgba(255, 255, 255, 0.20)",
+    color: "white",
   },
-}
+};
 
 /** Hover overlay — applied on top of the current variant base */
 const VARIANT_HOVER_PRESSED: Record<string, React.CSSProperties> = {
   default: { opacity: 0.8 },
-  outline: { backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, transparent)' },
+  outline: {
+    backgroundColor:
+      "color-mix(in srgb, var(--color-primary) 15%, transparent)",
+  },
   filled: { opacity: 0.8 },
-  ghost: { backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, transparent)' },
-  glass: { backgroundColor: 'rgba(255, 255, 255, 0.30)' },
-}
+  ghost: {
+    backgroundColor:
+      "color-mix(in srgb, var(--color-primary) 15%, transparent)",
+  },
+  glass: { backgroundColor: "rgba(255, 255, 255, 0.30)" },
+};
 
 const VARIANT_HOVER_IDLE: Record<string, React.CSSProperties> = {
-  default: { backgroundColor: 'color-mix(in srgb, var(--color-muted) 80%, transparent)' },
-  outline: { backgroundColor: 'var(--color-muted)' },
-  filled: { backgroundColor: 'var(--color-muted)' },
-  ghost: { backgroundColor: 'var(--color-muted)' },
-  glass: { backgroundColor: 'rgba(255, 255, 255, 0.20)' },
-}
+  default: {
+    backgroundColor: "color-mix(in srgb, var(--color-muted) 80%, transparent)",
+  },
+  outline: { backgroundColor: "var(--color-muted)" },
+  filled: { backgroundColor: "var(--color-muted)" },
+  ghost: { backgroundColor: "var(--color-muted)" },
+  glass: { backgroundColor: "rgba(255, 255, 255, 0.20)" },
+};
 
 const FOCUS_RING: React.CSSProperties = {
-  outline: 'none',
-  boxShadow: '0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)',
-}
+  outline: "none",
+  boxShadow: "0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)",
+};
 
 const DISABLED_STYLES: React.CSSProperties = {
-  cursor: 'not-allowed',
+  cursor: "not-allowed",
   opacity: 0.5,
-  pointerEvents: 'none',
-}
+  pointerEvents: "none",
+};
 
-const FLEX_SHRINK_ZERO: React.CSSProperties = { flexShrink: 0 }
+const FLEX_SHRINK_ZERO: React.CSSProperties = { flexShrink: 0 };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -139,17 +149,19 @@ const FLEX_SHRINK_ZERO: React.CSSProperties = { flexShrink: 0 }
  * @property {string} [dot] - dot 유틸리티 문자열 / dot utility string
  * @extends {Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'size'>}
  */
-export interface ToggleProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'size'> {
-  variant?: "default" | "outline" | "filled" | "ghost" | "glass"
-  size?: "sm" | "md" | "lg"
-  pressed?: boolean
-  onPressedChange?: (pressed: boolean) => void
-  label?: string
-  description?: string
-  icon?: React.ReactNode
-  iconPosition?: "left" | "right"
-  dot?: string
+export interface ToggleProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "className" | "size"
+> {
+  variant?: "default" | "outline" | "filled" | "ghost" | "glass";
+  size?: "sm" | "md" | "lg";
+  pressed?: boolean;
+  onPressedChange?: (pressed: boolean) => void;
+  label?: string;
+  description?: string;
+  icon?: React.ReactNode;
+  iconPosition?: "left" | "right";
+  dot?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -208,22 +220,22 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const [internalPressed, setInternalPressed] = useState(false)
-    const [isHovered, setIsHovered] = useState(false)
-    const [isFocused, setIsFocused] = useState(false)
+    const [internalPressed, setInternalPressed] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
-    const isControlled = controlledPressed !== undefined
-    const pressed = isControlled ? controlledPressed : internalPressed
+    const isControlled = controlledPressed !== undefined;
+    const pressed = isControlled ? controlledPressed : internalPressed;
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isControlled) {
-        setInternalPressed(!pressed)
+        setInternalPressed(!pressed);
       }
-      onPressedChange?.(!pressed)
-      onClick?.(e)
-    }
+      onPressedChange?.(!pressed);
+      onClick?.(e);
+    };
 
     const computedStyle = useMemo((): React.CSSProperties => {
       if (disabled) {
@@ -234,7 +246,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
           DISABLED_STYLES,
           resolveDot(dotProp),
           style,
-        )
+        );
       }
 
       return mergeStyles(
@@ -249,24 +261,33 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         isFocused ? FOCUS_RING : undefined,
         resolveDot(dotProp),
         style,
-      )
-    }, [variant, size, pressed, isHovered, isFocused, disabled, dotProp, style])
+      );
+    }, [
+      variant,
+      size,
+      pressed,
+      isHovered,
+      isFocused,
+      disabled,
+      dotProp,
+      style,
+    ]);
 
     const wrapperStyle: React.CSSProperties = {
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '0.75rem',
-    }
+      display: "flex",
+      alignItems: "flex-start",
+      ...resolveDot("gap-3"),
+    };
 
     const descriptionStyle: React.CSSProperties = {
-      display: 'flex',
-      flexDirection: 'column',
-    }
+      display: "flex",
+      flexDirection: "column",
+    };
 
     const descriptionTextStyle: React.CSSProperties = {
-      fontSize: '0.875rem',
-      color: 'var(--color-muted-foreground)',
-    }
+      fontSize: "0.875rem",
+      color: "var(--color-muted-foreground)",
+    };
 
     return (
       <div style={wrapperStyle}>
@@ -277,7 +298,9 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
           onClick={handleClick}
           aria-pressed={pressed}
           disabled={disabled}
-          onMouseEnter={() => { if (!disabled) setIsHovered(true) }}
+          onMouseEnter={() => {
+            if (!disabled) setIsHovered(true);
+          }}
           onMouseLeave={() => setIsHovered(false)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -293,15 +316,13 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         </button>
         {description && (
           <div style={descriptionStyle}>
-            <p style={descriptionTextStyle}>
-              {description}
-            </p>
+            <p style={descriptionTextStyle}>{description}</p>
           </div>
         )}
       </div>
-    )
-  }
-)
-Toggle.displayName = "Toggle"
+    );
+  },
+);
+Toggle.displayName = "Toggle";
 
-export { Toggle }
+export { Toggle };

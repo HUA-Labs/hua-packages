@@ -9,7 +9,13 @@ import type { IconName } from "../lib/icons";
  * 타임라인 아이템 상태 타입 / Timeline item status type
  * @typedef {"pending" | "active" | "completed" | "error" | "warning" | "info"} TimelineStatus
  */
-export type TimelineStatus = "pending" | "active" | "completed" | "error" | "warning" | "info";
+export type TimelineStatus =
+  | "pending"
+  | "active"
+  | "completed"
+  | "error"
+  | "warning"
+  | "info";
 
 /**
  * 타임라인 아이템 인터페이스 / TimelineItem interface
@@ -47,7 +53,10 @@ export interface TimelineItem {
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'className'>}
  */
-export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface TimelineProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   items: TimelineItem[];
   orientation?: "vertical" | "horizontal";
   align?: "left" | "right" | "alternate";
@@ -62,17 +71,20 @@ export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 
 // ── Color tokens ──────────────────────────────────────────────────────────────
 
-const STATUS_COLORS: Record<TimelineStatus, {
-  dotBg: string;
-  dotBorder: string;
-  dotShadow?: string;
-  cardBorder: string;
-  badgeBg: string;
-  badgeText: string;
-  label: string;
-  labelEn: string;
-  pulse?: boolean;
-}> = {
+const STATUS_COLORS: Record<
+  TimelineStatus,
+  {
+    dotBg: string;
+    dotBorder: string;
+    dotShadow?: string;
+    cardBorder: string;
+    badgeBg: string;
+    badgeText: string;
+    label: string;
+    labelEn: string;
+    pulse?: boolean;
+  }
+> = {
   completed: {
     dotBg: "#10b981",
     dotBorder: "#10b981",
@@ -149,7 +161,10 @@ const formatDate = (value?: string | Date, locale = "ko-KR") => {
   if (!value) return undefined;
   const parsed = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(parsed.getTime())) return undefined;
-  return parsed.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  return parsed.toLocaleString(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 };
 
 // ── Static styles ─────────────────────────────────────────────────────────────
@@ -163,8 +178,7 @@ const EMPTY_STYLE: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  paddingTop: "2rem",
-  paddingBottom: "2rem",
+  ...resolveDot("py-8"),
   textAlign: "center",
 };
 
@@ -177,7 +191,7 @@ const EMPTY_TEXT_PRIMARY: React.CSSProperties = {
 const EMPTY_TEXT_SECONDARY: React.CSSProperties = {
   fontSize: "0.75rem",
   color: "var(--color-muted-foreground, #64748b)",
-  marginTop: "0.25rem",
+  ...resolveDot("mt-1"),
 };
 
 const OL_HORIZONTAL: React.CSSProperties = {
@@ -209,7 +223,7 @@ const OL_VERTICAL: React.CSSProperties = {
   padding: 0,
   display: "flex",
   flexDirection: "column",
-  gap: "1rem",
+  ...resolveDot("gap-4"),
 };
 
 const DOT_COL: React.CSSProperties = {
@@ -219,7 +233,7 @@ const DOT_COL: React.CSSProperties = {
 };
 
 const CONNECTOR_VERTICAL: React.CSSProperties = {
-  marginTop: "0.25rem",
+  ...resolveDot("mt-1"),
   flex: 1,
   width: "1px",
   backgroundColor: "var(--color-border, #e2e8f0)",
@@ -244,16 +258,16 @@ const META_STYLE: React.CSSProperties = {
 };
 
 const DATE_ROW_STYLE: React.CSSProperties = {
-  marginTop: "0.75rem",
+  ...resolveDot("mt-3"),
   display: "flex",
   alignItems: "center",
-  gap: "0.25rem",
+  ...resolveDot("gap-1"),
   fontSize: "0.75rem",
   color: "var(--color-muted-foreground, #64748b)",
 };
 
 const CUSTOM_CONTENT_STYLE: React.CSSProperties = {
-  marginTop: "0.75rem",
+  ...resolveDot("mt-3"),
 };
 
 const ICON_WRAP_STYLE: React.CSSProperties = {
@@ -335,7 +349,9 @@ export const Timeline: React.FC<TimelineProps> = ({
               <Icon name="clock" size={40} />
             </span>
             <p style={EMPTY_TEXT_PRIMARY}>타임라인이 비어 있습니다</p>
-            <p style={EMPTY_TEXT_SECONDARY}>이벤트가 추가되면 여기에 표시됩니다.</p>
+            <p style={EMPTY_TEXT_SECONDARY}>
+              이벤트가 추가되면 여기에 표시됩니다.
+            </p>
           </div>
         )}
       </div>
@@ -345,7 +361,12 @@ export const Timeline: React.FC<TimelineProps> = ({
   // ── Horizontal ──────────────────────────────────────────────────────────────
   if (orientation === "horizontal") {
     return (
-      <div style={mergeStyles(WRAP_STYLE, rootStyle)} data-timeline-root data-orientation="horizontal" {...props}>
+      <div
+        style={mergeStyles(WRAP_STYLE, rootStyle)}
+        data-timeline-root
+        data-orientation="horizontal"
+        {...props}
+      >
         <ol style={OL_HORIZONTAL} role="list" aria-label="타임라인">
           {items.map((item, index) => {
             const status = item.status ?? "pending";
@@ -375,7 +396,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             };
 
             const contentStyle: React.CSSProperties = {
-              marginTop: "0.75rem",
+              ...resolveDot("mt-3"),
               textAlign: "center",
               maxWidth: "160px",
               fontSize: sizeConfig.fontSize,
@@ -392,14 +413,32 @@ export const Timeline: React.FC<TimelineProps> = ({
                   <div style={contentStyle}>
                     <p style={TITLE_STYLE}>{item.title}</p>
                     {item.description && (
-                      <p style={{ ...DESCRIPTION_STYLE, fontSize: sizeConfig.fontSize, WebkitLineClamp: 2, overflow: "hidden", display: "-webkit-box", WebkitBoxOrient: "vertical" }}>
+                      <p
+                        style={{
+                          ...DESCRIPTION_STYLE,
+                          fontSize: sizeConfig.fontSize,
+                          WebkitLineClamp: 2,
+                          overflow: "hidden",
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
                         {item.description}
                       </p>
                     )}
                     {date && (
                       <time
-                        style={{ fontSize: "0.75rem", color: "var(--color-muted-foreground, #64748b)", marginTop: "0.25rem", display: "block" }}
-                        dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "var(--color-muted-foreground, #64748b)",
+                          ...resolveDot("mt-1"),
+                          display: "block",
+                        }}
+                        dateTime={
+                          item.date instanceof Date
+                            ? item.date.toISOString()
+                            : item.date
+                        }
                       >
                         {date}
                       </time>
@@ -407,7 +446,11 @@ export const Timeline: React.FC<TimelineProps> = ({
                   </div>
                 </div>
                 {showLine && (
-                  <span style={CONNECTOR_HORIZONTAL} aria-hidden="true" data-connector="horizontal" />
+                  <span
+                    style={CONNECTOR_HORIZONTAL}
+                    aria-hidden="true"
+                    data-connector="horizontal"
+                  />
                 )}
               </li>
             );
@@ -419,7 +462,12 @@ export const Timeline: React.FC<TimelineProps> = ({
 
   // ── Vertical ────────────────────────────────────────────────────────────────
   return (
-    <div style={rootStyle} data-timeline-root data-orientation="vertical" {...props}>
+    <div
+      style={rootStyle}
+      data-timeline-root
+      data-orientation="vertical"
+      {...props}
+    >
       <ol style={OL_VERTICAL} role="list" aria-label="타임라인">
         {items.map((item, index) => {
           const status = item.status ?? "pending";
@@ -464,7 +512,8 @@ export const Timeline: React.FC<TimelineProps> = ({
             padding: sizeConfig.padding,
             transition: "all 200ms",
             ...(isHighlighted && {
-              boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+              boxShadow:
+                "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
               outline: "1px solid var(--color-border, #e2e8f0)",
             }),
           };
@@ -473,10 +522,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             fontSize: "0.75rem",
             fontWeight: 500,
             borderRadius: "9999px",
-            paddingLeft: "0.5rem",
-            paddingRight: "0.5rem",
-            paddingTop: "0.125rem",
-            paddingBottom: "0.125rem",
+            ...resolveDot("px-2 py-0.5"),
             backgroundColor: sc.badgeBg,
             color: sc.badgeText,
           };
@@ -485,7 +531,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            gap: "0.5rem",
+            ...resolveDot("gap-2"),
           };
 
           const liStyle: React.CSSProperties = {
@@ -498,12 +544,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           const iconNode = renderIcon();
 
           return (
-            <li
-              key={item.id}
-              role="listitem"
-              style={liStyle}
-              data-size={size}
-            >
+            <li key={item.id} role="listitem" style={liStyle} data-size={size}>
               {/* Dot and Connector */}
               <div style={DOT_COL}>
                 <span
@@ -512,29 +553,37 @@ export const Timeline: React.FC<TimelineProps> = ({
                   data-status={status}
                 />
                 {showLine && (
-                  <span style={CONNECTOR_VERTICAL} aria-hidden="true" data-connector="vertical" />
+                  <span
+                    style={CONNECTOR_VERTICAL}
+                    aria-hidden="true"
+                    data-connector="vertical"
+                  />
                 )}
               </div>
 
               {/* Card */}
-              <div style={cardStyle} data-highlighted={isHighlighted ? "true" : undefined}>
+              <div
+                style={cardStyle}
+                data-highlighted={isHighlighted ? "true" : undefined}
+              >
                 <div style={titleRowStyle}>
-                  {iconNode && (
-                    <span style={ICON_WRAP_STYLE}>{iconNode}</span>
-                  )}
-                  <span style={{ ...TITLE_STYLE, fontSize: sizeConfig.fontSize }}>
+                  {iconNode && <span style={ICON_WRAP_STYLE}>{iconNode}</span>}
+                  <span
+                    style={{ ...TITLE_STYLE, fontSize: sizeConfig.fontSize }}
+                  >
                     {item.title}
                   </span>
-                  <span style={badgeStyle}>
-                    {sc.label}
-                  </span>
-                  {item.meta && (
-                    <span style={META_STYLE}>{item.meta}</span>
-                  )}
+                  <span style={badgeStyle}>{sc.label}</span>
+                  {item.meta && <span style={META_STYLE}>{item.meta}</span>}
                 </div>
 
                 {item.description && (
-                  <p style={{ ...DESCRIPTION_STYLE, fontSize: sizeConfig.fontSize }}>
+                  <p
+                    style={{
+                      ...DESCRIPTION_STYLE,
+                      fontSize: sizeConfig.fontSize,
+                    }}
+                  >
                     {item.description}
                   </p>
                 )}
@@ -546,7 +595,13 @@ export const Timeline: React.FC<TimelineProps> = ({
                 {date && (
                   <div style={DATE_ROW_STYLE}>
                     <Icon name="clock" size={12} aria-hidden />
-                    <time dateTime={item.date instanceof Date ? item.date.toISOString() : item.date}>
+                    <time
+                      dateTime={
+                        item.date instanceof Date
+                          ? item.date.toISOString()
+                          : item.date
+                      }
+                    >
                       {date}
                     </time>
                   </div>

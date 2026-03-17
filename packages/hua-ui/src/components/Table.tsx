@@ -1,70 +1,79 @@
-"use client"
+"use client";
 
-import React, { useMemo, useState } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useMemo, useState } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ── Base styles ────────────────────────────────────────────────────────────
 
 const TABLE_BASE: React.CSSProperties = {
-  width: '100%',
-  captionSide: 'bottom',
-  fontSize: '0.875rem',
-  borderCollapse: 'collapse',
-}
+  width: "100%",
+  captionSide: "bottom",
+  fontSize: "0.875rem",
+  borderCollapse: "collapse",
+};
 
 const THEAD_BASE: React.CSSProperties = {
-  borderBottom: '1px solid var(--color-border)',
-}
+  borderBottom: "1px solid var(--color-border)",
+};
 
-const TBODY_BASE: React.CSSProperties = {}
+const TBODY_BASE: React.CSSProperties = {};
 
 const TFOOT_BASE: React.CSSProperties = {
-  borderTop: '1px solid var(--color-border)',
+  borderTop: "1px solid var(--color-border)",
   fontWeight: 500,
-}
+};
 
 const TR_BASE: React.CSSProperties = {
-  borderBottom: '1px solid var(--color-border)',
-  transition: 'background-color 150ms',
-}
+  borderBottom: "1px solid var(--color-border)",
+  transition: "background-color 150ms",
+};
 
 const TH_BASE: React.CSSProperties = {
-  height: '3rem',
-  padding: '0 1rem',
-  textAlign: 'left',
-  verticalAlign: 'middle',
+  ...resolveDot("h-12 px-4"),
+  textAlign: "left",
+  verticalAlign: "middle",
   fontWeight: 500,
-  color: 'var(--color-muted-foreground)',
-}
+  color: "var(--color-muted-foreground)",
+};
 
 const TD_BASE: React.CSSProperties = {
-  padding: '1rem',
-  verticalAlign: 'middle',
-}
+  ...resolveDot("p-4"),
+  verticalAlign: "middle",
+};
 
 const CAPTION_BASE: React.CSSProperties = {
-  marginTop: '1rem',
-  fontSize: '0.875rem',
-  color: 'var(--color-muted-foreground)',
-}
+  ...resolveDot("mt-4"),
+  fontSize: "0.875rem",
+  color: "var(--color-muted-foreground)",
+};
 
 // ── Variant styles ─────────────────────────────────────────────────────────
 
-const TABLE_VARIANT: Record<"default" | "bordered" | "striped", React.CSSProperties> = {
+const TABLE_VARIANT: Record<
+  "default" | "bordered" | "striped",
+  React.CSSProperties
+> = {
   default: {},
   bordered: {
-    border: '1px solid var(--color-border)',
+    border: "1px solid var(--color-border)",
   },
   striped: {},
-}
+};
 
 // ── Size styles (applied to th/td padding via context) ─────────────────────
 
-const SIZE_PADDING: Record<"sm" | "md" | "lg", { th: React.CSSProperties; td: React.CSSProperties; fontSize: React.CSSProperties }> = {
+const SIZE_PADDING: Record<
+  "sm" | "md" | "lg",
+  {
+    th: React.CSSProperties;
+    td: React.CSSProperties;
+    fontSize: React.CSSProperties;
+  }
+> = {
   sm: {
-    th: { padding: '0 0.75rem', height: '2.5rem' },
-    td: { padding: '0.5rem 0.75rem' },
-    fontSize: { fontSize: '0.8125rem' },
+    th: { ...resolveDot("px-3 h-10") },
+    td: { ...resolveDot("py-2 px-3") },
+    fontSize: { fontSize: "0.8125rem" },
   },
   md: {
     th: {},
@@ -72,23 +81,23 @@ const SIZE_PADDING: Record<"sm" | "md" | "lg", { th: React.CSSProperties; td: Re
     fontSize: {},
   },
   lg: {
-    th: { padding: '0 1.25rem', height: '3.5rem' },
-    td: { padding: '1.25rem' },
-    fontSize: { fontSize: '1rem' },
+    th: { padding: "0 1.25rem", height: "3.5rem" },
+    td: { padding: "1.25rem" },
+    fontSize: { fontSize: "1rem" },
   },
-}
+};
 
 // ── Context ────────────────────────────────────────────────────────────────
 
 interface TableContextValue {
-  variant: "default" | "bordered" | "striped"
-  size: "sm" | "md" | "lg"
+  variant: "default" | "bordered" | "striped";
+  size: "sm" | "md" | "lg";
 }
 
 const TableContext = React.createContext<TableContextValue>({
   variant: "default",
   size: "md",
-})
+});
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -101,12 +110,15 @@ const TableContext = React.createContext<TableContextValue>({
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableProps extends Omit<React.HTMLAttributes<HTMLTableElement>, 'className'> {
-  children: React.ReactNode
-  variant?: "default" | "bordered" | "striped"
-  size?: "sm" | "md" | "lg"
-  dot?: string
-  style?: React.CSSProperties
+export interface TableProps extends Omit<
+  React.HTMLAttributes<HTMLTableElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  variant?: "default" | "bordered" | "striped";
+  size?: "sm" | "md" | "lg";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -116,10 +128,13 @@ export interface TableProps extends Omit<React.HTMLAttributes<HTMLTableElement>,
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableHeaderProps extends Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'className'> {
-  children: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface TableHeaderProps extends Omit<
+  React.HTMLAttributes<HTMLTableSectionElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -129,10 +144,13 @@ export interface TableHeaderProps extends Omit<React.HTMLAttributes<HTMLTableSec
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableBodyProps extends Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'className'> {
-  children: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface TableBodyProps extends Omit<
+  React.HTMLAttributes<HTMLTableSectionElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -142,10 +160,13 @@ export interface TableBodyProps extends Omit<React.HTMLAttributes<HTMLTableSecti
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableFooterProps extends Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'className'> {
-  children: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface TableFooterProps extends Omit<
+  React.HTMLAttributes<HTMLTableSectionElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -156,11 +177,14 @@ export interface TableFooterProps extends Omit<React.HTMLAttributes<HTMLTableSec
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableRowProps extends Omit<React.HTMLAttributes<HTMLTableRowElement>, 'className'> {
-  children: React.ReactNode
-  variant?: "default" | "hover"
-  dot?: string
-  style?: React.CSSProperties
+export interface TableRowProps extends Omit<
+  React.HTMLAttributes<HTMLTableRowElement>,
+  "className"
+> {
+  children: React.ReactNode;
+  variant?: "default" | "hover";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -170,10 +194,13 @@ export interface TableRowProps extends Omit<React.HTMLAttributes<HTMLTableRowEle
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableHeadProps extends Omit<React.ThHTMLAttributes<HTMLTableCellElement>, 'className'> {
-  children?: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface TableHeadProps extends Omit<
+  React.ThHTMLAttributes<HTMLTableCellElement>,
+  "className"
+> {
+  children?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -183,10 +210,13 @@ export interface TableHeadProps extends Omit<React.ThHTMLAttributes<HTMLTableCel
  * @property {string} [dot] - dot utility string for custom styles
  * @property {React.CSSProperties} [style] - inline style overrides
  */
-export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCellElement>, 'className'> {
-  children?: React.ReactNode
-  dot?: string
-  style?: React.CSSProperties
+export interface TableCellProps extends Omit<
+  React.TdHTMLAttributes<HTMLTableCellElement>,
+  "className"
+> {
+  children?: React.ReactNode;
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 // ── Components ─────────────────────────────────────────────────────────────
@@ -248,29 +278,32 @@ export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCel
  * @returns {JSX.Element} Table 컴포넌트 / Table component
  */
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ dot: dotProp, variant = "default", size = "md", style, ...props }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      TABLE_BASE,
-      TABLE_VARIANT[variant],
-      SIZE_PADDING[size].fontSize,
-      resolveDot(dotProp),
-      style,
-    ), [variant, size, dotProp, style])
+  (
+    { dot: dotProp, variant = "default", size = "md", style, ...props },
+    ref,
+  ) => {
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(
+          TABLE_BASE,
+          TABLE_VARIANT[variant],
+          SIZE_PADDING[size].fontSize,
+          resolveDot(dotProp),
+          style,
+        ),
+      [variant, size, dotProp, style],
+    );
 
     return (
       <TableContext.Provider value={{ variant, size }}>
-        <div style={{ width: '100%', overflowX: 'auto' }}>
-          <table
-            ref={ref}
-            style={computedStyle}
-            {...props}
-          />
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <table ref={ref} style={computedStyle} {...props} />
         </div>
       </TableContext.Provider>
-    )
-  }
-)
-Table.displayName = "Table"
+    );
+  },
+);
+Table.displayName = "Table";
 
 /**
  * TableHeader 컴포넌트 / TableHeader component
@@ -284,16 +317,15 @@ Table.displayName = "Table"
  */
 const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      THEAD_BASE,
-      resolveDot(dotProp),
-      style,
-    ), [dotProp, style])
+    const computedStyle = useMemo(
+      () => mergeStyles(THEAD_BASE, resolveDot(dotProp), style),
+      [dotProp, style],
+    );
 
-    return <thead ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableHeader.displayName = "TableHeader"
+    return <thead ref={ref} style={computedStyle} {...props} />;
+  },
+);
+TableHeader.displayName = "TableHeader";
 
 /**
  * TableBody 컴포넌트 / TableBody component
@@ -307,16 +339,15 @@ TableHeader.displayName = "TableHeader"
  */
 const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      TBODY_BASE,
-      resolveDot(dotProp),
-      style,
-    ), [dotProp, style])
+    const computedStyle = useMemo(
+      () => mergeStyles(TBODY_BASE, resolveDot(dotProp), style),
+      [dotProp, style],
+    );
 
-    return <tbody ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableBody.displayName = "TableBody"
+    return <tbody ref={ref} style={computedStyle} {...props} />;
+  },
+);
+TableBody.displayName = "TableBody";
 
 /**
  * TableFooter 컴포넌트 / TableFooter component
@@ -330,16 +361,15 @@ TableBody.displayName = "TableBody"
  */
 const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      TFOOT_BASE,
-      resolveDot(dotProp),
-      style,
-    ), [dotProp, style])
+    const computedStyle = useMemo(
+      () => mergeStyles(TFOOT_BASE, resolveDot(dotProp), style),
+      [dotProp, style],
+    );
 
-    return <tfoot ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableFooter.displayName = "TableFooter"
+    return <tfoot ref={ref} style={computedStyle} {...props} />;
+  },
+);
+TableFooter.displayName = "TableFooter";
 
 /**
  * TableRow 컴포넌트 / TableRow component
@@ -352,27 +382,41 @@ TableFooter.displayName = "TableFooter"
  * @returns {JSX.Element} TableRow 컴포넌트 / TableRow component
  */
 const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
-  ({ dot: dotProp, variant = "default", style, onMouseEnter, onMouseLeave, ...props }, ref) => {
-    const [isHovered, setIsHovered] = useState(false)
-
-    const computedStyle = useMemo(() => mergeStyles(
-      TR_BASE,
-      isHovered && variant === "hover"
-        ? { backgroundColor: 'var(--color-muted)' }
-        : undefined,
-      resolveDot(dotProp),
+  (
+    {
+      dot: dotProp,
+      variant = "default",
       style,
-    ), [variant, isHovered, dotProp, style])
+      onMouseEnter,
+      onMouseLeave,
+      ...props
+    },
+    ref,
+  ) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(
+          TR_BASE,
+          isHovered && variant === "hover"
+            ? { backgroundColor: "var(--color-muted)" }
+            : undefined,
+          resolveDot(dotProp),
+          style,
+        ),
+      [variant, isHovered, dotProp, style],
+    );
 
     const handleMouseEnter = (e: React.MouseEvent<HTMLTableRowElement>) => {
-      if (variant === "hover") setIsHovered(true)
-      onMouseEnter?.(e)
-    }
+      if (variant === "hover") setIsHovered(true);
+      onMouseEnter?.(e);
+    };
 
     const handleMouseLeave = (e: React.MouseEvent<HTMLTableRowElement>) => {
-      if (variant === "hover") setIsHovered(false)
-      onMouseLeave?.(e)
-    }
+      if (variant === "hover") setIsHovered(false);
+      onMouseLeave?.(e);
+    };
 
     return (
       <tr
@@ -382,10 +426,10 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
         onMouseLeave={handleMouseLeave}
         {...props}
       />
-    )
-  }
-)
-TableRow.displayName = "TableRow"
+    );
+  },
+);
+TableRow.displayName = "TableRow";
 
 /**
  * TableHead 컴포넌트 / TableHead component
@@ -399,19 +443,18 @@ TableRow.displayName = "TableRow"
  */
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
-    const { size } = React.useContext(TableContext)
+    const { size } = React.useContext(TableContext);
 
-    const computedStyle = useMemo(() => mergeStyles(
-      TH_BASE,
-      SIZE_PADDING[size].th,
-      resolveDot(dotProp),
-      style,
-    ), [size, dotProp, style])
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(TH_BASE, SIZE_PADDING[size].th, resolveDot(dotProp), style),
+      [size, dotProp, style],
+    );
 
-    return <th ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableHead.displayName = "TableHead"
+    return <th ref={ref} style={computedStyle} {...props} />;
+  },
+);
+TableHead.displayName = "TableHead";
 
 /**
  * TableCell 컴포넌트 / TableCell component
@@ -425,19 +468,18 @@ TableHead.displayName = "TableHead"
  */
 const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
-    const { size } = React.useContext(TableContext)
+    const { size } = React.useContext(TableContext);
 
-    const computedStyle = useMemo(() => mergeStyles(
-      TD_BASE,
-      SIZE_PADDING[size].td,
-      resolveDot(dotProp),
-      style,
-    ), [size, dotProp, style])
+    const computedStyle = useMemo(
+      () =>
+        mergeStyles(TD_BASE, SIZE_PADDING[size].td, resolveDot(dotProp), style),
+      [size, dotProp, style],
+    );
 
-    return <td ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableCell.displayName = "TableCell"
+    return <td ref={ref} style={computedStyle} {...props} />;
+  },
+);
+TableCell.displayName = "TableCell";
 
 /**
  * TableCaption 컴포넌트 / TableCaption component
@@ -449,23 +491,26 @@ TableCell.displayName = "TableCell"
  * @param {React.Ref<HTMLTableCaptionElement>} ref - caption 요소 ref / caption element ref
  * @returns {JSX.Element} TableCaption 컴포넌트 / TableCaption component
  */
-export interface TableCaptionProps extends Omit<React.HTMLAttributes<HTMLTableCaptionElement>, 'className'> {
-  dot?: string
-  style?: React.CSSProperties
+export interface TableCaptionProps extends Omit<
+  React.HTMLAttributes<HTMLTableCaptionElement>,
+  "className"
+> {
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
-const TableCaption = React.forwardRef<HTMLTableCaptionElement, TableCaptionProps>(
-  ({ dot: dotProp, style, ...props }, ref) => {
-    const computedStyle = useMemo(() => mergeStyles(
-      CAPTION_BASE,
-      resolveDot(dotProp),
-      style,
-    ), [dotProp, style])
+const TableCaption = React.forwardRef<
+  HTMLTableCaptionElement,
+  TableCaptionProps
+>(({ dot: dotProp, style, ...props }, ref) => {
+  const computedStyle = useMemo(
+    () => mergeStyles(CAPTION_BASE, resolveDot(dotProp), style),
+    [dotProp, style],
+  );
 
-    return <caption ref={ref} style={computedStyle} {...props} />
-  }
-)
-TableCaption.displayName = "TableCaption"
+  return <caption ref={ref} style={computedStyle} {...props} />;
+});
+TableCaption.displayName = "TableCaption";
 
 export {
   Table,
@@ -476,4 +521,4 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-}
+};

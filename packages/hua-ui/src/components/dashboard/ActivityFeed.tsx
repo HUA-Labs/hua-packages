@@ -63,7 +63,7 @@ export interface ActivityFeedProps extends Omit<
 
 const CONTAINER_BASE: React.CSSProperties = {
   backgroundColor: "var(--activity-feed-bg)",
-  borderRadius: "1rem",
+  ...resolveDot("rounded-xl"),
   boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
   border: "1px solid var(--activity-feed-border)",
   overflow: "hidden",
@@ -139,9 +139,7 @@ const ICON_ROW_STYLE: React.CSSProperties = {
 };
 
 const ICON_WRAP_STYLE: React.CSSProperties = {
-  width: "2rem",
-  height: "2rem",
-  ...resolveDot("rounded-lg"),
+  ...resolveDot("w-8 h-8 rounded-lg"),
   backgroundColor: "var(--activity-feed-icon-bg)",
   color: "var(--activity-feed-icon-color)",
   display: "flex",

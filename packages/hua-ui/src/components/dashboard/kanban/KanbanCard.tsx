@@ -74,7 +74,10 @@ const cardVariantStyles: Record<string, React.CSSProperties> = {
   default: { backgroundColor: "#ffffff" },
   gradient: { background: "linear-gradient(135deg, #ffffff, #f9fafb)" },
   outline: { backgroundColor: "transparent", border: "1px solid #e5e7eb" },
-  elevated: { backgroundColor: "#ffffff", boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)" },
+  elevated: {
+    backgroundColor: "#ffffff",
+    boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
+  },
 };
 
 /**
@@ -84,17 +87,23 @@ const cardVariantStyles: Record<string, React.CSSProperties> = {
  * 우선순위 표시, 담당자, 마감일 등을 지원합니다.
  */
 export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
-  ({ card, index, isDragging: isDraggingProp = false, isOver = false, dot, style, ...props }, ref) => {
+  (
+    {
+      card,
+      index,
+      isDragging: isDraggingProp = false,
+      isOver = false,
+      dot,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     // Inject keyframes
     useCardKeyframes();
 
-    const {
-      deleteCard,
-      variant,
-      allowCardDrag,
-      readOnly,
-      onCardClick,
-    } = useKanban();
+    const { deleteCard, variant, allowCardDrag, readOnly, onCardClick } =
+      useKanban();
 
     // Sortable setup
     const {
@@ -139,7 +148,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
           deleteCard(card.id);
         }, 200);
       },
-      [card.id, deleteCard]
+      [card.id, deleteCard],
     );
 
     // Format due date
@@ -160,7 +169,8 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
     const isOverdue = card.dueDate && new Date(card.dueDate) < new Date();
 
     // Base card style
-    const variantStyle = cardVariantStyles[variant] ?? cardVariantStyles.elevated;
+    const variantStyle =
+      cardVariantStyles[variant] ?? cardVariantStyles.elevated;
 
     // Card animation styles
     const animationStyle: React.CSSProperties = {
@@ -173,9 +183,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
     const cardStyle: React.CSSProperties = mergeStyles(
       {
         position: "relative",
-        borderRadius: "0.5rem",
-        padding: "0.75rem",
-        marginBottom: "0.5rem",
+        ...resolveDot("rounded-lg p-3 mb-2"),
         cursor: allowCardDrag ? "grab" : "default",
         transition: "all 200ms",
         touchAction: "none",
@@ -183,13 +191,18 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
       },
       variantStyle,
       isDragging
-        ? { opacity: 0.5, transform: "scale(0.95)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", zIndex: 50 }
+        ? {
+            opacity: 0.5,
+            transform: "scale(0.95)",
+            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+            zIndex: 50,
+          }
         : undefined,
       isDeleting ? { pointerEvents: "none" } : undefined,
       sortableStyle,
       animationStyle,
       resolveDot(dot),
-      style
+      style,
     );
 
     return (
@@ -218,10 +231,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
             onClick={handleDelete}
             style={{
               position: "absolute",
-              top: "0.5rem",
-              right: "0.5rem",
-              padding: "0.25rem",
-              borderRadius: "0.25rem",
+              ...resolveDot("top-2 right-2 p-1 rounded"),
               opacity: 0,
               border: "none",
               background: "none",
@@ -231,11 +241,13 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
             aria-label="카드 삭제"
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#fee2e2";
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "#fee2e2";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.opacity = "0";
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                "transparent";
             }}
           >
             <Icon name="close" size={12} style={{ color: "#9ca3af" }} />
@@ -248,8 +260,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
             fontSize: "0.875rem",
             fontWeight: 500,
             color: "#1f2937",
-            paddingRight: "1.5rem",
-            marginBottom: "0.25rem",
+            ...resolveDot("pr-6 mb-1"),
           }}
         >
           {card.title}
@@ -258,15 +269,17 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
         {/* Description */}
         {card.description && (
           <p
-            style={{
-              fontSize: "0.75rem",
-              color: "#6b7280",
-              marginBottom: "0.5rem",
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            } as React.CSSProperties}
+            style={
+              {
+                fontSize: "0.75rem",
+                color: "#6b7280",
+                ...resolveDot("mb-2"),
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              } as React.CSSProperties
+            }
           >
             {card.description}
           </p>
@@ -278,8 +291,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
             style={{
               display: "flex",
               flexWrap: "wrap",
-              gap: "0.25rem",
-              marginBottom: "0.5rem",
+              ...resolveDot("gap-1 mb-2"),
             }}
           >
             {card.tags.slice(0, 3).map((tag) => (
@@ -287,11 +299,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
                 key={tag}
                 style={{
                   fontSize: "0.75rem",
-                  paddingLeft: "0.375rem",
-                  paddingRight: "0.375rem",
-                  paddingTop: "0.125rem",
-                  paddingBottom: "0.125rem",
-                  borderRadius: "0.25rem",
+                  ...resolveDot("px-1.5 py-0.5 rounded"),
                   backgroundColor: "#f3f4f6",
                   color: "#4b5563",
                 }}
@@ -313,25 +321,35 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: "0.5rem",
+            ...resolveDot("mt-2"),
           }}
         >
           {/* Assignee */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              ...resolveDot("gap-1"),
+            }}
+          >
             {card.assignee && (
-              <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  ...resolveDot("gap-1.5"),
+                }}
+              >
                 {card.assignee.avatar ? (
                   <img
                     src={card.assignee.avatar}
                     alt={card.assignee.name}
-                    style={{ width: "1.25rem", height: "1.25rem", borderRadius: "9999px" }}
+                    style={{ ...resolveDot("w-5 h-5 rounded-full") }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: "1.25rem",
-                      height: "1.25rem",
-                      borderRadius: "9999px",
+                      ...resolveDot("w-5 h-5 rounded-full"),
                       backgroundColor: "#d1d5db",
                       display: "flex",
                       alignItems: "center",
@@ -357,14 +375,20 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
           </div>
 
           {/* Due date & Priority */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              ...resolveDot("gap-2"),
+            }}
+          >
             {dueText && (
               <span
                 style={{
                   fontSize: "0.75rem",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.125rem",
+                  ...resolveDot("gap-0.5"),
                   color: isOverdue ? "#ef4444" : "#9ca3af",
                 }}
               >
@@ -376,11 +400,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
               <span
                 style={{
                   fontSize: "0.625rem",
-                  paddingLeft: "0.375rem",
-                  paddingRight: "0.375rem",
-                  paddingTop: "0.125rem",
-                  paddingBottom: "0.125rem",
-                  borderRadius: "0.25rem",
+                  ...resolveDot("px-1.5 py-0.5 rounded"),
                   ...priorityBadgeStyles[card.priority],
                 }}
               >
@@ -391,7 +411,7 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 KanbanCard.displayName = "KanbanCard";

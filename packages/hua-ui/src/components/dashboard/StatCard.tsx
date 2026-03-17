@@ -24,8 +24,10 @@ import type { Color } from "../../lib/types/common";
  * @property {string} [dot] - dot 스타일 유틸리티 문자열 / Dot style utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface StatCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "className"> {
+export interface StatCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title: string;
   value: string | number | null | undefined;
   description?: string;
@@ -46,8 +48,7 @@ export interface StatCardProps
 // ─── Base layout styles (CSSProperties) ────────────────────────────────────
 
 const BASE_CARD: React.CSSProperties = {
-  padding: "1.5rem",
-  borderRadius: "1.5rem",
+  ...resolveDot("p-6 rounded-3xl"),
   border: "1px solid",
   transition: "box-shadow 200ms ease-in-out",
 };
@@ -100,19 +101,21 @@ function getCardBg(color: Color, variant: Variant): React.CSSProperties {
 
 function getIconContainerStyle(
   color: Color,
-  isGradient: boolean
+  isGradient: boolean,
 ): React.CSSProperties {
   const base: React.CSSProperties = {
-    width: "3rem",
-    height: "3rem",
-    borderRadius: "0.5rem",
+    ...resolveDot("w-12 h-12 rounded-lg"),
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   };
   if (isGradient) {
-    return { ...base, backgroundColor: "rgba(255,255,255,0.2)", color: "white" };
+    return {
+      ...base,
+      backgroundColor: "rgba(255,255,255,0.2)",
+      color: "white",
+    };
   }
   return {
     ...base,
@@ -124,17 +127,10 @@ function getIconContainerStyle(
 // Returns a size number for Icon's `size` prop (24px = 1.5rem)
 const ICON_SIZE = 24;
 
-function getBadgeStyle(
-  color: Color,
-  isGradient: boolean
-): React.CSSProperties {
+function getBadgeStyle(color: Color, isGradient: boolean): React.CSSProperties {
   const base: React.CSSProperties = {
     fontSize: "0.875rem",
-    paddingLeft: "0.75rem",
-    paddingRight: "0.75rem",
-    paddingTop: "0.25rem",
-    paddingBottom: "0.25rem",
-    borderRadius: "9999px",
+    ...resolveDot("px-3 py-1 rounded-full"),
     fontWeight: 500,
   };
   if (isGradient) {
@@ -202,7 +198,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [isHovered, setIsHovered] = useState(false);
 
@@ -222,20 +218,19 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         colorVariantStyle,
         isHovered ? HOVER_SHADOW : undefined,
         resolveDot(dotProp),
-        style
+        style,
       );
     }, [color, variant, isHovered, dotProp, style]);
 
     const emptyCardStyle = useMemo(
       (): React.CSSProperties => ({
-        borderRadius: "1rem",
+        ...resolveDot("rounded-xl p-6"),
         border: "1px solid var(--stat-card-empty-border)",
-        padding: "1.5rem",
         backgroundColor: "var(--stat-card-empty-bg)",
         ...resolveDot(dotProp),
         ...style,
       }),
-      [dotProp, style]
+      [dotProp, style],
     );
 
     // Empty state
@@ -258,7 +253,6 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
           </h3>
           <p
             style={{
-              marginTop: "0.5rem",
               fontSize: "0.875rem",
               color: "var(--stat-card-empty-text)",
               margin: "0.5rem 0 0",
@@ -276,30 +270,29 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
     const valueStyle: React.CSSProperties = {
       fontSize: "1.875rem",
       fontWeight: 700,
-      marginBottom: "0.25rem",
+      ...resolveDot("mb-1"),
       margin: "0 0 0.25rem",
       color: isGradient ? "white" : "var(--stat-card-value-color)",
     };
 
     const descStyle: React.CSSProperties = {
       fontSize: "0.875rem",
-      color: isGradient ? "rgba(255,255,255,0.9)" : "var(--stat-card-desc-color)",
+      color: isGradient
+        ? "rgba(255,255,255,0.9)"
+        : "var(--stat-card-desc-color)",
       margin: 0,
     };
 
     const loadingBarStyle: React.CSSProperties = {
-      height: "2.5rem",
+      ...resolveDot("h-10 rounded-md mb-2"),
       backgroundColor: "var(--stat-card-loading-bg)",
-      borderRadius: "0.375rem",
-      marginBottom: "0.5rem",
       animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
     };
 
     const trendRowStyle: React.CSSProperties = {
-      marginTop: "0.75rem",
+      ...resolveDot("mt-3 gap-1"),
       display: "flex",
       alignItems: "center",
-      gap: "0.25rem",
     };
 
     return (
@@ -316,7 +309,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
-            marginBottom: "1rem",
+            ...resolveDot("mb-4"),
           }}
         >
           {icon && (
@@ -375,7 +368,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 StatCard.displayName = "StatCard";

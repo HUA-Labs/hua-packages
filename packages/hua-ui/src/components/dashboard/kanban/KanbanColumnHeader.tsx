@@ -123,11 +123,7 @@ export const KanbanColumnHeader = React.forwardRef<
               justifyContent: "center",
               height: "100%",
               minHeight: "300px",
-              paddingTop: "1rem",
-              paddingBottom: "1rem",
-              paddingLeft: "0.5rem",
-              paddingRight: "0.5rem",
-              borderRadius: "0.75rem",
+              ...resolveDot("py-4 px-2 rounded-xl"),
             },
             resolveDot(dot),
             style,
@@ -146,15 +142,13 @@ export const KanbanColumnHeader = React.forwardRef<
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "0.75rem",
+              ...resolveDot("gap-3 rounded-lg p-2"),
               width: "100%",
               height: "100%",
               justifyContent: "center",
               cursor: "pointer",
               background: "none",
               border: "none",
-              borderRadius: "0.5rem",
-              padding: "0.5rem",
               transition: "background-color 150ms",
             }}
             onMouseEnter={(e) => {
@@ -182,11 +176,7 @@ export const KanbanColumnHeader = React.forwardRef<
             <span
               style={{
                 fontSize: "0.75rem",
-                paddingLeft: "0.5rem",
-                paddingRight: "0.5rem",
-                paddingTop: "0.25rem",
-                paddingBottom: "0.25rem",
-                borderRadius: "9999px",
+                ...resolveDot("px-2 py-1 rounded-full"),
                 fontWeight: 500,
                 ...badgeStyle,
               }}
@@ -206,11 +196,7 @@ export const KanbanColumnHeader = React.forwardRef<
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "0.5rem",
-            paddingLeft: "0.75rem",
-            paddingRight: "0.75rem",
-            paddingTop: "0.75rem",
-            paddingBottom: "0.75rem",
+            ...resolveDot("gap-2 p-3"),
             borderBottom: "1px solid #e5e7eb",
           },
           resolveDot(dot),
@@ -223,7 +209,7 @@ export const KanbanColumnHeader = React.forwardRef<
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
+            ...resolveDot("gap-2"),
             flex: 1,
             minWidth: 0,
           }}
@@ -234,9 +220,8 @@ export const KanbanColumnHeader = React.forwardRef<
               {...dragHandleProps}
               style={{
                 flexShrink: 0,
-                padding: "0.125rem",
+                ...resolveDot("p-0.5 rounded"),
                 marginLeft: "-0.25rem",
-                borderRadius: "0.25rem",
                 cursor: "grab",
                 transition: "background-color 150ms",
               }}
@@ -261,9 +246,7 @@ export const KanbanColumnHeader = React.forwardRef<
           {/* Color dot */}
           <div
             style={{
-              width: "0.75rem",
-              height: "0.75rem",
-              borderRadius: "9999px",
+              ...resolveDot("w-3 h-3 rounded-full"),
               flexShrink: 0,
               ...dotStyle,
             }}
@@ -281,15 +264,11 @@ export const KanbanColumnHeader = React.forwardRef<
               style={{
                 flex: 1,
                 minWidth: 0,
-                paddingLeft: "0.5rem",
-                paddingRight: "0.5rem",
-                paddingTop: "0.25rem",
-                paddingBottom: "0.25rem",
+                ...resolveDot("px-2 py-1 rounded"),
                 fontSize: "0.875rem",
                 fontWeight: 600,
                 backgroundColor: "transparent",
                 border: "1px solid #6366f1",
-                borderRadius: "0.25rem",
                 outline: "none",
                 color: "#1f2937",
               }}
@@ -327,11 +306,7 @@ export const KanbanColumnHeader = React.forwardRef<
           <span
             style={{
               fontSize: "0.75rem",
-              paddingLeft: "0.5rem",
-              paddingRight: "0.5rem",
-              paddingTop: "0.125rem",
-              paddingBottom: "0.125rem",
-              borderRadius: "9999px",
+              ...resolveDot("px-2 py-0.5 rounded-full"),
               flexShrink: 0,
               ...(column.limit && cardCount >= column.limit
                 ? wipBadgeStyle
@@ -348,7 +323,7 @@ export const KanbanColumnHeader = React.forwardRef<
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "0.25rem",
+            ...resolveDot("gap-1"),
             flexShrink: 0,
           }}
         >
@@ -363,8 +338,7 @@ export const KanbanColumnHeader = React.forwardRef<
               }}
               onPointerDown={(e) => e.stopPropagation()}
               style={{
-                padding: "0.25rem",
-                borderRadius: "0.25rem",
+                ...resolveDot("p-1 rounded"),
                 background: "none",
                 border: "none",
                 cursor: "pointer",
@@ -395,8 +369,7 @@ export const KanbanColumnHeader = React.forwardRef<
               }}
               onPointerDown={(e) => e.stopPropagation()}
               style={{
-                padding: "0.25rem",
-                borderRadius: "0.25rem",
+                ...resolveDot("p-1 rounded"),
                 background: "none",
                 border: "none",
                 cursor: "pointer",

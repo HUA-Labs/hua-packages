@@ -145,9 +145,7 @@ const LOADING_WRAP: React.CSSProperties = {
 const SPINNER_STYLE: React.CSSProperties = {
   animation: "spin 1s linear infinite",
   marginLeft: "-4px",
-  marginRight: "8px",
-  height: "16px",
-  width: "16px",
+  ...resolveDot("mr-2 w-4 h-4"),
   color: "white",
 };
 

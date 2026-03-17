@@ -181,10 +181,9 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
     <div
       style={mergeStyles(
         {
-          borderRadius: "1rem",
+          ...resolveDot("rounded-xl p-4"),
           border: "1px solid var(--color-border, #f1f5f9)",
           backgroundColor: "var(--color-card, rgba(255,255,255,0.5))",
-          padding: "1rem",
         },
         resolveDot(dot),
         style,
@@ -193,7 +192,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
     >
       <div
         style={{
-          marginBottom: "1rem",
+          ...resolveDot("mb-4"),
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -226,7 +225,11 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
         ))
       ) : (
         <ol
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            ...resolveDot("gap-4"),
+          }}
           role="list"
           aria-label="정산 타임라인"
         >
@@ -248,7 +251,11 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                 key={item.id}
                 role="listitem"
                 aria-label={itemLabel}
-                style={{ position: "relative", display: "flex", gap: "1rem" }}
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  ...resolveDot("gap-4"),
+                }}
               >
                 <div
                   style={{
@@ -260,9 +267,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                   <span
                     style={{
                       zIndex: 10,
-                      height: "0.875rem",
-                      width: "0.875rem",
-                      borderRadius: "9999px",
+                      ...resolveDot("h-3.5 w-3.5 rounded-full"),
                       border: "2px solid",
                       backgroundColor: statusConfig.dotColor,
                       borderColor: statusConfig.dotColor,
@@ -275,7 +280,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                   {showConnector && (
                     <span
                       style={{
-                        marginTop: "0.25rem",
+                        ...resolveDot("mt-1"),
                         flex: 1,
                         width: "1px",
                         backgroundColor: "var(--color-border, #e2e8f0)",
@@ -288,11 +293,9 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                 <div
                   style={{
                     flex: 1,
-                    borderRadius: "0.75rem",
+                    ...resolveDot("rounded-xl p-4 mb-2"),
                     border: isHighlighted ? "2px solid" : "1px solid",
                     borderColor: statusConfig.borderColor,
-                    padding: "1rem",
-                    marginBottom: "0.5rem",
                     boxShadow: isHighlighted
                       ? "0 1px 3px rgba(0,0,0,0.1)"
                       : undefined,
@@ -303,7 +306,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                       display: "flex",
                       flexWrap: "wrap",
                       alignItems: "center",
-                      gap: "0.5rem",
+                      ...resolveDot("gap-2"),
                     }}
                   >
                     <span
@@ -335,7 +338,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                   {item.description && (
                     <p
                       style={{
-                        marginTop: "0.25rem",
+                        ...resolveDot("mt-1"),
                         fontSize: "0.875rem",
                         color: "#475569",
                       }}
@@ -345,10 +348,9 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                   )}
                   <div
                     style={{
-                      marginTop: "0.75rem",
+                      ...resolveDot("mt-3 gap-4"),
                       display: "flex",
                       flexWrap: "wrap",
-                      gap: "1rem",
                       fontSize: "0.75rem",
                       color: "#64748b",
                     }}
@@ -358,7 +360,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "0.25rem",
+                          ...resolveDot("gap-1"),
                           fontSize: "0.875rem",
                           color: "var(--color-foreground, #334155)",
                         }}
@@ -376,7 +378,7 @@ export const SettlementTimeline: React.FC<SettlementTimelineProps> = ({
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "0.25rem",
+                          ...resolveDot("gap-1"),
                         }}
                       >
                         <Icon

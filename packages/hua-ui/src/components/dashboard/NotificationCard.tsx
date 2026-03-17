@@ -44,7 +44,10 @@ export interface NotificationItem {
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
-export interface NotificationCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
+export interface NotificationCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
   title?: string;
   items: NotificationItem[];
   emptyMessage?: string;
@@ -64,124 +67,124 @@ export interface NotificationCardProps extends Omit<React.HTMLAttributes<HTMLDiv
 
 /** Root card container */
 const CARD_BASE: React.CSSProperties = {
-  backgroundColor: 'var(--color-card, #ffffff)',
-  borderRadius: '0.75rem',
-  boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-  padding: '1.5rem',
+  backgroundColor: "var(--color-card, #ffffff)",
+  ...resolveDot("rounded-xl p-6"),
+  boxShadow: "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)",
 };
 
 /** Header row: flex, align-center, justify-between, mb-4 */
 const HEADER_ROW: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: '1rem',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  ...resolveDot("mb-4"),
 };
 
 const HEADER_LEFT: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
 };
 
 /** Bell icon wrapper */
 const BELL_WRAP: React.CSSProperties = {
-  padding: '0.5rem',
-  backgroundColor: 'rgba(249, 115, 22, 0.1)',
-  borderRadius: '0.5rem',
-  marginRight: '0.75rem',
+  ...resolveDot("p-2 rounded-lg mr-3"),
+  backgroundColor: "rgba(249, 115, 22, 0.1)",
 };
 
 /** Card title */
 const CARD_TITLE: React.CSSProperties = {
-  fontSize: '1.125rem',
+  fontSize: "1.125rem",
   fontWeight: 600,
-  color: 'var(--color-foreground, #111827)',
+  color: "var(--color-foreground, #111827)",
 };
 
 /** Count badge */
 const COUNT_BADGE: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  paddingLeft: '0.625rem',
-  paddingRight: '0.625rem',
-  paddingTop: '0.125rem',
-  paddingBottom: '0.125rem',
-  borderRadius: '9999px',
-  fontSize: '0.75rem',
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "0.125rem 0.625rem",
+  ...resolveDot("rounded-full"),
+  fontSize: "0.75rem",
   fontWeight: 500,
-  backgroundColor: 'rgba(254, 215, 170, 0.8)',
-  color: 'rgba(154, 52, 18, 1)',
+  backgroundColor: "rgba(254, 215, 170, 0.8)",
+  color: "rgba(154, 52, 18, 1)",
 };
 
 /** Notification list container */
 const LIST_CONTAINER: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.75rem',
+  display: "flex",
+  flexDirection: "column",
+  ...resolveDot("gap-3"),
 };
 
 /** Per-type item container background + border */
-const TYPE_ITEM_STYLES: Record<NonNullable<NotificationItem['type']> | 'default', React.CSSProperties> = {
+const TYPE_ITEM_STYLES: Record<
+  NonNullable<NotificationItem["type"]> | "default",
+  React.CSSProperties
+> = {
   info: {
-    background: 'linear-gradient(to right, rgba(238, 242, 255, 1), rgba(238, 242, 255, 1))',
-    borderColor: 'rgba(199, 210, 254, 0.5)',
+    background:
+      "linear-gradient(to right, rgba(238, 242, 255, 1), rgba(238, 242, 255, 1))",
+    borderColor: "rgba(199, 210, 254, 0.5)",
   },
   warning: {
-    background: 'linear-gradient(to right, rgba(255, 247, 237, 1), rgba(254, 242, 242, 1))',
-    borderColor: 'rgba(253, 186, 116, 0.5)',
+    background:
+      "linear-gradient(to right, rgba(255, 247, 237, 1), rgba(254, 242, 242, 1))",
+    borderColor: "rgba(253, 186, 116, 0.5)",
   },
   error: {
-    background: 'linear-gradient(to right, rgba(254, 242, 242, 1), rgba(255, 241, 242, 1))',
-    borderColor: 'rgba(252, 165, 165, 0.5)',
+    background:
+      "linear-gradient(to right, rgba(254, 242, 242, 1), rgba(255, 241, 242, 1))",
+    borderColor: "rgba(252, 165, 165, 0.5)",
   },
   success: {
-    background: 'linear-gradient(to right, rgba(240, 253, 244, 1), rgba(236, 253, 245, 1))',
-    borderColor: 'rgba(134, 239, 172, 0.5)',
+    background:
+      "linear-gradient(to right, rgba(240, 253, 244, 1), rgba(236, 253, 245, 1))",
+    borderColor: "rgba(134, 239, 172, 0.5)",
   },
   default: {
-    background: 'linear-gradient(to right, rgba(249, 250, 251, 1), rgba(243, 244, 246, 1))',
-    borderColor: 'rgba(209, 213, 219, 0.5)',
+    background:
+      "linear-gradient(to right, rgba(249, 250, 251, 1), rgba(243, 244, 246, 1))",
+    borderColor: "rgba(209, 213, 219, 0.5)",
   },
 };
 
 /** Per-type dot color */
-const TYPE_DOT_COLORS: Record<NonNullable<NotificationItem['type']> | 'default', React.CSSProperties> = {
-  info: { backgroundColor: 'var(--color-primary, #3b82f6)' },
-  warning: { backgroundColor: 'rgba(239, 68, 68, 1)' },
-  error: { backgroundColor: 'rgba(220, 38, 38, 1)' },
-  success: { backgroundColor: 'rgba(34, 197, 94, 1)' },
-  default: { backgroundColor: 'rgba(107, 114, 128, 1)' },
+const TYPE_DOT_COLORS: Record<
+  NonNullable<NotificationItem["type"]> | "default",
+  React.CSSProperties
+> = {
+  info: { backgroundColor: "var(--color-primary, #3b82f6)" },
+  warning: { backgroundColor: "rgba(239, 68, 68, 1)" },
+  error: { backgroundColor: "rgba(220, 38, 38, 1)" },
+  success: { backgroundColor: "rgba(34, 197, 94, 1)" },
+  default: { backgroundColor: "rgba(107, 114, 128, 1)" },
 };
 
 /** Item container base */
 const ITEM_BASE: React.CSSProperties = {
-  padding: '0.75rem',
-  borderRadius: '0.5rem',
-  borderWidth: '1px',
-  borderStyle: 'solid',
+  ...resolveDot("p-3 rounded-lg"),
+  borderWidth: "1px",
+  borderStyle: "solid",
 };
 
 const ITEM_INTERACTIVE_BASE: React.CSSProperties = {
   ...ITEM_BASE,
-  cursor: 'pointer',
-  transition: 'box-shadow 200ms ease-in-out',
+  cursor: "pointer",
+  transition: "box-shadow 200ms ease-in-out",
 };
 
 const ITEM_HOVER: React.CSSProperties = {
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
 };
 
 const ITEM_INNER: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'flex-start',
+  display: "flex",
+  alignItems: "flex-start",
 };
 
 const DOT_INDICATOR: React.CSSProperties = {
-  width: '0.5rem',
-  height: '0.5rem',
-  borderRadius: '9999px',
-  marginTop: '0.5rem',
-  marginRight: '0.75rem',
+  ...resolveDot("w-2 h-2 rounded-full mt-2 mr-3"),
   flexShrink: 0,
 };
 
@@ -191,60 +194,59 @@ const ITEM_CONTENT: React.CSSProperties = {
 };
 
 const ITEM_HEADER: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: '0.25rem',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  ...resolveDot("mb-1"),
 };
 
 const ITEM_TITLE: React.CSSProperties = {
-  fontSize: '0.875rem',
+  fontSize: "0.875rem",
   fontWeight: 600,
-  color: 'var(--color-foreground, #111827)',
+  color: "var(--color-foreground, #111827)",
 };
 
 const ITEM_TIME: React.CSSProperties = {
-  fontSize: '0.75rem',
-  color: 'var(--color-muted-foreground, #6b7280)',
-  marginLeft: '0.5rem',
+  fontSize: "0.75rem",
+  color: "var(--color-muted-foreground, #6b7280)",
+  ...resolveDot("ml-2"),
   flexShrink: 0,
 };
 
 const ITEM_MESSAGE: React.CSSProperties = {
-  fontSize: '0.75rem',
-  color: 'var(--color-muted-foreground, #6b7280)',
+  fontSize: "0.75rem",
+  color: "var(--color-muted-foreground, #6b7280)",
 };
 
 /** Empty state */
 const EMPTY_STATE: React.CSSProperties = {
-  textAlign: 'center',
-  paddingTop: '2rem',
-  paddingBottom: '2rem',
+  textAlign: "center",
+  ...resolveDot("py-8"),
 };
 
 const EMPTY_MESSAGE: React.CSSProperties = {
-  color: 'var(--color-muted-foreground, #6b7280)',
-  fontSize: '0.875rem',
+  color: "var(--color-muted-foreground, #6b7280)",
+  fontSize: "0.875rem",
 };
 
 /** View all button row */
 const VIEW_ALL_ROW: React.CSSProperties = {
-  marginTop: '1rem',
-  textAlign: 'center',
+  ...resolveDot("mt-4"),
+  textAlign: "center",
 };
 
 const VIEW_ALL_BUTTON_BASE: React.CSSProperties = {
-  fontSize: '0.875rem',
-  color: 'var(--color-muted-foreground, #9ca3af)',
+  fontSize: "0.875rem",
+  color: "var(--color-muted-foreground, #9ca3af)",
   fontWeight: 500,
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  transition: 'color 200ms ease-in-out',
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  transition: "color 200ms ease-in-out",
 };
 
 const VIEW_ALL_BUTTON_HOVER: React.CSSProperties = {
-  color: 'var(--color-foreground, #4b5563)',
+  color: "var(--color-foreground, #4b5563)",
 };
 
 // ---------------------------------------------------------------------------
@@ -259,13 +261,19 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
   const [isHovered, setIsHovered] = useState(false);
   const isInteractive = !!(item.onClick || item.href);
 
-  const typeKey = (item.type ?? 'default') as NonNullable<NotificationItem['type']> | 'default';
+  const typeKey = (item.type ?? "default") as
+    | NonNullable<NotificationItem["type"]>
+    | "default";
   const typeStyle = TYPE_ITEM_STYLES[typeKey];
   const dotColor = TYPE_DOT_COLORS[typeKey];
 
   const containerStyle = useMemo((): React.CSSProperties => {
     const base = isInteractive ? ITEM_INTERACTIVE_BASE : ITEM_BASE;
-    return mergeStyles(base, typeStyle, isInteractive && isHovered ? ITEM_HOVER : undefined);
+    return mergeStyles(
+      base,
+      typeStyle,
+      isInteractive && isHovered ? ITEM_HOVER : undefined,
+    );
   }, [isInteractive, isHovered, typeStyle]);
 
   const content = (
@@ -283,9 +291,9 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
               dateTime={
                 item.timestamp instanceof Date
                   ? item.timestamp.toISOString()
-                  : typeof item.timestamp === 'string'
-                  ? item.timestamp
-                  : undefined
+                  : typeof item.timestamp === "string"
+                    ? item.timestamp
+                    : undefined
               }
               style={ITEM_TIME}
             >
@@ -300,7 +308,7 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
 
   if (item.href) {
     return (
-      <a href={item.href} style={{ display: 'block', textDecoration: 'none' }}>
+      <a href={item.href} style={{ display: "block", textDecoration: "none" }}>
         {content}
       </a>
     );
@@ -308,7 +316,7 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
 
   if (item.onClick) {
     return (
-      <div onClick={item.onClick} style={{ cursor: 'pointer' }}>
+      <div onClick={item.onClick} style={{ cursor: "pointer" }}>
         {content}
       </div>
     );
@@ -359,7 +367,10 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} NotificationCard 컴포넌트 / NotificationCard component
  */
-export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCardProps>(
+export const NotificationCard = React.forwardRef<
+  HTMLDivElement,
+  NotificationCardProps
+>(
   (
     {
       title = "알림 및 공지",
@@ -375,7 +386,7 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [viewAllHovered, setViewAllHovered] = useState(false);
 
@@ -384,12 +395,16 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
 
     const rootStyle = useMemo(
       () => mergeStyles(CARD_BASE, resolveDot(dotProp), style),
-      [dotProp, style]
+      [dotProp, style],
     );
 
     const viewAllButtonStyle = useMemo(
-      () => mergeStyles(VIEW_ALL_BUTTON_BASE, viewAllHovered ? VIEW_ALL_BUTTON_HOVER : undefined),
-      [viewAllHovered]
+      () =>
+        mergeStyles(
+          VIEW_ALL_BUTTON_BASE,
+          viewAllHovered ? VIEW_ALL_BUTTON_HOVER : undefined,
+        ),
+      [viewAllHovered],
     );
 
     return (
@@ -420,7 +435,15 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
           emptyState
         ) : (
           <div style={EMPTY_STATE}>
-            <span style={{ display: 'block', width: '3rem', height: '3rem', margin: '0 auto 0.75rem', color: 'var(--color-muted-foreground, #9ca3af)' }}>
+            <span
+              style={{
+                display: "block",
+                width: "3rem",
+                height: "3rem",
+                margin: "0 auto 0.75rem",
+                color: "var(--color-muted-foreground, #9ca3af)",
+              }}
+            >
               <Icon name="bell" size={48} />
             </span>
             <p style={EMPTY_MESSAGE}>{emptyMessage}</p>
@@ -442,7 +465,7 @@ export const NotificationCard = React.forwardRef<HTMLDivElement, NotificationCar
         )}
       </div>
     );
-  }
+  },
 );
 
 NotificationCard.displayName = "NotificationCard";

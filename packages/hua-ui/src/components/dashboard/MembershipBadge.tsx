@@ -12,7 +12,10 @@ import { mergeStyles, resolveDot } from "../../hooks/useDotMap";
  * @property {boolean} [showIcon=true] - 아이콘 표시 여부 / Show icon
  * @property {string} [dot] - dot 유틸리티 스트링 / dot utility string
  */
-export interface MembershipBadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'className'> {
+export interface MembershipBadgeProps extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "className"
+> {
   tier: "basic" | "pro" | "premium" | "admin";
   label?: string;
   size?: "sm" | "md" | "lg";
@@ -84,18 +87,13 @@ const sizeConfig = {
  * @param {React.Ref<HTMLSpanElement>} ref - span 요소 ref / span element ref
  * @returns {JSX.Element} MembershipBadge 컴포넌트 / MembershipBadge component
  */
-export const MembershipBadge = React.forwardRef<HTMLSpanElement, MembershipBadgeProps>(
+export const MembershipBadge = React.forwardRef<
+  HTMLSpanElement,
+  MembershipBadgeProps
+>(
   (
-    {
-      tier,
-      label,
-      size = "md",
-      showIcon = true,
-      dot,
-      style,
-      ...props
-    },
-    ref
+    { tier, label, size = "md", showIcon = true, dot, style, ...props },
+    ref,
   ) => {
     const config = tierConfig[tier];
     const sizes = sizeConfig[size];
@@ -121,14 +119,22 @@ export const MembershipBadge = React.forwardRef<HTMLSpanElement, MembershipBadge
       if (tier === "admin") {
         return (
           <svg style={iconStyle} fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+            <path
+              fillRule="evenodd"
+              d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+              clipRule="evenodd"
+            />
           </svg>
         );
       }
 
       return (
         <svg style={iconStyle} fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          <path
+            fillRule="evenodd"
+            d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clipRule="evenodd"
+          />
         </svg>
       );
     };
@@ -149,15 +155,15 @@ export const MembershipBadge = React.forwardRef<HTMLSpanElement, MembershipBadge
             fontSize: sizes.fontSize,
           },
           resolveDot(dot),
-          style
+          style,
         )}
         {...props}
       >
-        {showIcon && <span style={{ marginRight: "0.25rem" }}>{getIcon()}</span>}
+        {showIcon && <span style={{ ...resolveDot("mr-1") }}>{getIcon()}</span>}
         {displayLabel}
       </span>
     );
-  }
+  },
 );
 
 MembershipBadge.displayName = "MembershipBadge";

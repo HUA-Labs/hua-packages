@@ -204,17 +204,16 @@ const Command = React.forwardRef<HTMLDivElement, CommandProps>(
             onClick={() => handleOpenChange(false)}
           >
             <div
-              style={{
+              style={mergeStyles(resolveDot("rounded-lg"), {
                 width: "100%",
                 maxWidth: "42rem",
                 margin: "0 1rem",
                 backgroundColor: "var(--color-popover)",
                 color: "var(--color-popover-foreground)",
-                borderRadius: "0.5rem",
                 overflow: "hidden",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
                 border: "none",
-              }}
+              })}
               onClick={(e) => e.stopPropagation()}
             >
               <div
@@ -297,13 +296,12 @@ const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
     <input
       ref={ref}
       style={mergeStyles(
+        resolveDot("rounded-md py-2 px-3"),
         {
           display: "flex",
           height: "2.5rem",
           width: "100%",
-          borderRadius: "0.375rem",
           backgroundColor: "transparent",
-          ...resolveDot("py-2 px-3"),
           fontSize: "0.875rem",
           outline: "none",
           border: "none",

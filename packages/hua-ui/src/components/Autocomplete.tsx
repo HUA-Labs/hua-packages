@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Icon } from "./Icon"
-import { Input } from "./Input"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { Icon } from "./Icon";
+import { Input } from "./Input";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * Autocomplete 옵션 인터페이스 / Autocomplete option interface
@@ -15,11 +15,11 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {Record<string, unknown>} [data] - 추가 데이터 / Additional data
  */
 export interface AutocompleteOption {
-  value: string
-  label: string
-  description?: string
-  icon?: React.ReactNode
-  data?: Record<string, unknown>
+  value: string;
+  label: string;
+  description?: string;
+  icon?: React.ReactNode;
+  data?: Record<string, unknown>;
 }
 
 /**
@@ -40,31 +40,36 @@ export interface AutocompleteOption {
  * @property {"sm" | "md" | "lg"} [size="md"] - 크기 / Size
  * @extends {Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'>}
  */
-export interface AutocompleteProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'className'> {
-  options: AutocompleteOption[]
-  value?: string
-  onChange?: (value: string, option?: AutocompleteOption) => void
-  placeholder?: string
-  disabled?: boolean
-  error?: boolean
-  loading?: boolean
-  maxHeight?: number
-  clearable?: boolean
-  filterable?: boolean
-  onSearch?: (query: string) => AutocompleteOption[] | Promise<AutocompleteOption[]>
-  emptyText?: string
-  size?: "sm" | "md" | "lg"
+export interface AutocompleteProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onChange" | "className"
+> {
+  options: AutocompleteOption[];
+  value?: string;
+  onChange?: (value: string, option?: AutocompleteOption) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  error?: boolean;
+  loading?: boolean;
+  maxHeight?: number;
+  clearable?: boolean;
+  filterable?: boolean;
+  onSearch?: (
+    query: string,
+  ) => AutocompleteOption[] | Promise<AutocompleteOption[]>;
+  emptyText?: string;
+  size?: "sm" | "md" | "lg";
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
+  dot?: string;
   /** 추가 인라인 스타일 / Additional inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
 }
 
 const sizeClasses = {
   sm: "h-8 text-sm",
   md: "h-10 text-sm",
   lg: "h-12 text-base",
-}
+};
 
 /**
  * Autocomplete 컴포넌트 / Autocomplete component
@@ -120,141 +125,149 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const [isOpen, setIsOpen] = React.useState(false)
-    const [inputValue, setInputValue] = React.useState("")
-    const [filteredOptions, setFilteredOptions] = React.useState<AutocompleteOption[]>(options)
-    const [selectedIndex, setSelectedIndex] = React.useState(-1)
-    const [isSearching, setIsSearching] = React.useState(false)
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [inputValue, setInputValue] = React.useState("");
+    const [filteredOptions, setFilteredOptions] =
+      React.useState<AutocompleteOption[]>(options);
+    const [selectedIndex, setSelectedIndex] = React.useState(-1);
+    const [isSearching, setIsSearching] = React.useState(false);
 
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    const dropdownRef = React.useRef<HTMLDivElement>(null)
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
 
     const selectedOption = React.useMemo(() => {
-      return options.find((opt) => opt.value === value)
-    }, [options, value])
+      return options.find((opt) => opt.value === value);
+    }, [options, value]);
 
     // 초기 입력값 설정
     React.useEffect(() => {
       if (selectedOption) {
-        setInputValue(selectedOption.label)
+        setInputValue(selectedOption.label);
       } else if (!value) {
-        setInputValue("")
+        setInputValue("");
       }
-    }, [selectedOption, value])
+    }, [selectedOption, value]);
 
     // 옵션 필터링
     React.useEffect(() => {
       if (onSearch) {
-        setIsSearching(true)
-        const result = onSearch(inputValue)
+        setIsSearching(true);
+        const result = onSearch(inputValue);
         if (result instanceof Promise) {
           result.then((filtered) => {
-            setFilteredOptions(filtered)
-            setIsSearching(false)
-          })
+            setFilteredOptions(filtered);
+            setIsSearching(false);
+          });
         } else {
-          setFilteredOptions(result)
-          setIsSearching(false)
+          setFilteredOptions(result);
+          setIsSearching(false);
         }
       } else if (filterable) {
         if (!inputValue.trim()) {
-          setFilteredOptions(options)
+          setFilteredOptions(options);
         } else {
-          const filtered = options.filter((option) =>
-            option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
-            option.value.toLowerCase().includes(inputValue.toLowerCase()) ||
-            option.description?.toLowerCase().includes(inputValue.toLowerCase())
-          )
-          setFilteredOptions(filtered)
+          const filtered = options.filter(
+            (option) =>
+              option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option.value.toLowerCase().includes(inputValue.toLowerCase()) ||
+              option.description
+                ?.toLowerCase()
+                .includes(inputValue.toLowerCase()),
+          );
+          setFilteredOptions(filtered);
         }
       } else {
-        setFilteredOptions(options)
+        setFilteredOptions(options);
       }
-    }, [inputValue, options, filterable, onSearch])
+    }, [inputValue, options, filterable, onSearch]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value
-      setInputValue(newValue)
-      setIsOpen(true)
-      setSelectedIndex(-1)
+      const newValue = e.target.value;
+      setInputValue(newValue);
+      setIsOpen(true);
+      setSelectedIndex(-1);
 
       if (!newValue && clearable) {
-        onChange?.("")
+        onChange?.("");
       }
-    }
+    };
 
     const handleInputFocus = () => {
-      setIsOpen(true)
-    }
+      setIsOpen(true);
+    };
 
     const handleInputBlur = (e: React.FocusEvent) => {
       // 드롭다운 클릭 시에는 닫지 않음
       if (dropdownRef.current?.contains(e.relatedTarget as Node)) {
-        return
+        return;
       }
-      setIsOpen(false)
-      setSelectedIndex(-1)
+      setIsOpen(false);
+      setSelectedIndex(-1);
 
       // 선택된 옵션이 있으면 그 라벨로 복원
       if (selectedOption) {
-        setInputValue(selectedOption.label)
+        setInputValue(selectedOption.label);
       }
-    }
+    };
 
     const handleOptionSelect = (option: AutocompleteOption) => {
-      setInputValue(option.label)
-      onChange?.(option.value, option)
-      setIsOpen(false)
-      inputRef.current?.blur()
-    }
+      setInputValue(option.label);
+      onChange?.(option.value, option);
+      setIsOpen(false);
+      inputRef.current?.blur();
+    };
 
     const handleClear = () => {
-      setInputValue("")
-      onChange?.("")
-      inputRef.current?.focus()
-    }
+      setInputValue("");
+      onChange?.("");
+      inputRef.current?.focus();
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (!isOpen || filteredOptions.length === 0) {
         if (e.key === "ArrowDown") {
-          setIsOpen(true)
+          setIsOpen(true);
         }
-        return
+        return;
       }
 
       switch (e.key) {
         case "ArrowDown":
-          e.preventDefault()
+          e.preventDefault();
           setSelectedIndex((prev) =>
-            prev < filteredOptions.length - 1 ? prev + 1 : prev
-          )
-          break
+            prev < filteredOptions.length - 1 ? prev + 1 : prev,
+          );
+          break;
         case "ArrowUp":
-          e.preventDefault()
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1))
-          break
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+          break;
         case "Enter":
-          e.preventDefault()
+          e.preventDefault();
           if (selectedIndex >= 0 && filteredOptions[selectedIndex]) {
-            handleOptionSelect(filteredOptions[selectedIndex])
+            handleOptionSelect(filteredOptions[selectedIndex]);
           }
-          break
+          break;
         case "Escape":
-          setIsOpen(false)
-          inputRef.current?.blur()
-          break
+          setIsOpen(false);
+          inputRef.current?.blur();
+          break;
       }
-    }
+    };
 
     return (
       <div
         ref={ref}
-        style={mergeStyles(resolveDot('relative w-full'), resolveDot(dotProp), style)}
+        style={mergeStyles(
+          resolveDot("relative w-full"),
+          resolveDot(dotProp),
+          style,
+        )}
         {...props}
       >
-        <div style={resolveDot('relative')}>
+        <div style={resolveDot("relative")}>
           <Input
             ref={inputRef}
             type="text"
@@ -272,19 +285,32 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             dot={`${sizeClasses[size]} pr-10`}
           />
 
-          <div style={mergeStyles(resolveDot('absolute'), { right: '0.75rem', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '0.25rem' })}>
+          <div
+            style={mergeStyles(resolveDot("absolute gap-1"), {
+              right: "0.75rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "flex",
+              alignItems: "center",
+            })}
+          >
             {loading || isSearching ? (
               <Icon
-                      name="loader"
+                name="loader"
                 dot="h-4 w-4 animate-spin text-muted-foreground"
               />
             ) : clearable && inputValue ? (
               <button
                 type="button"
                 onClick={handleClear}
-                style={resolveDot('rounded p-1')}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-muted)' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '' }}
+                style={resolveDot("rounded p-1")}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor =
+                    "var(--color-muted)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = "";
+                }}
                 aria-label="지우기"
               >
                 <Icon name="close" dot="h-4 w-4 text-muted-foreground" />
@@ -302,25 +328,33 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
             id="autocomplete-list"
             role="listbox"
             style={mergeStyles(
-              resolveDot('absolute z-50 w-full mt-1 rounded-lg border overflow-hidden'),
+              resolveDot(
+                "absolute z-50 w-full mt-1 rounded-lg border overflow-hidden",
+              ),
               {
-                backgroundColor: 'var(--color-popover)',
-                color: 'var(--color-popover-foreground)',
-                borderColor: 'var(--color-border)',
-                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                backgroundColor: "var(--color-popover)",
+                color: "var(--color-popover-foreground)",
+                borderColor: "var(--color-border)",
+                boxShadow:
+                  "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
                 maxHeight: `${maxHeight}px`,
-              }
+              },
             )}
           >
-            <div style={{ overflowY: 'auto', maxHeight: `${maxHeight}px` }}>
+            <div style={{ overflowY: "auto", maxHeight: `${maxHeight}px` }}>
               {filteredOptions.length === 0 ? (
-                <div style={mergeStyles(resolveDot('px-4 py-8 text-center text-sm'), { color: 'var(--color-muted-foreground)' })}>
+                <div
+                  style={mergeStyles(
+                    resolveDot("px-4 py-8 text-center text-sm"),
+                    { color: "var(--color-muted-foreground)" },
+                  )}
+                >
                   {emptyText}
                 </div>
               ) : (
                 filteredOptions.map((option, index) => {
-                  const isSelected = selectedIndex === index
-                  const isValueSelected = value === option.value
+                  const isSelected = selectedIndex === index;
+                  const isValueSelected = value === option.value;
 
                   return (
                     <div
@@ -330,20 +364,39 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                       onClick={() => handleOptionSelect(option)}
                       onMouseEnter={() => setSelectedIndex(index)}
                       style={mergeStyles(
-                        resolveDot('px-4 py-3 cursor-pointer'),
-                        isSelected ? { backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' } : undefined,
-                        isValueSelected ? { backgroundColor: 'color-mix(in srgb, var(--color-primary) 15%, transparent)' } : undefined,
+                        resolveDot("px-4 py-3 cursor-pointer"),
+                        isSelected
+                          ? {
+                              backgroundColor:
+                                "color-mix(in srgb, var(--color-primary) 10%, transparent)",
+                            }
+                          : undefined,
+                        isValueSelected
+                          ? {
+                              backgroundColor:
+                                "color-mix(in srgb, var(--color-primary) 15%, transparent)",
+                            }
+                          : undefined,
                       )}
                     >
-                      <div style={resolveDot('flex items-center gap-3')}>
+                      <div style={resolveDot("flex items-center gap-3")}>
                         {option.icon && (
-                          <div style={mergeStyles(resolveDot('flex-shrink-0'), { color: 'var(--color-muted-foreground)' })}>
+                          <div
+                            style={mergeStyles(resolveDot("flex-shrink-0"), {
+                              color: "var(--color-muted-foreground)",
+                            })}
+                          >
                             {option.icon}
                           </div>
                         )}
-                        <div style={resolveDot('flex-1 min-w-0')}>
-                          <div style={resolveDot('flex items-center gap-2')}>
-                            <p style={mergeStyles(resolveDot('text-sm font-medium'), { color: 'var(--color-foreground)' })}>
+                        <div style={resolveDot("flex-1 min-w-0")}>
+                          <div style={resolveDot("flex items-center gap-2")}>
+                            <p
+                              style={mergeStyles(
+                                resolveDot("text-sm font-medium"),
+                                { color: "var(--color-foreground)" },
+                              )}
+                            >
                               {option.label}
                             </p>
                             {isValueSelected && (
@@ -354,24 +407,26 @@ export const Autocomplete = React.forwardRef<HTMLDivElement, AutocompleteProps>(
                             )}
                           </div>
                           {option.description && (
-                            <p style={mergeStyles(resolveDot('text-xs mt-0.5'), { color: 'var(--color-muted-foreground)' })}>
+                            <p
+                              style={mergeStyles(resolveDot("text-xs mt-0.5"), {
+                                color: "var(--color-muted-foreground)",
+                              })}
+                            >
                               {option.description}
                             </p>
                           )}
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })
               )}
             </div>
           </div>
         )}
       </div>
-    )
-  }
-)
+    );
+  },
+);
 
-Autocomplete.displayName = "Autocomplete"
-
-
+Autocomplete.displayName = "Autocomplete";

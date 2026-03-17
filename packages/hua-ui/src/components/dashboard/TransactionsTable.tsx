@@ -113,7 +113,10 @@ export interface TransactionsTableProps {
   onRowClick?: (row: TransactionRow) => void;
   highlightRow?: (row: TransactionRow) => boolean;
   statusLabels?: Partial<Record<TransactionStatus, string>>;
-  statusRenderer?: (status: TransactionStatus, row: TransactionRow) => React.ReactNode;
+  statusRenderer?: (
+    status: TransactionStatus,
+    row: TransactionRow,
+  ) => React.ReactNode;
   amountFormatter?: (row: TransactionRow) => React.ReactNode;
   methodFormatter?: (row: TransactionRow) => React.ReactNode;
   dateFormatter?: (row: TransactionRow) => React.ReactNode;
@@ -126,7 +129,10 @@ export interface TransactionsTableProps {
   rowActionHint?: string;
 }
 
-const STATUS_STYLES: Record<TransactionStatus, { label: string; badgeStyle: React.CSSProperties }> = {
+const STATUS_STYLES: Record<
+  TransactionStatus,
+  { label: string; badgeStyle: React.CSSProperties }
+> = {
   approved: {
     label: "승인",
     badgeStyle: { backgroundColor: "#d1fae5", color: "#065f46" },
@@ -230,7 +236,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const columnList = columns.length > 0 ? columns : DEFAULT_COLUMNS;
   const hasRows = rows.length > 0;
   const tableId = React.useId();
-  const rowActionHintId = rowActionHint ? `${tableId}-row-action-hint` : undefined;
+  const rowActionHintId = rowActionHint
+    ? `${tableId}-row-action-hint`
+    : undefined;
 
   const getRowActionLabel = React.useCallback(
     (row: TransactionRow) => {
@@ -238,7 +246,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       const baseLabel = row.id ? `거래 ${row.id}` : "거래 행";
       return `${baseLabel} 상세 보기`;
     },
-    [rowActionLabel]
+    [rowActionLabel],
   );
 
   const renderStatus = (status: TransactionStatus, row: TransactionRow) => {
@@ -246,7 +254,16 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const config = STATUS_STYLES[status] || STATUS_STYLES.pending;
     const label = statusLabels?.[status] ?? config.label;
     return (
-      <span style={{ display: "inline-flex", alignItems: "center", fontWeight: 500, padding: "0.25rem 0.75rem", borderRadius: "9999px", fontSize: "0.75rem", ...config.badgeStyle }}>
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          fontWeight: 500,
+          ...resolveDot("px-3 py-1 rounded-full"),
+          fontSize: "0.75rem",
+          ...config.badgeStyle,
+        }}
+      >
         {label}
       </span>
     );
@@ -257,7 +274,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const currency = row.currency || defaultCurrency;
     try {
       return (
-        <span style={{ fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}>
+        <span
+          style={{ fontWeight: 600, color: "var(--color-foreground, #0f172a)" }}
+        >
           {new Intl.NumberFormat(locale, {
             style: "currency",
             currency,
@@ -278,7 +297,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const renderDate = (row: TransactionRow) => {
     if (dateFormatter) return dateFormatter(row);
     const dateObj = row.date instanceof Date ? row.date : new Date(row.date);
-    return dateObj.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+    return dateObj.toLocaleString(locale, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
   };
 
   const renderCell = (column: TransactionColumnConfig, row: TransactionRow) => {
@@ -288,24 +310,48 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       case "id":
         return (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>{row.id}</span>
+            <span
+              style={{
+                fontWeight: 500,
+                color: "var(--color-foreground, #0f172a)",
+              }}
+            >
+              {row.id}
+            </span>
             {row.reference && (
-              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{row.reference}</span>
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                {row.reference}
+              </span>
             )}
           </div>
         );
       case "merchant":
         return (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontWeight: 500, color: "var(--color-foreground, #0f172a)" }}>{row.merchant}</span>
+            <span
+              style={{
+                fontWeight: 500,
+                color: "var(--color-foreground, #0f172a)",
+              }}
+            >
+              {row.merchant}
+            </span>
             {row.customer && (
-              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{row.customer}</span>
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                {row.customer}
+              </span>
             )}
           </div>
         );
       case "amount":
         return (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
+          >
             {renderAmount(row)}
             {typeof row.fee === "number" && (
               <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
@@ -323,41 +369,78 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       case "customer":
         return row.customer ?? "-";
       case "fee":
-        return typeof row.fee === "number" ? row.fee.toLocaleString(locale) : "-";
+        return typeof row.fee === "number"
+          ? row.fee.toLocaleString(locale)
+          : "-";
       default:
         return "-";
     }
   };
 
   return (
-    <div style={mergeStyles(
-      {
-        borderRadius: "1rem",
-        border: "1px solid rgba(226,232,240,0.6)",
-        backgroundColor: "var(--color-card, #ffffff)",
-      },
-      resolveDot(dotProp),
-      style
-    )}>
+    <div
+      style={mergeStyles(
+        {
+          ...resolveDot("rounded-xl"),
+          border: "1px solid rgba(226,232,240,0.6)",
+          backgroundColor: "var(--color-card, #ffffff)",
+        },
+        resolveDot(dotProp),
+        style,
+      )}
+    >
       {filters && (
-        <div style={{ borderBottom: "1px solid var(--color-border, #f1f5f9)", padding: "1rem 1.5rem" }}>{filters}</div>
+        <div
+          style={{
+            borderBottom: "1px solid var(--color-border, #f1f5f9)",
+            padding: "1rem 1.5rem",
+          }}
+        >
+          {filters}
+        </div>
       )}
       <div style={{ padding: "1rem 1.5rem" }}>
-        <div style={{ borderRadius: "0.75rem", border: "1px solid var(--color-border, #f1f5f9)", overflow: "hidden" }}>
+        <div
+          style={{
+            ...resolveDot("rounded-xl"),
+            border: "1px solid var(--color-border, #f1f5f9)",
+            overflow: "hidden",
+          }}
+        >
           <Table
             role="table"
-            aria-label={caption ? (typeof caption === "string" ? caption : "거래 목록 테이블") : "거래 목록 테이블"}
+            aria-label={
+              caption
+                ? typeof caption === "string"
+                  ? caption
+                  : "거래 목록 테이블"
+                : "거래 목록 테이블"
+            }
           >
             {caption && <TableCaption>{caption}</TableCaption>}
-            <TableHeader style={{ backgroundColor: 'var(--color-muted)', opacity: 0.6 }}>
-              <TableRow style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-muted-foreground)' }}>
+            <TableHeader
+              style={{ backgroundColor: "var(--color-muted)", opacity: 0.6 }}
+            >
+              <TableRow
+                style={{
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "var(--color-muted-foreground)",
+                }}
+              >
                 {columnList.map((column) => (
                   <TableHead
                     key={column.key}
                     style={{
                       width: column.width,
-                      textAlign: column.align === "right" ? "right" : column.align === "center" ? "center" : "left",
-                      fontSize: '0.75rem',
+                      textAlign:
+                        column.align === "right"
+                          ? "right"
+                          : column.align === "center"
+                            ? "center"
+                            : "left",
+                      fontSize: "0.75rem",
                       fontWeight: 600,
                     }}
                   >
@@ -391,14 +474,22 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
               {!isLoading &&
                 rows.map((row) => {
                   const clickable = Boolean(onRowClick);
-                  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+                  const handleRowKeyDown = (
+                    event: React.KeyboardEvent<HTMLTableRowElement>,
+                  ) => {
                     if (!onRowClick) return;
-                    if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " " ||
+                      event.key === "Spacebar"
+                    ) {
                       event.preventDefault();
                       onRowClick(row);
                     }
                   };
-                  const rowLabel = clickable ? getRowActionLabel(row) : undefined;
+                  const rowLabel = clickable
+                    ? getRowActionLabel(row)
+                    : undefined;
                   return (
                     <TableRow
                       key={row.id}
@@ -407,19 +498,30 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                       onKeyDown={clickable ? handleRowKeyDown : undefined}
                       onClick={onRowClick ? () => onRowClick(row) : undefined}
                       aria-label={rowLabel}
-                      aria-describedby={clickable && rowActionHintId ? rowActionHintId : undefined}
+                      aria-describedby={
+                        clickable && rowActionHintId
+                          ? rowActionHintId
+                          : undefined
+                      }
                       style={{
-                        fontSize: '0.875rem',
-                        cursor: clickable ? 'pointer' : undefined,
-                        backgroundColor: highlightRow?.(row) ? 'var(--color-primary-50, rgba(99,102,241,0.06))' : undefined,
+                        fontSize: "0.875rem",
+                        cursor: clickable ? "pointer" : undefined,
+                        backgroundColor: highlightRow?.(row)
+                          ? "var(--color-primary-50, rgba(99,102,241,0.06))"
+                          : undefined,
                       }}
                     >
                       {columnList.map((column) => (
                         <TableCell
                           key={column.key}
                           style={{
-                            textAlign: column.align === "right" ? "right" : column.align === "center" ? "center" : "left",
-                            verticalAlign: 'middle',
+                            textAlign:
+                              column.align === "right"
+                                ? "right"
+                                : column.align === "center"
+                                  ? "center"
+                                  : "left",
+                            verticalAlign: "middle",
                           }}
                         >
                           {renderCell(column, row)}
@@ -431,14 +533,35 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </TableBody>
           </Table>
           {!isLoading && hasRows && footer && (
-            <div style={{ borderTop: "1px solid var(--color-border, #f1f5f9)", backgroundColor: "var(--color-muted, rgba(248,250,252,0.5))", padding: "0.75rem 1rem", fontSize: "0.875rem", color: "#475569" }}>
+            <div
+              style={{
+                borderTop: "1px solid var(--color-border, #f1f5f9)",
+                backgroundColor: "var(--color-muted, rgba(248,250,252,0.5))",
+                ...resolveDot("py-3 px-4"),
+                fontSize: "0.875rem",
+                color: "#475569",
+              }}
+            >
               {footer}
             </div>
           )}
         </div>
       </div>
       {rowActionHint && (
-        <p id={rowActionHintId} style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
+        <p
+          id={rowActionHintId}
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            padding: 0,
+            margin: "-1px",
+            overflow: "hidden",
+            clip: "rect(0,0,0,0)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
           {rowActionHint}
         </p>
       )}

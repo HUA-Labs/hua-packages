@@ -184,10 +184,10 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
       width: "100%",
       backgroundColor: "var(--color-muted, rgb(229 231 235))",
       borderRadius: "9999px",
-      height: "0.5rem",
+      ...resolveDot("h-2"),
     };
     const progressBar: React.CSSProperties = {
-      height: "0.5rem",
+      ...resolveDot("h-2"),
       borderRadius: "9999px",
       transition: "all 300ms ease",
     };
@@ -505,7 +505,13 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
               감정 키워드
             </h3>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                ...resolveDot("gap-2"),
+              }}
+            >
               {keywords.map((keyword) => (
                 <Badge key={keyword} variant="outline" dot="text-sm">
                   {keyword}

@@ -388,7 +388,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
                     key={index}
                     onClick={() => handleIndicatorClick(index)}
                     style={{
-                      height: "0.25rem",
+                      ...resolveDot("h-1"),
                       borderRadius: "9999px",
                       transition: "all 300ms",
                       border: "none",
