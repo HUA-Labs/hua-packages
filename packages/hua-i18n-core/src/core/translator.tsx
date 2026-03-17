@@ -12,12 +12,21 @@ import {
   defaultErrorLoggingConfig,
   isRecoverableError,
   isPluralValue,
-  PluralCategory
-} from '../types';
+  PluralCategory,
+} from "../types";
 
 export interface TranslatorInterface {
-  translate(key: string, paramsOrLang?: Record<string, unknown> | string, language?: string): string;
-  tPlural(key: string, count: number, params?: Record<string, unknown>, language?: string): string;
+  translate(
+    key: string,
+    paramsOrLang?: Record<string, unknown> | string,
+    language?: string,
+  ): string;
+  tPlural(
+    key: string,
+    count: number,
+    params?: Record<string, unknown>,
+    language?: string,
+  ): string;
   setLanguage(lang: string): void;
   getCurrentLanguage(): string;
   initialize(): Promise<void>;
@@ -32,11 +41,14 @@ export class Translator implements TranslatorInterface {
   private pluralRulesCache = new Map<string, Intl.PluralRules>();
   private loadedNamespaces = new Set<string>();
   private loadingPromises = new Map<string, Promise<TranslationNamespace>>();
-  private allTranslations: Record<string, Record<string, TranslationNamespace>> = {};
+  private allTranslations: Record<
+    string,
+    Record<string, TranslationNamespace>
+  > = {};
   private isInitialized = false;
   private initializationError: TranslationError | null = null;
   private config: I18nConfig;
-  private currentLang: string = 'en';
+  private currentLang: string = "en";
   private cacheStats = {
     hits: 0,
     misses: 0,
@@ -44,12 +56,13 @@ export class Translator implements TranslatorInterface {
   // 번역 로드 완료 시 React 리렌더링을 위한 콜백
   private onTranslationLoadedCallbacks: Set<() => void> = new Set();
   // 언어 변경 시 React 리렌더링을 위한 콜백
-  private onLanguageChangedCallbacks: Set<(language: string) => void> = new Set();
+  private onLanguageChangedCallbacks: Set<(language: string) => void> =
+    new Set();
   // 디바운싱을 위한 타이머
   private notifyTimer: ReturnType<typeof setTimeout> | null = null;
   // 최근 알림한 네임스페이스 (중복 알림 방지)
   private recentlyNotified = new Set<string>();
-  
+
   /**
    * 번역 로드 완료 콜백 등록
    */
@@ -74,77 +87,79 @@ export class Translator implements TranslatorInterface {
    * 언어 변경 이벤트 발생
    */
   private notifyLanguageChanged(language: string): void {
-    this.onLanguageChangedCallbacks.forEach(callback => {
+    this.onLanguageChangedCallbacks.forEach((callback) => {
       try {
         callback(language);
       } catch (error) {
         if (this.config.debug) {
-          console.error('Error in language changed callback:', error);
+          console.error("Error in language changed callback:", error);
         }
       }
     });
   }
-  
+
   /**
    * 번역 로드 완료 이벤트 발생 (디바운싱 적용)
    */
   private notifyTranslationLoaded(language: string, namespace: string): void {
     const cacheKey = `${language}:${namespace}`;
-    
+
     // 최근에 알림한 네임스페이스는 스킵 (중복 알림 방지)
     if (this.recentlyNotified.has(cacheKey)) {
       return;
     }
-    
+
     this.recentlyNotified.add(cacheKey);
-    
+
     // 디바운싱: 짧은 시간 내 여러 번역이 로드되면 한 번만 알림
     if (this.notifyTimer) {
       clearTimeout(this.notifyTimer);
     }
-    
+
     this.notifyTimer = setTimeout(() => {
-      this.onTranslationLoadedCallbacks.forEach(callback => {
+      this.onTranslationLoadedCallbacks.forEach((callback) => {
         try {
           callback();
         } catch (error) {
           if (this.config.debug) {
-            console.warn('Error in translation loaded callback:', error);
+            console.warn("Error in translation loaded callback:", error);
           }
         }
       });
-      
+
       // 100ms 후 recentlyNotified 초기화 (같은 네임스페이스도 다시 알림 가능하도록)
       setTimeout(() => {
         this.recentlyNotified.clear();
       }, 100);
-      
+
       this.notifyTimer = null;
     }, 50); // 50ms 디바운싱
   }
 
   constructor(config: I18nConfig) {
     if (!validateI18nConfig(config)) {
-      throw new Error('Invalid I18nConfig provided');
+      throw new Error("Invalid I18nConfig provided");
     }
 
     this.config = {
-      fallbackLanguage: 'en',
-      namespaces: ['common'],
+      fallbackLanguage: "en",
+      namespaces: ["common"],
       debug: false,
       missingKeyHandler: (key: string) => key,
       errorHandler: (error: Error) => {
         // Silent by default, user can override
       },
-      ...config
+      ...config,
     };
     this.currentLang = config.defaultLanguage;
-    
+
     // SSR에서 전달된 초기 번역 데이터가 있으면 즉시 설정 (네트워크 요청 없음)
     if (config.initialTranslations) {
       this.allTranslations = config.initialTranslations;
       // 로드된 네임스페이스 마킹
-      for (const [language, namespaces] of Object.entries(config.initialTranslations)) {
+      for (const [language, namespaces] of Object.entries(
+        config.initialTranslations,
+      )) {
         for (const namespace of Object.keys(namespaces)) {
           this.loadedNamespaces.add(`${language}:${namespace}`);
         }
@@ -161,13 +176,13 @@ export class Translator implements TranslatorInterface {
   async initialize(): Promise<void> {
     if (this.isInitialized) {
       if (this.config.debug) {
-        console.log('🚫 [TRANSLATOR] Already initialized, skipping');
+        console.log("🚫 [TRANSLATOR] Already initialized, skipping");
       }
       return;
     }
 
     if (this.config.debug) {
-      console.log('🚀 [TRANSLATOR] Starting initialization...');
+      console.log("🚀 [TRANSLATOR] Starting initialization...");
     }
 
     try {
@@ -177,10 +192,13 @@ export class Translator implements TranslatorInterface {
       }
 
       const languages = [this.currentLang];
-      if (this.config.fallbackLanguage && this.config.fallbackLanguage !== this.currentLang) {
+      if (
+        this.config.fallbackLanguage &&
+        this.config.fallbackLanguage !== this.currentLang
+      ) {
         languages.push(this.config.fallbackLanguage);
       }
-      
+
       // 초기 번역 데이터가 이미 있으면 해당 네임스페이스는 스킵
       const skipNamespaces = new Set<string>();
       for (const language of languages) {
@@ -192,14 +210,20 @@ export class Translator implements TranslatorInterface {
       }
 
       if (this.config.debug) {
-        console.log('🌍 [TRANSLATOR] Initializing translator with languages:', languages);
-        console.log('📍 [TRANSLATOR] Current language:', this.currentLang);
-        console.log('📦 [TRANSLATOR] Config namespaces:', this.config.namespaces);
+        console.log(
+          "🌍 [TRANSLATOR] Initializing translator with languages:",
+          languages,
+        );
+        console.log("📍 [TRANSLATOR] Current language:", this.currentLang);
+        console.log(
+          "📦 [TRANSLATOR] Config namespaces:",
+          this.config.namespaces,
+        );
       }
 
       for (const language of languages) {
         if (this.config.debug) {
-          console.log('Processing language:', language);
+          console.log("Processing language:", language);
         }
 
         if (!this.allTranslations[language]) {
@@ -208,35 +232,45 @@ export class Translator implements TranslatorInterface {
 
         for (const namespace of this.config.namespaces || []) {
           const cacheKey = `${language}:${namespace}`;
-          
+
           // 이미 초기 번역 데이터가 있으면 스킵 (네트워크 요청 없음)
           if (skipNamespaces.has(cacheKey)) {
             if (this.config.debug) {
-              console.log('⏭️ [TRANSLATOR] Skipping', namespace, 'for', language, '(already loaded from SSR)');
+              console.log(
+                "⏭️ [TRANSLATOR] Skipping",
+                namespace,
+                "for",
+                language,
+                "(already loaded from SSR)",
+              );
             }
             continue;
           }
-          
+
           if (this.config.debug) {
-            console.log('Loading namespace:', namespace, 'for language:', language);
+            console.log(
+              "Loading namespace:",
+              namespace,
+              "for language:",
+              language,
+            );
           }
 
           try {
             const data = await this.safeLoadTranslations(language, namespace);
 
             if (this.config.debug) {
-              console.log('Loaded data for', language, namespace, ':', data);
+              console.log("Loaded data for", language, namespace, ":", data);
             }
 
             this.allTranslations[language][namespace] = data;
             this.loadedNamespaces.add(`${language}:${namespace}`);
-
           } catch (error) {
             const translationError = this.createTranslationError(
-              'LOAD_FAILED',
+              "LOAD_FAILED",
               error as Error,
               language,
-              namespace
+              namespace,
             );
 
             this.logError(translationError);
@@ -246,19 +280,22 @@ export class Translator implements TranslatorInterface {
               // 폴백 언어로 시도
               if (language !== this.config.fallbackLanguage) {
                 try {
-                  const fallbackData = await this.safeLoadTranslations(this.config.fallbackLanguage || 'en', namespace);
+                  const fallbackData = await this.safeLoadTranslations(
+                    this.config.fallbackLanguage || "en",
+                    namespace,
+                  );
                   this.allTranslations[language][namespace] = fallbackData;
                   this.loadedNamespaces.add(`${language}:${namespace}`);
 
                   if (this.config.debug) {
-                    console.log('Using fallback data for', language, namespace);
+                    console.log("Using fallback data for", language, namespace);
                   }
                 } catch (fallbackError) {
                   const fallbackTranslationError = this.createTranslationError(
-                    'FALLBACK_LOAD_FAILED',
+                    "FALLBACK_LOAD_FAILED",
                     fallbackError as Error,
                     this.config.fallbackLanguage,
-                    namespace
+                    namespace,
                   );
 
                   this.logError(fallbackTranslationError);
@@ -281,14 +318,13 @@ export class Translator implements TranslatorInterface {
       this.isInitialized = true;
 
       if (this.config.debug) {
-        console.log('Translator initialized successfully');
-        console.log('Loaded translations:', this.allTranslations);
+        console.log("Translator initialized successfully");
+        console.log("Loaded translations:", this.allTranslations);
       }
-
     } catch (error) {
       this.initializationError = this.createTranslationError(
-        'INITIALIZATION_FAILED',
-        error as Error
+        "INITIALIZATION_FAILED",
+        error as Error,
       );
 
       this.logError(this.initializationError);
@@ -297,7 +333,9 @@ export class Translator implements TranslatorInterface {
       this.isInitialized = true;
 
       if (this.config.debug) {
-        console.warn('Translator initialized with errors, using fallback translations');
+        console.warn(
+          "Translator initialized with errors, using fallback translations",
+        );
       }
     }
   }
@@ -307,38 +345,48 @@ export class Translator implements TranslatorInterface {
    */
   private translateBeforeInitialized(key: string, targetLang: string): string {
     if (this.config.debug) {
-      console.warn('Translator not initialized. Call initialize() first.');
+      console.warn("Translator not initialized. Call initialize() first.");
     }
-    
+
     // 초기화되지 않았을 때도 기본 번역 시도 (initialTranslations 사용)
     const { namespace, key: actualKey } = this.parseKey(key);
-    
+
     // findInNamespace를 사용하여 중첩 키도 처리
     const result = this.findInNamespace(namespace, actualKey, targetLang);
     if (result) {
       if (this.config.debug) {
-        console.log(`✅ [TRANSLATOR] Found fallback translation from initialTranslations:`, result);
+        console.log(
+          `✅ [TRANSLATOR] Found fallback translation from initialTranslations:`,
+          result,
+        );
       }
       return result;
     }
-    
+
     if (this.config.debug) {
       const translations = this.allTranslations[targetLang]?.[namespace];
       console.log(`🔍 [TRANSLATOR] Not initialized, fallback failed:`, {
         namespace,
         actualKey,
         hasTranslations: !!translations,
-        translationsKeys: translations ? Object.keys(translations) : []
+        translationsKeys: translations ? Object.keys(translations) : [],
       });
     }
-    return this.config.missingKeyHandler?.(key, targetLang, 'default') || key;
+    return this.config.missingKeyHandler?.(key, targetLang, "default") || key;
   }
 
   /**
    * 다른 로드된 언어에서 번역 찾기 (언어 변경 중 깜빡임 방지)
    */
-  private findInOtherLanguages(namespace: string, key: string, targetLang: string): string | null {
-    if (!this.allTranslations || Object.keys(this.allTranslations).length === 0) {
+  private findInOtherLanguages(
+    namespace: string,
+    key: string,
+    targetLang: string,
+  ): string | null {
+    if (
+      !this.allTranslations ||
+      Object.keys(this.allTranslations).length === 0
+    ) {
       return null;
     }
 
@@ -351,15 +399,19 @@ export class Translator implements TranslatorInterface {
         }
       }
     }
-    
+
     return null;
   }
 
   /**
    * 폴백 언어에서 번역 찾기
    */
-  private findInFallbackLanguage(namespace: string, key: string, targetLang: string): string | null {
-    const fallbackLang = this.config.fallbackLanguage || 'en';
+  private findInFallbackLanguage(
+    namespace: string,
+    key: string,
+    targetLang: string,
+  ): string | null {
+    const fallbackLang = this.config.fallbackLanguage || "en";
     if (targetLang === fallbackLang) {
       return null;
     }
@@ -369,20 +421,24 @@ export class Translator implements TranslatorInterface {
       this.cacheStats.hits++;
       return result;
     }
-    
+
     return null;
   }
 
   /**
    * 번역 키를 번역된 텍스트로 변환
    */
-  translate(key: string, paramsOrLang?: Record<string, unknown> | string, language?: string): string {
+  translate(
+    key: string,
+    paramsOrLang?: Record<string, unknown> | string,
+    language?: string,
+  ): string {
     // 두 번째 인자 타입으로 분기
     let params: Record<string, unknown> | undefined;
     let targetLang: string;
-    if (typeof paramsOrLang === 'string') {
+    if (typeof paramsOrLang === "string") {
       targetLang = paramsOrLang;
-    } else if (typeof paramsOrLang === 'object' && paramsOrLang !== null) {
+    } else if (typeof paramsOrLang === "object" && paramsOrLang !== null) {
       params = paramsOrLang;
       targetLang = language || this.currentLang;
     } else {
@@ -392,13 +448,28 @@ export class Translator implements TranslatorInterface {
     // 초기화되지 않은 경우 처리
     if (!this.isInitialized) {
       const raw = this.translateBeforeInitialized(key, targetLang);
+      // translateBeforeInitialized returns key or missingKeyHandler result on miss
+      // Check defaultValue before returning the raw key
+      if (
+        (!raw || raw === key) &&
+        params &&
+        typeof params === "object" &&
+        "defaultValue" in params &&
+        typeof params.defaultValue === "string"
+      ) {
+        return this.interpolate(params.defaultValue, params);
+      }
       return params ? this.interpolate(raw, params) : raw;
     }
 
     const { namespace, key: actualKey } = this.parseKey(key);
 
     // 1단계: 현재 언어에서 찾기
-    let result: string | null = this.findInNamespace(namespace, actualKey, targetLang);
+    let result: string | null = this.findInNamespace(
+      namespace,
+      actualKey,
+      targetLang,
+    );
     if (result) {
       this.cacheStats.hits++;
       return params ? this.interpolate(result, params) : result;
@@ -419,38 +490,61 @@ export class Translator implements TranslatorInterface {
     // 모든 단계에서 찾지 못한 경우
     this.cacheStats.misses++;
 
+    // defaultValue가 제공된 경우 반환 (프로덕션/디버그 모두 적용)
+    if (
+      params &&
+      typeof params === "object" &&
+      "defaultValue" in params &&
+      typeof params.defaultValue === "string"
+    ) {
+      return this.interpolate(params.defaultValue, params);
+    }
+
     if (this.config.debug) {
-      const missing = this.config.missingKeyHandler?.(key, targetLang, namespace) || key;
+      const missing =
+        this.config.missingKeyHandler?.(key, targetLang, namespace) || key;
       return params ? this.interpolate(missing, params) : missing;
     }
 
     // 프로덕션에서는 빈 문자열 반환 (미싱 키 노출 방지)
-    return '';
+    return "";
   }
 
   /**
    * 네임스페이스에서 키 찾기
    */
-  private findInNamespace(namespace: string, key: string, language: string): string {
+  private findInNamespace(
+    namespace: string,
+    key: string,
+    language: string,
+  ): string {
     const translations = this.allTranslations[language]?.[namespace];
 
     if (!translations) {
       // 네임스페이스가 없으면 자동으로 로드 시도 (비동기, 백그라운드)
       const cacheKey = `${language}:${namespace}`;
-      if (!this.loadedNamespaces.has(cacheKey) && !this.loadingPromises.has(cacheKey)) {
+      if (
+        !this.loadedNamespaces.has(cacheKey) &&
+        !this.loadingPromises.has(cacheKey)
+      ) {
         // 로딩 시작 (비동기, 즉시 반환하지 않음)
-        this.loadTranslationData(language, namespace).catch(error => {
+        this.loadTranslationData(language, namespace).catch((error) => {
           if (this.config.debug) {
-            console.warn(`⚠️ [TRANSLATOR] Auto-load failed for ${language}/${namespace}:`, error);
+            console.warn(
+              `⚠️ [TRANSLATOR] Auto-load failed for ${language}/${namespace}:`,
+              error,
+            );
           }
         });
-        
+
         // 디버그 모드에서만 첫 시도 시에만 경고 출력 (중복 방지)
         if (this.config.debug) {
-          console.warn(`❌ [TRANSLATOR] No translations found for ${language}/${namespace}, attempting auto-load...`);
+          console.warn(
+            `❌ [TRANSLATOR] No translations found for ${language}/${namespace}, attempting auto-load...`,
+          );
         }
       }
-      return '';
+      return "";
     }
 
     // 직접 키 매칭
@@ -472,9 +566,11 @@ export class Translator implements TranslatorInterface {
     }
 
     if (this.config.debug) {
-      console.warn(`❌ [TRANSLATOR] No match found for key: ${key} in ${language}/${namespace}`);
+      console.warn(
+        `❌ [TRANSLATOR] No match found for key: ${key} in ${language}/${namespace}`,
+      );
     }
-    return '';
+    return "";
   }
 
   /**
@@ -482,28 +578,31 @@ export class Translator implements TranslatorInterface {
    * 배열도 지원: 최종 값이 string[]이면 그대로 반환
    */
   private getNestedValue(obj: unknown, path: string): unknown {
-    if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+    if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
       return undefined;
     }
 
-    return path.split('.').reduce((current: unknown, key: string) => {
+    return path.split(".").reduce((current: unknown, key: string) => {
       if (current == null) return undefined;
       if (Array.isArray(current)) {
         const idx = Number(key);
         return Number.isInteger(idx) ? current[idx] : undefined;
       }
-      if (typeof current === 'object' && key in (current as Record<string, unknown>)) {
+      if (
+        typeof current === "object" &&
+        key in (current as Record<string, unknown>)
+      ) {
         return (current as Record<string, unknown>)[key];
       }
       return undefined;
     }, obj);
   }
-  
+
   /**
    * 문자열 값인지 확인하는 타입 가드
    */
   private isStringValue(value: unknown): value is string {
-    return typeof value === 'string' && value.length > 0;
+    return typeof value === "string" && value.length > 0;
   }
 
   /**
@@ -511,7 +610,11 @@ export class Translator implements TranslatorInterface {
    * 배열 값이 t()에 전달되면 랜덤으로 하나를 선택하여 반환
    */
   private isStringArray(value: unknown): value is string[] {
-    return Array.isArray(value) && value.length > 0 && value.every(v => typeof v === 'string');
+    return (
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value.every((v) => typeof v === "string")
+    );
   }
 
   /**
@@ -522,7 +625,7 @@ export class Translator implements TranslatorInterface {
 
     if (!this.isInitialized) {
       if (this.config.debug) {
-        console.warn('Translator not initialized. Call initialize() first.');
+        console.warn("Translator not initialized. Call initialize() first.");
       }
       return undefined;
     }
@@ -547,12 +650,16 @@ export class Translator implements TranslatorInterface {
 
     // 폴백 언어에서 찾기
     if (targetLang !== this.config.fallbackLanguage) {
-      const fallbackTranslations = this.allTranslations[this.config.fallbackLanguage || 'en']?.[namespace];
+      const fallbackTranslations =
+        this.allTranslations[this.config.fallbackLanguage || "en"]?.[namespace];
       if (fallbackTranslations) {
         if (actualKey in fallbackTranslations) {
           return fallbackTranslations[actualKey] as T;
         }
-        const fallbackNestedValue = this.getNestedValue(fallbackTranslations, actualKey);
+        const fallbackNestedValue = this.getNestedValue(
+          fallbackTranslations,
+          actualKey,
+        );
         if (fallbackNestedValue !== undefined) {
           return fallbackNestedValue as T;
         }
@@ -567,10 +674,13 @@ export class Translator implements TranslatorInterface {
    */
   tArray(key: string, language?: string): string[] {
     const raw = this.getRawValue(key, language);
-    if (Array.isArray(raw) && raw.every((v: unknown) => typeof v === 'string')) {
+    if (
+      Array.isArray(raw) &&
+      raw.every((v: unknown) => typeof v === "string")
+    ) {
       return raw as string[];
     }
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.warn(`tArray: "${key}" is not a string array`);
     }
     return [];
@@ -597,20 +707,27 @@ export class Translator implements TranslatorInterface {
    * tPlural('common:total_count', 1) → en: "1 item" / ko: "총 1개"
    * tPlural('common:total_count', 5) → en: "5 items" / ko: "총 5개"
    */
-  tPlural(key: string, count: number, params?: Record<string, unknown>, language?: string): string {
+  tPlural(
+    key: string,
+    count: number,
+    params?: Record<string, unknown>,
+    language?: string,
+  ): string {
     const targetLang = language || this.currentLang;
     const raw = this.getRawValue(key, targetLang);
     const mergedParams: Record<string, unknown> = { count, ...params };
 
     // PluralValue 객체인 경우: Intl.PluralRules로 카테고리 결정
     if (isPluralValue(raw)) {
-      const category = this.getPluralRules(targetLang).select(count) as PluralCategory;
+      const category = this.getPluralRules(targetLang).select(
+        count,
+      ) as PluralCategory;
       const text = raw[category] ?? raw.other;
       return this.interpolate(text, mergedParams);
     }
 
     // fallback: plain string이면 interpolate만
-    if (typeof raw === 'string') {
+    if (typeof raw === "string") {
       return this.interpolate(raw, mergedParams);
     }
 
@@ -618,7 +735,7 @@ export class Translator implements TranslatorInterface {
     if (this.config.debug) {
       return this.interpolate(key, mergedParams);
     }
-    return '';
+    return "";
   }
 
   /**
@@ -652,15 +769,17 @@ export class Translator implements TranslatorInterface {
 
     // 새로운 언어의 데이터가 로드되지 않았다면 로드
     if (!this.allTranslations[language]) {
-      this.loadLanguageData(language).catch(error => {
+      this.loadLanguageData(language).catch((error) => {
         if (this.config.debug) {
-          console.warn('Failed to load language data:', error);
+          console.warn("Failed to load language data:", error);
         }
       });
     }
 
     if (this.config.debug) {
-      console.log(`🌐 [TRANSLATOR] Language changed: ${previousLanguage} -> ${language}`);
+      console.log(
+        `🌐 [TRANSLATOR] Language changed: ${previousLanguage} -> ${language}`,
+      );
     }
   }
 
@@ -677,15 +796,15 @@ export class Translator implements TranslatorInterface {
         const data = await this.safeLoadTranslations(language, namespace);
         this.allTranslations[language][namespace] = data;
         this.loadedNamespaces.add(`${language}:${namespace}`);
-        
+
         // 언어 변경 시 번역 로드 완료 알림
         this.notifyTranslationLoaded(language, namespace);
       } catch (error) {
         const translationError = this.createTranslationError(
-          'LOAD_FAILED',
+          "LOAD_FAILED",
           error as Error,
           language,
-          namespace
+          namespace,
         );
 
         this.logError(translationError);
@@ -713,7 +832,7 @@ export class Translator implements TranslatorInterface {
    * 지원되는 언어 목록 가져오기
    */
   getSupportedLanguages(): string[] {
-    return this.config.supportedLanguages?.map(lang => lang.code) || [];
+    return this.config.supportedLanguages?.map((lang) => lang.code) || [];
   }
 
   /**
@@ -738,7 +857,7 @@ export class Translator implements TranslatorInterface {
     this.cacheStats = { hits: 0, misses: 0 };
 
     if (this.config.debug) {
-      console.log('Cache cleared');
+      console.log("Cache cleared");
     }
   }
 
@@ -749,7 +868,7 @@ export class Translator implements TranslatorInterface {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: 5 * 60 * 1000 // 5분
+      ttl: 5 * 60 * 1000, // 5분
     });
   }
 
@@ -776,14 +895,14 @@ export class Translator implements TranslatorInterface {
    * 번역 오류 생성
    */
   private createTranslationError(
-    code: TranslationError['code'],
+    code: TranslationError["code"],
     originalError: Error,
     language?: string,
     namespace?: string,
-    key?: string
+    key?: string,
   ): TranslationError {
     return {
-      name: 'TranslationError',
+      name: "TranslationError",
       code,
       message: originalError.message,
       originalError,
@@ -791,7 +910,7 @@ export class Translator implements TranslatorInterface {
       namespace,
       key,
       timestamp: Date.now(),
-      stack: originalError.stack
+      stack: originalError.stack,
     };
   }
 
@@ -800,7 +919,11 @@ export class Translator implements TranslatorInterface {
    */
   private logError(error: TranslationError): void {
     if (this.config.errorHandler) {
-      this.config.errorHandler(error, error.language || '', error.namespace || '');
+      this.config.errorHandler(
+        error,
+        error.language || "",
+        error.namespace || "",
+      );
     }
   }
 
@@ -810,7 +933,7 @@ export class Translator implements TranslatorInterface {
   private async retryOperation<T>(
     operation: () => Promise<T>,
     error: TranslationError,
-    context: { language?: string; namespace?: string; key?: string }
+    context: { language?: string; namespace?: string; key?: string },
   ): Promise<T> {
     const maxRetries = 3;
     let lastError = error;
@@ -820,11 +943,11 @@ export class Translator implements TranslatorInterface {
         return await operation();
       } catch (retryError) {
         lastError = this.createTranslationError(
-          'RETRY_FAILED',
+          "RETRY_FAILED",
           retryError as Error,
           context.language,
           context.namespace,
-          context.key
+          context.key,
         );
 
         if (attempt === maxRetries) {
@@ -832,7 +955,9 @@ export class Translator implements TranslatorInterface {
         }
 
         // 지수 백오프
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.pow(2, attempt) * 1000),
+        );
       }
     }
 
@@ -842,18 +967,27 @@ export class Translator implements TranslatorInterface {
   /**
    * 안전한 번역 로드
    */
-  private async safeLoadTranslations(language: string, namespace: string): Promise<TranslationNamespace> {
+  private async safeLoadTranslations(
+    language: string,
+    namespace: string,
+  ): Promise<TranslationNamespace> {
     if (this.config.debug) {
-      console.log(`📥 [TRANSLATOR] safeLoadTranslations called:`, { language, namespace });
+      console.log(`📥 [TRANSLATOR] safeLoadTranslations called:`, {
+        language,
+        namespace,
+      });
     }
 
     const loadOperation = async (): Promise<TranslationNamespace> => {
       if (!this.config.loadTranslations) {
-        throw new Error('No translation loader configured');
+        throw new Error("No translation loader configured");
       }
 
       if (this.config.debug) {
-        console.log(`🔄 [TRANSLATOR] Calling loadTranslations for:`, { language, namespace });
+        console.log(`🔄 [TRANSLATOR] Calling loadTranslations for:`, {
+          language,
+          namespace,
+        });
       }
 
       const data = await this.config.loadTranslations(language, namespace);
@@ -863,7 +997,9 @@ export class Translator implements TranslatorInterface {
       }
 
       if (!isTranslationNamespace(data)) {
-        throw new Error(`Invalid translation data for ${language}:${namespace}`);
+        throw new Error(
+          `Invalid translation data for ${language}:${namespace}`,
+        );
       }
 
       return data;
@@ -873,13 +1009,16 @@ export class Translator implements TranslatorInterface {
       return await loadOperation();
     } catch (error) {
       const translationError = this.createTranslationError(
-        'LOAD_FAILED',
+        "LOAD_FAILED",
         error as Error,
         language,
-        namespace
+        namespace,
       );
 
-      return this.retryOperation(loadOperation, translationError, { language, namespace });
+      return this.retryOperation(loadOperation, translationError, {
+        language,
+        namespace,
+      });
     }
   }
 
@@ -895,14 +1034,16 @@ export class Translator implements TranslatorInterface {
       cacheSize: this.cache.size,
       allTranslations: this.allTranslations,
       initializationError: this.initializationError,
-      config: this.config
+      config: this.config,
     };
   }
 
   /**
    * SSR에서 하이드레이션
    */
-  hydrateFromSSR(translations: Record<string, Record<string, TranslationNamespace>>): void {
+  hydrateFromSSR(
+    translations: Record<string, Record<string, TranslationNamespace>>,
+  ): void {
     this.allTranslations = translations;
     this.isInitialized = true;
 
@@ -917,18 +1058,15 @@ export class Translator implements TranslatorInterface {
   /**
    * 비동기 번역 (고급 기능)
    */
-  async translateAsync(key: string, params?: Record<string, unknown>): Promise<string> {
+  async translateAsync(
+    key: string,
+    params?: Record<string, unknown>,
+  ): Promise<string> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
-    const translated = this.translate(key);
-
-    if (!params) {
-      return translated;
-    }
-
-    return this.interpolate(translated, params);
+    return this.translate(key, params);
   }
 
   /**
@@ -936,28 +1074,33 @@ export class Translator implements TranslatorInterface {
    */
   translateSync(key: string, params?: Record<string, unknown>): string {
     if (!this.isInitialized) {
+      // defaultValue support even before initialization
+      if (
+        params &&
+        typeof params === "object" &&
+        "defaultValue" in params &&
+        typeof params.defaultValue === "string"
+      ) {
+        return this.interpolate(params.defaultValue, params);
+      }
       if (this.config.debug) {
-        console.warn('Translator not initialized for sync translation');
+        console.warn("Translator not initialized for sync translation");
       }
       const { namespace } = this.parseKey(key);
-      return this.config.missingKeyHandler?.(key, this.currentLang, namespace) || key;
+      return (
+        this.config.missingKeyHandler?.(key, this.currentLang, namespace) || key
+      );
     }
 
-    const translated = this.translate(key);
-
-    if (!params) {
-      return translated;
-    }
-
-    return this.interpolate(translated, params);
+    return this.translate(key, params);
   }
 
   /**
    * 키 파싱 (네임스페이스:키 형식)
-   * 
+   *
    * - 콜론(:)만 네임스페이스 구분자로 사용
    * - 점(.)은 키 이름의 일부로 취급 (중첩 객체 접근용)
-   * 
+   *
    * @example
    * parseKey("home:hero.badge") → { namespace: "home", key: "hero.badge" }
    * parseKey("hero.badge") → { namespace: "common", key: "hero.badge" }
@@ -965,20 +1108,26 @@ export class Translator implements TranslatorInterface {
    */
   private parseKey(key: string): { namespace: string; key: string } {
     // 콜론(:)만 네임스페이스 구분자로 사용
-    const colonIndex = key.indexOf(':');
+    const colonIndex = key.indexOf(":");
     if (colonIndex !== -1) {
-      return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
+      return {
+        namespace: key.substring(0, colonIndex),
+        key: key.substring(colonIndex + 1),
+      };
     }
 
     // 콜론이 없으면 common 네임스페이스로 간주
     // 점(.)은 키 이름의 일부 (중첩 객체 접근은 getNestedValue에서 처리)
-    return { namespace: 'common', key };
+    return { namespace: "common", key };
   }
 
   /**
    * 번역 데이터 로드 (고급 기능)
    */
-  private async loadTranslationData(language: string, namespace: string): Promise<TranslationNamespace> {
+  private async loadTranslationData(
+    language: string,
+    namespace: string,
+  ): Promise<TranslationNamespace> {
     const cacheKey = `${language}:${namespace}`;
 
     // 이미 로드된 네임스페이스인지 확인
@@ -1013,24 +1162,26 @@ export class Translator implements TranslatorInterface {
 
     try {
       const data = await loadPromise;
-      
+
       // allTranslations에 저장 (중요: 이렇게 해야 findInNamespace에서 찾을 수 있음)
       if (!this.allTranslations[language]) {
         this.allTranslations[language] = {};
       }
       this.allTranslations[language][namespace] = data;
       this.loadedNamespaces.add(cacheKey);
-      
+
       // 캐시에도 저장
       this.setCacheEntry(cacheKey, data);
-      
+
       if (this.config.debug) {
-        console.log(`✅ [TRANSLATOR] Auto-loaded and saved ${language}/${namespace}`);
+        console.log(
+          `✅ [TRANSLATOR] Auto-loaded and saved ${language}/${namespace}`,
+        );
       }
-      
+
       // React 리렌더링 트리거 (디바운싱 적용)
       this.notifyTranslationLoaded(language, namespace);
-      
+
       return data;
     } finally {
       this.loadingPromises.delete(cacheKey);
@@ -1040,25 +1191,30 @@ export class Translator implements TranslatorInterface {
   /**
    * 실제 번역 데이터 로드
    */
-  private async _loadTranslationData(language: string, namespace: string): Promise<TranslationNamespace> {
+  private async _loadTranslationData(
+    language: string,
+    namespace: string,
+  ): Promise<TranslationNamespace> {
     if (!this.config.loadTranslations) {
-      throw new Error('No translation loader configured');
+      throw new Error("No translation loader configured");
     }
 
     try {
       const data = await this.config.loadTranslations(language, namespace);
 
       if (!isTranslationNamespace(data)) {
-        throw new Error(`Invalid translation data for ${language}:${namespace}`);
+        throw new Error(
+          `Invalid translation data for ${language}:${namespace}`,
+        );
       }
 
       return data;
     } catch (error) {
       const translationError = this.createTranslationError(
-        'LOAD_FAILED',
+        "LOAD_FAILED",
         error as Error,
         language,
-        namespace
+        namespace,
       );
 
       this.logError(translationError);
@@ -1073,9 +1229,9 @@ export class Translator implements TranslatorInterface {
 export function ssrTranslate({
   translations,
   key,
-  language = 'ko',
-  fallbackLanguage = 'en',
-  missingKeyHandler = (key: string) => key
+  language = "ko",
+  fallbackLanguage = "en",
+  missingKeyHandler = (key: string) => key,
 }: {
   translations: Record<string, Record<string, TranslationNamespace>>;
   key: string;
@@ -1086,7 +1242,14 @@ export function ssrTranslate({
   const { namespace, key: actualKey } = parseKey(key);
 
   // 현재 언어에서 찾기
-  let result = ssrFindInNamespace(translations, namespace, actualKey, language, fallbackLanguage, missingKeyHandler);
+  let result = ssrFindInNamespace(
+    translations,
+    namespace,
+    actualKey,
+    language,
+    fallbackLanguage,
+    missingKeyHandler,
+  );
 
   if (result) {
     return result;
@@ -1094,7 +1257,14 @@ export function ssrTranslate({
 
   // 폴백 언어에서 찾기
   if (language !== fallbackLanguage) {
-    result = ssrFindInNamespace(translations, namespace, actualKey, fallbackLanguage, fallbackLanguage, missingKeyHandler);
+    result = ssrFindInNamespace(
+      translations,
+      namespace,
+      actualKey,
+      fallbackLanguage,
+      fallbackLanguage,
+      missingKeyHandler,
+    );
     if (result) {
       return result;
     }
@@ -1109,12 +1279,12 @@ function ssrFindInNamespace(
   key: string,
   language: string,
   fallbackLanguage: string,
-  missingKeyHandler: (key: string) => string
+  missingKeyHandler: (key: string) => string,
 ): string {
   const namespaceData = translations[language]?.[namespace];
 
   if (!namespaceData) {
-    return '';
+    return "";
   }
 
   // 직접 키 매칭
@@ -1129,16 +1299,21 @@ function ssrFindInNamespace(
     return nestedValue;
   }
 
-  return '';
+  return "";
 }
 
 function getNestedValue(obj: unknown, path: string): unknown {
-  if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+  if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
     return undefined;
   }
 
-  return path.split('.').reduce((current: unknown, key: string) => {
-    if (current && typeof current === 'object' && !Array.isArray(current) && key in current) {
+  return path.split(".").reduce((current: unknown, key: string) => {
+    if (
+      current &&
+      typeof current === "object" &&
+      !Array.isArray(current) &&
+      key in current
+    ) {
       return (current as Record<string, unknown>)[key];
     }
     return undefined;
@@ -1149,34 +1324,37 @@ function getNestedValue(obj: unknown, path: string): unknown {
  * 문자열 값인지 확인하는 타입 가드
  */
 function isStringValue(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
+  return typeof value === "string" && value.length > 0;
 }
 
 /**
  * 키 파싱 (네임스페이스:키 형식) - SSR용 standalone 함수
- * 
+ *
  * - 콜론(:)만 네임스페이스 구분자로 사용
  * - 점(.)은 키 이름의 일부로 취급 (중첩 객체 접근용)
  */
 function parseKey(key: string): { namespace: string; key: string } {
   // 콜론(:)만 네임스페이스 구분자로 사용
-  const colonIndex = key.indexOf(':');
+  const colonIndex = key.indexOf(":");
   if (colonIndex !== -1) {
-    return { namespace: key.substring(0, colonIndex), key: key.substring(colonIndex + 1) };
+    return {
+      namespace: key.substring(0, colonIndex),
+      key: key.substring(colonIndex + 1),
+    };
   }
 
   // 콜론이 없으면 common 네임스페이스로 간주
-  return { namespace: 'common', key };
+  return { namespace: "common", key };
 }
 
 // 서버 번역 함수 (고급 기능 포함)
 export function serverTranslate({
   translations,
   key,
-  language = 'ko',
-  fallbackLanguage = 'en',
+  language = "ko",
+  fallbackLanguage = "en",
   missingKeyHandler = (key: string) => key,
-  options = {}
+  options = {},
 }: {
   translations: Record<string, unknown>; // 번역 데이터
   key: string; // 번역 키
@@ -1203,7 +1381,13 @@ export function serverTranslate({
   }
 
   // 번역 찾기
-  const result = findInTranslations(translations, key, language, fallbackLanguage, missingKeyHandler);
+  const result = findInTranslations(
+    translations,
+    key,
+    language,
+    fallbackLanguage,
+    missingKeyHandler,
+  );
 
   // 캐시에 저장
   if (cache && result) {
@@ -1222,7 +1406,7 @@ function findInTranslations(
   key: string,
   language: string,
   fallbackLanguage: string,
-  missingKeyHandler: (key: string) => string
+  missingKeyHandler: (key: string) => string,
 ): string {
   const { namespace, key: actualKey } = parseKey(key);
 
@@ -1235,49 +1419,62 @@ function findInTranslations(
 
   // 폴백 언어에서 찾기
   if (language !== fallbackLanguage) {
-    result = findInNamespace(translations, namespace, actualKey, fallbackLanguage);
+    result = findInNamespace(
+      translations,
+      namespace,
+      actualKey,
+      fallbackLanguage,
+    );
     if (result) {
       return result;
     }
   }
 
-  return '';
+  return "";
 }
 
 function findInNamespace(
   translations: Record<string, unknown>,
   namespace: string,
   key: string,
-  language: string
+  language: string,
 ): string {
   // 언어 데이터 가져오기
   const languageData = translations[language];
 
   // 언어 데이터가 객체인지 확인
-  if (!languageData || typeof languageData !== 'object' || Array.isArray(languageData)) {
-    return '';
+  if (
+    !languageData ||
+    typeof languageData !== "object" ||
+    Array.isArray(languageData)
+  ) {
+    return "";
   }
 
   // 네임스페이스 데이터 가져오기
   const namespaceData = (languageData as Record<string, unknown>)[namespace];
 
-  if (!namespaceData || typeof namespaceData !== 'object' || Array.isArray(namespaceData)) {
-    return '';
+  if (
+    !namespaceData ||
+    typeof namespaceData !== "object" ||
+    Array.isArray(namespaceData)
+  ) {
+    return "";
   }
 
   // 타입 단언: namespaceData는 객체임을 확인했으므로 Record로 단언
   const data = namespaceData as Record<string, unknown>;
 
   // 직접 키 매칭
-  if (data[key] && typeof data[key] === 'string') {
+  if (data[key] && typeof data[key] === "string") {
     return data[key] as string;
   }
 
   // 중첩 키 매칭
   const nestedValue = getNestedValue(namespaceData, key);
-  if (typeof nestedValue === 'string') {
+  if (typeof nestedValue === "string") {
     return nestedValue;
   }
 
-  return '';
+  return "";
 }

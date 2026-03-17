@@ -1,364 +1,213 @@
-# @hua-labs/dot Detailed Guide
+# @hua-labs/dot — Detailed Guide
 
-Cross-platform utility style engine that parses Tailwind-inspired utility strings into flat style objects for Web, React Native, and Flutter via a shared resolver pipeline and target-specific adapters.
+Complete technical reference for the cross-platform style engine.
 
 ---
 
 ## Table of Contents
 
-- [Architecture](#architecture)
-- [Installation & Setup](#installation--setup)
-- [Core Concepts](#core-concepts)
-- [API Reference](#api-reference)
-- [Advanced Usage](#advanced-usage)
-- [Integration Examples](#integration-examples)
-- [Troubleshooting](#troubleshooting)
+1. [Architecture](#architecture)
+2. [Installation & Configuration](#installation--configuration)
+3. [Core API](#core-api)
+4. [Resolver Modules](#resolver-modules)
+5. [Adapters](#adapters)
+6. [Variant System](#variant-system)
+7. [Class Mode](#class-mode)
+8. [Capability System](#capability-system)
+9. [Advanced Features](#advanced-features)
+10. [Caching](#caching)
+11. [Type Reference](#type-reference)
 
 ---
 
 ## Architecture
 
-### Resolver Pipeline
-
-Every call to `dot()` or `dotMap()` passes through a multi-stage pipeline:
-
-1. **Parser** — tokenizes the input string into `DotToken[]`, splitting on whitespace and extracting variants (prefixes before `:`), the `!important` flag, and arbitrary value brackets.
-2. **Variant categorizer** — classifies each token's variants as `dark`, `breakpoint`, `state`, or unsupported. Tokens with unsupported variants are silently skipped.
-3. **Token resolver** — maps each raw utility (e.g. `p-4`, `bg-blue-500`) to a partial `StyleObject` using one of 25 resolver modules. Results are stored in the token-level cache.
-4. **Layer merger** — places resolved objects into four buckets (`base`, `bpLayers`, `darkBase`, `darkBpLayers`) and cascades them in mobile-first order: `base → sm → md → lg → xl → 2xl → dark → dark:sm → ...`
-5. **Finalizer** — collapses internal accumulation keys: shadow/ring layers → `boxShadow`, gradient direction/stops → `backgroundImage`, divide keys are stripped.
-6. **Target adapter** — passes the finalized `StyleObject` to `adaptNative()`, `adaptFlutter()`, or returns as-is for web.
-
 ```
 Input string
     │
     ▼
-  parse()  →  DotToken[]
+ parser.ts          — tokenizes "p-4 dark:bg-gray-900 md:flex" into DotToken[]
     │
     ▼
-  resolveToken()  →  StyleObject per token   (token-level FIFO cache: 1000 entries)
+ resolver.ts         — dispatches each token to the matching resolver module
     │
     ▼
-  mergeStyle()  →  layered buckets
+ [25 resolver modules]  — spacing, color, typography, layout, border, flexbox,
+                          grid, shadow, ring, filter, backdrop, transform,
+                          animation, transition, opacity, z-index, positioning,
+                          gradient, line-clamp, interactivity, divide, object-fit,
+                          table, list, scroll
     │
     ▼
-  cascade + finalizeStyle()  →  clean StyleObject
+ index.ts (dot/dotMap)  — merges resolved layers in correct cascade order
+    │                      (base → sm → md → lg → dark → dark:sm → ...)
     │
-    ▼
-  adaptNative() / adaptFlutter() / identity
-    │
-    ▼
-  Final result  (input-level FIFO cache: 500 entries)
+    ├─ adaptWeb()        — identity, returns merged StyleObject as-is
+    ├─ adaptNative()     — px→number, transform→array, boxShadow→RN shadow props,
+    │                      45+ unsupported props silently dropped
+    └─ adaptFlutter()    — StyleObject → FlutterRecipe (BoxDecoration, EdgeInsets,
+                           TextStyle, Matrix4, FlutterConstraints, ...)
 ```
 
-### Adapter System
-
-Three adapters translate the web `StyleObject` into target-native formats:
-
-| Adapter        | Target      | Behavior                                                                                                                                                                                                                |
-| -------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `adaptWeb`     | `'web'`     | Identity — returns the object unchanged                                                                                                                                                                                 |
-| `adaptNative`  | `'native'`  | `px → number`, `transform → array`, `boxShadow → RN shadow props`, 45+ unsupported CSS properties silently dropped                                                                                                      |
-| `adaptFlutter` | `'flutter'` | Structured `FlutterRecipe` map — groups properties into `decoration`, `padding`, `margin`, `constraints`, `layout`, `flexChild`, `positioning`, `textStyle`, `transform`, `opacity`, `visible`, `aspectRatio`, `zIndex` |
-
-### Cache Layers
-
-dot uses a two-layer FIFO cache scoped to the module-level singleton:
-
-- **Input cache** — keyed on full context `(target, breakpoint, dark, input string)`. Capacity: 500 entries. A cache hit returns the final adapted result directly, skipping all pipeline stages.
-- **Token cache** — keyed on the raw utility string after variant stripping (e.g. `p-4`). Capacity: 1000 entries. Avoids re-resolving the same token within a batch.
-
-Both caches are reset by `clearDotCache()` or by calling `createDotConfig()` (which replaces the cache instance entirely).
-
-Cache can be disabled globally:
-
-```ts
-createDotConfig({ cache: false });
-```
-
-### Config System
-
-`createDotConfig()` applies a `DotUserConfig` deep-merge on top of the built-in token defaults and stores it as a module-level singleton. All subsequent calls to `dot()`, `dotMap()`, and `dotExplain()` read from this singleton.
-
-The config controls:
-
-| Field                  | Purpose                                              |
-| ---------------------- | ---------------------------------------------------- |
-| `theme.colors`         | Custom color palette (deep-merged into defaults)     |
-| `theme.spacing`        | Custom spacing scale                                 |
-| `theme.borderRadius`   | Custom radius tokens                                 |
-| `theme.fontSize`       | Custom font size tokens                              |
-| `theme.gridCols`       | Custom grid column tokens                            |
-| `theme.semanticColors` | CSS variable color bridge                            |
-| `breakpoints`          | Custom breakpoint name array                         |
-| `remBase`              | px-per-rem for `rem` conversion (default: 16)        |
-| `runtime`              | Default target: `'web'` \| `'native'` \| `'flutter'` |
-| `cache`                | Enable/disable caching (default: `true`)             |
-| `cacheSize`            | Override FIFO capacity                               |
-| `strictMode`           | Throw on unknown tokens                              |
-| `warnUnknown`          | `console.warn` on unknown tokens in dev              |
+The entire pipeline is synchronous and pure. No DOM access, no Dimensions API, no global state beyond the module-level config singleton and 2-layer FIFO cache.
 
 ---
 
-## Installation & Setup
-
-### Basic (Web / Node)
+## Installation & Configuration
 
 ```bash
 pnpm add @hua-labs/dot
-# or
-npm install @hua-labs/dot
 ```
 
-No peer dependencies. Zero runtime dependencies.
-
-```ts
-import { dot, dotMap, createDotConfig } from "@hua-labs/dot";
-
-const style = dot("p-4 flex items-center bg-primary-500 text-white rounded-lg");
-// { padding: '16px', display: 'flex', alignItems: 'center', ... }
-```
-
-### With React Native
-
-The package ships a `react-native` conditional export. Metro resolves it automatically, so no extra config is needed in most setups.
-
-```ts
-// Explicit native subpath — always returns RNStyleObject
-import { dot } from "@hua-labs/dot/native";
-
-const style = dot("p-4 rounded-lg shadow-lg");
-// { padding: 16, borderRadius: 8, shadowColor: '#000000', ... }
-```
-
-Alternatively, pass `target: 'native'` from the main entry:
+### Default usage (no config needed)
 
 ```ts
 import { dot } from "@hua-labs/dot";
 
-const style = dot("p-4 rounded-lg", { target: "native" });
-// { padding: 16, borderRadius: 8 }
+dot("p-4 flex items-center bg-primary-500 text-white rounded-lg");
 ```
 
-#### Metro resolver config (if needed)
-
-```js
-// metro.config.js
-const { getDefaultConfig } = require("expo/metro-config");
-const config = getDefaultConfig(__dirname);
-
-config.resolver.unstable_conditionNames = [
-  "react-native",
-  "require",
-  "default",
-];
-
-module.exports = config;
-```
-
-### With Flutter (Dart bridge)
-
-dot generates `FlutterRecipe` objects that a Dart FFI or JSON bridge can consume to drive widget composition on the Flutter side.
+### createDotConfig — full options
 
 ```ts
-import { dot, adaptFlutter } from "@hua-labs/dot";
-import type { FlutterRecipe } from "@hua-labs/dot";
+import { createDotConfig } from "@hua-labs/dot";
 
-// Via dot() directly
-const recipe = dot("p-4 bg-blue-500 rounded-lg", {
-  target: "flutter",
-}) as FlutterRecipe;
+createDotConfig({
+  // Default output target. Overridable per-call via options.target.
+  // Defaults to 'web'.
+  runtime: "web",
 
-// Via adaptFlutter() from an existing style object
-const recipe2 = adaptFlutter({
-  padding: "16px",
-  backgroundColor: "#3b82f6",
-  borderRadius: "8px",
+  // Token overrides — deep-merged with built-in defaults.
+  theme: {
+    colors: {
+      brand: { 500: "#6630E6", 700: "#4A1FA8" },
+    },
+    spacing: {
+      "18": "72px",
+      "22": "88px",
+    },
+    borderRadius: {
+      xl: "16px",
+    },
+    fontSize: {
+      display: "3.5rem",
+    },
+    fontWeight: {
+      black: 900,
+    },
+    fontFamily: {
+      brand: "'Inter', sans-serif",
+    },
+    lineHeight: {
+      relaxed: "1.75",
+    },
+    letterSpacing: {
+      widest: "0.15em",
+    },
+    shadows: {
+      card: "0 4px 12px rgba(0,0,0,0.08)",
+    },
+    gridCols: {
+      "7": "repeat(7, minmax(0, 1fr))",
+    },
+
+    // Semantic color tokens — mapped to CSS variables.
+    // Option 1: string[] — auto-maps to var(--color-{name})
+    semanticColors: ["sidebar", "sidebar-foreground", "chart-1"],
+    // Option 2: Record<string, string> — explicit variable references
+    // semanticColors: { brand: 'var(--my-brand)', accent: 'var(--theme-accent)' }
+
+    // Override CSS variable prefix for shorthand form. Defaults to '--color'.
+    semanticPrefix: "--color",
+  },
+
+  // Custom breakpoint names in mobile-first order.
+  // Defaults to ['sm', 'md', 'lg', 'xl', '2xl'].
+  breakpoints: ["sm", "md", "lg", "xl", "2xl"],
+
+  // Min-width values for custom breakpoints (used by class mode @media rules).
+  // Merged with defaults.
+  breakpointWidths: {
+    tablet: "900px",
+    desktop: "1280px",
+  },
+
+  // rem base for px↔rem/em conversion in native and flutter adapters.
+  // Defaults to 16.
+  remBase: 16,
+
+  // Enable caching. Defaults to true.
+  cache: true,
+
+  // Input cache capacity (Layer 1). Defaults to 500.
+  cacheSize: 500,
+
+  // Throw on unknown tokens. Defaults to false.
+  strictMode: false,
+
+  // console.warn on unknown tokens. Defaults to true in NODE_ENV=development.
+  warnUnknown: false,
 });
 ```
 
-Send the recipe to Flutter via `jsonEncode` and reconstruct widgets based on the structured fields. See the [Flutter recipe section](#flutter-recipe-interpretation) for field details.
+After calling `createDotConfig`, all subsequent `dot()` / `dotMap()` calls use the new config. Call `clearDotCache()` if you change config at runtime and need the cache cleared.
 
 ---
 
-## Core Concepts
+## Core API
 
-### Utility Resolution
+### dot(input, options?)
 
-dot resolves utility strings token by token. Each whitespace-separated token maps to one or more CSS properties via one of 25 resolver modules:
-
-`spacing` · `color` · `typography` · `layout` · `border` · `flexbox` · `z-index` · `shadow` · `opacity` · `transform` · `transition` · `animation` · `backdrop` · `positioning` · `grid` · `ring` · `filter` · `interactivity` · `line-clamp` · `gradient` · `object-fit` · `table` · `list` · `scroll` · `divide` (+ word-break, outline within shared resolvers)
-
-```ts
-dot("p-4 flex items-center gap-2 text-sm font-medium");
-// {
-//   padding: '16px',
-//   display: 'flex',
-//   alignItems: 'center',
-//   gap: '8px',
-//   fontSize: '14px',
-//   fontWeight: '500',
-// }
-```
-
-### Targets
-
-The `target` option (or `createDotConfig({ runtime })`) selects the output format:
-
-```ts
-// Web (default) — CSSProperties
-dot("p-4 rounded-lg");
-// { padding: '16px', borderRadius: '8px' }
-
-// React Native — RNStyleObject
-dot("p-4 rounded-lg rotate-45", { target: "native" });
-// { padding: 16, borderRadius: 8, transform: [{ rotate: '45deg' }] }
-
-// Flutter — FlutterRecipe
-dot("p-4 bg-blue-500 rounded-lg", { target: "flutter" });
-// { padding: { top: 16, right: 16, bottom: 16, left: 16 },
-//   decoration: { color: '#3b82f6', borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 8, bottomRight: 8 } } }
-```
-
-TypeScript overloads narrow the return type when `target` is a string literal:
-
-```ts
-const s1 = dot("p-4"); // StyleObject
-const s2 = dot("p-4", { target: "native" }); // RNStyleObject
-const s3 = dot("p-4", { target: "flutter" }); // FlutterRecipe
-```
-
-### Dark Mode
-
-Pass `dark: true` to activate `dark:` prefixed utilities. Without this flag, dark-prefixed tokens are silently skipped, so you can always pass the app's current color scheme:
-
-```ts
-dot("bg-white text-gray-900 dark:bg-gray-900 dark:text-white", {
-  dark: isDarkMode,
-});
-```
-
-In class mode, dark mode behavior is controlled by the `darkMode` option on `dotClass()`:
-
-```ts
-dotClass("bg-white dark:bg-gray-900", { darkMode: "class" });
-// Emits: .dot-xxx { background-color: #fff } .dark .dot-xxx { background-color: #111827 }
-
-dotClass("bg-white dark:bg-gray-900", { darkMode: "media" });
-// Emits: .dot-xxx { background-color: #fff } @media (prefers-color-scheme: dark) { .dot-xxx { ... } }
-```
-
-### Responsive Variants
-
-dot uses a mobile-first cascade. Breakpoints are applied only when `breakpoint` is set and only tokens at or below that breakpoint are included:
-
-```ts
-// Default breakpoints: sm (640px) | md (768px) | lg (1024px) | xl (1280px) | 2xl (1536px)
-dot("p-4 md:p-8 lg:p-12", { breakpoint: "lg" });
-// Mobile-first: base (p-4) → md (p-8) → lg (p-12)
-// { padding: '48px' }
-
-dot("p-4 md:p-8 lg:p-12", { breakpoint: "md" });
-// { padding: '32px' }
-
-dot("p-4 md:p-8 lg:p-12");
-// No active breakpoint → only base styles
-// { padding: '16px' }
-```
-
-### Arbitrary Values
-
-Square brackets escape arbitrary values, bypassing the token lookup:
-
-```ts
-dot("w-[300px] h-[calc(100vh-64px)] bg-[#ff0000] p-[2rem]");
-// { width: '300px', height: 'calc(100vh-64px)', backgroundColor: '#ff0000', padding: '2rem' }
-```
-
-Arbitrary values are also supported for colors with opacity modifier:
-
-```ts
-dot("bg-[#6630E6]/50");
-// { backgroundColor: 'rgb(102 48 230 / 0.5)' }
-```
-
-### Opacity Modifier
-
-Append `/N` to color utilities to set opacity (0–100):
-
-```ts
-dot("bg-primary-500/50 text-gray-900/80 border-blue-500/25");
-// backgroundColor: 'rgb(59 130 246 / 0.5)'
-// color: 'rgb(17 24 39 / 0.8)'
-// borderColor: 'rgb(59 130 246 / 0.25)'
-```
-
-### Negative Values
-
-Prefix utilities with `-` for negative values:
-
-```ts
-dot("-m-4 -top-2 -translate-x-4");
-// { margin: '-16px', top: '-8px', transform: 'translateX(-16px)' }
-```
-
-### !important Modifier
-
-Prefix a utility with `!` to mark all its output values as `!important`:
-
-```ts
-dot("!p-4 !bg-white");
-// { padding: '16px !important', backgroundColor: '#ffffff !important' }
-```
-
-`!important` propagates correctly through shadow and ring composition — if any layer has `!important`, the final `boxShadow` string is also marked.
-
----
-
-## API Reference
-
-### `dot(input, options?)`
-
-Converts a utility string into a style object. Returns `StyleObject` (web), `RNStyleObject` (native), or `FlutterRecipe` (flutter) based on the `target` option.
+Converts a utility string to a style object.
 
 ```ts
 function dot(
   input: string | undefined | null,
   options?: DotOptions,
 ): StyleObject;
-function dot(
-  input: string | undefined | null,
-  options: DotOptions & { target: "native" },
-): RNStyleObject;
-function dot(
-  input: string | undefined | null,
-  options: DotOptions & { target: "flutter" },
-): FlutterRecipe;
+// Overloads narrow the return type by target literal:
+function dot(input, options: { target: "native" }): RNStyleObject;
+function dot(input, options: { target: "flutter" }): FlutterRecipe;
 ```
 
-**DotOptions:**
+**Options:**
 
-| Property     | Type                             | Default          | Description                                   |
-| ------------ | -------------------------------- | ---------------- | --------------------------------------------- |
-| `dark`       | `boolean`                        | `false`          | Activate `dark:` variant utilities            |
-| `breakpoint` | `string`                         | —                | Active breakpoint name for responsive cascade |
-| `target`     | `'web' \| 'native' \| 'flutter'` | config `runtime` | Output target adapter                         |
+| Option       | Type                             | Description                                                               |
+| ------------ | -------------------------------- | ------------------------------------------------------------------------- |
+| `dark`       | `boolean`                        | Apply `dark:` variant classes                                             |
+| `breakpoint` | `string`                         | Active breakpoint for mobile-first cascade (`'sm'`, `'md'`, `'lg'`, etc.) |
+| `target`     | `'web' \| 'native' \| 'flutter'` | Override the global runtime for this call                                 |
 
 ```ts
-dot("bg-white dark:bg-gray-900 md:p-8", {
-  dark: true,
-  breakpoint: "md",
-  target: "web",
-});
+// Web — returns CSSProperties-compatible object
+dot("p-4 flex items-center");
+// { padding: '16px', display: 'flex', alignItems: 'center' }
+
+// Native — px values become numbers
+dot("p-4 rounded-lg", { target: "native" });
+// { padding: 16, borderRadius: 8 }
+
+// Flutter — returns FlutterRecipe
+dot("p-4 bg-blue-500", { target: "flutter" });
+// { padding: { top: 16, ... }, decoration: { color: '#3b82f6' } }
+
+// Dark mode
+dot("bg-white text-black dark:bg-gray-900 dark:text-white", { dark: true });
+// { backgroundColor: '#111827', color: '#ffffff' }
+
+// Responsive — mobile-first, cascades up to the active breakpoint
+dot("p-2 sm:p-4 md:p-6 lg:p-8", { breakpoint: "md" });
+// { padding: '24px' }  (base + sm + md applied)
+
+// Null/undefined safe — returns {}
+dot(null);
+dot(undefined);
+dot("  ");
 ```
 
-If `input` is `null`, `undefined`, or empty string, `dot()` returns `{}`.
+### dotMap(input, options?)
 
----
-
-### `dotMap(input, options?)`
-
-Like `dot()`, but also resolves state variants (`hover:`, `focus:`, `active:`, `focus-visible:`, `focus-within:`, `disabled:`) into separate style objects.
+Same signature and type overloads as `dot()`. Resolves state variants into separate style objects instead of ignoring them.
 
 ```ts
 function dotMap(
@@ -367,391 +216,348 @@ function dotMap(
 ): DotStyleMap<StyleObject>;
 ```
 
-**Return type — DotStyleMap:**
+State variants: `hover:`, `focus:`, `active:`, `focus-visible:`, `focus-within:`, `disabled:`
 
 ```ts
-interface DotStyleMap<T = StyleObject> {
-  base: T;
-  hover?: T;
-  focus?: T;
-  active?: T;
-  "focus-visible"?: T;
-  "focus-within"?: T;
-  disabled?: T;
-}
-```
-
-```ts
-const styles = dotMap('bg-white hover:bg-gray-100 focus:ring-2 disabled:opacity-50');
+const styles = dotMap("bg-white hover:bg-gray-100 focus:ring-2 disabled:opacity-50");
 // {
 //   base: { backgroundColor: '#ffffff' },
 //   hover: { backgroundColor: '#f3f4f6' },
-//   focus: { boxShadow: '0 0 0 2px ...' },
-//   disabled: { opacity: '0.5' },
+//   focus: { boxShadow: '0 0 0 3px ...' },
+//   disabled: { opacity: 0.5 },
 // }
 
-// React usage — apply handlers manually:
-<div
-  style={styles.base}
-  onMouseEnter={e => Object.assign(e.currentTarget.style, styles.hover)}
-  onMouseLeave={e => Object.assign(e.currentTarget.style, styles.base)}
-/>
+// React usage — attach styles via event handlers
+function Button({ children }) {
+  const [hovered, setHovered] = useState(false);
+  const s = dotMap("bg-primary-500 hover:bg-primary-700 focus:ring-2");
+  return (
+    <button
+      style={{ ...s.base, ...(hovered ? s.hover : {}) }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+    </button>
+  );
+}
 ```
 
-Same type-safe overloads as `dot()` apply for `native` and `flutter` targets.
+### dotExplain(input, options?)
 
----
-
-### `dotExplain(input, options?)`
-
-Resolves a utility string and returns both the style result and a capability report for the active target. On `'web'` target, the report is always empty (`{}`).
+Resolves styles and returns a capability report. Useful for debugging cross-platform compatibility.
 
 ```ts
-function dotExplain(
-  input: string | undefined | null,
-  options?: DotOptions,
-): DotExplainResult;
-
 interface DotExplainResult {
   styles: StyleObject | RNStyleObject | FlutterRecipe;
   report: DotCapabilityReport;
 }
 
-interface DotCapabilityReport {
-  _dropped?: string[]; // CSS properties with no equivalent on target
-  _approximated?: string[]; // Properties mapped with loss of fidelity
-  _capabilities?: Record<string, CapabilityLevel>; // Level per property
-  _details?: Record<string, string[]>; // Human-readable approximation notes
-}
-```
-
-```ts
-const result = dotExplain("p-4 blur-md grid grid-cols-3 transition-all", {
-  target: "native",
-});
-
-// result.styles → { padding: 16 }  (only what native supports)
-// result.report → {
-//   _dropped: ['filter', 'gridTemplateColumns', 'transitionProperty'],
-//   _capabilities: {
-//     filter: 'unsupported',
-//     gridTemplateColumns: 'unsupported',
-//     transitionProperty: 'unsupported',
+dotExplain("p-4 blur-md grid grid-cols-3 transition-all", { target: "native" });
+// {
+//   styles: { padding: 16 },
+//   report: {
+//     _dropped: ['filter', 'gridTemplateColumns', 'transitionProperty', ...],
+//     _approximated: [],
+//     _capabilities: { filter: 'unsupported', grid: 'unsupported', transition: 'unsupported' }
 //   }
 // }
 ```
 
-Use `dotExplain()` during development to audit cross-platform compatibility before shipping a utility string to a non-web target.
+For `target: 'web'`, the report is always empty `{}` — all properties are natively supported.
 
 ---
 
-### `dotVariants(config)`
+## Resolver Modules
 
-CVA-style variant factory. Returns a callable function that resolves the correct dot utility string based on provided props.
+Each module handles a specific group of Tailwind-compatible utility prefixes:
+
+| Module          | Handles                                                                                                                                                                                         |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spacing`       | `p-`, `m-`, `px-`, `py-`, `pt-`, `pr-`, `pb-`, `pl-`, `gap-`, `gap-x-`, `gap-y-`, `space-x-`, `space-y-`                                                                                        |
+| `color`         | `bg-{color}-{shade}`, `text-{color}`, `border-{color}`, opacity modifiers `/50`                                                                                                                 |
+| `typography`    | `text-{size}`, `font-{weight/family}`, `leading-`, `tracking-`, `uppercase`, `italic`, `truncate`, `text-{align}`                                                                               |
+| `layout`        | `flex`, `block`, `grid`, `inline`, `hidden`, `overflow-`, `aspect-ratio-`                                                                                                                       |
+| `border`        | `border`, `border-{side}`, `border-{width}`, `border-{style}`, `rounded-`, `rounded-{corner}-`                                                                                                  |
+| `flexbox`       | `flex-row`, `flex-col`, `flex-wrap`, `items-`, `justify-`, `self-`, `content-`, `flex-{grow/shrink}`, `flex-basis-`, `order-`                                                                   |
+| `grid`          | `grid-cols-`, `grid-rows-`, `col-span-`, `row-span-`, `col-start-`, `col-end-`                                                                                                                  |
+| `shadow`        | `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl`, `shadow-2xl`, `shadow-none` (composes with ring into `boxShadow`)                                                                           |
+| `ring`          | `ring-`, `ring-{color}`, `ring-offset-` (prepended before shadow in final `boxShadow`)                                                                                                          |
+| `z-index`       | `z-0`, `z-10`, `z-20`, `z-30`, `z-40`, `z-50`, `z-auto`                                                                                                                                         |
+| `positioning`   | `static`, `relative`, `absolute`, `fixed`, `sticky`, `top-`, `right-`, `bottom-`, `left-`, `inset-`                                                                                             |
+| `opacity`       | `opacity-0`, `opacity-25`, `opacity-50`, `opacity-75`, `opacity-100`                                                                                                                            |
+| `transform`     | `rotate-`, `scale-`, `scale-x-`, `scale-y-`, `translate-x-`, `translate-y-`, `skew-x-`, `skew-y-`, `origin-` (accumulates into single `transform` string)                                       |
+| `animation`     | `animate-spin`, `animate-ping`, `animate-pulse`, `animate-bounce`                                                                                                                               |
+| `transition`    | `transition-`, `duration-`, `ease-`, `delay-`                                                                                                                                                   |
+| `filter`        | `blur-`, `brightness-`, `contrast-`, `grayscale-`, `hue-rotate-`, `invert-`, `saturate-`, `sepia-`, `drop-shadow-`                                                                              |
+| `backdrop`      | `backdrop-blur-`, `backdrop-brightness-`, `backdrop-contrast-`, `backdrop-grayscale-`, `backdrop-hue-rotate-`, `backdrop-invert-`, `backdrop-opacity-`, `backdrop-saturate-`, `backdrop-sepia-` |
+| `gradient`      | `bg-gradient-to-{r/l/t/b/tr/tl/br/bl}`, `from-`, `via-`, `to-`, position modifiers `from-10%`                                                                                                   |
+| `line-clamp`    | `line-clamp-{1-6}`, `line-clamp-none`                                                                                                                                                           |
+| `interactivity` | `cursor-`, `select-`, `resize-`, `pointer-events-`                                                                                                                                              |
+| `divide`        | `divide-x-`, `divide-y-`, `divide-reverse` (class mode only — produces child-combinator CSS, no inline style)                                                                                   |
+| `object-fit`    | `object-contain`, `object-cover`, `object-fill`, `object-none`, `object-scale-down`                                                                                                             |
+| `table`         | `table`, `table-auto`, `table-fixed`, `border-collapse`, `border-separate`                                                                                                                      |
+| `list`          | `list-none`, `list-disc`, `list-decimal`, `list-inside`, `list-outside`                                                                                                                         |
+| `scroll`        | `scroll-smooth`, `scroll-auto`, `scroll-m-`, `scroll-p-`                                                                                                                                        |
+| `outline`       | `outline-none`, `outline`, `outline-{style}`, `outline-{color}`, `outline-{width}`, `outline-offset-`                                                                                           |
+
+> `utils.ts` is an internal helpers module, not a public resolver.
+
+---
+
+## Adapters
+
+### adaptWeb
+
+Identity adapter. Returns the input `StyleObject` unchanged. Included for structural symmetry.
 
 ```ts
-function dotVariants<V extends VariantShape>(
-  config: DotVariantsConfig<V>,
-): DotVariantsFn<V>;
-
-interface DotVariantsConfig<V> {
-  base?: string;
-  variants?: V;
-  defaultVariants?: Partial<VariantProps<V>>;
-  compoundVariants?: CompoundVariant<V>[];
-}
+import { adaptWeb } from "@hua-labs/dot";
+adaptWeb({ padding: "16px" }); // → { padding: '16px' }
 ```
 
+### adaptNative
+
+Converts a web `StyleObject` to a React Native `StyleSheet`-compatible object.
+
 ```ts
-const button = dotVariants({
-  base: "inline-flex items-center font-medium rounded-lg transition-colors",
-  variants: {
-    intent: {
-      primary: "bg-primary-500 text-white hover:bg-primary-600",
-      secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-      danger: "bg-red-500 text-white hover:bg-red-600",
-    },
-    size: {
-      sm: "px-3 py-1.5 text-sm",
-      md: "px-4 py-2 text-base",
-      lg: "px-6 py-3 text-lg",
-    },
-    disabled: {
-      true: "opacity-50 cursor-not-allowed",
-    },
-  },
-  defaultVariants: {
-    intent: "primary",
-    size: "md",
-  },
-  compoundVariants: [
-    {
-      conditions: { intent: "primary", size: "lg" },
-      dot: "shadow-lg",
-    },
-  ],
+import { adaptNative } from "@hua-labs/dot";
+
+adaptNative({
+  padding: "16px",
+  borderRadius: "8px",
+  transform: "rotate(45deg)",
 });
-
-const style = button({ intent: "secondary", size: "sm" });
-// Resolves to merged StyleObject for secondary + sm
-
-// With TypeScript — VariantProps extracts the prop types:
-type ButtonProps = VariantProps<typeof button>;
+// { padding: 16, borderRadius: 8, transform: [{ rotate: '45deg' }] }
 ```
 
----
+**Conversion rules:**
 
-### `dotCx(...inputs)`
+- `px` values → plain numbers (`padding: '16px'` → `padding: 16`)
+- `rem`/`em` → multiplied by `remBase` (default 16) then converted to number
+- `transform` string → array of `{ fnName: value }` entries
+- `boxShadow` → `{ shadowColor, shadowOffset, shadowOpacity, shadowRadius, elevation }`
+- `objectFit` → `resizeMode` (`cover`, `contain`, `stretch`, `center`)
+- `WebkitLineClamp` → `numberOfLines`
+- `display` → only `'flex'` and `'none'` pass through
+- `opacity`, `flexGrow`, `flexShrink` → `parseFloat`
+- `zIndex`, `order` → `parseInt`
+- `lineHeight` unitless multiplier → absolute pixels (`fontSize * multiplier`)
+- CSS custom properties (`--*`) → dropped
+- CSS variable values (`var(...)`) → dropped
+- **45+ unsupported props dropped silently** — see full list: animation, transition, backdropFilter, cursor, outline, grid\*, filter, userSelect, float, clear, isolation, table/border-collapse/list-style/scroll-\*, willChange, touchAction, textIndent, wordBreak, backgroundImage, backgroundClip, overflow-x/y, visibility
 
-clsx replacement — filters falsy values and joins utility strings. Performs no style computation; useful for conditional string building before passing to `dot()`.
-
-```ts
-function dotCx(...inputs: (string | false | null | undefined | 0)[]): string;
-```
-
-```ts
-const input = dotCx(
-  "p-4 flex",
-  isActive && "bg-primary-500",
-  isDisabled && "opacity-50 cursor-not-allowed",
-  hasError ? "border-red-500" : "border-gray-300",
-);
-// 'p-4 flex bg-primary-500 border-gray-300'  (if isActive=true, isDisabled=false, hasError=false)
-
-const style = dot(input);
-```
-
----
-
-### `adaptNative(cssProps, options?)`
-
-Directly convert a web `CSSProperties` object to `RNStyleObject`. Useful when you already have a plain style object from another source.
+**Options:**
 
 ```ts
-function adaptNative(
-  style: StyleObject,
-  options?: AdaptNativeOptions,
-): RNStyleObject;
-
 interface AdaptNativeOptions {
-  remBase?: number; // px-per-rem (default: 16)
-  warnDropped?: boolean; // console.warn dropped properties in dev
+  remBase?: number; // default 16
+  warnDropped?: boolean; // emit console.warn for dropped props (once per property)
 }
 ```
 
-Conversions performed:
-
-- `'16px'` → `16` (numeric)
-- `'1rem'` → `16` (rem → px using remBase)
-- `transform: 'rotate(45deg) scale(1.1)'` → `[{ rotate: '45deg' }, { scale: 1.1 }]`
-- `boxShadow` → `shadowColor`, `shadowOffset`, `shadowOpacity`, `shadowRadius` (first non-inset layer only)
-- 45+ CSS properties with no RN equivalent are silently dropped (e.g. `filter`, `transition`, `cursor`, `gridTemplateColumns`)
+The RN subpath (`@hua-labs/dot/native`) auto-sets `target: 'native'` without needing explicit options:
 
 ```ts
-adaptNative(
-  {
-    padding: "16px",
-    transform: "rotate(45deg)",
-    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
-    filter: "blur(4px)", // dropped
-  },
-  { warnDropped: true },
-);
-
-// {
-//   padding: 16,
-//   transform: [{ rotate: '45deg' }],
-//   shadowColor: '#000000',
-//   shadowOffset: { width: 0, height: 4 },
-//   shadowOpacity: 0.1,
-//   shadowRadius: 3,
-// }
+import { dot } from "@hua-labs/dot/native";
+dot("p-4 rounded-lg"); // → RNStyleObject automatically
 ```
 
----
+Metro resolves the `react-native` conditional export automatically.
 
-### `adaptFlutter(cssProps, options?)`
+### adaptFlutter
 
-Convert a web `CSSProperties` object to a `FlutterRecipe`. The recipe is a structured map that a Flutter Dart bridge or codegen tool uses to drive widget composition.
-
-```ts
-function adaptFlutter(
-  style: StyleObject,
-  options?: AdaptFlutterOptions,
-): FlutterRecipe;
-
-interface AdaptFlutterOptions {
-  remBase?: number; // default: 16
-}
-```
-
-**FlutterRecipe fields:**
-
-| Field                 | Flutter widget concept        | CSS source                                                  |
-| --------------------- | ----------------------------- | ----------------------------------------------------------- |
-| `decoration`          | `BoxDecoration`               | `backgroundColor`, `borderRadius`, `border`, `boxShadow`    |
-| `decoration.gradient` | `LinearGradient`              | `backgroundImage: linear-gradient(...)`                     |
-| `padding`             | `EdgeInsets`                  | `padding*`                                                  |
-| `margin`              | `EdgeInsets`                  | `margin*`                                                   |
-| `constraints`         | `SizedBox` / `BoxConstraints` | `width`, `height`, `minWidth`, `maxWidth`, etc.             |
-| `layout`              | `Row` / `Column` layout hints | `flexDirection`, `justifyContent`, `alignItems`, `flexWrap` |
-| `flexChild`           | `Flexible` / `Expanded`       | `flexGrow`, `flexShrink`, `flexBasis`                       |
-| `positioning`         | `Positioned`                  | `position: absolute`, `top`, `right`, `bottom`, `left`      |
-| `textStyle`           | `TextStyle`                   | `color`, `fontSize`, `fontWeight`, `letterSpacing`, etc.    |
-| `transform`           | `Matrix4` hint                | `transform`                                                 |
-| `opacity`             | `Opacity.opacity`             | `opacity`                                                   |
-| `visible`             | `Visibility.visible`          | `visibility`                                                |
-| `aspectRatio`         | `AspectRatio.aspectRatio`     | `aspectRatio`                                               |
-| `zIndex`              | `Stack` z-ordering            | `zIndex`                                                    |
+Converts a web `StyleObject` to a `FlutterRecipe` — a structured widget composition map that a Flutter renderer or SDUI engine maps to actual Flutter widgets.
 
 ```ts
+import { adaptFlutter } from "@hua-labs/dot";
+import type { FlutterRecipe } from "@hua-labs/dot";
+
 const recipe = adaptFlutter({
   padding: "16px",
   backgroundColor: "#3b82f6",
   borderRadius: "8px",
   fontSize: "16px",
-  fontWeight: "600",
+  fontWeight: "700",
   color: "#ffffff",
-});
+  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+}) as FlutterRecipe;
+```
 
-// {
-//   padding: { top: 16, right: 16, bottom: 16, left: 16 },
-//   decoration: {
-//     color: '#3b82f6',
-//     borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 8, bottomRight: 8 },
-//   },
-//   textStyle: { fontSize: 16, fontWeight: '600', color: '#ffffff' },
-// }
+**FlutterRecipe structure:**
+
+| Field         | Flutter equivalent             | Populated by                                                                                                                       |
+| ------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `decoration`  | `BoxDecoration`                | bg color, border, borderRadius, boxShadow, gradient                                                                                |
+| `padding`     | `EdgeInsets.only()`            | `padding-*`                                                                                                                        |
+| `margin`      | `EdgeInsets.only()`            | `margin-*`                                                                                                                         |
+| `constraints` | `SizedBox` / `ConstrainedBox`  | `width`, `height`, `min-*`, `max-*`, `w-full`→`expandWidth`                                                                        |
+| `layout`      | `Row` / `Column` / `Wrap`      | `flex-direction`, `justify-content`, `align-items`, `flex-wrap`                                                                    |
+| `flexChild`   | `Flexible` / `Expanded`        | `flex-grow`, `flex-shrink`, `order`                                                                                                |
+| `positioning` | `Positioned` (inside `Stack`)  | `position`, `top`, `right`, `bottom`, `left`                                                                                       |
+| `textStyle`   | `TextStyle`                    | `font-size`, `font-weight`, `font-family`, `color`, `letter-spacing`, `line-height`, `text-decoration`, `text-align`, `line-clamp` |
+| `transform`   | `Matrix4` / `Transform` widget | `transform` — parsed into rotate/scale/translate/skew                                                                              |
+| `opacity`     | `Opacity` widget               | `opacity`                                                                                                                          |
+| `visible`     | `Visibility` widget            | `visibility`                                                                                                                       |
+| `aspectRatio` | `AspectRatio` widget           | `aspect-ratio`                                                                                                                     |
+| `zIndex`      | ordering in `Stack`            | `z-index`                                                                                                                          |
+| `_dropped`    | —                              | Properties not mappable to any Flutter concept                                                                                     |
+
+**FlutterGradient** (`decoration.gradient`): produced by gradient utilities — `bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500` → `{ type: 'linear', begin: 'centerLeft', end: 'centerRight', colors: [...], stops?: [...] }`.
+
+**Options:**
+
+```ts
+interface AdaptFlutterOptions {
+  remBase?: number; // default 16
+}
 ```
 
 ---
 
-### `createDotConfig(userConfig?)`
+## Variant System
 
-Set the global token configuration. Deep-merges `userConfig.theme` into the built-in token defaults, rebuilds the config singleton, and resets caches.
+### dotVariants
 
-```ts
-function createDotConfig(userConfig?: DotUserConfig): DotConfig;
-```
+CVA-style variant factory. Returns a function that accepts variant props and produces a merged `StyleObject`.
 
 ```ts
-createDotConfig({
-  theme: {
-    colors: {
-      brand: { 500: "#6630E6", 600: "#5520D0" },
-      surface: "#1c1c1e",
+import { dotVariants } from "@hua-labs/dot";
+
+const badge = dotVariants({
+  // Applied to all variants
+  base: "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+
+  variants: {
+    variant: {
+      default: "bg-primary-500 text-white border-transparent",
+      secondary: "bg-gray-100 text-gray-900 border-transparent",
+      destructive: "bg-red-500 text-white border-transparent",
+      outline: "border-border text-foreground",
     },
-    spacing: { "18": "72px", "22": "88px" },
-    borderRadius: { pill: "9999px" },
-    fontSize: { "2xs": "10px" },
-  },
-  breakpoints: ["mobile", "tablet", "desktop"],
-  remBase: 16,
-  runtime: "web",
-  strictMode: false,
-  warnUnknown: true,
-});
-
-dot("bg-brand-500 p-18 rounded-pill");
-// { backgroundColor: '#6630E6', padding: '72px', borderRadius: '9999px' }
-
-dot("p-4 tablet:p-8", { breakpoint: "tablet" });
-// { padding: '32px' }
-```
-
-Calling `createDotConfig()` always resets both cache layers.
-
----
-
-### `clearDotCache()`
-
-Clear both input and token caches without changing config. Use after config changes performed outside of `createDotConfig()`, or to free memory in long-running processes.
-
-```ts
-function clearDotCache(): void;
-```
-
-```ts
-clearDotCache();
-// Next dot() call will resolve fresh from scratch
-```
-
----
-
-### `semanticVars(...names)` / `semanticVars(options, ...names)`
-
-Generate semantic color token mappings that point to CSS variables. Pass the result to `createDotConfig({ theme: { semanticColors: ... } })` to enable `bg-background`, `text-foreground`, etc. in utility strings.
-
-```ts
-function semanticVars(...names: string[]): Record<string, string>;
-function semanticVars(
-  options: { prefix: string },
-  ...names: string[]
-): Record<string, string>;
-```
-
-Default prefix is `--color`, producing `var(--color-<name>)`.
-
-```ts
-import { semanticVars, createDotConfig } from "@hua-labs/dot";
-
-createDotConfig({
-  theme: {
-    semanticColors: {
-      // Default --color prefix
-      ...semanticVars(
-        "background",
-        "foreground",
-        "card",
-        "muted",
-        "accent",
-        "border",
-      ),
-      // Custom prefix
-      ...semanticVars({ prefix: "--ui" }, "primary", "secondary"),
-      // Explicit mapping
-      brand: "var(--my-brand-color)",
+    size: {
+      sm: "text-xs px-2 py-0.5",
+      md: "text-sm px-2.5 py-1",
     },
   },
+
+  defaultVariants: {
+    variant: "default",
+    size: "md",
+  },
+
+  // Applied when multiple variant conditions match simultaneously
+  compoundVariants: [
+    {
+      conditions: { variant: "destructive", size: "sm" },
+      dot: "font-bold",
+    },
+  ],
 });
 
-dot("bg-background text-foreground border-border");
-// { backgroundColor: 'var(--color-background)',
-//   color: 'var(--color-foreground)',
-//   borderColor: 'var(--color-border)' }
+badge(); // base + default + md
+badge({ variant: "outline" }); // base + outline + md
+badge({ variant: "destructive", size: "sm" }); // base + destructive + sm + compoundVariant
 ```
 
-The 17 built-in semantic token names (always available without config): `background`, `foreground`, `card`, `card-foreground`, `popover`, `popover-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `destructive`, `border`, `ring`.
+**Notes:**
+
+- Variant styles are shallow-merged in order: base → variant axes → compound variants
+- The underlying `dot()` function is called lazily per unique variant string and cached
+- Flutter target is not supported — `FlutterRecipe` uses nested objects incompatible with shallow merge. Use `dot(input, { target: 'flutter' })` directly.
+
+### dotCx
+
+Filters falsy values and joins utility strings. No style resolution.
+
+```ts
+import { dotCx } from "@hua-labs/dot";
+
+dotCx("p-4", isActive && "bg-primary-500", undefined, false, "rounded-lg");
+// → "p-4 bg-primary-500 rounded-lg"
+```
 
 ---
 
-### `CAPABILITY_MATRIX`
+## Class Mode
 
-Static constant mapping utility family names to per-target support levels.
+Import from the `/class` subpath. Produces stable CSS class names and rulesets instead of inline style objects. Suitable for SSR and for utilities that require child combinators (like `divide-x`).
 
 ```ts
-const CAPABILITY_MATRIX: Record<
-  string,
-  Partial<Record<DotTarget, CapabilityLevel>>
->;
-
-type CapabilityLevel =
-  | "native"
-  | "approximate"
-  | "recipe-only"
-  | "plugin-backed"
-  | "unsupported";
+import { dotClass, dotCSS, dotFlush, dotReset } from "@hua-labs/dot/class";
 ```
 
-Support levels:
+### dotClass
 
-| Level             | Meaning                                                      |
-| ----------------- | ------------------------------------------------------------ |
-| `'native'`        | Full, lossless support                                       |
-| `'approximate'`   | Supported with caveats (e.g. RN shadow drops inset / spread) |
-| `'recipe-only'`   | Flutter recipe output only — not applied as an inline style  |
-| `'plugin-backed'` | Requires a Flutter plugin (e.g. `flutter_blur`)              |
-| `'unsupported'`   | No equivalent on the target — property is dropped            |
+Generates a stable hash-based class name and injects the CSS rule into:
+
+- **Browser**: a shared `<style>` element in `<head>`
+- **SSR**: an in-memory buffer (collect with `dotFlush()`)
+
+```ts
+const cls = dotClass("p-4 hover:bg-red-500 focus:ring-2");
+// → 'dot-a3f2b1'
+
+// Apply to element
+<div className={cls} />
+```
+
+### dotCSS
+
+Like `dotClass` but also returns the generated CSS string for inspection or manual injection.
+
+```ts
+const { className, css } = dotCSS("p-4 hover:bg-red-500 md:p-8");
+// className: 'dot-a3f2b1'
+// css: '.dot-a3f2b1 { padding: 1rem }\n@media (min-width:768px){.dot-a3f2b1{padding:2rem}}\n.dot-a3f2b1:hover { background-color: #ef4444 }'
+```
+
+### dotFlush
+
+Collects all CSS generated since the last flush and resets the buffer. Call during SSR to inject styles into the `<style>` tag.
+
+```ts
+// In a Next.js layout or document
+const allCSS = dotFlush();
+// → full CSS string of all generated rules
+
+// Inject:
+<style dangerouslySetInnerHTML={{ __html: allCSS }} />
+```
+
+### dotReset
+
+Clears the class cache and the CSS buffer. Use between test runs or isolated SSR renders.
+
+```ts
+dotReset();
+```
+
+### DotClassOptions
+
+```ts
+interface DotClassOptions {
+  naming?: "hash" | "atomic"; // 'hash' = one class per input string (default)
+  darkMode?: "class" | "media"; // how dark: variants are emitted
+}
+```
+
+### divide-x / divide-y — class mode only
+
+The `divide-x-`, `divide-y-` utilities produce child-combinator CSS (`> * + *`) which cannot be expressed as inline styles. They resolve to internal markers in inline mode and are silently stripped. Use class mode:
+
+```ts
+const cls = dotClass("divide-y divide-gray-200");
+// → generates: '.dot-xyz > * + * { border-top-width: 1px; border-color: #e5e7eb }'
+```
+
+---
+
+## Capability System
+
+### CAPABILITY_MATRIX
+
+Static constant mapping utility family → target → support level.
 
 ```ts
 import { CAPABILITY_MATRIX } from "@hua-labs/dot";
@@ -766,615 +572,254 @@ CAPABILITY_MATRIX["filter"];
 // { web: 'native', native: 'unsupported', flutter: 'plugin-backed' }
 ```
 
----
+Support levels:
 
-### `PROPERTY_TO_FAMILY`
+| Level           | Meaning                                                                              |
+| --------------- | ------------------------------------------------------------------------------------ |
+| `native`        | Target supports the intent directly                                                  |
+| `approximate`   | Target produces a similar but not identical effect (e.g., RN shadow via `elevation`) |
+| `recipe-only`   | Requires a widget/component recipe, not a flat style (e.g., Flutter gradients)       |
+| `plugin-backed` | Needs an ecosystem plugin/package (e.g., `BackdropFilter` on Flutter)                |
+| `unsupported`   | Not available on this target                                                         |
 
-Static constant mapping CSS property names to utility family names for use with `CAPABILITY_MATRIX`.
+### PROPERTY_TO_FAMILY
 
-```ts
-const PROPERTY_TO_FAMILY: Record<string, string>;
-```
-
-```ts
-import { PROPERTY_TO_FAMILY, CAPABILITY_MATRIX } from "@hua-labs/dot";
-
-const family = PROPERTY_TO_FAMILY["backgroundImage"]; // 'gradient'
-const level = CAPABILITY_MATRIX[family]?.["native"]; // 'unsupported'
-
-// Programmatic audit of a style object:
-function auditForNative(style: Record<string, unknown>) {
-  for (const prop of Object.keys(style)) {
-    const family = PROPERTY_TO_FAMILY[prop];
-    const level = family ? CAPABILITY_MATRIX[family]?.["native"] : undefined;
-    if (level === "unsupported") console.warn(`Drop: ${prop} (${family})`);
-    if (level === "approximate") console.warn(`Approx: ${prop} (${family})`);
-  }
-}
-```
-
----
-
-### `getCapability(property, target, value?)`
-
-Programmatic per-property capability query. Checks value-level overrides first (e.g. `display: 'flex'` is `'native'` on RN even though `display` family is `'approximate'`), then falls back to family-level lookup.
+Maps CSS property names to utility family names for use with `CAPABILITY_MATRIX`.
 
 ```ts
-function getCapability(
-  property: string,
-  target: DotTarget,
-  value?: string,
-): CapabilityLevel;
+import { PROPERTY_TO_FAMILY } from "@hua-labs/dot";
+
+PROPERTY_TO_FAMILY["backgroundImage"]; // 'gradient'
+PROPERTY_TO_FAMILY["gridTemplateColumns"]; // 'grid'
+PROPERTY_TO_FAMILY["boxShadow"]; // 'shadow'
 ```
+
+### getCapability
+
+Programmatic per-property capability query. Checks value-level overrides first (e.g., `display: flex` is `native` on RN even though `display: grid` is `unsupported`), then falls back to family-level lookup.
 
 ```ts
 import { getCapability } from "@hua-labs/dot";
 
 getCapability("padding", "native"); // 'native'
 getCapability("filter", "native"); // 'unsupported'
-getCapability("filter", "flutter"); // 'plugin-backed'
-getCapability("display", "native", "flex"); // 'native'  (value-level override)
-getCapability("display", "native", "grid"); // 'approximate'
 getCapability("backgroundImage", "flutter"); // 'recipe-only'
+getCapability("display", "native", "flex"); // 'native'
+getCapability("display", "native", "grid"); // 'approximate'
 ```
+
+### dotExplain
+
+Resolves a utility string and returns both styles and a full capability report. See [Core API](#core-api) section for examples.
 
 ---
 
-### `dotClass(input, options?)` — `/class` subpath
+## Advanced Features
 
-Generate a stable, hash-based class name for a utility string. In browser environments, CSS rules are injected into a shared `<style>` element. In SSR environments, rules are collected for `dotFlush()`.
+### Arbitrary values
+
+Wrap any value in square brackets to pass it through directly.
 
 ```ts
-import { dotClass } from "@hua-labs/dot/class";
-
-function dotClass(
-  input: string | undefined | null,
-  options?: DotClassOptions,
-): string;
-
-interface DotClassOptions {
-  naming?: "hash" | "atomic";
-  darkMode?: "class" | "media";
-}
+dot(
+  "w-[300px] h-[calc(100vh-64px)] bg-[#ff0000] p-[2rem] text-[clamp(1rem,2.5vw,2rem)]",
+);
+// { width: '300px', height: 'calc(100vh-64px)', backgroundColor: '#ff0000',
+//   padding: '2rem', fontSize: 'clamp(1rem,2.5vw,2rem)' }
 ```
 
-```ts
-const cls = dotClass("p-4 flex items-center hover:bg-gray-100");
-// → 'dot-a3f2b1'
+### Opacity modifiers
 
-// With dark mode via .dark class on <html>:
-const cls2 = dotClass("bg-white dark:bg-gray-900", { darkMode: "class" });
-// Emits: .dot-xxx { background-color: #fff } .dark .dot-xxx { background-color: #111827 }
+Append `/{opacity}` to color utilities to apply alpha.
+
+```ts
+dot("bg-primary-500/50 text-gray-900/80 border-blue-500/20");
+// backgroundColor: 'rgb(59 130 246 / 0.5)'
+// color: 'rgb(17 24 39 / 0.8)'
+// borderColor: 'rgb(59 130 246 / 0.2)'
 ```
 
----
+### Negative values
 
-### `dotCSS(input, options?)` — `/class` subpath
-
-Like `dotClass()` but also returns the generated CSS string.
+Prefix with `-` for negative spacing, translate, rotate, and positioning values.
 
 ```ts
-import { dotCSS } from "@hua-labs/dot/class";
-
-function dotCSS(
-  input: string | undefined | null,
-  options?: DotClassOptions,
-): DotClassResult;
-
-interface DotClassResult {
-  className: string;
-  css: string;
-}
+dot("-m-4 -translate-x-2 -top-1");
+// { margin: '-16px', transform: 'translateX(-8px)', top: '-4px' }
 ```
 
-```ts
-const { className, css } = dotCSS("p-4 hover:bg-red-500 dark:text-white");
+### !important modifier
 
-// className: 'dot-a3f2b1'
-// css:
-// '.dot-a3f2b1 { padding: 1rem }\n
-//  .dot-a3f2b1:hover { background-color: #ef4444 }\n
-//  .dark .dot-a3f2b1 { color: #ffffff }'
+Prefix a utility with `!` to add `!important` to the generated value.
+
+```ts
+dot("!p-4 !bg-white !rounded-none");
+// { padding: '16px !important', backgroundColor: '#ffffff !important', borderRadius: '0 !important' }
 ```
 
----
+`!important` propagates through shadow/ring composition — if any layer is flagged, the merged `boxShadow` string gets `!important`.
 
-### `dotFlush()` — `/class` subpath
+### Gradient composition
 
-Collect all generated CSS rules accumulated since the last flush (SSR). Returns the CSS string and resets the collection buffer.
-
-```ts
-import { dotFlush } from "@hua-labs/dot/class";
-
-function dotFlush(): string;
-```
+Multiple gradient utilities are collected as internal markers and composed into a single `backgroundImage` at finalization.
 
 ```ts
-// In your SSR render function:
-const html = renderToString(<App />);
-const collectedCSS = dotFlush();
-
-// Inject into the HTML response:
-const fullHTML = `
-  <!doctype html>
-  <html>
-    <head>
-      <style id="dot-ssr">${collectedCSS}</style>
-    </head>
-    <body>${html}</body>
-  </html>
-`;
-```
-
----
-
-## Advanced Usage
-
-### Custom Tokens
-
-Override the built-in token scale with `createDotConfig()`. Deep merge means you only need to specify what changes — defaults remain in place:
-
-```ts
-createDotConfig({
-  theme: {
-    colors: {
-      brand: {
-        50: "#f0ebff",
-        100: "#ddd4ff",
-        500: "#6630E6",
-        600: "#5520D0",
-        900: "#2a0a6b",
-      },
-      // Flat color (no scale)
-      overlay: "rgba(0,0,0,0.5)",
-    },
-    spacing: {
-      "13": "52px",
-      "15": "60px",
-      "18": "72px",
-    },
-    borderRadius: {
-      pill: "9999px",
-      card: "12px",
-    },
-    fontSize: {
-      "2xs": "10px",
-      "3xl": "30px",
-    },
-  },
-});
-
-dot("bg-brand-500 p-18 rounded-pill text-2xs");
-// { backgroundColor: '#6630E6', padding: '72px', borderRadius: '9999px', fontSize: '10px' }
-
-// Flat color works too
-dot("bg-overlay");
-// { backgroundColor: 'rgba(0,0,0,0.5)' }
-```
-
-### strictMode and warnUnknown
-
-During development you can surface unknown tokens instead of silently ignoring them:
-
-```ts
-// Throw on any unrecognized token
-createDotConfig({ strictMode: true });
-dot("p-4 bogus-token"); // throws Error('Unknown token: bogus-token')
-
-// Warn in console (non-throwing, good for CI canary)
-createDotConfig({ strictMode: false, warnUnknown: true });
-dot("p-4 bogus-token"); // console.warn('Unknown token: bogus-token')
-```
-
-`warnUnknown` is also passed through to `adaptNative()` to warn about dropped properties.
-
-### Gradient Composition
-
-Gradients are composed from three independent token groups that dot merges in `finalizeStyle()`:
-
-```ts
-// Direction + from/via/to stops → backgroundImage
 dot("bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500");
 // { backgroundImage: 'linear-gradient(to right, #3b82f6, #a855f7, #ec4899)' }
 
-// With position modifiers
+// With position stops
 dot(
   "bg-gradient-to-b from-blue-500 from-10% via-purple-500 via-50% to-pink-500 to-90%",
 );
 // { backgroundImage: 'linear-gradient(to bottom, #3b82f6 10%, #a855f7 50%, #ec4899 90%)' }
 
-// Diagonal
-dot("bg-gradient-to-tr from-cyan-400 to-blue-600");
-// { backgroundImage: 'linear-gradient(to top right, #22d3ee, #2563eb)' }
-
-// With arbitrary colors
-dot("bg-gradient-to-r from-[#ff6b6b] to-[#4ecdc4]");
-// { backgroundImage: 'linear-gradient(to right, #ff6b6b, #4ecdc4)' }
+// Arbitrary direction
+dot("bg-gradient-to-tr from-emerald-400 to-cyan-400");
+// { backgroundImage: 'linear-gradient(to top right, #34d399, #22d3ee)' }
 ```
 
-Available gradient directions: `to-r` `to-l` `to-t` `to-b` `to-tr` `to-tl` `to-br` `to-bl`.
+On Flutter, gradient input produces a `FlutterGradient` inside `recipe.decoration.gradient` instead of `backgroundImage`.
 
-### Ring + Shadow Merging
+### Ring + shadow composition
 
-Ring and shadow utilities use internal accumulation keys that get merged into a single `boxShadow` string. The ring layer is always prepended before the shadow layer (Tailwind convention):
+`ring-*` and `shadow-*` utilities set internal markers (`__dot_ringLayer`, `__dot_shadowLayer`) that are merged into a single `boxShadow` string at finalization. The ring layer is always prepended (Tailwind convention).
 
 ```ts
-// Ring only
-dot("ring-2");
-// { boxShadow: '0 0 0 2px #3b82f6' }
+dot("ring-2 ring-blue-500 shadow-md");
+// { boxShadow: '0 0 0 2px #3b82f6, 0 4px 6px -1px rgba(0,0,0,0.1)' }
 
-// Ring with color
-dot("ring-2 ring-red-500");
-// { boxShadow: '0 0 0 2px #ef4444' }
-
-// Shadow only
-dot("shadow-md");
-// { boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)' }
-
-// Ring + shadow — ring is prepended
-dot("ring-2 ring-blue-500 shadow-lg");
-// { boxShadow: '0 0 0 2px #3b82f6, 0 10px 15px -3px rgba(0,0,0,0.1), ...' }
-
-// !important propagates through composition
-dot("!ring-2 !shadow-md");
-// { boxShadow: '0 0 0 2px #3b82f6, 0 4px 6px -1px rgba(0,0,0,0.1) !important' }
+dot("focus:ring-2 focus:ring-primary-500");
+// via dotMap → focus: { boxShadow: '0 0 0 2px #3b82f6' }
 ```
 
-### Flutter Recipe Interpretation
-
-When targeting Flutter, the recipe fields map directly to Flutter widget construction arguments. Here is a practical Dart usage pattern:
-
-```ts
-// TypeScript side — produce a recipe
-import { dot } from "@hua-labs/dot";
-import type { FlutterRecipe } from "@hua-labs/dot";
-
-const recipe: FlutterRecipe = dot(
-  "p-4 bg-blue-500/80 rounded-lg shadow-md text-white text-base font-bold",
-  {
-    target: "flutter",
-  },
-) as FlutterRecipe;
-
-// Serialize for Dart bridge
-const json = JSON.stringify(recipe);
-```
-
-```dart
-// Dart side — consume the recipe
-import 'dart:convert';
-
-Widget buildFromRecipe(Map<String, dynamic> recipe) {
-  final deco = recipe['decoration'] as Map<String, dynamic>?;
-  final padding = recipe['padding'] as Map<String, dynamic>?;
-  final textStyle = recipe['textStyle'] as Map<String, dynamic>?;
-
-  return Container(
-    padding: padding != null ? EdgeInsets.only(
-      top: (padding['top'] as num).toDouble(),
-      right: (padding['right'] as num).toDouble(),
-      bottom: (padding['bottom'] as num).toDouble(),
-      left: (padding['left'] as num).toDouble(),
-    ) : null,
-    decoration: deco != null ? BoxDecoration(
-      color: Color(int.parse((deco['color'] as String).replaceFirst('#', '0xFF'))),
-      borderRadius: BorderRadius.circular(
-        (deco['borderRadius']?['topLeft'] as num? ?? 0).toDouble()
-      ),
-    ) : null,
-    child: Text('Hello', style: TextStyle(
-      fontSize: (textStyle?['fontSize'] as num?)?.toDouble(),
-      fontWeight: textStyle?['fontWeight'] == '700' ? FontWeight.bold : FontWeight.normal,
-      color: Colors.white,
-    )),
-  );
-}
-```
-
-### Capability Reporting for Production Audits
-
-Use `dotExplain()` together with `CAPABILITY_MATRIX` to build automated cross-platform compatibility audits:
-
-```ts
-import { dotExplain, CAPABILITY_MATRIX } from "@hua-labs/dot";
-
-function auditUtilityString(input: string) {
-  const rnResult = dotExplain(input, { target: "native" });
-  const flutterResult = dotExplain(input, { target: "flutter" });
-
-  return {
-    input,
-    nativeDropped: rnResult.report._dropped ?? [],
-    nativeApproximate: rnResult.report._approximated ?? [],
-    flutterDropped: flutterResult.report._dropped ?? [],
-    flutterRecipeOnly: Object.entries(flutterResult.report._capabilities ?? {})
-      .filter(([, v]) => v === "recipe-only")
-      .map(([k]) => k),
-  };
-}
-
-auditUtilityString(
-  "p-4 flex rounded-lg shadow-md transition-all filter blur-sm",
-);
-// {
-//   nativeDropped: ['transitionProperty', 'filter'],
-//   nativeApproximate: ['shadowColor', 'shadowOffset', ...],
-//   flutterDropped: ['transitionProperty'],
-//   flutterRecipeOnly: ['backgroundImage'],
-// }
-```
-
----
-
-## Integration Examples
-
-### Next.js App Router
-
-```tsx
-// app/components/card.tsx
-"use client";
-
-import { dot, dotMap } from "@hua-labs/dot";
-import { useState } from "react";
-
-export function Card({ dark }: { dark: boolean }) {
-  const [hovered, setHovered] = useState(false);
-
-  const styles = dotMap(
-    "rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800",
-    { dark },
-  );
-
-  return (
-    <div
-      style={hovered ? { ...styles.base, ...styles.hover } : styles.base}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      Content
-    </div>
-  );
-}
-```
-
-#### SSR with class mode
-
-```tsx
-// app/layout.tsx (server component)
-import { dotClass, dotFlush } from "@hua-labs/dot/class";
-
-// Generate class names during render
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const bodyClass = dotClass("min-h-screen bg-background text-foreground");
-
-  // Collect all CSS generated during this render pass
-  const css = dotFlush();
-
-  return (
-    <html>
-      <head>
-        <style id="dot-styles" dangerouslySetInnerHTML={{ __html: css }} />
-      </head>
-      <body className={bodyClass}>{children}</body>
-    </html>
-  );
-}
-```
-
-#### Theme-aware setup
-
-```ts
-// lib/dot-config.ts
-import { createDotConfig, semanticVars } from "@hua-labs/dot";
-
-createDotConfig({
-  theme: {
-    semanticColors: semanticVars(
-      "background",
-      "foreground",
-      "card",
-      "card-foreground",
-      "primary",
-      "primary-foreground",
-      "muted",
-      "muted-foreground",
-      "border",
-      "ring",
-      "accent",
-      "accent-foreground",
-    ),
-  },
-  warnUnknown: process.env.NODE_ENV === "development",
-});
-```
-
-### React Native with Metro
-
-```tsx
-// components/Button.tsx
-import React, { useState } from "react";
-import { TouchableOpacity, Text } from "react-native";
-import { dotMap } from "@hua-labs/dot/native";
-
-export function Button({
-  label,
-  onPress,
-}: {
-  label: string;
-  onPress: () => void;
-}) {
-  const [pressed, setPressed] = useState(false);
-
-  const styles = dotMap(
-    "px-4 py-2 rounded-lg bg-blue-500 active:bg-blue-700 disabled:opacity-50",
-    { target: "native" },
-  );
-
-  return (
-    <TouchableOpacity
-      style={pressed ? { ...styles.base, ...styles.active } : styles.base}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      onPress={onPress}
-    >
-      <Text
-        style={dot("text-white font-semibold text-base", { target: "native" })}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-```
-
-#### Capability-safe utility hook
-
-```tsx
-// hooks/useDotStyle.ts
-import { dotExplain, DotOptions } from "@hua-labs/dot";
-
-export function useDotStyle(input: string, options?: DotOptions) {
-  const { styles, report } = dotExplain(input, {
-    ...options,
-    target: "native",
-  });
-
-  if (__DEV__ && report._dropped?.length) {
-    console.warn("[dot] Dropped on native:", report._dropped.join(", "));
-  }
-
-  return styles;
-}
-```
-
-### Flutter Bridge
-
-```ts
-// scripts/generate-flutter-styles.ts
-import { dot, dotExplain } from "@hua-labs/dot";
-import type { FlutterRecipe } from "@hua-labs/dot";
-import * as fs from "fs";
-
-const componentStyles: Record<string, string> = {
-  card: "p-4 bg-white rounded-xl shadow-md",
-  button: "px-4 py-2 bg-primary-500 rounded-lg",
-  badge: "px-2 py-0.5 bg-gray-100 rounded-full text-xs font-medium",
-};
-
-const output: Record<string, FlutterRecipe> = {};
-
-for (const [name, utilities] of Object.entries(componentStyles)) {
-  const { styles, report } = dotExplain(utilities, { target: "flutter" });
-  if (report._dropped?.length) {
-    console.warn(`${name}: dropped ${report._dropped.join(", ")}`);
-  }
-  output[name] = styles as FlutterRecipe;
-}
-
-fs.writeFileSync(
-  "flutter_bridge/dot_styles.json",
-  JSON.stringify(output, null, 2),
-);
-```
-
----
-
-## Troubleshooting
-
-### Unknown tokens silently produce empty objects
-
-**Issue:** A utility like `p-18` or `bg-brand-500` resolves to `{}`.
-
-**Cause:** The token does not exist in the built-in scale.
-
-**Solution:** Add it via `createDotConfig()`:
+### Custom breakpoints
 
 ```ts
 createDotConfig({
-  theme: {
-    spacing: { "18": "72px" },
-    colors: { brand: { 500: "#6630E6" } },
+  breakpoints: ["sm", "tablet", "md", "desktop", "lg"],
+  breakpointWidths: {
+    tablet: "900px",
+    desktop: "1280px",
   },
 });
 
-// Or enable warnUnknown to surface the issue without throwing:
-createDotConfig({ warnUnknown: true });
-dot("p-18 bg-brand-500"); // console.warn logs the unknown tokens
+dot("p-4 tablet:p-6 desktop:p-8", { breakpoint: "desktop" });
+// { padding: '32px' }  (base + tablet + desktop applied)
+```
+
+Class mode uses `breakpointWidths` to generate `@media (min-width: ...)` rules.
+
+### Semantic color tokens
+
+CSS variable-backed color tokens for use with design systems.
+
+```ts
+import { semanticVars, createDotConfig } from "@hua-labs/dot";
+
+createDotConfig({
+  theme: {
+    semanticColors: {
+      // Built-in shadcn tokens are pre-registered:
+      // background, foreground, card, card-foreground, muted, muted-foreground,
+      // accent, accent-foreground, primary, primary-foreground, secondary,
+      // secondary-foreground, destructive, destructive-foreground,
+      // border, input, ring, popover, popover-foreground
+
+      // Add your own:
+      ...semanticVars("sidebar", "sidebar-foreground", "chart-1"),
+      brand: "var(--my-brand-color)",
+    },
+  },
+});
+
+dot("bg-sidebar text-sidebar-foreground");
+// { backgroundColor: 'var(--color-sidebar)', color: 'var(--color-sidebar-foreground)' }
+```
+
+`semanticVars()` helper generates the mapping for you:
+
+```ts
+semanticVars("sidebar", "chart-1");
+// { sidebar: 'var(--color-sidebar)', 'chart-1': 'var(--color-chart-1)' }
+
+semanticVars({ prefix: "--theme" }, "brand");
+// { brand: 'var(--theme-brand)' }
 ```
 
 ---
 
-### Cache stale after config change
+## Caching
 
-**Issue:** Calling `createDotConfig()` then `dot()` returns the old result.
+`dot()` uses a 2-layer FIFO cache:
 
-**Cause:** Cache is keyed by input string. If `createDotConfig()` was called with the same config shape previously, the input cache still holds the old result.
+| Layer                 | Key                                  | Capacity     | Purpose                                       |
+| --------------------- | ------------------------------------ | ------------ | --------------------------------------------- |
+| Layer 1 (input cache) | full input string + options encoding | 500 entries  | Skip parsing + resolving entirely             |
+| Layer 2 (token cache) | individual token string              | 1000 entries | Skip resolving; still parses the input string |
 
-**Solution:** `createDotConfig()` always resets the cache automatically — this should not happen. If you mutate config outside of `createDotConfig()` (which is not supported), call `clearDotCache()` manually:
+Cache keys encode target, active breakpoint, and dark mode flag to avoid cross-context collisions.
+
+FIFO eviction: when at capacity, the oldest entry is deleted before inserting the new one.
 
 ```ts
-// Correct pattern — always use createDotConfig for changes
+import { clearDotCache, createDotConfig } from "@hua-labs/dot";
+
+// After a config change, clear stale entries
 createDotConfig({ theme: { colors: { brand: { 500: "#new" } } } });
-// Cache is reset automatically ✓
-
-// If you somehow need a manual reset:
 clearDotCache();
+
+// Disable caching entirely (useful for SSR micro-environments)
+createDotConfig({ cache: false });
+
+// Resize the input cache
+createDotConfig({ cacheSize: 1000 });
 ```
+
+`dotMap()` uses the same cache with a distinct key prefix to avoid collisions with `dot()` output.
 
 ---
 
-### React Native — unsupported CSS properties
+## Type Reference
 
-**Issue:** `dot('flex-col transition-all blur-sm', { target: 'native' })` drops `transition` and `filter` silently.
-
-**Cause:** `adaptNative()` drops ~45 CSS properties that have no React Native equivalent.
-
-**Solution:** Use `dotExplain()` to audit before shipping, or enable `warnDropped`:
-
-```ts
-import { dotExplain } from "@hua-labs/dot";
-
-const { styles, report } = dotExplain("flex-col transition-all blur-sm", {
-  target: "native",
-});
-console.log(report._dropped); // ['transitionProperty', 'filter']
-
-// Or at the adapter level:
-import { adaptNative } from "@hua-labs/dot";
-
-adaptNative(myStyles, { warnDropped: true });
-// Logs: [dot/native] Dropped unsupported property: transitionProperty
-```
-
-Avoid using web-only utilities (`transition-*`, `animate-*`, `filter`, `backdrop-*`, `cursor-*`, `select-*`, `grid-*`) in strings intended for the native target.
-
----
-
-### Flutter — recipe-only fields not applied inline
-
-**Issue:** `dot('bg-gradient-to-r from-blue-500 to-pink-500', { target: 'flutter' })` does not include `backgroundImage` in the recipe output.
-
-**Cause:** `backgroundImage` is `'recipe-only'` on Flutter — gradients map to `FlutterGradient` inside `decoration.gradient`, not as a CSS string.
-
-**Solution:** Read from `decoration.gradient` in the recipe:
-
-```ts
-import type { FlutterRecipe } from "@hua-labs/dot";
-
-const recipe = dot("bg-gradient-to-r from-blue-500 to-pink-500", {
-  target: "flutter",
-}) as FlutterRecipe;
-
-// recipe.decoration.gradient →
-// {
-//   type: 'linear',
-//   direction: 'to right',
-//   stops: [{ color: '#3b82f6', offset: 0 }, { color: '#ec4899', offset: 1 }]
-// }
-```
-
-Use `CAPABILITY_MATRIX['gradient'].flutter` (`'recipe-only'`) to programmatically check this before passing a utility string to the Flutter target.
+| Type                   | Description                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `StyleObject`          | `Record<string, string \| number>` — Web CSSProperties-compatible output                                                  |
+| `RNStyleObject`        | `Record<string, RNStyleValue>` — React Native StyleSheet-compatible output                                                |
+| `RNStyleValue`         | `string \| number \| RNTransformEntry[] \| RNShadowOffset`                                                                |
+| `RNTransformEntry`     | `Record<string, string \| number>` — single RN transform entry, e.g. `{ rotate: '45deg' }`                                |
+| `RNShadowOffset`       | `{ width: number; height: number }`                                                                                       |
+| `DotTarget`            | `'web' \| 'native' \| 'flutter'`                                                                                          |
+| `DotOptions`           | `{ dark?: boolean; breakpoint?: string; target?: DotTarget }`                                                             |
+| `DotState`             | `'hover' \| 'focus' \| 'active' \| 'focus-visible' \| 'focus-within' \| 'disabled'`                                       |
+| `DotStyleMap<T>`       | `{ base: T; hover?: T; focus?: T; active?: T; 'focus-visible'?: T; 'focus-within'?: T; disabled?: T }`                    |
+| `DotToken`             | Parsed token: `{ variants, prefix, value, raw, negative, important }`                                                     |
+| `DotUserConfig`        | Full user-facing config shape — see [createDotConfig](#createdotconfig--full-options)                                     |
+| `DotConfig`            | Resolved internal config (tokens, cache, breakpointOrder, etc.)                                                           |
+| `ResolvedTokens`       | Merged token table (colors, spacing, fontSize, shadows, etc.)                                                             |
+| `ResolverFn`           | `(prefix: string, value: string, config: DotConfig) => StyleObject`                                                       |
+| `DotAdapterOutput`     | `StyleObject \| RNStyleObject \| FlutterRecipe`                                                                           |
+| `CapabilityLevel`      | `'native' \| 'approximate' \| 'recipe-only' \| 'plugin-backed' \| 'unsupported'`                                          |
+| `TargetCapability`     | `Record<DotTarget, CapabilityLevel>`                                                                                      |
+| `DotCapabilityReport`  | `{ _dropped?, _approximated?, _capabilities?, _details? }`                                                                |
+| `AdaptNativeOptions`   | `{ remBase?: number; warnDropped?: boolean }`                                                                             |
+| `AdaptFlutterOptions`  | `{ remBase?: number }`                                                                                                    |
+| `FlutterRecipe`        | Full widget recipe — see [adaptFlutter](#adaptflutter)                                                                    |
+| `FlutterDecoration`    | `BoxDecoration` fields: color, gradient, borderRadius, border, boxShadow                                                  |
+| `FlutterEdgeInsets`    | `{ top?, right?, bottom?, left? }` — `EdgeInsets.only()`                                                                  |
+| `FlutterConstraints`   | `{ width?, height?, minWidth?, maxWidth?, ..., expandWidth?, expandHeight? }`                                             |
+| `FlutterLayout`        | `{ direction?, mainAxisAlignment?, crossAxisAlignment?, wrap? }`                                                          |
+| `FlutterFlexChild`     | `{ flex?, flexFit?, order? }`                                                                                             |
+| `FlutterPositioning`   | `{ type?, top?, right?, bottom?, left? }`                                                                                 |
+| `FlutterTextStyle`     | `{ color?, fontSize?, fontWeight?, fontFamily?, letterSpacing?, height?, decoration?, textAlign?, maxLines?, overflow? }` |
+| `FlutterTransform`     | `{ rotate?, scaleX?, scaleY?, translateX?, translateY?, skewX?, skewY?, origin? }`                                        |
+| `FlutterBoxShadow`     | `{ color, offset: { dx, dy }, blurRadius, spreadRadius }`                                                                 |
+| `FlutterBorderSide`    | `{ width?, color?, style? }`                                                                                              |
+| `FlutterBorderRadius`  | `{ topLeft?, topRight?, bottomLeft?, bottomRight? }`                                                                      |
+| `FlutterGradient`      | `{ type: 'linear', begin, end, colors, stops? }`                                                                          |
+| `DotVariantsConfig<V>` | `{ base?, variants?, defaultVariants?, compoundVariants? }`                                                               |
+| `DotVariantsFn<V>`     | `(props?: VariantProps<V>) => StyleObject`                                                                                |
+| `VariantProps<V>`      | Inferred props type for a `dotVariants` config                                                                            |
+| `CompoundVariant<V>`   | `{ conditions: Partial<VariantProps<V>>, dot: string }`                                                                   |
+| `VariantShape`         | `Record<string, Record<string, string>>`                                                                                  |
+| `DotClassOptions`      | `{ naming?: 'hash' \| 'atomic'; darkMode?: 'class' \| 'media' }`                                                          |
+| `DotClassResult`       | `{ className: string; css: string }`                                                                                      |

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Plural (ICU / Intl.PluralRules)
 // ---------------------------------------------------------------------------
-export type PluralCategory = 'zero' | 'one' | 'two' | 'few' | 'many' | 'other';
+export type PluralCategory = "zero" | "one" | "two" | "few" | "many" | "other";
 
 export interface PluralValue {
   zero?: string;
@@ -12,17 +12,25 @@ export interface PluralValue {
   other: string; // 필수
 }
 
-const PLURAL_CATEGORIES = new Set<string>(['zero', 'one', 'two', 'few', 'many', 'other']);
+const PLURAL_CATEGORIES = new Set<string>([
+  "zero",
+  "one",
+  "two",
+  "few",
+  "many",
+  "other",
+]);
 
 export function isPluralValue(value: unknown): value is PluralValue {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  if (typeof value !== "object" || value === null || Array.isArray(value))
+    return false;
   const obj = value as Record<string, unknown>;
   const keys = Object.keys(obj);
   return (
     keys.length > 0 &&
-    keys.every(k => PLURAL_CATEGORIES.has(k)) &&
-    Object.values(obj).every(v => typeof v === 'string') &&
-    typeof obj.other === 'string'
+    keys.every((k) => PLURAL_CATEGORIES.has(k)) &&
+    Object.values(obj).every((v) => typeof v === "string") &&
+    typeof obj.other === "string"
   );
 }
 
@@ -50,24 +58,32 @@ export interface I18nPlatformAdapter {
  */
 export const webPlatformAdapter: I18nPlatformAdapter = {
   getDeviceLanguage() {
-    if (typeof globalThis !== 'undefined' && typeof navigator !== 'undefined' && navigator.language) {
+    if (
+      typeof globalThis !== "undefined" &&
+      typeof navigator !== "undefined" &&
+      navigator.language
+    ) {
       return navigator.language.slice(0, 2).toLowerCase();
     }
     return undefined;
   },
   onLanguageChange(cb) {
-    if (typeof globalThis === 'undefined' || typeof window === 'undefined' || typeof CustomEvent === 'undefined') {
+    if (
+      typeof globalThis === "undefined" ||
+      typeof window === "undefined" ||
+      typeof CustomEvent === "undefined"
+    ) {
       return () => {};
     }
     const handler = (e: Event) => {
       const lang = (e as CustomEvent).detail;
-      if (typeof lang === 'string') cb(lang);
+      if (typeof lang === "string") cb(lang);
     };
-    window.addEventListener('huaI18nLanguageChange', handler);
-    window.addEventListener('i18nLanguageChanged', handler);
+    window.addEventListener("huaI18nLanguageChange", handler);
+    window.addEventListener("i18nLanguageChanged", handler);
     return () => {
-      window.removeEventListener('huaI18nLanguageChange', handler);
-      window.removeEventListener('i18nLanguageChanged', handler);
+      window.removeEventListener("huaI18nLanguageChange", handler);
+      window.removeEventListener("i18nLanguageChanged", handler);
     };
   },
 };
@@ -77,8 +93,12 @@ export const webPlatformAdapter: I18nPlatformAdapter = {
  * 언어 감지·이벤트 없이 config.defaultLanguage만 사용.
  */
 export const headlessPlatformAdapter: I18nPlatformAdapter = {
-  getDeviceLanguage() { return undefined; },
-  onLanguageChange() { return () => {}; },
+  getDeviceLanguage() {
+    return undefined;
+  },
+  onLanguageChange() {
+    return () => {};
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -96,8 +116,15 @@ export interface LanguageConfig {
   code: string;
   name: string;
   nativeName: string;
-  tone?: 'emotional' | 'encouraging' | 'calm' | 'gentle' | 'formal' | 'technical' | 'informal';
-  formality?: 'informal' | 'casual' | 'formal' | 'polite';
+  tone?:
+    | "emotional"
+    | "encouraging"
+    | "calm"
+    | "gentle"
+    | "formal"
+    | "technical"
+    | "informal";
+  formality?: "informal" | "casual" | "formal" | "polite";
 }
 
 // 더 구체적인 설정 타입 정의
@@ -106,13 +133,20 @@ export interface I18nConfig {
   fallbackLanguage?: string;
   supportedLanguages: LanguageConfig[];
   namespaces?: string[];
-  loadTranslations: (language: string, namespace: string) => Promise<TranslationNamespace>;
+  loadTranslations: (
+    language: string,
+    namespace: string,
+  ) => Promise<TranslationNamespace>;
   // SSR에서 전달된 초기 번역 데이터 (네트워크 요청 없이 사용)
   initialTranslations?: Record<string, Record<string, TranslationNamespace>>;
   // 개발 모드 설정
   debug?: boolean;
   // 번역 키가 없을 때의 동작
-  missingKeyHandler?: (key: string, language: string, namespace: string) => string;
+  missingKeyHandler?: (
+    key: string,
+    language: string,
+    namespace: string,
+  ) => string;
   // 번역 로딩 실패 시 동작
   errorHandler?: (error: Error, language: string, namespace: string) => void;
   // 캐시 설정
@@ -140,7 +174,17 @@ export interface I18nConfig {
 
 // 에러 타입 정의
 export interface TranslationError extends Error {
-  code: 'MISSING_KEY' | 'LOAD_FAILED' | 'INVALID_KEY' | 'NETWORK_ERROR' | 'INITIALIZATION_ERROR' | 'VALIDATION_ERROR' | 'CACHE_ERROR' | 'FALLBACK_LOAD_FAILED' | 'INITIALIZATION_FAILED' | 'RETRY_FAILED';
+  code:
+    | "MISSING_KEY"
+    | "LOAD_FAILED"
+    | "INVALID_KEY"
+    | "NETWORK_ERROR"
+    | "INITIALIZATION_ERROR"
+    | "VALIDATION_ERROR"
+    | "CACHE_ERROR"
+    | "FALLBACK_LOAD_FAILED"
+    | "INITIALIZATION_FAILED"
+    | "RETRY_FAILED";
   language?: string;
   namespace?: string;
   key?: string;
@@ -164,7 +208,7 @@ export interface ErrorRecoveryStrategy {
 // 에러 로깅 설정
 export interface ErrorLoggingConfig {
   enabled: boolean;
-  level: 'error' | 'warn' | 'info' | 'debug';
+  level: "error" | "warn" | "info" | "debug";
   includeStack: boolean;
   includeContext: boolean;
   customLogger?: (error: TranslationError) => void;
@@ -176,7 +220,7 @@ export interface UserFriendlyError {
   message: string;
   suggestion?: string;
   action?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 // 캐시 엔트리 타입
@@ -210,13 +254,26 @@ export interface I18nContextType {
   currentLanguage: string;
   setLanguage: (language: string) => void | Promise<void>;
   // 통합 번역 함수: t(key), t(key, language), t(key, params), t(key, params, language)
-  t: (key: ResolveStringKey, paramsOrLang?: TranslationParams | string, language?: string) => string;
+  t: (
+    key: ResolveStringKey,
+    paramsOrLang?: TranslationParams | string,
+    language?: string,
+  ) => string;
   // 복수형 번역 함수: tPlural(key, count), tPlural(key, count, params), tPlural(key, count, params, language)
-  tPlural: (key: ResolvePluralKey, count: number, params?: Record<string, unknown>, language?: string) => string;
-  // 기존 비동기 번역 함수 (하위 호환성)
+  tPlural: (
+    key: ResolvePluralKey,
+    count: number,
+    params?: Record<string, unknown>,
+    language?: string,
+  ) => string;
+  /** @deprecated Use `t()` instead. Will be removed in a future major version. */
   tAsync: (key: string, params?: TranslationParams) => Promise<string>;
-  // 기존 동기 번역 함수 (하위 호환성)
-  tSync: (key: string, namespace?: string, params?: TranslationParams) => string;
+  /** @deprecated Use `t()` instead. Will be removed in a future major version. */
+  tSync: (
+    key: string,
+    namespace?: string,
+    params?: TranslationParams,
+  ) => string;
   // 원시 값 가져오기 (배열, 객체 포함) — 제네릭으로 타입 캐스팅 가능
   getRawValue: <T = unknown>(key: string, language?: string) => T | undefined;
   // 배열 번역 값 가져오기 (타입 안전)
@@ -244,6 +301,18 @@ export interface I18nContextType {
   };
 }
 
+/**
+ * Parameters for the `t()` function.
+ *
+ * `defaultValue` is a reserved key: when translation lookup fails entirely,
+ * the string provided here is returned instead of empty string (production)
+ * or the raw key (debug). Interpolation variables still work:
+ *
+ * ```ts
+ * t('missing:key', { defaultValue: 'Hello {{name}}', name: 'World' })
+ * // → 'Hello World'
+ * ```
+ */
 export interface TranslationParams {
   [key: string]: string | number;
 }
@@ -263,115 +332,162 @@ export interface TranslationParams {
  *
  * augmentation이 없으면 string으로 fallback (breaking 없음).
  */
- 
+
 export interface TypedTranslationKeys {}
 
 /** augmentation 시 좁혀진 타입, 미설정 시 string */
-export type ResolveStringKey = TypedTranslationKeys extends { stringKey: infer K } ? K & string : string;
-export type ResolveArrayKey = TypedTranslationKeys extends { arrayKey: infer K } ? K & string : string;
-export type ResolvePluralKey = TypedTranslationKeys extends { pluralKey: infer K } ? K & string : string;
+export type ResolveStringKey = TypedTranslationKeys extends {
+  stringKey: infer K;
+}
+  ? K & string
+  : string;
+export type ResolveArrayKey = TypedTranslationKeys extends { arrayKey: infer K }
+  ? K & string
+  : string;
+export type ResolvePluralKey = TypedTranslationKeys extends {
+  pluralKey: infer K;
+}
+  ? K & string
+  : string;
 
 // 타입 안전한 번역 키 시스템 (단순화된 버전)
-export type TranslationKey<T> = T extends Record<string, unknown>
-  ? {
-      [K in keyof T]: T[K] extends string
-        ? K
-        : T[K] extends Record<string, unknown>
-          ? `${K & string}.${TranslationKey<T[K]> & string}`
-          : never;
-    }[keyof T]
-  : never;
+export type TranslationKey<T> =
+  T extends Record<string, unknown>
+    ? {
+        [K in keyof T]: T[K] extends string
+          ? K
+          : T[K] extends Record<string, unknown>
+            ? `${K & string}.${TranslationKey<T[K]> & string}`
+            : never;
+      }[keyof T]
+    : never;
 
 // 타입 안전한 번역 함수들
-export interface TypedI18nContextType<T extends TranslationData> extends Omit<I18nContextType, 't' | 'tSync'> {
+export interface TypedI18nContextType<T extends TranslationData> extends Omit<
+  I18nContextType,
+  "t" | "tSync"
+> {
   // 타입 안전한 번역 함수
-  t: <K extends TranslationKey<T>>(key: K, paramsOrLang?: TranslationParams | string, language?: string) => string;
-  tSync: <K extends TranslationKey<T>>(key: K, namespace?: string, params?: TranslationParams) => string;
+  t: <K extends TranslationKey<T>>(
+    key: K,
+    paramsOrLang?: TranslationParams | string,
+    language?: string,
+  ) => string;
+  tSync: <K extends TranslationKey<T>>(
+    key: K,
+    namespace?: string,
+    params?: TranslationParams,
+  ) => string;
 }
 
 // 간단한 번역 키 타입 (무한 재귀 방지)
 export type SimpleTranslationKey = string;
 
 // 고급 번역 키 타입 (제한된 깊이)
-export type TranslationKeyLegacy<T extends Record<string, unknown>, D extends number = 3> = 
-  [D] extends [never] 
-    ? never 
-    : T extends Record<string, unknown>
-      ? {
-          [K in keyof T]: T[K] extends string 
-            ? K 
-            : T[K] extends Record<string, unknown>
-              ? `${K & string}.${TranslationKeyLegacy<T[K], Prev<D>> & string}` 
-              : never;
-        }[keyof T]
-      : never;
+export type TranslationKeyLegacy<
+  T extends Record<string, unknown>,
+  D extends number = 3,
+> = [D] extends [never]
+  ? never
+  : T extends Record<string, unknown>
+    ? {
+        [K in keyof T]: T[K] extends string
+          ? K
+          : T[K] extends Record<string, unknown>
+            ? `${K & string}.${TranslationKeyLegacy<T[K], Prev<D>> & string}`
+            : never;
+      }[keyof T]
+    : never;
 
-type Prev<T extends number> = T extends 0 ? never : T extends 1 ? 0 : T extends 2 ? 1 : T extends 3 ? 2 : never;
+type Prev<T extends number> = T extends 0
+  ? never
+  : T extends 1
+    ? 0
+    : T extends 2
+      ? 1
+      : T extends 3
+        ? 2
+        : never;
 
 // 유틸리티 타입들
-export type ExtractTranslationKeys<T> = T extends Record<string, unknown>
-  ? {
-      [K in keyof T]: T[K] extends string
-        ? K
-        : T[K] extends Record<string, unknown>
-          ? `${K & string}.${ExtractTranslationKeys<T[K]> & string}`
-          : never;
-    }[keyof T]
-  : never;
+export type ExtractTranslationKeys<T> =
+  T extends Record<string, unknown>
+    ? {
+        [K in keyof T]: T[K] extends string
+          ? K
+          : T[K] extends Record<string, unknown>
+            ? `${K & string}.${ExtractTranslationKeys<T[K]> & string}`
+            : never;
+      }[keyof T]
+    : never;
 
 // 네임스페이스별 타입 정의를 위한 헬퍼
-export type NamespaceKeys<T extends TranslationData, N extends keyof T> = ExtractTranslationKeys<T[N]>;
+export type NamespaceKeys<
+  T extends TranslationData,
+  N extends keyof T,
+> = ExtractTranslationKeys<T[N]>;
 
 // 타입 안전한 번역 키 생성 헬퍼
-export const createTranslationKey = <T extends TranslationData, N extends keyof T, K extends NamespaceKeys<T, N>>(
+export const createTranslationKey = <
+  T extends TranslationData,
+  N extends keyof T,
+  K extends NamespaceKeys<T, N>,
+>(
   namespace: N,
-  key: K
-): `${N & string}.${K & string}` => `${String(namespace)}.${String(key)}` as `${N & string}.${K & string}`; 
+  key: K,
+): `${N & string}.${K & string}` =>
+  `${String(namespace)}.${String(key)}` as `${N & string}.${K & string}`;
 
 // 타입 가드 함수들
-export function isTranslationNamespace(value: unknown): value is TranslationNamespace {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+export function isTranslationNamespace(
+  value: unknown,
+): value is TranslationNamespace {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function isLanguageConfig(value: unknown): value is LanguageConfig {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
-    typeof (value as LanguageConfig).code === 'string' &&
-    typeof (value as LanguageConfig).name === 'string' &&
-    typeof (value as LanguageConfig).nativeName === 'string'
+    typeof (value as LanguageConfig).code === "string" &&
+    typeof (value as LanguageConfig).name === "string" &&
+    typeof (value as LanguageConfig).nativeName === "string"
   );
 }
 
 export function isTranslationError(value: unknown): value is TranslationError {
   return (
     value instanceof Error &&
-    typeof (value as TranslationError).code === 'string' &&
-    ['MISSING_KEY', 'LOAD_FAILED', 'INVALID_KEY', 'NETWORK_ERROR', 'INITIALIZATION_ERROR'].includes(
-      (value as TranslationError).code
-    )
+    typeof (value as TranslationError).code === "string" &&
+    [
+      "MISSING_KEY",
+      "LOAD_FAILED",
+      "INVALID_KEY",
+      "NETWORK_ERROR",
+      "INITIALIZATION_ERROR",
+    ].includes((value as TranslationError).code)
   );
 }
 
 // 설정 검증 함수
 export function validateI18nConfig(config: unknown): config is I18nConfig {
-  if (!config || typeof config !== 'object') {
+  if (!config || typeof config !== "object") {
     return false;
   }
 
   const c = config as I18nConfig;
-  
+
   return (
-    typeof c.defaultLanguage === 'string' &&
+    typeof c.defaultLanguage === "string" &&
     Array.isArray(c.supportedLanguages) &&
     c.supportedLanguages.every(isLanguageConfig) &&
-    typeof c.loadTranslations === 'function'
+    typeof c.loadTranslations === "function"
   );
 }
 
 // 에러 처리 유틸리티 함수들
 export function createTranslationError(
-  code: TranslationError['code'],
+  code: TranslationError["code"],
   message: string,
   originalError?: Error,
   context?: {
@@ -380,7 +496,7 @@ export function createTranslationError(
     key?: string;
     retryCount?: number;
     maxRetries?: number;
-  }
+  },
 ): TranslationError {
   const error = new Error(message) as TranslationError;
   error.code = code;
@@ -391,83 +507,85 @@ export function createTranslationError(
   error.retryCount = context?.retryCount || 0;
   error.maxRetries = context?.maxRetries || 3;
   error.timestamp = Date.now();
-  error.name = 'TranslationError';
+  error.name = "TranslationError";
   return error;
 }
 
 // 사용자 친화적 에러 메시지 생성
-export function createUserFriendlyError(error: TranslationError): UserFriendlyError {
-  const errorMessages: Record<TranslationError['code'], UserFriendlyError> = {
+export function createUserFriendlyError(
+  error: TranslationError,
+): UserFriendlyError {
+  const errorMessages: Record<TranslationError["code"], UserFriendlyError> = {
     MISSING_KEY: {
-      code: 'MISSING_KEY',
-      message: '번역 키를 찾을 수 없습니다',
-      suggestion: '번역 파일에 해당 키가 있는지 확인해주세요',
-      action: '번역 파일 업데이트',
-      severity: 'low'
+      code: "MISSING_KEY",
+      message: "번역 키를 찾을 수 없습니다",
+      suggestion: "번역 파일에 해당 키가 있는지 확인해주세요",
+      action: "번역 파일 업데이트",
+      severity: "low",
     },
     LOAD_FAILED: {
-      code: 'LOAD_FAILED',
-      message: '번역 파일을 불러오는데 실패했습니다',
-      suggestion: '네트워크 연결과 파일 경로를 확인해주세요',
-      action: '재시도',
-      severity: 'medium'
+      code: "LOAD_FAILED",
+      message: "번역 파일을 불러오는데 실패했습니다",
+      suggestion: "네트워크 연결과 파일 경로를 확인해주세요",
+      action: "재시도",
+      severity: "medium",
     },
     INVALID_KEY: {
-      code: 'INVALID_KEY',
-      message: '잘못된 번역 키 형식입니다',
+      code: "INVALID_KEY",
+      message: "잘못된 번역 키 형식입니다",
       suggestion: '키 형식을 "namespace.key" 형태로 입력해주세요',
-      action: '키 형식 수정',
-      severity: 'low'
+      action: "키 형식 수정",
+      severity: "low",
     },
     NETWORK_ERROR: {
-      code: 'NETWORK_ERROR',
-      message: '네트워크 오류가 발생했습니다',
-      suggestion: '인터넷 연결을 확인하고 다시 시도해주세요',
-      action: '재시도',
-      severity: 'high'
+      code: "NETWORK_ERROR",
+      message: "네트워크 오류가 발생했습니다",
+      suggestion: "인터넷 연결을 확인하고 다시 시도해주세요",
+      action: "재시도",
+      severity: "high",
     },
     INITIALIZATION_ERROR: {
-      code: 'INITIALIZATION_ERROR',
-      message: '번역 시스템 초기화에 실패했습니다',
-      suggestion: '설정을 확인하고 페이지를 새로고침해주세요',
-      action: '페이지 새로고침',
-      severity: 'critical'
+      code: "INITIALIZATION_ERROR",
+      message: "번역 시스템 초기화에 실패했습니다",
+      suggestion: "설정을 확인하고 페이지를 새로고침해주세요",
+      action: "페이지 새로고침",
+      severity: "critical",
     },
     VALIDATION_ERROR: {
-      code: 'VALIDATION_ERROR',
-      message: '설정 검증에 실패했습니다',
-      suggestion: '번역 설정을 확인해주세요',
-      action: '설정 수정',
-      severity: 'medium'
+      code: "VALIDATION_ERROR",
+      message: "설정 검증에 실패했습니다",
+      suggestion: "번역 설정을 확인해주세요",
+      action: "설정 수정",
+      severity: "medium",
     },
     CACHE_ERROR: {
-      code: 'CACHE_ERROR',
-      message: '캐시 처리 중 오류가 발생했습니다',
-      suggestion: '캐시를 초기화하고 다시 시도해주세요',
-      action: '캐시 초기화',
-      severity: 'low'
+      code: "CACHE_ERROR",
+      message: "캐시 처리 중 오류가 발생했습니다",
+      suggestion: "캐시를 초기화하고 다시 시도해주세요",
+      action: "캐시 초기화",
+      severity: "low",
     },
     FALLBACK_LOAD_FAILED: {
-      code: 'FALLBACK_LOAD_FAILED',
-      message: '폴백 언어 로딩에 실패했습니다',
-      suggestion: '폴백 언어 파일을 확인해주세요',
-      action: '폴백 언어 파일 수정',
-      severity: 'medium'
+      code: "FALLBACK_LOAD_FAILED",
+      message: "폴백 언어 로딩에 실패했습니다",
+      suggestion: "폴백 언어 파일을 확인해주세요",
+      action: "폴백 언어 파일 수정",
+      severity: "medium",
     },
     INITIALIZATION_FAILED: {
-      code: 'INITIALIZATION_FAILED',
-      message: '초기화에 실패했습니다',
-      suggestion: '설정을 확인하고 다시 시도해주세요',
-      action: '설정 확인',
-      severity: 'critical'
+      code: "INITIALIZATION_FAILED",
+      message: "초기화에 실패했습니다",
+      suggestion: "설정을 확인하고 다시 시도해주세요",
+      action: "설정 확인",
+      severity: "critical",
     },
     RETRY_FAILED: {
-      code: 'RETRY_FAILED',
-      message: '재시도에 실패했습니다',
-      suggestion: '네트워크 연결을 확인해주세요',
-      action: '재시도',
-      severity: 'high'
-    }
+      code: "RETRY_FAILED",
+      message: "재시도에 실패했습니다",
+      suggestion: "네트워크 연결을 확인해주세요",
+      action: "재시도",
+      severity: "high",
+    },
   };
 
   return errorMessages[error.code];
@@ -475,14 +593,16 @@ export function createUserFriendlyError(error: TranslationError): UserFriendlyEr
 
 // 에러 복구 가능 여부 확인
 export function isRecoverableError(error: TranslationError): boolean {
-  const recoverableCodes: TranslationError['code'][] = [
-    'LOAD_FAILED',
-    'NETWORK_ERROR',
-    'CACHE_ERROR'
+  const recoverableCodes: TranslationError["code"][] = [
+    "LOAD_FAILED",
+    "NETWORK_ERROR",
+    "CACHE_ERROR",
   ];
-  
-  return recoverableCodes.includes(error.code) && 
-         (error.retryCount || 0) < (error.maxRetries || 3);
+
+  return (
+    recoverableCodes.includes(error.code) &&
+    (error.retryCount || 0) < (error.maxRetries || 3)
+  );
 }
 
 // 기본 에러 복구 전략
@@ -492,26 +612,33 @@ export const defaultErrorRecoveryStrategy: ErrorRecoveryStrategy = {
   backoffMultiplier: 2,
   shouldRetry: isRecoverableError,
   onRetry: (error: TranslationError, attempt: number) => {
-    if (process.env.NODE_ENV !== 'production') console.warn(`Retrying translation operation (attempt ${attempt}/${error.maxRetries}):`, error.message);
+    if (process.env.NODE_ENV !== "production")
+      console.warn(
+        `Retrying translation operation (attempt ${attempt}/${error.maxRetries}):`,
+        error.message,
+      );
   },
   onMaxRetriesExceeded: (error: TranslationError) => {
-    console.error('Max retries exceeded for translation operation:', error.message);
-  }
+    console.error(
+      "Max retries exceeded for translation operation:",
+      error.message,
+    );
+  },
 };
 
 // 기본 에러 로깅 설정
 export const defaultErrorLoggingConfig: ErrorLoggingConfig = {
   enabled: true,
-  level: 'error',
+  level: "error",
   includeStack: true,
   includeContext: true,
-  customLogger: undefined
+  customLogger: undefined,
 };
 
 // 에러 로깅 함수
 export function logTranslationError(
-  error: TranslationError, 
-  config: ErrorLoggingConfig = defaultErrorLoggingConfig
+  error: TranslationError,
+  config: ErrorLoggingConfig = defaultErrorLoggingConfig,
 ): void {
   if (!config.enabled) return;
 
@@ -520,7 +647,7 @@ export function logTranslationError(
     message: error.message,
     timestamp: error.timestamp,
     retryCount: error.retryCount,
-    maxRetries: error.maxRetries
+    maxRetries: error.maxRetries,
   };
 
   if (config.includeContext) {
@@ -538,18 +665,19 @@ export function logTranslationError(
     config.customLogger(error);
   } else {
     switch (config.level) {
-      case 'error':
-        console.error('Translation Error:', logData);
+      case "error":
+        console.error("Translation Error:", logData);
         break;
-      case 'warn':
-        if (process.env.NODE_ENV !== 'production') console.warn('Translation Warning:', logData);
+      case "warn":
+        if (process.env.NODE_ENV !== "production")
+          console.warn("Translation Warning:", logData);
         break;
-      case 'info':
-        console.info('Translation Info:', logData);
+      case "info":
+        console.info("Translation Info:", logData);
         break;
-      case 'debug':
-        console.debug('Translation Debug:', logData);
+      case "debug":
+        console.debug("Translation Debug:", logData);
         break;
     }
   }
-} 
+}
