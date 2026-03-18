@@ -13,7 +13,7 @@ GEO is a system that generates **metadata optimized for AI search engines** like
 
 > **Server-safe**: GEO functions are exported from `framework/shared`. Use them in server components or `generateMetadata()`.
 
-> **Import note**: `metaToObject` and `openGraphToObject` are internal helpers used by the server helpers below. They are NOT exported from `framework/shared`. Use `generateGEOForMetadata` instead for Next.js Metadata integration.
+> **Import note**: `metaToObject` and `openGraphToObject` are exported from the GEO module (`@hua-labs/hua/framework/seo/geo`) but NOT from `framework/shared`. For Next.js Metadata integration, prefer `generateGEOForMetadata` instead.
 
 ## Core Functions
 
@@ -396,4 +396,4 @@ export async function generateMetadata({ params }) {
 - `framework/shared` exports: `generateGEOMetadata`, `renderJSONLD`, `createAIContext`, and the 4 structured data helpers.
 - `metaToObject` and `openGraphToObject` are internal helpers used by server.ts. They are NOT exported from `framework/shared` — do not import them.
 - `renderJSONLD` escapes `</script>` strings for XSS prevention. Do not use `JSON.stringify` directly.
-- `generateCodeLD`, `generateVideoLD`, `generateOrganizationLD`, `validateJsonLd`, `formatValidationResult`, and `GEO_PRESETS` exist in `geo/index.ts` internally but are NOT exported from `framework/shared`.
+- `generateCodeLD`, `generateVideoLD`, `generateOrganizationLD`, `validateJsonLd`, `formatValidationResult`, and `GEO_PRESETS` are exported from `geo/index.ts` (accessible via `@hua-labs/hua/framework/seo/geo`), but NOT from `framework/shared`.
