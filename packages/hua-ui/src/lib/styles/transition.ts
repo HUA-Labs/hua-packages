@@ -29,6 +29,12 @@ export const TRANSITIONS = {
     "background-color 200ms ease-in-out, border-color 200ms ease-in-out",
   /** transform only — switch thumb, chevron rotation */
   transform: "transform 200ms ease-out",
+  /** opacity + transform — Pressable micro-interaction */
+  micro: "opacity 120ms ease, transform 100ms ease",
+  /** all 300ms ease-in-out — Toast items */
+  smooth: "all 300ms ease-in-out",
+  /** background-color only — close button hover */
+  bg: "background-color 200ms ease-in-out",
 } as const;
 
 /**

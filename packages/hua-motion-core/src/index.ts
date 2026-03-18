@@ -354,7 +354,8 @@ export type {
   // 고급 모션 타입들
   SpringConfig,
   GestureConfig,
-  OrchestrationConfig,
+  OrchestrationConfig, // deprecated alias
+  SequenceOrchestrationConfig,
 
   // 훅별 확장 옵션 타입들
   FadeInOptions,

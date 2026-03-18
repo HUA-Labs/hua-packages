@@ -1,15 +1,27 @@
 import { useRef, useCallback, useState, useEffect } from "react";
+import type { BaseMotionReturn, MotionElement } from "../types/common";
+
+/** The subset of BaseMotionReturn that useSequence actually consumes. */
+type SequenceMotionResult = Pick<
+  BaseMotionReturn<MotionElement>,
+  "start" | "stop" | "reset" | "ref"
+> & {
+  pause?: () => void;
+  resume?: () => void;
+};
 
 export interface SequenceConfig {
   autoStart?: boolean;
   loop?: boolean;
 }
 
+/** @deprecated Use useOrchestration or useMotionOrchestra instead. */
 interface SequenceItem {
-  hook: () => any;
+  hook: () => SequenceMotionResult;
   delay?: number;
 }
 
+/** @deprecated Use useOrchestration or useMotionOrchestra instead. */
 export function useSequence(
   sequence: SequenceItem[],
   options: SequenceConfig = {},
@@ -18,7 +30,7 @@ export function useSequence(
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const motionsRef = useRef<any[]>([]);
+  const motionsRef = useRef<SequenceMotionResult[]>([]);
   const timeoutsRef = useRef<number[]>([]);
 
   // 컴포넌트 레벨에서 모션 훅들을 미리 생성
@@ -135,6 +147,6 @@ export function useSequence(
     isPlaying,
     currentIndex,
     totalMotions: sequence.length,
-    ref: motions[0]?.ref || (() => {}), // 첫 번째 모션의 ref 반환
+    ref: motions[0]?.ref ?? { current: null }, // 첫 번째 모션의 ref 반환
   };
 }

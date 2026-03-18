@@ -1,8 +1,8 @@
-overview: "A collection of 35+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API."
+overview: "A collection of 60+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API."
 docsUrl: "https://docs.hua-labs.com"
 
 features:
-  - "35+ animation hooks — Fade, slide, scale, scroll, interactions, gestures"
+  - "60+ animation hooks — Fade, slide, scale, scroll, interactions, gestures, orchestration"
   - "Zero dependencies — Pure JavaScript motion engine"
   - "Ref-based — Direct DOM manipulation for consistent performance"
   - "SSR compatible — Works with Next.js, Remix, and SSR frameworks"
@@ -162,6 +162,76 @@ apiNotes:
   # Stagger
   useStagger:
     description: "Orchestrate staggered entrance animations across a list of elements"
+    kind: "hook"
+
+  # Orchestration
+  useOrchestration:
+    description: "rAF-based timeline engine with seek, speed, reverse support"
+    kind: "hook"
+  useMotionOrchestra:
+    description: "Multi-mode orchestrator (sequential/parallel/stagger) with dynamic step registration"
+    kind: "hook"
+  useSequence:
+    description: "[DEPRECATED] Sequential motion chaining — use useOrchestration or useMotionOrchestra instead"
+    kind: "hook"
+
+  # Auto animations (looping)
+  useAutoFade:
+    description: "Auto-looping fade animation"
+    kind: "hook"
+  useAutoPlay:
+    description: "Auto-looping playback animation"
+    kind: "hook"
+  useAutoScale:
+    description: "Auto-looping scale animation"
+    kind: "hook"
+  useAutoSlide:
+    description: "Auto-looping slide animation"
+    kind: "hook"
+
+  # Layout & interaction (Pro)
+  useLayoutMotion:
+    description: "Layout change animation with FLIP technique"
+    kind: "hook"
+  createLayoutTransition:
+    description: "Factory function to create layout transition configs"
+    kind: "function"
+  useKeyboardToggle:
+    description: "Keyboard shortcut-triggered toggle animation"
+    kind: "hook"
+  useScrollDirection:
+    description: "Detect scroll direction (up/down) for show/hide patterns"
+    kind: "hook"
+  useStickyToggle:
+    description: "Toggle animation based on sticky scroll threshold"
+    kind: "hook"
+  useInteractive:
+    description: "Combined hover/press/focus interaction state"
+    kind: "hook"
+  usePerformanceMonitor:
+    description: "FPS and frame timing monitor for motion performance"
+    kind: "hook"
+  useLanguageAwareMotion:
+    description: "Direction-aware motion that adapts to LTR/RTL languages"
+    kind: "hook"
+  useGameLoop:
+    description: "Fixed-timestep game loop with state management"
+    kind: "hook"
+  useMotion:
+    description: "Flexible single-element motion hook with from/to config"
+    kind: "hook"
+
+  # Renamed hooks (collision avoidance)
+  useViewportToggle:
+    description: "IntersectionObserver-based viewport visibility toggle (renamed from pro useVisibilityToggle)"
+    kind: "hook"
+  useScrollPositionToggle:
+    description: "pageYOffset-based scroll position toggle (renamed from pro useScrollToggle)"
+    kind: "hook"
+
+  # Additional utilities
+  useReducedMotionObject:
+    description: "Returns { prefersReducedMotion } object (extended form of useReducedMotion)"
     kind: "hook"
 
   # Advanced interaction

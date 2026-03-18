@@ -6,6 +6,7 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { Card, CardProps } from "./Card";
 import type { CSSProperties } from "react";
 import { createGlassStyle } from "../lib/styles/glass";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 const panelVariantStyles = dotVariants({
   base: "",
@@ -297,7 +298,7 @@ const Panel = React.forwardRef<HTMLDivElement, PanelProps>(
     const computedStyle = useMemo(
       () =>
         mergeStyles(
-          { transition: "all 300ms" },
+          { transition: TRANSITIONS.slow },
           panelVariantStyles({
             padding: customPadding ? "custom" : padding,
             rounded: customRounded ? "custom" : rounded,

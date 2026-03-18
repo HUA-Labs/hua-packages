@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useDotMap, mergeStyles } from "../hooks/useDotMap";
 import { Slot } from "../lib/Slot";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 /** Minimum touch target size (px) per WCAG 2.1 AA §2.5.5 */
 const MIN_TOUCH_PX = 44;
@@ -87,7 +88,7 @@ const Pressable = React.forwardRef<HTMLButtonElement, PressableProps>(
      */
     const defaultStyle = useMemo((): React.CSSProperties => {
       const base: React.CSSProperties = {
-        transition: "opacity 120ms ease, transform 100ms ease",
+        transition: TRANSITIONS.micro,
         cursor: disabled ? "not-allowed" : "pointer",
         // Hover: subtle dim — overridden if dot prop sets its own hover opacity
         opacity: isHovered && !disabled && !isPressed ? 0.85 : 1,

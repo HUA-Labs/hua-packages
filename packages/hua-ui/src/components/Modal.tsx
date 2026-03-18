@@ -54,6 +54,27 @@ export interface ModalProps {
   style?: React.CSSProperties;
 }
 
+// Close button static styles
+const CLOSE_BTN_BASE: React.CSSProperties = {
+  ...resolveDot("p-2 rounded-full z-20"),
+  color: "var(--color-muted-foreground)",
+  transition: "all 200ms ease-in-out",
+  outline: "none",
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
+};
+
+const CLOSE_BTN_HOVER: React.CSSProperties = {
+  backgroundColor: "var(--color-muted)",
+  color: "var(--color-foreground)",
+};
+
+const CLOSE_BTN_FOCUS: React.CSSProperties = {
+  outline: "none",
+  boxShadow: "0 0 0 1px var(--color-ring)",
+};
+
 // 모달 닫기 버튼 컴포넌트 (title 유무에 따라 위치만 다름)
 function ModalCloseButton({
   onClick,
@@ -62,13 +83,20 @@ function ModalCloseButton({
   onClick: () => void;
   style?: React.CSSProperties;
 }) {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isFocused, setIsFocused] = React.useState(false);
+
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
       style={mergeStyles(
-        resolveDot(
-          "p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20",
-        ),
+        CLOSE_BTN_BASE,
+        isHovered ? CLOSE_BTN_HOVER : undefined,
+        isFocused ? CLOSE_BTN_FOCUS : undefined,
         style,
       )}
       aria-label="닫기"

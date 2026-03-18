@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
 import { RADIO_FOCUS_SHADOW } from "../lib/styles/focus";
+import { CONTROL_HOVER_BORDER } from "../lib/styles/hover";
 import { TRANSITIONS } from "../lib/styles/transition";
 
 // --- Static style constants ---
@@ -161,6 +162,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     const descriptionId = description ? `${radioId}-description` : undefined;
 
     const [isFocused, setIsFocused] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     // Support both controlled and uncontrolled modes
     const isControlled = props.checked !== undefined;
@@ -199,9 +201,21 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
           CIRCLE_SIZE[size],
           VARIANT_BASE[variant],
           stateBorderColor,
+          isHovered && !isChecked && !disabled
+            ? CONTROL_HOVER_BORDER
+            : undefined,
           isFocused ? { boxShadow: focusShadow } : undefined,
         ),
-      [size, variant, isFocused, disabled, focusShadow, stateBorderColor],
+      [
+        size,
+        variant,
+        isFocused,
+        isHovered,
+        isChecked,
+        disabled,
+        focusShadow,
+        stateBorderColor,
+      ],
     );
 
     // Computed inner dot style
@@ -253,7 +267,11 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
             }}
             {...props}
           />
-          <div style={circleStyle}>
+          <div
+            style={circleStyle}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <div style={innerDotStyle} />
           </div>
         </div>

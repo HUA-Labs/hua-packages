@@ -476,10 +476,10 @@ export default function HomePage() {
                   content: (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <Card className="glass">
-                        <CardHeader className="pb-2">
+                        <CardHeader dot="p-3" className="pb-2">
                           <CardTitle className="text-base">{t('common:welcome.features.design.title')}</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent dot="px-3 pb-3">
                           <p className="text-sm text-muted-foreground">{t('common:welcome.features.design.description')}</p>
                           <Button size="sm" variant="outline" className="mt-3">
                             {t('common:welcome.hero.secondaryCta')}
@@ -487,10 +487,10 @@ export default function HomePage() {
                         </CardContent>
                       </Card>
                       <Card className="glass">
-                        <CardHeader className="pb-2">
+                        <CardHeader dot="p-3" className="pb-2">
                           <CardTitle className="text-base">{t('common:welcome.features.i18n.title')}</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent dot="px-3 pb-3">
                           <p className="text-sm text-muted-foreground">{t('common:welcome.features.i18n.description')}</p>
                           <div className="flex gap-2 mt-3">
                             <Badge variant="outline">KO</Badge>

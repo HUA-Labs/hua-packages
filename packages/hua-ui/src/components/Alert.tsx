@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { dotVariants } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 const ROUNDED_MAP: Record<string, string> = {
   none: "rounded-none",
@@ -294,7 +295,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           {
             display: "inline-flex",
             ...resolveDot("rounded-md p-1.5"),
-            transition: "background-color 200ms ease-in-out",
+            transition: TRANSITIONS.bg,
             outline: "none",
             border: "none",
             cursor: "pointer",

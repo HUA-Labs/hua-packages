@@ -10,6 +10,7 @@ import {
 } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 /**
  * Toast 메시지 타입 / Toast message type
@@ -281,7 +282,7 @@ const ITEM_BASE: React.CSSProperties = {
   ...resolveDot("p-4 rounded-xl"),
   border: "1px solid",
   ...createGlassStyle("light"),
-  transition: "all 300ms ease-in-out",
+  transition: TRANSITIONS.smooth,
 };
 
 /** Type-specific styles: background, border color, text color */
