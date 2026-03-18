@@ -14,12 +14,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@hua-labs/docs-engine",
-    "my-docs",
-    "my-site",
-    "hue",
-    "slides",
-    "my-app"
-  ]
+  "ignore": []
 }
