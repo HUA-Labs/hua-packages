@@ -4,12 +4,12 @@
  * Utility functions for project creation
  */
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { execSync } from 'child_process';
-import inquirer from 'inquirer';
-import chalk from 'chalk';
-import { HUA_VERSION, UI_VERSION } from './version';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { execSync } from "child_process";
+import inquirer from "inquirer";
+import chalk from "chalk";
+import { HUA_VERSION, UI_VERSION } from "./version";
 
 /**
  * Cached npm registry versions (fetched once per CLI run)
@@ -21,9 +21,15 @@ let _npmVersionCache: { hua?: string; ui?: string } | null = null;
  * Returns cached result on subsequent calls.
  * Falls back to null on network failure (timeout 3s).
  */
-async function fetchLatestNpmVersions(): Promise<{ hua: string | null; ui: string | null }> {
+async function fetchLatestNpmVersions(): Promise<{
+  hua: string | null;
+  ui: string | null;
+}> {
   if (_npmVersionCache) {
-    return { hua: _npmVersionCache.hua ?? null, ui: _npmVersionCache.ui ?? null };
+    return {
+      hua: _npmVersionCache.hua ?? null,
+      ui: _npmVersionCache.ui ?? null,
+    };
   }
 
   _npmVersionCache = {};
@@ -33,8 +39,8 @@ async function fetchLatestNpmVersions(): Promise<{ hua: string | null; ui: strin
       try {
         const result = execSync(`npm view ${pkg} version`, {
           timeout: 3000,
-          stdio: 'pipe',
-          encoding: 'utf-8',
+          stdio: "pipe",
+          encoding: "utf-8",
         });
         resolve(result.trim() || null);
       } catch {
@@ -44,8 +50,8 @@ async function fetchLatestNpmVersions(): Promise<{ hua: string | null; ui: strin
   };
 
   const [hua, ui] = await Promise.all([
-    fetchVersion('@hua-labs/hua'),
-    fetchVersion('@hua-labs/ui'),
+    fetchVersion("@hua-labs/hua"),
+    fetchVersion("@hua-labs/ui"),
   ]);
 
   _npmVersionCache = { hua: hua ?? undefined, ui: ui ?? undefined };
@@ -60,17 +66,17 @@ import {
   compareVersions,
   validateProjectName,
   listEnabledAiFiles,
-} from './shared';
+} from "./shared";
 
 /**
  * Detect which package manager was used to run the CLI
  */
-function detectPackageManager(): 'npm' | 'pnpm' | 'yarn' {
-  const userAgent = process.env.npm_config_user_agent || '';
+function detectPackageManager(): "npm" | "pnpm" | "yarn" {
+  const userAgent = process.env.npm_config_user_agent || "";
 
-  if (userAgent.startsWith('pnpm')) return 'pnpm';
-  if (userAgent.startsWith('yarn')) return 'yarn';
-  return 'npm';
+  if (userAgent.startsWith("pnpm")) return "pnpm";
+  if (userAgent.startsWith("yarn")) return "yarn";
+  return "npm";
 }
 import {
   NEXTJS_VERSION,
@@ -88,12 +94,12 @@ import {
   PHOSPHOR_ICONS_VERSION,
   CLSX_VERSION,
   TAILWIND_MERGE_VERSION,
-} from './constants/versions';
+} from "./constants/versions";
 
 // Resolve template directory
 // When compiled, __dirname points to dist/, so we need to go up to templates/
 // When running with tsx, __dirname points to src/, so we need to go up one level
-const TEMPLATE_DIR = path.join(__dirname, '../templates/nextjs');
+const TEMPLATE_DIR = path.join(__dirname, "../templates/nextjs");
 
 /**
  * AI context generation options
@@ -105,13 +111,14 @@ export interface AiContextOptions {
   skillsMd: boolean;
   claudeContext: boolean;
   claudeSkills: boolean;
-  language: 'ko' | 'en' | 'both';
+  agentDocs: boolean;
+  language: "ko" | "en" | "both";
 }
 
 interface MonorepoContext {
   isMonorepo: boolean;
   rootDir?: string;
-  projectLocation?: 'root' | 'apps' | 'packages' | 'other';
+  projectLocation?: "root" | "apps" | "packages" | "other";
 }
 
 /**
@@ -119,14 +126,16 @@ interface MonorepoContext {
  */
 export async function promptProjectName(): Promise<string> {
   if (!isInteractive()) {
-    throw new Error('Project name is required when running in non-interactive mode. Please provide it as an argument: npx create-hua <project-name>');
+    throw new Error(
+      "Project name is required when running in non-interactive mode. Please provide it as an argument: npx create-hua <project-name>",
+    );
   }
 
   const { projectName } = await inquirer.prompt([
     {
-      type: 'input',
-      name: 'projectName',
-      message: t('projectNamePrompt'),
+      type: "input",
+      name: "projectName",
+      message: t("projectNamePrompt"),
       validate: (input: string) => {
         const result = validateProjectName(input);
         if (!result.valid) return result.message!;
@@ -154,7 +163,7 @@ export async function isEmptyDir(dirPath: string): Promise<boolean> {
  */
 export async function promptAiContextOptions(): Promise<AiContextOptions> {
   if (!isInteractive()) {
-    console.log('Running in non-interactive mode, using default options...');
+    console.log("Running in non-interactive mode, using default options...");
     return {
       cursorRules: true,
       aiContext: true,
@@ -162,7 +171,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
       skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
-      language: 'both',
+      language: "both",
     };
   }
 
@@ -170,66 +179,89 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
     const isEn = isEnglishOnly();
     const answers = await inquirer.prompt([
       {
-        type: 'checkbox',
-        name: 'options',
-        message: t('selectAiContext'),
+        type: "checkbox",
+        name: "options",
+        message: t("selectAiContext"),
         choices: [
           {
-            name: isEn ? '.cursor/rules/ (Cursor IDE rules)' : '.cursor/rules/ (Cursor IDE rules) / Cursor IDE 규칙',
-            value: 'cursorRules',
+            name: isEn
+              ? ".cursor/rules/ (Cursor IDE rules)"
+              : ".cursor/rules/ (Cursor IDE rules) / Cursor IDE 규칙",
+            value: "cursorRules",
             checked: true,
           },
           {
-            name: isEn ? 'ai-context.md (General AI context)' : 'ai-context.md (General AI context) / 범용 AI 컨텍스트',
-            value: 'aiContext',
+            name: isEn
+              ? "ai-context.md (General AI context)"
+              : "ai-context.md (General AI context) / 범용 AI 컨텍스트",
+            value: "aiContext",
             checked: true,
           },
           {
-            name: isEn ? 'AGENTS.md (OpenAI Codex)' : 'AGENTS.md (OpenAI Codex) / Codex 컨텍스트',
-            value: 'agentsMd',
+            name: isEn
+              ? "AGENTS.md (OpenAI Codex)"
+              : "AGENTS.md (OpenAI Codex) / Codex 컨텍스트",
+            value: "agentsMd",
             checked: true,
           },
           {
-            name: isEn ? 'skills.md (Antigravity)' : 'skills.md (Antigravity) / Antigravity 스킬',
-            value: 'skillsMd',
+            name: isEn
+              ? "skills.md (Antigravity)"
+              : "skills.md (Antigravity) / Antigravity 스킬",
+            value: "skillsMd",
             checked: true,
           },
           {
-            name: isEn ? '.claude/project-context.md (Claude context)' : '.claude/project-context.md (Claude context) / Claude 컨텍스트',
-            value: 'claudeContext',
+            name: isEn
+              ? ".claude/project-context.md (Claude context)"
+              : ".claude/project-context.md (Claude context) / Claude 컨텍스트",
+            value: "claudeContext",
             checked: true,
           },
           {
-            name: isEn ? '.claude/skills/ (Claude skills)' : '.claude/skills/ (Claude skills) / Claude 스킬',
-            value: 'claudeSkills',
+            name: isEn
+              ? ".claude/skills/ (Claude skills)"
+              : ".claude/skills/ (Claude skills) / Claude 스킬",
+            value: "claudeSkills",
             checked: false,
           },
         ],
       },
       {
-        type: 'list',
-        name: 'language',
-        message: t('documentationLanguage'),
+        type: "list",
+        name: "language",
+        message: t("documentationLanguage"),
         choices: [
-          { name: isEn ? 'Korean only' : 'Korean only / 한국어만', value: 'ko' },
-          { name: isEn ? 'English only' : 'English only / 영어만', value: 'en' },
-          { name: isEn ? 'Both Korean and English' : 'Both Korean and English / 한국어와 영어 모두', value: 'both' },
+          {
+            name: isEn ? "Korean only" : "Korean only / 한국어만",
+            value: "ko",
+          },
+          {
+            name: isEn ? "English only" : "English only / 영어만",
+            value: "en",
+          },
+          {
+            name: isEn
+              ? "Both Korean and English"
+              : "Both Korean and English / 한국어와 영어 모두",
+            value: "both",
+          },
         ],
-        default: 'both',
+        default: "both",
       },
     ]);
 
     return {
-      cursorRules: answers.options.includes('cursorRules'),
-      aiContext: answers.options.includes('aiContext'),
-      agentsMd: answers.options.includes('agentsMd'),
-      skillsMd: answers.options.includes('skillsMd'),
-      claudeContext: answers.options.includes('claudeContext'),
-      claudeSkills: answers.options.includes('claudeSkills'),
-      language: answers.language || 'both',
+      cursorRules: answers.options.includes("cursorRules"),
+      aiContext: answers.options.includes("aiContext"),
+      agentsMd: answers.options.includes("agentsMd"),
+      skillsMd: answers.options.includes("skillsMd"),
+      claudeContext: answers.options.includes("claudeContext"),
+      claudeSkills: answers.options.includes("claudeSkills"),
+      language: answers.language || "both",
     };
   } catch (error) {
-    console.warn('Failed to get interactive input, using default options...');
+    console.warn("Failed to get interactive input, using default options...");
     return {
       cursorRules: true,
       aiContext: true,
@@ -237,7 +269,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
       skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
-      language: 'both',
+      language: "both",
     };
   }
 }
@@ -247,22 +279,27 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
  */
 export async function copyTemplate(
   projectPath: string,
-  options?: { skipAiContext?: boolean }
+  options?: { skipAiContext?: boolean },
 ): Promise<void> {
   await fs.copy(TEMPLATE_DIR, projectPath, {
     filter: (src: string) => {
       const relativePath = path.relative(TEMPLATE_DIR, src);
 
-      if (relativePath.includes('node_modules') || relativePath.includes('.git')) {
+      if (
+        relativePath.includes("node_modules") ||
+        relativePath.includes(".git")
+      ) {
         return false;
       }
 
       if (options?.skipAiContext) {
-        if (relativePath === 'ai-context.md' ||
-          relativePath === 'AGENTS.md' ||
-          relativePath === 'skills.md' ||
-          relativePath.startsWith('.cursor') ||
-          relativePath.startsWith('.claude')) {
+        if (
+          relativePath === "ai-context.md" ||
+          relativePath === "AGENTS.md" ||
+          relativePath === "skills.md" ||
+          relativePath.startsWith(".cursor") ||
+          relativePath.startsWith(".claude")
+        ) {
           return false;
         }
       }
@@ -282,22 +319,22 @@ export async function copyTemplate(
  */
 async function getHuaVersion(): Promise<string> {
   // 1. Explicit workspace env
-  if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
-    return 'workspace:*';
+  if (process.env.HUA_WORKSPACE_VERSION === "workspace") {
+    return "workspace:*";
   }
 
   // 2. Monorepo: look for sibling hua package
   try {
-    const createHuaRoot = path.resolve(__dirname, '..');
-    const huaPackageJson = path.join(createHuaRoot, '../hua/package.json');
+    const createHuaRoot = path.resolve(__dirname, "..");
+    const huaPackageJson = path.join(createHuaRoot, "../hua/package.json");
 
     if (fs.pathExistsSync(huaPackageJson)) {
       const huaPackage = fs.readJSONSync(huaPackageJson);
       if (huaPackage.version) {
         let currentDir = process.cwd();
         for (let i = 0; i < 10; i++) {
-          if (fs.pathExistsSync(path.join(currentDir, 'pnpm-workspace.yaml'))) {
-            return 'workspace:*';
+          if (fs.pathExistsSync(path.join(currentDir, "pnpm-workspace.yaml"))) {
+            return "workspace:*";
           }
           const parentDir = path.dirname(currentDir);
           if (parentDir === currentDir) break;
@@ -322,21 +359,21 @@ async function getHuaVersion(): Promise<string> {
  * Get @hua-labs/ui version — mirrors getHuaVersion() logic
  */
 async function getUiVersion(): Promise<string> {
-  if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
-    return 'workspace:*';
+  if (process.env.HUA_WORKSPACE_VERSION === "workspace") {
+    return "workspace:*";
   }
 
   try {
-    const createHuaRoot = path.resolve(__dirname, '..');
-    const uiPackageJson = path.join(createHuaRoot, '../hua-ui/package.json');
+    const createHuaRoot = path.resolve(__dirname, "..");
+    const uiPackageJson = path.join(createHuaRoot, "../hua-ui/package.json");
 
     if (fs.pathExistsSync(uiPackageJson)) {
       const uiPackage = fs.readJSONSync(uiPackageJson);
       if (uiPackage.version) {
         let currentDir = process.cwd();
         for (let i = 0; i < 10; i++) {
-          if (fs.pathExistsSync(path.join(currentDir, 'pnpm-workspace.yaml'))) {
-            return 'workspace:*';
+          if (fs.pathExistsSync(path.join(currentDir, "pnpm-workspace.yaml"))) {
+            return "workspace:*";
           }
           const parentDir = path.dirname(currentDir);
           if (parentDir === currentDir) break;
@@ -360,21 +397,23 @@ async function getUiVersion(): Promise<string> {
 /**
  * Detect monorepo context by looking for workspace markers in parent directories
  */
-async function detectMonorepoContext(projectPath: string): Promise<MonorepoContext> {
+async function detectMonorepoContext(
+  projectPath: string,
+): Promise<MonorepoContext> {
   const visited = new Set<string>();
   let currentDir = path.dirname(projectPath);
 
   const buildResult = (rootDir: string): MonorepoContext => {
     const relativePath = path.relative(rootDir, projectPath);
     const segments = relativePath.split(path.sep).filter(Boolean);
-    let projectLocation: MonorepoContext['projectLocation'] = 'other';
+    let projectLocation: MonorepoContext["projectLocation"] = "other";
 
     if (segments.length === 0) {
-      projectLocation = 'root';
-    } else if (segments[0] === 'apps') {
-      projectLocation = 'apps';
-    } else if (segments[0] === 'packages') {
-      projectLocation = 'packages';
+      projectLocation = "root";
+    } else if (segments[0] === "apps") {
+      projectLocation = "apps";
+    } else if (segments[0] === "packages") {
+      projectLocation = "packages";
     }
 
     return {
@@ -390,12 +429,12 @@ async function detectMonorepoContext(projectPath: string): Promise<MonorepoConte
     }
     visited.add(currentDir);
 
-    const workspaceFile = path.join(currentDir, 'pnpm-workspace.yaml');
+    const workspaceFile = path.join(currentDir, "pnpm-workspace.yaml");
     if (await fs.pathExists(workspaceFile)) {
       return buildResult(currentDir);
     }
 
-    const packageJsonPath = path.join(currentDir, 'package.json');
+    const packageJsonPath = path.join(currentDir, "package.json");
     if (await fs.pathExists(packageJsonPath)) {
       try {
         const packageJson = await fs.readJSON(packageJsonPath);
@@ -416,8 +455,8 @@ async function detectMonorepoContext(projectPath: string): Promise<MonorepoConte
 
   // Fallback: check immediate parent for monorepo structure hints
   const parentDir = path.dirname(projectPath);
-  const hasPackagesDir = await fs.pathExists(path.join(parentDir, 'packages'));
-  const hasAppsDir = await fs.pathExists(path.join(parentDir, 'apps'));
+  const hasPackagesDir = await fs.pathExists(path.join(parentDir, "packages"));
+  const hasAppsDir = await fs.pathExists(path.join(parentDir, "apps"));
   if (hasPackagesDir || hasAppsDir) {
     return buildResult(parentDir);
   }
@@ -426,8 +465,8 @@ async function detectMonorepoContext(projectPath: string): Promise<MonorepoConte
 }
 
 function toPosixRelative(from: string, target: string): string {
-  let relativePath = path.relative(from, target).replace(/\\/g, '/');
-  if (!relativePath.startsWith('.')) {
+  let relativePath = path.relative(from, target).replace(/\\/g, "/");
+  if (!relativePath.startsWith(".")) {
     relativePath = `./${relativePath}`;
   }
   return relativePath;
@@ -438,9 +477,9 @@ function toPosixRelative(from: string, target: string): string {
  */
 export async function generatePackageJson(
   projectPath: string,
-  projectName: string
+  projectName: string,
 ): Promise<void> {
-  const packageJsonPath = path.join(projectPath, 'package.json');
+  const packageJsonPath = path.join(projectPath, "package.json");
 
   if (await fs.pathExists(packageJsonPath)) {
     await fs.remove(packageJsonPath);
@@ -448,31 +487,31 @@ export async function generatePackageJson(
 
   const packageJson = {
     name: projectName,
-    version: '0.1.0',
+    version: "0.1.0",
     private: true,
     scripts: {
-      dev: 'next dev',
-      build: 'next build --webpack',
-      start: 'next start',
+      dev: "next dev",
+      build: "next build --webpack",
+      start: "next start",
       lint: "next lint",
-      'lint:fix': 'next lint --fix',
+      "lint:fix": "next lint --fix",
     },
     dependencies: {
-      '@hua-labs/hua': await getHuaVersion(),
-      '@hua-labs/ui': await getUiVersion(),
-      '@phosphor-icons/react': PHOSPHOR_ICONS_VERSION,
+      "@hua-labs/hua": await getHuaVersion(),
+      "@hua-labs/ui": await getUiVersion(),
+      "@phosphor-icons/react": PHOSPHOR_ICONS_VERSION,
       clsx: CLSX_VERSION,
       next: NEXTJS_VERSION,
       react: REACT_VERSION,
-      'react-dom': REACT_DOM_VERSION,
-      'tailwind-merge': TAILWIND_MERGE_VERSION,
+      "react-dom": REACT_DOM_VERSION,
+      "tailwind-merge": TAILWIND_MERGE_VERSION,
       zustand: ZUSTAND_VERSION,
     },
     devDependencies: {
-      '@types/node': TYPES_NODE_VERSION,
-      '@types/react': TYPES_REACT_VERSION,
-      '@types/react-dom': TYPES_REACT_DOM_VERSION,
-      '@tailwindcss/postcss': TAILWIND_POSTCSS_VERSION,
+      "@types/node": TYPES_NODE_VERSION,
+      "@types/react": TYPES_REACT_VERSION,
+      "@types/react-dom": TYPES_REACT_DOM_VERSION,
+      "@tailwindcss/postcss": TAILWIND_POSTCSS_VERSION,
       autoprefixer: AUTOPREFIXER_VERSION,
       postcss: POSTCSS_VERSION,
       tailwindcss: TAILWIND_VERSION,
@@ -487,24 +526,24 @@ export async function generatePackageJson(
  * Generate Tailwind config based on monorepo context
  */
 async function generateTailwindConfig(projectPath: string): Promise<void> {
-  const tailwindConfigPath = path.join(projectPath, 'tailwind.config.js');
+  const tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
   const context = await detectMonorepoContext(projectPath);
 
   const contentEntries = new Set<string>([
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
   ]);
 
   if (context.isMonorepo && context.rootDir) {
     const packageMappings = [
-      { dir: 'hua-ui', glob: 'src/**/*.{ts,tsx}' },
-      { dir: 'hua', glob: 'src/**/*.{ts,tsx}' },
-      { dir: 'hua-motion-core', glob: 'src/**/*.{ts,tsx}' },
+      { dir: "hua-ui", glob: "src/**/*.{ts,tsx}" },
+      { dir: "hua", glob: "src/**/*.{ts,tsx}" },
+      { dir: "hua-motion-core", glob: "src/**/*.{ts,tsx}" },
     ];
 
     for (const pkg of packageMappings) {
-      const packageDir = path.join(context.rootDir, 'packages', pkg.dir);
+      const packageDir = path.join(context.rootDir, "packages", pkg.dir);
       if (!(await fs.pathExists(packageDir))) {
         continue;
       }
@@ -513,21 +552,21 @@ async function generateTailwindConfig(projectPath: string): Promise<void> {
     }
   } else {
     [
-      './node_modules/@hua-labs/ui/**/*.{ts,tsx}',
-      './node_modules/@hua-labs/hua/**/*.{ts,tsx}',
-      './node_modules/@hua-labs/motion-core/**/*.{ts,tsx}',
-    ].forEach(entry => contentEntries.add(entry));
+      "./node_modules/@hua-labs/ui/**/*.{ts,tsx}",
+      "./node_modules/@hua-labs/hua/**/*.{ts,tsx}",
+      "./node_modules/@hua-labs/motion-core/**/*.{ts,tsx}",
+    ].forEach((entry) => contentEntries.add(entry));
   }
 
   const safelistEntries = [
-    '{ pattern: /^(bg|text|border)-(?:primary|secondary|accent|neutral|success|warning|danger)(?:-(?:50|100|200|300|400|500|600|700|800|900))?$/ }',
-    '{ pattern: /^(px|py)-(?:0|1|2|3|4|5|6|8|10)$/ }',
-    '{ pattern: /^text-(?:xs|sm|base|lg|xl|2xl)$/ }',
-    '{ pattern: /^rounded-(?:none|sm|md|lg|xl|2xl|3xl|full)$/ }',
-    '{ pattern: /^shadow-(?:sm|md|lg|xl|2xl)$/ }',
-    '{ pattern: /^transition(?:-(?:all|colors|opacity|transform))?$/ }',
-    '{ pattern: /^duration-(?:75|100|150|200|300)$/ }',
-    '{ pattern: /^ease-(?:linear|in|out|in-out)$/ }',
+    "{ pattern: /^(bg|text|border)-(?:primary|secondary|accent|neutral|success|warning|danger)(?:-(?:50|100|200|300|400|500|600|700|800|900))?$/ }",
+    "{ pattern: /^(px|py)-(?:0|1|2|3|4|5|6|8|10)$/ }",
+    "{ pattern: /^text-(?:xs|sm|base|lg|xl|2xl)$/ }",
+    "{ pattern: /^rounded-(?:none|sm|md|lg|xl|2xl|3xl|full)$/ }",
+    "{ pattern: /^shadow-(?:sm|md|lg|xl|2xl)$/ }",
+    "{ pattern: /^transition(?:-(?:all|colors|opacity|transform))?$/ }",
+    "{ pattern: /^duration-(?:75|100|150|200|300)$/ }",
+    "{ pattern: /^ease-(?:linear|in|out|in-out)$/ }",
     "'modal-open'",
     "'modal-close'",
     "'modal-backdrop'",
@@ -538,8 +577,13 @@ async function generateTailwindConfig(projectPath: string): Promise<void> {
     "'card-gradient'",
   ];
 
-  const contentArray = Array.from(contentEntries).sort().map(entry => `    '${entry}'`).join(',\n');
-  const safelistArray = safelistEntries.map(entry => `  ${entry}`).join(',\n');
+  const contentArray = Array.from(contentEntries)
+    .sort()
+    .map((entry) => `    '${entry}'`)
+    .join(",\n");
+  const safelistArray = safelistEntries
+    .map((entry) => `  ${entry}`)
+    .join(",\n");
 
   const configContent = `/**
  * This file is generated by create-hua.
@@ -561,7 +605,7 @@ ${contentArray}
 };
 `;
 
-  await fs.writeFile(tailwindConfigPath, configContent, 'utf-8');
+  await fs.writeFile(tailwindConfigPath, configContent, "utf-8");
 }
 
 /**
@@ -676,18 +720,15 @@ export default defineConfig({
 });
 `;
 
-  await fs.writeFile(
-    path.join(projectPath, 'hua.config.ts'),
-    configContent
-  );
+  await fs.writeFile(path.join(projectPath, "hua.config.ts"), configContent);
 
   try {
     await generateTailwindConfig(projectPath);
   } catch (error) {
     console.warn(
       chalk.yellow(
-        `Warning: Failed to generate Tailwind config: ${error instanceof Error ? error.message : String(error)}`
-      )
+        `Warning: Failed to generate Tailwind config: ${error instanceof Error ? error.message : String(error)}`,
+      ),
     );
   }
 }
@@ -700,7 +741,7 @@ export default defineConfig({
 export async function generateAiContextFiles(
   projectPath: string,
   projectName?: string,
-  options?: AiContextOptions
+  options?: AiContextOptions,
 ): Promise<void> {
   const opts = options || {
     cursorRules: true,
@@ -709,7 +750,7 @@ export async function generateAiContextFiles(
     skillsMd: true,
     claudeContext: true,
     claudeSkills: false,
-    language: 'both',
+    language: "both",
   };
 
   // Data-driven: remove files for disabled options
@@ -727,32 +768,36 @@ export async function generateAiContextFiles(
   // Project-specific customization
   if (projectName) {
     if (opts.aiContext) {
-      const aiContextPath = path.join(projectPath, 'ai-context.md');
+      const aiContextPath = path.join(projectPath, "ai-context.md");
       if (await fs.pathExists(aiContextPath)) {
-        let content = await fs.readFile(aiContextPath, 'utf-8');
+        let content = await fs.readFile(aiContextPath, "utf-8");
         content = content.replace(
           /^# hua Project AI Context/,
-          `# ${projectName} - hua Project AI Context\n\n**Project Name**: ${projectName}`
+          `# ${projectName} - hua Project AI Context\n\n**Project Name**: ${projectName}`,
         );
-        await fs.writeFile(aiContextPath, content, 'utf-8');
+        await fs.writeFile(aiContextPath, content, "utf-8");
       }
     }
 
     if (opts.claudeContext) {
-      const claudeContextPath = path.join(projectPath, '.claude', 'project-context.md');
+      const claudeContextPath = path.join(
+        projectPath,
+        ".claude",
+        "project-context.md",
+      );
       if (await fs.pathExists(claudeContextPath)) {
-        let content = await fs.readFile(claudeContextPath, 'utf-8');
+        let content = await fs.readFile(claudeContextPath, "utf-8");
         content = content.replace(
           /^# hua Project Context/,
-          `# ${projectName} - hua Project Context\n\n**Project Name**: ${projectName}`
+          `# ${projectName} - hua Project Context\n\n**Project Name**: ${projectName}`,
         );
-        await fs.writeFile(claudeContextPath, content, 'utf-8');
+        await fs.writeFile(claudeContextPath, content, "utf-8");
       }
     }
   }
 
   // Inject package version info into ai-context.md
-  const packageJsonPath = path.join(projectPath, 'package.json');
+  const packageJsonPath = path.join(projectPath, "package.json");
   if (await fs.pathExists(packageJsonPath)) {
     try {
       const packageJson = await fs.readJSON(packageJsonPath);
@@ -760,36 +805,44 @@ export async function generateAiContextFiles(
       const devDependencies = packageJson.devDependencies || {};
 
       if (opts.aiContext) {
-        const aiContextPath = path.join(projectPath, 'ai-context.md');
+        const aiContextPath = path.join(projectPath, "ai-context.md");
         if (await fs.pathExists(aiContextPath)) {
-          let content = await fs.readFile(aiContextPath, 'utf-8');
+          let content = await fs.readFile(aiContextPath, "utf-8");
 
           const depsSection = `
 ## Installed Package Versions
 
 ### Core Dependencies
 ${Object.entries(dependencies)
-            .filter(([name]) => name.startsWith('@hua-labs/') || name === 'next' || name === 'react')
-            .map(([name, version]) => `- \`${name}\`: ${version}`)
-            .join('\n')}
+  .filter(
+    ([name]) =>
+      name.startsWith("@hua-labs/") || name === "next" || name === "react",
+  )
+  .map(([name, version]) => `- \`${name}\`: ${version}`)
+  .join("\n")}
 
 ### Dev Dependencies
 ${Object.entries(devDependencies)
-            .filter(([name]) => name.includes('typescript') || name.includes('tailwind') || name.includes('@types'))
-            .map(([name, version]) => `- \`${name}\`: ${version}`)
-            .join('\n')}
+  .filter(
+    ([name]) =>
+      name.includes("typescript") ||
+      name.includes("tailwind") ||
+      name.includes("@types"),
+  )
+  .map(([name, version]) => `- \`${name}\`: ${version}`)
+  .join("\n")}
 `;
 
           content = content.replace(
             /## 참고 자료/,
-            `${depsSection}\n## 참고 자료`
+            `${depsSection}\n## 참고 자료`,
           );
 
-          await fs.writeFile(aiContextPath, content, 'utf-8');
+          await fs.writeFile(aiContextPath, content, "utf-8");
         }
       }
     } catch (error) {
-      console.warn('Failed to extract package versions for AI context:', error);
+      console.warn("Failed to extract package versions for AI context:", error);
     }
   }
 }
@@ -808,18 +861,18 @@ export async function checkPrerequisites(): Promise<void> {
     errors.push(
       isEn
         ? `Node.js ${MIN_NODE_VERSION}+ required. Current: ${nodeVersion}`
-        : `Node.js ${MIN_NODE_VERSION}+ 필요합니다. 현재: ${nodeVersion}`
+        : `Node.js ${MIN_NODE_VERSION}+ 필요합니다. 현재: ${nodeVersion}`,
     );
   }
 
   // 2. pnpm installation check
   try {
-    execSync('pnpm --version', { stdio: 'ignore' });
+    execSync("pnpm --version", { stdio: "ignore" });
   } catch {
     errors.push(
       isEn
-        ? 'pnpm is required. Install: npm install -g pnpm'
-        : 'pnpm이 필요합니다. 설치: npm install -g pnpm'
+        ? "pnpm is required. Install: npm install -g pnpm"
+        : "pnpm이 필요합니다. 설치: npm install -g pnpm",
     );
   }
 
@@ -830,19 +883,19 @@ export async function checkPrerequisites(): Promise<void> {
     errors.push(
       isEn
         ? `Template validation failed: ${error instanceof Error ? error.message : String(error)}`
-        : `템플릿 검증 실패: ${error instanceof Error ? error.message : String(error)}`
+        : `템플릿 검증 실패: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 
   if (warnings.length > 0) {
-    console.log(chalk.yellow('\nWarnings:'));
-    warnings.forEach(w => console.log(chalk.yellow(`  - ${w}`)));
+    console.log(chalk.yellow("\nWarnings:"));
+    warnings.forEach((w) => console.log(chalk.yellow(`  - ${w}`)));
   }
 
   if (errors.length > 0) {
     const errorMessage = isEn
-      ? `Prerequisites check failed:\n${errors.map(e => `  - ${e}`).join('\n')}\n\nTips:\n  - Update Node.js: https://nodejs.org/\n  - Install pnpm: npm install -g pnpm`
-      : `사전 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}\n\n팁:\n  - Node.js 업데이트: https://nodejs.org/\n  - pnpm 설치: npm install -g pnpm`;
+      ? `Prerequisites check failed:\n${errors.map((e) => `  - ${e}`).join("\n")}\n\nTips:\n  - Update Node.js: https://nodejs.org/\n  - Install pnpm: npm install -g pnpm`
+      : `사전 검증 실패:\n${errors.map((e) => `  - ${e}`).join("\n")}\n\n팁:\n  - Node.js 업데이트: https://nodejs.org/\n  - pnpm 설치: npm install -g pnpm`;
 
     throw new Error(errorMessage);
   }
@@ -857,27 +910,27 @@ export async function validateTemplate(): Promise<void> {
     throw new Error(
       isEn
         ? `Template directory not found: ${TEMPLATE_DIR}`
-        : `템플릿 디렉토리를 찾을 수 없습니다: ${TEMPLATE_DIR}`
+        : `템플릿 디렉토리를 찾을 수 없습니다: ${TEMPLATE_DIR}`,
     );
   }
 
   const requiredFiles = [
-    'tsconfig.json',
-    'next.config.ts',
-    'tailwind.config.js',
-    'app/layout.tsx',
-    'app/page.tsx',
-    'app/not-found.tsx',
-    'app/globals.css',
-    'lib/i18n-setup.ts',
-    'lib/utils.ts',
-    'store/useAppStore.ts',
-    'translations/ko/common.json',
-    'translations/en/common.json',
-    'ai-context.md',
-    'AGENTS.md',
-    'skills.md',
-    '.cursor/rules/hua-framework.mdc',
+    "tsconfig.json",
+    "next.config.ts",
+    "tailwind.config.js",
+    "app/layout.tsx",
+    "app/page.tsx",
+    "app/not-found.tsx",
+    "app/globals.css",
+    "lib/i18n-setup.ts",
+    "lib/utils.ts",
+    "store/useAppStore.ts",
+    "translations/ko/common.json",
+    "translations/en/common.json",
+    "ai-context.md",
+    "AGENTS.md",
+    "skills.md",
+    ".cursor/rules/hua-framework.mdc",
   ];
 
   const missingFiles: string[] = [];
@@ -893,8 +946,8 @@ export async function validateTemplate(): Promise<void> {
     const isEn = isEnglishOnly();
     throw new Error(
       isEn
-        ? `Template files missing: ${missingFiles.join(', ')}`
-        : `템플릿 파일 누락: ${missingFiles.join(', ')}`
+        ? `Template files missing: ${missingFiles.join(", ")}`
+        : `템플릿 파일 누락: ${missingFiles.join(", ")}`,
     );
   }
 }
@@ -902,33 +955,39 @@ export async function validateTemplate(): Promise<void> {
 /**
  * Validate generated project
  */
-export async function validateGeneratedProject(projectPath: string): Promise<void> {
+export async function validateGeneratedProject(
+  projectPath: string,
+): Promise<void> {
   const isEn = isEnglishOnly();
   const errors: string[] = [];
 
   // 1. package.json
-  const packageJsonPath = path.join(projectPath, 'package.json');
+  const packageJsonPath = path.join(projectPath, "package.json");
   if (!(await fs.pathExists(packageJsonPath))) {
-    errors.push(isEn ? 'package.json file was not created' : 'package.json 파일이 생성되지 않았습니다.');
+    errors.push(
+      isEn
+        ? "package.json file was not created"
+        : "package.json 파일이 생성되지 않았습니다.",
+    );
   } else {
     try {
       const packageJson = await fs.readJSON(packageJsonPath);
 
-      if (packageJson.scripts?.lint !== 'next lint') {
+      if (packageJson.scripts?.lint !== "next lint") {
         errors.push(
           isEn
             ? `package.json lint script is incorrect. Expected: "next lint", Got: "${packageJson.scripts?.lint}"`
-            : `package.json의 lint 스크립트가 올바르지 않습니다. 예상: "next lint", 실제: "${packageJson.scripts?.lint}"`
+            : `package.json의 lint 스크립트가 올바르지 않습니다. 예상: "next lint", 실제: "${packageJson.scripts?.lint}"`,
         );
       }
 
-      const requiredDeps = ['@hua-labs/hua', 'next', 'react', 'react-dom'];
+      const requiredDeps = ["@hua-labs/hua", "next", "react", "react-dom"];
       for (const dep of requiredDeps) {
         if (!packageJson.dependencies?.[dep]) {
           errors.push(
             isEn
               ? `Required dependency ${dep} is missing from package.json`
-              : `필수 의존성 ${dep}이 package.json에 없습니다.`
+              : `필수 의존성 ${dep}이 package.json에 없습니다.`,
           );
         }
       }
@@ -936,54 +995,70 @@ export async function validateGeneratedProject(projectPath: string): Promise<voi
       errors.push(
         isEn
           ? `Failed to parse package.json: ${error}`
-          : `package.json 파싱 실패: ${error}`
+          : `package.json 파싱 실패: ${error}`,
       );
     }
   }
 
   // 2. hua.config.ts
-  const configPath = path.join(projectPath, 'hua.config.ts');
+  const configPath = path.join(projectPath, "hua.config.ts");
   if (!(await fs.pathExists(configPath))) {
-    errors.push(isEn ? 'hua.config.ts file was not created' : 'hua.config.ts 파일이 생성되지 않았습니다.');
+    errors.push(
+      isEn
+        ? "hua.config.ts file was not created"
+        : "hua.config.ts 파일이 생성되지 않았습니다.",
+    );
   }
 
   // 3. Required directories
-  const requiredDirs = ['app', 'lib', 'store', 'translations'];
+  const requiredDirs = ["app", "lib", "store", "translations"];
   for (const dir of requiredDirs) {
     const dirPath = path.join(projectPath, dir);
     if (!(await fs.pathExists(dirPath))) {
-      errors.push(isEn ? `Required directory ${dir} was not created` : `필수 디렉토리 ${dir}가 생성되지 않았습니다.`);
+      errors.push(
+        isEn
+          ? `Required directory ${dir} was not created`
+          : `필수 디렉토리 ${dir}가 생성되지 않았습니다.`,
+      );
     }
   }
 
   // 4. Required files
   const requiredFiles = [
-    'app/layout.tsx',
-    'app/page.tsx',
-    'tsconfig.json',
-    'next.config.ts',
+    "app/layout.tsx",
+    "app/page.tsx",
+    "tsconfig.json",
+    "next.config.ts",
   ];
   for (const file of requiredFiles) {
     const filePath = path.join(projectPath, file);
     if (!(await fs.pathExists(filePath))) {
-      errors.push(isEn ? `Required file ${file} was not created` : `필수 파일 ${file}이 생성되지 않았습니다.`);
+      errors.push(
+        isEn
+          ? `Required file ${file} was not created`
+          : `필수 파일 ${file}이 생성되지 않았습니다.`,
+      );
     }
   }
 
   if (errors.length > 0) {
-    throw new Error(isEn
-      ? `Project validation failed:\n${errors.map(e => `  - ${e}`).join('\n')}\n\nTips:\n  - Check file permissions\n  - Ensure disk space is available\n  - Try running again`
-      : `프로젝트 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}\n\n팁:\n  - 파일 권한 확인\n  - 디스크 공간 확인\n  - 다시 실행해보세요`);
+    throw new Error(
+      isEn
+        ? `Project validation failed:\n${errors.map((e) => `  - ${e}`).join("\n")}\n\nTips:\n  - Check file permissions\n  - Ensure disk space is available\n  - Try running again`
+        : `프로젝트 검증 실패:\n${errors.map((e) => `  - ${e}`).join("\n")}\n\n팁:\n  - 파일 권한 확인\n  - 디스크 공간 확인\n  - 다시 실행해보세요`,
+    );
   }
 }
 
 /**
  * Validate translation files JSON syntax
  */
-export async function validateTranslationFiles(projectPath: string): Promise<void> {
+export async function validateTranslationFiles(
+  projectPath: string,
+): Promise<void> {
   const translationFiles = [
-    'translations/ko/common.json',
-    'translations/en/common.json',
+    "translations/ko/common.json",
+    "translations/en/common.json",
   ];
 
   const errors: string[] = [];
@@ -993,20 +1068,20 @@ export async function validateTranslationFiles(projectPath: string): Promise<voi
     const filePath = path.join(projectPath, file);
     if (await fs.pathExists(filePath)) {
       try {
-        const content = await fs.readFile(filePath, 'utf-8');
+        const content = await fs.readFile(filePath, "utf-8");
         JSON.parse(content);
       } catch (error) {
         if (error instanceof SyntaxError) {
           errors.push(
             isEn
               ? `Invalid JSON in ${file}: ${error.message}`
-              : `${file}의 JSON 문법 오류: ${error.message}`
+              : `${file}의 JSON 문법 오류: ${error.message}`,
           );
         } else {
           errors.push(
             isEn
               ? `Failed to read ${file}: ${error instanceof Error ? error.message : String(error)}`
-              : `${file} 읽기 실패: ${error instanceof Error ? error.message : String(error)}`
+              : `${file} 읽기 실패: ${error instanceof Error ? error.message : String(error)}`,
           );
         }
       }
@@ -1016,8 +1091,8 @@ export async function validateTranslationFiles(projectPath: string): Promise<voi
   if (errors.length > 0) {
     throw new Error(
       isEn
-        ? `Translation files validation failed:\n${errors.map(e => `  - ${e}`).join('\n')}`
-        : `번역 파일 검증 실패:\n${errors.map(e => `  - ${e}`).join('\n')}`
+        ? `Translation files validation failed:\n${errors.map((e) => `  - ${e}`).join("\n")}`
+        : `번역 파일 검증 실패:\n${errors.map((e) => `  - ${e}`).join("\n")}`,
     );
   }
 }
@@ -1027,7 +1102,7 @@ export async function validateTranslationFiles(projectPath: string): Promise<voi
  */
 export async function generateSummary(
   projectPath: string,
-  aiContextOptions?: AiContextOptions
+  aiContextOptions?: AiContextOptions,
 ): Promise<{
   directories: number;
   files: number;
@@ -1041,10 +1116,14 @@ export async function generateSummary(
     try {
       const items = await fs.readdir(dirPath, { withFileTypes: true });
       for (const item of items) {
-        if (item.name.startsWith('.') && !item.name.startsWith('.cursor') && !item.name.startsWith('.claude')) {
+        if (
+          item.name.startsWith(".") &&
+          !item.name.startsWith(".cursor") &&
+          !item.name.startsWith(".claude")
+        ) {
           continue;
         }
-        if (item.name === 'node_modules' || item.name === '.git') {
+        if (item.name === "node_modules" || item.name === ".git") {
           continue;
         }
 
@@ -1068,11 +1147,17 @@ export async function generateSummary(
     : [];
 
   const languages: string[] = [];
-  if (aiContextOptions?.language === 'ko' || aiContextOptions?.language === 'both') {
-    languages.push('ko');
+  if (
+    aiContextOptions?.language === "ko" ||
+    aiContextOptions?.language === "both"
+  ) {
+    languages.push("ko");
   }
-  if (aiContextOptions?.language === 'en' || aiContextOptions?.language === 'both') {
-    languages.push('en');
+  if (
+    aiContextOptions?.language === "en" ||
+    aiContextOptions?.language === "both"
+  ) {
+    languages.push("en");
   }
 
   return {
@@ -1092,18 +1177,20 @@ export function displaySummary(summary: {
   aiContextFiles: string[];
   languages: string[];
 }): void {
-  console.log(chalk.cyan('\nSummary:'));
+  console.log(chalk.cyan("\nSummary:"));
   console.log(chalk.white(`  Directories: ${summary.directories}`));
   console.log(chalk.white(`  Files: ${summary.files}`));
 
   if (summary.aiContextFiles.length > 0) {
-    console.log(chalk.white(`  AI Context: ${summary.aiContextFiles.join(', ')}`));
+    console.log(
+      chalk.white(`  AI Context: ${summary.aiContextFiles.join(", ")}`),
+    );
   } else {
     console.log(chalk.gray(`  AI Context: None`));
   }
 
   if (summary.languages.length > 0) {
-    console.log(chalk.white(`  Languages: ${summary.languages.join(', ')}`));
+    console.log(chalk.white(`  Languages: ${summary.languages.join(", ")}`));
   }
 }
 
@@ -1112,14 +1199,15 @@ export function displaySummary(summary: {
  */
 export function displayNextSteps(
   projectPath: string,
-  aiContextOptions?: AiContextOptions
+  aiContextOptions?: AiContextOptions,
 ): void {
   const isEn = isEnglishOnly();
   const relativePath = path.relative(process.cwd(), projectPath);
   const displayPath = relativePath || path.basename(projectPath);
 
   const packageManager = detectPackageManager();
-  const devCommand = packageManager === 'npm' ? 'npm run dev' : `${packageManager} dev`;
+  const devCommand =
+    packageManager === "npm" ? "npm run dev" : `${packageManager} dev`;
   console.log(chalk.cyan(`\nNext Steps:`));
   console.log(chalk.white(`  cd ${displayPath}`));
   console.log(chalk.white(`  ${packageManager} install`));
@@ -1127,19 +1215,23 @@ export function displayNextSteps(
 
   if (aiContextOptions?.claudeSkills) {
     console.log(chalk.cyan(`\nClaude Skills enabled:`));
-    console.log(chalk.white(
-      isEn
-        ? '  Check .claude/skills/ for framework usage guide'
-        : '  .claude/skills/에서 프레임워크 사용 가이드를 확인하세요'
-    ));
+    console.log(
+      chalk.white(
+        isEn
+          ? "  Check .claude/skills/ for framework usage guide"
+          : "  .claude/skills/에서 프레임워크 사용 가이드를 확인하세요",
+      ),
+    );
   }
 
-  if (aiContextOptions?.language === 'both') {
+  if (aiContextOptions?.language === "both") {
     console.log(chalk.cyan(`\nBilingual mode:`));
-    console.log(chalk.white(
-      isEn
-        ? '  Edit translations/ko/ and translations/en/ for your content'
-        : '  translations/ko/와 translations/en/에서 번역을 수정하세요'
-    ));
+    console.log(
+      chalk.white(
+        isEn
+          ? "  Edit translations/ko/ and translations/en/ for your content"
+          : "  translations/ko/와 translations/en/에서 번역을 수정하세요",
+      ),
+    );
   }
 }
