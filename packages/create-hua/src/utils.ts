@@ -171,6 +171,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
       skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
+      agentDocs: true,
       language: "both",
     };
   }
@@ -258,6 +259,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
       skillsMd: answers.options.includes("skillsMd"),
       claudeContext: answers.options.includes("claudeContext"),
       claudeSkills: answers.options.includes("claudeSkills"),
+      agentDocs: true,
       language: answers.language || "both",
     };
   } catch (error) {
@@ -269,6 +271,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
       skillsMd: true,
       claudeContext: true,
       claudeSkills: false,
+      agentDocs: true,
       language: "both",
     };
   }
@@ -750,6 +753,7 @@ export async function generateAiContextFiles(
     skillsMd: true,
     claudeContext: true,
     claudeSkills: false,
+    agentDocs: true,
     language: "both",
   };
 
