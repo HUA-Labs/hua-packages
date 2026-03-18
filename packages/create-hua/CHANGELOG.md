@@ -1,5 +1,16 @@
 # create-hua
 
+## 1.4.0
+
+### Minor Changes
+
+- feat(create-hua): dynamic version resolution, agent docs, QA fixes
+  - Fetch latest @hua-labs/hua and @hua-labs/ui versions from npm registry at CLI runtime (3s timeout, offline fallback to build-time constants)
+  - Bundle .hua-agent-docs/ (32 files) into generated projects with --no-agent-docs flag
+  - Add not-found.tsx template to fix /\_not-found prerender failure
+  - Fix doctor.ts theme CSS path to match template
+  - Add not-found.tsx to template validation checklist
+
 ## 1.3.1
 
 ### Patch Changes
