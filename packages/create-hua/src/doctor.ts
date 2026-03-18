@@ -149,15 +149,15 @@ export async function diagnoseProject(projectPath: string): Promise<{
   if (await fs.pathExists(globalsCssPath)) {
     try {
       const cssContent = await fs.readFile(globalsCssPath, 'utf-8');
-      if (!cssContent.includes('recommended-theme') && !cssContent.includes('@hua-labs/hua')) {
+      if (!cssContent.includes('recommended-theme') && !cssContent.includes('@hua-labs/ui/styles')) {
         issues.push({
           type: 'warning',
           message: isEn
             ? 'globals.css does not import hua theme'
             : 'globals.css에 hua 테마 import가 없습니다',
           solution: isEn
-            ? 'Add @import "@hua-labs/hua/recommended-theme.css" to globals.css'
-            : 'globals.css에 @import "@hua-labs/hua/recommended-theme.css"를 추가하세요',
+            ? 'Add @import "@hua-labs/ui/styles/recommended-theme.css" to globals.css'
+            : 'globals.css에 @import "@hua-labs/ui/styles/recommended-theme.css"를 추가하세요',
         });
       }
     } catch {

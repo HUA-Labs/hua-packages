@@ -10,6 +10,47 @@ import { execSync } from 'child_process';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { HUA_VERSION, UI_VERSION } from './version';
+
+/**
+ * Cached npm registry versions (fetched once per CLI run)
+ */
+let _npmVersionCache: { hua?: string; ui?: string } | null = null;
+
+/**
+ * Fetch latest published versions from npm registry.
+ * Returns cached result on subsequent calls.
+ * Falls back to null on network failure (timeout 3s).
+ */
+async function fetchLatestNpmVersions(): Promise<{ hua: string | null; ui: string | null }> {
+  if (_npmVersionCache) {
+    return { hua: _npmVersionCache.hua ?? null, ui: _npmVersionCache.ui ?? null };
+  }
+
+  _npmVersionCache = {};
+
+  const fetchVersion = (pkg: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+      try {
+        const result = execSync(`npm view ${pkg} version`, {
+          timeout: 3000,
+          stdio: 'pipe',
+          encoding: 'utf-8',
+        });
+        resolve(result.trim() || null);
+      } catch {
+        resolve(null);
+      }
+    });
+  };
+
+  const [hua, ui] = await Promise.all([
+    fetchVersion('@hua-labs/hua'),
+    fetchVersion('@hua-labs/ui'),
+  ]);
+
+  _npmVersionCache = { hua: hua ?? undefined, ui: ui ?? undefined };
+  return { hua, ui };
+}
 import {
   MIN_NODE_VERSION,
   AI_CONTEXT_FILES,
@@ -239,7 +280,7 @@ export async function copyTemplate(
  * 2. Monorepo detection (packages/hua/package.json)
  * 3. Fallback: HUA_VERSION constant (set at build time)
  */
-function getHuaVersion(): string {
+async function getHuaVersion(): Promise<string> {
   // 1. Explicit workspace env
   if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
     return 'workspace:*';
@@ -252,9 +293,7 @@ function getHuaVersion(): string {
 
     if (fs.pathExistsSync(huaPackageJson)) {
       const huaPackage = fs.readJSONSync(huaPackageJson);
-      // If we can read sibling package, we're in a monorepo
       if (huaPackage.version) {
-        // Check for pnpm-workspace.yaml to confirm monorepo
         let currentDir = process.cwd();
         for (let i = 0; i < 10; i++) {
           if (fs.pathExistsSync(path.join(currentDir, 'pnpm-workspace.yaml'))) {
@@ -271,14 +310,18 @@ function getHuaVersion(): string {
     // Cannot read sibling package, continue to fallback
   }
 
-  // 3. Build-time constant (npm publish)
+  // 3. npm registry (dynamic — always gets latest published version)
+  const { hua } = await fetchLatestNpmVersions();
+  if (hua) return `^${hua}`;
+
+  // 4. Build-time constant (offline fallback)
   return HUA_VERSION;
 }
 
 /**
  * Get @hua-labs/ui version — mirrors getHuaVersion() logic
  */
-function getUiVersion(): string {
+async function getUiVersion(): Promise<string> {
   if (process.env.HUA_WORKSPACE_VERSION === 'workspace') {
     return 'workspace:*';
   }
@@ -306,6 +349,11 @@ function getUiVersion(): string {
     // Cannot read sibling package, continue to fallback
   }
 
+  // 3. npm registry (dynamic)
+  const { ui } = await fetchLatestNpmVersions();
+  if (ui) return `^${ui}`;
+
+  // 4. Build-time constant (offline fallback)
   return UI_VERSION;
 }
 
@@ -410,8 +458,8 @@ export async function generatePackageJson(
       'lint:fix': 'next lint --fix',
     },
     dependencies: {
-      '@hua-labs/hua': getHuaVersion(),
-      '@hua-labs/ui': getUiVersion(),
+      '@hua-labs/hua': await getHuaVersion(),
+      '@hua-labs/ui': await getUiVersion(),
       '@phosphor-icons/react': PHOSPHOR_ICONS_VERSION,
       clsx: CLSX_VERSION,
       next: NEXTJS_VERSION,
@@ -819,6 +867,7 @@ export async function validateTemplate(): Promise<void> {
     'tailwind.config.js',
     'app/layout.tsx',
     'app/page.tsx',
+    'app/not-found.tsx',
     'app/globals.css',
     'lib/i18n-setup.ts',
     'lib/utils.ts',
