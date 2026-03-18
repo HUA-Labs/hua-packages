@@ -11,6 +11,7 @@ This project uses the **hua framework** for Next.js applications.
 ## Architecture Layers
 
 ### Top Layer: AI Context & CLI
+
 - `.cursor/rules/hua-framework.mdc`: Cursor IDE rules (MDC format)
 - `.claude/project-context.md`: This document (for Claude)
 - `ai-context.md`: General AI context (SSOT)
@@ -18,12 +19,14 @@ This project uses the **hua framework** for Next.js applications.
 - `skills.md`: Antigravity skills
 
 ### Middle Layer: Framework & Config
+
 - `hua.config.ts`: Framework configuration
 - `HuaProvider`: Automatic Provider setup
 - `HuaPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
 
 ### Bottom Layer: Core & Types
+
 - `@hua-labs/state`: State management
 - `@hua-labs/motion-core`: Motion/animations
 - `@hua-labs/i18n-core`: Internationalization
@@ -77,6 +80,7 @@ Project Root/
 ### @hua-labs/hua/framework
 
 **Framework Components**:
+
 - `HuaProvider`: Automatic Provider setup
 - `HuaPage`: Page wrapper (Motion, i18n, SEO automatically applied)
 - `UnifiedProviders`: All Providers unified
@@ -84,6 +88,7 @@ Project Root/
 - `ErrorBoundary`: Error boundary
 
 **Hooks**:
+
 - `useMotion`: Unified motion hook
 - `useData`: Client data fetching
 - `useFocusManagement`, `useFocusTrap`: Accessibility hooks
@@ -91,6 +96,7 @@ Project Root/
 - `useLiveRegion`: Screen reader support
 
 **Utilities**:
+
 - `fetchData`: Server data fetching
 - `generatePageMetadata`: SEO metadata generation
 - `generateGEOMetadata`: GEO metadata generation
@@ -99,6 +105,7 @@ Project Root/
 ### @hua-labs/hua/hooks
 
 **Utility Hooks** (import from `@hua-labs/hua/hooks`):
+
 - `useLoading`: Loading state management with delay support
 - `useAutoScroll`: Auto-scrolling for chat/feed UIs
 - `usePerformanceMonitor`: Performance metrics monitoring
@@ -106,6 +113,7 @@ Project Root/
 ### @hua-labs/hua/loaders
 
 **Translation Loaders** (import from `@hua-labs/hua/loaders`):
+
 - `createApiTranslationLoader`: API-based translation loading with caching
 - `preloadNamespaces`: Preload translation namespaces for instant display
 - `warmFallbackLanguages`: Pre-warm fallback language translations
@@ -114,6 +122,7 @@ Project Root/
 ### @hua-labs/motion-core
 
 **Motion Hooks**:
+
 - `useFadeIn`, `useSlideUp`, `useSlideLeft`, `useSlideRight`, `useScaleIn`, `useBounceIn`, `usePulse`, `useSpringMotion`
 - `useHoverMotion`, `useClickToggle`, `useFocusToggle`
 - `useScrollReveal`, `useScrollProgress`
@@ -121,6 +130,7 @@ Project Root/
 ### @hua-labs/i18n-core
 
 **i18n Hooks**:
+
 - `useTranslation`: Translation hook
 - `useLanguage`: Language change hook
 
@@ -131,31 +141,35 @@ Project Root/
 **Direct approach (recommended)** — use hooks directly for full control:
 
 ```tsx
-'use client';
+"use client";
 
-import { useTranslation } from '@hua-labs/hua/i18n';
-import { useFadeIn, useScrollReveal } from '@hua-labs/hua/motion';
-import { Card, Button } from '@hua-labs/hua/ui';
+import { useTranslation } from "@hua-labs/hua/i18n";
+import { useFadeIn, useScrollReveal } from "@hua-labs/hua/motion";
+import { Card, Button } from "@hua-labs/hua/ui";
 
 export default function MyPage() {
-  const { t } = useTranslation('my-page');
+  const { t } = useTranslation("my-page");
   const fade = useFadeIn({ duration: 600 });
 
   return (
     <div ref={fade.ref} style={fade.style}>
-      <h1>{t('my-page:title')}</h1>
+      <h1>{t("my-page:title")}</h1>
     </div>
   );
 }
 ```
 
 **HuaPage wrapper (optional)** — auto-applies motion, i18n key, and head metadata:
+
 ```tsx
-import { HuaPage } from '@hua-labs/hua/framework';
-<HuaPage title={t('title')} description={t('description')}>{/* content */}</HuaPage>
+import { HuaPage } from "@hua-labs/hua/framework";
+<HuaPage title={t("title")} description={t("description")}>
+  {/* content */}
+</HuaPage>;
 ```
 
 **Important**:
+
 - Add translation keys to `translations/{language}/my-page.json`
 - Motion hooks return `{ ref, style }` — apply **both** to the target element
 - `HuaPage` is optional; using hooks directly gives more flexibility
@@ -164,26 +178,27 @@ import { HuaPage } from '@hua-labs/hua/framework';
 
 ```tsx
 // components/MyComponent.tsx
-'use client';
+"use client";
 
-import { Card, Button } from '@hua-labs/hua/ui';
-import { useMotion } from '@hua-labs/hua/framework';
-import { useTranslation } from '@hua-labs/hua/i18n';
+import { Card, Button } from "@hua-labs/hua/ui";
+import { useMotion } from "@hua-labs/hua/framework";
+import { useTranslation } from "@hua-labs/hua/i18n";
 
 export function MyComponent() {
-  const { t } = useTranslation('my-component');
+  const { t } = useTranslation("my-component");
   const motion = useMotion();
-  
+
   return (
     <Card ref={motion.ref} style={motion.style}>
-      <h2>{t('title')}</h2>
-      <Button>{t('button')}</Button>
+      <h2>{t("title")}</h2>
+      <Button>{t("button")}</Button>
     </Card>
   );
 }
 ```
 
 **Important**:
+
 - Client components require `'use client'`
 - Utilize framework components (`@hua-labs/ui`, `@hua-labs/motion-core`)
 - Consider applying motion
@@ -191,27 +206,29 @@ export function MyComponent() {
 ### 3. Data Fetching Pattern
 
 **Server Component**:
+
 ```tsx
 // app/data/page.tsx
-import { fetchData } from '@hua-labs/hua/framework';
+import { fetchData } from "@hua-labs/hua/framework";
 
 export default async function DataPage() {
-  const data = await fetchData<DataType>('/api/data');
+  const data = await fetchData<DataType>("/api/data");
   return <div>{/* display data */}</div>;
 }
 ```
 
 **Client Component**:
+
 ```tsx
 // components/DataComponent.tsx
-'use client';
+"use client";
 
-import { useData } from '@hua-labs/hua/framework';
-import { LoadingSpinner, AlertError } from '@hua-labs/hua/ui';
+import { useData } from "@hua-labs/hua/framework";
+import { LoadingSpinner, AlertError } from "@hua-labs/hua/ui";
 
 export function DataComponent() {
-  const { data, isLoading, error } = useData<DataType>('/api/data');
-  
+  const { data, isLoading, error } = useData<DataType>("/api/data");
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <AlertError>{error.message}</AlertError>;
   return <div>{/* display data */}</div>;
@@ -237,6 +254,7 @@ export function DataComponent() {
 ```
 
 **Important**:
+
 - Add all translation keys to both Korean and English
 - Namespace should match page name
 - Use `common` namespace for shared translations
@@ -246,25 +264,25 @@ export function DataComponent() {
 ### hua.config.ts
 
 ```typescript
-import { defineConfig } from '@hua-labs/hua/framework';
+import { defineConfig } from "@hua-labs/hua/framework";
 
 export default defineConfig({
-  preset: 'product',  // 'product' or 'marketing'
-  
+  preset: "product", // 'product' or 'marketing'
+
   i18n: {
-    defaultLanguage: 'ko',
-    supportedLanguages: ['ko', 'en'],
-    fallbackLanguage: 'en',
-    namespaces: ['common'],
-    translationLoader: 'api',
-    translationApiPath: '/api/translations',
+    defaultLanguage: "ko",
+    supportedLanguages: ["ko", "en"],
+    fallbackLanguage: "en",
+    namespaces: ["common"],
+    translationLoader: "api",
+    translationApiPath: "/api/translations",
   },
-  
+
   motion: {
-    defaultPreset: 'product',
+    defaultPreset: "product",
     enableAnimations: true,
   },
-  
+
   state: {
     persist: true,
     ssr: true,
@@ -273,10 +291,12 @@ export default defineConfig({
 ```
 
 **Preset Selection**:
+
 - `'product'`: For product pages (professional, efficient)
 - `'marketing'`: For marketing pages (dramatic, eye-catching)
 
 **Branding Configuration** (optional):
+
 ```typescript
 branding: {
   colors: {
@@ -329,48 +349,61 @@ This project supports **vibe coding**:
 
 ## Framework Deep Docs (hua-agent-docs)
 
-The `@hua-labs/hua` package ships with detailed framework documentation at:
+Framework documentation is included in your project:
 
 ```
-node_modules/@hua-labs/hua/.hua-agent-docs/
+.hua-agent-docs/                              # Local copy (primary)
+node_modules/@hua-labs/hua/.hua-agent-docs/   # npm package copy (fallback)
 ```
 
 **IMPORTANT**: When answering questions about hua framework architecture, icons, config, or advanced patterns, search these docs FIRST:
 
-| Topic | Path |
-|-------|------|
-| Getting Started | `.hua-agent-docs/01-getting-started/` |
-| Architecture | `.hua-agent-docs/02-architecture/` |
-| Configuration | `.hua-agent-docs/03-config/` |
-| Icon System | `.hua-agent-docs/04-icon-system/` |
-| Systems (GEO, Branding, a11y, etc.) | `.hua-agent-docs/05-systems/` |
-| API Reference | `.hua-agent-docs/06-api-reference/` |
-| Runtime Constraints | `.hua-agent-docs/07-constraints/` |
+| Topic                               | Path                                  |
+| ----------------------------------- | ------------------------------------- |
+| Getting Started                     | `.hua-agent-docs/01-getting-started/` |
+| Architecture                        | `.hua-agent-docs/02-architecture/`    |
+| Configuration                       | `.hua-agent-docs/03-config/`          |
+| Icon System                         | `.hua-agent-docs/04-icon-system/`     |
+| Systems (GEO, Branding, a11y, etc.) | `.hua-agent-docs/05-systems/`         |
+| API Reference                       | `.hua-agent-docs/06-api-reference/`   |
+| Runtime Constraints                 | `.hua-agent-docs/07-constraints/`     |
 
 ### Icon System
+
 Icon: 96 static + 174 aliases. Use `<Icon name="zap" size={20} />`.
 Categories: navigation, actions, status, user, data, files, communication, media, emotions, security, time, ui, theme
 Aliases: "back"→arrowLeft, "trash"→delete, "ai"→brain etc.
-Full list: `node_modules/@hua-labs/hua/.hua-agent-docs/04-icon-system/02-icon-names.mdx`
+Full list: `.hua-agent-docs/04-icon-system/02-icon-names.mdx`
 
 ### ThemeToggle
+
 ```tsx
-import { ThemeToggle } from '@hua-labs/hua/ui';
-<ThemeToggle variant="icon" />  // "button" | "icon" | "switch"
+import { ThemeToggle } from "@hua-labs/hua/ui";
+<ThemeToggle variant="icon" />; // "button" | "icon" | "switch"
 ```
 
 ### Advanced Components
+
 ```tsx
-import { GlowCard, TiltCard, SpotlightCard, Timeline, Marquee } from '@hua-labs/ui/advanced';
+import {
+  GlowCard,
+  TiltCard,
+  SpotlightCard,
+  Timeline,
+  Marquee,
+} from "@hua-labs/ui/advanced";
 ```
 
 ### i18n Lint
+
 `@hua-labs/eslint-plugin-i18n` — 4 rules: no-missing-key, no-raw-text, no-dynamic-key, no-unused-key
 
 ### CSS Utilities
+
 ```css
 @import "@hua-labs/ui/styles/utilities.css";
 ```
+
 Provides: `.glass`, `.gradient-text`, `.sr-only`
 
 ### Motion Hook API
@@ -379,20 +412,23 @@ Motion hooks return `{ ref, style }` — always apply BOTH to the target element
 
 ```tsx
 const fade = useFadeIn({ duration: 800 });
-<div ref={fade.ref} style={fade.style}>Animated content</div>
+<div ref={fade.ref} style={fade.style}>
+  Animated content
+</div>;
 ```
 
 ### Namespace Separator
 
 i18n namespace separator is `:` (colon), NOT `.` (dot):
+
 ```tsx
-t('landing:hero.title')  // correct
-t('landing.hero.title')  // wrong
+t("landing:hero.title"); // correct
+t("landing.hero.title"); // wrong
 ```
 
 ## References
 
-- **Framework deep docs**: `node_modules/@hua-labs/hua/.hua-agent-docs/` (SSOT for framework internals)
+- **Framework deep docs**: `.hua-agent-docs/` (SSOT for framework internals)
 - `ai-context.md`: Project structure overview
 - `.cursor/rules/hua-framework.mdc`: Cursor IDE rules
 - `AGENTS.md`: OpenAI Codex context

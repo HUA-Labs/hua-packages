@@ -27,10 +27,16 @@ pnpm dev
 
 ## API
 
-| Export               | Type     | Description                                                                                                                                                                           |
-| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `createProject`      | function | Scaffold a new Next.js + hua project with interactive prompts                                                                                                                         |
-| `resolveProjectPath` | function | Resolve the output directory for a project name. When run from within the monorepo (packages/create-hua), resolves relative to the monorepo root; otherwise resolves relative to cwd. |
+| Export          | Type     | Description                                                   |
+| --------------- | -------- | ------------------------------------------------------------- |
+| `createProject` | function | Scaffold a new Next.js + hua project with interactive prompts |
+
+### CLI Commands
+
+```bash
+npx create-hua <project-name> [options]   # Create a new project
+npx create-hua doctor [path]              # Diagnose project health
+```
 
 ## Related Packages
 

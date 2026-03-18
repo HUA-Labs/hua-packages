@@ -1,0 +1,399 @@
+---
+title: GEO System
+description: Generative Engine Optimization — 14 functions for AI search optimization
+category: systems
+related:
+  - ../02-architecture/03-ssr-patterns.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# GEO System (Generative Engine Optimization)
+
+GEO is a system that generates **metadata optimized for AI search engines** like ChatGPT, Claude, Gemini, and Perplexity. While SEO is for Google search, GEO helps AI accurately understand and cite your site.
+
+> **Server-safe**: GEO functions are exported from `framework/shared`. Use them in server components or `generateMetadata()`.
+
+> **Import note**: `metaToObject` and `openGraphToObject` are internal helpers used by the server helpers below. They are NOT exported from `framework/shared`. Use `generateGEOForMetadata` instead for Next.js Metadata integration.
+
+## Core Functions
+
+### generateGEOMetadata
+
+Generates metadata for AI search engines.
+
+```typescript
+function generateGEOMetadata(config: GEOConfig): GEOMetadata
+```
+
+```typescript
+interface GEOConfig {
+  name: string                    // Required: app/service name
+  description: string             // Required: description
+  version?: string
+  applicationCategory?: string    // e.g. 'Health', 'Developer Tool'
+  programmingLanguage?: string[]
+  technologyStack?: string[]
+  applicationType?: SoftwareApplicationType
+  url?: string
+  documentationUrl?: string
+  codeRepository?: string
+  license?: string
+  author?: string | { name: string; url?: string }
+  features?: string[]
+  useCases?: string[]
+  keywords?: string[]
+  operatingSystem?: string
+  softwareRequirements?: string[]
+  relatedTo?: string[]
+}
+
+type SoftwareApplicationType =
+  | 'WebApplication' | 'MobileApplication'
+  | 'DesktopApplication' | 'DeveloperApplication'
+
+interface GEOMetadata {
+  meta: Array<{ name: string; content: string }>
+  jsonLd: object           // Schema.org JSON-LD
+  openGraph?: object
+  twitter?: object
+  version: string
+}
+```
+
+```tsx
+import { generateGEOMetadata } from '@hua-labs/hua/framework/shared'
+
+const geo = generateGEOMetadata({
+  name: 'Sum Diary',
+  description: 'AI emotion diary app',
+  applicationCategory: 'Health',
+  technologyStack: ['Next.js', 'React', 'TypeScript'],
+  features: ['E2E encryption', 'AI emotion analysis', 'Multi-language support']
+})
+```
+
+### renderJSONLD
+
+Renders JSON-LD as a Next.js Script tag. Internally escapes content for XSS prevention.
+
+```typescript
+function renderJSONLD(jsonLd: unknown, id?: string): {
+  id: string
+  type: 'application/ld+json'
+  dangerouslySetInnerHTML: { __html: string }
+}
+```
+
+```tsx
+import Script from 'next/script'
+import { renderJSONLD } from '@hua-labs/hua/framework/shared'
+
+<Script {...renderJSONLD(geo.jsonLd, 'app-jsonld')} />
+```
+
+### createAIContext
+
+Generates a context description string that helps AI understand the site.
+
+```typescript
+function createAIContext(config: GEOConfig): string
+```
+
+## Next.js Server Component Helpers
+
+These helpers simplify GEO integration with the Next.js Metadata API. They are exported from the `geo/index.ts` module and accessible via `@hua-labs/hua/framework`.
+
+### generateGEOForMetadata
+
+Generates a complete Next.js `Metadata` object from a GEO config. The recommended way to integrate GEO with `generateMetadata()`.
+
+```typescript
+function generateGEOForMetadata(config: GEOConfig): Metadata
+```
+
+```tsx
+// app/layout.tsx (Next.js 16 Server Component)
+import type { Metadata } from 'next'
+import { generateGEOForMetadata } from '@hua-labs/hua/framework'
+
+export async function generateMetadata(): Promise<Metadata> {
+  return generateGEOForMetadata({
+    name: 'Sum Diary',
+    description: 'AI emotion diary app',
+    url: 'https://my-app.app',
+    features: ['E2E encryption', 'AI emotion analysis', 'Multi-language']
+  })
+}
+```
+
+### generateGEOForMetadataAsync
+
+Async version of `generateGEOForMetadata` — accepts a config or a Promise resolving to a config. Useful for dynamic data from databases or APIs.
+
+```typescript
+async function generateGEOForMetadataAsync(
+  configOrPromise: GEOConfig | Promise<GEOConfig>
+): Promise<Metadata>
+```
+
+```tsx
+// app/[slug]/page.tsx
+import { generateGEOForMetadataAsync } from '@hua-labs/hua/framework'
+
+export async function generateMetadata({ params }) {
+  const data = await fetchPageData(params.slug)
+
+  return generateGEOForMetadataAsync({
+    name: data.title,
+    description: data.description,
+    keywords: data.tags,
+  })
+}
+```
+
+### generateGEOScripts
+
+Returns the full `GEOMetadata` object for use in layout components when rendering multiple JSON-LD script tags.
+
+```typescript
+function generateGEOScripts(config: GEOConfig): GEOMetadata
+```
+
+```tsx
+// app/layout.tsx
+import { generateGEOScripts, renderJSONLD } from '@hua-labs/hua/framework'
+import Script from 'next/script'
+
+export default function RootLayout({ children }) {
+  const geoMeta = generateGEOScripts({
+    name: 'My App',
+    description: 'Built with hua',
+  })
+
+  return (
+    <html>
+      <head>
+        {geoMeta.jsonLd && <Script {...renderJSONLD(geoMeta.jsonLd)} />}
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### getGEOMetadata
+
+Returns the raw `GEOMetadata` object. Use when you need direct access to meta tags or JSON-LD data in a server component.
+
+```typescript
+function getGEOMetadata(config: GEOConfig): GEOMetadata
+```
+
+```tsx
+// app/page.tsx (Server Component)
+import { getGEOMetadata } from '@hua-labs/hua/framework'
+
+export default function Page() {
+  const geoMeta = getGEOMetadata({
+    name: 'My Page',
+    description: 'Page description',
+  })
+
+  const description = geoMeta.meta.find(m => m.name === 'description')?.content
+  return <div>{description}</div>
+}
+```
+
+### combineGEOConfigs
+
+Merges a base GEO config with a page-specific override. Arrays (`keywords`, `features`, `useCases`) are concatenated rather than replaced.
+
+```typescript
+function combineGEOConfigs(baseConfig: GEOConfig, pageConfig: Partial<GEOConfig>): GEOConfig
+```
+
+```tsx
+// app/blog/[slug]/page.tsx
+import { combineGEOConfigs, generateGEOForMetadata } from '@hua-labs/hua/framework'
+
+const appGEO: GEOConfig = {
+  name: 'My App',
+  description: 'App description',
+  author: { name: 'My Org' },
+}
+
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug)
+
+  const mergedConfig = combineGEOConfigs(appGEO, {
+    name: post.title,
+    description: post.excerpt,
+    keywords: post.tags,
+  })
+
+  return generateGEOForMetadata(mergedConfig)
+}
+```
+
+### createGEOFromEnv
+
+Builds a GEO config from environment variables, falling back to the provided config for missing values.
+
+```typescript
+function createGEOFromEnv(fallbackConfig: GEOConfig): GEOConfig
+```
+
+```tsx
+// app/layout.tsx
+import { createGEOFromEnv, generateGEOForMetadata } from '@hua-labs/hua/framework'
+
+const geoConfig = createGEOFromEnv({
+  name: 'Default App Name',
+  description: 'Default description',
+})
+
+export const metadata = generateGEOForMetadata(geoConfig)
+```
+
+Reads from these env vars (all optional, fall back to config values):
+
+| Env Var | GEO field |
+|---------|-----------|
+| `NEXT_PUBLIC_APP_NAME` | `name` |
+| `NEXT_PUBLIC_APP_DESCRIPTION` | `description` |
+| `NEXT_PUBLIC_APP_VERSION` | `version` |
+| `NEXT_PUBLIC_APP_URL` | `url` |
+| `NEXT_PUBLIC_REPO_URL` | `codeRepository` |
+| `NEXT_PUBLIC_DOCS_URL` | `documentationUrl` |
+
+## Structured Data Helpers
+
+Functions that generate Schema.org structured data (exported from `framework/shared`):
+
+### generateSoftwareApplicationLD
+
+```typescript
+function generateSoftwareApplicationLD(config: GEOConfig): StructuredData
+// → { @context: 'https://schema.org', @type: 'SoftwareApplication', ... }
+```
+
+### generateFAQPageLD
+
+```typescript
+function generateFAQPageLD(faqs: Array<{ question: string; answer: string }>): StructuredData
+// → { @context: 'https://schema.org', @type: 'FAQPage', mainEntity: [...] }
+```
+
+### generateHowToLD
+
+```typescript
+function generateHowToLD(howTo: {
+  name: string
+  description?: string
+  steps: Array<{ name: string; text: string; url?: string; image?: string }>
+  totalTime?: string  // ISO 8601 duration (e.g. 'PT10M')
+}): StructuredData
+```
+
+### generateTechArticleLD
+
+```typescript
+function generateTechArticleLD(article: {
+  name: string
+  description?: string
+  author?: string | { name: string; url?: string }
+  datePublished?: string
+  dateModified?: string
+}): StructuredData
+```
+
+## Examples
+
+### 1. Full GEO Setup (Next.js)
+
+```tsx
+// app/layout.tsx
+import type { Metadata } from 'next'
+import Script from 'next/script'
+import {
+  generateGEOForMetadata,
+  generateGEOScripts,
+  renderJSONLD,
+} from '@hua-labs/hua/framework'
+
+export async function generateMetadata(): Promise<Metadata> {
+  return generateGEOForMetadata({
+    name: 'Sum Diary',
+    description: 'AI emotion diary app — secure emotion recording with E2E encryption',
+    url: 'https://my-app.app',
+    features: ['E2E encryption', 'AI emotion analysis', 'Multi-language']
+  })
+}
+
+export default function Layout({ children }) {
+  const geoMeta = generateGEOScripts({
+    name: 'Sum Diary',
+    description: 'AI emotion diary app',
+  })
+
+  return (
+    <html>
+      <head>
+        {geoMeta.jsonLd && <Script {...renderJSONLD(geoMeta.jsonLd)} />}
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### 2. FAQ Page
+
+```tsx
+import { generateFAQPageLD, renderJSONLD } from '@hua-labs/hua/framework/shared'
+
+const faqLd = generateFAQPageLD([
+  { question: 'What is Sum Diary?', answer: 'A diary app where AI analyzes your emotions.' },
+  { question: 'Is my data safe?', answer: 'With E2E encryption, even the server cannot read your data.' }
+])
+
+<Script {...renderJSONLD(faqLd, 'faq-jsonld')} />
+```
+
+### 3. HowTo Guide
+
+```tsx
+const howToLd = generateHowToLD({
+  name: 'Getting Started with Sum Diary',
+  steps: [
+    { name: 'Sign up', text: 'Register with email or social login.' },
+    { name: 'Write your first diary', text: 'Freely write about your emotions today.' },
+    { name: 'Check AI analysis', text: 'Review the emotion report analyzed by AI.' }
+  ],
+  totalTime: 'PT5M'
+})
+```
+
+### 4. Dynamic page with combineGEOConfigs
+
+```tsx
+// app/blog/[slug]/page.tsx
+import { combineGEOConfigs, generateGEOForMetadataAsync } from '@hua-labs/hua/framework'
+
+const baseGEO = { name: 'HUA Blog', description: 'Technical articles', author: { name: 'HUA Labs' } }
+
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug)
+  return generateGEOForMetadataAsync(
+    combineGEOConfigs(baseGEO, { name: post.title, description: post.excerpt, keywords: post.tags })
+  )
+}
+```
+
+## Constraints & Gotchas
+
+- `generateGEOForMetadata` and other server helpers are exported from the `geo/index.ts` module (accessible via `@hua-labs/hua/framework`), NOT from `framework/shared`.
+- `framework/shared` exports: `generateGEOMetadata`, `renderJSONLD`, `createAIContext`, and the 4 structured data helpers.
+- `metaToObject` and `openGraphToObject` are internal helpers used by server.ts. They are NOT exported from `framework/shared` — do not import them.
+- `renderJSONLD` escapes `</script>` strings for XSS prevention. Do not use `JSON.stringify` directly.
+- `generateCodeLD`, `generateVideoLD`, `generateOrganizationLD`, `validateJsonLd`, `formatValidationResult`, and `GEO_PRESETS` exist in `geo/index.ts` internally but are NOT exported from `framework/shared`.

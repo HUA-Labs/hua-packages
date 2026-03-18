@@ -1,0 +1,98 @@
+---
+title: Package Map
+description: "npm package → re-export path mapping. Never import sub-packages directly — always use @hua-labs/hua/* paths."
+category: packages
+related:
+  - ../01-getting-started/01-entry-points.mdx
+  - ../01-getting-started/02-ui-export-paths.mdx
+---
+
+# Package Map
+
+> **STOP.** Never import `@hua-labs/i18n-core`, `@hua-labs/motion-core`, etc. directly.
+> Always use `@hua-labs/hua/*` re-export paths.
+
+## Full Mapping Table
+
+| npm Package | Correct Import Path | Description |
+|-------------|--------------------|-------------|
+| `@hua-labs/ui` | `@hua-labs/ui` or `@hua-labs/hua/ui` | UI components (13 sub-paths) |
+| `@hua-labs/i18n-core` | `@hua-labs/hua/i18n` | i18n core + zustand merged |
+| `@hua-labs/i18n-core-zustand` | `@hua-labs/hua/i18n` | ↑ merged into above |
+| `@hua-labs/i18n-loaders` | `@hua-labs/hua/loaders` | Translation loaders |
+| `@hua-labs/i18n-formatters` | `@hua-labs/hua/formatters` | Date/number/currency formatters |
+| `@hua-labs/motion-core` | `@hua-labs/hua/motion` | Motion/animation hooks |
+| `@hua-labs/state` | `@hua-labs/hua/state` | Zustand store utilities |
+| `@hua-labs/hooks` | `@hua-labs/hua/hooks` | Common React hooks |
+| `@hua-labs/utils` | `@hua-labs/hua/utils` | Utility functions |
+| `@hua-labs/dot` | `@hua-labs/hua/dot` | Dot style engine (core) |
+| `@hua-labs/dot` | `@hua-labs/hua/dot/react` | Dot React hooks (useDot, useDotMap) |
+
+## @hua-labs/hua — All Subpaths
+
+```
+@hua-labs/hua                  ← All-in-one (prototyping only, not for production)
+@hua-labs/hua/framework        ← 'use client' — HuaProvider, HuaPage, defineConfig
+@hua-labs/hua/framework/shared ← Pure — GEO, CSS vars, createI18nMiddleware
+@hua-labs/hua/framework/server ← 'server-only' — getSSRTranslations, loadConfig
+@hua-labs/hua/framework/config ← defineConfig, getConfig, setConfig, resetConfig
+@hua-labs/hua/ui               ← UI component re-exports
+@hua-labs/hua/i18n             ← i18n-core + i18n-core-zustand merged
+@hua-labs/hua/motion           ← motion-core re-exports
+@hua-labs/hua/state            ← state re-exports
+@hua-labs/hua/hooks            ← hooks re-exports
+@hua-labs/hua/utils            ← utils re-exports (+createLogger, logger)
+@hua-labs/hua/loaders          ← i18n-loaders re-exports
+@hua-labs/hua/formatters       ← i18n-formatters re-exports
+@hua-labs/hua/dot              ← dot style engine (dot, dotMap, dotCx, dotVariants, createDotConfig)
+@hua-labs/hua/dot/react        ← dot React hooks (useDot, useDotMap) — 'use client'
+@hua-labs/hua/presets           ← productPreset, marketingPreset
+```
+
+## Anti-patterns
+
+```typescript
+// BAD: Direct package import
+import { useTranslation } from '@hua-labs/i18n-core'
+import { useFadeIn } from '@hua-labs/motion-core'
+import { createHuaStore } from '@hua-labs/state'
+import { formatCurrency } from '@hua-labs/i18n-formatters'
+
+// GOOD: hua re-export paths
+import { useTranslation } from '@hua-labs/hua/i18n'
+import { useFadeIn } from '@hua-labs/hua/motion'
+import { createHuaStore } from '@hua-labs/hua/state'
+import { formatCurrency } from '@hua-labs/hua/formatters'
+```
+
+```typescript
+// BAD: Import everything from UI root
+import { Button, GlowCard, Table, Modal } from '@hua-labs/ui'
+
+// GOOD: Use UI sub-paths for smaller bundles
+import { Button } from '@hua-labs/ui'
+import { GlowCard } from '@hua-labs/ui/advanced'
+import { Table } from '@hua-labs/ui/data'
+import { Modal } from '@hua-labs/ui/overlay'
+```
+
+## UI Sub-paths Summary
+
+UI is the exception — `@hua-labs/ui` can be used directly (rich sub-paths):
+
+| Path | Contents |
+|------|----------|
+| `@hua-labs/ui` | Button, Badge, Card, Input, Icon, Avatar, Section, ThemeToggle, etc. |
+| `@hua-labs/ui/advanced` | GlowCard, TiltCard, Carousel, Marquee, BlogEditor, etc. |
+| `@hua-labs/ui/data` | Table, CodeBlock, StatsPanel, BarChart, DataTable, DetailDrawer, BreakdownCard, EntityList, DashboardGrid, etc. |
+| `@hua-labs/ui/feedback` | ToastProvider, useToast, Alert, LoadingSpinner, EmptyState |
+| `@hua-labs/ui/navigation` | Navigation, Breadcrumb, Pagination, Sidebar |
+| `@hua-labs/ui/interactive` | Accordion, Tabs, Menu, Command, Toolbar |
+| `@hua-labs/ui/interactive/kanban` | KanbanBoard, KanbanColumn, KanbanCard, KanbanProvider, useKanban |
+| `@hua-labs/ui/advanced/emotion` | EmotionMeter, EmotionButton, etc. |
+| `@hua-labs/ui/form` | Form, FormField, Select, DatePicker, Upload, etc. |
+| `@hua-labs/ui/overlay` | Modal, ConfirmModal, Popover, Drawer, BottomSheet |
+| `@hua-labs/ui/landing` | Landing.Provider, Landing.Hero, Landing.Features, etc. |
+| `@hua-labs/ui/sdui` | SDUIRenderer, SDUIFromJSON |
+
+Full details: [02-ui-export-paths.mdx](../01-getting-started/02-ui-export-paths.mdx)

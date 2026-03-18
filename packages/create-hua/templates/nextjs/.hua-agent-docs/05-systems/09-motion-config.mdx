@@ -1,0 +1,203 @@
+---
+title: Motion Config System
+description: Preset-based component motion configuration with per-component overrides
+category: systems
+related:
+  - ../01-getting-started/03-presets.mdx
+  - ../03-config/02-config-schema.mdx
+  - ../06-api-reference/01-framework-exports.mdx
+---
+
+# Motion Config System
+
+The motion config system connects hua presets to per-component animation behavior. Each preset defines motion settings for component roles (hero, card, button, etc.), and components automatically consume these via context.
+
+## How It Works
+
+```
+hua.config.ts (preset + overrides)
+  → Providers.tsx (merge preset.motion + config.motion.components)
+    → MotionConfigProvider (React context)
+      → Components read via useComponentMotion / usePresetMotion
+```
+
+## hua.config.ts Setup
+
+### Basic — select a preset
+
+```typescript
+import { defineConfig } from '@hua-labs/hua/framework/config'
+
+export default defineConfig({
+  preset: 'product',  // or 'marketing' or 'minimal'
+})
+```
+
+### With per-component overrides
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: {
+    defaultPreset: 'product',
+    components: {
+      card: { entrance: 'fadeIn', duration: 500 },  // override card only
+      hero: { hover: true },                         // add hover to hero
+    },
+  },
+})
+```
+
+### Disable all animations
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: { enableAnimations: false },
+})
+```
+
+## 3 Presets Comparison
+
+### Motion
+
+| Role | product | marketing | minimal |
+|------|---------|-----------|---------|
+| hero.entrance | fadeIn | fadeIn | fadeIn |
+| hero.delay | 100ms | 300ms | 0ms |
+| hero.duration | 400ms | 1000ms | 200ms |
+| hero.hover / click | false / false | false / false | false / false |
+| title.entrance | slideUp | slideUp | fadeIn |
+| title.delay | 150ms | 500ms | 0ms |
+| title.duration | 350ms | 800ms | 150ms |
+| button.entrance | scaleIn | scaleIn | fadeIn |
+| button.delay | 200ms | 700ms | 0ms |
+| button.duration | 200ms | 400ms | 150ms |
+| button.hover / click | true / true | true / true | true / true |
+| card.entrance | slideUp | slideUp | fadeIn |
+| card.delay | 100ms | 600ms | 0ms |
+| card.duration | 300ms | 600ms | 200ms |
+| card.hover / click | true / false | true / false | false / false |
+| text.entrance | fadeIn | fadeIn | fadeIn |
+| text.delay | 50ms | 400ms | 0ms |
+| text.duration | 300ms | 700ms | 150ms |
+| image | — | scaleIn 500/800ms | — |
+
+### Spacing
+
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| default | md | xl | md |
+| section | lg | xl | md |
+| component | sm | md | sm |
+
+### Icons
+
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| set | phosphor | phosphor | phosphor |
+| weight | regular | bold | regular |
+| size | 20 | 24 | 20 |
+
+## Component Roles
+
+| Role | Used By | Description |
+|------|---------|-------------|
+| `hero` | Hero sections, banners | Page-level entrance |
+| `title` | Headings, section titles | Text entrance |
+| `button` | CTAs, action buttons | Interactive element |
+| `card` | Card, FeatureCard | Content container |
+| `text` | Body text, descriptions | Content entrance |
+| `image` | Marketing images (marketing preset only) | Media entrance |
+
+## Hooks
+
+### useMotionConfig
+
+Returns full motion config context.
+
+```typescript
+import { useMotionConfig } from '@hua-labs/ui'
+
+const { enableAnimations, components } = useMotionConfig()
+// enableAnimations: boolean
+// components: Record<string, ComponentMotionConfig>
+```
+
+### useComponentMotion
+
+Returns motion config for a specific component role.
+
+```typescript
+import { useComponentMotion } from '@hua-labs/ui'
+
+const cardMotion = useComponentMotion('card')
+// { entrance: 'slideUp', delay: 100, duration: 300, hover: true, click: false }
+```
+
+### usePresetMotion
+
+Convenience hook combining preset lookup + reducedMotion + enableAnimations.
+
+```typescript
+import { usePresetMotion } from '@hua-labs/hua/framework'
+
+const { config, shouldAnimate } = usePresetMotion('card')
+// config: ComponentMotionConfig | undefined
+// shouldAnimate: boolean (false if reducedMotion or enableAnimations=false)
+```
+
+## Components with Motion Support
+
+### Card / FeatureCard
+
+`animated` prop enables preset-based entrance animation:
+
+```tsx
+<Card animated>Content</Card>
+<FeatureCard animated icon="star" title="Feature" />
+```
+
+When `animated` is set, the component reads its role from MotionConfigContext and applies entrance animation via `useAnimatedEntrance`.
+
+### GlowCard / TiltCard / SpotlightCard
+
+Advanced cards automatically respect `enableAnimations` and `prefers-reduced-motion`. When motion is disabled, hover/mouse effects are suppressed.
+
+## Override Examples
+
+### Override a single role
+
+```typescript
+// hua.config.ts
+export default defineConfig({
+  preset: 'marketing',
+  motion: {
+    components: {
+      card: { duration: 200, delay: 0 },  // make cards snappy in marketing preset
+    },
+  },
+})
+```
+
+### Add a custom role
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: {
+    components: {
+      sidebar: { entrance: 'slideLeft', delay: 0, duration: 250, hover: false, click: false },
+    },
+  },
+})
+// Then: const { config } = usePresetMotion('sidebar')
+```
+
+## Constraints & Gotchas
+
+- `motion.components` does shallow merge per role — you only need to specify fields you want to override, not the entire config.
+- If a role doesn't exist in the base preset (e.g. `image` in product), the override creates it from scratch.
+- `motion.style` maps to `defaultPreset`: `smooth` → `product`, `dramatic` → `marketing`, `minimal` → `minimal`.
+- `prefers-reduced-motion` OS setting overrides everything — even if `enableAnimations: true`, animations won't run for users with reduced motion preference.
+- `MotionConfigProvider` is initialized once at mount via `useRef`. Changing config at runtime requires a remount.

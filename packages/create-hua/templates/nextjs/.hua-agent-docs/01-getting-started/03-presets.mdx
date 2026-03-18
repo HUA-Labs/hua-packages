@@ -1,0 +1,183 @@
+---
+title: Presets
+description: Comparing product and marketing presets, custom preset patterns
+category: getting-started
+related:
+  - ../03-config/01-define-config.mdx
+  - ../03-config/02-config-schema.mdx
+---
+
+# Presets
+
+hua ships with three built-in presets. A preset configures motion, spacing, i18n, and icon defaults in one shot.
+
+## Vibe Mode vs Developer Mode
+
+Two ways to specify a preset:
+
+```typescript
+// Vibe mode — single string, simple setup
+defineConfig({ preset: 'product' })
+defineConfig({ preset: 'marketing' })
+defineConfig({ preset: 'minimal' })
+
+// Developer mode — preset-based with granular overrides
+defineConfig({
+  preset: {
+    type: 'product',
+    motion: { duration: 500 },
+    spacing: { default: 'lg' }
+  }
+})
+```
+
+## Preset Comparison
+
+### Motion
+
+| Element | product | marketing | minimal |
+|---------|---------|-----------|---------|
+| hero.entrance | fadeIn | fadeIn | fadeIn |
+| hero.delay | 100ms | 300ms | 0ms |
+| hero.duration | 400ms | 1000ms | 200ms |
+| hero.hover / click | false / false | false / false | false / false |
+| title.entrance | slideUp | slideUp | fadeIn |
+| title.delay | 150ms | 500ms | 0ms |
+| title.duration | 350ms | 800ms | 150ms |
+| button.entrance | scaleIn | scaleIn | fadeIn |
+| button.delay | 200ms | 700ms | 0ms |
+| button.duration | 200ms | 400ms | 150ms |
+| button.hover / click | true / true | true / true | true / true |
+| card.entrance | slideUp | slideUp | fadeIn |
+| card.delay | 100ms | 600ms | 0ms |
+| card.duration | 300ms | 600ms | 200ms |
+| card.hover / click | true / false | true / false | false / false |
+| text.entrance | fadeIn | fadeIn | fadeIn |
+| text.delay | 50ms | 400ms | 0ms |
+| text.duration | 300ms | 700ms | 150ms |
+| image (marketing only) | — | scaleIn, 500ms delay, 800ms dur | — |
+
+**Summary**: product = fast, restrained. marketing = dramatic, sequential. minimal = fadeIn only, near-instant.
+
+### Spacing
+
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| default | md | xl | md |
+| section | lg | xl | md |
+| component | sm | md | sm |
+
+### i18n
+
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| defaultLanguage | ko | ko | ko |
+| supportedLanguages | ['ko', 'en'] | ['ko', 'en'] | ['ko', 'en'] |
+
+### Icons
+
+| Property | product | marketing | minimal |
+|----------|---------|-----------|---------|
+| set | phosphor | phosphor | phosphor |
+| weight | regular | bold | regular |
+| size | 20 | 24 | 20 |
+| color | currentColor | currentColor | currentColor |
+
+## Custom Presets
+
+Override specific values on top of a preset using developer mode:
+
+```typescript
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
+
+export default defineConfig({
+  preset: {
+    type: 'product',        // Based on product
+    motion: { duration: 500 }, // Longer motion only
+    spacing: { default: 'lg' } // Wider spacing only
+  },
+  icons: {
+    set: 'lucide',
+    strokeWidth: 2
+  }
+})
+```
+
+### Per-Component Motion Overrides
+
+Override individual component roles on top of a preset:
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: {
+    components: {
+      card: { entrance: 'fadeIn', duration: 500 },  // override card motion
+      hero: { hover: true },                         // add hover to hero
+    },
+  },
+})
+```
+
+### Merge Priority
+
+```
+1. Built-in preset (product/marketing/minimal)
+   -> Developer mode overrides merged
+2. Preset + motion/spacing overrides
+   -> motion.components per-role shallow merge
+3. Final HuaConfig (user config always wins)
+```
+
+## Examples
+
+### 1. Product app (default)
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  i18n: {
+    defaultLanguage: 'ko',
+    supportedLanguages: ['ko', 'en', 'ja']
+  }
+})
+```
+
+### 2. Marketing landing page
+
+```typescript
+export default defineConfig({
+  preset: 'marketing',
+  branding: {
+    name: 'HUA Labs',
+    colors: { primary: '#0ea5e9', accent: '#f59e0b' }
+  }
+})
+```
+
+### 3. Minimal preset (near-zero motion)
+
+```typescript
+export default defineConfig({
+  preset: 'minimal',
+})
+```
+
+### 4. Disable all motion completely
+
+```typescript
+export default defineConfig({
+  preset: 'product',
+  motion: { enableAnimations: false },
+})
+```
+
+## Constraints & Gotchas
+
+- `preset` accepts `'product'`, `'marketing'`, or `'minimal'`. Other values cause a validateConfig error.
+- Calling defineConfig without a preset defaults to the product preset.
+- `motion.style` field (`'smooth'`, `'dramatic'`, `'minimal'`) maps internally to `motion.defaultPreset` (`smooth` → `product`, `dramatic` → `marketing`, `minimal` → `minimal`).
+- `motion.components` does shallow merge per role — only specify fields you want to override.
+- Developer mode `motion`/`spacing` overrides apply at the preset level. User config `motion`/`icons` etc. merge as a separate layer.
+- `minimal` preset uses fadeIn-only with 0ms delay and 150-200ms duration. Good for accessibility-first apps or utility dashboards.

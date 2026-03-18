@@ -1,0 +1,557 @@
+---
+title: Dot Style Engine
+description: "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Flutter recipes. 1176+ tests, 33 resolvers, 12 utility families added in Wave 2."
+category: packages
+related:
+  - ./01-package-map.mdx
+  - ./03-motion.mdx
+  - ../../docs/areas/architecture/dot-style-engine.md
+---
+
+# Dot Style Engine
+
+`@hua-labs/dot` | `@hua-labs/hua/dot` (re-export) | `@hua-labs/hua/dot/react` (hooks)
+
+> Tailwind-inspired syntax, zero Tailwind dependency. Web + RN + Flutter from one string.
+
+---
+
+## Entry Points
+
+| Import Path | Contents | Note |
+|-------------|----------|------|
+| `@hua-labs/hua/dot` | `dot`, `dotMap`, `dotExplain`, `createDotConfig`, `clearDotCache`, `dotCx`, `dotVariants`, `adaptNative`, `adaptWeb`, `adaptFlutter`, `CAPABILITY_MATRIX`, `PROPERTY_TO_FAMILY`, `getCapability` | Pure functions, server-safe |
+| `@hua-labs/hua/dot/react` | `useDot`, `useDotMap` | `'use client'` required |
+| `@hua-labs/dot` | Same as hua/dot | Direct import (prefer hua path) |
+| `@hua-labs/dot/native` | dot/dotMap pre-bound `target:'native'` | Auto-resolved by Metro |
+| `@hua-labs/dot-aot` | `extractStaticCalls`, `transformSource`, `styleToObjectLiteral` | Build-time extraction engine |
+| `@hua-labs/dot-aot/vite` | Vite plugin | Build-time AOT (complete) |
+| `@hua-labs/dot-aot/babel` | Babel plugin | Works with Metro, Next.js, etc. |
+
+---
+
+## Core API
+
+### `dot(input, options?)` — String to Style
+
+```typescript
+import { dot } from '@hua-labs/hua/dot'
+
+// Basic
+dot('p-4 rounded-lg bg-primary-500 text-white')
+// { padding: '16px', borderRadius: '8px', backgroundColor: '#3b82f6', color: '#ffffff' }
+
+// Dark mode
+dot('bg-white dark:bg-gray-900', { dark: true })
+// { backgroundColor: '#111827' }
+
+// Responsive (mobile-first cascade)
+dot('p-4 md:p-8 lg:p-12', { breakpoint: 'lg' })
+// { padding: '48px' }
+
+// Negative values + transform accumulation
+dot('-m-4 rotate-45 scale-110')
+// { margin: '-16px', transform: 'rotate(45deg) scale(1.1)' }
+
+// Arbitrary values
+dot('w-[300px] bg-[#ff0000] p-[2rem]')
+// { width: '300px', backgroundColor: '#ff0000', padding: '2rem' }
+
+// Opacity modifier
+dot('bg-primary-500/50 text-gray-900/80')
+// { backgroundColor: 'rgb(59 130 246 / 0.5)', color: 'rgb(17 24 39 / 0.8)' }
+
+// !important
+dot('!p-4 !bg-white')
+// { padding: '16px !important', backgroundColor: '#ffffff !important' }
+
+// React Native
+dot('p-4 rounded-lg shadow-lg', { target: 'native' })
+// { padding: 16, borderRadius: 8, shadowColor: '#000000', elevation: 8, ... }
+
+// Flutter — returns FlutterRecipe (structured widget composition object)
+dot('p-4 bg-blue-500 rounded-lg flex items-center', { target: 'flutter' })
+// { padding: { top: 16, right: 16, bottom: 16, left: 16 }, decoration: { color: '#3b82f6', borderRadius: {...} }, layout: { crossAxisAlignment: 'center' } }
+
+// Gradient (Wave 3)
+dot('bg-gradient-to-r from-cyan-500 to-blue-600')
+// { backgroundImage: 'linear-gradient(to right, #06b6d4, #2563eb)' }
+
+// Gradient with via stop
+dot('bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500')
+// { backgroundImage: 'linear-gradient(to bottom right, #a855f7, #ec4899, #f97316)' }
+```
+
+### `dotMap(input, options?)` — State-Aware Styles
+
+```typescript
+import { dotMap } from '@hua-labs/hua/dot'
+
+const styles = dotMap('bg-white hover:bg-gray-100 focus:ring-2 active:scale-95')
+// {
+//   base: { backgroundColor: '#ffffff' },
+//   hover: { backgroundColor: '#f3f4f6' },
+//   focus: { boxShadow: '0 0 0 2px ...' },
+//   active: { transform: 'scale(0.95)' }
+// }
+```
+
+**Supported states:** `hover`, `focus`, `active`, `focus-visible`, `focus-within`, `disabled`
+
+### `dotExplain(input, options?)` — Resolve with Capability Report
+
+```typescript
+import { dotExplain } from '@hua-labs/hua/dot'
+
+dotExplain('p-4 blur-md grid grid-cols-3', { target: 'native' })
+// {
+//   styles: { padding: 16 },
+//   report: {
+//     _dropped: ['filter', 'gridTemplateColumns'],
+//     _approximated: [],
+//     _capabilities: { filter: 'unsupported', grid: 'unsupported' }
+//   }
+// }
+
+dotExplain('p-4 bg-white shadow-lg', { target: 'flutter' })
+// {
+//   styles: { padding: { top: 16, ... }, decoration: { color: '#ffffff', boxShadow: [...] } },
+//   report: {}
+// }
+```
+
+Use `dotExplain()` when you need to know which utilities will be silently dropped or approximated on a given platform. For web target the report is always empty (`{}`).
+
+### `dotCx(...inputs)` — Utility Joiner
+
+```typescript
+import { dotCx } from '@hua-labs/hua/dot'
+
+dotCx('p-4 flex', isActive && 'bg-primary-500', undefined, 'text-white')
+// 'p-4 flex bg-primary-500 text-white' (falsy filtered)
+```
+
+### `dotVariants(config)` — CVA-Style Variants
+
+```typescript
+import { dotVariants } from '@hua-labs/hua/dot'
+
+const badge = dotVariants({
+  base: 'inline-flex items-center rounded-full',
+  variants: {
+    variant: { default: 'bg-primary-500 text-white', outline: 'border border-gray-300' },
+    size: { sm: 'text-xs px-2', md: 'text-sm px-3', lg: 'text-base px-4' },
+  },
+  defaultVariants: { variant: 'default', size: 'md' },
+  compoundVariants: [
+    { variant: 'outline', size: 'lg', style: 'font-bold' },
+  ],
+})
+
+badge({ variant: 'outline', size: 'lg' })
+// Merged StyleObject of base + outline + lg + compound
+```
+
+### `createDotConfig(config?)` — Token Customization
+
+```typescript
+import { createDotConfig } from '@hua-labs/hua/dot'
+
+createDotConfig({
+  runtime: 'web',           // 'web' | 'native' | 'flutter'
+  theme: {
+    colors: {
+      brand: { 500: '#6630E6', 600: '#5525C0' },
+      card: 'var(--color-card)',  // CSS variable bridge
+    },
+    spacing: { '18': '72px' },
+    borderRadius: { pill: '999px' },
+    fontSize: { '2xs': '0.625rem' },
+    gridCols: { '16': 'repeat(16, minmax(0, 1fr))' },
+  },
+  cache: true,               // Default: true
+  cacheSize: 500,             // Default: 500
+  strictMode: false,          // Default: false (throws on unknown)
+  warnUnknown: true,          // Default: true in dev
+  breakpoints: ['sm','md','lg','xl','2xl'],  // Customizable
+  remBase: 16,                // Default: 16
+})
+```
+
+### `clearDotCache()` — Cache Reset
+
+Call after config changes or for memory management. Clears both input-level and token-level FIFO caches.
+
+### `adaptNative(webStyle, options?)` — Web to RN Conversion
+
+```typescript
+import { adaptNative } from '@hua-labs/hua/dot'
+
+adaptNative({
+  padding: '16px',
+  transform: 'rotate(45deg) scale(1.1)',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+})
+// {
+//   padding: 16,
+//   transform: [{ rotate: '45deg' }, { scale: 1.1 }],
+//   shadowColor: '#000000', shadowOffset: { width: 0, height: 4 },
+//   shadowOpacity: 0.1, shadowRadius: 6, elevation: 4,
+// }
+```
+
+**45 properties silently dropped** on RN (animation, transition, cursor, grid, filter, backdrop, etc.)
+
+### `adaptFlutter(webStyle, options?)` — Web to Flutter Recipe Conversion
+
+```typescript
+import { adaptFlutter } from '@hua-labs/hua/dot'
+
+adaptFlutter({
+  padding: '16px',
+  backgroundColor: '#3b82f6',
+  borderRadius: '8px',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+})
+// {
+//   padding: { top: 16, right: 16, bottom: 16, left: 16 },
+//   decoration: {
+//     color: '#3b82f6',
+//     borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 8, bottomRight: 8 },
+//     boxShadow: [{ color: 'rgba(0, 0, 0, 0.1)', offset: { dx: 0, dy: 4 }, blurRadius: 6, spreadRadius: 0 }],
+//   },
+//   layout: { mainAxisAlignment: 'spaceBetween', crossAxisAlignment: 'center' },
+// }
+```
+
+`FlutterRecipe` is a structured object — NOT a flat style map. Each section maps to a specific Flutter widget in your SDUI bridge:
+
+| Recipe key | Flutter widget / property |
+|------------|--------------------------|
+| `padding` | `EdgeInsets` on `Padding` or `Container` |
+| `margin` | `EdgeInsets` on `Container.margin` |
+| `decoration` | `BoxDecoration` on `Container` |
+| `constraints` | `BoxConstraints` on `Container` |
+| `layout` | `Row`/`Column` direction + alignment |
+| `flexChild` | `Flexible`/`Expanded` wrapping |
+| `positioning` | `Positioned` within `Stack` |
+| `textStyle` | `TextStyle` on `Text` |
+| `transform` | `Transform` widget |
+| `opacity` | `Opacity` widget |
+| `visible` | `Visibility` widget |
+| `aspectRatio` | `AspectRatio` widget |
+| `zIndex` | `IndexedStack` / elevation hint |
+| `_dropped` | Properties that had no Flutter mapping |
+
+**Gradient support in Flutter:** `bg-gradient-to-{dir}` resolves into `decoration.gradient` as a `FlutterGradient` with `type: 'linear'`, `begin`/`end` alignment strings, `colors` array, and optional `stops`.
+
+---
+
+## React Hooks
+
+### `useDot(input, options?)` — Memoized Style
+
+```tsx
+import { useDot } from '@hua-labs/hua/dot/react'
+
+function Card() {
+  const style = useDot('p-4 rounded-lg bg-card shadow-md')
+  return <div style={style}>...</div>
+}
+```
+
+### `useDotMap(input, options?)` — Interactive Styles
+
+```tsx
+import { useDotMap } from '@hua-labs/hua/dot/react'
+
+function Button() {
+  const { style, handlers } = useDotMap('bg-primary-500 hover:bg-primary-600 active:scale-95')
+  return <button style={style} {...handlers}>Click</button>
+}
+```
+
+Returns `{ style, handlers }` where handlers = `onMouseEnter/Leave`, `onFocus/Blur`, `onMouseDown/Up`.
+Internally tracks hover, focus, active, focus-visible, focus-within, disabled states.
+
+---
+
+## DotOptions
+
+```typescript
+interface DotOptions {
+  dark?: boolean;        // Apply dark: variants
+  breakpoint?: string;   // Active breakpoint (mobile-first cascade)
+  target?: 'web' | 'native' | 'flutter';  // Override config-level runtime
+}
+```
+
+---
+
+## AOT Static Extraction (`@hua-labs/dot-aot`)
+
+Replaces static `dot('...')` calls with pre-computed style objects at build time, eliminating runtime parsing overhead entirely.
+
+### Vite Plugin
+
+```typescript
+// vite.config.ts
+import dotAot from '@hua-labs/dot-aot/vite'
+
+export default defineConfig({
+  plugins: [dotAot()],
+})
+```
+
+Options: `include` (default: `['.ts', '.tsx', '.js', '.jsx']`), `exclude` (default: `['node_modules']`), `functionNames` (default: `['dot']`), `target`.
+
+### Babel Plugin (Metro / Next.js)
+
+```javascript
+// babel.config.js
+module.exports = {
+  plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]],
+}
+```
+
+**What gets extracted:** Only calls where the first argument is a string literal and there is no `breakpoint` option (breakpoint must stay runtime because it depends on window width). `dark: true/false` is extracted as a static option.
+
+**Core API** (`@hua-labs/dot-aot`): `extractStaticCalls(source)`, `transformSource(source, options)`, `styleToObjectLiteral(style)`.
+
+---
+
+## Token Categories (33 Resolver Families)
+
+### Original 21 families
+
+| Category | Examples | Count |
+|----------|----------|-------|
+| Spacing | `p-4`, `mx-auto`, `gap-2`, `-m-4`, `space-x-4` | ~40 |
+| Color | `bg-primary-500`, `text-gray-300/80`, `border-[#ff0000]` | ~250+ |
+| Typography | `text-sm`, `font-bold`, `leading-tight`, `tracking-wide` | ~38 |
+| Layout | `flex`, `grid`, `block`, `hidden`, `overflow-hidden` | ~45 |
+| Sizing | `w-full`, `h-12`, `max-w-md`, `min-h-screen`, `aspect-video` | ~20 |
+| Border | `rounded-lg`, `border`, `border-dashed`, `rounded-t-xl` | ~18 |
+| Flexbox | `flex-row`, `justify-between`, `items-center`, `order-first` | ~30 |
+| Z-index | `z-0` ~ `z-50` | 7 |
+| Shadow | `shadow-sm` ~ `shadow-2xl`, `shadow-inner`, `shadow-none` | 8 |
+| Opacity | `opacity-0` ~ `opacity-100` | 16 |
+| Transform | `rotate-45`, `scale-110`, `-translate-x-4`, `origin-center` | ~51 |
+| Transition | `transition-all`, `duration-200`, `ease-in-out` | ~30 |
+| Animation | `animate-spin`, `animate-pulse`, `animate-bounce` | ~20 |
+| Backdrop | `backdrop-blur-md`, `backdrop-brightness-75` | ~14 |
+| Positioning | `top-0`, `left-4`, `inset-0`, `inset-x-4`, `start-4` | ~75 |
+| Grid | `grid-cols-3`, `col-span-6`, `row-start-1`, `grid-flow-row` | ~75 |
+| Ring | `ring-2`, `ring-blue-500`, `ring-offset-2`, `ring-[5px]` | ~20 |
+| Filter | `blur-md`, `brightness-75`, `grayscale`, `drop-shadow-lg` | ~30 |
+| Mix-blend | `mix-blend-overlay`, `mix-blend-multiply` | ~12 |
+| Interactivity | `cursor-pointer`, `select-none`, `resize`, `pointer-events-none` | ~30 |
+| Line-clamp | `line-clamp-3` (WebkitLineClamp / numberOfLines on RN) | ~6 |
+
+### Wave 2 additions (12 new families, ~90% Tailwind parity)
+
+| Category | Examples |
+|----------|----------|
+| Object fit | `object-cover`, `object-contain`, `object-position-center` |
+| Text decoration | `underline`, `overline`, `line-through`, `no-underline`, `decoration-2`, `underline-offset-2` |
+| Text indent | `indent-4`, `indent-[2rem]` |
+| Float / clear | `float-left`, `float-right`, `clear-both` |
+| Isolation | `isolate`, `isolation-auto` |
+| Table | `table-auto`, `table-fixed`, `border-collapse`, `border-separate` |
+| List | `list-disc`, `list-decimal`, `list-inside`, `list-outside` |
+| Scroll | `scroll-smooth`, `scroll-mt-4`, `scroll-pt-4` |
+| Touch action | `touch-auto`, `touch-none`, `touch-pan-x`, `touch-pan-y` |
+| Will change | `will-change-auto`, `will-change-transform`, `will-change-opacity` |
+| Word break | `break-normal`, `break-words`, `break-all`, `break-keep` |
+| Place alignment | `place-content-center`, `place-items-start`, `place-self-end` |
+
+### Wave 3 additions (gradient + shadow composition)
+
+| Feature | Examples |
+|---------|---------|
+| Gradient direction | `bg-gradient-to-r`, `bg-gradient-to-br`, `bg-gradient-to-t` (8 directions) |
+| Gradient from | `from-cyan-500`, `from-[#ff0000]`, `from-cyan-500/75` |
+| Gradient via | `via-pink-500`, `via-transparent` |
+| Gradient to | `to-blue-600`, `to-[#0000ff]` |
+| Shadow composition | Multi-layer `boxShadow` (ring layer + shadow layer merged at finalization) |
+| Ring + shadow | `ring-2 ring-blue-500 shadow-lg` — both compose into one `boxShadow` value |
+
+---
+
+## Shadow Composition
+
+`ring-*` and `shadow-*` tokens write to internal keys (`__dot_ringLayer`, `__dot_shadowLayer`) and are merged into a single `boxShadow` string during finalization. This matches Tailwind convention where ring appears before shadow.
+
+```typescript
+dot('ring-2 ring-primary-500 shadow-lg')
+// { boxShadow: '0 0 0 2px #3b82f6, 0 10px 15px -3px rgba(0,0,0,0.1)' }
+// ^ring layer                        ^shadow layer
+```
+
+The `!important` flag is propagated correctly: if either layer is `!important`, the composed value carries `!important`.
+
+---
+
+## Capability Matrix
+
+Exported from `@hua-labs/dot` as `CAPABILITY_MATRIX` and `PROPERTY_TO_FAMILY`:
+
+```typescript
+import { CAPABILITY_MATRIX, PROPERTY_TO_FAMILY, getCapability } from '@hua-labs/hua/dot'
+
+// Check if a CSS property is supported on a target
+getCapability('gridTemplateColumns', 'native') // 'unsupported'
+getCapability('boxShadow', 'flutter')           // 'native'
+getCapability('filter', 'flutter')              // 'plugin-backed'
+getCapability('display', 'native', 'flex')      // 'native' (value-level override)
+getCapability('display', 'native', 'grid')      // 'approximate'
+```
+
+**Capability levels:**
+- `native` — full support
+- `approximate` — supported with caveats (e.g., RN shadow loses multi-layer)
+- `recipe-only` — Flutter: expressed as recipe field, not flat style
+- `plugin-backed` — Flutter: requires a third-party plugin (e.g., `image_filter`)
+- `unsupported` — silently dropped
+
+---
+
+## CSS Variable Bridge (17 Semantic Tokens)
+
+Pre-configured semantic colors that map to CSS variables for automatic dark mode:
+
+```
+background, foreground, card, card-foreground, popover, popover-foreground,
+primary-foreground, secondary-foreground, muted, muted-foreground,
+accent, accent-foreground, destructive, destructive-foreground,
+border, input, ring
+```
+
+Usage: `dot('bg-card text-card-foreground border-border')`
+
+**Warning:** Don't override `primary`, `secondary` etc. with flat strings — breaks shade lookup. Add new semantic names instead.
+
+---
+
+## Palette Colors
+
+- **Semantic:** `primary`, `secondary`, `success` (each with shades 50-950)
+- **Tailwind v3 full set:** slate, gray, zinc, neutral, stone, red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose
+- **Special:** white, black, transparent, current
+
+---
+
+## Architecture
+
+```
+dot('p-4 hover:bg-gray-100 dark:bg-gray-900 bg-gradient-to-r from-cyan-500')
+  |
+  v
+Parser (tokenize + variant extract)
+  |
+  v
+Resolver (token -> CSS property + value)
+  — gradient tokens → __dot_gradientDirection / __dot_gradientFrom / etc.
+  — ring tokens     → __dot_ringLayer (internal key)
+  — shadow tokens   → __dot_shadowLayer (internal key)
+  |
+  v
+Cascade merge (base → sm → md → lg → xl → 2xl → dark → dark:sm → ...)
+  |
+  v
+finalizeStyle()
+  — merges __dot_ringLayer + __dot_shadowLayer → boxShadow
+  — merges gradient internal keys → backgroundImage
+  — strips all __dot_* internal keys
+  |
+  v
+Cache (2-layer FIFO: input + token level)
+  |
+  v
+Target adapter:
+  web    → StyleObject (CSSProperties)
+  native → adaptNative() → RNStyleObject
+  flutter→ adaptFlutter() → FlutterRecipe
+```
+
+Full architecture doc: [dot-style-engine.md](../../docs/areas/architecture/dot-style-engine.md)
+
+---
+
+## Flutter Adapter — `adaptFlutter()` (Wave 1, complete)
+
+The Flutter adapter converts a resolved web `StyleObject` into a `FlutterRecipe` — a structured object for SDUI bridges. It is fully integrated as `target: 'flutter'` in `dot()` and `dotMap()`.
+
+**Key types exported from `@hua-labs/dot`:**
+
+```typescript
+import type {
+  FlutterRecipe,
+  FlutterDecoration,
+  FlutterEdgeInsets,
+  FlutterConstraints,
+  FlutterLayout,
+  FlutterFlexChild,
+  FlutterPositioning,
+  FlutterTextStyle,
+  FlutterTransform,
+  FlutterBoxShadow,
+  FlutterBorderSide,
+  FlutterBorderRadius,
+} from '@hua-labs/dot'
+```
+
+**Properties dropped by Flutter adapter** (no direct widget mapping):
+- Transitions and animations
+- `cursor`, `userSelect`, `resize`, `pointerEvents`
+- `whiteSpace`, `textOverflow`
+- `filter`, `backdropFilter`, `mixBlendMode`
+- All grid properties
+- `touchAction`
+
+**Font weight** maps to Flutter's `FontWeight` enum strings: `w100`–`w900`.
+**Text decoration** maps to Flutter's `TextDecoration` constants: `underline`, `overline`, `lineThrough`, `none`.
+**Transform** maps to radian rotation, scale, translate, skew fields (not a matrix string).
+
+---
+
+## Anti-patterns
+
+```typescript
+// BAD: group variants (CSS selector needed, not supported)
+dot('group-hover:bg-blue-500')
+
+// BAD: divide-* (CSS selector needed, not supported)
+dot('divide-y divide-gray-200')
+
+// GOOD: use space-* instead (maps to gap)
+dot('flex flex-col space-y-4')
+
+// BAD: override primary with flat string
+createDotConfig({ theme: { colors: { primary: '#ff0000' } } })
+// Breaks primary-500, primary-600, etc.
+
+// GOOD: add new semantic name
+createDotConfig({ theme: { colors: { brand: { 500: '#ff0000' } } } })
+
+// BAD: use breakpoint option in AOT context
+dot('p-4 md:p-8', { breakpoint: currentBp })
+// AOT cannot extract — stays runtime (correct behavior)
+
+// GOOD: AOT-friendly calls (string literal + no breakpoint)
+dot('p-4 rounded-lg bg-card text-white')
+dot('bg-white dark:bg-gray-900', { dark: true })
+```
+
+---
+
+## Not Implemented
+
+| Feature | Reason |
+|---------|--------|
+| `group-hover:` | Requires CSS selectors (parent→child relationship) |
+| `divide-*` | Requires CSS selectors (`:not(:first-child)`) |
+| Debug trace | Planned — `dotExplain()` covers capability reporting; token-level trace not yet exposed |

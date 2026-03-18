@@ -1,0 +1,305 @@
+---
+title: Motion Hooks & Components
+description: "@hua-labs/motion-core API reference — full export listing for all 60+ hooks, components, and utilities"
+category: api-reference
+related:
+  - ../01-getting-started/02-ui-export-paths.mdx
+---
+
+# Motion Hooks & Components (`@hua-labs/motion-core`)
+
+## `<Motion>` — Wrapper Component
+
+Eliminates manual `ref={motion.ref} style={motion.style}` wiring.
+
+```tsx
+import { Motion } from '@hua-labs/motion-core'
+
+// Basic fade-in (auto-start with IntersectionObserver)
+<Motion>content</Motion>
+
+// Scroll reveal with options
+<Motion scroll delay={200} className="grid grid-cols-3">
+  {children}
+</Motion>
+
+// Custom element type + motion type
+<Motion as="section" type="slideUp" duration={800}>
+  {children}
+</Motion>
+
+// Multi-effect mode
+<Motion effects={{ fade: true, slide: { direction: 'up' } }}>
+  {children}
+</Motion>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `as` | `'div' \| 'span' \| 'section' \| 'article' \| 'header' \| 'footer' \| 'main' \| 'nav'` | `'div'` | Wrapper element type |
+| `type` | `EntranceType` | `'fadeIn'` | Motion type |
+| `effects` | `MotionEffects` | — | Multi-effect mode |
+| `scroll` | `boolean \| ScrollRevealOptions` | — | Scroll-based reveal |
+| `delay` | `number` | — | Delay in ms |
+| `duration` | `number` | — | Duration in ms |
+
+Plus all standard HTML attributes (`className`, `style`, `id`, etc.).
+
+---
+
+## 3-Level Abstraction Hooks
+
+High-level page motion hooks. Start here for most use cases.
+
+| Hook | Description |
+|------|-------------|
+| `useSimplePageMotion` | Level 1 — preset-based page motion; pass a `PageType` string (`'home'`, `'dashboard'`, etc.) and get pre-configured motion refs |
+| `usePageMotions` | Level 2 — page-level motion manager with a `MotionStateManager`; accepts a `PageMotionsConfig` object for fine-grained per-element control |
+| `useSmartMotion` | Level 3 — per-element smart motion; picks optimal entrance and hover/click effects based on element type (`'hero'`, `'title'`, `'card'`, etc.) |
+| `useUnifiedMotion` | Single hook that unifies all entrance animations; supports both single-type and multi-effect `effects` object mode |
+| `useMotion` | Low-level from/to animation engine; accepts `MotionConfig` or legacy `(from, to, options)` signature |
+
+---
+
+## Basic Entrance Animations
+
+One-shot entrance effects triggered by IntersectionObserver.
+
+| Hook | Description |
+|------|-------------|
+| `useFadeIn` | Fades element from transparent to opaque on scroll into view |
+| `useSlideUp` | Slides element up from below while fading in |
+| `useSlideDown` | Slides element down from above while fading in |
+| `useSlideLeft` | Slides element in from the right while fading in |
+| `useSlideRight` | Slides element in from the left while fading in |
+| `useScaleIn` | Scales element up from a smaller size while fading in |
+| `useBounceIn` | Scales in with an overshoot bounce effect |
+| `usePulse` | Repeating pulse scale animation; useful for attention indicators |
+| `useSpringMotion` | Physics-based spring animation between two numeric values; returns `value` and `velocity` |
+| `useGradient` | Animates a CSS background gradient shift using `@keyframes` |
+
+---
+
+## Scroll Hooks
+
+Hooks that react to page scroll position or element visibility in the scroll context.
+
+| Hook | Description |
+|------|-------------|
+| `useScrollReveal` | Reveals an element when it enters the viewport; supports multiple motion types (`fadeIn`, `slideUp`, `slideLeft`, `slideRight`, `scaleIn`, `bounceIn`) |
+| `useScrollProgress` | Tracks overall page scroll progress as a 0–1 value |
+| `useElementProgress` | Per-element scroll progress (0–1) based on how far the element has traveled through the viewport; extension of `useScrollProgress` |
+| `useScrollDirection` | Detects current scroll direction: `'up'` | `'down'` | `'idle'` |
+| `useStickyToggle` | Toggles a boolean when scroll position exceeds an `offset` threshold; useful for sticky headers |
+| `useScrollToggle` | Toggles show/hide animation styles based on scroll direction and threshold; animation-lifecycle based |
+| `useScrollPositionToggle` | Toggles visibility based on `window.pageYOffset` exceeding a `threshold`; includes `scrollToTop()` helper |
+| `useSmoothScroll` | Lerp-based smooth scroll with configurable `lerp`, `wheelMultiplier`, and `touchMultiplier`; returns current and target scroll positions |
+
+---
+
+## Stagger Hook
+
+| Hook | Description |
+|------|-------------|
+| `useStagger` | Single IntersectionObserver for a parent container; computes per-child `transition-delay` styles for staggered list entrance |
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `count` | `number` | required | Number of child items |
+| `staggerDelay` | `number` | `100` | Delay between items (ms) |
+| `baseDelay` | `number` | `0` | Initial delay before first item (ms) |
+| `duration` | `number` | `700` | Animation duration (ms) |
+| `motionType` | `ScrollRevealMotionType` | `'fadeIn'` | Motion type |
+| `threshold` | `number` | `0.1` | IntersectionObserver threshold |
+| `easing` | `string` | `'ease-out'` | CSS easing function |
+
+### Return
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `containerRef` | `RefObject<HTMLDivElement>` | Attach to parent container |
+| `styles` | `CSSProperties[]` | Per-item styles (index-matched) |
+| `isVisible` | `boolean` | Whether container is in viewport |
+
+---
+
+## Interaction Hooks
+
+Hooks that respond to user input events.
+
+| Hook | Description |
+|------|-------------|
+| `useHoverMotion` | Scale and translate animation on mouse hover; respects `MotionProfile` defaults |
+| `useClickToggle` | Boolean toggle state driven by click, double-click, right-click, or keyboard Enter/Space |
+| `useFocusToggle` | Boolean toggle state driven by focus/blur events |
+| `useVisibilityToggle` | Animates show/hide transitions with configurable scale, opacity, rotation, and translate values; animation-lifecycle based |
+| `useButtonEffect` | Button click effects: `scale`, `ripple`, `glow`, `shake`, `bounce`, `slide`, or `custom` |
+| `useToggleMotion` | Programmatic show/hide toggle with CSS transition styles |
+| `useInteractive` | Hover + click scale states with event handler objects ready to spread onto an element |
+| `useGesture` | Touch/pointer gesture detection: swipe (with direction and velocity thresholds), pinch-to-zoom, and rotate |
+| `useGestureMotion` | Applies CSS transform animations in response to gesture types (`hover`, `drag`, `pinch`, `swipe`, `tilt`) |
+| `useKeyboardToggle` | Boolean toggle driven by configurable key or key combination |
+| `useLayoutMotion` | Animates CSS layout properties (width, height, flex, gap, grid) between `from` and `to` states |
+
+---
+
+## Auto-Play Hooks
+
+Hooks that self-drive animations on a timer or RAF loop, without needing user interaction.
+
+| Hook | Description |
+|------|-------------|
+| `useAutoFade` | Continuously fades opacity between `initialOpacity` and `targetOpacity`; supports repeat, loop delay, and manual `fadeIn`/`fadeOut`/`toggle` |
+| `useAutoPlay` | Interval-based step counter; powers slideshows and carousels; `pauseOnHover` and `pauseOnBlur` support |
+| `useAutoScale` | Continuously scales between `initialScale` and `targetScale`; supports bounce and elastic easing |
+| `useAutoSlide` | Slides element between positions in 8 directions (`left`, `right`, `up`, `down`, and diagonals) on a loop |
+
+---
+
+## Orchestration Hooks
+
+Hooks for coordinating multiple animations in sequence, parallel, or stagger patterns.
+
+| Hook | Description |
+|------|-------------|
+| `useMotionOrchestra` | Runs a set of motion step callbacks in `sequential`, `parallel`, or `stagger` mode; supports loop and `autoStart` |
+| `useOrchestration` | Timeline-based orchestration engine; supports `play`, `pause`, `stop`, `seek`, `setSpeed`, `reverse`, and per-step progress callbacks |
+| `useSequence` | **Deprecated** — chains motion hook results in sequence; use `useOrchestration` or `useMotionOrchestra` instead |
+
+---
+
+## Layout & UI Pattern Hooks
+
+Hooks purpose-built for common UI components.
+
+| Hook | Description |
+|------|-------------|
+| `useCardList` | Staggered entrance animation for card grids; wraps `observeElement` and produces per-card styles |
+| `useLoadingSpinner` | Looping spinner animations: `rotate`, `pulse`, `bounce`, `wave`, `dots`, `bars`, or `custom` |
+| `useNavigation` | Animated menu open/close with staggered item entrance; supports `slide`, `fade`, `scale`, `rotate` types |
+| `useSkeleton` | Skeleton loading placeholder with wave or pulse shimmer animation |
+| `useTypewriter` | Character-by-character typewriter effect; returns `displayText`, `isTyping`, `progress`, and `restart` |
+
+---
+
+## Cursor Hooks
+
+| Hook | Description |
+|------|-------------|
+| `useCustomCursor` | Smooth spring-tracked custom cursor with `data-cursor` label detection and configurable hover scale |
+| `useMagneticCursor` | Magnetic pull effect on an element toward the cursor within a configurable `radius`; returns `ref`, `handlers`, and `style` |
+
+---
+
+## Lightweight Active-Trigger Hooks
+
+These hooks are `"use client"` and start animating when `active` flips to `true` — suitable for controlled entrance triggers.
+
+| Hook | Description |
+|------|-------------|
+| `useCountUp` | Counts a number from 0 to `end` over a `duration`; starts when `active` becomes true |
+| `useClipReveal` | Clip-path reveal with spring overshoot easing; splits into `containerStyle` and `innerStyle` |
+| `useBlurIn` | Blur + scale fade-in; starts sharp at `blurAmount` px blur and animates to fully clear |
+
+---
+
+## Utility Hooks
+
+Environment and observer utilities used internally and available publicly.
+
+| Hook | Description |
+|------|-------------|
+| `useInView` | IntersectionObserver wrapper; returns `{ ref, inView }`; supports `threshold`, `rootMargin`, and `triggerOnce` |
+| `useMouse` | Real-time mouse position tracking; returns `{ x, y }` coordinates relative to the document |
+| `useReducedMotion` | Reads `prefers-reduced-motion` media query; returns `boolean` |
+| `useReducedMotionObject` | Extended version returning an object with the preference value plus helpers |
+| `useWindowSize` | Debounced window resize listener; returns `{ width, height }` |
+| `useViewportToggle` | IntersectionObserver-based viewport enter/exit toggle; supports `trigger: 'enter' \| 'exit' \| 'both'` and `once` |
+| `useMotionState` | State machine for animation lifecycle: `idle → playing → paused → completed → error` |
+| `useRepeat` | Repeating looping animation (default type: `'pulse'`) with configurable `intensity` |
+| `usePerformanceMonitor` | RAF-based FPS counter; reports `fps`, `isLowPerformance`, and `frameCount` against a configurable threshold |
+| `useGameLoop` | Fixed-timestep game loop with `onUpdate` and `onRender` callback registration; exposes `fps`, `deltaTime`, `elapsedTime` |
+| `useLanguageAwareMotion` | Scroll reveal that pauses or restarts on locale change; accepts `currentLanguage` externally |
+
+---
+
+## Motion Profile System
+
+Configure animation defaults globally for an entire subtree.
+
+| Export | Description |
+|--------|-------------|
+| `MotionProfileProvider` | Context provider — wrap your app or subtree to set a profile |
+| `useMotionProfile` | Reads the current `MotionProfile` from context |
+| `neutral` | Built-in subtle profile: conservative durations and reduced spring stiffness |
+| `hua` | Built-in expressive profile: spring-forward, slightly playful defaults |
+| `resolveProfile` | Merges a partial profile override with a base profile |
+| `mergeProfileOverrides` | Deep-merges multiple partial overrides into a base profile |
+
+---
+
+## Core Engine & Easing Utilities
+
+Low-level building blocks. Use hooks above instead unless you need direct control.
+
+### Engine
+
+| Export | Description |
+|--------|-------------|
+| `MotionEngine` | Class — pure JS animation engine using `requestAnimationFrame` |
+| `motionEngine` | Singleton instance of `MotionEngine` |
+| `TransitionEffects` | Class — CSS transition effect presets |
+| `transitionEffects` | Singleton instance of `TransitionEffects` |
+| `observeElement` | Shared `IntersectionObserver` utility used by scroll hooks |
+| `calculateSpring` | Pure function — spring physics calculation given `SpringPhysicsConfig`; returns `SpringResult` |
+| `createLayoutTransition` | Helper that builds a `LayoutMotionConfig` object from `from`/`to`/`options` |
+
+### Easing Functions
+
+| Export | Description |
+|--------|-------------|
+| `linear` | Linear easing function |
+| `easeIn` | Quadratic ease-in |
+| `easeOut` | Quadratic ease-out |
+| `easeInOut` | Quadratic ease-in-out |
+| `easeInQuad` | Quadratic ease-in (alias) |
+| `easeOutQuad` | Quadratic ease-out (alias) |
+| `easeInOutQuad` | Quadratic ease-in-out (alias) |
+| `getEasing` | Retrieves an easing function by `EasingType` name |
+| `applyEasing` | Applies an easing function or type to a 0–1 progress value |
+| `safeApplyEasing` | Same as `applyEasing` but catches invalid inputs |
+| `isValidEasing` | Type guard — checks whether a value is a valid `EasingType` |
+| `getAvailableEasings` | Returns the list of all registered easing type names |
+| `isEasingFunction` | Type guard — checks whether a value is a callable `EasingFunction` |
+| `easingPresets` | Record of preset easing functions keyed by name |
+| `getPresetEasing` | Retrieves a preset easing function by name |
+
+---
+
+## Landing Page Pattern
+
+```tsx
+import { Motion, useStagger } from '@hua-labs/motion-core'
+import { Section } from '@hua-labs/ui'
+
+function FeaturesSection({ features }) {
+  const stagger = useStagger({ count: features.length, staggerDelay: 100 })
+
+  return (
+    <Section header={{ title: "Features", subtitle: "What we offer" }}>
+      <div ref={stagger.containerRef} className="grid grid-cols-3 gap-6">
+        {features.map((f, i) => (
+          <div key={f.id} style={stagger.styles[i]} className="card-hover-lift">
+            <h3>{f.title}</h3>
+            <p>{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+```

@@ -1,0 +1,118 @@
+---
+title: Config Schema
+description: Full HuaConfig schema reference
+category: config
+related:
+  - ./01-define-config.mdx
+  - ./03-client-server-split.mdx
+  - ../06-api-reference/02-type-definitions.mdx
+---
+
+# Config Schema
+
+`HuaConfig` is the unified configuration interface for all hua sub-systems.
+
+## Full Schema
+
+```typescript
+interface HuaConfig {
+  preset?: Preset
+  i18n?: I18nConfig
+  motion?: MotionConfig
+  state?: StateConfig
+  fileStructure?: FileStructureConfig
+  icons?: IconsConfig
+  toast?: ToastConfig
+  branding?: BrandingConfig
+  plugins?: HuaPlugin[]
+  license?: LicenseConfig
+}
+```
+
+## preset
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| preset | `PresetName \| PresetConfig` | `'product'` | Vibe mode (string) or developer mode (object) |
+
+```typescript
+type PresetName = 'product' | 'marketing' | 'minimal'
+type PresetConfig = { type: PresetName; motion?: { duration?; easing? }; spacing?: { default?: 'sm' | 'md' | 'lg' | 'xl' } }
+type Preset = PresetName | PresetConfig
+```
+
+## i18n
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| defaultLanguage | `string` | `'ko'` | Default language code |
+| supportedLanguages | `string[]` | `['ko', 'en']` | Supported language list |
+| fallbackLanguage | `string` | — | Fallback when translation missing |
+| namespaces | `string[]` | — | Translation namespace list |
+| translationLoader | `'api' \| 'static' \| 'custom'` | — | Translation loading method |
+| translationApiPath | `string` | — | API translation loader path |
+| loadTranslations | `(lang, ns) => Promise<Record>` | — | Custom translation loader |
+| debug | `boolean` | `false` | i18n debug mode |
+| autoUpdateHtmlLang | `boolean` | — | Auto-update `<html lang>` |
+| initialTranslations | `Record<...>` | — | SSR initial translation data |
+| storageKey | `string` | — | localStorage key for language persistence |
+
+## motion
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| style | `'smooth' \| 'dramatic' \| 'minimal'` | — | Motion style (maps to defaultPreset) |
+| defaultPreset | `PresetName` | — | Motion preset (`'product'` \| `'marketing'` \| `'minimal'`) |
+| enableAnimations | `boolean` | `true` | Global animation on/off |
+| duration | `number` | — | Global default duration (ms) |
+| easing | `string` | — | Global default easing |
+| components | `Record<string, Partial<ComponentMotionConfig>>` | — | Per-component role overrides (shallow merge with preset) |
+
+## icons
+
+| Field | Type | product | marketing | Description |
+|-------|------|---------|-----------|-------------|
+| set | `'phosphor' \| 'lucide' \| 'iconsax'` | `'phosphor'` | `'phosphor'` | Icon provider |
+| weight | `PhosphorWeight` | `'regular'` | `'bold'` | Phosphor weight |
+| size | `number` | `20` | `24` | Default size (px) |
+| color | `string` | `'currentColor'` | `'currentColor'` | Default color |
+| strokeWidth | `number` | — | — | Stroke width |
+
+## toast
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| position | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center'` | `'top-right'` | Toast position |
+| maxToasts | `number` | — | Max simultaneous toasts |
+
+## branding
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | `string` | Brand name |
+| logo | `string` | Logo image path |
+| colors | `{ primary?, secondary?, accent?, success?, warning?, error?, info? }` | Brand colors (CSS values) |
+| typography | `{ fontFamily?: string[], fontSize?: { h1?, h2?, h3?, body? } }` | Font settings |
+| customVariables | `Record<string, string>` | Custom CSS variables |
+
+## license
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| apiKey | `string` | — | License API key |
+| type | `'free' \| 'pro' \| 'enterprise'` | `'free'` | License tier |
+
+## state
+
+| Field | Type | Description |
+|-------|------|-------------|
+| persist | `boolean` | Zustand state persistence |
+| ssr | `boolean` | SSR safe mode |
+
+## Constraints & Gotchas
+
+- `i18n.defaultLanguage` must be included in `supportedLanguages`. Validation error otherwise.
+- When `branding` is defined, BrandingProvider is automatically added to the provider chain.
+- Each plugin in `plugins` must have a unique `name`. Duplicates trigger a warning and are overwritten.
+- Without `license.apiKey`, the system checks `HUA_LICENSE_KEY` env var. Both missing = free license.
+- `toast` settings cannot be changed at runtime. Applied once during provider initialization.

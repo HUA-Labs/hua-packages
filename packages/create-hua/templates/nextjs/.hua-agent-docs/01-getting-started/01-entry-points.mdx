@@ -1,0 +1,146 @@
+---
+title: Entry Points
+description: All 16 hua entry points and correct import path guide
+category: getting-started
+related:
+  - ../02-architecture/01-overview.mdx
+  - ../03-config/03-client-server-split.mdx
+  - ../07-constraints/01-runtime-boundaries.mdx
+---
+
+# Entry Points
+
+hua provides **16 entry points** separated by purpose. Importing from the wrong entry causes bundle bloat or runtime errors.
+
+> **Looking for UI component paths?** (`@hua-labs/ui/advanced`, `/data`, `/form`, etc.)
+> See [02-ui-export-paths](./02-ui-export-paths.mdx) — covers all 12 sub-path exports.
+
+## Full Entry Point List
+
+### Main Entry (All-in-One)
+
+```typescript
+// @hua-labs/hua
+// Includes UI + Motion + i18n + State. For rapid prototyping.
+import { Button, Card, useMotion, useTranslation } from '@hua-labs/hua'
+```
+
+> **Warning**: The main entry re-exports all sub-packages. Use granular entries for production.
+
+### Framework Entries (Core)
+
+```typescript
+// @hua-labs/hua/framework — Client entry ('use client')
+// HuaProvider, HuaPage, UnifiedProviders, defineConfig,
+// BrandedButton, BrandedCard, ErrorBoundary, WelcomePage,
+// License, Plugin, Branding, A11y, Loading, Motion hooks
+import { HuaProvider, defineConfig, useBranding } from '@hua-labs/hua/framework'
+```
+
+```typescript
+// @hua-labs/hua/framework/shared — Pure exports (server + client safe)
+// Types and pure functions only. No 'use client' / 'server-only' directives.
+// GEO, CSS var generation, Tailwind config generation, createI18nMiddleware
+import { generateGEOMetadata, generateCSSVariables } from '@hua-labs/hua/framework/shared'
+```
+
+```typescript
+// @hua-labs/hua/framework/server — Server-only (fs-dependent)
+// Everything from shared + getSSRTranslations, loadConfig
+// Will cause build error if imported on client
+import { getSSRTranslations, loadConfig } from '@hua-labs/hua/framework/server'
+```
+
+```typescript
+// @hua-labs/hua/framework/config — Config system
+// defineConfig, getConfig, setConfig, resetConfig
+import { defineConfig } from '@hua-labs/hua/framework/config'
+```
+
+### Sub-package Entries
+
+```typescript
+// @hua-labs/hua/ui — Full hua-ui component re-export
+import { Button, Card, Input, Modal } from '@hua-labs/hua/ui'
+
+// @hua-labs/hua/i18n — i18n-core + i18n-core-zustand re-export
+import { useTranslation, useLanguageChange } from '@hua-labs/hua/i18n'
+
+// @hua-labs/hua/motion — motion-core re-export
+import { useFadeIn, useSlideUp, useScrollReveal } from '@hua-labs/hua/motion'
+
+// @hua-labs/hua/state — State package re-export
+import { createHuaStore } from '@hua-labs/hua/state'
+
+// @hua-labs/hua/hooks — Common hooks re-export
+import { useLoading, useAutoScroll } from '@hua-labs/hua/hooks'
+
+// @hua-labs/hua/utils — Utilities re-export
+import { cn, createLogger } from '@hua-labs/hua/utils'
+
+// @hua-labs/hua/loaders — i18n loaders re-export
+import { createApiTranslationLoader } from '@hua-labs/hua/loaders'
+
+// @hua-labs/hua/formatters — i18n formatters re-export
+import { useCurrencyFormatter, useDateFormatter } from '@hua-labs/hua/formatters'
+
+// @hua-labs/hua/presets — Preset definitions
+import { productPreset, marketingPreset } from '@hua-labs/hua/presets'
+
+// @hua-labs/hua/dot — dot style engine
+import { dot, dotCx, dotMap, dotVariants, createDotConfig } from '@hua-labs/hua/dot'
+
+// @hua-labs/hua/dot/react — React memoized wrappers ('use client')
+import { useDot, useDotMap } from '@hua-labs/hua/dot/react'
+```
+
+## Choosing the Right Import
+
+| Scenario | Correct Entry |
+|----------|--------------|
+| App root layout setup | `@hua-labs/hua/framework` |
+| Server component translation loading | `@hua-labs/hua/framework/server` |
+| i18n middleware in middleware.ts | `@hua-labs/hua/framework/shared` |
+| UI components only | `@hua-labs/hua/ui` |
+| Motion hooks only | `@hua-labs/hua/motion` |
+| GEO metadata generation | `@hua-labs/hua/framework/shared` |
+| Rapid prototyping | `@hua-labs/hua` (main) |
+
+## Anti-patterns
+
+```typescript
+// Server component importing client entry
+// 'use client' propagates, converting server component to client
+import { HuaProvider } from '@hua-labs/hua/framework'
+
+// Client importing server entry
+// 'server-only' or fs module error
+import { getSSRTranslations } from '@hua-labs/hua/framework/server'
+
+// Importing everything from main entry (bundle bloat)
+import { Button, useMotion, useTranslation, defineConfig } from '@hua-labs/hua'
+
+// Use purpose-specific entries instead
+import { defineConfig } from '@hua-labs/hua/framework/config'
+import { Button } from '@hua-labs/hua/ui'
+import { useMotion } from '@hua-labs/hua/motion'
+```
+
+## framework vs framework/shared vs framework/server
+
+| Property | `./framework` | `./framework/shared` | `./framework/server` |
+|----------|-------------|---------------------|---------------------|
+| Directive | `'use client'` | None | `'server-only'` |
+| Components | Yes | No | No |
+| Hooks | Yes | No | No |
+| Pure functions | Yes | Yes | Yes |
+| Types | Yes | Yes | Yes |
+| fs-dependent | No | No | Yes |
+| middleware.ts | No | Yes | No |
+| Server Component | No | Yes | Yes |
+
+## Constraints & Gotchas
+
+- `framework/server`'s `getSSRTranslations` and `loadConfig` use Node.js fs. Not available in Edge Runtime.
+- `framework/shared` is safe to import anywhere. Use it exclusively in middleware.ts.
+- The main entry (`@hua-labs/hua`) may not tree-shake perfectly. Use granular entries for production apps.

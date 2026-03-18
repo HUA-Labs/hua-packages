@@ -1,0 +1,176 @@
+---
+title: Architecture Overview
+description: hua meta-framework layer structure and package integration
+category: architecture
+related:
+  - ../01-getting-started/01-entry-points.mdx
+  - ./02-provider-chain.mdx
+  - ../06-api-reference/01-framework-exports.mdx
+---
+
+# Architecture Overview
+
+hua is a **meta-framework** that unifies individual packages into a single integrated DX.
+
+## Layer Structure
+
+```
++---------------------------------------------+
+|              @hua-labs/hua                |  <- Meta-framework
+|  +----------------------------------------+  |
+|  |           framework layer              |  |  <- Config, Providers, Layout, Page
+|  |  +------+------+------+------+------+  |  |
+|  |  | UI   |Motion| i18n |State | A11y |  |  |  <- Sub-systems
+|  |  +------+------+------+------+------+  |  |
+|  +----------------------------------------+  |
+|  +----------------------------------------+  |
+|  |         sub-package layer              |  |
+|  |  hua-ui | motion-core | i18n-core |    |  |  <- Independent packages
+|  |  state  | hooks | utils | formatters   |  |
+|  +----------------------------------------+  |
++---------------------------------------------+
+```
+
+## Package Dependencies
+
+```
+@hua-labs/hua
++-- @hua-labs/ui           -> UI components (Button, Card, Icon, etc.)
++-- @hua-labs/motion-core  -> CSS motion (useEntrance, useScrollReveal, etc.)
++-- @hua-labs/i18n-core    -> i18n core (useTranslation, useLanguageChange)
++-- @hua-labs/i18n-core-zustand -> Zustand-based i18n state
++-- @hua-labs/i18n-loaders -> Translation loaders (API, static)
++-- @hua-labs/i18n-currency/date/number -> Formatters
++-- @hua-labs/state        -> Zustand store utilities
++-- @hua-labs/hooks        -> Common hooks (useLoading, useAutoScroll)
++-- @hua-labs/utils        -> Utilities (cn, createLogger, validators)
+```
+
+## Re-export Strategy
+
+The main entry (`@hua-labs/hua`) uses **named exports** from all sub-packages. `export *` is avoided to prevent naming conflicts and Turbopack CJS warnings:
+
+```typescript
+// Main index.ts structure — named exports only
+export { Button as UIButton, Action, Input, Modal, ... } from '@hua-labs/ui'
+export { useFadeIn, useSlideUp, useScrollReveal, Motion, ... } from '@hua-labs/motion-core'
+export { createCoreI18n, useTranslation, I18nProvider, ... } from '@hua-labs/i18n-core'
+export { createZustandI18n, useZustandI18n, ... } from '@hua-labs/i18n-core-zustand'
+export { createHuaStore, createI18nStore, ... } from '@hua-labs/state'
+// ... other packages
+```
+
+Each sub-entry (`/ui`, `/motion`, `/i18n`, etc.) re-exports only its package.
+
+## Framework Layer
+
+The framework layer **integrates and extends** sub-packages:
+
+### Integration
+- **UnifiedProviders**: Auto-composes Icon + i18n + Motion + Toast + Branding Providers
+- **HuaProvider**: Layout + theme CSS injection + language transition animation
+- **defineConfig**: Single config file for all sub-systems
+
+### Extension (Branded Overrides)
+- **BrandedButton**: hua-ui Button with auto-applied branding colors
+- **BrandedCard**: hua-ui Card with branding border/shadow
+- **WelcomePage**: Preset-based welcome page component
+
+### Additional Systems
+- **GEO**: AI search engine optimization metadata
+- **License**: Feature-level license management
+- **Plugin**: Extension plugin registry
+- **A11y**: Accessibility (focus management, live region)
+- **Loading**: Loading UI (SuspenseWrapper, useDelayedLoading)
+- **Error**: ErrorBoundary, HuaPage error boundaries
+
+## Config-to-Render Flow
+
+```
+hua.config.ts
+  | defineConfig()
+  | preset merge + validation
+  v
+HuaConfig (cached)
+  v
+HuaProvider
+  +-- ThemeInjector -> CSS variable <style> injection
+  +-- UnifiedProviders
+  |   +-- BrandingProvider -> Branding CSS variables
+  |   +-- ToastProvider -> Toast position/count
+  |   +-- IconProvider -> Icon set/weight/size
+  |   +-- I18nProvider -> Language/translations
+  +-- LanguageTransitionWrapper -> Fade on language switch
+      +-- {children}
+          +-- HuaPage -> Motion + error boundary + vibe
+              +-- Actual page content
+```
+
+## Examples
+
+### 1. Basic app setup
+
+```typescript
+// hua.config.ts
+import { defineConfig } from '@hua-labs/hua/framework/config'
+
+export default defineConfig({
+  preset: 'product',
+  i18n: { defaultLanguage: 'ko', supportedLanguages: ['ko', 'en'] }
+})
+```
+
+```tsx
+// app/layout.tsx
+import { HuaProvider } from '@hua-labs/hua/framework'
+import config from '../hua.config'
+
+export default function RootLayout({ children }) {
+  return (
+    <html><body>
+      <HuaProvider config={config}>{children}</HuaProvider>
+    </body></html>
+  )
+}
+```
+
+### 2. Using individual packages without framework
+
+```tsx
+import { Button, Card } from '@hua-labs/ui'
+import { useFadeIn } from '@hua-labs/motion-core'
+
+function MyComponent() {
+  const ref = useFadeIn()
+  return <div ref={ref}><Button>Click</Button></div>
+}
+```
+
+### 3. Server component with SSR translations
+
+```tsx
+// app/layout.tsx (Server Component)
+import { getSSRTranslations } from '@hua-labs/hua/framework/server'
+import { HuaProvider } from '@hua-labs/hua/framework'
+import config from '../hua.config'
+
+export default async function RootLayout({ children }) {
+  const initialTranslations = await getSSRTranslations(config)
+  return (
+    <html><body>
+      <HuaProvider config={{
+        ...config,
+        i18n: { ...config.i18n, initialTranslations }
+      }}>
+        {children}
+      </HuaProvider>
+    </body></html>
+  )
+}
+```
+
+## Constraints & Gotchas
+
+- hua is optimized for Next.js. For other React frameworks, use sub-packages (hua-ui, motion-core, etc.) directly.
+- BrandedButton/BrandedCard only apply branding inside BrandingProvider. Outside the provider, they behave like regular Button/Card.
+- The `'use client'` directive in the framework layer means server components must use `framework/shared` or `framework/server`.

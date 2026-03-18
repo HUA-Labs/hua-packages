@@ -8,7 +8,7 @@
 /**
  * Minimum required Node.js version
  */
-export const MIN_NODE_VERSION = '22.0.0';
+export const MIN_NODE_VERSION = "22.0.0";
 
 /**
  * AI context file definitions
@@ -20,12 +20,17 @@ export const AI_CONTEXT_FILES: Array<{
   label: string;
   paths: string[];
 }> = [
-  { key: 'cursorRules', label: '.cursor/rules/', paths: ['.cursor'] },
-  { key: 'aiContext', label: 'ai-context.md', paths: ['ai-context.md'] },
-  { key: 'agentsMd', label: 'AGENTS.md', paths: ['AGENTS.md'] },
-  { key: 'skillsMd', label: 'skills.md', paths: ['skills.md'] },
-  { key: 'claudeContext', label: '.claude/project-context.md', paths: ['.claude/project-context.md'] },
-  { key: 'claudeSkills', label: '.claude/skills/', paths: ['.claude/skills'] },
+  { key: "cursorRules", label: ".cursor/rules/", paths: [".cursor"] },
+  { key: "aiContext", label: "ai-context.md", paths: ["ai-context.md"] },
+  { key: "agentsMd", label: "AGENTS.md", paths: ["AGENTS.md"] },
+  { key: "skillsMd", label: "skills.md", paths: ["skills.md"] },
+  {
+    key: "claudeContext",
+    label: ".claude/project-context.md",
+    paths: [".claude/project-context.md"],
+  },
+  { key: "claudeSkills", label: ".claude/skills/", paths: [".claude/skills"] },
+  { key: "agentDocs", label: ".hua-agent-docs/", paths: [".hua-agent-docs"] },
 ];
 
 /**
@@ -38,6 +43,7 @@ export interface AiContextOptionFlags {
   skillsMd: boolean;
   claudeContext: boolean;
   claudeSkills: boolean;
+  agentDocs: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -52,9 +58,9 @@ export interface AiContextOptionFlags {
  */
 export function parseVersion(v: string): number[] {
   return v
-    .replace(/^v/, '')
-    .replace(/-.*$/, '')
-    .split('.')
+    .replace(/^v/, "")
+    .replace(/-.*$/, "")
+    .split(".")
     .map((s) => parseInt(s, 10) || 0);
 }
 
@@ -83,42 +89,47 @@ export function compareVersions(v1: string, v2: string): number {
  */
 export function isEnglishOnly(): boolean {
   return (
-    process.env.LANG === 'en' ||
-    process.env.CLI_LANG === 'en' ||
-    process.argv.includes('--english-only')
+    process.env.LANG === "en" ||
+    process.env.CLI_LANG === "en" ||
+    process.argv.includes("--english-only")
   );
 }
 
 type MessageKey =
-  | 'projectNamePrompt'
-  | 'projectNameRequired'
-  | 'selectAiContext'
-  | 'documentationLanguage'
-  | 'projectNameInvalidUppercase'
-  | 'projectNameInvalidSpaces'
-  | 'projectNameInvalidStartChar'
-  | 'projectNameInvalidChars';
+  | "projectNamePrompt"
+  | "projectNameRequired"
+  | "selectAiContext"
+  | "documentationLanguage"
+  | "projectNameInvalidUppercase"
+  | "projectNameInvalidSpaces"
+  | "projectNameInvalidStartChar"
+  | "projectNameInvalidChars";
 
 const MESSAGES_EN: Record<MessageKey, string> = {
-  projectNamePrompt: 'What is your project name?',
-  projectNameRequired: 'Project name is required',
-  selectAiContext: 'Select AI context files to generate:',
-  documentationLanguage: 'Documentation language:',
-  projectNameInvalidUppercase: 'No uppercase letters allowed',
-  projectNameInvalidSpaces: 'No spaces allowed',
-  projectNameInvalidStartChar: 'Cannot start with . or _',
-  projectNameInvalidChars: 'Only lowercase letters, numbers, hyphens, dots, and @ are allowed',
+  projectNamePrompt: "What is your project name?",
+  projectNameRequired: "Project name is required",
+  selectAiContext: "Select AI context files to generate:",
+  documentationLanguage: "Documentation language:",
+  projectNameInvalidUppercase: "No uppercase letters allowed",
+  projectNameInvalidSpaces: "No spaces allowed",
+  projectNameInvalidStartChar: "Cannot start with . or _",
+  projectNameInvalidChars:
+    "Only lowercase letters, numbers, hyphens, dots, and @ are allowed",
 };
 
 const MESSAGES_BI: Record<MessageKey, string> = {
-  projectNamePrompt: 'What is your project name? / 프로젝트 이름을 입력하세요:',
-  projectNameRequired: 'Project name is required / 프로젝트 이름이 필요합니다',
-  selectAiContext: 'Select AI context files to generate / 생성할 AI 컨텍스트 파일을 선택하세요:',
-  documentationLanguage: 'Documentation language / 문서 언어:',
-  projectNameInvalidUppercase: 'No uppercase letters / 대문자는 사용할 수 없습니다',
-  projectNameInvalidSpaces: 'No spaces allowed / 공백은 사용할 수 없습니다',
-  projectNameInvalidStartChar: 'Cannot start with . or _ / .이나 _로 시작할 수 없습니다',
-  projectNameInvalidChars: 'Only lowercase, numbers, hyphens allowed / 소문자, 숫자, 하이픈만 사용 가능합니다',
+  projectNamePrompt: "What is your project name? / 프로젝트 이름을 입력하세요:",
+  projectNameRequired: "Project name is required / 프로젝트 이름이 필요합니다",
+  selectAiContext:
+    "Select AI context files to generate / 생성할 AI 컨텍스트 파일을 선택하세요:",
+  documentationLanguage: "Documentation language / 문서 언어:",
+  projectNameInvalidUppercase:
+    "No uppercase letters / 대문자는 사용할 수 없습니다",
+  projectNameInvalidSpaces: "No spaces allowed / 공백은 사용할 수 없습니다",
+  projectNameInvalidStartChar:
+    "Cannot start with . or _ / .이나 _로 시작할 수 없습니다",
+  projectNameInvalidChars:
+    "Only lowercase, numbers, hyphens allowed / 소문자, 숫자, 하이픈만 사용 가능합니다",
 };
 
 /**
@@ -150,7 +161,7 @@ export function isInteractive(): boolean {
   if (process.env.CI || process.env.NON_INTERACTIVE) {
     return false;
   }
-  if (process.argv.includes('--non-interactive')) {
+  if (process.argv.includes("--non-interactive")) {
     return false;
   }
 
@@ -171,21 +182,24 @@ export function isInteractive(): boolean {
 /**
  * Validate a project name against npm package naming conventions.
  */
-export function validateProjectName(name: string): { valid: boolean; message?: string } {
+export function validateProjectName(name: string): {
+  valid: boolean;
+  message?: string;
+} {
   if (!name || !name.trim()) {
-    return { valid: false, message: t('projectNameRequired') };
+    return { valid: false, message: t("projectNameRequired") };
   }
   if (/[A-Z]/.test(name)) {
-    return { valid: false, message: t('projectNameInvalidUppercase') };
+    return { valid: false, message: t("projectNameInvalidUppercase") };
   }
   if (/\s/.test(name)) {
-    return { valid: false, message: t('projectNameInvalidSpaces') };
+    return { valid: false, message: t("projectNameInvalidSpaces") };
   }
   if (/^[._]/.test(name)) {
-    return { valid: false, message: t('projectNameInvalidStartChar') };
+    return { valid: false, message: t("projectNameInvalidStartChar") };
   }
-  if (!/^[a-z0-9@][a-z0-9._\/-]*$/.test(name)) {
-    return { valid: false, message: t('projectNameInvalidChars') };
+  if (!/^[a-z0-9@][a-z0-9._/-]*$/.test(name)) {
+    return { valid: false, message: t("projectNameInvalidChars") };
   }
   return { valid: true };
 }
@@ -198,7 +212,7 @@ export function validateProjectName(name: string): { valid: boolean; message?: s
  * Build a list of AI context file labels that are enabled in the given options.
  */
 export function listEnabledAiFiles(opts: AiContextOptionFlags): string[] {
-  return AI_CONTEXT_FILES
-    .filter((entry) => opts[entry.key])
-    .map((entry) => entry.label);
+  return AI_CONTEXT_FILES.filter((entry) => opts[entry.key]).map(
+    (entry) => entry.label,
+  );
 }
