@@ -52,42 +52,51 @@ const BASE_CONTAINER: React.CSSProperties = {
   borderStyle: "solid",
 };
 
-/** Per-variant container styles */
+/**
+ * Per-variant container styles — uses semantic CSS variables.
+ * Text color uses the base token (not -foreground) because -foreground
+ * is #fff designed for solid fills, not subtle 10%-tinted surfaces.
+ */
 const VARIANT_CONTAINER: Record<string, React.CSSProperties> = {
   default: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderColor: "rgba(255, 255, 255, 0.3)",
-    color: "rgba(255, 255, 255, 1)",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-foreground) 10%, transparent)",
+    borderColor: "color-mix(in srgb, var(--color-foreground) 30%, transparent)",
+    color: "var(--color-foreground)",
   },
   success: {
-    backgroundColor: "rgba(34, 197, 94, 0.1)",
-    borderColor: "rgba(74, 222, 128, 0.3)",
-    color: "rgba(187, 247, 208, 1)",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-success) 10%, transparent)",
+    borderColor: "color-mix(in srgb, var(--color-success) 30%, transparent)",
+    color: "var(--color-success)",
   },
   warning: {
-    backgroundColor: "rgba(234, 179, 8, 0.1)",
-    borderColor: "rgba(250, 204, 21, 0.3)",
-    color: "rgba(254, 240, 138, 1)",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-warning) 10%, transparent)",
+    borderColor: "color-mix(in srgb, var(--color-warning) 30%, transparent)",
+    color: "var(--color-warning)",
   },
   error: {
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
-    borderColor: "rgba(248, 113, 113, 0.3)",
-    color: "rgba(254, 202, 202, 1)",
+    backgroundColor:
+      "color-mix(in srgb, var(--color-destructive) 10%, transparent)",
+    borderColor:
+      "color-mix(in srgb, var(--color-destructive) 30%, transparent)",
+    color: "var(--color-destructive)",
   },
   info: {
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
-    borderColor: "rgba(34, 211, 238, 0.3)",
-    color: "rgba(165, 243, 252, 1)",
+    backgroundColor: "color-mix(in srgb, var(--color-info) 10%, transparent)",
+    borderColor: "color-mix(in srgb, var(--color-info) 30%, transparent)",
+    color: "var(--color-info)",
   },
 };
 
 /** Per-variant icon color styles */
 const VARIANT_ICON: Record<string, React.CSSProperties> = {
-  default: { color: "var(--color-muted-foreground, rgba(148, 163, 184, 1))" },
-  success: { color: "rgba(34, 197, 94, 1)" },
-  warning: { color: "rgba(234, 179, 8, 1)" },
-  error: { color: "rgba(239, 68, 68, 1)" },
-  info: { color: "rgba(6, 182, 212, 1)" },
+  default: { color: "var(--color-muted-foreground)" },
+  success: { color: "var(--color-success)" },
+  warning: { color: "var(--color-warning)" },
+  error: { color: "var(--color-destructive)" },
+  info: { color: "var(--color-info)" },
 };
 
 /** Close button hover overlay */

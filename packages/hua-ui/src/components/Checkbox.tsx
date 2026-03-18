@@ -95,7 +95,9 @@ const ERROR_BORDER: React.CSSProperties = {
 };
 
 /** Success border override */
-const SUCCESS_BORDER: React.CSSProperties = { borderColor: "hsl(142 71% 45%)" };
+const SUCCESS_BORDER: React.CSSProperties = {
+  borderColor: "var(--color-success)",
+};
 
 /** Disabled overlay */
 const DISABLED_STYLE: React.CSSProperties = {
@@ -297,6 +299,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                   fontWeight: 500,
                   color: "var(--color-foreground)",
                   cursor: isDisabled ? "not-allowed" : "pointer",
+                  opacity: isDisabled ? 0.5 : 1,
                 }}
               >
                 {label}

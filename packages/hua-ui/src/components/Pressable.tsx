@@ -91,7 +91,7 @@ const Pressable = React.forwardRef<HTMLButtonElement, PressableProps>(
         transition: TRANSITIONS.micro,
         cursor: disabled ? "not-allowed" : "pointer",
         // Hover: subtle dim — overridden if dot prop sets its own hover opacity
-        opacity: isHovered && !disabled && !isPressed ? 0.85 : 1,
+        opacity: disabled ? 0.5 : isHovered && !isPressed ? 0.85 : 1,
       };
 
       if (!disableMinTouch) {

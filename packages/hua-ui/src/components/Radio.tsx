@@ -178,7 +178,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     const stateBorderColor: React.CSSProperties | undefined = error
       ? { borderColor: "var(--color-destructive)" }
       : success
-        ? { borderColor: "#22c55e" }
+        ? { borderColor: "var(--color-success)" }
         : isChecked
           ? { borderColor: "var(--color-primary)" }
           : undefined;

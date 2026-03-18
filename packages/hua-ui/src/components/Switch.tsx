@@ -129,10 +129,10 @@ const STATE_CHECKED_ERROR: React.CSSProperties = {
   backgroundColor: "var(--color-destructive)",
 };
 const STATE_UNCHECKED_SUCCESS: React.CSSProperties = {
-  backgroundColor: "color-mix(in srgb, #16a34a 20%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--color-success) 20%, transparent)",
 };
 const STATE_CHECKED_SUCCESS: React.CSSProperties = {
-  backgroundColor: "#16a34a",
+  backgroundColor: "var(--color-success)",
 };
 
 // Focus ring — imported from shared focus.ts

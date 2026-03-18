@@ -71,8 +71,8 @@ export const FORM_FOCUS_ERROR: CSSProperties = {
 /** Form success focus */
 export const FORM_FOCUS_SUCCESS: CSSProperties = {
   outline: "none",
-  boxShadow: "0 0 0 1px #22c55e",
-  borderColor: "#22c55e",
+  boxShadow: "0 0 0 1px var(--color-success)",
+  borderColor: "var(--color-success)",
 };
 
 /** Form error border (non-focus) */
@@ -82,14 +82,11 @@ export const FORM_BORDER_ERROR: CSSProperties = {
 
 /** Form success border (non-focus) */
 export const FORM_BORDER_SUCCESS: CSSProperties = {
-  borderColor: "#22c55e",
+  borderColor: "var(--color-success)",
 };
 
-/** Form disabled style */
-export const FORM_DISABLED: CSSProperties = {
-  cursor: "not-allowed",
-  opacity: 0.5,
-};
+/** Form disabled style — re-exported from disabled.ts for backward compat */
+export { DISABLED_INPUT as FORM_DISABLED } from "./disabled";
 
 // ── Radio focus shadow map ─────────────────────────────────────────────────
 
@@ -99,5 +96,5 @@ export const RADIO_FOCUS_SHADOW: Record<string, string> = {
   filled: "0 0 0 1px var(--color-ring)",
   glass: "0 0 0 1px rgba(var(--color-ring), 0.5)",
   error: "0 0 0 1px var(--color-destructive)",
-  success: "0 0 0 1px #22c55e",
+  success: "0 0 0 1px var(--color-success)",
 };

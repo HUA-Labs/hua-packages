@@ -19,7 +19,7 @@ import type { CSSProperties } from "react";
 const s = (input: string) => dotFn(input) as CSSProperties;
 
 export const inputVariantStyles = dotVariants({
-  base: "flex h-10 w-full border px-3 py-2 text-sm",
+  base: "flex w-full border",
   variants: {
     variant: {
       default: "border-[var(--color-input)] bg-[var(--color-background)]",
@@ -35,10 +35,16 @@ export const inputVariantStyles = dotVariants({
       xl: "rounded-xl",
       full: "rounded-full",
     },
+    size: {
+      sm: "h-8 px-2 py-1 text-sm",
+      md: "h-10 px-3 py-2 text-sm",
+      lg: "h-12 px-4 py-3 text-base",
+    },
   },
   defaultVariants: {
     variant: "default",
     rounded: "md",
+    size: "md",
   },
 });
 
@@ -61,6 +67,7 @@ export interface InputProps extends Omit<
 > {
   variant?: "default" | "outline" | "filled" | "glass";
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  size?: "sm" | "md" | "lg";
   error?: boolean;
   success?: boolean;
   dot?: string;
@@ -84,6 +91,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       type,
       variant = "default",
       rounded = "md",
+      size = "md",
       error,
       success,
       style,
@@ -109,9 +117,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const computedStyle = useMemo(() => {
       const base = mergeStyles(
         { transition: TRANSITIONS.normal },
-        inputVariantStyles({ variant, rounded }) as CSSProperties,
+        inputVariantStyles({ variant, rounded, size }) as CSSProperties,
         VARIANT_EXTRAS[variant],
-        leftIcon ? { paddingLeft: "40px" } : undefined,
+        leftIcon
+          ? {
+              paddingLeft:
+                size === "sm" ? "32px" : size === "lg" ? "44px" : "40px",
+            }
+          : undefined,
       );
 
       if (isDisabled) {
@@ -147,6 +160,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }, [
       variant,
       rounded,
+      size,
       isHovered,
       isFocused,
       isDisabled,

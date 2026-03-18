@@ -55,6 +55,9 @@ export {
 // Hover
 export { FORM_HOVER, CONTROL_HOVER_BORDER } from "./hover";
 
+// Disabled
+export { DISABLED_INTERACTIVE, DISABLED_INPUT } from "./disabled";
+
 // Transition
 export {
   TRANSITIONS,
