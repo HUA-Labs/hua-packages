@@ -1,5 +1,24 @@
 # @hua-labs/motion-core
 
+## 2.4.1
+
+### Patch Changes
+
+- feat(hua-ui): dot token unification, a11y polish, component normalization
+
+  ### @hua-labs/ui (2.2.0 → 2.3.0)
+  - Unify raw px/rem spacing to dot tokens across 35+ components
+  - Add MotionConfigProvider, useMotionConfig, useComponentMotion exports
+  - Card, Text, Pressable, Form a11y improvements (useId, WCAG touch targets)
+  - Normalize hover/focus/transition/disabled styles across all interactive components
+  - Add primary to all Record<Color> maps
+  - className → dot prop migration support
+  - Phase D/E/F normalization (disabled, colors, form-size)
+
+  ### @hua-labs/motion-core (2.4.0 → 2.4.1)
+  - Fix any types in motion hooks
+  - Normalize hover/focus/transition utilities
+
 ## 2.4.0
 
 ### Minor Changes

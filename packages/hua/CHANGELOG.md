@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @hua-labs/ui@2.3.0
+  - @hua-labs/motion-core@2.4.1
+
 ## 1.2.0
 
 ### Minor Changes
