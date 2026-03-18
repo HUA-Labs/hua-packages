@@ -18,6 +18,7 @@ import {
 } from "@floating-ui/react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { EASING_FUNCTIONS, DURATIONS } from "../lib/motion/presets";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 // ---------------------------------------------------------------------------
 // Static style objects
@@ -64,7 +65,7 @@ const ITEM_BASE_STYLE: React.CSSProperties = {
   ...resolveDot("gap-2 px-3 py-2"),
   fontSize: "0.875rem",
   fontWeight: 500,
-  transition: "background-color 200ms ease-in-out, color 200ms ease-in-out",
+  transition: TRANSITIONS.colors,
   background: "none",
   border: "none",
   textAlign: "left" as const,

@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { FOCUS_RING_CONTROL } from "../lib/styles/focus";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 // ---------------------------------------------------------------------------
 // Static style constants
@@ -21,8 +23,7 @@ const TRACK_BASE: React.CSSProperties = {
   alignItems: "center",
   borderRadius: "9999px",
   flexShrink: 0,
-  transition:
-    "background-color 200ms ease-in-out, border-color 200ms ease-in-out",
+  transition: TRANSITIONS.bgBorder,
 };
 
 const THUMB_BASE: React.CSSProperties = {
@@ -34,7 +35,7 @@ const THUMB_BASE: React.CSSProperties = {
     "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
   top: "50%",
   transform: "translateY(-50%)",
-  transition: "transform 200ms ease-out",
+  transition: TRANSITIONS.transform,
 };
 
 // Screen-reader-only hidden input
@@ -134,11 +135,7 @@ const STATE_CHECKED_SUCCESS: React.CSSProperties = {
   backgroundColor: "#16a34a",
 };
 
-// Focus ring
-const FOCUS_RING: React.CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)",
-};
+// Focus ring — imported from shared focus.ts
 
 // Disabled styles
 const DISABLED_TRACK: React.CSSProperties = {
@@ -306,7 +303,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
         TRACK_SIZES[size],
         variantColor,
         stateColor,
-        isFocused ? FOCUS_RING : undefined,
+        isFocused ? FOCUS_RING_CONTROL : undefined,
         disabled ? DISABLED_TRACK : undefined,
         resolveDot(dotProp),
         style,

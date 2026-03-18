@@ -5,6 +5,16 @@ import { dotVariants, dot as dotFn } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import type { CSSProperties } from "react";
 import { createGlassStyle } from "../lib/styles/glass";
+import {
+  FORM_FOCUS_BASE,
+  FORM_FOCUS_ERROR,
+  FORM_FOCUS_SUCCESS,
+  FORM_BORDER_ERROR,
+  FORM_BORDER_SUCCESS,
+  FORM_DISABLED,
+} from "../lib/styles/focus";
+import { FORM_HOVER } from "../lib/styles/hover";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 const s = (input: string) => dotFn(input) as CSSProperties;
 
@@ -42,25 +52,12 @@ const VARIANT_EXTRAS: Record<string, CSSProperties> = {
   },
 };
 
-/** Focus styles per variant */
+/** Focus styles per variant (ghost/filled/glass have unique overrides) */
 const VARIANT_FOCUS: Record<string, CSSProperties> = {
-  default: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
-  outline: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
+  default: FORM_FOCUS_BASE,
+  outline: FORM_FOCUS_BASE,
   filled: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
+    ...FORM_FOCUS_BASE,
     backgroundColor: "var(--color-background)",
   },
   ghost: {
@@ -77,40 +74,6 @@ const VARIANT_FOCUS: Record<string, CSSProperties> = {
     borderColor: "color-mix(in srgb, var(--color-ring) 50%, transparent)",
     backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
-};
-
-/** Hover styles */
-const HOVER_STYLE: CSSProperties = {
-  borderColor: "var(--color-accent-foreground)",
-  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-};
-
-/** Disabled styles */
-const DISABLED_STYLE: CSSProperties = {
-  cursor: "not-allowed",
-  opacity: 0.5,
-};
-
-/** Error state styles */
-const ERROR_STYLE: CSSProperties = {
-  borderColor: "var(--color-destructive)",
-};
-
-const ERROR_FOCUS_STYLE: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px var(--color-destructive)",
-  borderColor: "var(--color-destructive)",
-};
-
-/** Success state styles */
-const SUCCESS_STYLE: CSSProperties = {
-  borderColor: "#22c55e",
-};
-
-const SUCCESS_FOCUS_STYLE: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px #22c55e",
-  borderColor: "#22c55e",
 };
 
 /**
@@ -229,7 +192,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
     const computedStyle = useMemo(() => {
       const base = mergeStyles(
-        { transition: "all 200ms", appearance: "none" as const },
+        { transition: TRANSITIONS.normal, appearance: "none" as const },
         selectVariantStyles({ variant, size }) as CSSProperties,
         VARIANT_EXTRAS[variant],
         leftIcon ? { paddingLeft: "40px" } : undefined,
@@ -237,25 +200,20 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       );
 
       if (isDisabled) {
-        return mergeStyles(
-          base,
-          DISABLED_STYLE,
-          resolveDot(dotProp),
-          styleProp,
-        );
+        return mergeStyles(base, FORM_DISABLED, resolveDot(dotProp), styleProp);
       }
 
       let stateStyles: CSSProperties = {};
 
       if (isHovered && !isFocused) {
-        stateStyles = HOVER_STYLE;
+        stateStyles = FORM_HOVER;
       }
 
       if (isFocused) {
         if (isInvalid) {
-          stateStyles = ERROR_FOCUS_STYLE;
+          stateStyles = FORM_FOCUS_ERROR;
         } else if (success) {
-          stateStyles = SUCCESS_FOCUS_STYLE;
+          stateStyles = FORM_FOCUS_SUCCESS;
         } else {
           stateStyles = VARIANT_FOCUS[variant] ?? VARIANT_FOCUS.default;
         }
@@ -264,9 +222,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       // Error/success border (non-focus)
       if (!isFocused) {
         if (isInvalid) {
-          stateStyles = mergeStyles(stateStyles, ERROR_STYLE);
+          stateStyles = mergeStyles(stateStyles, FORM_BORDER_ERROR);
         } else if (success) {
-          stateStyles = mergeStyles(stateStyles, SUCCESS_STYLE);
+          stateStyles = mergeStyles(stateStyles, FORM_BORDER_SUCCESS);
         }
       }
 
@@ -294,7 +252,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ? "translateY(-50%) rotate(180deg)"
           : "translateY(-50%)",
         pointerEvents: "none",
-        transition: "transform 200ms ease-out",
+        transition: TRANSITIONS.transform,
       }),
       [isFocused, chevronRight],
     );

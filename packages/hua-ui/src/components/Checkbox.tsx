@@ -4,6 +4,9 @@ import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { Icon } from "./Icon";
 import { createGlassStyle } from "../lib/styles/glass";
+import { FOCUS_RING_CONTROL_SOFT } from "../lib/styles/focus";
+import { CONTROL_HOVER_BORDER } from "../lib/styles/hover";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 /**
  * Checkbox 컴포넌트의 props / Checkbox component props
@@ -51,7 +54,7 @@ const BASE_BOX_STYLE: React.CSSProperties = {
   justifyContent: "center",
   borderRadius: "0.25rem",
   border: "1px solid",
-  transition: "all 200ms",
+  transition: TRANSITIONS.normal,
   cursor: "pointer",
   position: "relative",
   flexShrink: 0,
@@ -93,18 +96,6 @@ const ERROR_BORDER: React.CSSProperties = {
 
 /** Success border override */
 const SUCCESS_BORDER: React.CSSProperties = { borderColor: "hsl(142 71% 45%)" };
-
-/** Focus ring style */
-const FOCUS_RING: React.CSSProperties = {
-  outline: "none",
-  boxShadow:
-    "0 0 0 1px var(--color-ring), 0 0 0 3px color-mix(in srgb, var(--color-ring) 30%, transparent)",
-};
-
-/** Hover border (only when unchecked) */
-const HOVER_BORDER: React.CSSProperties = {
-  borderColor: "var(--color-foreground)",
-};
 
 /** Disabled overlay */
 const DISABLED_STYLE: React.CSSProperties = {
@@ -200,13 +191,15 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 
       // Hover: only when unchecked and not disabled
       const hoverStyle =
-        isHovered && !isChecked && !isDisabled ? HOVER_BORDER : undefined;
+        isHovered && !isChecked && !isDisabled
+          ? CONTROL_HOVER_BORDER
+          : undefined;
 
       // Checked fills with primary
       const checkedStyle = isChecked ? CHECKED_STYLE : undefined;
 
       // Focus ring
-      const focusStyle = isFocused ? FOCUS_RING : undefined;
+      const focusStyle = isFocused ? FOCUS_RING_CONTROL_SOFT : undefined;
 
       // Disabled
       const disabledStyle = isDisabled ? DISABLED_STYLE : undefined;
@@ -284,7 +277,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               style={{
                 display: "inline-flex",
                 color: "white",
-                transition: "all 200ms",
+                transition: TRANSITIONS.normal,
                 opacity: isChecked ? 1 : 0,
                 transform: isChecked ? "scale(1)" : "scale(0)",
               }}

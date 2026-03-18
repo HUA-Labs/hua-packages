@@ -4,6 +4,8 @@ import React, { useState, useMemo } from "react";
 import { dotVariants } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { FOCUS_RING_CONTROL } from "../lib/styles/focus";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 export const badgeVariantStyles = dotVariants({
   base: "inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold",
@@ -92,16 +94,10 @@ const Badge = React.memo(
         }) as React.CSSProperties;
         return mergeStyles(
           base,
-          { transition: "all 200ms ease-in-out" },
+          { transition: TRANSITIONS.normal },
           variant === "glass" ? GLASS_EXTRAS : undefined,
           isHovered ? VARIANT_HOVER[variant] : undefined,
-          isFocused
-            ? {
-                outline: "none",
-                boxShadow:
-                  "0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)",
-              }
-            : undefined,
+          isFocused ? FOCUS_RING_CONTROL : undefined,
           resolveDot(dotProp),
           style,
         );

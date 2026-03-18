@@ -4,6 +4,16 @@ import React, { useState, useMemo, useId } from "react";
 import { dotVariants, dot as dotFn } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import {
+  FORM_FOCUS_BASE,
+  FORM_FOCUS_ERROR,
+  FORM_FOCUS_SUCCESS,
+  FORM_BORDER_ERROR,
+  FORM_BORDER_SUCCESS,
+  FORM_DISABLED,
+} from "../lib/styles/focus";
+import { FORM_HOVER } from "../lib/styles/hover";
+import { TRANSITIONS } from "../lib/styles/transition";
 import type { CSSProperties } from "react";
 
 const s = (input: string) => dotFn(input) as CSSProperties;
@@ -40,67 +50,7 @@ const VARIANT_EXTRAS: Record<string, CSSProperties> = {
   },
 };
 
-/** Focus styles per variant */
-const VARIANT_FOCUS: Record<string, CSSProperties> = {
-  default: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
-  outline: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
-  filled: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
-  glass: {
-    outline: "none",
-    boxShadow:
-      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
-    borderColor: "var(--color-ring)",
-  },
-};
-
-/** Hover styles */
-const HOVER_STYLE: CSSProperties = {
-  borderColor: "var(--color-accent-foreground)",
-  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-};
-
-/** Disabled styles */
-const DISABLED_STYLE: CSSProperties = {
-  cursor: "not-allowed",
-  opacity: 0.5,
-};
-
-/** Error state styles */
-const ERROR_STYLE: CSSProperties = {
-  borderColor: "var(--color-destructive)",
-};
-
-const ERROR_FOCUS_STYLE: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px var(--color-destructive)",
-  borderColor: "var(--color-destructive)",
-};
-
-/** Success state styles */
-const SUCCESS_STYLE: CSSProperties = {
-  borderColor: "#22c55e",
-};
-
-const SUCCESS_FOCUS_STYLE: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px #22c55e",
-  borderColor: "#22c55e",
-};
+/** All Input variants share the same focus ring (FORM_FOCUS_BASE) */
 
 /**
  * Input 컴포넌트의 props / Input component props
@@ -158,38 +108,38 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     const computedStyle = useMemo(() => {
       const base = mergeStyles(
-        { transition: "all 200ms" },
+        { transition: TRANSITIONS.normal },
         inputVariantStyles({ variant, rounded }) as CSSProperties,
         VARIANT_EXTRAS[variant],
         leftIcon ? { paddingLeft: "40px" } : undefined,
       );
 
       if (isDisabled) {
-        return mergeStyles(base, DISABLED_STYLE, resolveDot(dotProp), style);
+        return mergeStyles(base, FORM_DISABLED, resolveDot(dotProp), style);
       }
 
       let stateStyles: CSSProperties = {};
 
       if (isHovered && !isFocused) {
-        stateStyles = HOVER_STYLE;
+        stateStyles = FORM_HOVER;
       }
 
       if (isFocused) {
         if (isInvalid) {
-          stateStyles = ERROR_FOCUS_STYLE;
+          stateStyles = FORM_FOCUS_ERROR;
         } else if (success) {
-          stateStyles = SUCCESS_FOCUS_STYLE;
+          stateStyles = FORM_FOCUS_SUCCESS;
         } else {
-          stateStyles = VARIANT_FOCUS[variant] ?? VARIANT_FOCUS.default;
+          stateStyles = FORM_FOCUS_BASE;
         }
       }
 
       // Error/success border (non-focus)
       if (!isFocused) {
         if (isInvalid) {
-          stateStyles = mergeStyles(stateStyles, ERROR_STYLE);
+          stateStyles = mergeStyles(stateStyles, FORM_BORDER_ERROR);
         } else if (success) {
-          stateStyles = mergeStyles(stateStyles, SUCCESS_STYLE);
+          stateStyles = mergeStyles(stateStyles, FORM_BORDER_SUCCESS);
         }
       }
 

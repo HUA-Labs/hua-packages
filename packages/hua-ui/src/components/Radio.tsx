@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { RADIO_FOCUS_SHADOW } from "../lib/styles/focus";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 // --- Static style constants ---
 
@@ -84,16 +86,7 @@ const VARIANT_BASE: Record<Variant, React.CSSProperties> = {
   },
 };
 
-// --- Focus ring colors per variant/state ---
-
-const FOCUS_SHADOW: Record<string, string> = {
-  default: "0 0 0 1px var(--color-ring)",
-  outline: "0 0 0 1px var(--color-ring)",
-  filled: "0 0 0 1px var(--color-ring)",
-  glass: "0 0 0 1px rgba(var(--color-ring), 0.5)",
-  error: "0 0 0 1px var(--color-destructive)",
-  success: "0 0 0 1px #22c55e",
-};
+// Focus ring — imported from shared focus.ts
 
 /**
  * Radio component props
@@ -176,7 +169,8 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
 
     // Resolve which focus shadow to use
     const focusShadowKey = error ? "error" : success ? "success" : variant;
-    const focusShadow = FOCUS_SHADOW[focusShadowKey] ?? FOCUS_SHADOW["default"];
+    const focusShadow =
+      RADIO_FOCUS_SHADOW[focusShadowKey] ?? RADIO_FOCUS_SHADOW["default"];
 
     // State border color overrides
     const stateBorderColor: React.CSSProperties | undefined = error
@@ -197,7 +191,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
             justifyContent: "center",
             borderRadius: "50%",
             border: "1px solid",
-            transition: "all 200ms ease-in-out",
+            transition: TRANSITIONS.normal,
             cursor: disabled ? "not-allowed" : "pointer",
             opacity: disabled ? 0.5 : 1,
             outline: "none",
@@ -217,7 +211,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
           {
             borderRadius: "50%",
             backgroundColor: "var(--color-primary)",
-            transition: "all 200ms ease-in-out",
+            transition: TRANSITIONS.normal,
             opacity: isChecked ? 1 : 0,
             transform: isChecked ? "scale(1)" : "scale(0)",
           },

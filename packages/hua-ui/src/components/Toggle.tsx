@@ -4,6 +4,8 @@ import React, { useState, useMemo } from "react";
 import { dotVariants } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
+import { FOCUS_RING_OFFSET } from "../lib/styles/focus";
+import { TRANSITIONS } from "../lib/styles/transition";
 
 // ---------------------------------------------------------------------------
 // Variant styles via dotVariants
@@ -29,7 +31,7 @@ export const toggleVariantStyles = dotVariants({
 
 const BASE_EXTRAS: React.CSSProperties = {
   ...resolveDot("gap-2"),
-  transition: "all 200ms ease-in-out",
+  transition: TRANSITIONS.normal,
   userSelect: "none",
   cursor: "pointer",
   outline: "none",
@@ -117,10 +119,7 @@ const VARIANT_HOVER_IDLE: Record<string, React.CSSProperties> = {
   glass: { backgroundColor: "rgba(255, 255, 255, 0.20)" },
 };
 
-const FOCUS_RING: React.CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)",
-};
+// Focus ring — same as Button (offset double-ring), imported from shared focus.ts
 
 const DISABLED_STYLES: React.CSSProperties = {
   cursor: "not-allowed",
@@ -257,7 +256,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
             ? VARIANT_HOVER_PRESSED[variant]
             : VARIANT_HOVER_IDLE[variant]
           : undefined,
-        isFocused ? FOCUS_RING : undefined,
+        isFocused ? FOCUS_RING_OFFSET : undefined,
         resolveDot(dotProp),
         style,
       );

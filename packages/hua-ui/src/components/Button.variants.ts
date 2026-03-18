@@ -2,6 +2,7 @@ import { dotVariants } from "@hua-labs/dot";
 import type { CSSProperties } from "react";
 import { createGlassStyle } from "../lib/styles/glass";
 import { EASING_FUNCTIONS } from "../lib/motion/presets";
+import { getButtonFocusRing } from "../lib/styles/focus";
 
 /** Spring easing — HUA 시그니처 "쫀득한" 느낌 (from motion presets) */
 const SPRING = EASING_FUNCTIONS.springy;
@@ -131,29 +132,8 @@ export const ACTIVE_STYLES: Record<HoverEffect, CSSProperties> = {
   none: {},
 };
 
-/** Focus ring variants */
-const FOCUS_RING: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 2px var(--color-background), 0 0 0 3px var(--color-ring)",
-};
-
-const FOCUS_RING_NO_OFFSET: CSSProperties = {
-  outline: "none",
-  boxShadow: "0 0 0 1px var(--color-ring)",
-};
-
-const FOCUS_RING_DESTRUCTIVE: CSSProperties = {
-  outline: "none",
-  boxShadow:
-    "0 0 0 2px var(--color-background), 0 0 0 3px var(--color-destructive)",
-};
-
-export function getFocusRing(variant: string): CSSProperties {
-  if (variant === "destructive") return FOCUS_RING_DESTRUCTIVE;
-  if (variant === "outline" || variant === "ghost" || variant === "link")
-    return FOCUS_RING_NO_OFFSET;
-  return FOCUS_RING;
-}
+/** Focus ring — delegated to shared focus.ts */
+export { getButtonFocusRing as getFocusRing };
 
 export const DISABLED_STYLES: CSSProperties = {
   pointerEvents: "none",
