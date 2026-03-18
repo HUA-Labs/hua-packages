@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { dotVariants } from "@hua-labs/dot";
+import React, { useState, useMemo, useId } from "react";
+import { dotVariants, dot as dotFn } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { createGlassStyle } from "../lib/styles/glass";
 import type { CSSProperties } from "react";
+
+const s = (input: string) => dotFn(input) as CSSProperties;
 
 export const inputVariantStyles = dotVariants({
   base: "flex h-10 w-full border px-3 py-2 text-sm",
@@ -136,10 +138,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       success,
       style,
       leftIcon,
+      id: idProp,
       ...props
     },
     ref,
   ) => {
+    const autoId = useId();
+    const id = idProp || autoId;
+
     const [isHovered, setIsHovered] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -204,6 +210,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputElement = (
       <input
         type={type}
+        id={id}
         style={computedStyle}
         ref={ref}
         aria-invalid={isInvalid || undefined}

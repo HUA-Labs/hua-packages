@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useId } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 // ---------------------------------------------------------------------------
@@ -256,10 +256,14 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       buttonLayout = "horizontal",
       dot: dotProp,
       style,
+      id: idProp,
       ...props
     },
     ref,
   ) => {
+    const autoId = useId();
+    const id = idProp || autoId;
+
     const [internalValue, setInternalValue] = React.useState(defaultValue);
     const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -388,6 +392,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           </div>
           <input
             ref={ref}
+            id={id}
             type="text"
             inputMode="numeric"
             pattern={min !== undefined && min >= 0 ? "[0-9]*" : "-?[0-9]*"}
@@ -418,6 +423,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         )}
         <input
           ref={ref}
+          id={id}
           type="text"
           inputMode="numeric"
           pattern={min !== undefined && min >= 0 ? "[0-9]*" : "-?[0-9]*"}

@@ -165,7 +165,7 @@ apiNotes:
     description: "Base text primitive (renders as <span> on web, Text on native via .native.tsx)"
     kind: "component"
   Pressable:
-    description: "Interactive primitive with hover/focus dot styles (renders as <button> on web)"
+    description: "Interactive primitive with hover/active feedback and WCAG 2.1 AA touch targets (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of touch targets."
     kind: "component"
 
   # Utilities

@@ -258,7 +258,7 @@ export interface CardContentProps extends Omit<
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ dot: dotProp, style, ...props }, ref) => {
     const computedStyle = useMemo(
-      () => mergeStyles(resolveDot(dotProp), style),
+      () => mergeStyles(s("p-4"), resolveDot(dotProp), style),
       [dotProp, style],
     );
     return <div ref={ref} style={computedStyle} {...props} />;

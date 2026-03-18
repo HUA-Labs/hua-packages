@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 import { Icon } from "./Icon";
 import { Popover } from "./Popover";
 import { Button } from "./Button";
@@ -44,6 +44,8 @@ export interface DatePickerProps extends Omit<
   dot?: string;
   /** 추가 인라인 스타일 / Additional inline style */
   style?: React.CSSProperties;
+  /** trigger 버튼의 id (label htmlFor 연결용) / id for the trigger button (for label htmlFor linking) */
+  triggerId?: string;
 }
 
 const sizeStyles: Record<string, React.CSSProperties> = {
@@ -124,10 +126,14 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       markedDateKeys,
       dot: dotProp,
       style,
+      triggerId,
       ...props
     },
     ref,
   ) => {
+    const autoTriggerId = useId();
+    const finalTriggerId = triggerId || autoTriggerId;
+
     const [isOpen, setIsOpen] = React.useState(false);
     const [currentMonth, setCurrentMonth] = React.useState(
       value ? new Date(value.getFullYear(), value.getMonth()) : new Date(),
@@ -469,6 +475,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const triggerButton = (
       <button
         type="button"
+        id={finalTriggerId}
         disabled={disabled}
         style={triggerButtonStyle}
         aria-label={displayDate || placeholder}

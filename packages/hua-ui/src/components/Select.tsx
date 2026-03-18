@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
-import { dotVariants } from "@hua-labs/dot";
+import React, { useState, useMemo, useCallback, useId } from "react";
+import { dotVariants, dot as dotFn } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import type { CSSProperties } from "react";
 import { createGlassStyle } from "../lib/styles/glass";
+
+const s = (input: string) => dotFn(input) as CSSProperties;
 
 export const selectVariantStyles = dotVariants({
   base: "flex w-full rounded-md border",
@@ -193,10 +195,14 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       children,
       "aria-label": ariaLabel,
       "aria-invalid": ariaInvalid,
+      id: idProp,
       ...props
     },
     ref,
   ) => {
+    const autoId = useId();
+    const id = idProp || autoId;
+
     const selectRef = React.useRef<HTMLSelectElement>(null);
     const combinedRef = useCallback(
       (node: HTMLSelectElement | null) => {
@@ -312,6 +318,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         )}
         <select
           ref={combinedRef}
+          id={id}
           style={computedStyle}
           aria-label={ariaLabel || (placeholder ? undefined : "선택")}
           aria-invalid={
