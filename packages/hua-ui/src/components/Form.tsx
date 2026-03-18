@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 // ---------------------------------------------------------------------------
 // Base style constants
@@ -17,9 +18,8 @@ const FORM_GLASS: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   ...resolveDot("gap-6 rounded-xl p-6"),
+  ...createGlassStyle("light"),
   backgroundColor: "var(--form-glass-bg)",
-  backdropFilter: "blur(4px)",
-  WebkitBackdropFilter: "blur(4px)",
   border: "1px solid var(--form-glass-border)",
   boxShadow: "var(--form-glass-shadow)",
 };

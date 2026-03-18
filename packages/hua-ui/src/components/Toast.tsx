@@ -9,6 +9,7 @@ import {
   useMemo,
 } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 /**
  * Toast 메시지 타입 / Toast message type
@@ -279,8 +280,7 @@ const ITEM_BASE: React.CSSProperties = {
   alignItems: "flex-start",
   ...resolveDot("p-4 rounded-xl"),
   border: "1px solid",
-  backdropFilter: "blur(4px)",
-  WebkitBackdropFilter: "blur(4px)",
+  ...createGlassStyle("light"),
   transition: "all 300ms ease-in-out",
 };
 

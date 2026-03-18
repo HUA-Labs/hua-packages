@@ -2,23 +2,29 @@
 // HUA Motion SDK - 공통 타입 정의 (React 19 호환)
 // ========================================
 
-import { RefObject, CSSProperties } from 'react'
+import { RefObject, CSSProperties } from "react";
 
 // ========================================
 // React 19 호환 타입 정의
 // ========================================
 
 // React 19에서 더 구체적인 요소 타입 사용 (HTMLElement 제거)
-export type MotionElement = HTMLDivElement | HTMLSpanElement | HTMLButtonElement | HTMLHeadingElement | HTMLParagraphElement | HTMLImageElement
+export type MotionElement =
+  | HTMLDivElement
+  | HTMLSpanElement
+  | HTMLButtonElement
+  | HTMLHeadingElement
+  | HTMLParagraphElement
+  | HTMLImageElement;
 
 // React 19 호환 스타일 타입
 export type MotionStyle = CSSProperties & {
   // React 19의 새로운 CSS 속성들 지원
-  '--motion-delay'?: string
-  '--motion-duration'?: string
-  '--motion-easing'?: string
-  '--motion-progress'?: string
-}
+  "--motion-delay"?: string;
+  "--motion-duration"?: string;
+  "--motion-easing"?: string;
+  "--motion-progress"?: string;
+};
 
 // ========================================
 // 기본 모션 옵션 인터페이스
@@ -26,25 +32,25 @@ export type MotionStyle = CSSProperties & {
 
 export interface BaseMotionOptions {
   /** 모션 시작 지연 시간 (ms) */
-  delay?: number
+  delay?: number;
   /** 모션 지속 시간 (ms) */
-  duration?: number
+  duration?: number;
   /** Intersection Observer 임계값 (0-1) */
-  threshold?: number
+  threshold?: number;
   /** 한 번만 트리거할지 여부 */
-  triggerOnce?: boolean
+  triggerOnce?: boolean;
   /** 이징 함수명 */
-  easing?: string
+  easing?: string;
   /** 자동 시작 여부 */
-  autoStart?: boolean
+  autoStart?: boolean;
   /** 모션 완료 시 콜백 */
-  onComplete?: () => void
+  onComplete?: () => void;
   /** 모션 시작 시 콜백 */
-  onStart?: () => void
+  onStart?: () => void;
   /** 모션 중단 시 콜백 */
-  onStop?: () => void
+  onStop?: () => void;
   /** 모션 리셋 시 콜백 */
-  onReset?: () => void
+  onReset?: () => void;
 }
 
 // ========================================
@@ -53,40 +59,42 @@ export interface BaseMotionOptions {
 
 export interface BaseMotionReturn<T extends MotionElement = HTMLDivElement> {
   /** DOM 요소 참조 (React 19 호환) */
-  ref: React.RefObject<T | null>
+  ref: React.RefObject<T | null>;
   /** 요소가 화면에 보이는지 여부 */
-  isVisible: boolean
+  isVisible: boolean;
   /** 모션이 진행 중인지 여부 */
-  isAnimating: boolean
+  isAnimating: boolean;
   /** 적용할 CSS 스타일 (React 19 호환) - useFadeIn 등에서는 항상 반환됨 */
-  style: MotionStyle
+  style: MotionStyle;
   /** 적용할 CSS 클래스명 */
-  className?: string
+  className?: string;
   /** 모션 진행률 (0-1) - useFadeIn 등에서는 항상 반환됨 */
-  progress: number
+  progress: number;
   /** 모션 시작 함수 - useFadeIn 등에서는 항상 반환됨 */
-  start: () => void
+  start: () => void;
   /** 모션 리셋 함수 - useFadeIn 등에서는 항상 반환됨 */
-  reset: () => void
+  reset: () => void;
   /** 모션 중단 함수 - useFadeIn 등에서는 항상 반환됨 */
-  stop: () => void
+  stop: () => void;
   /** 모션 일시정지 함수 - 일부 훅에서만 제공 */
-  pause?: () => void
+  pause?: () => void;
   /** 모션 재개 함수 - 일부 훅에서만 제공 */
-  resume?: () => void
+  resume?: () => void;
 }
 
 // ========================================
 // 인터랙션 모션 반환값 인터페이스
 // ========================================
 
-export interface InteractionReturn<T extends MotionElement = HTMLDivElement> extends BaseMotionReturn<T> {
+export interface InteractionReturn<
+  T extends MotionElement = HTMLDivElement,
+> extends BaseMotionReturn<T> {
   /** 가시성 토글 함수 */
-  toggle?: () => void
+  toggle?: () => void;
   /** 표시 함수 */
-  show?: () => void
+  show?: () => void;
   /** 숨김 함수 */
-  hide?: () => void
+  hide?: () => void;
 }
 
 // ========================================
@@ -95,92 +103,100 @@ export interface InteractionReturn<T extends MotionElement = HTMLDivElement> ext
 
 export interface FadeInOptions extends BaseMotionOptions {
   /** 초기 투명도 */
-  initialOpacity?: number
+  initialOpacity?: number;
   /** 목표 투명도 */
-  targetOpacity?: number
+  targetOpacity?: number;
 }
 
 export interface SlideOptions extends BaseMotionOptions {
   /** 슬라이드 방향 */
-  direction?: 'up' | 'down' | 'left' | 'right'
+  direction?: "up" | "down" | "left" | "right";
   /** 슬라이드 거리 (px) */
-  distance?: number
+  distance?: number;
 }
 
 export interface ScaleOptions extends BaseMotionOptions {
   /** 초기 스케일 */
-  initialScale?: number
+  initialScale?: number;
   /** 목표 스케일 */
-  targetScale?: number
+  targetScale?: number;
 }
 
 export interface BounceOptions extends BaseMotionOptions {
   /** 바운스 강도 */
-  intensity?: number
+  intensity?: number;
   /** 바운스 횟수 */
-  bounces?: number
+  bounces?: number;
 }
 
 export interface PulseOptions extends BaseMotionOptions {
   /** 펄스 강도 */
-  intensity?: number
+  intensity?: number;
   /** 반복 횟수 (-1 = 무한) */
-  repeatCount?: number
+  repeatCount?: number;
   /** 반복 간격 (ms) */
-  repeatDelay?: number
+  repeatDelay?: number;
 }
 
 export interface SpringOptions extends BaseMotionOptions {
   /** 스프링 질량 */
-  mass?: number
+  mass?: number;
   /** 스프링 강성 */
-  stiffness?: number
+  stiffness?: number;
   /** 스프링 감쇠 */
-  damping?: number
+  damping?: number;
   /** 정지 임계값 */
-  restDelta?: number
+  restDelta?: number;
   /** 정지 속도 */
-  restSpeed?: number
+  restSpeed?: number;
 }
 
 export interface GestureOptions extends BaseMotionOptions {
   /** 호버 제스처 활성화 */
-  hover?: boolean
+  hover?: boolean;
   /** 드래그 제스처 활성화 */
-  drag?: boolean
+  drag?: boolean;
   /** 핀치 제스처 활성화 */
-  pinch?: boolean
+  pinch?: boolean;
   /** 스와이프 제스처 활성화 */
-  swipe?: boolean
+  swipe?: boolean;
   /** 틸트 제스처 활성화 */
-  tilt?: boolean
+  tilt?: boolean;
 }
 
 export interface OrchestrationOptions extends BaseMotionOptions {
   /** 모션 시퀀스 타입 */
-  sequence?: 'sequential' | 'parallel' | 'stagger'
+  sequence?: "sequential" | "parallel" | "stagger";
   /** 스태거 지연 시간 */
-  staggerDelay?: number
+  staggerDelay?: number;
   /** 스태거 지속 시간 */
-  staggerDuration?: number
+  staggerDuration?: number;
 }
 
 // ========================================
 // 유틸리티 타입들
 // ========================================
 
-export type MotionDirection = 'up' | 'down' | 'left' | 'right'
-export type MotionEasing = 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce' | 'elastic'
-export type MotionSequence = 'sequential' | 'parallel' | 'stagger'
-export type MotionTrigger = 'scroll' | 'click' | 'hover' | 'focus' | 'auto'
+export type MotionDirection = "up" | "down" | "left" | "right";
+export type MotionEasing =
+  | "linear"
+  | "ease-in"
+  | "ease-out"
+  | "ease-in-out"
+  | "bounce"
+  | "elastic";
+export type MotionSequence = "sequential" | "parallel" | "stagger";
+export type MotionTrigger = "scroll" | "click" | "hover" | "focus" | "auto";
 
 // ========================================
 // 이벤트 콜백 타입들 (React 19 호환)
 // ========================================
 
-export type MotionCallback = () => void
-export type MotionProgressCallback = (progress: number) => void
-export type MotionStateCallback<T extends MotionElement = HTMLDivElement> = (state: BaseMotionReturn<T>) => void
+export type MotionCallback = () => void;
+export type MotionProgressCallback = (progress: number) => void;
+export type MotionStateCallback<T extends MotionElement = HTMLDivElement> = (
+  state: BaseMotionReturn<T>,
+) => void;
 
 // ========================================
 // 성능 관련 타입들
@@ -188,24 +204,24 @@ export type MotionStateCallback<T extends MotionElement = HTMLDivElement> = (sta
 
 export interface PerformanceMetrics {
   /** 모션 시작 시간 */
-  startTime: number
+  startTime: number;
   /** 모션 종료 시간 */
-  endTime?: number
+  endTime?: number;
   /** 총 지속 시간 */
-  duration: number
+  duration: number;
   /** FPS */
-  fps: number
+  fps: number;
   /** 메모리 사용량 */
-  memoryUsage?: number
+  memoryUsage?: number;
 }
 
 export interface MotionConfig {
   /** 성능 모니터링 활성화 */
-  enablePerformanceMonitoring?: boolean
+  enablePerformanceMonitoring?: boolean;
   /** 디버그 모드 활성화 */
-  debug?: boolean
+  debug?: boolean;
   /** 로그 레벨 */
-  logLevel?: 'none' | 'error' | 'warn' | 'info' | 'debug'
+  logLevel?: "none" | "error" | "warn" | "info" | "debug";
 }
 
 // ========================================
@@ -214,22 +230,22 @@ export interface MotionConfig {
 
 export interface InViewOptions {
   /** Intersection Observer 임계값 */
-  threshold?: number | number[]
+  threshold?: number | number[];
   /** 루트 마진 */
-  rootMargin?: string
+  rootMargin?: string;
   /** 한 번만 트리거할지 여부 */
-  triggerOnce?: boolean
+  triggerOnce?: boolean;
   /** 초기 가시성 상태 */
-  initialInView?: boolean
+  initialInView?: boolean;
 }
 
 export interface InViewReturn<T extends HTMLElement = HTMLDivElement> {
   /** DOM 요소 참조 */
-  ref: RefObject<T | null>
+  ref: RefObject<T | null>;
   /** 요소가 화면에 보이는지 여부 */
-  inView: boolean
+  inView: boolean;
   /** IntersectionObserver 엔트리 */
-  entry: IntersectionObserverEntry | null
+  entry: IntersectionObserverEntry | null;
 }
 
 // ========================================
@@ -238,22 +254,22 @@ export interface InViewReturn<T extends HTMLElement = HTMLDivElement> {
 
 export interface MouseOptions {
   /** 타겟 요소 참조 */
-  targetRef?: RefObject<HTMLElement | null>
+  targetRef?: RefObject<HTMLElement | null>;
   /** 스로틀 시간 (ms) */
-  throttle?: number
+  throttle?: number;
 }
 
 export interface MouseReturn {
   /** 마우스 X 좌표 (viewport 기준) */
-  x: number
+  x: number;
   /** 마우스 Y 좌표 (viewport 기준) */
-  y: number
+  y: number;
   /** 요소 내 상대 X 좌표 (0-1) */
-  elementX: number
+  elementX: number;
   /** 요소 내 상대 Y 좌표 (0-1) */
-  elementY: number
+  elementY: number;
   /** 마우스가 타겟 위에 있는지 여부 */
-  isOver: boolean
+  isOver: boolean;
 }
 
 // ========================================
@@ -262,7 +278,7 @@ export interface MouseReturn {
 
 export interface ReducedMotionReturn {
   /** 사용자가 모션 감소를 선호하는지 여부 */
-  prefersReducedMotion: boolean
+  prefersReducedMotion: boolean;
 }
 
 // ========================================
@@ -271,42 +287,48 @@ export interface ReducedMotionReturn {
 
 export interface WindowSizeOptions {
   /** 디바운스 시간 (ms) */
-  debounce?: number
+  debounce?: number;
   /** 초기 너비 */
-  initialWidth?: number
+  initialWidth?: number;
   /** 초기 높이 */
-  initialHeight?: number
+  initialHeight?: number;
 }
 
 export interface WindowSizeReturn {
   /** 윈도우 너비 */
-  width: number
+  width: number;
   /** 윈도우 높이 */
-  height: number
+  height: number;
   /** 마운트 여부 (SSR 대응) */
-  isMounted: boolean
+  isMounted: boolean;
 }
 
 // ========================================
 // 훅별 확장 옵션 (WS1: 공유 타입 추가)
 // ========================================
 
-export type ScrollRevealMotionType = 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'bounceIn'
+export type ScrollRevealMotionType =
+  | "fadeIn"
+  | "slideUp"
+  | "slideLeft"
+  | "slideRight"
+  | "scaleIn"
+  | "bounceIn";
 
 export interface ScrollRevealOptions extends BaseMotionOptions {
   /** 루트 마진 */
-  rootMargin?: string
+  rootMargin?: string;
   /** 모션 타입 */
-  motionType?: ScrollRevealMotionType
+  motionType?: ScrollRevealMotionType;
 }
 
 export interface GradientOptions extends BaseMotionOptions {
   /** 그라디언트 색상 배열 */
-  colors?: string[]
+  colors?: string[];
   /** 그라디언트 방향 */
-  direction?: 'horizontal' | 'vertical' | 'diagonal'
+  direction?: "horizontal" | "vertical" | "diagonal";
   /** 그라디언트 크기 (%) */
-  size?: number
+  size?: number;
 }
 
 export interface ToggleMotionOptions extends BaseMotionOptions {
@@ -315,16 +337,78 @@ export interface ToggleMotionOptions extends BaseMotionOptions {
 
 export interface RepeatOptions extends BaseMotionOptions {
   /** 반복 효과 타입 */
-  type?: 'pulse' | 'bounce' | 'wave' | 'fade'
+  type?: "pulse" | "bounce" | "wave" | "fade";
   /** 효과 강도 */
-  intensity?: number
+  intensity?: number;
 }
 
 export interface HoverMotionOptions extends BaseMotionOptions {
   /** 호버 시 스케일 */
-  hoverScale?: number
+  hoverScale?: number;
   /** 호버 시 Y 오프셋 (px) */
-  hoverY?: number
+  hoverY?: number;
   /** 호버 시 투명도 */
-  hoverOpacity?: number
+  hoverOpacity?: number;
+}
+
+// ========================================
+// 카테고리별 표준 반환 타입들
+// ========================================
+
+/**
+ * Standard return type for entrance/exit animation hooks.
+ * Used by: useFadeIn, useSlideUp, useScaleIn, useBounceIn, etc.
+ */
+export interface EntranceMotionReturn<
+  T extends MotionElement = HTMLDivElement,
+> extends BaseMotionReturn<T> {
+  /** Pause the animation */
+  pause: () => void;
+  /** Resume a paused animation */
+  resume: () => void;
+}
+
+/**
+ * Standard return type for style-only hooks (no animation controls).
+ * Used by: useBlurIn, useClipReveal, etc.
+ */
+export interface StyleMotionReturn<T extends MotionElement = HTMLDivElement> {
+  ref: RefObject<T | null>;
+  style: MotionStyle;
+  isVisible: boolean;
+}
+
+/**
+ * Standard return type for toggle/interaction hooks.
+ * Used by: useClickToggle, useFocusToggle, useKeyboardToggle, etc.
+ */
+export interface ToggleMotionReturn<T extends MotionElement = HTMLDivElement> {
+  ref: RefObject<T | null>;
+  isActive: boolean;
+  mounted: boolean;
+  toggle: () => void;
+  activate: () => void;
+  deactivate: () => void;
+  reset: () => void;
+}
+
+/**
+ * Standard return type for observation/utility hooks.
+ * Used by: useInView, useElementProgress, etc.
+ */
+export interface ObserverReturn<T extends MotionElement = HTMLDivElement> {
+  ref: RefObject<T | null>;
+}
+
+/**
+ * Standard return type for auto-looping animation hooks.
+ * Used by: useAutoFade, useAutoScale, useAutoSlide, etc.
+ */
+export interface AutoMotionReturn {
+  isAnimating: boolean;
+  isVisible: boolean;
+  mounted: boolean;
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
 }

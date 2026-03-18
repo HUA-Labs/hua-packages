@@ -1,12 +1,12 @@
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
-import { FadeInOptions, BaseMotionReturn, MotionElement } from '../types'
-import { useMotionProfile } from '../profiles/MotionProfileContext'
-import { observeElement } from '../utils/sharedIntersectionObserver'
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { FadeInOptions, EntranceMotionReturn, MotionElement } from "../types";
+import { useMotionProfile } from "../profiles/MotionProfileContext";
+import { observeElement } from "../utils/sharedIntersectionObserver";
 
 export function useFadeIn<T extends MotionElement = HTMLDivElement>(
-  options: FadeInOptions = {}
-): BaseMotionReturn<T> {
-  const profile = useMotionProfile()
+  options: FadeInOptions = {},
+): EntranceMotionReturn<T> {
+  const profile = useMotionProfile();
   const {
     delay = 0,
     duration = profile.base.duration,
@@ -19,110 +19,130 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
     onComplete,
     onStart,
     onStop,
-    onReset
-  } = options
+    onReset,
+  } = options;
 
-  const ref = useRef<T>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [nodeReady, setNodeReady] = useState(false)
-  const motionRef = useRef<number | null>(null)
-  const timeoutRef = useRef<number | null>(null)
-  const startRef = useRef<() => void>(() => {})
+  const ref = useRef<T>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [nodeReady, setNodeReady] = useState(false);
+  const motionRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const startRef = useRef<() => void>(() => {});
 
   // ref가 DOM에 연결되었는지 polling으로 감지
   useEffect(() => {
-    if (nodeReady) return
+    if (nodeReady) return;
     if (ref.current) {
-      setNodeReady(true)
-      return
+      setNodeReady(true);
+      return;
     }
     const id = setInterval(() => {
       if (ref.current) {
-        setNodeReady(true)
-        clearInterval(id)
+        setNodeReady(true);
+        clearInterval(id);
       }
-    }, 50)
-    return () => clearInterval(id)
-  }, [nodeReady])
+    }, 50);
+    return () => clearInterval(id);
+  }, [nodeReady]);
 
   // 모션 시작 함수
   const start = useCallback(() => {
-    if (isAnimating) return
+    if (isAnimating) return;
 
-    setIsAnimating(true)
-    setProgress(0)
-    onStart?.()
+    setIsAnimating(true);
+    setProgress(0);
+    onStart?.();
 
     // 지연 시간 적용
     if (delay > 0) {
       timeoutRef.current = window.setTimeout(() => {
-        setIsVisible(true)
-        setProgress(1)
-        setIsAnimating(false)
-        onComplete?.()
-      }, delay)
+        setIsVisible(true);
+        setProgress(1);
+        setIsAnimating(false);
+        onComplete?.();
+      }, delay);
     } else {
-      setIsVisible(true)
-      setProgress(1)
-      setIsAnimating(false)
-      onComplete?.()
+      setIsVisible(true);
+      setProgress(1);
+      setIsAnimating(false);
+      onComplete?.();
     }
-  }, [delay, isAnimating, onStart, onComplete])
+  }, [delay, isAnimating, onStart, onComplete]);
 
   // startRef 업데이트 (IntersectionObserver에서 안정적인 참조 사용)
-  startRef.current = start
+  startRef.current = start;
 
   // 모션 중단 함수
   const stop = useCallback(() => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     if (motionRef.current) {
-      cancelAnimationFrame(motionRef.current)
-      motionRef.current = null
+      cancelAnimationFrame(motionRef.current);
+      motionRef.current = null;
     }
-    setIsAnimating(false)
-    onStop?.()
-  }, [onStop])
+    setIsAnimating(false);
+    onStop?.();
+  }, [onStop]);
 
   // 모션 리셋 함수
   const reset = useCallback(() => {
-    stop()
-    setIsVisible(false)
-    setProgress(0)
-    onReset?.()
-  }, [stop, onReset])
+    stop();
+    setIsVisible(false);
+    setProgress(0);
+    onReset?.();
+  }, [stop, onReset]);
+
+  // 모션 일시정지 함수 (no-op: CSS transition은 JS pause 미지원)
+  const pause = useCallback(() => {}, []);
+
+  // 모션 재개 함수 (no-op: CSS transition은 JS resume 미지원)
+  const resume = useCallback(() => {}, []);
 
   // Intersection Observer 설정 (공유 observer pool 사용)
   useEffect(() => {
-    if (!ref.current || !autoStart) return
+    if (!ref.current || !autoStart) return;
     return observeElement(
       ref.current,
-      (entry) => { if (entry.isIntersecting) startRef.current() },
+      (entry) => {
+        if (entry.isIntersecting) startRef.current();
+      },
       { threshold },
-      triggerOnce
-    )
-  }, [autoStart, threshold, triggerOnce, nodeReady])
+      triggerOnce,
+    );
+  }, [autoStart, threshold, triggerOnce, nodeReady]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
-      stop()
-    }
-  }, [stop])
+      stop();
+    };
+  }, [stop]);
 
   // 스타일 계산 (React 19 호환) - 메모이제이션으로 불필요한 리렌더링 방지
-  const style = useMemo(() => ({
-    opacity: isVisible ? targetOpacity : initialOpacity,
-    transition: `opacity ${duration}ms ${easing}`,
-    '--motion-delay': `${delay}ms`,
-    '--motion-duration': `${duration}ms`,
-    '--motion-easing': easing,
-    '--motion-progress': `${progress}`
-  } as const), [isVisible, targetOpacity, initialOpacity, duration, easing, delay, progress])
+  const style = useMemo(
+    () =>
+      ({
+        opacity: isVisible ? targetOpacity : initialOpacity,
+        transition: `opacity ${duration}ms ${easing}`,
+        "--motion-delay": `${delay}ms`,
+        "--motion-duration": `${duration}ms`,
+        "--motion-easing": easing,
+        "--motion-progress": `${progress}`,
+      }) as const,
+    [
+      isVisible,
+      targetOpacity,
+      initialOpacity,
+      duration,
+      easing,
+      delay,
+      progress,
+    ],
+  );
 
   return {
     ref,
@@ -132,6 +152,8 @@ export function useFadeIn<T extends MotionElement = HTMLDivElement>(
     progress,
     start,
     stop,
-    reset
-  }
-} 
+    reset,
+    pause,
+    resume,
+  };
+}

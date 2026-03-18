@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 // --- Static style constants ---
 
@@ -77,10 +78,8 @@ const VARIANT_BASE: Record<Variant, React.CSSProperties> = {
     color: "var(--color-primary)",
   },
   glass: {
+    ...createGlassStyle("light"),
     borderColor: "rgba(255,255,255,0.3)",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
     color: "#fff",
   },
 };
@@ -208,16 +207,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
           stateBorderColor,
           isFocused ? { boxShadow: focusShadow } : undefined,
         ),
-      [
-        size,
-        variant,
-        error,
-        success,
-        isChecked,
-        isFocused,
-        disabled,
-        focusShadow,
-      ],
+      [size, variant, isFocused, disabled, focusShadow, stateBorderColor],
     );
 
     // Computed inner dot style

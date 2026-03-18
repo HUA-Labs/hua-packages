@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { Icon } from "./Icon";
+import { createGlassStyle } from "../lib/styles/glass";
 
 /**
  * Checkbox 컴포넌트의 props / Checkbox component props
@@ -72,10 +73,8 @@ const VARIANT_BASE: Record<string, React.CSSProperties> = {
     backgroundColor: "var(--color-muted)",
   },
   glass: {
+    ...createGlassStyle("light"),
     borderColor: "rgba(255,255,255,0.3)",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
   },
 };
 

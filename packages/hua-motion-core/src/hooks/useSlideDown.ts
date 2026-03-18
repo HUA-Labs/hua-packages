@@ -1,5 +1,5 @@
-import { SlideOptions, BaseMotionReturn, MotionElement } from '../types'
-import { useSlideUp } from './useSlideUp'
+import { SlideOptions, EntranceMotionReturn, MotionElement } from "../types";
+import { useSlideUp } from "./useSlideUp";
 
 /**
  * useSlideDown - 아래에서 위로 슬라이드하며 나타나는 애니메이션 훅
@@ -19,7 +19,7 @@ import { useSlideUp } from './useSlideUp'
  * ```
  */
 export function useSlideDown<T extends MotionElement = HTMLDivElement>(
-  options: Omit<SlideOptions, 'direction'> = {}
-): BaseMotionReturn<T> {
-  return useSlideUp<T>({ ...options, direction: 'down' })
+  options: Omit<SlideOptions, "direction"> = {},
+): EntranceMotionReturn<T> {
+  return useSlideUp<T>({ ...options, direction: "down" });
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { ReducedMotionReturn } from '../types'
+import { useState, useEffect } from "react";
+import { ReducedMotionReturn } from "../types";
 
 /**
  * useReducedMotion - 모션 감소 설정 감지 훅
@@ -11,9 +11,11 @@ import { ReducedMotionReturn } from '../types'
  * Detects user's prefers-reduced-motion setting.
  * Used to reduce or disable motion for accessibility.
  *
+ * @returns {boolean} 모션 감소 선호 여부 / Whether reduced motion is preferred
+ *
  * @example
  * ```tsx
- * const { prefersReducedMotion } = useReducedMotion()
+ * const prefersReducedMotion = useReducedMotion()
  *
  * return (
  *   <motion.div
@@ -25,31 +27,45 @@ import { ReducedMotionReturn } from '../types'
  * )
  * ```
  */
-export function useReducedMotion(): ReducedMotionReturn {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+export function useReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     // SSR 대응
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return;
 
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     // 초기값 설정
-    setPrefersReducedMotion(mediaQuery.matches)
+    setPrefersReducedMotion(mediaQuery.matches);
 
     // 변경 감지
     const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
+      setPrefersReducedMotion(event.matches);
+    };
 
-    mediaQuery.addEventListener('change', handleChange)
+    mediaQuery.addEventListener("change", handleChange);
 
     return () => {
-      mediaQuery.removeEventListener('change', handleChange)
-    }
-  }, [])
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
-  return {
-    prefersReducedMotion
-  }
+  return prefersReducedMotion;
+}
+
+/**
+ * useReducedMotionObject - 객체 형태 반환 (backwards compat)
+ * Returns `{ prefersReducedMotion: boolean }` for backwards compatibility.
+ *
+ * @deprecated Use `useReducedMotion()` which returns `boolean` directly.
+ *
+ * @example
+ * ```tsx
+ * const { prefersReducedMotion } = useReducedMotionObject()
+ * ```
+ */
+export function useReducedMotionObject(): ReducedMotionReturn {
+  const prefersReducedMotion = useReducedMotion();
+  return { prefersReducedMotion };
 }

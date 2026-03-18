@@ -3,6 +3,25 @@
 import React, { useState, useMemo } from "react";
 import { dotVariants } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
+
+const ROUNDED_MAP: Record<string, string> = {
+  none: "rounded-none",
+  sm: "rounded",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+  full: "rounded-full",
+};
+
+const SHADOW_MAP: Record<string, string> = {
+  none: "",
+  sm: "shadow-sm",
+  md: "shadow-md",
+  lg: "shadow-lg",
+  xl: "shadow-xl",
+  "2xl": "shadow-2xl",
+};
 
 // ---------------------------------------------------------------------------
 // Variant style maps
@@ -24,14 +43,12 @@ export const alertVariantStyles = dotVariants({
   },
 });
 
-/** Base container styles as plain CSSProperties */
+/** Base container styles as plain CSSProperties (rounded/shadow applied dynamically) */
 const BASE_CONTAINER: React.CSSProperties = {
   position: "relative",
-  ...resolveDot("rounded-lg p-4"),
+  ...resolveDot("p-4"),
   borderWidth: "1px",
   borderStyle: "solid",
-  backdropFilter: "blur(4px)",
-  WebkitBackdropFilter: "blur(4px)",
 };
 
 /** Per-variant container styles */
@@ -174,6 +191,8 @@ export interface AlertProps extends Omit<
   "className"
 > {
   variant?: "default" | "success" | "warning" | "error" | "info";
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  shadow?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
   title?: string;
   description?: string;
   icon?: React.ReactNode;
@@ -231,6 +250,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       dot: dotProp,
       style,
       variant = "default",
+      rounded = "lg",
+      shadow = "none",
       title,
       description,
       icon,
@@ -248,11 +269,14 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       () =>
         mergeStyles(
           BASE_CONTAINER,
+          resolveDot(ROUNDED_MAP[rounded]),
+          shadow !== "none" ? resolveDot(SHADOW_MAP[shadow]) : undefined,
+          createGlassStyle("light"),
           VARIANT_CONTAINER[variant],
           resolveDot(dotProp),
           style,
         ),
-      [variant, dotProp, style],
+      [variant, rounded, shadow, dotProp, style],
     );
 
     const iconWrapStyle = useMemo(

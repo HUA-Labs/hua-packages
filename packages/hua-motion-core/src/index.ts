@@ -79,7 +79,10 @@ export { useSlideDown } from "./hooks/useSlideDown";
 // 유틸리티 훅들 (신규 export)
 export { useInView } from "./hooks/useInView";
 export { useMouse } from "./hooks/useMouse";
-export { useReducedMotion } from "./hooks/useReducedMotion";
+export {
+  useReducedMotion,
+  useReducedMotionObject,
+} from "./hooks/useReducedMotion";
 export { useWindowSize } from "./hooks/useWindowSize";
 
 // 기본 제스처 훅들 (Core 패키지 범위)
@@ -368,6 +371,13 @@ export type {
   RepeatOptions,
   HoverMotionOptions,
   InteractionReturn,
+
+  // 카테고리별 표준 반환 타입들
+  EntranceMotionReturn,
+  StyleMotionReturn,
+  ToggleMotionReturn,
+  ObserverReturn,
+  AutoMotionReturn,
 
   // 유틸리티 훅 타입들
   InViewOptions,

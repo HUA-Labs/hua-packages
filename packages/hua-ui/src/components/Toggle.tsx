@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { dotVariants } from "@hua-labs/dot";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 // ---------------------------------------------------------------------------
 // Variant styles via dotVariants
@@ -58,9 +59,8 @@ const VARIANT_PRESSED: Record<string, React.CSSProperties> = {
     color: "var(--color-primary)",
   },
   glass: {
+    ...createGlassStyle("light"),
     backgroundColor: "rgba(255, 255, 255, 0.20)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
     border: "1px solid rgba(255, 255, 255, 0.30)",
     color: "white",
   },
@@ -85,9 +85,8 @@ const VARIANT_IDLE: Record<string, React.CSSProperties> = {
     color: "var(--color-foreground)",
   },
   glass: {
+    ...createGlassStyle("light"),
     backgroundColor: "rgba(255, 255, 255, 0.10)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
     border: "1px solid rgba(255, 255, 255, 0.20)",
     color: "white",
   },

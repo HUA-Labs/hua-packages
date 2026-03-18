@@ -267,7 +267,7 @@ const EmotionAnalysis = React.forwardRef<HTMLDivElement, EmotionAnalysisProps>(
     if (layout === "card") {
       return (
         <Card ref={ref} dot={dotProp} style={style} {...props}>
-          <CardHeader>
+          <CardHeader dot="p-3">
             <CardTitle dot="flex items-center">
               <span style={{ fontSize: "1.5rem", ...resolveDot("mr-2") }}>
                 ✨

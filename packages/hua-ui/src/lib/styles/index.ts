@@ -25,6 +25,16 @@ export {
   type HoverEffect,
 } from "./variants";
 
+// Glass
+export { createGlassStyle, type GlassIntensity } from "./glass";
+
+// Animation
+export {
+  createSpringTransition,
+  createEnterAnimation,
+  type EnterPreset,
+} from "./animation";
+
 // Utils
 export {
   withDarkMode,
@@ -35,4 +45,3 @@ export {
   responsive,
   conditionalClass,
 } from "./utils";
-

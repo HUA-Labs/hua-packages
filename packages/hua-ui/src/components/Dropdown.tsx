@@ -17,6 +17,7 @@ import {
   type Placement,
 } from "@floating-ui/react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { EASING_FUNCTIONS, DURATIONS } from "../lib/motion/presets";
 
 // ---------------------------------------------------------------------------
 // Static style objects
@@ -27,15 +28,32 @@ const TRIGGER_WRAPPER_STYLE: React.CSSProperties = {
   cursor: "pointer",
 };
 
-const FLOATING_PANEL_STYLE: React.CSSProperties = {
+const FLOATING_PANEL_BASE: React.CSSProperties = {
   zIndex: 50,
   minWidth: "8rem",
   width: "max-content",
-  ...resolveDot("py-1 rounded-lg"),
+  ...resolveDot("py-1"),
   border: "1px solid var(--color-border)",
   backgroundColor: "var(--color-popover, var(--dropdown-bg, #fff))",
   color: "var(--color-popover-foreground)",
-  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+};
+
+const ROUNDED_CSS: Record<string, React.CSSProperties> = {
+  none: resolveDot("rounded-none") ?? {},
+  sm: resolveDot("rounded") ?? {},
+  md: resolveDot("rounded-md") ?? {},
+  lg: resolveDot("rounded-lg") ?? {},
+  xl: resolveDot("rounded-xl") ?? {},
+  full: resolveDot("rounded-full") ?? {},
+};
+
+const SHADOW_CSS: Record<string, React.CSSProperties> = {
+  none: {},
+  sm: resolveDot("shadow-sm") ?? {},
+  md: resolveDot("shadow-md") ?? {},
+  lg: resolveDot("shadow-lg") ?? {},
+  xl: resolveDot("shadow-xl") ?? {},
+  "2xl": resolveDot("shadow-2xl") ?? {},
 };
 
 // DropdownItem variants
@@ -155,6 +173,8 @@ export interface DropdownProps extends Omit<
   offset?: number;
   disabled?: boolean;
   showArrow?: boolean;
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  shadow?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
   dot?: string;
   style?: React.CSSProperties;
 }
@@ -172,6 +192,8 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
       offset = 8,
       disabled = false,
       showArrow = false,
+      rounded = "lg",
+      shadow = "md",
       style,
       ...props
     },
@@ -234,8 +256,18 @@ const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     );
 
     const panelStyle = useMemo(
-      () => mergeStyles(FLOATING_PANEL_STYLE, floatingStyles),
-      [floatingStyles],
+      () =>
+        mergeStyles(
+          FLOATING_PANEL_BASE,
+          ROUNDED_CSS[rounded],
+          SHADOW_CSS[shadow],
+          {
+            animation: `dropdownEnter ${DURATIONS.soft}ms ${EASING_FUNCTIONS.soft}`,
+            transformOrigin: "top",
+          },
+          floatingStyles,
+        ),
+      [rounded, shadow, floatingStyles],
     );
 
     return (

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 // ---------------------------------------------------------------------------
 // Static style constants
@@ -98,10 +99,9 @@ const VARIANT_UNCHECKED: Record<VariantKey, React.CSSProperties> = {
   },
   filled: { backgroundColor: "var(--color-secondary)" },
   glass: {
+    ...createGlassStyle("light"),
     backgroundColor: "rgba(255, 255, 255, 0.20)",
     border: "1px solid rgba(255, 255, 255, 0.30)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
   },
 };
 
@@ -113,10 +113,9 @@ const VARIANT_CHECKED: Record<VariantKey, React.CSSProperties> = {
   },
   filled: { backgroundColor: "var(--color-primary)" },
   glass: {
+    ...createGlassStyle("light"),
     backgroundColor: "rgba(var(--color-primary-rgb, 99, 102, 241), 0.50)",
     border: "1px solid rgba(var(--color-primary-rgb, 99, 102, 241), 0.30)",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
   },
 };
 

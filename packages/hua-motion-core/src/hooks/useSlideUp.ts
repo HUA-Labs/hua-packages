@@ -1,12 +1,12 @@
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
-import { SlideOptions, BaseMotionReturn, MotionElement } from '../types'
-import { useMotionProfile } from '../profiles/MotionProfileContext'
-import { observeElement } from '../utils/sharedIntersectionObserver'
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { SlideOptions, EntranceMotionReturn, MotionElement } from "../types";
+import { useMotionProfile } from "../profiles/MotionProfileContext";
+import { observeElement } from "../utils/sharedIntersectionObserver";
 
 export function useSlideUp<T extends MotionElement = HTMLDivElement>(
-  options: SlideOptions = {}
-): BaseMotionReturn<T> {
-  const profile = useMotionProfile()
+  options: SlideOptions = {},
+): EntranceMotionReturn<T> {
+  const profile = useMotionProfile();
   const {
     delay = 0,
     duration = profile.base.duration,
@@ -14,137 +14,164 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
     triggerOnce = profile.base.triggerOnce,
     easing = profile.entrance.slide.easing,
     autoStart = true,
-    direction = 'up',
+    direction = "up",
     distance = profile.entrance.slide.distance,
     onComplete,
     onStart,
     onStop,
-    onReset
-  } = options
+    onReset,
+  } = options;
 
-  const ref = useRef<T>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [nodeReady, setNodeReady] = useState(false)
-  const timeoutRef = useRef<number | null>(null)
-  const startRef = useRef<() => void>(() => {})
+  const ref = useRef<T>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [nodeReady, setNodeReady] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+  const startRef = useRef<() => void>(() => {});
 
   // ref가 DOM에 연결되었는지 polling으로 감지
   useEffect(() => {
-    if (nodeReady) return
+    if (nodeReady) return;
     if (ref.current) {
-      setNodeReady(true)
-      return
+      setNodeReady(true);
+      return;
     }
     const id = setInterval(() => {
       if (ref.current) {
-        setNodeReady(true)
-        clearInterval(id)
+        setNodeReady(true);
+        clearInterval(id);
       }
-    }, 50)
-    return () => clearInterval(id)
-  }, [nodeReady])
+    }, 50);
+    return () => clearInterval(id);
+  }, [nodeReady]);
 
   // 방향에 따른 초기 위치 계산
   const getInitialTransform = useCallback(() => {
     switch (direction) {
-      case 'up':
-        return `translateY(${distance}px)`
-      case 'down':
-        return `translateY(-${distance}px)`
-      case 'left':
-        return `translateX(${distance}px)`
-      case 'right':
-        return `translateX(-${distance}px)`
+      case "up":
+        return `translateY(${distance}px)`;
+      case "down":
+        return `translateY(-${distance}px)`;
+      case "left":
+        return `translateX(${distance}px)`;
+      case "right":
+        return `translateX(-${distance}px)`;
       default:
-        return `translateY(${distance}px)`
+        return `translateY(${distance}px)`;
     }
-  }, [direction, distance])
+  }, [direction, distance]);
 
   // 모션 시작 함수
   const start = useCallback(() => {
-    if (isAnimating) return
+    if (isAnimating) return;
 
-    setIsAnimating(true)
-    setProgress(0)
-    onStart?.()
+    setIsAnimating(true);
+    setProgress(0);
+    onStart?.();
 
     // 지연 시간 적용
     if (delay > 0) {
       timeoutRef.current = window.setTimeout(() => {
-        setIsVisible(true)
-        setProgress(1)
-        setIsAnimating(false)
-        onComplete?.()
-      }, delay)
+        setIsVisible(true);
+        setProgress(1);
+        setIsAnimating(false);
+        onComplete?.();
+      }, delay);
     } else {
-      setIsVisible(true)
-      setProgress(1)
-      setIsAnimating(false)
-      onComplete?.()
+      setIsVisible(true);
+      setProgress(1);
+      setIsAnimating(false);
+      onComplete?.();
     }
-  }, [delay, isAnimating, onStart, onComplete])
+  }, [delay, isAnimating, onStart, onComplete]);
 
   // startRef 업데이트 (IntersectionObserver에서 안정적인 참조 사용)
-  startRef.current = start
+  startRef.current = start;
 
   // 모션 중단 함수
   const stop = useCallback(() => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
-    setIsAnimating(false)
-    onStop?.()
-  }, [onStop])
+    setIsAnimating(false);
+    onStop?.();
+  }, [onStop]);
 
   // 모션 리셋 함수
   const reset = useCallback(() => {
-    stop()
-    setIsVisible(false)
-    setProgress(0)
-    onReset?.()
-  }, [stop, onReset])
+    stop();
+    setIsVisible(false);
+    setProgress(0);
+    onReset?.();
+  }, [stop, onReset]);
+
+  // 모션 일시정지 함수 (no-op: CSS transition은 JS pause 미지원)
+  const pause = useCallback(() => {}, []);
+
+  // 모션 재개 함수 (no-op: CSS transition은 JS resume 미지원)
+  const resume = useCallback(() => {}, []);
 
   // Intersection Observer 설정 (공유 observer pool 사용)
   useEffect(() => {
-    if (!ref.current || !autoStart) return
+    if (!ref.current || !autoStart) return;
     return observeElement(
       ref.current,
-      (entry) => { if (entry.isIntersecting) startRef.current() },
+      (entry) => {
+        if (entry.isIntersecting) startRef.current();
+      },
       { threshold },
-      triggerOnce
-    )
-  }, [autoStart, threshold, triggerOnce, nodeReady])
+      triggerOnce,
+    );
+  }, [autoStart, threshold, triggerOnce, nodeReady]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
-      stop()
-    }
-  }, [stop])
+      stop();
+    };
+  }, [stop]);
 
   // 초기 transform 값 메모이제이션
-  const initialTransform = useMemo(() => getInitialTransform(), [getInitialTransform])
+  const initialTransform = useMemo(
+    () => getInitialTransform(),
+    [getInitialTransform],
+  );
 
   // 최종 transform 값 (방향에 따라 translateX(0) 또는 translateY(0))
   const finalTransform = useMemo(() => {
-    return direction === 'left' || direction === 'right' ? 'translateX(0)' : 'translateY(0)'
-  }, [direction])
+    return direction === "left" || direction === "right"
+      ? "translateX(0)"
+      : "translateY(0)";
+  }, [direction]);
 
   // 스타일 계산 (React 19 호환) - 메모이제이션으로 불필요한 리렌더링 방지
-  const style = useMemo(() => ({
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? finalTransform : initialTransform,
-    transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}`,
-    '--motion-delay': `${delay}ms`,
-    '--motion-duration': `${duration}ms`,
-    '--motion-easing': easing,
-    '--motion-progress': `${progress}`,
-    '--motion-direction': direction,
-    '--motion-distance': `${distance}px`
-  } as const), [isVisible, initialTransform, finalTransform, duration, easing, delay, progress, direction, distance])
+  const style = useMemo(
+    () =>
+      ({
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? finalTransform : initialTransform,
+        transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}`,
+        "--motion-delay": `${delay}ms`,
+        "--motion-duration": `${duration}ms`,
+        "--motion-easing": easing,
+        "--motion-progress": `${progress}`,
+        "--motion-direction": direction,
+        "--motion-distance": `${distance}px`,
+      }) as const,
+    [
+      isVisible,
+      initialTransform,
+      finalTransform,
+      duration,
+      easing,
+      delay,
+      progress,
+      direction,
+      distance,
+    ],
+  );
 
   return {
     ref,
@@ -154,6 +181,8 @@ export function useSlideUp<T extends MotionElement = HTMLDivElement>(
     progress,
     start,
     stop,
-    reset
-  }
-} 
+    reset,
+    pause,
+    resume,
+  };
+}

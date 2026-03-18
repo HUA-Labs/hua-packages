@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
 // ---------------------------------------------------------------------------
 // Static style objects
@@ -20,12 +21,11 @@ const PANEL_BASE_STYLE: React.CSSProperties = {
   zIndex: 50,
   minWidth: "200px",
   ...resolveDot("py-2 rounded-lg"),
+  ...createGlassStyle("light"),
   backgroundColor: "var(--context-menu-bg, #fff)",
   color: "var(--context-menu-foreground)",
   boxShadow:
     "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-  backdropFilter: "blur(4px)",
-  WebkitBackdropFilter: "blur(4px)",
 };
 
 const ITEM_BASE_STYLE: React.CSSProperties = {

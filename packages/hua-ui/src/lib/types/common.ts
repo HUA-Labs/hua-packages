@@ -120,12 +120,12 @@ export interface IconProps {
 /**
  * 모서리 둥글기 타입
  */
-export type Rounded = "none" | "sm" | "md" | "lg" | "full";
+export type Rounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
 
 /**
  * 그림자 타입
  */
-export type Shadow = "none" | "sm" | "md" | "lg" | "xl";
+export type Shadow = "none" | "sm" | "md" | "lg" | "xl" | "2xl";
 
 /**
  * 패딩 타입

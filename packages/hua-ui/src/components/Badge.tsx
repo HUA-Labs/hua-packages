@@ -1,29 +1,38 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { dotVariants, dot as dotFn } from "@hua-labs/dot"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React, { useState, useMemo } from "react";
+import { dotVariants } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { createGlassStyle } from "../lib/styles/glass";
 
-const s = (input: string) => dotFn(input) as React.CSSProperties
-
-export const badgeVariantStyles = dotVariants(
-  {
-    base: "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
-    variants: {
-      variant: {
-        default: "bg-[var(--badge-default-bg)] text-[var(--badge-default-text)]",
-        secondary: "bg-[var(--badge-secondary-bg)] text-[var(--badge-secondary-text)]",
-        destructive: "bg-[var(--badge-destructive-bg)] text-slate-50",
-        error: "bg-[var(--badge-destructive-bg)] text-slate-50",
-        outline: "bg-transparent text-[var(--badge-outline-text)] border border-[var(--badge-outline-border)]",
-        glass: "bg-[var(--badge-glass-bg)] border border-[var(--badge-glass-border)] text-[var(--badge-glass-text)]",
-      },
+export const badgeVariantStyles = dotVariants({
+  base: "inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold",
+  variants: {
+    variant: {
+      default: "bg-[var(--badge-default-bg)] text-[var(--badge-default-text)]",
+      secondary:
+        "bg-[var(--badge-secondary-bg)] text-[var(--badge-secondary-text)]",
+      destructive: "bg-[var(--badge-destructive-bg)] text-slate-50",
+      error: "bg-[var(--badge-destructive-bg)] text-slate-50",
+      outline:
+        "bg-transparent text-[var(--badge-outline-text)] border border-[var(--badge-outline-border)]",
+      glass:
+        "bg-[var(--badge-glass-bg)] border border-[var(--badge-glass-border)] text-[var(--badge-glass-text)]",
     },
-    defaultVariants: {
-      variant: "default",
+    rounded: {
+      none: "rounded-none",
+      sm: "rounded",
+      md: "rounded-md",
+      lg: "rounded-lg",
+      xl: "rounded-xl",
+      full: "rounded-full",
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: "default",
+    rounded: "full",
+  },
+});
 
 /** Variant-specific hover overrides */
 const VARIANT_HOVER: Record<string, React.CSSProperties> = {
@@ -31,23 +40,30 @@ const VARIANT_HOVER: Record<string, React.CSSProperties> = {
   secondary: { opacity: 0.8 },
   destructive: { opacity: 0.8 },
   error: { opacity: 0.8 },
-  outline: { backgroundColor: 'var(--badge-outline-hover-bg)' },
+  outline: { backgroundColor: "var(--badge-outline-hover-bg)" },
   glass: { opacity: 0.8 },
-}
+};
 
 /** Glass variant extras (backdrop-blur) */
-const GLASS_EXTRAS: React.CSSProperties = {
-  backdropFilter: 'blur(4px)',
-  WebkitBackdropFilter: 'blur(4px)',
-}
+const GLASS_EXTRAS: React.CSSProperties = createGlassStyle("light");
 
 /**
  * Badge component props
  */
-export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
-  variant?: "default" | "secondary" | "destructive" | "error" | "outline" | "glass"
-  dot?: string
-  style?: React.CSSProperties
+export interface BadgeProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "className"
+> {
+  variant?:
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "error"
+    | "outline"
+    | "glass";
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -60,37 +76,51 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
  * <Badge variant="destructive">Done</Badge>
  * <Badge variant="outline">Pending</Badge>
  */
-const Badge = React.memo(React.forwardRef<HTMLDivElement, BadgeProps>(
-  ({ dot: dotProp, variant = "default", style, ...props }, ref) => {
-    const [isHovered, setIsHovered] = useState(false)
-    const [isFocused, setIsFocused] = useState(false)
+const Badge = React.memo(
+  React.forwardRef<HTMLDivElement, BadgeProps>(
+    (
+      { dot: dotProp, variant = "default", rounded = "full", style, ...props },
+      ref,
+    ) => {
+      const [isHovered, setIsHovered] = useState(false);
+      const [isFocused, setIsFocused] = useState(false);
 
-    const computedStyle = useMemo(() => {
-      const base = badgeVariantStyles({ variant }) as React.CSSProperties
-      return mergeStyles(
-        base,
-        { transition: 'all 200ms ease-in-out' },
-        variant === "glass" ? GLASS_EXTRAS : undefined,
-        isHovered ? VARIANT_HOVER[variant] : undefined,
-        isFocused ? { outline: 'none', boxShadow: '0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)' } : undefined,
-        resolveDot(dotProp),
-        style,
-      )
-    }, [variant, isHovered, isFocused, dotProp, style])
+      const computedStyle = useMemo(() => {
+        const base = badgeVariantStyles({
+          variant,
+          rounded,
+        }) as React.CSSProperties;
+        return mergeStyles(
+          base,
+          { transition: "all 200ms ease-in-out" },
+          variant === "glass" ? GLASS_EXTRAS : undefined,
+          isHovered ? VARIANT_HOVER[variant] : undefined,
+          isFocused
+            ? {
+                outline: "none",
+                boxShadow:
+                  "0 0 0 1px var(--color-ring), 0 0 0 3px var(--color-ring)",
+              }
+            : undefined,
+          resolveDot(dotProp),
+          style,
+        );
+      }, [variant, rounded, isHovered, isFocused, dotProp, style]);
 
-    return (
-      <div
-        ref={ref}
-        style={computedStyle}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        {...props}
-      />
-    )
-  }
-))
-Badge.displayName = "Badge"
+      return (
+        <div
+          ref={ref}
+          style={computedStyle}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          {...props}
+        />
+      );
+    },
+  ),
+);
+Badge.displayName = "Badge";
 
-export { Badge }
+export { Badge };

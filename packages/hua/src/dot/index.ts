@@ -1,11 +1,12 @@
 export {
   dot,
+  dotCx,
   dotMap,
   createDotConfig,
   clearDotCache,
   adaptNative,
   adaptWeb,
-} from '@hua-labs/dot';
+} from "@hua-labs/dot";
 
 export type {
   StyleObject,
@@ -22,4 +23,4 @@ export type {
   RNStyleValue,
   RNTransformEntry,
   RNShadowOffset,
-} from '@hua-labs/dot';
+} from "@hua-labs/dot";

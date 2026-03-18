@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import React from "react"
-import { createPortal } from "react-dom"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { createPortal } from "react-dom";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { EASING_FUNCTIONS } from "../lib/motion/presets";
 
 /**
  * Modal 컴포넌트의 props / Modal component props
@@ -22,31 +23,35 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  */
 export interface ModalProps {
   /** 모달 열림/닫힘 상태 / Modal open/close state */
-  isOpen: boolean
+  isOpen: boolean;
   /** 모달 닫기 콜백 함수 / Modal close callback function */
-  onClose: () => void
+  onClose: () => void;
   /** 모달 내용 / Modal content */
-  children: React.ReactNode
+  children: React.ReactNode;
   /** 모달 크기 / Modal size */
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   /** 닫기 버튼 표시 여부 / Show close button */
-  closable?: boolean
+  closable?: boolean;
   /** 오버레이 클릭 시 닫기 여부 / Close on overlay click */
-  closeOnOverlayClick?: boolean
+  closeOnOverlayClick?: boolean;
   /** 모달 제목 / Modal title */
-  title?: string
+  title?: string;
   /** 모달 설명 / Modal description */
-  description?: string
+  description?: string;
   /** 배경 오버레이 표시 여부 / Show backdrop overlay */
-  showBackdrop?: boolean
+  showBackdrop?: boolean;
   /** 배경 오버레이 추가 dot 스트링 / Additional dot string for backdrop */
-  backdropDot?: string
+  backdropDot?: string;
   /** 모달을 화면 중앙에 배치할지 여부 / Center modal on screen */
-  centered?: boolean
+  centered?: boolean;
+  /** 모달 컨테이너 둥글기 / Modal container border-radius */
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "full";
+  /** 모달 그림자 / Modal shadow */
+  shadow?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
+  dot?: string;
   /** 인라인 스타일 / Inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
 }
 
 // 모달 닫기 버튼 컴포넌트 (title 유무에 따라 위치만 다름)
@@ -61,20 +66,34 @@ function ModalCloseButton({
     <button
       onClick={onClick}
       style={mergeStyles(
-        resolveDot('p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20'),
-        style
+        resolveDot(
+          "p-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-full hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 z-20",
+        ),
+        style,
       )}
       aria-label="닫기"
     >
-      <svg style={resolveDot('w-5 h-5')} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      <svg
+        style={resolveDot("w-5 h-5")}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     </button>
   );
 }
 
 // Ref 병합 유틸리티
-function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
+function useCombinedRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
   return React.useCallback(
     (node: T) => {
       refs.forEach((ref) => {
@@ -87,7 +106,7 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    refs
+    refs,
   );
 }
 
@@ -136,159 +155,208 @@ function useCombinedRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCal
  * @returns {JSX.Element} Modal 컴포넌트 / Modal component
  */
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
-  ({
-  dot: dotProp,
-  style,
-  isOpen,
-  onClose,
-  children,
-  size = "md",
-  closable,
-  closeOnOverlayClick = true,
-  title,
-  description,
-  showBackdrop = true,
-  backdropDot,
-  centered = true
-  }, ref) => {
-  const _closable = closable ?? true
-  const modalRef = React.useRef<HTMLDivElement>(null)
-    const combinedRef = useCombinedRefs(ref, modalRef)
+  (
+    {
+      dot: dotProp,
+      style,
+      isOpen,
+      onClose,
+      children,
+      size = "md",
+      closable,
+      closeOnOverlayClick = true,
+      title,
+      description,
+      showBackdrop = true,
+      backdropDot,
+      centered = true,
+      rounded = "lg",
+      shadow = "2xl",
+    },
+    ref,
+  ) => {
+    const _closable = closable ?? true;
+    const modalRef = React.useRef<HTMLDivElement>(null);
+    const combinedRef = useCombinedRefs(ref, modalRef);
 
-  // ESC 키로 모달 닫기 및 스크롤 잠금 (화면 흔들림 방지)
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose()
+    // ESC 키로 모달 닫기 및 스크롤 잠금 (화면 흔들림 방지)
+    React.useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          onClose();
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener("keydown", handleEscape);
+        // 스크롤바 너비 계산하여 padding 추가 (화면 흔들림 방지)
+        const scrollbarWidth =
+          window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = "hidden";
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
-    }
 
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape)
-      // 스크롤바 너비 계산하여 padding 추가 (화면 흔들림 방지)
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-      document.body.style.overflow = "hidden"
-      document.body.style.paddingRight = `${scrollbarWidth}px`
-    }
+      return () => {
+        document.removeEventListener("keydown", handleEscape);
+        document.body.style.overflow = "unset";
+        document.body.style.paddingRight = "unset";
+      };
+    }, [isOpen, onClose]);
 
-    return () => {
-      document.removeEventListener("keydown", handleEscape)
-      document.body.style.overflow = "unset"
-      document.body.style.paddingRight = "unset"
-    }
-  }, [isOpen, onClose])
+    // 모달 외부 클릭으로 닫기
+    const handleOverlayClick = (e: React.MouseEvent) => {
+      if (closeOnOverlayClick && e.target === e.currentTarget) {
+        onClose();
+      }
+    };
 
-  // 모달 외부 클릭으로 닫기
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
-      onClose()
-    }
-  }
+    // 모달 크기 스타일 (max-w 기반, 콘텐츠에 맞게 자연스럽게 축소)
+    const sizeStyles: Record<string, React.CSSProperties> = {
+      sm: { maxWidth: "20rem" }, // 320px
+      md: { maxWidth: "24rem" }, // 384px
+      lg: { maxWidth: "28rem" }, // 448px
+      xl: { maxWidth: "32rem" }, // 512px
+      "2xl": { maxWidth: "36rem" }, // 576px
+      "3xl": { maxWidth: "42rem" }, // 672px
+    };
 
-  // 모달 크기 스타일 (max-w 기반, 콘텐츠에 맞게 자연스럽게 축소)
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { maxWidth: '20rem' },  // 320px
-    md: { maxWidth: '24rem' },  // 384px
-    lg: { maxWidth: '28rem' },  // 448px
-    xl: { maxWidth: '32rem' },  // 512px
-    "2xl": { maxWidth: '36rem' }, // 576px
-    "3xl": { maxWidth: '42rem' }  // 672px
-  }
+    // 접근성을 위한 ID 생성
+    const generatedTitleId = React.useId();
+    const generatedDescId = React.useId();
+    const titleId = title ? `modal-title-${generatedTitleId}` : undefined;
+    const descriptionId = description
+      ? `modal-description-${generatedDescId}`
+      : undefined;
 
-  // 접근성을 위한 ID 생성
-  const generatedTitleId = React.useId()
-  const generatedDescId = React.useId()
-  const titleId = title ? `modal-title-${generatedTitleId}` : undefined;
-  const descriptionId = description ? `modal-description-${generatedDescId}` : undefined;
+    // SSR에서는 document가 없으므로 체크
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => {
+      setMounted(true);
+    }, []);
 
-  // SSR에서는 document가 없으므로 체크
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+    if (!isOpen) return null;
 
-  if (!isOpen) return null
+    const modalContent = (
+      <div
+        style={mergeStyles(
+          resolveDot("fixed inset-0 z-50 overflow-y-auto"),
+          resolveDot(dotProp),
+          style,
+        )}
+        onClick={handleOverlayClick}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+      >
+        {/* 배경 오버레이 - pointer-events-none으로 클릭이 뒤로 전달됨 */}
+        {showBackdrop && (
+          <div
+            style={mergeStyles(
+              resolveDot(
+                "fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300 pointer-events-none",
+              ),
+              resolveDot(backdropDot),
+            )}
+          />
+        )}
 
-  const modalContent = (
-    <div
-      style={mergeStyles(
-        resolveDot('fixed inset-0 z-50 overflow-y-auto'),
-        resolveDot(dotProp),
-        style
-      )}
-      onClick={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
-    >
-      {/* 배경 오버레이 - pointer-events-none으로 클릭이 뒤로 전달됨 */}
-      {showBackdrop && (
+        {/* 센터링 컨테이너 */}
         <div
           style={mergeStyles(
-            resolveDot('fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300 pointer-events-none'),
-            resolveDot(backdropDot)
-          )}
-        />
-      )}
-
-      {/* 센터링 컨테이너 */}
-      <div style={mergeStyles(
-        resolveDot('flex h-full justify-center p-4'),
-        centered ? resolveDot('items-center') : resolveDot('items-start pt-16')
-      )}>
-        {/* 모달 컨테이너 */}
-        {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
-        <div
-          ref={combinedRef}
-          style={mergeStyles(
-            resolveDot('relative bg-[var(--modal-bg)] rounded-lg shadow-2xl border border-[var(--modal-border)] transform transition-all duration-300 ease-out'),
-            sizeStyles[size],
-            {
-              animation: "modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-            }
+            resolveDot("flex h-full justify-center p-4"),
+            centered
+              ? resolveDot("items-center")
+              : resolveDot("items-start pt-16"),
           )}
         >
-
-        {/* 헤더 */}
-        {title && (
-          <div style={mergeStyles(resolveDot('relative z-10 px-6 pt-6 pb-4 border-b border-border/50'))}>
-            {/* 타이틀과 닫기 버튼 - 같은 줄, 양쪽 끝 */}
-            <div style={resolveDot('flex items-center justify-between gap-4 mb-2')}>
-              <h2 id={titleId} style={resolveDot('text-xl font-semibold text-foreground flex-1 min-w-0')}>{title}</h2>
-              {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
-              {_closable && (
-                <ModalCloseButton onClick={onClose} style={{ flexShrink: 0 }} />
-              )}
-            </div>
-            {/* 설명 - 아래 줄 */}
-            {description && (
-              <p id={descriptionId} style={resolveDot('text-sm text-muted-foreground')}>{description}</p>
+          {/* 모달 컨테이너 */}
+          {/* CSS 변수 기반 배경색 (Tailwind v4 dark: + bg-* 충돌 우회) */}
+          <div
+            ref={combinedRef}
+            style={mergeStyles(
+              resolveDot(
+                `relative bg-[var(--modal-bg)] ${rounded === "none" ? "rounded-none" : rounded === "sm" ? "rounded" : rounded === "full" ? "rounded-full" : `rounded-${rounded}`} ${shadow === "none" ? "shadow-none" : `shadow-${shadow}`} border border-[var(--modal-border)] transform transition-all duration-300 ease-out`,
+              ),
+              sizeStyles[size],
+              {
+                animation: `modalSlideIn 0.3s ${EASING_FUNCTIONS.springy}`,
+              },
             )}
+          >
+            {/* 헤더 */}
+            {title && (
+              <div
+                style={mergeStyles(
+                  resolveDot(
+                    "relative z-10 px-6 pt-6 pb-4 border-b border-border/50",
+                  ),
+                )}
+              >
+                {/* 타이틀과 닫기 버튼 - 같은 줄, 양쪽 끝 */}
+                <div
+                  style={resolveDot(
+                    "flex items-center justify-between gap-4 mb-2",
+                  )}
+                >
+                  <h2
+                    id={titleId}
+                    style={resolveDot(
+                      "text-xl font-semibold text-foreground flex-1 min-w-0",
+                    )}
+                  >
+                    {title}
+                  </h2>
+                  {/* 닫기 버튼 - 타이틀과 같은 계층의 오른쪽 끝 */}
+                  {_closable && (
+                    <ModalCloseButton
+                      onClick={onClose}
+                      style={{ flexShrink: 0 }}
+                    />
+                  )}
+                </div>
+                {/* 설명 - 아래 줄 */}
+                {description && (
+                  <p
+                    id={descriptionId}
+                    style={resolveDot("text-sm text-muted-foreground")}
+                  >
+                    {description}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
+            {!title && _closable && (
+              <ModalCloseButton
+                onClick={onClose}
+                style={{ position: "absolute", top: "1rem", right: "1rem" }}
+              />
+            )}
+
+            {/* 모달 내용 */}
+            <div
+              style={mergeStyles(
+                resolveDot("relative z-10"),
+                title ? resolveDot("px-6 mb-6") : resolveDot("p-6"),
+              )}
+            >
+              {children}
+            </div>
           </div>
-        )}
-
-        {/* 타이틀이 없을 때만 별도 닫기 버튼 */}
-        {!title && _closable && (
-          <ModalCloseButton onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem' }} />
-        )}
-
-        {/* 모달 내용 */}
-        <div style={mergeStyles(resolveDot('relative z-10'), title ? resolveDot('px-6 mb-6') : resolveDot('p-6'))}>
-          {children}
         </div>
       </div>
-      </div>
-    </div>
-  )
+    );
 
-  // 브라우저에서만 createPortal 사용 (SSR 호환)
-  if (mounted && typeof document !== 'undefined') {
-    return createPortal(modalContent, document.body)
-  }
+    // 브라우저에서만 createPortal 사용 (SSR 호환)
+    if (mounted && typeof document !== "undefined") {
+      return createPortal(modalContent, document.body);
+    }
 
-  // SSR fallback - 그냥 렌더링 (첫 렌더링에는 보이지 않음)
-  return null
-})
+    // SSR fallback - 그냥 렌더링 (첫 렌더링에는 보이지 않음)
+    return null;
+  },
+);
 
-Modal.displayName = "Modal"
+Modal.displayName = "Modal";

@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { dotVariants, dot as dotFn } from "@hua-labs/dot"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import type { CSSProperties } from "react"
-
-const s = (input: string) => dotFn(input) as CSSProperties
+import React, { useState, useMemo } from "react";
+import { dotVariants } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import type { CSSProperties } from "react";
+import { createGlassStyle } from "../lib/styles/glass";
 
 export const textareaVariantStyles = dotVariants({
   base: "flex w-full rounded-md border",
   variants: {
     variant: {
-      default: "border-[var(--color-input)] bg-[var(--color-background)] text-[var(--color-foreground)]",
-      outline: "border-2 border-[var(--color-input)] bg-transparent text-[var(--color-foreground)]",
-      filled: "border-transparent bg-[var(--color-secondary)]/50 text-[var(--color-foreground)]",
+      default:
+        "border-[var(--color-input)] bg-[var(--color-background)] text-[var(--color-foreground)]",
+      outline:
+        "border-2 border-[var(--color-input)] bg-transparent text-[var(--color-foreground)]",
+      filled:
+        "border-transparent bg-[var(--color-secondary)]/50 text-[var(--color-foreground)]",
       ghost: "border-transparent bg-transparent text-[var(--color-foreground)]",
       glass: "",
     },
@@ -34,111 +36,116 @@ export const textareaVariantStyles = dotVariants({
     size: "md",
     resize: "vertical",
   },
-})
+});
 
 /** Resize → CSSProperties mapping (can't be dot utilities) */
 const RESIZE_STYLE: Record<string, CSSProperties> = {
-  none: { resize: 'none' },
-  vertical: { resize: 'vertical' },
-  horizontal: { resize: 'horizontal' },
-  both: { resize: 'both' },
-}
+  none: { resize: "none" },
+  vertical: { resize: "vertical" },
+  horizontal: { resize: "horizontal" },
+  both: { resize: "both" },
+};
 
 /** MinHeight per size */
 const MIN_HEIGHT: Record<string, CSSProperties> = {
-  sm: { minHeight: '80px' },
-  md: { minHeight: '100px' },
-  lg: { minHeight: '120px' },
-}
+  sm: { minHeight: "80px" },
+  md: { minHeight: "100px" },
+  lg: { minHeight: "120px" },
+};
 
 /** Extra base styles per variant (can't be expressed as dot utilities) */
 const VARIANT_EXTRAS: Record<string, CSSProperties> = {
   glass: {
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    color: 'white',
+    ...createGlassStyle("light"),
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    color: "white",
   },
-}
+};
 
 /** Focus styles per variant */
 const VARIANT_FOCUS: Record<string, CSSProperties> = {
   default: {
-    outline: 'none',
-    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
-    borderColor: 'var(--color-ring)',
+    outline: "none",
+    boxShadow:
+      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
+    borderColor: "var(--color-ring)",
   },
   outline: {
-    outline: 'none',
-    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
-    borderColor: 'var(--color-ring)',
+    outline: "none",
+    boxShadow:
+      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
+    borderColor: "var(--color-ring)",
   },
   filled: {
-    outline: 'none',
-    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)',
-    borderColor: 'var(--color-ring)',
-    backgroundColor: 'var(--color-background)',
+    outline: "none",
+    boxShadow:
+      "0 0 0 1px color-mix(in srgb, var(--color-ring) 50%, transparent)",
+    borderColor: "var(--color-ring)",
+    backgroundColor: "var(--color-background)",
   },
   ghost: {
-    outline: 'none',
-    boxShadow: '0 0 0 1px var(--color-muted-foreground)',
-    backgroundColor: 'var(--color-muted)',
-    borderColor: 'var(--color-border)',
+    outline: "none",
+    boxShadow: "0 0 0 1px var(--color-muted-foreground)",
+    backgroundColor: "var(--color-muted)",
+    borderColor: "var(--color-border)",
   },
   glass: {
-    outline: 'none',
-    boxShadow: '0 0 0 1px color-mix(in srgb, var(--color-ring) 20%, transparent)',
-    borderColor: 'color-mix(in srgb, var(--color-ring) 50%, transparent)',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    outline: "none",
+    boxShadow:
+      "0 0 0 1px color-mix(in srgb, var(--color-ring) 20%, transparent)",
+    borderColor: "color-mix(in srgb, var(--color-ring) 50%, transparent)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
-}
+};
 
 /** Hover styles */
 const HOVER_STYLE: CSSProperties = {
-  borderColor: 'var(--color-accent-foreground)',
-  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-}
+  borderColor: "var(--color-accent-foreground)",
+  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+};
 
 /** Disabled styles */
 const DISABLED_STYLE: CSSProperties = {
-  cursor: 'not-allowed',
+  cursor: "not-allowed",
   opacity: 0.5,
-}
+};
 
 /** Error state styles */
 const ERROR_STYLE: CSSProperties = {
-  borderColor: 'var(--color-destructive)',
-}
+  borderColor: "var(--color-destructive)",
+};
 
 const ERROR_FOCUS_STYLE: CSSProperties = {
-  outline: 'none',
-  boxShadow: '0 0 0 1px var(--color-destructive)',
-  borderColor: 'var(--color-destructive)',
-}
+  outline: "none",
+  boxShadow: "0 0 0 1px var(--color-destructive)",
+  borderColor: "var(--color-destructive)",
+};
 
 /** Success state styles */
 const SUCCESS_STYLE: CSSProperties = {
-  borderColor: '#22c55e',
-}
+  borderColor: "#22c55e",
+};
 
 const SUCCESS_FOCUS_STYLE: CSSProperties = {
-  outline: 'none',
-  boxShadow: '0 0 0 1px #22c55e',
-  borderColor: '#22c55e',
-}
+  outline: "none",
+  boxShadow: "0 0 0 1px #22c55e",
+  borderColor: "#22c55e",
+};
 
 /**
  * Textarea 컴포넌트의 props / Textarea component props
  */
-export interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'className' | 'size'> {
-  variant?: "default" | "outline" | "filled" | "ghost" | "glass"
-  size?: "sm" | "md" | "lg"
-  error?: boolean
-  success?: boolean
-  resize?: "none" | "vertical" | "horizontal" | "both"
-  dot?: string
-  style?: CSSProperties
+export interface TextareaProps extends Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "className" | "size"
+> {
+  variant?: "default" | "outline" | "filled" | "ghost" | "glass";
+  size?: "sm" | "md" | "lg";
+  error?: boolean;
+  success?: boolean;
+  resize?: "none" | "vertical" | "horizontal" | "both";
+  dot?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -178,63 +185,85 @@ export interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTex
  * @todo 접근성 개선: aria-invalid 속성 자동 추가 필요 / Accessibility improvement: auto-add aria-invalid attribute
  */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({
-    dot: dotProp,
-    style: styleProp,
-    variant = "default",
-    size = "md",
-    error = false,
-    success = false,
-    resize = "vertical",
-    ...props
-  }, ref) => {
-    const [isHovered, setIsHovered] = useState(false)
-    const [isFocused, setIsFocused] = useState(false)
+  (
+    {
+      dot: dotProp,
+      style: styleProp,
+      variant = "default",
+      size = "md",
+      error = false,
+      success = false,
+      resize = "vertical",
+      ...props
+    },
+    ref,
+  ) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
-    const ariaInvalid = props['aria-invalid' as keyof typeof props] as boolean | undefined
-    const isInvalid = error || (ariaInvalid !== undefined ? ariaInvalid : false)
-    const isDisabled = props.disabled ?? false
+    const ariaInvalid = props["aria-invalid" as keyof typeof props] as
+      | boolean
+      | undefined;
+    const isInvalid =
+      error || (ariaInvalid !== undefined ? ariaInvalid : false);
+    const isDisabled = props.disabled ?? false;
 
     const computedStyle = useMemo(() => {
       const base = mergeStyles(
-        { transition: 'all 200ms' },
+        { transition: "all 200ms" },
         textareaVariantStyles({ variant, size, resize }) as CSSProperties,
         VARIANT_EXTRAS[variant],
         RESIZE_STYLE[resize],
         MIN_HEIGHT[size],
-      )
+      );
 
       if (isDisabled) {
-        return mergeStyles(base, DISABLED_STYLE, resolveDot(dotProp), styleProp)
+        return mergeStyles(
+          base,
+          DISABLED_STYLE,
+          resolveDot(dotProp),
+          styleProp,
+        );
       }
 
-      let stateStyles: CSSProperties = {}
+      let stateStyles: CSSProperties = {};
 
       if (isHovered && !isFocused) {
-        stateStyles = HOVER_STYLE
+        stateStyles = HOVER_STYLE;
       }
 
       if (isFocused) {
         if (isInvalid) {
-          stateStyles = ERROR_FOCUS_STYLE
+          stateStyles = ERROR_FOCUS_STYLE;
         } else if (success) {
-          stateStyles = SUCCESS_FOCUS_STYLE
+          stateStyles = SUCCESS_FOCUS_STYLE;
         } else {
-          stateStyles = VARIANT_FOCUS[variant] ?? VARIANT_FOCUS.default
+          stateStyles = VARIANT_FOCUS[variant] ?? VARIANT_FOCUS.default;
         }
       }
 
       // Error/success border (non-focus)
       if (!isFocused) {
         if (isInvalid) {
-          stateStyles = mergeStyles(stateStyles, ERROR_STYLE)
+          stateStyles = mergeStyles(stateStyles, ERROR_STYLE);
         } else if (success) {
-          stateStyles = mergeStyles(stateStyles, SUCCESS_STYLE)
+          stateStyles = mergeStyles(stateStyles, SUCCESS_STYLE);
         }
       }
 
-      return mergeStyles(base, stateStyles, resolveDot(dotProp), styleProp)
-    }, [variant, size, resize, isHovered, isFocused, isDisabled, isInvalid, success, dotProp, styleProp])
+      return mergeStyles(base, stateStyles, resolveDot(dotProp), styleProp);
+    }, [
+      variant,
+      size,
+      resize,
+      isHovered,
+      isFocused,
+      isDisabled,
+      isInvalid,
+      success,
+      dotProp,
+      styleProp,
+    ]);
 
     return (
       <textarea
@@ -244,18 +273,18 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onFocus={(e) => {
-          setIsFocused(true)
-          props.onFocus?.(e)
+          setIsFocused(true);
+          props.onFocus?.(e);
         }}
         onBlur={(e) => {
-          setIsFocused(false)
-          props.onBlur?.(e)
+          setIsFocused(false);
+          props.onBlur?.(e);
         }}
         {...props}
       />
-    )
-  }
-)
-Textarea.displayName = "Textarea"
+    );
+  },
+);
+Textarea.displayName = "Textarea";
 
-export { Textarea }
+export { Textarea };
