@@ -1,40 +1,39 @@
 # Scripts
 
-## 핵심 (워크플로우에서 사용)
+This repository is the public package workspace for HUA Labs packages. Keep
+scripts here limited to commands that work in this repository without private
+monorepo state.
 
-| 스크립트 | 명령어 | 용도 |
-|----------|--------|------|
-| `generate-docs.ts` | `pnpm generate:docs` | doc.yaml → README.md + ai.yaml 자동 생성 |
-| `generate-pr.ts` | `pnpm generate:pr` | PR 템플릿 생성 (`/pr` 스킬) |
-| `generate-devlog.ts` | `pnpm generate:devlog --date=YYYY-MM-DD --title=topic` | devlog 스캐폴딩 (`docs/devlogs/YYYY-MM/YYYY-MM-DD-topic.md`) |
-| `check-workspace-registry.ts` | `pnpm workspace:check` | workspace registry SSOT 검증 |
-| `generate-workspace-report.ts` | `pnpm workspace:report` | workspace registry 기준 운영 표 출력 |
-| `audit-public-mirror.ts` | `pnpm workspace:audit:public-mirror` | registry vs public mirror sync 정책 드리프트 감사 |
-| `run-workspace-task.mjs` | `pnpm workspace:type-check` 등 | registry 기준 workspace task 실행 |
-| `sync-to-public.sh` | `bash scripts/sync-to-public.sh --push` | 프라이빗→퍼블릭 packages 레포 동기화 (npm publish 파이프라인) |
+## Documentation
 
-## Publish 파이프라인
+| Script                        | Command                       | Purpose                                                                           |
+| ----------------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
+| `generate-docs.ts`            | `pnpm generate:docs`          | Generate package `README.md` files and `ai-docs/*.ai.yaml` files from `doc.yaml`. |
+| `generate-docs.ts --validate` | `pnpm generate:docs:validate` | Check generated package docs for drift.                                           |
 
-| 스크립트 | 용도 |
-|----------|------|
-| `sync-to-public.sh` | pro strip, changeset 정리, workspace:* 변환, 퍼블릭 packages 레포 push |
-| `prepare-publish.js` | 배포 전 검증 |
-| `restore-workspace.js` | publish 후 workspace 복원 |
+## Package Checks
 
-> Flow: changeset → version-packages → commit → `bash scripts/sync-to-public.sh --push` → 퍼블릭 packages CI 자동 publish
-> Target resolution: `PUBLIC_REPO_URL` env → `public-packages` remote → legacy `public-repo` remote
+| Command           | Purpose                                |
+| ----------------- | -------------------------------------- |
+| `pnpm build`      | Build packages through Turbo.          |
+| `pnpm type-check` | Run package type checks through Turbo. |
+| `pnpm lint`       | Run package lint tasks through Turbo.  |
+| `pnpm test`       | Run package tests through Turbo.       |
 
-## 분석 도구 (1회성/수동)
+## Release Helpers
 
-| 스크립트 | 용도 |
-|----------|------|
-| `analyze-export.js` | 패키지 export 분석 |
-| `analyze-persona-test.js` | 페르소나 테스트 결과 분석 (논문용) |
-| `deployment-status.ts` | 배포 상태 확인 |
+| Script                 | Purpose                                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `prepare-publish.js`   | Convert local `workspace:*` dependencies to publishable package versions before manual package inspection. |
+| `restore-workspace.js` | Restore `workspace:*` dependencies after manual publish preparation.                                       |
 
-## 기타
+## Manual Analysis
 
-| 파일 | 용도 |
-|------|------|
-| `templates/` | devlog, PR 등 스캐폴딩 템플릿 |
-| `tsconfig.json` | 스크립트용 TS 설정 |
+| Script                | Purpose                          |
+| --------------------- | -------------------------------- |
+| `analyze-export.js`   | Inspect package export surfaces. |
+| `dot-audit.ts`        | Run dot package audits.          |
+| `generate-palette.ts` | Generate palette data.           |
+
+Do not document private monorepo-only scripts here unless the files are present
+and the command works from this public repository.

@@ -12,8 +12,14 @@ Interactive scaffolding CLI for creating Next.js + hua projects. Generates a pre
 - **Interactive prompts — Choose AI context files and documentation language**
 - **Pre-wired stack — Next.js 16, React 19, Tailwind 4, Zustand 5, hua i18n**
 - **Doctor command — Diagnose existing project health**
-- **Monorepo aware — Detects pnpm workspace, uses workspace:\* versions**
+- **Monorepo aware — Detects pnpm workspace, uses workspace:* versions**
 - **AI context — Optional .cursorrules, ai-context.md, .claude/ generation**
+
+## Installation
+
+```bash
+pnpm add @hua-labs/create-hua
+```
 
 ## Quick Start
 
@@ -27,16 +33,9 @@ pnpm dev
 
 ## API
 
-| Export          | Type     | Description                                                   |
-| --------------- | -------- | ------------------------------------------------------------- |
+| Export | Type | Description |
+|--------|------|-------------|
 | `createProject` | function | Scaffold a new Next.js + hua project with interactive prompts |
-
-### CLI Commands
-
-```bash
-npx create-hua <project-name> [options]   # Create a new project
-npx create-hua doctor [path]              # Diagnose project health
-```
 
 ## Related Packages
 
