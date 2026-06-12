@@ -22,6 +22,7 @@ const forbiddenPatterns = [
 ];
 
 const ignoredPaths = new Set([
+  ".changeset/config.json",
   "scripts/check-public-exposure.js",
   "pnpm-lock.yaml",
 ]);
@@ -32,7 +33,6 @@ const ignoredPrefixes = [
   ".git/",
   ".turbo/",
   "coverage/",
-  ".changeset/",
 ];
 
 function isIgnored(filePath) {
