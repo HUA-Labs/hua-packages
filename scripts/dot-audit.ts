@@ -1,26 +1,34 @@
-import { dot } from '../packages/hua-dot/src/index.ts';
-import * as fs from 'fs';
-import * as path from 'path';
+import { dot } from "../packages/hua-dot/src/index.ts";
+import * as fs from "fs";
+import * as path from "path";
 
 const patterns: string[] = [];
 function scan(dir: string) {
   for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (['node_modules', '.next', 'dist', '_reference', '__tests__'].includes(f.name)) continue;
+    if (
+      ["node_modules", ".next", "dist", "_reference", "__tests__"].includes(
+        f.name,
+      )
+    )
+      continue;
     const p = path.join(dir, f.name);
     if (f.isDirectory()) scan(p);
     else if (/\.(tsx?|jsx?)$/.test(f.name)) {
-      const content = fs.readFileSync(p, 'utf8');
-      for (const m of content.matchAll(/dot=['"]([^'"]+)['"]/g)) patterns.push(m[1]);
-      for (const m of content.matchAll(/dot\(['"]([^'"]+)['"]/g)) patterns.push(m[1]);
-      for (const m of content.matchAll(/useDot\(['"]([^'"]+)['"]/g)) patterns.push(m[1]);
+      const content = fs.readFileSync(p, "utf8");
+      for (const m of content.matchAll(/dot=['"]([^'"]+)['"]/g))
+        patterns.push(m[1]);
+      for (const m of content.matchAll(/dot\(['"]([^'"]+)['"]/g))
+        patterns.push(m[1]);
+      for (const m of content.matchAll(/useDot\(['"]([^'"]+)['"]/g))
+        patterns.push(m[1]);
     }
   }
 }
-scan('./apps/my-app/app');
-scan('./packages/hua-ui/src');
+scan("./apps/my-app/app");
+scan("./packages/hua-ui/src");
 
 const allTokens = new Set<string>();
-patterns.forEach(p => p.split(/\s+/).forEach(t => allTokens.add(t)));
+patterns.forEach((p) => p.split(/\s+/).forEach((t) => allTokens.add(t)));
 
 // Tokens intentionally excluded from the unknown-token report:
 //   1. Variant-prefixed tokens — handled by class adapter (dark:, hover:, etc.)
@@ -60,7 +68,12 @@ Generated: ${new Date().toISOString()}
 Total unique tokens: ${allTokens.size}
 Unknown tokens: ${unknown.length}
 
-${unknown.map(t => `- \`${t}\``).join('\n')}
+${unknown.map((t) => `- \`${t}\``).join("\n")}
 `;
-fs.writeFileSync('./docs/areas/tasks/dot-unknown-tokens-audit.md', output);
-console.log(`Done: ${unknown.length} unknown out of ${allTokens.size} total`);
+const outputPath =
+  process.env.DOT_AUDIT_OUTPUT ?? "./.tmp/dot-unknown-tokens-audit.md";
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, output);
+console.log(
+  `Done: ${unknown.length} unknown out of ${allTokens.size} total (${outputPath})`,
+);
