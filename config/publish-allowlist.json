@@ -1,0 +1,21 @@
+{
+  "packages": [
+    "@hua-labs/dot",
+    "@hua-labs/dot-aot",
+    "@hua-labs/dot-lsp",
+    "@hua-labs/dot-mcp",
+    "@hua-labs/eslint-plugin-i18n",
+    "@hua-labs/hooks",
+    "@hua-labs/hua",
+    "@hua-labs/i18n-core",
+    "@hua-labs/i18n-core-zustand",
+    "@hua-labs/i18n-formatters",
+    "@hua-labs/i18n-loaders",
+    "@hua-labs/motion-core",
+    "@hua-labs/security",
+    "@hua-labs/state",
+    "@hua-labs/ui",
+    "@hua-labs/utils",
+    "create-hua"
+  ]
+}

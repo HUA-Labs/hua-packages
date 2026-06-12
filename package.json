@@ -14,6 +14,7 @@
     "lint": "turbo run lint",
     "clean": "turbo run clean",
     "check:pack-artifacts": "node scripts/check-pack-artifacts.js",
+    "check:publish-allowlist": "node scripts/check-publish-allowlist.js",
     "generate:docs": "tsx scripts/generate-docs.ts",
     "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
     "changeset": "changeset",

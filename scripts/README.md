@@ -22,11 +22,12 @@ monorepo state.
 
 ## Release Helpers
 
-| Script                    | Purpose                                                                                                            |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `check-pack-artifacts.js` | Inspect packed `.tgz` artifacts for missing type entries, `workspace:*` specs, and unintended source/test payload. |
-| `prepare-publish.js`      | Convert local `workspace:*` dependencies to publishable package versions before manual package inspection.         |
-| `restore-workspace.js`    | Restore `workspace:*` dependencies after manual publish preparation.                                               |
+| Script                       | Purpose                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `check-pack-artifacts.js`    | Inspect packed `.tgz` artifacts for missing type entries, `workspace:*` specs, and unintended source/test payload. |
+| `check-publish-allowlist.js` | Fail when a public workspace package is not listed in `config/publish-allowlist.json`.                             |
+| `prepare-publish.js`         | Convert local `workspace:*` dependencies to publishable package versions before manual package inspection.         |
+| `restore-workspace.js`       | Restore `workspace:*` dependencies after manual publish preparation.                                               |
 
 ## Manual Analysis
 
