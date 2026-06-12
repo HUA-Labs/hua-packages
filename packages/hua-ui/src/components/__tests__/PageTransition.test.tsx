@@ -80,7 +80,7 @@ describe('PageTransition', () => {
     );
 
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('transition-opacity');
+    expect(wrapper).toHaveDotStyle('transition-opacity');
   });
 
   it('should apply slide variant classes', () => {
@@ -91,7 +91,7 @@ describe('PageTransition', () => {
     );
 
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('transition-transform');
+    expect(wrapper).toHaveDotStyle('transition-transform');
   });
 
   it('should apply custom className', () => {

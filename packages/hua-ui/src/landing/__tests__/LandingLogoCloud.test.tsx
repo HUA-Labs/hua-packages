@@ -57,8 +57,9 @@ describe('LandingLogoCloud', () => {
   })
 
   it('should render grid variant', () => {
-    const { container } = renderLogoCloud({ variant: 'grid' })
-    expect(container.querySelector('.flex-wrap')).toBeInTheDocument()
+    renderLogoCloud({ variant: 'grid' })
+    const grid = screen.getByAltText('Company A').parentElement as HTMLElement
+    expect(grid).toHaveDotStyle('flex-wrap')
   })
 
   it('should render marquee variant', () => {
@@ -68,8 +69,9 @@ describe('LandingLogoCloud', () => {
   })
 
   it('should use grid variant for corporate theme', () => {
-    const { container } = renderLogoCloud({}, 'corporate')
-    expect(container.querySelector('.flex-wrap')).toBeInTheDocument()
+    renderLogoCloud({}, 'corporate')
+    const grid = screen.getByAltText('Company A').parentElement as HTMLElement
+    expect(grid).toHaveDotStyle('flex-wrap')
   })
 
   it('should pass className to section', () => {

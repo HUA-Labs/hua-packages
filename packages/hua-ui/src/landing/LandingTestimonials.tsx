@@ -2,6 +2,7 @@
 
 import React from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Section } from "../components/Section";
 import { Carousel } from "../components/advanced/Carousel";
 import { Marquee } from "../components/advanced/Marquee";
@@ -110,7 +111,7 @@ export function LandingTestimonials({
 
   if (variant === "marquee") {
     return (
-      <Section header={header} dot={className} {...rest}>
+      <Section header={header} className={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
             <div key={i} style={dot("w-80 shrink-0")}>
@@ -124,7 +125,7 @@ export function LandingTestimonials({
 
   if (variant === "carousel") {
     return (
-      <Section header={header} dot={className} {...rest}>
+      <Section header={header} className={className} {...rest}>
         <Carousel
           autoPlay={autoPlay}
           interval={interval}
@@ -146,16 +147,19 @@ export function LandingTestimonials({
 
   // grid variant
   const cols = colsProp ?? ((items.length <= 2 ? 2 : 3) as 2 | 3);
+  const gridCls = dotCSS(`grid gap-6 ${gridColsMap[cols]}`);
+
   return (
-    <Section header={header} dot={className} {...rest}>
+    <Section header={header} className={className} {...rest}>
       <div
         ref={stagger?.containerRef}
-        style={dot(`grid gap-6 ${gridColsMap[cols]}`)}
+        className={gridCls.className}
       >
         {items.map((item, i) => (
           <TestimonialCard key={i} item={item} style={stagger?.styles[i]} />
         ))}
       </div>
+      <style dangerouslySetInnerHTML={{ __html: gridCls.css }} />
     </Section>
   );
 }

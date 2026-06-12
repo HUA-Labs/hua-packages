@@ -19,79 +19,79 @@ describe('Stack', () => {
     const { container } = render(<Stack>Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('flex');
-    expect(stack).toHaveClass('flex-col');
+    expect(stack).toHaveDotStyle('flex');
+    expect(stack).toHaveDotStyle('flex-col');
   });
 
   it('should render horizontal direction', () => {
     const { container } = render(<Stack direction="horizontal">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('flex');
-    expect(stack).toHaveClass('flex-row');
+    expect(stack).toHaveDotStyle('flex');
+    expect(stack).toHaveDotStyle('flex-row');
   });
 
   it('should apply vertical spacing', () => {
     const { container } = render(<Stack spacing="md">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('space-y-6');
+    expect(stack?.style.gap).toBe('1.5rem');
   });
 
   it('should apply horizontal spacing', () => {
     const { container } = render(<Stack direction="horizontal" spacing="lg">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('space-x-8');
+    expect(stack?.style.gap).toBe('2rem');
   });
 
   it('should apply align center', () => {
     const { container } = render(<Stack align="center">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('items-center');
+    expect(stack).toHaveDotStyle('items-center');
   });
 
   it('should apply align end', () => {
     const { container } = render(<Stack align="end">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('items-end');
+    expect(stack).toHaveDotStyle('items-end');
   });
 
   it('should apply align stretch', () => {
     const { container } = render(<Stack align="stretch">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('items-stretch');
+    expect(stack).toHaveDotStyle('items-stretch');
   });
 
   it('should apply justify center', () => {
     const { container } = render(<Stack justify="center">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('justify-center');
+    expect(stack).toHaveDotStyle('justify-center');
   });
 
   it('should apply justify between', () => {
     const { container } = render(<Stack justify="between">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('justify-between');
+    expect(stack).toHaveDotStyle('justify-between');
   });
 
   it('should apply wrap when enabled', () => {
     const { container } = render(<Stack wrap>Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('flex-wrap');
+    expect(stack).toHaveDotStyle('flex-wrap');
   });
 
   it('should merge custom className', () => {
     const { container } = render(<Stack className="custom-class">Content</Stack>);
 
     const stack = container.querySelector('div');
-    expect(stack).toHaveClass('custom-class');
-    expect(stack).toHaveClass('flex');
+    expect(stack).toHaveDotStyle('custom-class');
+    expect(stack).toHaveDotStyle('flex');
   });
 });

@@ -43,7 +43,7 @@ describe("Prose", () => {
         <p>Content</p>
       </Prose>,
     );
-    expect(container.firstChild).toHaveClass("hua-prose");
+    expect(container.firstChild).toHaveDotStyle("hua-prose");
   });
 
   it("should render as different element via as prop", () => {
@@ -194,7 +194,7 @@ describe("Prose", () => {
       </Prose>,
     );
     const el = container.firstChild as HTMLElement;
-    expect(el).toHaveClass("hua-prose");
-    expect(el).not.toHaveClass("external");
+    expect(el).toHaveDotStyle("hua-prose");
+    expect(el).not.toHaveDotStyle("external");
   });
 });

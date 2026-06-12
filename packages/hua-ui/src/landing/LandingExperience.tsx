@@ -110,7 +110,7 @@ export function LandingExperience({
     title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
   return (
-    <Section header={header} dot={className} {...rest}>
+    <Section header={header} className={className} {...rest}>
       <div ref={stagger?.containerRef} style={dot("max-w-3xl mx-auto")}>
         {items.map((item, i) => (
           <ExperienceItem key={i} item={item} style={stagger?.styles[i]} />

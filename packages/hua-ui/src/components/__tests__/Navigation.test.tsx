@@ -38,7 +38,7 @@ describe('Navigation', () => {
       </Navigation>
     );
     // NavigationList wrapper should have a background-color set (pills uses --color-muted)
-    const list = container.querySelector('div > div') as HTMLElement;
+    const list = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(list).toBeTruthy();
     expect(list.style.backgroundColor).toBeTruthy();
   });
@@ -51,7 +51,7 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    const list = container.querySelector('div > div') as HTMLElement;
+    const list = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(list).toBeTruthy();
     expect(list.style.borderBottom).toBeTruthy();
   });
@@ -64,7 +64,7 @@ describe('Navigation', () => {
         </NavigationList>
       </Navigation>
     );
-    const list = container.querySelector('div > div') as HTMLElement;
+    const list = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(list).toBeTruthy();
     expect(list.style.backgroundColor).toBeTruthy();
   });

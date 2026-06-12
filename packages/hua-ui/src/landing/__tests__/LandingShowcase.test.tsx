@@ -44,12 +44,12 @@ describe('LandingShowcase', () => {
   })
 
   it('should alternate layout direction', () => {
-    const { container } = renderShowcase()
-    // Even items get md:flex-row, odd items get md:flex-row-reverse
-    const rows = container.querySelectorAll('.md\\:flex-row')
-    const reverseRows = container.querySelectorAll('.md\\:flex-row-reverse')
-    expect(rows.length).toBe(2) // items 0, 2
-    expect(reverseRows.length).toBe(1) // item 1
+    renderShowcase()
+    const getRowForTitle = (title: string) =>
+      screen.getByText(title).parentElement?.parentElement as HTMLElement
+    expect(getRowForTitle('Feature One')).toHaveDotStyle('md:flex-row')
+    expect(getRowForTitle('Feature Two')).toHaveDotStyle('md:flex-row-reverse')
+    expect(getRowForTitle('Feature Three')).toHaveDotStyle('md:flex-row')
   })
 
   it('should render h3 for item titles', () => {
@@ -59,9 +59,11 @@ describe('LandingShowcase', () => {
   })
 
   it('should render rounded image containers', () => {
-    const { container } = renderShowcase()
-    const roundedDivs = container.querySelectorAll('.rounded-xl')
-    expect(roundedDivs.length).toBeGreaterThanOrEqual(items.length)
+    renderShowcase()
+    for (const item of items) {
+      const imageFrame = screen.getByAltText(item.title).parentElement as HTMLElement
+      expect(imageFrame).toHaveDotStyle('rounded-xl')
+    }
   })
 
   it('should pass className to section', () => {

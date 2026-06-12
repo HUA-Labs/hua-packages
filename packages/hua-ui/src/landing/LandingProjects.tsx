@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Section } from "../components/Section";
 import { Card } from "../components/Card";
 import { Icon } from "../components/Icon/Icon";
@@ -162,9 +163,10 @@ export function LandingProjects({
 
   const header =
     title || subtitle ? { title: title ?? "", subtitle } : undefined;
+  const gridCls = dotCSS(`grid gap-6 ${gridColsMap[columns]}`);
 
   return (
-    <Section header={header} dot={className} {...rest}>
+    <Section header={header} className={className} {...rest}>
       {/* Tag Filter */}
       {filter && allTags.length > 0 && (
         <div style={dot("flex flex-wrap gap-2 mb-8 justify-center")}>
@@ -193,12 +195,13 @@ export function LandingProjects({
       {/* Projects Grid */}
       <div
         ref={stagger?.containerRef}
-        style={dot(`grid gap-6 ${gridColsMap[columns]}`)}
+        className={gridCls.className}
       >
         {filteredItems.map((item, i) => (
           <ProjectCard key={i} item={item} style={stagger?.styles[i]} />
         ))}
       </div>
+      <style dangerouslySetInnerHTML={{ __html: gridCls.css }} />
     </Section>
   );
 }

@@ -47,40 +47,39 @@ describe('Avatar', () => {
     const { container } = render(<Avatar size="sm" alt="User" />);
 
     const avatar = container.querySelector('div');
-    expect(avatar).toHaveClass('w-8');
-    expect(avatar).toHaveClass('h-8');
+    expect(avatar).toHaveDotStyle('w-8');
+    expect(avatar).toHaveDotStyle('h-8');
   });
 
   it('should apply medium size variant (default)', () => {
     const { container } = render(<Avatar alt="User" />);
 
     const avatar = container.querySelector('div');
-    expect(avatar).toHaveClass('w-10');
-    expect(avatar).toHaveClass('h-10');
+    expect(avatar).toHaveDotStyle('w-10');
+    expect(avatar).toHaveDotStyle('h-10');
   });
 
   it('should apply large size variant', () => {
     const { container } = render(<Avatar size="lg" alt="User" />);
 
     const avatar = container.querySelector('div');
-    expect(avatar).toHaveClass('w-12');
-    expect(avatar).toHaveClass('h-12');
+    expect(avatar).toHaveDotStyle('w-12');
+    expect(avatar).toHaveDotStyle('h-12');
   });
 
   it('should apply glass variant classes', () => {
     const { container } = render(<Avatar variant="glass" alt="User" />);
 
     const avatar = container.querySelector('div');
-    expect(avatar).toHaveClass('ring-1');
-    expect(avatar).toHaveClass('ring-white/30');
-    expect(avatar).toHaveClass('backdrop-blur-sm');
+    expect(avatar).toHaveDotStyle('backdrop-blur-sm');
+    expect(avatar?.style.boxShadow).toContain('rgba(255, 255, 255, 0.3)');
   });
 
   it('should merge custom className', () => {
     const { container } = render(<Avatar className="custom-class" alt="User" />);
 
     const avatar = container.querySelector('div');
-    expect(avatar).toHaveClass('custom-class');
-    expect(avatar).toHaveClass('rounded-full');
+    expect(avatar).toHaveDotStyle('custom-class');
+    expect(avatar).toHaveDotStyle('rounded-full');
   });
 });

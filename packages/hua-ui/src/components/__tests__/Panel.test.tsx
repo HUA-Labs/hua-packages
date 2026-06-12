@@ -3,6 +3,9 @@ import { render } from '@testing-library/react';
 import { Panel } from '../Panel';
 
 describe('Panel', () => {
+  const getPanelCard = (container: HTMLElement) =>
+    (container.firstElementChild as HTMLElement).querySelector(':scope > div') as HTMLElement;
+
   it('should render children', () => {
     const { container } = render(<Panel>Panel content</Panel>);
     expect(container.textContent).toContain('Panel content');
@@ -10,42 +13,42 @@ describe('Panel', () => {
 
   it('should apply default style class', () => {
     const { container } = render(<Panel>Content</Panel>);
-    expect(container.querySelector('.panel-default')).toBeInTheDocument();
+    expect(getPanelCard(container).style.backgroundColor).toContain('var(--color-card)');
   });
 
   it('should apply glass style', () => {
     const { container } = render(<Panel style="glass">Content</Panel>);
-    expect(container.querySelector('.panel-glass')).toBeInTheDocument();
+    expect(getPanelCard(container).style.backdropFilter).toBeTruthy();
   });
 
   it('should apply neon style', () => {
     const { container } = render(<Panel style="neon">Content</Panel>);
-    expect(container.querySelector('.panel-neon')).toBeInTheDocument();
+    expect(getPanelCard(container).style.border).toContain('rgba(103, 232, 249, 0.3)');
   });
 
   it('should apply effect class', () => {
     const { container } = render(<Panel effect="glow">Content</Panel>);
-    expect(container.querySelector('.panel-effect-glow')).toBeInTheDocument();
+    expect(getPanelCard(container).style.boxShadow).toBeTruthy();
   });
 
   it('should apply padding variant', () => {
     const { container } = render(<Panel padding="lg">Content</Panel>);
-    expect(container.querySelector('.p-8')).toBeInTheDocument();
+    expect(getPanelCard(container).style.padding).toBe('32px');
   });
 
   it('should apply rounded variant', () => {
     const { container } = render(<Panel rounded="xl">Content</Panel>);
-    expect(container.querySelector('.rounded-xl')).toBeInTheDocument();
+    expect(getPanelCard(container).style.borderRadius).toBe('12px');
   });
 
   it('should apply custom padding', () => {
-    const { container } = render(<Panel customPadding="p-10">Content</Panel>);
-    expect(container.querySelector('.p-10')).toBeInTheDocument();
+    const { container } = render(<Panel customPadding="40px">Content</Panel>);
+    expect(getPanelCard(container).style.padding).toBe('40px');
   });
 
   it('should apply transparency to style', () => {
     const { container } = render(<Panel transparency={0.5}>Content</Panel>);
-    const card = container.querySelector('.panel-component') as HTMLElement;
+    const card = getPanelCard(container);
     expect(card.style.opacity).toBe('0.5');
   });
 

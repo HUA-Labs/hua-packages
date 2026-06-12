@@ -254,7 +254,9 @@ describe('Autocomplete', () => {
   it('should show loading state', () => {
     const { container } = render(<Autocomplete options={defaultOptions} loading />);
 
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    const loader = container.querySelector('span[aria-hidden="true"]');
+    expect(loader).toBeInTheDocument();
+    expect((loader as HTMLElement).style.animation).toContain('spin');
   });
 
   it('should be disabled', () => {

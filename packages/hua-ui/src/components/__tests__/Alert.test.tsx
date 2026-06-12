@@ -101,7 +101,7 @@ describe("Alert", () => {
     const { container } = render(<Alert title="Alert" />);
 
     const alert = container.querySelector("div");
-    expect(alert?.style.borderRadius).toBe("0.5rem");
+    expect(alert?.style.borderRadius).toBe("8px");
   });
 
   it("should show default icon based on variant", () => {

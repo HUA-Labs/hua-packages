@@ -16,50 +16,50 @@ describe('Section', () => {
   it('should apply default spacing (lg)', () => {
     const { container } = render(<Section>Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('py-20');
+    expect(section).toHaveDotStyle('py-20');
   });
 
   it('should apply sm spacing', () => {
     const { container } = render(<Section spacing="sm">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('py-12');
+    expect(section).toHaveDotStyle('py-12');
   });
 
   it('should apply md spacing', () => {
     const { container } = render(<Section spacing="md">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('py-16');
+    expect(section).toHaveDotStyle('py-16');
   });
 
   it('should apply xl spacing', () => {
     const { container } = render(<Section spacing="xl">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('py-28');
+    expect(section).toHaveDotStyle('py-28');
   });
 
   it('should apply none spacing', () => {
     const { container } = render(<Section spacing="none">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).not.toHaveClass('py-20');
-    expect(section).not.toHaveClass('py-12');
+    expect(section).not.toHaveDotStyle('py-20');
+    expect(section).not.toHaveDotStyle('py-12');
   });
 
   it('should apply muted background', () => {
     const { container } = render(<Section background="muted">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('bg-muted/30');
+    expect(section).toHaveDotStyle('bg-muted/30');
   });
 
   it('should apply accent background', () => {
     const { container } = render(<Section background="accent">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('bg-accent/5');
+    expect(section).toHaveDotStyle('bg-accent/5');
   });
 
   it('should apply primary background', () => {
     const { container } = render(<Section background="primary">Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('bg-primary/5');
+    expect(section).toHaveDotStyle('bg-primary/5');
   });
 
   it('should render header with title', () => {
@@ -106,7 +106,7 @@ describe('Section', () => {
     const { container } = render(<Section>Content</Section>);
     // Container renders a div with max-w-6xl by default
     const innerDiv = container.querySelector('section > div');
-    expect(innerDiv).toHaveClass('max-w-6xl');
+    expect(innerDiv).toHaveDotStyle('max-w-6xl');
   });
 
   it('should skip Container in fullWidth mode', () => {
@@ -122,8 +122,8 @@ describe('Section', () => {
       <Section className="custom-class">Content</Section>
     );
     const section = container.querySelector('section');
-    expect(section).toHaveClass('custom-class');
-    expect(section).toHaveClass('relative');
+    expect(section).toHaveDotStyle('custom-class');
+    expect(section).toHaveDotStyle('relative');
   });
 
   it('should forward ref', () => {
@@ -143,12 +143,12 @@ describe('Section', () => {
   it('should apply px-6 padding', () => {
     const { container } = render(<Section>Content</Section>);
     const section = container.querySelector('section');
-    expect(section).toHaveClass('px-6');
+    expect(section).toHaveDotStyle('px-6');
   });
 
   it('should pass container size prop', () => {
     const { container } = render(<Section container="sm">Content</Section>);
     const innerDiv = container.querySelector('section > div');
-    expect(innerDiv).toHaveClass('max-w-2xl');
+    expect(innerDiv).toHaveDotStyle('max-w-2xl');
   });
 });

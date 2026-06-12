@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Bookmark } from '../Bookmark';
 
@@ -60,42 +60,42 @@ describe('Bookmark', () => {
     expect(localStorage.getItem('bookmarks')).toBeNull();
   });
 
-  it('should load initial state from localStorage', () => {
+  it('should load initial state from localStorage', async () => {
     localStorage.setItem('bookmarks', JSON.stringify(['existing-1']));
 
-    const { container } = render(<Bookmark id="existing-1" />);
+    render(<Bookmark id="existing-1" />);
 
-    const button = container.querySelector('button');
-    // When bookmarked, icon has fill-current class
-    const icon = button?.querySelector('.fill-current');
-    expect(icon).toBeInTheDocument();
+    await waitFor(() => {
+      const icon = screen.getByRole('button').querySelector('span');
+      expect(icon?.style.fill).toBe('currentcolor');
+    });
   });
 
   it('should apply size variants', () => {
     const { rerender } = render(<Bookmark id="item-1" size="sm" />);
-    expect(screen.getByRole('button').className).toContain('w-6');
+    expect(screen.getByRole('button')).toHaveDotStyle('w-6');
 
     rerender(<Bookmark id="item-1" size="lg" />);
-    expect(screen.getByRole('button').className).toContain('w-10');
+    expect(screen.getByRole('button')).toHaveDotStyle('w-10');
   });
 
   it('should apply variant styles', () => {
     const { rerender } = render(<Bookmark id="item-1" variant="outline" />);
-    expect(screen.getByRole('button').className).toContain('border');
+    expect(screen.getByRole('button')).toHaveDotStyle('border');
 
     rerender(<Bookmark id="item-1" variant="filled" />);
-    expect(screen.getByRole('button').className).toContain('text-yellow-500');
+    expect(screen.getByRole('button').style.color).toBe('rgb(137, 110, 0)');
   });
 
   it('should apply custom className', () => {
     render(<Bookmark id="item-1" className="my-bookmark" />);
-    expect(screen.getByRole('button').className).toContain('my-bookmark');
+    expect(screen.getByRole('button')).toHaveDotStyle('my-bookmark');
   });
 
   it('should respect defaultBookmarked prop', () => {
-    const { container } = render(<Bookmark id="new-item" defaultBookmarked />);
+    render(<Bookmark id="new-item" defaultBookmarked />);
 
-    const icon = container.querySelector('.fill-current');
-    expect(icon).toBeInTheDocument();
+    const icon = screen.getByRole('button').querySelector('span');
+    expect(icon?.style.fill).toBe('currentcolor');
   });
 });

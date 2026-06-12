@@ -172,7 +172,7 @@ describe('BottomSheet', () => {
     // Sheet is the last child of the outer fixed container
     const outerDiv = container.firstChild as HTMLElement;
     let sheet = outerDiv?.lastChild as HTMLElement;
-    expect(sheet).toHaveStyle({ height: '16rem' });
+    expect(sheet.style.height).toBe('16rem');
 
     rerender(
       <BottomSheet isOpen={true} onClose={vi.fn()} height="lg">
@@ -181,7 +181,7 @@ describe('BottomSheet', () => {
     );
 
     sheet = (container.firstChild as HTMLElement)?.lastChild as HTMLElement;
-    expect(sheet).toHaveStyle({ height: '32rem' });
+    expect(sheet.style.height).toBe('32rem');
   });
 
   it('should apply custom dot style', () => {

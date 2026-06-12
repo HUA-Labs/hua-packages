@@ -214,6 +214,6 @@ describe('Pagination', () => {
     );
 
     const button = container.querySelector('button[aria-current="page"]');
-    expect(button).toHaveClass('border-primary');
+    expect((button as HTMLElement).style.border).toContain('var(--color-primary)');
   });
 });

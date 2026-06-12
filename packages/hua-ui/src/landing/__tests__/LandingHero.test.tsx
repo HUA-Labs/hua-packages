@@ -49,23 +49,23 @@ describe('LandingHero', () => {
 
   it('should apply full size for marketing theme', () => {
     const { container } = renderHero({ title: 'Title' }, 'marketing')
-    expect(container.querySelector('section')).toHaveClass('min-h-screen')
+    expect(container.querySelector('section')).toHaveDotStyle('min-h-screen')
   })
 
   it('should apply xl size for corporate theme', () => {
     const { container } = renderHero({ title: 'Title' }, 'corporate')
     const section = container.querySelector('section')
-    expect(section).not.toHaveClass('min-h-screen')
+    expect(section).not.toHaveDotStyle('min-h-screen')
   })
 
   it('should allow size override', () => {
     const { container } = renderHero({ title: 'Title', size: 'xl' }, 'marketing')
-    expect(container.querySelector('section')).not.toHaveClass('min-h-screen')
+    expect(container.querySelector('section')).not.toHaveDotStyle('min-h-screen')
   })
 
   it('should render dark background for product theme', () => {
     const { container } = renderHero({ title: 'Title' }, 'product')
-    expect(container.querySelector('section')).toHaveClass('bg-gray-950')
+    expect(container.querySelector('section')).toHaveDotStyle('bg-gray-950')
   })
 
   it('should accept ReactNode as title', () => {
@@ -75,6 +75,6 @@ describe('LandingHero', () => {
 
   it('should pass className to section', () => {
     const { container } = renderHero({ title: 'T', className: 'my-custom-class' })
-    expect(container.querySelector('section')).toHaveClass('my-custom-class')
+    expect(container.querySelector('section')).toHaveDotStyle('my-custom-class')
   })
 })

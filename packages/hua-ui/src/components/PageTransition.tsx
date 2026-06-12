@@ -18,6 +18,7 @@ import { mergeStyles, resolveDot } from '../hooks/useDotMap'
  */
 export interface PageTransitionProps {
   children: React.ReactNode
+  className?: string
   dot?: string
   style?: React.CSSProperties
   duration?: number
@@ -61,6 +62,7 @@ export interface PageTransitionProps {
  */
 export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(({
   children,
+  className,
   dot: dotProp,
   style,
   duration = 300,
@@ -116,6 +118,7 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
   return (
     <div
       ref={ref}
+      className={className}
       style={mergeStyles(
         resolveDot('w-full'),
         resolveDot(transitionClasses[variant]),

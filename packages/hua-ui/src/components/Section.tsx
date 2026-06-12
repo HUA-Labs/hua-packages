@@ -46,6 +46,7 @@ export interface SectionProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
   "className"
 > {
+  className?: string;
   /** Container 사이즈 @default 'lg' */
   container?: ContainerProps["size"];
   /** Container 패딩 @default 'none' */
@@ -137,6 +138,7 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
       containerPadding = "none",
       header,
       fullWidth = false,
+      className,
       style,
       children,
       ...props
@@ -170,9 +172,9 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
     return (
       <section
         ref={ref}
-        className={sectionCls.className}
-        style={mergeStyles(bgStyle, style)}
         {...props}
+        className={[sectionCls.className, className].filter(Boolean).join(" ")}
+        style={mergeStyles(bgStyle, style)}
       >
         {fullWidth ? (
           content

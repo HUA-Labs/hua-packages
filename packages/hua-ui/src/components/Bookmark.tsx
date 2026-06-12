@@ -126,7 +126,8 @@ const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
       >
         <Icon
           name="star"
-          dot={isBookmarked ? "transition-all duration-200 fill-current" : "transition-all duration-200"}
+          dot="transition-all duration-200"
+          style={isBookmarked ? { fill: "currentColor" } : undefined}
         />
       </button>
     )

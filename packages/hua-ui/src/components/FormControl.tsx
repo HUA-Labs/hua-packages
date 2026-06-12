@@ -23,6 +23,7 @@ export interface FormControlProps {
   htmlFor?: string;
   showErrorIcon?: boolean;
   suppressBrowserValidation?: boolean;
+  className?: string;
   dot?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -62,6 +63,7 @@ function FormControl({
   htmlFor,
   showErrorIcon = true,
   suppressBrowserValidation = true,
+  className,
   dot: dotProp,
   style,
   children,
@@ -94,7 +96,10 @@ function FormControl({
   });
 
   return (
-    <div style={mergeStyles(resolveDot("space-y-2"), resolveDot(dotProp), style)}>
+    <div
+      className={className}
+      style={mergeStyles(resolveDot("space-y-2"), resolveDot(dotProp), style)}
+    >
       {/* Label */}
       {label && (
         <label

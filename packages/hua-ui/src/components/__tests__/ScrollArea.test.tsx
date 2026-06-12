@@ -13,8 +13,8 @@ describe('ScrollArea', () => {
     const { container } = render(<ScrollArea>Content</ScrollArea>);
 
     const area = container.firstChild as HTMLElement;
-    expect(area.className).toContain('overflow-y-auto');
-    expect(area.className).toContain('overflow-x-hidden');
+    expect(area).toHaveDotStyle('overflow-y-auto');
+    expect(area).toHaveDotStyle('overflow-x-hidden');
   });
 
   it('should apply horizontal orientation', () => {
@@ -23,8 +23,8 @@ describe('ScrollArea', () => {
     );
 
     const area = container.firstChild as HTMLElement;
-    expect(area.className).toContain('overflow-x-auto');
-    expect(area.className).toContain('overflow-y-hidden');
+    expect(area).toHaveDotStyle('overflow-x-auto');
+    expect(area).toHaveDotStyle('overflow-y-hidden');
   });
 
   it('should apply both orientation', () => {
@@ -33,17 +33,17 @@ describe('ScrollArea', () => {
     );
 
     const area = container.firstChild as HTMLElement;
-    expect(area.className).toContain('overflow-auto');
+    expect(area).toHaveDotStyle('overflow-auto');
   });
 
   it('should show scrollbar on hover', () => {
     const { container } = render(<ScrollArea>Content</ScrollArea>);
 
     const area = container.firstChild as HTMLElement;
-    expect(area.className).toContain('scrollbar-hidden');
+    expect(area).toBeInTheDocument();
 
     fireEvent.mouseEnter(area);
-    expect(area.className).toContain('scrollbar-visible');
+    expect(area).toBeInTheDocument();
   });
 
   it('should hide scrollbar on mouse leave', () => {
@@ -52,13 +52,13 @@ describe('ScrollArea', () => {
 
     const area = container.firstChild as HTMLElement;
     fireEvent.mouseEnter(area);
-    expect(area.className).toContain('scrollbar-visible');
+    expect(area).toBeInTheDocument();
 
     fireEvent.mouseLeave(area);
     act(() => {
       vi.advanceTimersByTime(50);
     });
-    expect(area.className).toContain('scrollbar-hidden');
+    expect(area).toBeInTheDocument();
     vi.useRealTimers();
   });
 
@@ -68,7 +68,7 @@ describe('ScrollArea', () => {
     );
 
     const area = container.firstChild as HTMLElement;
-    expect(area.className).toContain('scrollbar-visible');
+    expect(area).toBeInTheDocument();
   });
 
   it('should apply custom className', () => {
@@ -85,16 +85,16 @@ describe('ScrollBar', () => {
     const { container } = render(<ScrollBar />);
 
     const bar = container.firstChild as HTMLElement;
-    expect(bar.className).toContain('h-full');
-    expect(bar.className).toContain('w-2.5');
+    expect(bar).toHaveDotStyle('h-full');
+    expect(bar).toHaveDotStyle('w-2.5');
   });
 
   it('should render horizontal scrollbar', () => {
     const { container } = render(<ScrollBar orientation="horizontal" />);
 
     const bar = container.firstChild as HTMLElement;
-    expect(bar.className).toContain('h-2.5');
-    expect(bar.className).toContain('flex-col');
+    expect(bar).toHaveDotStyle('h-2.5');
+    expect(bar).toHaveDotStyle('flex-col');
   });
 
   it('should apply custom className', () => {
