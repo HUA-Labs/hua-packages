@@ -37,12 +37,12 @@
     "@hua-labs/dot": "workspace:*"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/types": "^7.26.0",
+    "@babel/core": "^7.29.7",
+    "@babel/types": "^7.29.7",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vite": "^6.2.0",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.8"
   },
   "peerDependencies": {
     "vite": ">=5.0.0"
