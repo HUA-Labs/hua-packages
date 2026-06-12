@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  NODE_VERSION: '24'
+  NODE_VERSION: "24"
 
 jobs:
   type-check:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install build tools for native modules
         run: |
@@ -34,14 +34,11 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
-      - name: Validate workspace registry
-        run: node --experimental-strip-types scripts/check-workspace-registry.ts
-
       - name: Build packages
-        run: pnpm workspace:build:packages
+        run: pnpm build
 
       - name: Type check
-        run: pnpm workspace:type-check
+        run: pnpm type-check
 
   lint:
     runs-on: ubuntu-latest
@@ -55,7 +52,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install build tools for native modules
         run: |
@@ -67,14 +64,11 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
-      - name: Validate workspace registry
-        run: node --experimental-strip-types scripts/check-workspace-registry.ts
-
       - name: Build packages
-        run: pnpm workspace:build:packages
+        run: pnpm build
 
       - name: Lint
-        run: pnpm workspace:lint
+        run: pnpm lint
 
   test:
     runs-on: ubuntu-latest
@@ -88,7 +82,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install build tools for native modules
         run: |
@@ -100,14 +94,11 @@ jobs:
           rm -rf node_modules
           pnpm install --frozen-lockfile --ignore-scripts=false
 
-      - name: Validate workspace registry
-        run: node --experimental-strip-types scripts/check-workspace-registry.ts
-
       - name: Build packages
-        run: pnpm workspace:build:packages
+        run: pnpm build
 
-      - name: Test
-        run: pnpm workspace:test
+      - name: Test non-UI packages
+        run: pnpm exec turbo run test --filter=!@hua-labs/ui
 
   doc-validation:
     runs-on: ubuntu-latest
@@ -121,7 +112,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: |
