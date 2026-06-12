@@ -26,11 +26,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Check publish allowlist
+        run: pnpm check:publish-allowlist
 
       - name: Build publishable packages
         run: pnpm build --filter "@hua-labs/*"
