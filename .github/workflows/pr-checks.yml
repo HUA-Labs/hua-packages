@@ -141,3 +141,16 @@ jobs:
 
       - name: Check publish allowlist
         run: pnpm check:publish-allowlist
+
+  public-exposure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Check public exposure guard
+        run: node scripts/check-public-exposure.js
