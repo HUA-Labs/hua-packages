@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../Card';
 
 describe('Card', () => {
@@ -14,55 +14,57 @@ describe('Card', () => {
     const { container } = render(<Card>Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('bg-card');
-    expect(card).toHaveClass('text-card-foreground');
-    expect(card).toHaveClass('border');
+    expect(card?.style.backgroundColor).toContain('var(--color-card)');
+    expect(card?.style.color).toContain('var(--color-card-foreground)');
+    expect(card?.style.borderColor).toContain('var(--color-border)');
   });
 
   it('should apply outline variant classes', () => {
     const { container } = render(<Card variant="outline">Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('bg-transparent');
-    expect(card).toHaveClass('border-2');
+    expect(card?.style.backgroundColor).toBe('transparent');
+    expect(card?.style.borderWidth).toBe('2px');
   });
 
   it('should apply elevated variant classes', () => {
     const { container } = render(<Card variant="elevated">Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('shadow-lg');
+    expect(card).toHaveDotStyle('shadow-lg');
   });
 
   it('should apply shadow variants', () => {
     const { container } = render(<Card shadow="md">Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('shadow-md');
+    expect(card).toHaveDotStyle('shadow-md');
   });
 
   it('should apply padding variants', () => {
     const { container } = render(<Card padding="lg">Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('p-6');
+    expect(card).toHaveDotStyle('p-6');
   });
 
   it('should apply hoverable styles', () => {
     const { container } = render(<Card hoverable>Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('transition-shadow');
-    expect(card).toHaveClass('hover:shadow-lg');
-    expect(card).toHaveClass('cursor-pointer');
+    expect(card?.style.transition).toContain('box-shadow');
+
+    fireEvent.mouseEnter(card as HTMLElement);
+    expect(card?.style.cursor).toBe('pointer');
+    expect(card?.style.boxShadow).toBeTruthy();
   });
 
   it('should merge custom className', () => {
     const { container } = render(<Card className="custom-class">Content</Card>);
 
     const card = container.querySelector('div');
-    expect(card).toHaveClass('custom-class');
-    expect(card).toHaveClass('rounded-lg');
+    expect(card).toHaveDotStyle('custom-class');
+    expect(card).toHaveDotStyle('rounded-lg');
   });
 });
 
@@ -78,9 +80,9 @@ describe('CardHeader', () => {
     const { container } = render(<CardHeader>Header</CardHeader>);
 
     const header = container.querySelector('div');
-    expect(header).toHaveClass('flex');
-    expect(header).toHaveClass('flex-col');
-    expect(header).toHaveClass('p-3');
+    expect(header).toHaveDotStyle('flex');
+    expect(header).toHaveDotStyle('flex-col');
+    expect(header).toHaveDotStyle('gap-1');
   });
 });
 
@@ -97,7 +99,7 @@ describe('CardTitle', () => {
 
     const title = container.querySelector('h3');
     expect(title).toBeInTheDocument();
-    expect(title).toHaveClass('font-semibold');
+    expect(title).toHaveDotStyle('font-semibold');
   });
 });
 
@@ -113,7 +115,7 @@ describe('CardDescription', () => {
     const { container } = render(<CardDescription>Description</CardDescription>);
 
     const description = container.querySelector('p');
-    expect(description).toHaveClass('text-muted-foreground');
+    expect(description).toHaveDotStyle('text-muted-foreground');
   });
 });
 
@@ -129,8 +131,7 @@ describe('CardContent', () => {
     const { container } = render(<CardContent>Content</CardContent>);
 
     const content = container.querySelector('div');
-    expect(content).toHaveClass('px-3');
-    expect(content).toHaveClass('pb-3');
+    expect(content).toHaveDotStyle('p-4');
   });
 });
 
@@ -146,7 +147,7 @@ describe('CardFooter', () => {
     const { container } = render(<CardFooter>Footer</CardFooter>);
 
     const footer = container.querySelector('div');
-    expect(footer).toHaveClass('flex');
-    expect(footer).toHaveClass('items-center');
+    expect(footer).toHaveDotStyle('flex');
+    expect(footer).toHaveDotStyle('items-center');
   });
 });

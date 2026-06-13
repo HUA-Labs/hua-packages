@@ -46,6 +46,7 @@ export interface LinkProps {
   variant?: "default" | "primary" | "secondary" | "ghost" | "underline"
   size?: "sm" | "md" | "lg"
   external?: boolean
+  className?: string
   dot?: string
   style?: React.CSSProperties
   onClick?: () => void
@@ -69,6 +70,7 @@ export function Link({
   variant = "default",
   size = "md",
   external = false,
+  className,
   style,
   onClick,
 }: LinkProps) {
@@ -86,6 +88,7 @@ export function Link({
   return (
     <a
       href={href}
+      className={className}
       style={computedStyle}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}

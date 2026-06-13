@@ -15,32 +15,32 @@ describe('ScrollToTop', () => {
 
   it('should apply size variants', () => {
     const { rerender } = render(<ScrollToTop size="sm" />);
-    expect(screen.getByRole('button').className).toContain('w-8');
+    expect(screen.getByRole('button')).toHaveDotStyle('w-8');
 
     rerender(<ScrollToTop size="lg" />);
-    expect(screen.getByRole('button').className).toContain('w-12');
+    expect(screen.getByRole('button')).toHaveDotStyle('w-12');
   });
 
   it('should apply variant styles', () => {
     const { rerender } = render(<ScrollToTop variant="primary" />);
-    expect(screen.getByRole('button').className).toContain('bg-primary');
+    expect(screen.getByRole('button').style.backgroundColor).toContain('color-mix');
 
     rerender(<ScrollToTop variant="ghost" />);
-    expect(screen.getByRole('button').className).toContain('bg-transparent');
+    expect(screen.getByRole('button').style.backgroundColor).toBe('transparent');
   });
 
   it('should be hidden by default (not scrolled)', () => {
     render(<ScrollToTop />);
-    expect(screen.getByRole('button').className).toContain('opacity-0');
+    expect(screen.getByRole('button')).toHaveDotStyle('opacity-0');
   });
 
   it('should apply custom className', () => {
     render(<ScrollToTop className="custom-scroll" />);
-    expect(screen.getByRole('button').className).toContain('custom-scroll');
+    expect(screen.getByRole('button')).toHaveDotStyle('custom-scroll');
   });
 
   it('should have fixed positioning', () => {
     render(<ScrollToTop />);
-    expect(screen.getByRole('button').className).toContain('fixed');
+    expect(screen.getByRole('button')).toHaveDotStyle('fixed');
   });
 });

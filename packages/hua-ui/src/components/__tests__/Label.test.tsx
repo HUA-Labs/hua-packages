@@ -20,7 +20,7 @@ describe('Label', () => {
   it('should show required indicator when required', () => {
     render(<Label required>Name</Label>);
 
-    const indicator = screen.getByLabelText('필수 필드');
+    const indicator = screen.getByLabelText('required field');
     expect(indicator).toBeInTheDocument();
     expect(indicator).toHaveTextContent('*');
   });
@@ -36,35 +36,35 @@ describe('Label', () => {
     const { container } = render(<Label error>Error Label</Label>);
 
     const label = container.querySelector('label');
-    expect(label).toHaveClass('text-destructive');
+    expect(label).toHaveDotStyle('text-destructive');
   });
 
   it('should apply disabled text color', () => {
     const { container } = render(<Label disabled>Disabled Label</Label>);
 
     const label = container.querySelector('label');
-    expect(label).toHaveClass('text-muted-foreground');
+    expect(label).toHaveDotStyle('text-muted-foreground');
   });
 
   it('should apply glass variant classes', () => {
     const { container } = render(<Label variant="glass">Glass Label</Label>);
 
     const label = container.querySelector('label');
-    expect(label).toHaveClass('text-white');
+    expect(label?.style.color).toBe('rgb(255, 255, 255)');
   });
 
   it('should apply glass variant error color', () => {
     const { container } = render(<Label variant="glass" error>Error</Label>);
 
     const label = container.querySelector('label');
-    expect(label).toHaveClass('text-red-400');
+    expect(label?.style.color).toBe('rgb(248, 113, 113)');
   });
 
   it('should merge custom className', () => {
     const { container } = render(<Label className="custom-class">Label</Label>);
 
     const label = container.querySelector('label');
-    expect(label).toHaveClass('custom-class');
-    expect(label).toHaveClass('text-sm');
+    expect(label).toHaveDotStyle('custom-class');
+    expect(label).toHaveDotStyle('text-sm');
   });
 });

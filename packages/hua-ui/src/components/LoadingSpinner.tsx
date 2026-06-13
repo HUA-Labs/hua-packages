@@ -18,6 +18,7 @@ export interface LoadingSpinnerProps {
   variant?: "default" | "dots" | "bars" | "ring" | "ripple"
   text?: string
   color?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"
+  className?: string
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
   dot?: string
   style?: React.CSSProperties
@@ -59,6 +60,7 @@ export function LoadingSpinner({
   variant = "default",
   text,
   color = "default",
+  className,
   dot: dotProp,
   style,
 }: LoadingSpinnerProps) {
@@ -153,7 +155,7 @@ export function LoadingSpinner({
   }
 
   return (
-    <div style={mergeStyles(resolveDot("flex flex-col items-center justify-center"), resolveDot(dotProp), style)}>
+    <div className={className} style={mergeStyles(resolveDot("flex flex-col items-center justify-center"), resolveDot(dotProp), style)}>
       <div style={mergeStyles(resolveDot(sizeClasses[size]), resolveDot("text-muted-foreground"))}>
         {renderSpinner()}
       </div>

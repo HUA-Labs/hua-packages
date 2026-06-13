@@ -98,13 +98,25 @@ describe('LandingProjects', () => {
 
   it('should render with different grid columns', () => {
     const { container, rerender } = renderProjects({ columns: 2 })
-    expect(container.querySelector('.md\\:grid-cols-2')).toBeInTheDocument()
+    const getGrid = () =>
+      Array.from(container.querySelectorAll('div')).find(
+        (el) => {
+          try {
+            expect(el).toHaveDotStyle('grid')
+            return true
+          } catch {
+            return false
+          }
+        }
+      ) as HTMLElement
+
+    expect(getGrid()).toHaveDotStyle('md:grid-cols-2')
 
     rerender(
       <LandingProvider theme="portfolio">
         <LandingProjects items={items} columns={3} />
       </LandingProvider>
     )
-    expect(container.querySelector('.lg\\:grid-cols-3')).toBeInTheDocument()
+    expect(getGrid()).toHaveDotStyle('lg:grid-cols-3')
   })
 })

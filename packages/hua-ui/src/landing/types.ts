@@ -221,6 +221,8 @@ export interface LandingCTAProps extends Omit<
   background?: "gradient-soft" | "animated-gradient" | "dark";
   /** AnimatedGradient 색상 */
   gradientColors?: string[];
+  /** 섹션 className */
+  className?: string;
   /** dot 유틸리티 스트링 */
   dot?: string;
   /** 모션 오버라이드 */

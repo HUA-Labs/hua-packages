@@ -56,6 +56,7 @@ export function LandingCTA({
   background: bgProp,
   gradientColors,
   motion: motionOverride,
+  className,
   dot: dotProp,
   ...rest
 }: LandingCTAProps) {
@@ -91,7 +92,10 @@ export function LandingCTA({
   }, [scrollReveal, motion]);
 
   return (
-    <section className={sectionCls.className} {...rest}>
+    <section
+      {...rest}
+      className={[sectionCls.className, className].filter(Boolean).join(" ")}
+    >
       {/* Background */}
       {bg === "gradient-soft" && (
         <div

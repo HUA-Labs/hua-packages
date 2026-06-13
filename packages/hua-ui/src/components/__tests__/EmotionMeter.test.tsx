@@ -61,35 +61,35 @@ describe('EmotionMeter', () => {
     const { container } = render(<EmotionMeter value={50} />);
 
     const fill = (container.firstChild as HTMLElement).firstChild as HTMLElement;
-    expect(fill.style.backgroundColor).toBe('rgb(99 102 241)');
+    expect(fill.style.backgroundColor).toBe('rgb(99, 102, 241)');
   });
 
   it('should apply green color via inline style', () => {
     const { container } = render(<EmotionMeter value={50} color="green" />);
 
     const fill = (container.firstChild as HTMLElement).firstChild as HTMLElement;
-    expect(fill.style.backgroundColor).toBe('rgb(34 197 94)');
+    expect(fill.style.backgroundColor).toBe('rgb(34, 197, 94)');
   });
 
   it('should apply red color via inline style', () => {
     const { container } = render(<EmotionMeter value={50} color="red" />);
 
     const fill = (container.firstChild as HTMLElement).firstChild as HTMLElement;
-    expect(fill.style.backgroundColor).toBe('rgb(239 68 68)');
+    expect(fill.style.backgroundColor).toBe('rgb(239, 68, 68)');
   });
 
   it('should apply yellow color via inline style', () => {
     const { container } = render(<EmotionMeter value={50} color="yellow" />);
 
     const fill = (container.firstChild as HTMLElement).firstChild as HTMLElement;
-    expect(fill.style.backgroundColor).toBe('rgb(234 179 8)');
+    expect(fill.style.backgroundColor).toBe('rgb(234, 179, 8)');
   });
 
   it('should apply custom style via style prop', () => {
     const { container } = render(<EmotionMeter value={50} style={{ flex: 1 }} />);
 
     const track = container.firstChild as HTMLElement;
-    expect(track.style.flex).toBe('1');
+    expect(track.style.flex).toBe('1 1 0%');
   });
 
   it('should calculate percentage with custom max', () => {

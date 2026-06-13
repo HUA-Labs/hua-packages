@@ -44,7 +44,7 @@ describe('EmotionButton', () => {
     render(<EmotionButton emotion="😊" isSelected />);
 
     const button = screen.getByRole('button');
-    expect(button.style.borderColor).toBe('rgb(99 102 241)');
+    expect(button.style.borderColor).toBe('rgb(99, 102, 241)');
   });
 
   it('should apply rounded-full style by default', () => {

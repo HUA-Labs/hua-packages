@@ -19,6 +19,21 @@ const items: LandingTestimonialItem[] = [
   { quote: 'Highly recommend.', author: 'Charlie' },
 ]
 
+const getGrid = (container: HTMLElement) => {
+  const grid = Array.from(container.querySelectorAll('div')).find(
+    (el) => {
+      try {
+        expect(el).toHaveDotStyle('grid')
+        return true
+      } catch {
+        return false
+      }
+    }
+  )
+  expect(grid).toBeInTheDocument()
+  return grid as HTMLElement
+}
+
 function renderTestimonials(
   props: Partial<React.ComponentProps<typeof LandingTestimonials>> = {},
   theme = 'marketing' as const
@@ -58,8 +73,7 @@ describe('LandingTestimonials', () => {
 
   it('should render grid variant with columns', () => {
     const { container } = renderTestimonials({ variant: 'grid', columns: 3 })
-    const grid = container.querySelector('.lg\\:grid-cols-3')
-    expect(grid).toBeInTheDocument()
+    expect(getGrid(container)).toHaveDotStyle('lg:grid-cols-3')
   })
 
   it('should render carousel variant', () => {
@@ -76,8 +90,7 @@ describe('LandingTestimonials', () => {
 
   it('should use grid variant for corporate theme', () => {
     const { container } = renderTestimonials({}, 'corporate')
-    const grid = container.querySelector('.grid')
-    expect(grid).toBeInTheDocument()
+    expect(getGrid(container)).toBeInTheDocument()
   })
 
   it('should use carousel variant for marketing theme', () => {

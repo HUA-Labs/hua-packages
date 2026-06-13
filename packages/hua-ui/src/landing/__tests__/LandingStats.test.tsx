@@ -10,6 +10,21 @@ const items: LandingStatItem[] = [
   { value: '50+', label: 'Countries' },
 ]
 
+const getGrid = (container: HTMLElement) => {
+  const grid = Array.from(container.querySelectorAll('div')).find(
+    (el) => {
+      try {
+        expect(el).toHaveDotStyle('grid')
+        return true
+      } catch {
+        return false
+      }
+    }
+  )
+  expect(grid).toBeInTheDocument()
+  return grid as HTMLElement
+}
+
 function renderStats(
   props: Partial<React.ComponentProps<typeof LandingStats>> = {},
   theme = 'marketing' as const
@@ -51,14 +66,24 @@ describe('LandingStats', () => {
     const { container } = renderStats({ numberSize: 'text-7xl' })
     const statNumbers = container.querySelectorAll('.stat-number')
     statNumbers.forEach((el) => {
-      expect(el).toHaveClass('text-7xl')
+      expect(el).toHaveDotStyle('text-7xl')
     })
+  })
+
+  it('should preserve sectionProps className', () => {
+    const { container } = renderStats({
+      sectionProps: { className: 'from-section-props' },
+      className: 'from-direct-prop',
+    })
+    const section = container.querySelector('section')
+    expect(section).toHaveClass('from-section-props')
+    expect(section).toHaveClass('from-direct-prop')
   })
 
   it('should render grid with correct columns for 3 items', () => {
     const { container } = renderStats()
-    const grid = container.querySelector('.grid')
-    expect(grid).toHaveClass('sm:grid-cols-3')
+    const grid = getGrid(container)
+    expect(grid).toHaveDotStyle('sm:grid-cols-3')
   })
 
   it('should render grid with 4 columns for 4 items', () => {
@@ -68,8 +93,8 @@ describe('LandingStats', () => {
         <LandingStats items={fourItems} />
       </LandingProvider>
     )
-    const grid = container.querySelector('.grid')
-    expect(grid).toHaveClass('sm:grid-cols-4')
+    const grid = getGrid(container)
+    expect(grid).toHaveDotStyle('sm:grid-cols-4')
   })
 
   it('should use prefix and suffix from item', () => {

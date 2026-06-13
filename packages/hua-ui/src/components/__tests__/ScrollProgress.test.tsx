@@ -6,7 +6,7 @@ describe('ScrollProgress', () => {
   it('should render progress bar', () => {
     const { container } = render(<ScrollProgress />);
 
-    expect(container.querySelector('.fixed')).toBeInTheDocument();
+    expect((container.firstChild as HTMLElement).style.position).toBe('fixed');
   });
 
   it('should use default height of 2px', () => {
@@ -27,28 +27,28 @@ describe('ScrollProgress', () => {
     const { container } = render(<ScrollProgress />);
 
     const bar = container.firstChild as HTMLElement;
-    expect(bar.className).toContain('top-0');
+    expect(bar.style.top).toBe('0px');
   });
 
   it('should position at bottom', () => {
     const { container } = render(<ScrollProgress position="bottom" />);
 
     const bar = container.firstChild as HTMLElement;
-    expect(bar.className).toContain('bottom-0');
+    expect(bar.style.bottom).toBe('0px');
   });
 
   it('should apply gradient color by default', () => {
     const { container } = render(<ScrollProgress />);
 
-    const fill = container.querySelector('.bg-gradient-to-r');
-    expect(fill).toBeInTheDocument();
+    const fill = (container.firstChild as HTMLElement).children[1] as HTMLElement;
+    expect(fill.style.backgroundImage).toContain('linear-gradient');
   });
 
   it('should apply primary color', () => {
     const { container } = render(<ScrollProgress color="primary" />);
 
-    const fill = container.querySelector('.bg-primary');
-    expect(fill).toBeInTheDocument();
+    const fill = (container.firstChild as HTMLElement).children[1] as HTMLElement;
+    expect(fill.style.backgroundColor).toBe('var(--color-primary)');
   });
 
   it('should show percentage when showPercentage is true', () => {
@@ -73,6 +73,6 @@ describe('ScrollProgress', () => {
     const { container } = render(<ScrollProgress />);
 
     const bar = container.firstChild as HTMLElement;
-    expect(bar.className).toContain('z-50');
+    expect(bar).toHaveDotStyle('z-50');
   });
 });

@@ -50,7 +50,7 @@ describe('Button', () => {
     const { container } = render(<Button variant="destructive">Delete</Button>);
     
     const button = container.querySelector('button');
-    expect(button).toHaveClass('bg-[var(--color-destructive)]');
+    expect(button).toHaveDotStyle('bg-[var(--color-destructive)]');
   });
 });
 

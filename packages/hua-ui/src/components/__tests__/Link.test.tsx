@@ -16,31 +16,33 @@ describe('Link', () => {
     const { container } = render(<Link href="/">Home</Link>);
 
     const link = container.querySelector('a');
-    expect(link?.className).toContain('text-foreground');
-    expect(link?.className).toContain('text-base');
+    expect(link).toHaveDotStyle('text-foreground');
+    expect(link).toHaveDotStyle('text-base');
   });
 
   it('should apply primary variant', () => {
     const { container } = render(<Link href="/" variant="primary">Link</Link>);
 
     const link = container.querySelector('a');
-    expect(link?.className).toContain('text-primary');
+    expect(link).toHaveDotStyle('text-primary');
   });
 
   it('should apply underline variant', () => {
     const { container } = render(<Link href="/" variant="underline">Link</Link>);
 
     const link = container.querySelector('a');
-    expect(link?.className).toContain('underline');
+    expect(link).toHaveDotStyle('underline');
   });
 
   it('should apply size variants', () => {
     const { container, rerender } = render(<Link href="/" size="sm">Link</Link>);
 
-    expect(container.querySelector('a')?.className).toContain('text-sm');
+    const smallLink = container.querySelector('a');
+    expect(smallLink).toHaveDotStyle('text-sm');
 
     rerender(<Link href="/" size="lg">Link</Link>);
-    expect(container.querySelector('a')?.className).toContain('text-lg');
+    const largeLink = container.querySelector('a');
+    expect(largeLink).toHaveDotStyle('text-lg');
   });
 
   it('should set target and rel for external links', () => {

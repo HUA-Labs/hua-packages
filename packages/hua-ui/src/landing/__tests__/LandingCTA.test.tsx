@@ -37,18 +37,19 @@ describe('LandingCTA', () => {
 
   it('should apply dark background for product theme', () => {
     const { container } = renderCTA({ title: 'Go' }, 'product')
-    expect(container.querySelector('section')).toHaveClass('bg-gray-950')
+    expect(container.querySelector('section')).toHaveDotStyle('bg-gray-950')
   })
 
   it('should apply gradient-soft for corporate theme', () => {
     const { container } = renderCTA({ title: 'Go' }, 'corporate')
-    const bgDiv = container.querySelector('.gradient-bg-soft')
+    const bgDiv = container.querySelector('section > div[aria-hidden="true"]') as HTMLElement
     expect(bgDiv).toBeInTheDocument()
+    expect(bgDiv.style.background).toContain('linear-gradient')
   })
 
   it('should allow background override', () => {
     const { container } = renderCTA({ title: 'Go', background: 'dark' }, 'marketing')
-    expect(container.querySelector('section')).toHaveClass('bg-gray-950')
+    expect(container.querySelector('section')).toHaveDotStyle('bg-gray-950')
   })
 
   it('should accept ReactNode as title', () => {
@@ -58,6 +59,6 @@ describe('LandingCTA', () => {
 
   it('should pass className to section', () => {
     const { container } = renderCTA({ title: 'Go', className: 'extra-class' })
-    expect(container.querySelector('section')).toHaveClass('extra-class')
+    expect(container.querySelector('section')).toHaveDotStyle('extra-class')
   })
 })

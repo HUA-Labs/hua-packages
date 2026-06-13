@@ -15,10 +15,10 @@ export const cardVariants = dotVariants({
   variants: {
     variant: {
       default:
-        "bg-[var(--color-card)] text-[var(--color-card-foreground)] border border-[var(--color-border)]",
-      outline: "bg-transparent border-2 border-[var(--color-border)]",
+        "bg-[var(--color-card)] text-[var(--color-card-foreground)]",
+      outline: "bg-transparent",
       elevated:
-        "bg-[var(--color-card)] text-[var(--color-card-foreground)] shadow-lg border border-[var(--color-border)]",
+        "bg-[var(--color-card)] text-[var(--color-card-foreground)] shadow-lg",
     },
     rounded: {
       none: "rounded-none",
@@ -68,6 +68,27 @@ const SPRING_TRANSITION: string = createSpringTransition(
   ["transform", "box-shadow"],
   200,
 );
+
+const VARIANT_BORDER_STYLE: Record<
+  "default" | "outline" | "elevated",
+  React.CSSProperties
+> = {
+  default: {
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--color-border)",
+  },
+  outline: {
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "var(--color-border)",
+  },
+  elevated: {
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--color-border)",
+  },
+};
 
 /**
  * Card 컴포넌트의 props / Card component props
@@ -145,6 +166,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           : undefined;
       return mergeStyles(
         base,
+        VARIANT_BORDER_STYLE[variant],
         hoverTransition,
         hoverActive,
         entranceWillChange,

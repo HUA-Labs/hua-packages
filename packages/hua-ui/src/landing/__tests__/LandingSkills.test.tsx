@@ -43,7 +43,17 @@ describe('LandingSkills', () => {
     const { container } = renderSkills({ variant: 'grid' })
     expect(screen.getByText('TypeScript')).toBeInTheDocument()
     expect(screen.getByText('React')).toBeInTheDocument()
-    expect(container.querySelector('.grid')).toBeInTheDocument()
+    const grid = Array.from(container.querySelectorAll('div')).find(
+      (el) => {
+        try {
+          expect(el).toHaveDotStyle('grid')
+          return true
+        } catch {
+          return false
+        }
+      }
+    )
+    expect(grid).toBeInTheDocument()
     expect(screen.getByText('Language')).toBeInTheDocument()
     expect(screen.getByText('Framework')).toBeInTheDocument()
   })

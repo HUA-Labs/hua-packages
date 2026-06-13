@@ -1,9 +1,7 @@
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -23,9 +21,10 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: [
+      { find: '@hua-labs/dot/class', replacement: path.resolve(__dirname, '../hua-dot/src/class.ts') },
+      { find: '@hua-labs/dot', replacement: path.resolve(__dirname, '../hua-dot/src/index.ts') },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
 });
-

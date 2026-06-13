@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Input } from '../Input';
 
@@ -23,7 +23,13 @@ describe('Input', () => {
     const { container } = render(<Input type="text" />);
     
     const input = container.querySelector('input');
-    expect(input).toHaveClass('hover:border-accent-foreground', 'hover:shadow-sm');
+    fireEvent.mouseEnter(input as HTMLElement);
+    expect(input?.style.borderColor).toBe('var(--color-accent-foreground)');
+    expect(input?.style.boxShadow).toBeTruthy();
+
+    fireEvent.focus(input as HTMLElement);
+    expect(input?.style.outline).toBe('none');
+    expect(input?.style.boxShadow).toBeTruthy();
   });
 
   it('should handle user input', async () => {
@@ -41,7 +47,6 @@ describe('Input', () => {
     
     const input = screen.getByRole('textbox');
     expect(input).toBeDisabled();
-    expect(input).toHaveClass('disabled:opacity-50');
+    expect(input).toHaveDotStyle('disabled:opacity-50');
   });
 });
-

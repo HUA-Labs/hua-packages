@@ -2,6 +2,7 @@
 
 import React from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Section } from "../components/Section";
 import { GlowCard } from "../components/advanced/GlowCard";
 import { SpotlightCard } from "../components/advanced/SpotlightCard";
@@ -108,6 +109,10 @@ export function LandingFeatures({
 
   const header =
     title || subtitle ? { title: title ?? "", subtitle, decorator } : undefined;
+  const gridCls = dotCSS(`grid gap-6 lg:gap-8 ${gridColsMap[columns]}`);
+  const sectionClassName =
+    [sectionProps?.className, className].filter(Boolean).join(" ") ||
+    undefined;
 
   // useStagger if available
   const stagger = useStagger?.({
@@ -123,17 +128,18 @@ export function LandingFeatures({
       header={header}
       spacing="lg"
       {...sectionProps}
-      dot={className}
+      className={sectionClassName}
       {...rest}
     >
       <div
         ref={stagger?.containerRef}
-        style={dot(`grid gap-6 lg:gap-8 ${gridColsMap[columns]}`)}
+        className={gridCls.className}
       >
         {items.map((item, i) => (
           <div key={i}>{renderCard(item, cardType, stagger?.styles[i])}</div>
         ))}
       </div>
+      <style dangerouslySetInnerHTML={{ __html: gridCls.css }} />
     </Section>
   );
 }

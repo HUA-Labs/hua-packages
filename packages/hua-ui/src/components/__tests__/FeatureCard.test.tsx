@@ -40,7 +40,7 @@ describe('FeatureCard', () => {
       <FeatureCard title="T" description="D" size="sm" />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.style.padding).toBe('1rem');
+    expect(card.style.padding).toBe('16px');
   });
 
   it('should apply size lg padding via inline style', () => {
@@ -48,7 +48,7 @@ describe('FeatureCard', () => {
       <FeatureCard title="T" description="D" size="lg" />
     );
     const card = container.firstChild as HTMLElement;
-    expect(card.style.padding).toBe('2rem');
+    expect(card.style.padding).toBe('32px');
   });
 
   it('should apply default variant background via inline style', () => {

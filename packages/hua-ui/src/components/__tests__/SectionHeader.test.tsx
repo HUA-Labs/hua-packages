@@ -58,6 +58,6 @@ describe('SectionHeader', () => {
     const { container } = render(<SectionHeader title="Settings" />);
 
     const header = container.firstChild as HTMLElement;
-    expect(header.className).toContain('border-b');
+    expect(header).toHaveDotStyle('border-b');
   });
 });

@@ -56,12 +56,11 @@ describe('LandingMetrics', () => {
 
   it('should apply color coding based on value', () => {
     const { container } = renderMetrics()
-    // Green for >= 90
-    const greenBars = container.querySelectorAll('.bg-green-500')
-    expect(greenBars.length).toBeGreaterThan(0)
-    // Orange for >= 50 && < 90
-    const orangeBars = container.querySelectorAll('.bg-orange-500')
-    expect(orangeBars.length).toBeGreaterThan(0)
+    const bars = Array.from(container.querySelectorAll('div')).filter(
+      (el) => (el as HTMLElement).style.width.endsWith('%')
+    ) as HTMLElement[]
+    expect(bars.some((bar) => bar.style.backgroundColor === 'rgb(34, 197, 94)')).toBe(true)
+    expect(bars.some((bar) => bar.style.backgroundColor === 'rgb(249, 115, 22)')).toBe(true)
   })
 
   it('should render tabs when provided', () => {

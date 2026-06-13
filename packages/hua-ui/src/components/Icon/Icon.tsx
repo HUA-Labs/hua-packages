@@ -336,6 +336,7 @@ const MemoizedIcon = React.memo(IconComponent, (prevProps, nextProps) => {
     prevProps.size === nextProps.size &&
     prevProps.className === nextProps.className &&
     prevProps.dot === nextProps.dot &&
+    prevProps.style === nextProps.style &&
     prevProps.emotion === nextProps.emotion &&
     prevProps.status === nextProps.status &&
     prevProps.provider === nextProps.provider &&

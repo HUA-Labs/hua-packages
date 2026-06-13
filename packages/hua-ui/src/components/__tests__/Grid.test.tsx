@@ -21,73 +21,71 @@ describe('Grid', () => {
     const { container } = render(<Grid>Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('grid');
+    expect(grid).toHaveDotStyle('grid');
   });
 
   it('should apply responsive columns by default', () => {
     const { container } = render(<Grid cols={3}>Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('grid-cols-1');
-    expect(grid).toHaveClass('sm:grid-cols-2');
-    expect(grid).toHaveClass('lg:grid-cols-3');
+    expect(grid?.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
   });
 
   it('should apply fixed columns when responsive is false', () => {
     const { container } = render(<Grid cols={4} responsive={false}>Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('grid-cols-4');
+    expect(grid).toHaveDotStyle('grid-cols-4');
   });
 
   it('should apply default gap', () => {
     const { container } = render(<Grid>Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-6');
+    expect(grid).toHaveDotStyle('gap-6');
   });
 
   it('should apply small gap', () => {
     const { container } = render(<Grid gap="sm">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-4');
+    expect(grid).toHaveDotStyle('gap-4');
   });
 
   it('should apply large gap', () => {
     const { container } = render(<Grid gap="lg">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-8');
+    expect(grid).toHaveDotStyle('gap-8');
   });
 
   it('should apply gapX', () => {
     const { container } = render(<Grid gapX="lg">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-x-8');
+    expect(grid?.style.columnGap).toBe('2rem');
   });
 
   it('should apply gapY', () => {
     const { container } = render(<Grid gapY="sm">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-y-4');
+    expect(grid?.style.rowGap).toBe('1rem');
   });
 
   it('should apply both gapX and gapY', () => {
     const { container } = render(<Grid gapX="lg" gapY="sm">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('gap-x-8');
-    expect(grid).toHaveClass('gap-y-4');
+    expect(grid?.style.columnGap).toBe('2rem');
+    expect(grid?.style.rowGap).toBe('1rem');
   });
 
   it('should merge custom className', () => {
     const { container } = render(<Grid className="custom-class">Content</Grid>);
 
     const grid = container.querySelector('div');
-    expect(grid).toHaveClass('custom-class');
-    expect(grid).toHaveClass('grid');
+    expect(grid).toHaveDotStyle('custom-class');
+    expect(grid).toHaveDotStyle('grid');
   });
 });

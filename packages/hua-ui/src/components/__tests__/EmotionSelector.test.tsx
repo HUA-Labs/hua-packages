@@ -34,7 +34,7 @@ describe('EmotionSelector', () => {
     // In dot-based approach, selected button has boxShadow set
     const joyButton = screen.getByText('joy').closest('button') as HTMLElement;
     expect(joyButton).toBeInTheDocument();
-    expect(joyButton.style.borderColor).toBe('rgb(99 102 241)');
+    expect(joyButton.style.borderColor).toBe('rgb(99, 102, 241)');
   });
 
   it('should render card variant with cursor-pointer style', () => {

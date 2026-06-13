@@ -32,15 +32,17 @@ try {
   // motion-core unavailable
 }
 
-function getMetricColor(value: number): { bar: string; text: string } {
-  if (value >= 90)
-    return { bar: "bg-green-500", text: "text-green-600 dark:text-green-400" };
-  if (value >= 50)
-    return {
-      bar: "bg-orange-500",
-      text: "text-orange-600 dark:text-orange-400",
-    };
-  return { bar: "bg-red-500", text: "text-red-600 dark:text-red-400" };
+function getMetricColor(value: number): {
+  bar: React.CSSProperties;
+  text: React.CSSProperties;
+} {
+  if (value >= 90) {
+    return { bar: { backgroundColor: "#22c55e" }, text: { color: "#16a34a" } };
+  }
+  if (value >= 50) {
+    return { bar: { backgroundColor: "#f97316" }, text: { color: "#ea580c" } };
+  }
+  return { bar: { backgroundColor: "#ef4444" }, text: { color: "#dc2626" } };
 }
 
 function MetricBar({
@@ -64,16 +66,15 @@ function MetricBar({
     <div style={dot("space-y-2")}>
       <div style={dot("flex justify-between items-center")}>
         <span style={dot("text-sm font-medium")}>{item.label}</span>
-        <span style={dot(`text-2xl font-bold ${color.text}`)}>
+        <span style={mergeStyles(dot("text-2xl font-bold"), color.text)}>
           {Math.round(animatedValue)}
         </span>
       </div>
       <div style={dot("h-2 bg-secondary rounded-full overflow-hidden")}>
         <div
           style={mergeStyles(
-            dot(
-              `h-full rounded-full transition-all duration-1000 ease-out ${color.bar}`,
-            ),
+            dot("h-full rounded-full transition-all duration-1000 ease-out"),
+            color.bar,
             { width: `${animatedValue}%` },
           )}
         />
@@ -121,7 +122,7 @@ export function LandingMetrics({
     title || subtitle ? { title: title ?? "", subtitle } : undefined;
 
   return (
-    <Section header={header} dot={className} {...rest}>
+    <Section header={header} className={className} {...rest}>
       <div
         ref={scrollReveal?.ref as React.Ref<HTMLDivElement>}
         style={mergeStyles(

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { Section } from "../components/Section";
 import { useLandingTheme } from "./LandingProvider";
 import type { LandingStatsProps, LandingStatItem } from "./types";
@@ -159,18 +160,22 @@ export function LandingStats({
       : items.length <= 3
         ? "grid-cols-1 sm:grid-cols-3"
         : "grid-cols-2 sm:grid-cols-4";
+  const gridCls = dotCSS(`grid gap-8 lg:gap-12 ${gridCols}`);
+  const sectionClassName =
+    [sectionProps?.className, className].filter(Boolean).join(" ") ||
+    undefined;
 
   return (
     <Section
       header={header}
       spacing="lg"
       {...sectionProps}
-      dot={className}
+      className={sectionClassName}
       {...rest}
     >
       <div
         ref={stagger?.containerRef}
-        style={dot(`grid gap-8 lg:gap-12 ${gridCols}`)}
+        className={gridCls.className}
       >
         {items.map((item, i) => (
           <StatItemDisplay
@@ -183,6 +188,7 @@ export function LandingStats({
           />
         ))}
       </div>
+      <style dangerouslySetInnerHTML={{ __html: gridCls.css }} />
     </Section>
   );
 }

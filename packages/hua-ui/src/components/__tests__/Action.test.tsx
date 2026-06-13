@@ -27,7 +27,7 @@ describe('Action', () => {
     const { container } = render(
       <Action transparency={0.5} blurIntensity={10} glowIntensity={5} glowColor="red">Btn</Action>
     );
-    const btn = container.querySelector('.hua-action') as HTMLElement;
+    const btn = screen.getByRole('button');
     expect(btn.style.getPropertyValue('--action-opacity')).toBe('0.5');
     expect(btn.style.getPropertyValue('--action-blur')).toBe('10px');
   });
@@ -54,8 +54,8 @@ describe('Action', () => {
   });
 
   it('should set aria-busy when loading', () => {
-    const { container } = render(<Action loading>Btn</Action>);
-    expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument();
+    render(<Action loading>Btn</Action>);
+    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('should apply custom className', () => {

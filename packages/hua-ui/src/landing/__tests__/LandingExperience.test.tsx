@@ -70,12 +70,11 @@ describe('LandingExperience', () => {
   })
 
   it('should render timeline structure with dots and lines', () => {
-    const { container } = renderExperience()
-    // Check for timeline dots (rounded-full)
-    const dots = container.querySelectorAll('.rounded-full')
-    expect(dots.length).toBeGreaterThanOrEqual(items.length)
-    // Check for timeline line (bg-border)
-    const lines = container.querySelectorAll('.bg-border')
-    expect(lines.length).toBeGreaterThan(0)
+    renderExperience()
+    for (const item of items) {
+      const itemRoot = screen.getByText(item.title).parentElement?.parentElement?.parentElement as HTMLElement
+      expect(itemRoot.children[0]).toHaveDotStyle('rounded-full', 'w-3', 'h-3')
+      expect(itemRoot.children[1]).toHaveDotStyle('bg-border')
+    }
   })
 })

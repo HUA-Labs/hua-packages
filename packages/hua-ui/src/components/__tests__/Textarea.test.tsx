@@ -53,14 +53,14 @@ describe('Textarea', () => {
     const { container } = render(<Textarea resize="none" aria-label="No resize" />);
 
     const textarea = container.querySelector('textarea');
-    expect(textarea).toHaveClass('resize-none');
+    expect(textarea).toHaveDotStyle('resize-none');
   });
 
   it('should apply size variants', () => {
     const { container } = render(<Textarea size="sm" aria-label="Small textarea" />);
 
     const textarea = container.querySelector('textarea');
-    expect(textarea).toHaveClass('text-sm');
-    expect(textarea).toHaveClass('min-h-[80px]');
+    expect(textarea).toHaveDotStyle('text-sm');
+    expect(textarea).toHaveDotStyle('min-h-[80px]');
   });
 });

@@ -6,41 +6,41 @@ describe('Skeleton', () => {
   it('should render with animation class', () => {
     const { container } = render(<Skeleton />);
 
-    const skeleton = container.querySelector('.animate-pulse');
-    expect(skeleton).toBeInTheDocument();
+    const skeleton = container.querySelector('div') as HTMLElement;
+    expect(skeleton.style.animation).toContain('pulse');
   });
 
   it('should apply text variant by default', () => {
     const { container } = render(<Skeleton />);
 
     const skeleton = container.querySelector('div');
-    expect(skeleton).toHaveClass('w-full');
-    expect(skeleton).toHaveClass('h-4');
+    expect(skeleton).toHaveDotStyle('w-full');
+    expect(skeleton).toHaveDotStyle('h-4');
   });
 
   it('should apply circular variant', () => {
     const { container } = render(<Skeleton variant="circular" />);
 
     const skeleton = container.querySelector('div');
-    expect(skeleton).toHaveClass('rounded-full');
-    expect(skeleton).toHaveClass('w-10');
-    expect(skeleton).toHaveClass('h-10');
+    expect(skeleton).toHaveDotStyle('rounded-full');
+    expect(skeleton).toHaveDotStyle('w-10');
+    expect(skeleton).toHaveDotStyle('h-10');
   });
 
   it('should apply rectangular variant', () => {
     const { container } = render(<Skeleton variant="rectangular" />);
 
     const skeleton = container.querySelector('div');
-    expect(skeleton).toHaveClass('rounded-none');
-    expect(skeleton).toHaveClass('h-[200px]');
+    expect(skeleton).toHaveDotStyle('rounded-none');
+    expect(skeleton).toHaveDotStyle('h-[200px]');
   });
 
   it('should apply rounded variant', () => {
     const { container } = render(<Skeleton variant="rounded" />);
 
     const skeleton = container.querySelector('div');
-    expect(skeleton).toHaveClass('rounded-lg');
-    expect(skeleton).toHaveClass('h-[200px]');
+    expect(skeleton).toHaveDotStyle('rounded-lg');
+    expect(skeleton).toHaveDotStyle('h-[200px]');
   });
 
   it('should apply custom width as number', () => {
@@ -74,8 +74,8 @@ describe('Skeleton', () => {
   it('should apply pulse animation by default', () => {
     const { container } = render(<Skeleton animation="pulse" />);
 
-    const skeleton = container.querySelector('.animate-pulse');
-    expect(skeleton).toBeInTheDocument();
+    const skeleton = container.querySelector('div') as HTMLElement;
+    expect(skeleton.style.animation).toContain('pulse');
   });
 
   it('should apply wave animation styles', () => {
@@ -96,7 +96,7 @@ describe('Skeleton', () => {
     const { container } = render(<Skeleton className="custom-class" />);
 
     const skeleton = container.querySelector('div');
-    expect(skeleton).toHaveClass('custom-class');
-    expect(skeleton).toHaveClass('bg-muted');
+    expect(skeleton).toHaveDotStyle('custom-class');
+    expect(skeleton).toHaveDotStyle('bg-muted');
   });
 });

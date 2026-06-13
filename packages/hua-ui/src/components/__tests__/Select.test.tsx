@@ -69,7 +69,7 @@ describe('Select', () => {
     );
 
     const select = container.querySelector('select');
-    expect(select).toHaveClass('h-12');
+    expect(select).toHaveDotStyle('h-12');
   });
 
   it('should have error state with aria-invalid', () => {
@@ -91,6 +91,6 @@ describe('Select', () => {
     );
 
     const select = container.querySelector('select');
-    expect(select).toHaveClass('border-green-500');
+    expect(select?.style.borderColor).toBe('var(--color-success)');
   });
 });

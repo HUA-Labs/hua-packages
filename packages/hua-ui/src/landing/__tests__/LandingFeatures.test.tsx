@@ -10,6 +10,21 @@ const items: LandingFeatureItem[] = [
   { icon: '🎨', title: 'Beautiful', description: 'Modern design' },
 ]
 
+const getGrid = (container: HTMLElement) => {
+  const grid = Array.from(container.querySelectorAll('div')).find(
+    (el) => {
+      try {
+        expect(el).toHaveDotStyle('grid')
+        return true
+      } catch {
+        return false
+      }
+    }
+  )
+  expect(grid).toBeInTheDocument()
+  return grid as HTMLElement
+}
+
 function renderFeatures(
   props: Partial<React.ComponentProps<typeof LandingFeatures>> = {},
   theme = 'marketing' as const
@@ -47,10 +62,20 @@ describe('LandingFeatures', () => {
     expect(screen.getByText('What we offer')).toBeInTheDocument()
   })
 
+  it('should preserve sectionProps className', () => {
+    const { container } = renderFeatures({
+      sectionProps: { className: 'from-section-props' },
+      className: 'from-direct-prop',
+    })
+    const section = container.querySelector('section')
+    expect(section).toHaveClass('from-section-props')
+    expect(section).toHaveClass('from-direct-prop')
+  })
+
   it('should auto-calculate 3 columns for 3 items', () => {
     const { container } = renderFeatures()
-    const grid = container.querySelector('.grid')
-    expect(grid).toHaveClass('lg:grid-cols-3')
+    const grid = getGrid(container)
+    expect(grid).toHaveDotStyle('lg:grid-cols-3')
   })
 
   it('should use 2 columns for 2 items', () => {
@@ -60,14 +85,14 @@ describe('LandingFeatures', () => {
         <LandingFeatures items={twoItems} />
       </LandingProvider>
     )
-    const grid = container.querySelector('.grid')
-    expect(grid).toHaveClass('md:grid-cols-2')
+    const grid = getGrid(container)
+    expect(grid).toHaveDotStyle('md:grid-cols-2')
   })
 
   it('should respect columns override', () => {
     const { container } = renderFeatures({ columns: 4 })
-    const grid = container.querySelector('.grid')
-    expect(grid).toHaveClass('lg:grid-cols-4')
+    const grid = getGrid(container)
+    expect(grid).toHaveDotStyle('lg:grid-cols-4')
   })
 
   it('should render with corporate theme (spotlight cards)', () => {

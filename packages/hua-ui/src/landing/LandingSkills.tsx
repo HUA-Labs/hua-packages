@@ -2,6 +2,7 @@
 
 import React from "react";
 import { dot } from "@hua-labs/dot";
+import { dotCSS } from "@hua-labs/dot/class";
 import { mergeStyles } from "../hooks/useDotMap";
 import { Section } from "../components/Section";
 import { Icon } from "../components/Icon/Icon";
@@ -9,7 +10,6 @@ import { Marquee } from "../components/advanced/Marquee";
 import { useLandingTheme } from "./LandingProvider";
 import type {
   LandingSkillsProps,
-  LandingSkillItem,
   LandingMotionOverride,
 } from "./types";
 
@@ -71,7 +71,7 @@ export function LandingSkills({
   // Marquee variant
   if (variant === "marquee") {
     return (
-      <Section header={header} dot={className} {...rest}>
+      <Section header={header} className={className} {...rest}>
         <Marquee speed={50} pauseOnHover gradient>
           {items.map((item, i) => (
             <div
@@ -89,11 +89,13 @@ export function LandingSkills({
 
   // Grid variant
   if (variant === "grid") {
+    const gridCls = dotCSS("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6");
+
     return (
-      <Section header={header} dot={className} {...rest}>
+      <Section header={header} className={className} {...rest}>
         <div
           ref={stagger?.containerRef}
-          style={dot("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6")}
+          className={gridCls.className}
         >
           {items.map((item, i) => (
             <div
@@ -117,13 +119,14 @@ export function LandingSkills({
             </div>
           ))}
         </div>
+        <style dangerouslySetInnerHTML={{ __html: gridCls.css }} />
       </Section>
     );
   }
 
   // Bars variant
   return (
-    <Section header={header} dot={className} {...rest}>
+    <Section header={header} className={className} {...rest}>
       <div
         ref={stagger?.containerRef}
         style={dot("space-y-6 max-w-3xl mx-auto")}

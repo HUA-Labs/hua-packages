@@ -22,7 +22,7 @@ describe('InfoCard', () => {
 
     const card = container.firstChild as HTMLElement;
     expect(card.style.border).toContain('var(--ic-blue-border)');
-    expect(card.style.borderRadius).toBe('0.5rem');
+    expect(card.style.borderRadius).toBe('8px');
   });
 
   it('should apply green tone styles', () => {
@@ -78,7 +78,7 @@ describe('InfoCard', () => {
     );
 
     const card = container.firstChild as HTMLElement;
-    expect(card.style.borderRadius).toBe('0.5rem');
+    expect(card.style.borderRadius).toBe('8px');
     expect(card.style.border).toBeTruthy();
   });
 });
