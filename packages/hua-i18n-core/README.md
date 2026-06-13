@@ -1,6 +1,6 @@
 # @hua-labs/i18n-core
 
-Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~6.5KB gzipped with zero dependencies (React only).
+Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~7KB gzipped with zero dependencies (React only).
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/i18n-core.svg)](https://www.npmjs.com/package/@hua-labs/i18n-core)
@@ -18,7 +18,7 @@ Lightweight, production-ready i18n library for React. Delivers zero-flicker lang
 - **State management — First-class Zustand support via i18n-core-zustand**
 - **Automatic retry — Exponential backoff for API loader failures**
 - **React Native — Works in Expo and bare RN projects via CJS/ESM dual format**
-- **~6.5KB gzipped — Zero external dependencies**
+- **~7KB gzipped — Zero external dependencies**
 - **Cross-platform — I18nPlatformAdapter for Web, React Native, Flutter bridge**
 - **Generic getRawValue<T>() — type-safe raw value access without casting**
 
@@ -68,8 +68,8 @@ function Welcome() {
 | `Translator` | class | Core translator class (for manual instantiation) |
 | `ssrTranslate` | function | Server-side translation function (no React needed) |
 | `serverTranslate` | function | Server-side translate with full config |
-| `webPlatformAdapter` | function | Default web adapter — navigator.language detection + window event language sync |
-| `headlessPlatformAdapter` | function | No-op adapter for SSR, testing, and Flutter bridge scenarios |
+| `webPlatformAdapter` | adapter | Default web adapter — navigator.language detection + window event language sync |
+| `headlessPlatformAdapter` | adapter | No-op adapter for SSR, testing, and Flutter bridge scenarios |
 | `I18nConfig` | type |  |
 | `I18nContextType` | type |  |
 | `TranslationParams` | type |  |

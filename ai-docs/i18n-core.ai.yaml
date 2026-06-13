@@ -8,7 +8,7 @@ package:
   description: "HUA Labs - Core i18n functionality with SSR/CSR support and state management integration"
   license: "MIT"
 
-overview: "Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~6.5KB gzipped with zero dependencies (React only)."
+overview: "Lightweight, production-ready i18n library for React. Delivers zero-flicker language transitions through intelligent caching, SSR-first hydration handling, and built-in state management integration. ~7KB gzipped with zero dependencies (React only)."
 
 exports:
   main:
@@ -36,10 +36,10 @@ exports:
         type: "function"
         description: "Server-side translate with full config"
       - name: "webPlatformAdapter"
-        type: "function"
+        type: "adapter"
         description: "Default web adapter — navigator.language detection + window event language sync"
       - name: "headlessPlatformAdapter"
-        type: "function"
+        type: "adapter"
         description: "No-op adapter for SSR, testing, and Flutter bridge scenarios"
       - name: "I18nConfig"
         type: "type"
@@ -100,7 +100,7 @@ features:
   - "State management — First-class Zustand support via i18n-core-zustand"
   - "Automatic retry — Exponential backoff for API loader failures"
   - "React Native — Works in Expo and bare RN projects via CJS/ESM dual format"
-  - "~6.5KB gzipped — Zero external dependencies"
+  - "~7KB gzipped — Zero external dependencies"
   - "Cross-platform — I18nPlatformAdapter for Web, React Native, Flutter bridge"
   - "Generic getRawValue<T>() — type-safe raw value access without casting"
 
