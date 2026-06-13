@@ -1,5 +1,16 @@
 # @hua-labs/motion-core
 
+## 2.4.2
+
+### Patch Changes
+
+- 96b66f9: Prepare the i18n package set, motion-core, and the hua meta-package for the next
+  public release.
+
+  Refresh i18n-core generated documentation metadata so the published README and
+  AI docs report the current gzipped size and adapter exports, and keep the hua
+  meta-package aligned with the bumped internal packages.
+
 ## 2.4.1
 
 ### Patch Changes
