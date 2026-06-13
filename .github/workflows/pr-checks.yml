@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -98,7 +98,7 @@ jobs:
         run: pnpm build
 
       - name: Test non-UI packages
-        run: pnpm exec turbo run test --filter=!@hua-labs/ui
+        run: pnpm -r --filter '!@hua-labs/ui' --workspace-concurrency=1 test
 
   doc-validation:
     runs-on: ubuntu-latest
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
