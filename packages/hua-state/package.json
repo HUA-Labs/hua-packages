@@ -4,15 +4,15 @@
   "description": "HUA State - Unified state management for hua framework with SSR support and integrations",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
     "./integrations/i18n": {
-      "types": "./dist/integrations/i18n.d.ts",
+      "types": "./dist/integrations/i18n.d.mts",
       "import": "./dist/integrations/i18n.mjs",
       "default": "./dist/integrations/i18n.mjs"
     }

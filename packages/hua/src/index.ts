@@ -288,16 +288,9 @@ export { EmptyState } from "@hua-labs/ui/feedback";
 // Navigation: Sidebar
 export { Sidebar } from "@hua-labs/ui/navigation";
 
-// Interactive: Toolbar + Kanban
+// Interactive: Toolbar. Kanban requires optional @dnd-kit peers and is isolated
+// behind @hua-labs/hua/ui/interactive/kanban.
 export { Toolbar } from "@hua-labs/ui/interactive";
-
-export {
-  KanbanBoard,
-  KanbanColumn,
-  KanbanCard,
-  KanbanProvider,
-  useKanban,
-} from "@hua-labs/ui/interactive/kanban";
 
 // Motion components — dedicated sub-entry
 export {

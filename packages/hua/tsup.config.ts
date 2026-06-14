@@ -10,6 +10,7 @@ const entry = {
   "framework/seo/geo/index": "src/framework/seo/geo/index.ts",
   // Subpath exports
   "ui/index": "src/ui/index.ts",
+  "ui/interactive/kanban": "src/ui/interactive/kanban.ts",
   "i18n/index": "src/i18n/index.ts",
   "motion/index": "src/motion/index.ts",
   "state/index": "src/state/index.ts",

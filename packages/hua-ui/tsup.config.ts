@@ -97,6 +97,25 @@ export default defineConfig([
       "@hua-labs/dot/native",
     ],
   },
+  // Legacy Iconsax barrels. Runtime-only because tsc emits their public .d.ts files.
+  {
+    ...shared,
+    entry: { icons: "src/components/icons/index.ts" },
+    dts: false,
+    format: ["esm"],
+    splitting: false,
+    outDir: "dist",
+    clean: false,
+  },
+  {
+    ...shared,
+    entry: { "icons-bold": "src/components/icons-bold/index.ts" },
+    dts: false,
+    format: ["esm"],
+    splitting: false,
+    outDir: "dist",
+    clean: false,
+  },
   // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {
     ...shared,

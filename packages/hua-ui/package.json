@@ -8,7 +8,7 @@
   "exports": {
     ".": {
       "react-native": {
-        "types": "./dist/native.d.ts",
+        "types": "./dist/native/index.d.ts",
         "import": "./dist/native.mjs",
         "default": "./dist/native.mjs"
       },
@@ -17,7 +17,7 @@
       "default": "./dist/index.mjs"
     },
     "./native": {
-      "types": "./dist/native.d.ts",
+      "types": "./dist/native/index.d.ts",
       "import": "./dist/native.mjs",
       "default": "./dist/native.mjs"
     },
@@ -82,12 +82,12 @@
       "default": "./dist/interactive-kanban.mjs"
     },
     "./sdui": {
-      "types": "./dist/sdui.d.ts",
+      "types": "./dist/sdui.d.mts",
       "import": "./dist/sdui.mjs",
       "default": "./dist/sdui.mjs"
     },
     "./landing": {
-      "types": "./dist/landing.d.ts",
+      "types": "./dist/landing.d.mts",
       "import": "./dist/landing.mjs",
       "default": "./dist/landing.mjs"
     },
@@ -99,14 +99,14 @@
     "./styles/landing.css": "./src/styles/landing.css",
     "./styles/prose.css": "./src/styles/prose.css",
     "./icons": {
-      "types": "./src/components/icons/index.ts",
-      "import": "./src/components/icons/index.ts",
-      "default": "./src/components/icons/index.ts"
+      "types": "./dist/components/icons/index.d.ts",
+      "import": "./dist/icons.mjs",
+      "default": "./dist/icons.mjs"
     },
     "./icons-bold": {
-      "types": "./src/components/icons-bold/index.ts",
-      "import": "./src/components/icons-bold/index.ts",
-      "default": "./src/components/icons-bold/index.ts"
+      "types": "./dist/components/icons-bold/index.d.ts",
+      "import": "./dist/icons-bold.mjs",
+      "default": "./dist/icons-bold.mjs"
     },
     "./iconsax": {
       "types": "./dist/iconsax.d.ts",

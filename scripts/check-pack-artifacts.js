@@ -60,6 +60,37 @@ function normalizePackagePath(value) {
   return `package/${withoutPrefix}`;
 }
 
+function collectExportRefs(exportsValue, pathSegments = [], refs = []) {
+  if (!exportsValue) return refs;
+
+  if (typeof exportsValue === "string") {
+    const normalized = normalizePackagePath(exportsValue);
+    if (normalized) {
+      refs.push({
+        path: pathSegments.join("."),
+        ref: exportsValue,
+        normalized,
+      });
+    }
+    return refs;
+  }
+
+  if (Array.isArray(exportsValue)) {
+    exportsValue.forEach((item, index) => {
+      collectExportRefs(item, [...pathSegments, String(index)], refs);
+    });
+    return refs;
+  }
+
+  if (typeof exportsValue === "object") {
+    for (const [key, value] of Object.entries(exportsValue)) {
+      collectExportRefs(value, [...pathSegments, key], refs);
+    }
+  }
+
+  return refs;
+}
+
 function collectExportTypeRefs(exportsValue, refs = new Set()) {
   if (!exportsValue) return refs;
 
@@ -85,6 +116,13 @@ function collectExportTypeRefs(exportsValue, refs = new Set()) {
   }
 
   return refs;
+}
+
+function isSourceTypeScriptExportRef(ref) {
+  return (
+    ref.normalized.startsWith("package/src/") &&
+    /\.(?:[cm]?ts|tsx)$/.test(ref.normalized)
+  );
 }
 
 function collectTypeRefs(pkg) {
@@ -151,12 +189,24 @@ for (const tarball of tarballs) {
   const files = listTarball(tarball);
   const fileSet = new Set(files);
   const pkg = getPackageJson(tarball);
+  const exportRefs = collectExportRefs(pkg.exports);
   const typeRefs = collectTypeRefs(pkg);
+  const typeRefSet = new Set(typeRefs);
   const missingTypeRefs = typeRefs.filter((ref) => !fileSet.has(ref));
+  const missingExportRefs = exportRefs.filter(
+    (ref) => !typeRefSet.has(ref.normalized) && !fileSet.has(ref.normalized),
+  );
+  const sourceTypeScriptExportRefs = exportRefs.filter(
+    isSourceTypeScriptExportRef,
+  );
   const workspaceSpecs = collectWorkspaceSpecs(pkg);
   const payloadIssues = collectPayloadIssues(pkg, files);
   const issues =
-    missingTypeRefs.length + workspaceSpecs.length + payloadIssues.length;
+    missingTypeRefs.length +
+    missingExportRefs.length +
+    sourceTypeScriptExportRefs.length +
+    workspaceSpecs.length +
+    payloadIssues.length;
 
   issueCount += issues;
   results.push({
@@ -164,6 +214,8 @@ for (const tarball of tarballs) {
     name: pkg.name,
     version: pkg.version,
     missingTypeRefs,
+    missingExportRefs,
+    sourceTypeScriptExportRefs,
     workspaceSpecs,
     payloadIssues,
   });
@@ -172,6 +224,8 @@ for (const tarball of tarballs) {
 for (const result of results) {
   const status =
     result.missingTypeRefs.length === 0 &&
+    result.missingExportRefs.length === 0 &&
+    result.sourceTypeScriptExportRefs.length === 0 &&
     result.workspaceSpecs.length === 0 &&
     result.payloadIssues.length === 0
       ? "PASS"
@@ -183,6 +237,20 @@ for (const result of results) {
     console.log("  missing type refs:");
     for (const ref of result.missingTypeRefs) {
       console.log(`    - ${ref}`);
+    }
+  }
+
+  if (result.missingExportRefs.length > 0) {
+    console.log("  missing export targets:");
+    for (const ref of result.missingExportRefs) {
+      console.log("    - exports " + ref.path + " -> " + ref.ref);
+    }
+  }
+
+  if (result.sourceTypeScriptExportRefs.length > 0) {
+    console.log("  TypeScript source export targets:");
+    for (const ref of result.sourceTypeScriptExportRefs) {
+      console.log("    - exports " + ref.path + " -> " + ref.ref);
     }
   }
 
