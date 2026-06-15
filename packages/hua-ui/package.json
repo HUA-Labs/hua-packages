@@ -162,7 +162,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
-    "lucide-react": "^0.575.0",
+    "lucide-react": "^1.18.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "rollup-plugin-visualizer": "^7.0.1",
