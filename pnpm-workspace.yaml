@@ -1,13 +1,16 @@
 packages:
   - packages/*
 
-ignoredBuiltDependencies:
-  - '@scarf/scarf'
-  - '@tree-sitter-grammars/tree-sitter-yaml'
-  - core-js-pure
-  - esbuild
-  - tree-sitter
-  - tree-sitter-json
+allowBuilds:
+  "@scarf/scarf": false
+  "@swc/core": false
+  "@tree-sitter-grammars/tree-sitter-yaml": false
+  core-js-pure: false
+  esbuild: false
+  protobufjs: false
+  sharp: false
+  tree-sitter: false
+  tree-sitter-json: false
 
 patchedDependencies:
-  '@phosphor-icons/react@2.1.10': patches/@phosphor-icons__react@2.1.10.patch
+  "@phosphor-icons/react@2.1.10": patches/@phosphor-icons__react@2.1.10.patch
