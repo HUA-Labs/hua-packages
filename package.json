@@ -41,7 +41,7 @@
     "lint-staged": "^16.3.2",
     "node-gyp": "^12.4.0",
     "playwright": "^1.61.1",
-    "pnpm": "^10.30.3",
+    "pnpm": "^11.9.0",
     "prettier": "^3.9.1",
     "subset-font": "^2.5.0",
     "tailwindcss": "4.3.1",
