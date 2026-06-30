@@ -1,17 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "types": ["jest", "@testing-library/jest-dom", "node"],
     "noEmit": true
   },
-  "include": [
-    "src/__tests__/**/*",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/__tests__/**/*", "src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": ["node_modules", "dist"]
 }
-
