@@ -26,7 +26,7 @@ import {
   DiagnosticSeverity,
   Range,
   Position,
-} from "vscode-languageserver/node.js";
+} from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { dot } from "@hua-labs/dot";
 import {
