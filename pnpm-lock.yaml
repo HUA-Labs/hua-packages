@@ -68,8 +68,8 @@ importers:
         specifier: ^1.61.1
         version: 1.61.1
       pnpm:
-        specifier: ^10.30.3
-        version: 10.30.3
+        specifier: ^11.9.0
+        version: 11.9.0
       prettier:
         specifier: ^3.9.1
         version: 3.9.1
@@ -5116,9 +5116,9 @@ packages:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
     engines: {node: '>=14.19.0'}
 
-  pnpm@10.30.3:
-    resolution: {integrity: sha512-yWHR4KLY41TsqlFmuCJRZmi39Ey1vZUSLVkN2Bki9gb1RzttI+xKW+Bef80Y6EiNR9l4u+mBhy8RRdBumnQAFw==}
-    engines: {node: '>=18.12'}
+  pnpm@11.9.0:
+    resolution: {integrity: sha512-vWgtXQP+Ul73yf1ngMaITR51asTJyf4AxTh4KCQxDc+Q493E9Tg18G3669UIXkGFXgvLs7YN4qxburieUDbwOw==}
+    engines: {node: '>=22.13'}
     hasBin: true
 
   possible-typed-array-names@1.1.0:
@@ -10975,7 +10975,7 @@ snapshots:
 
   pngjs@7.0.0: {}
 
-  pnpm@10.30.3: {}
+  pnpm@11.9.0: {}
 
   possible-typed-array-names@1.1.0: {}
 
