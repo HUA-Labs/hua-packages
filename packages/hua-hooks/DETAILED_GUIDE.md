@@ -16,10 +16,9 @@ React 19 or newer is expected as a peer dependency.
 ## `useLoading`
 
 `useLoading` tracks async work with an optional delay and user-facing message.
-The delay defers when loading state is turned on, but the current hook does not
-cancel a pending delay timer when work finishes early. Prefer `delay: 0` with
-`withLoading` unless the surrounding UI can safely tolerate that deferred
-loading behavior.
+The delay defers when loading state is turned on, and pending delayed starts are
+cancelled when work finishes early, `stopLoading()` is called, or the hook
+unmounts.
 
 ```tsx
 import { useLoading } from "@hua-labs/hooks";
@@ -40,8 +39,7 @@ function SaveButton() {
 
 Use `withLoading` when the hook should manage the whole async lifecycle. Use
 the returned setters directly only when a larger workflow owns the loading
-state. If you opt into `delay`, keep the pending-timer behavior in mind until a
-future hook release cancels delayed starts on early completion.
+state. A delayed short operation can complete without ever showing loading UI.
 
 ## `useAutoScroll`
 
