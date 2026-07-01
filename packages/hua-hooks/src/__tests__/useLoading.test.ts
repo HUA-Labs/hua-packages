@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useLoading } from '../useLoading';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useLoading } from "../useLoading";
 
-describe('useLoading', () => {
+describe("useLoading", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -11,21 +11,21 @@ describe('useLoading', () => {
     vi.useRealTimers();
   });
 
-  describe('initial state', () => {
-    it('should start with loading false by default', () => {
+  describe("initial state", () => {
+    it("should start with loading false by default", () => {
       const { result } = renderHook(() => useLoading());
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.loadingMessage).toBe('');
+      expect(result.current.loadingMessage).toBe("");
     });
 
-    it('should start with loading true when initialLoading is true', () => {
+    it("should start with loading true when initialLoading is true", () => {
       const { result } = renderHook(() => useLoading({ initialLoading: true }));
       expect(result.current.isLoading).toBe(true);
     });
   });
 
-  describe('startLoading / stopLoading', () => {
-    it('should set loading to true without delay', () => {
+  describe("startLoading / stopLoading", () => {
+    it("should set loading to true without delay", () => {
       const { result } = renderHook(() => useLoading());
 
       act(() => {
@@ -35,21 +35,21 @@ describe('useLoading', () => {
       expect(result.current.isLoading).toBe(true);
     });
 
-    it('should set loading message', () => {
+    it("should set loading message", () => {
       const { result } = renderHook(() => useLoading());
 
       act(() => {
-        result.current.startLoading('Loading data...');
+        result.current.startLoading("Loading data...");
       });
 
-      expect(result.current.loadingMessage).toBe('Loading data...');
+      expect(result.current.loadingMessage).toBe("Loading data...");
     });
 
-    it('should stop loading', () => {
+    it("should stop loading", () => {
       const { result } = renderHook(() => useLoading());
 
       act(() => {
-        result.current.startLoading('test');
+        result.current.startLoading("test");
       });
 
       act(() => {
@@ -57,14 +57,14 @@ describe('useLoading', () => {
       });
 
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.loadingMessage).toBe('');
+      expect(result.current.loadingMessage).toBe("");
     });
 
-    it('should respect delay option', () => {
+    it("should respect delay option", () => {
       const { result } = renderHook(() => useLoading({ delay: 500 }));
 
       act(() => {
-        result.current.startLoading('Loading...');
+        result.current.startLoading("Loading...");
       });
 
       // Before delay, loading should still be false
@@ -76,55 +76,79 @@ describe('useLoading', () => {
 
       // After delay, loading should be true
       expect(result.current.isLoading).toBe(true);
-      expect(result.current.loadingMessage).toBe('Loading...');
+      expect(result.current.loadingMessage).toBe("Loading...");
+    });
+
+    it("should cancel a pending delayed start when stopLoading is called before delay elapses", () => {
+      const { result } = renderHook(() => useLoading({ delay: 500 }));
+
+      act(() => {
+        result.current.startLoading("Loading...");
+      });
+
+      expect(vi.getTimerCount()).toBe(1);
+
+      act(() => {
+        result.current.stopLoading();
+      });
+
+      expect(vi.getTimerCount()).toBe(0);
+
+      act(() => {
+        vi.advanceTimersByTime(500);
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loadingMessage).toBe("");
     });
   });
 
-  describe('withLoading', () => {
-    it('should wrap async function with loading state', async () => {
+  describe("withLoading", () => {
+    it("should wrap async function with loading state", async () => {
       const { result } = renderHook(() => useLoading());
 
       let resolvePromise: (value: string) => void;
-      const asyncFn = () => new Promise<string>((resolve) => {
-        resolvePromise = resolve;
-      });
+      const asyncFn = () =>
+        new Promise<string>((resolve) => {
+          resolvePromise = resolve;
+        });
 
       let promise: Promise<string>;
       act(() => {
-        promise = result.current.withLoading(asyncFn, 'Processing...');
+        promise = result.current.withLoading(asyncFn, "Processing...");
       });
 
       expect(result.current.isLoading).toBe(true);
-      expect(result.current.loadingMessage).toBe('Processing...');
+      expect(result.current.loadingMessage).toBe("Processing...");
 
       await act(async () => {
-        resolvePromise!('done');
+        resolvePromise!("done");
         await promise!;
       });
 
       expect(result.current.isLoading).toBe(false);
     });
 
-    it('should return the result of async function', async () => {
+    it("should return the result of async function", async () => {
       const { result } = renderHook(() => useLoading());
 
       let returnValue: string;
       await act(async () => {
         returnValue = await result.current.withLoading(
-          async () => 'result-value'
+          async () => "result-value",
         );
       });
 
-      expect(returnValue!).toBe('result-value');
+      expect(returnValue!).toBe("result-value");
     });
 
-    it('should stop loading even if async function throws', async () => {
+    it("should stop loading even if async function throws", async () => {
       const { result } = renderHook(() => useLoading());
 
       await act(async () => {
         try {
           await result.current.withLoading(async () => {
-            throw new Error('test error');
+            throw new Error("test error");
           });
         } catch (e) {
           // expected
@@ -134,15 +158,78 @@ describe('useLoading', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    it('should work without message parameter', async () => {
+    it("should work without message parameter", async () => {
       const { result } = renderHook(() => useLoading());
 
       await act(async () => {
-        await result.current.withLoading(async () => 'result');
+        await result.current.withLoading(async () => "result");
       });
 
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.loadingMessage).toBe('');
+      expect(result.current.loadingMessage).toBe("");
+    });
+
+    it("should cancel delayed loading when async work finishes before delay elapses", async () => {
+      const { result } = renderHook(() => useLoading({ delay: 500 }));
+
+      let promise: Promise<string>;
+      await act(async () => {
+        promise = result.current.withLoading(
+          async () => "done",
+          "Processing...",
+        );
+        await promise;
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loadingMessage).toBe("");
+      expect(vi.getTimerCount()).toBe(0);
+
+      act(() => {
+        vi.advanceTimersByTime(500);
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loadingMessage).toBe("");
+    });
+
+    it("should cancel delayed loading when async work throws before delay elapses", async () => {
+      const { result } = renderHook(() => useLoading({ delay: 500 }));
+
+      await act(async () => {
+        await expect(
+          result.current.withLoading(async () => {
+            throw new Error("test error");
+          }, "Processing..."),
+        ).rejects.toThrow("test error");
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loadingMessage).toBe("");
+      expect(vi.getTimerCount()).toBe(0);
+
+      act(() => {
+        vi.advanceTimersByTime(500);
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.loadingMessage).toBe("");
+    });
+  });
+
+  describe("cleanup", () => {
+    it("should clear a pending delayed start on unmount", () => {
+      const { result, unmount } = renderHook(() => useLoading({ delay: 500 }));
+
+      act(() => {
+        result.current.startLoading("Loading...");
+      });
+
+      expect(vi.getTimerCount()).toBe(1);
+
+      unmount();
+
+      expect(vi.getTimerCount()).toBe(0);
     });
   });
 });
