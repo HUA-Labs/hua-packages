@@ -17,6 +17,10 @@ const forbiddenPatterns = [
   ["internal host nickname", "sum-" + "back"],
   ["developer home path", "/home/" + "devin"],
   ["developer Windows workspace path", "C:/" + "hua"],
+  [
+    "developer Windows Downloads path",
+    /[A-Za-z]:[\\/]+Users[\\/]+[^"'`\\/]+[\\/]+Downloads[\\/]+/i,
+  ],
   ["internal docs inventory artifact", "public-docs-surface-" + "inventory"],
   ["internal publish hygiene artifact", "publish-artifact-" + "hygiene"],
 ];
@@ -44,6 +48,16 @@ function isBinary(buffer) {
   return buffer.includes(0);
 }
 
+function patternMatches(line, pattern) {
+  return typeof pattern === "string"
+    ? line.includes(pattern)
+    : pattern.test(line);
+}
+
+function patternLabel(pattern) {
+  return typeof pattern === "string" ? pattern : pattern.toString();
+}
+
 const files = execFileSync("git", ["ls-files", "-z"], {
   cwd: root,
   encoding: "utf8",
@@ -66,12 +80,12 @@ for (const filePath of files) {
     let lineNumber = 0;
     for (const line of lines) {
       lineNumber += 1;
-      if (!line.includes(pattern)) continue;
+      if (!patternMatches(line, pattern)) continue;
       findings.push({
         filePath,
         label,
         lineNumber,
-        pattern,
+        pattern: patternLabel(pattern),
         snippet: line.trim(),
       });
     }
