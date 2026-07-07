@@ -8,7 +8,7 @@ package:
   description: "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Swift / Compose"
   license: "MIT"
 
-overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. ~90% Tailwind parity across 33 resolver families."
+overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. Broad Tailwind-inspired utility coverage across common style families."
 
 exports:
   main:
@@ -224,7 +224,7 @@ exports:
 
 features:
   - "dot() — utility string → CSSProperties (or RN StyleSheet / FlutterRecipe via adapter)"
-  - "33 resolver families — spacing, colors, typography, layout, sizing, border, flexbox, z-index, shadow, opacity, transform, transition, animation, backdrop, positioning, grid, ring, filter, interactivity, line-clamp, mix-blend, gradient, object-fit, float, table, list, scroll, touch-action, will-change, word-break, isolation, bg-clip, font-smoothing, divide"
+  - "Broad utility coverage — spacing, colors, typography, layout, sizing, border, flexbox, z-index, shadow, opacity, transform, transition, animation, backdrop, positioning, grid, ring, filter, interactivity, line-clamp, mix-blend, gradient, object-fit, float, table, list, scroll, touch-action, will-change, word-break, isolation, bg-clip, font-smoothing, divide"
   - "Arbitrary values — w-[300px], bg-[#ff0000], p-[2rem]"
   - "Opacity modifier — bg-primary-500/50, text-gray-900/80"
   - "Negative values — -m-4, -top-2, -translate-x-4"

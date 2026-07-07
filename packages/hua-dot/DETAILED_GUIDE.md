@@ -32,11 +32,11 @@ Input string
  resolver.ts         — dispatches each token to the matching resolver module
     │
     ▼
- [25 resolver modules]  — spacing, color, typography, layout, border, flexbox,
+ [26 resolver modules]  — spacing, color, typography, layout, border, flexbox,
                           grid, shadow, ring, filter, backdrop, transform,
                           animation, transition, opacity, z-index, positioning,
                           gradient, line-clamp, interactivity, divide, object-fit,
-                          table, list, scroll
+                          table, list, scroll, outline
     │
     ▼
  index.ts (dot/dotMap)  — merges resolved layers in correct cascade order
@@ -607,6 +607,37 @@ getCapability("backgroundImage", "flutter"); // 'recipe-only'
 getCapability("display", "native", "flex"); // 'native'
 getCapability("display", "native", "grid"); // 'approximate'
 ```
+
+### getDotAxCatalog
+
+Read-only package AX catalog derived from `CAPABILITY_MATRIX` and
+`PROPERTY_TO_FAMILY`. Use it when tools need target support metadata without
+executing `dot()` or `dotExplain()`.
+
+```ts
+import { getDotAxCatalog } from "@hua-labs/dot";
+
+const catalog = getDotAxCatalog();
+
+catalog.schemaVersion; // 'dot-ax-catalog.v1'
+catalog.sourcePackage; // '@hua-labs/dot'
+catalog.targets; // ['web', 'native', 'flutter']
+catalog.entries[0];
+// {
+//   id: 'animation',
+//   label: 'Animation',
+//   category: 'visual-effect',
+//   support: { web: ..., native: ..., flutter: ... },
+//   properties: [...],
+//   examples: [...],
+//   caveats: [...]
+// }
+```
+
+Each catalog entry includes a stable family id, label, category, target support
+map, source CSS properties, examples, caveats, and provenance. Composed
+families such as `ring` and class-mode `divide` also include optional
+`composition` metadata describing internal markers and final output properties.
 
 ### dotExplain
 

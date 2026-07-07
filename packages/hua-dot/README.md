@@ -1,6 +1,6 @@
 # @hua-labs/dot
 
-Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. ~90% Tailwind parity across 33 resolver families.
+Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. Broad Tailwind-inspired utility coverage across common style families.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)

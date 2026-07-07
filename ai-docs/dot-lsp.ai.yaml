@@ -24,7 +24,7 @@ features:
   - "Diagnostics — flags unrecognized utility tokens as warnings on file open and change"
   - "Target Caveats — optional web/native/flutter diagnostics for dropped, approximated, and recipe-only output, annotated with package-owned AX family/category metadata"
   - "Pattern Detection — works inside dot(), dot='', dot={''}, and template literal forms"
-  - "500+ built-in token suggestions across 14 categories (spacing, color, sizing, typography, layout, flexbox, grid, border, shadow, background, transition, animation, transform, filter, interactivity)"
+  - "500+ built-in token suggestions across 15 categories (spacing, color, sizing, typography, layout, flexbox, grid, border, shadow, background, transition, animation, transform, filter, interactivity)"
 
 related_packages:
   - "@hua-labs/dot"
