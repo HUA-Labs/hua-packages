@@ -1,5 +1,11 @@
 # @hua-labs/dot
 
+## 0.2.1
+
+### Patch Changes
+
+- Align public documentation claims with current dot resolver and AX catalog evidence.
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @hua-labs/dot-lsp
 
+## 0.1.2
+
+### Patch Changes
+
+- Align public documentation claims with current dot resolver and AX catalog evidence.
+- Updated dependencies
+  - @hua-labs/dot@0.2.1
+
 ## 0.1.1
 
 ### Patch Changes
