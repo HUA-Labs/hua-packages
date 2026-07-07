@@ -142,6 +142,24 @@ quickStart: |
   dot('bg-brand-500 p-18');
   // { backgroundColor: '#6630E6', padding: '72px' }
 
+readme:
+  features:
+    - "dot() resolves Tailwind-inspired utility strings to Web CSSProperties, React Native style objects, or FlutterRecipe output"
+    - "dotExplain() reports target caveats for dropped, approximated, recipe-only, and unsupported properties"
+    - "Native subpath, AOT/codegen, and AX catalog exports support app and tooling integrations"
+  quickStart: |
+    import { dot, dotExplain } from '@hua-labs/dot';
+
+    const web = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
+    const native = dot('p-4 rounded-lg shadow-lg', { target: 'native' });
+    const report = dotExplain('grid grid-cols-3 gap-4', { target: 'native' });
+
+    console.log(web, native, report.report._dropped);
+  codeBlockLang: "ts"
+  hideApi: true
+  hideSections: true
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "hua"
   - "ui"

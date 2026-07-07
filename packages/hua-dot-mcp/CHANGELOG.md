@@ -1,5 +1,13 @@
 # @hua-labs/dot-mcp
 
+## 0.1.3
+
+### Patch Changes
+
+- Restore npm provenance enforcement for dot-family releases and keep the public dot README concise.
+- Updated dependencies
+  - @hua-labs/dot@0.2.2
+
 ## 0.1.2
 
 ### Patch Changes
