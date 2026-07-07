@@ -227,7 +227,7 @@ dot('bg-brand-500 p-18');
 
 ## AI / Operator Guide
 
-`@hua-labs/dot` is intentionally not a full Tailwind runtime. AI agents and advanced operators should read [`AI_GUIDE.md`](./AI_GUIDE.md) before claiming cross-platform support, adding new token families, or using dot for responsive/state/motion-heavy UI.
+`@hua-labs/dot` is intentionally not a full Tailwind runtime. AI agents and advanced operators should read the [Detailed Guide](./DETAILED_GUIDE.md) before claiming cross-platform support, adding new token families, or using dot for responsive/state/motion-heavy UI.
 
 ## Related Packages
 
