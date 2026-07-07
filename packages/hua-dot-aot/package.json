@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/dot-aot",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Build-time static extraction for @hua-labs/dot — Vite and Babel plugins",
   "license": "MIT",
   "main": "./dist/index.mjs",
@@ -37,7 +37,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:0.2.1"
+    "@hua-labs/dot": "workspace:0.2.2"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",

@@ -43,10 +43,20 @@ jobs:
 
       - name: Create .npmrc for npm token
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          echo "access=public" >> .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "provenance=true" >> .npmrc
+          for npmrc in "$HOME/.npmrc" .npmrc; do
+            echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > "$npmrc"
+            echo "access=public" >> "$npmrc"
+            echo "registry=https://registry.npmjs.org/" >> "$npmrc"
+            echo "provenance=true" >> "$npmrc"
+          done
+
+      - name: Verify publish provenance config
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+          PNPM_CONFIG_PROVENANCE: "true"
+        run: |
+          test "$(npm config get provenance)" = "true"
+          test "$(pnpm config get provenance)" = "true"
 
       - name: Create release (changesets)
         uses: changesets/action@v1
@@ -55,3 +65,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
+          PNPM_CONFIG_PROVENANCE: "true"
+
+      - name: Check npm provenance
+        run: pnpm check:npm-provenance

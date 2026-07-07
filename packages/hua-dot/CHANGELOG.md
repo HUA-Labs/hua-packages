@@ -1,5 +1,11 @@
 # @hua-labs/dot
 
+## 0.2.2
+
+### Patch Changes
+
+- Restore npm provenance enforcement for dot-family releases and keep the public dot README concise.
+
 ## 0.2.1
 
 ### Patch Changes
