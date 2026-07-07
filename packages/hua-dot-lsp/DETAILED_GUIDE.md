@@ -96,9 +96,12 @@ npx dot-lsp --stdio
 
 The executable is named **`dot-lsp`** regardless of install method. All editor configuration examples below use this name and assume it is on `PATH`. Substitute the full path if using a local install.
 
-### Peer Dependency
+### Engine Dependency
 
-`@hua-labs/dot` is a peer dependency. It is resolved automatically when `@hua-labs/dot-lsp` is installed via npm in a project that already has `@hua-labs/dot` installed. If the peer is missing, the hover fallback and diagnostic resolution will not function correctly.
+`@hua-labs/dot` is installed as a package dependency of `@hua-labs/dot-lsp`.
+When `@hua-labs/dot-lsp` is installed from npm, the matching dot engine package
+is installed with it so hover fallback and diagnostic resolution can run without
+an extra peer install step.
 
 ---
 
@@ -347,7 +350,7 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 
 **Checks:**
 
-1. Ensure `@hua-labs/dot` is installed as a peer dependency. If the peer is missing, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
+1. Ensure the installed `@hua-labs/dot-lsp` package includes its `@hua-labs/dot` dependency. If the dependency install is incomplete or the package tree is corrupted, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
 2. If you are using a custom token defined only in a project-level dot config, the built-in list will not contain it. The server falls back to the dot engine for resolution — verify that your project's dot config is on the module resolution path used by the server process (i.e., the server is started from the project root).
 3. Confirm the token is not a typo. Hover over it to see whether hover documentation appears — if it does, the token is known and should not produce a diagnostic.
 
