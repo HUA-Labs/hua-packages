@@ -1,28 +1,31 @@
 {
   "name": "@hua-labs/dot-aot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build-time static extraction for @hua-labs/dot — Vite and Babel plugins",
+  "license": "MIT",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
     "./vite": {
-      "types": "./dist/vite.d.ts",
+      "types": "./dist/vite.d.mts",
       "import": "./dist/vite.mjs",
       "default": "./dist/vite.mjs"
     },
     "./babel": {
-      "types": "./dist/babel.d.ts",
+      "types": "./dist/babel.d.mts",
       "import": "./dist/babel.mjs",
       "default": "./dist/babel.mjs"
     }
   },
   "files": [
+    "CHANGELOG.md",
+    "DETAILED_GUIDE.md",
     "dist"
   ],
   "scripts": {
@@ -34,15 +37,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:*"
+    "@hua-labs/dot": "workspace:0.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/types": "^7.29.7",
+    "@babel/core": "^8.0.1",
+    "@babel/types": "^8.0.0",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.1.0",
-    "vitest": "^4.1.9"
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "vite": ">=5.0.0"

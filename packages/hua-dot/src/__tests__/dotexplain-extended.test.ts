@@ -93,8 +93,26 @@ describe("dotExplain() — extended coverage", () => {
   describe("native target — shadow details", () => {
     it("multi-layer shadow reports layer reduction detail", () => {
       const result = dotExplain("shadow-xl ring-2", { target: "native" });
-      // Both shadow and ring merge to boxShadow
-      expect(result.report).toBeDefined();
+      expect(result.styles).toHaveProperty("shadowColor");
+      expect(result.report._approximated).toContain("boxShadow");
+      expect(result.report._capabilities?.boxShadow).toBe("approximate");
+      expect(result.report._dropped ?? []).not.toContain("boxShadow");
+    });
+
+    it("ring-only shadow color does not report approximation without native output", () => {
+      const result = dotExplain("ring-blue-500", { target: "native" });
+      expect(result.styles).toEqual({});
+      expect(result.report._approximated ?? []).not.toContain("boxShadow");
+      expect(result.report._capabilities ?? {}).not.toHaveProperty("boxShadow");
+    });
+
+    it("renderable CSS variable shadow color is reported as dropped", () => {
+      const result = dotExplain("shadow-[0_4px_6px_var(--shadow-color)]", {
+        target: "native",
+      });
+      expect(result.styles).toEqual({});
+      expect(result.report._dropped).toContain("boxShadow");
+      expect(result.report._capabilities?.boxShadow).toBe("unsupported");
     });
 
     it("single-layer shadow has no details", () => {

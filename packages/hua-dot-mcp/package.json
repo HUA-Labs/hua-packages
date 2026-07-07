@@ -1,31 +1,39 @@
 {
   "name": "@hua-labs/dot-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "description": "MCP server for the dot style engine",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "dot-mcp": "./dist/index.js"
   },
+  "files": [
+    "CHANGELOG.md",
+    "DETAILED_GUIDE.md",
+    "dist/index.js"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --target es2022",
+    "build": "tsup src/index.ts --format esm --target es2022 && rm -f dist/index.d.ts",
     "dev": "tsx src/index.ts",
+    "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:*",
+    "@hua-labs/dot": "workspace:0.2.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
-    "tsx": "^4.22.4",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "repository": {
     "type": "git",

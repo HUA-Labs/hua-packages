@@ -476,6 +476,16 @@ export function dotExplain(
 
   for (const prop of Object.keys(webStyles)) {
     const propValue = String(webStyles[prop]);
+    const nativeShadowRendered =
+      target === "native" &&
+      prop === "boxShadow" &&
+      [
+        "shadowColor",
+        "shadowOffset",
+        "shadowOpacity",
+        "shadowRadius",
+        "elevation",
+      ].some((key) => Object.prototype.hasOwnProperty.call(styles, key));
 
     // CSS custom properties (--tw-*, --dot-*) are web-only
     if (prop.startsWith("--")) {
@@ -486,31 +496,76 @@ export function dotExplain(
 
     // CSS variable values are unsupported on non-web targets
     // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
-    if (propValue.includes("var(")) {
+    if (propValue.includes("var(") && !nativeShadowRendered) {
       dropped.push(prop);
       capabilities[prop] = "unsupported";
       continue;
+    }
+
+    if (target === "native" && prop === "boxShadow" && !nativeShadowRendered) {
+      const shadowLayers = parseShadowLayers(propValue);
+      if (shadowLayers.some((layer) => layer.inset)) {
+        dropped.push(prop);
+        capabilities[prop] = "unsupported";
+        continue;
+      }
     }
 
     const level = getCapability(prop, target, propValue);
 
     if (level === "unsupported") {
       dropped.push(prop);
-    } else if (level === "approximate") {
+    } else if (
+      level === "approximate" &&
+      (prop !== "boxShadow" || nativeShadowRendered)
+    ) {
       approximated.push(prop);
     }
 
     if (level !== "native") {
+      if (
+        prop === "boxShadow" &&
+        level === "approximate" &&
+        !nativeShadowRendered
+      ) {
+        continue;
+      }
       capabilities[prop] = level;
+    }
+  }
+
+  const styleDropped = (styles as Record<string, unknown>)._dropped;
+  if (Array.isArray(styleDropped)) {
+    for (const prop of styleDropped) {
+      if (typeof prop !== "string") continue;
+      if (!dropped.includes(prop)) dropped.push(prop);
+      if (!capabilities[prop]) {
+        const level = getCapability(
+          prop,
+          target,
+          String(webStyles[prop] ?? ""),
+        );
+        capabilities[prop] = level === "native" ? "unsupported" : level;
+      }
     }
   }
 
   // Collect approximation details for shadow on native
   const details: Record<string, string[]> = {};
+  const nativeShadowHasRenderedOutput =
+    target === "native" &&
+    [
+      "shadowColor",
+      "shadowOffset",
+      "shadowOpacity",
+      "shadowRadius",
+      "elevation",
+    ].some((key) => Object.prototype.hasOwnProperty.call(styles, key));
   if (
     target === "native" &&
     webStyles.boxShadow &&
-    typeof webStyles.boxShadow === "string"
+    typeof webStyles.boxShadow === "string" &&
+    (nativeShadowHasRenderedOutput || dropped.includes("boxShadow"))
   ) {
     const shadowStr = webStyles.boxShadow as string;
     if (shadowStr !== "none") {
@@ -750,6 +805,9 @@ export function dotMap(
   return result;
 }
 
+// Re-export parser for V1 schema pipeline (tokenization)
+export { parse } from "./parser";
+
 // Re-export types for consumers
 export type {
   StyleObject,
@@ -777,6 +835,29 @@ export {
   PROPERTY_TO_FAMILY,
   getCapability,
 } from "./capabilities";
+
+// Re-export package-owned AX catalog metadata
+export {
+  DOT_AX_CATALOG_SCHEMA_VERSION,
+  DOT_AX_CATALOG_SOURCE_PACKAGE,
+  DOT_AX_TARGETS,
+  DOT_AX_SURFACES,
+  dotAxCatalog,
+  getDotAxCatalog,
+} from "./ax";
+export type {
+  DotAxCatalog,
+  DotAxCatalogEntry,
+  DotAxCategory,
+  DotAxComposition,
+  DotAxCompositionKind,
+  DotAxSurface,
+  DotAxSurfaceSupport,
+  DotAxSurfaceSupportLevel,
+  DotAxTarget,
+  DotAxTargetSupport,
+  DotAxTargetSupportMap,
+} from "./ax";
 
 // Re-export adapters for direct usage
 export { adaptNative, _resetNativeWarnings } from "./adapters/native";

@@ -96,9 +96,12 @@ npx dot-lsp --stdio
 
 The executable is named **`dot-lsp`** regardless of install method. All editor configuration examples below use this name and assume it is on `PATH`. Substitute the full path if using a local install.
 
-### Peer Dependency
+### Engine Dependency
 
-`@hua-labs/dot` is a peer dependency. It is resolved automatically when `@hua-labs/dot-lsp` is installed via npm in a project that already has `@hua-labs/dot` installed. If the peer is missing, the hover fallback and diagnostic resolution will not function correctly.
+`@hua-labs/dot` is installed as a package dependency of `@hua-labs/dot-lsp`.
+When `@hua-labs/dot-lsp` is installed from npm, the matching dot engine package
+is installed with it so hover fallback and diagnostic resolution can run without
+an extra peer install step.
 
 ---
 
@@ -162,6 +165,35 @@ The `!` important prefix is also stripped before validation, so `!p-4` is checke
 
 All diagnostic messages emitted by the server carry the source identifier **`dot-lsp`**. Editors that allow filtering diagnostics by source use this string. The severity level is always `Warning` — the server never emits errors or information-level diagnostics for unknown tokens.
 
+### Target Caveat Diagnostics
+
+By default, `dot-lsp` validates only token recognition and CSS-only variant
+usage. If an LSP client supplies a target, diagnostics also include target
+capability caveats from `dotExplain()`:
+
+```json
+{
+  "initializationOptions": {
+    "dot": {
+      "target": "native"
+    }
+  }
+}
+```
+
+Supported target values are `"web"`, `"native"`, and `"flutter"`. Invalid or
+missing target values are ignored, preserving the no-target diagnostic path.
+Clients may also send `workspace/didChangeConfiguration` with either
+`{ "target": "native" }` or `{ "dot": { "target": "native" } }`; open
+documents are revalidated after the setting changes.
+
+When a caveat property is covered by the package-owned `@hua-labs/dot` AX
+catalog, the diagnostic appends the AX family label and category. For example,
+`filter=unsupported` may be shown as `filter=unsupported (Filter,
+visual-effect)`. This is editor/AI diagnostic context only; it does not change
+resolver output, target adapters, VS Code runtime behavior, or platform
+support.
+
 ---
 
 ## Editor Configuration
@@ -191,8 +223,10 @@ If you are already using a multi-LSP extension (such as `neovim.vscode-neovim` o
 
 - **command:** `["dot-lsp", "--stdio"]`
 - **filetypes:** the four TS/JS file types listed above
+- **initializationOptions.dot.target:** optional `"web"`, `"native"`, or
+  `"flutter"` for target caveat diagnostics
 
-Note: A first-party VS Code extension (`@hua-labs/dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
+Note: A first-party VS Code extension (`hua-labs.dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
 
 ### Neovim — nvim-lspconfig
 
@@ -212,7 +246,13 @@ if not configs.dot_lsp then
   }
 end
 
-lspconfig.dot_lsp.setup({})
+lspconfig.dot_lsp.setup({
+  init_options = {
+    dot = {
+      target = "native",
+    },
+  },
+})
 ```
 
 Place this block in your Neovim config after `lspconfig` is loaded. The `root_dir` pattern anchors the server to the nearest `package.json` or `.git` directory, which is the standard convention for JavaScript/TypeScript projects.
@@ -310,7 +350,7 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 
 **Checks:**
 
-1. Ensure `@hua-labs/dot` is installed as a peer dependency. If the peer is missing, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
+1. Ensure the installed `@hua-labs/dot-lsp` package includes its `@hua-labs/dot` dependency. If the dependency install is incomplete or the package tree is corrupted, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
 2. If you are using a custom token defined only in a project-level dot config, the built-in list will not contain it. The server falls back to the dot engine for resolution — verify that your project's dot config is on the module resolution path used by the server process (i.e., the server is started from the project root).
 3. Confirm the token is not a typo. Hover over it to see whether hover documentation appears — if it does, the token is known and should not produce a diagnostic.
 

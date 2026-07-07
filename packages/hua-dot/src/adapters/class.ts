@@ -101,8 +101,85 @@ function tokenToClassName(raw: string): string {
 
 const G = globalThis as Record<string, unknown>;
 
-/** Collected CSS rules (for flush) — shared via globalThis */
+// ── Request-scoped CSS isolation via AsyncLocalStorage ──
+// Node.js SSR can handle concurrent async requests that interleave on the
+// event loop. A shared global buffer would mix CSS across requests.
+// AsyncLocalStorage provides implicit per-request context without API changes.
+// Browser: single-threaded, no interleaving — global buffer is safe.
+
+interface DotScopeStore {
+  buffer: string[];
+}
+
+type ALS<T> = {
+  run<R>(store: T, fn: () => R): R;
+  getStore(): T | undefined;
+};
+
+/** Lazy-init promise for AsyncLocalStorage (dynamic import for ESM compat) */
+let _alsInitPromise: Promise<void> | null = null;
+
+async function importNodeAsyncHooks(): Promise<{
+  AsyncLocalStorage: new () => ALS<DotScopeStore>;
+}> {
+  // Keep the Node-only module specifier out of ESM import syntax. Turbopack
+  // resolves literal dynamic imports even when guarded by runtime checks.
+  const getBuiltinModule = (process as any).getBuiltinModule as
+    | ((specifier: string) => unknown)
+    | undefined;
+  if (!getBuiltinModule) {
+    throw new Error("process.getBuiltinModule is unavailable");
+  }
+  return getBuiltinModule("node:async_hooks") as {
+    AsyncLocalStorage: new () => ALS<DotScopeStore>;
+  };
+}
+
+function getAsyncStorage(): ALS<DotScopeStore> | null {
+  return (G.__dotAsyncStorage as ALS<DotScopeStore> | null) ?? null;
+}
+
+/** Ensure AsyncLocalStorage is initialized (async for ESM dynamic import) */
+function ensureAsyncStorage(): Promise<ALS<DotScopeStore> | null> {
+  if (G.__dotAsyncStorage !== undefined)
+    return Promise.resolve(G.__dotAsyncStorage as ALS<DotScopeStore> | null);
+  if (!_alsInitPromise) {
+    _alsInitPromise = (async () => {
+      try {
+        if (
+          typeof globalThis !== "undefined" &&
+          !("document" in globalThis) &&
+          typeof process !== "undefined" &&
+          (process as any).versions?.node
+        ) {
+          const mod = await importNodeAsyncHooks();
+          G.__dotAsyncStorage = new mod.AsyncLocalStorage();
+          return;
+        }
+      } catch {
+        // Expected in browser environments
+      }
+      G.__dotAsyncStorage = null;
+    })();
+  }
+  return _alsInitPromise.then(() => getAsyncStorage());
+}
+
+// Eagerly trigger init in Node.js (non-blocking)
+if (
+  typeof globalThis !== "undefined" &&
+  !("document" in globalThis) &&
+  typeof process !== "undefined" &&
+  (process as any).versions?.node
+) {
+  ensureAsyncStorage();
+}
+
+/** Collected CSS rules — request-scoped if inside dotRunInScope(), global otherwise */
 function getCollectedRules(): string[] {
+  const als = getAsyncStorage();
+  const store = als?.getStore();
+  if (store) return store.buffer;
   if (!G.__dotCollectedCSS) G.__dotCollectedCSS = [];
   return G.__dotCollectedCSS as string[];
 }
@@ -314,7 +391,7 @@ const PASSTHROUGH_PREFIX_TOKENS = new Set<string>(["prose"]);
 interface ClassRule {
   selector: string;
   declarations: string;
-  mediaWrapper?: string;
+  mediaWrappers?: string[];
 }
 
 function buildRules(
@@ -362,30 +439,30 @@ function buildRules(
       b.styles.__dot_divideX !== undefined,
   );
 
-  // Helper: resolve variant list → selector + media wrapper
+  // Helper: resolve variant list → selector + media wrappers
   function resolveVariants(
     variants: string[],
     baseClassName: string,
-  ): { selectorStr: string; mediaWrapper?: string } {
+  ): { selectorStr: string; mediaWrappers: string[] } {
     let sel = baseClassName;
-    let mw: string | undefined;
+    const mws: string[] = [];
     for (const variant of variants) {
       if (variant === "dark") {
         if (options.darkMode === "media") {
-          mw = "@media (prefers-color-scheme: dark)";
+          mws.push("@media (prefers-color-scheme: dark)");
         } else {
           sel = `dark .${sel}`;
         }
       } else if (bpSet.has(variant)) {
         const width = config.breakpointWidths[variant];
-        if (width) mw = `@media (min-width: ${width})`;
+        if (width) mws.push(`@media (min-width: ${width})`);
       } else if (SELECTOR_MAP[variant]) {
         const built = SELECTOR_MAP[variant](sel);
         sel = built.startsWith(".") ? built.slice(1) : built;
       }
     }
     const selectorStr = sel.startsWith(".") ? sel : `.${sel}`;
-    return { selectorStr, mediaWrapper: mw };
+    return { selectorStr, mediaWrappers: mws };
   }
 
   // Convert buckets to CSS rules
@@ -399,14 +476,20 @@ function buildRules(
     const finalized = finalizeStyle(bucket.styles);
     const declarations = styleToDeclarations(finalized);
 
-    const { selectorStr: baseSelectorStr, mediaWrapper } = resolveVariants(
+    const { selectorStr: baseSelectorStr, mediaWrappers } = resolveVariants(
       bucket.variants,
       className,
     );
 
+    const mws = mediaWrappers.length > 0 ? mediaWrappers : undefined;
+
     // ── Regular style declarations ──
     if (declarations) {
-      rules.push({ selector: baseSelectorStr, declarations, mediaWrapper });
+      rules.push({
+        selector: baseSelectorStr,
+        declarations,
+        mediaWrappers: mws,
+      });
     }
 
     // ── Divide child-combinator rules ──
@@ -422,7 +505,7 @@ function buildRules(
       rules.push({
         selector: `${baseSelectorStr} > * + *`,
         declarations: `${prop}: ${width}; border-style: solid${divideColor}`,
-        mediaWrapper,
+        mediaWrappers: mws,
       });
     }
 
@@ -434,7 +517,7 @@ function buildRules(
       rules.push({
         selector: `${baseSelectorStr} > * + *`,
         declarations: `${prop}: ${width}; border-style: solid${divideColor}`,
-        mediaWrapper,
+        mediaWrappers: mws,
       });
     }
 
@@ -451,7 +534,7 @@ function buildRules(
       rules.push({
         selector: `${baseSelectorStr} > * + *`,
         declarations: `border-color: ${finalized.borderColor}`,
-        mediaWrapper,
+        mediaWrappers: mws,
       });
     }
   }
@@ -463,8 +546,13 @@ function rulesToCSS(rules: ClassRule[]): string {
   const lines: string[] = [];
   for (const rule of rules) {
     const ruleStr = `${rule.selector} { ${rule.declarations} }`;
-    if (rule.mediaWrapper) {
-      lines.push(`${rule.mediaWrapper} { ${ruleStr} }`);
+    if (rule.mediaWrappers && rule.mediaWrappers.length > 0) {
+      // Nest media queries outward: last wrapper becomes outermost
+      let wrapped = ruleStr;
+      for (let i = rule.mediaWrappers.length - 1; i >= 0; i--) {
+        wrapped = `${rule.mediaWrappers[i]} { ${wrapped} }`;
+      }
+      lines.push(wrapped);
     } else {
       lines.push(ruleStr);
     }
@@ -481,8 +569,9 @@ let currentConfig: DotConfig = getGlobalConfig();
  * Call this after createDotConfig() to sync settings.
  */
 export function syncClassConfig(): void {
-  // Re-resolve from the module-level singleton
   currentConfig = getGlobalConfig();
+  classCache.clear();
+  emittedAtomicClasses.clear();
 }
 
 /**
@@ -610,8 +699,54 @@ export function dotCSS(
 }
 
 /**
+ * Run a sync function with request-scoped CSS collection.
+ * Uses already-initialized AsyncLocalStorage if available.
+ *
+ * @example
+ * const { result, css } = dotRunInScope(() => renderToString(<App />));
+ */
+export function dotRunInScope<T>(fn: () => T): { result: T; css: string } {
+  const store: DotScopeStore = { buffer: [] };
+  const als = getAsyncStorage();
+  if (als) {
+    const result = als.run(store, fn);
+    return { result, css: store.buffer.join("\n") };
+  }
+  const result = fn();
+  return { result, css: dotFlush() };
+}
+
+/**
+ * Run an async function with request-scoped CSS collection.
+ * Awaits both AsyncLocalStorage init and the function itself, so
+ * post-await dotCSS() calls are fully captured.
+ *
+ * @example
+ * const { result, css } = await dotRunInScopeAsync(async () => {
+ *   const data = await fetchData();
+ *   dotCSS("p-4"); // captured even after await
+ *   return renderToString(<App data={data} />);
+ * });
+ */
+export async function dotRunInScopeAsync<T>(
+  fn: () => Promise<T>,
+): Promise<{ result: T; css: string }> {
+  const als = await ensureAsyncStorage();
+  const store: DotScopeStore = { buffer: [] };
+  if (als) {
+    return als.run(store, async () => {
+      const result = await fn();
+      return { result, css: store.buffer.join("\n") };
+    });
+  }
+  const result = await fn();
+  return { result, css: dotFlush() };
+}
+
+/**
  * Return all collected CSS from dotClass/dotCSS calls and reset the buffer.
  * Use this for SSR to inject styles into the HTML head.
+ * NOTE: For concurrent SSR, prefer dotRunInScope() instead.
  *
  * @example
  * // In Next.js layout.tsx:

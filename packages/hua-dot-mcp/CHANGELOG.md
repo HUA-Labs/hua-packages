@@ -4,6 +4,13 @@
 
 ### Patch Changes
 
+- Updated dependencies
+  - @hua-labs/dot@0.2.0
+
+## 0.1.1
+
+### Patch Changes
+
 - Package consolidation for public release.
   - **ui**: className → dot migration, dashboard decomposition into semantic subpaths, OKLCH color palette, SDUI registry expansion
   - **motion-core**: absorb 18 hooks from hua-pro (auto-play, orchestration, interaction, specialized)

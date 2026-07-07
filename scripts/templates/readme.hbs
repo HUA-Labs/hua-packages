@@ -12,7 +12,7 @@
 
 ## Features
 
-{{#each features}}
+{{#each readmeFeatures}}
 - **{{this}}**
 {{/each}}
 
@@ -32,6 +32,7 @@ pnpm add @hua-labs/{{shortName}}
 {{{quickStart}}}
 ```
 
+{{#if showReadmeApi}}
 ## API
 
 | Export | Type | Description |
@@ -39,13 +40,24 @@ pnpm add @hua-labs/{{shortName}}
 {{#each exports}}
 | `{{name}}` | {{kind}} | {{description}} |
 {{/each}}
+{{/if}}
 
+{{#if detailedGuide}}
+## Documentation
+
+- [Detailed Guide]({{{detailedGuide}}})
+{{#if docsUrl}}
+- [Full Documentation]({{{docsUrl}}})
+{{/if}}
+{{else}}
 {{#if docsUrl}}
 ## Documentation
 
 [Full Documentation]({{{docsUrl}}})
 {{/if}}
+{{/if}}
 
+{{#if showReadmeSections}}
 {{#if sections}}
 {{#each sections}}
 ## {{title}}
@@ -53,6 +65,7 @@ pnpm add @hua-labs/{{shortName}}
 {{{content}}}
 
 {{/each}}
+{{/if}}
 {{/if}}
 {{#if related}}
 ## Related Packages

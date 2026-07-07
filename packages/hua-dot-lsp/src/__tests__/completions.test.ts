@@ -22,12 +22,36 @@ describe("getAllCompletions", () => {
   });
 
   it("every entry has a non-empty label and detail", () => {
-    for (const entry of all) {
-      expect(typeof entry.label).toBe("string");
-      expect(entry.label.length).toBeGreaterThan(0);
-      expect(typeof entry.detail).toBe("string");
-      expect(entry.detail.length).toBeGreaterThan(0);
+    const invalid = all.filter(
+      (entry) =>
+        typeof entry.label !== "string" ||
+        entry.label.length === 0 ||
+        typeof entry.detail !== "string" ||
+        entry.detail.length === 0,
+    );
+    expect(invalid).toEqual([]);
+  });
+
+  it("supports fast exact label lookup", () => {
+    const started = performance.now();
+    let found: CompletionEntry | undefined;
+    for (let i = 0; i < 10000; i += 1) {
+      found = getCompletionByLabel("dark:text-lg");
     }
+    expect(found?.label).toBe("dark:text-lg");
+    expect(performance.now() - started).toBeLessThan(250);
+  });
+
+  it("entries keep the expected shape", () => {
+    expect(all.every((entry) => typeof entry.label === "string")).toBe(true);
+    expect(all.every((entry) => typeof entry.detail === "string")).toBe(true);
+    expect(
+      all.every(
+        (entry) =>
+          entry.documentation === undefined ||
+          typeof entry.documentation === "string",
+      ),
+    ).toBe(true);
   });
 
   it("is stable across multiple calls (cached)", () => {
@@ -172,9 +196,9 @@ describe("CompletionEntry shape", () => {
     const all = getAllCompletions();
     const withDoc = all.filter((e) => e.documentation !== undefined);
     expect(withDoc.length).toBeGreaterThan(0);
-    for (const entry of withDoc) {
-      expect(typeof entry.documentation).toBe("string");
-    }
+    expect(
+      withDoc.every((entry) => typeof entry.documentation === "string"),
+    ).toBe(true);
   });
 
   it("documentation is absent on non-color entries like p-4", () => {

@@ -1,7 +1,10 @@
 {
   "name": "@hua-labs/dot",
-  "version": "0.1.0",
-  "description": "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet",
+  "version": "0.2.0",
+  "description": "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Swift / Compose",
+  "bin": {
+    "dot-codegen": "./dist/codegen/cli.mjs"
+  },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -24,9 +27,16 @@
       "types": "./dist/class.d.mts",
       "import": "./dist/class.mjs",
       "default": "./dist/class.mjs"
+    },
+    "./codegen": {
+      "types": "./dist/codegen/index.d.mts",
+      "import": "./dist/codegen/index.mjs",
+      "default": "./dist/codegen/index.mjs"
     }
   },
   "files": [
+    "CHANGELOG.md",
+    "DETAILED_GUIDE.md",
     "dist"
   ],
   "scripts": {
@@ -40,8 +50,8 @@
   },
   "devDependencies": {
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "keywords": [
     "style-engine",
@@ -49,6 +59,9 @@
     "utility-first",
     "cross-platform",
     "react-native",
+    "swift",
+    "compose",
+    "codegen",
     "typescript"
   ],
   "author": "HUA Labs",
@@ -59,7 +72,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.16.0"
   },
   "publishConfig": {
     "access": "public",

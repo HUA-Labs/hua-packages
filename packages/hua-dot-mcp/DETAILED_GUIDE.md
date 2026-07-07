@@ -13,6 +13,7 @@ MCP server for the [@hua-labs/dot](https://www.npmjs.com/package/@hua-labs/dot) 
    - [dot_resolve](#dot_resolve)
    - [dot_explain](#dot_explain)
    - [dot_complete](#dot_complete)
+   - [dot_capabilities](#dot_capabilities)
    - [dot_validate](#dot_validate)
 5. [Client Configuration](#client-configuration)
 6. [Advanced Usage](#advanced-usage)
@@ -34,14 +35,15 @@ The server communicates exclusively over **stdio transport**. It reads newline-d
 - The host process (Claude Desktop, VS Code, etc.) spawns the server as a child process.
 - Lifecycle is tied to the host: the server exits when the host closes the pipe.
 
-### 4 Tools Overview
+### 5 Tools Overview
 
-| Tool           | Purpose                                                                     |
-| -------------- | --------------------------------------------------------------------------- |
-| `dot_resolve`  | Resolve utility strings into style objects for a target platform            |
-| `dot_explain`  | Capability report showing what works, what is dropped, what is approximated |
-| `dot_complete` | Completion suggestions for partial utility tokens                           |
-| `dot_validate` | Validate tokens — check that each resolves to at least one CSS property     |
+| Tool               | Purpose                                                                     |
+| ------------------ | --------------------------------------------------------------------------- |
+| `dot_resolve`      | Resolve utility strings into style objects for a target platform            |
+| `dot_explain`      | Capability report showing what works, what is dropped, what is approximated |
+| `dot_complete`     | Completion suggestions for partial utility tokens                           |
+| `dot_capabilities` | Read-only query over the package-owned AX capability catalog                |
+| `dot_validate`     | Validate tokens — check that each resolves to at least one CSS property     |
 
 ### Request / Response Flow
 
@@ -146,6 +148,11 @@ Resolve a dot utility string into a style object for web, native (React Native),
 - `native` — React Native `StyleSheet`-compatible object (numeric sizes, camelCase)
 - `flutter` — Flutter recipe object (`FlutterRecipe`)
 
+`dot_resolve` intentionally returns only the style object. It does not wrap the
+response with `report` or `summary`; use `dot_explain` or target-aware
+`dot_validate` when you need dropped, approximated, recipe-only, or
+plugin-backed capability evidence.
+
 **Example — web target:**
 
 Input:
@@ -204,14 +211,14 @@ Resolve a dot utility string and get a capability report showing what works, wha
   report: {
     _dropped?: string[],         // CSS properties not supported on the target
     _approximated?: string[],    // properties with limited/approximate support
-    _capabilities?: Record<string, "unsupported" | "approximate" | "web-only">,
+    _capabilities?: Record<string, "native" | "approximate" | "recipe-only" | "plugin-backed" | "unsupported">,
     _details?: Record<string, string[]>  // extra notes, e.g. shadow approximation reasons
   },
   summary: string                // human-readable summary
 }
 ```
 
-When `target` is `"web"` or no unsupported properties exist, `report` is `{}` and `summary` is `"All properties supported on this target"`.
+When no dropped/approximated properties exist, `summary` is `"All properties supported on this target"`. The `report` may still include target capability notes such as recipe-only properties. If properties are dropped or approximated, `summary` reports both counts.
 
 **Example — native target with unsupported properties:**
 
@@ -295,21 +302,127 @@ Input:
 
 ---
 
-### dot_validate
+### dot_capabilities
 
-Validate a dot utility string. Checks whether each token resolves to at least one CSS property.
+Query the package-owned AX capability catalog without resolving styles or
+executing target adapters. Use this before `dot_resolve` when an AI assistant
+needs to understand target support by utility family.
 
 **Parameters:**
 
-| Name    | Type     | Required | Description                                    |
-| ------- | -------- | -------- | ---------------------------------------------- |
-| `input` | `string` | Yes      | Space-separated dot utility string to validate |
+| Name                 | Type                                                                                                          | Required | Description                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------- |
+| `target`             | `"web" \| "native" \| "flutter"`                                                                              | No       | Return support for a single target                                      |
+| `category`           | `"box-model" \| "color" \| "layout" \| "typography" \| "visual-effect" \| "interaction" \| "platform-detail"` | No       | Filter by capability category                                           |
+| `level`              | `"native" \| "approximate" \| "recipe-only" \| "plugin-backed" \| "unsupported"`                              | No       | Filter by support level; with `target`, only that target row is matched |
+| `family`             | `string`                                                                                                      | No       | Exact capability family id, such as `"gradient"` or `"interactivity"`   |
+| `limit`              | `number`                                                                                                      | No       | Maximum capability rows to return (default: `20`, max: `100`)           |
+| `includeProperties`  | `boolean`                                                                                                     | No       | Include source CSS property names for each family                       |
+| `includeExamples`    | `boolean`                                                                                                     | No       | Include representative utility examples for each family                 |
+| `includeComposition` | `boolean`                                                                                                     | No       | Include internal marker composition metadata for composed families      |
+
+**Response Shape:**
+
+```ts
+{
+  schemaVersion: string,
+  sourcePackage: "@hua-labs/dot",
+  sourceExport: "getDotAxCatalog",
+  filters: object,
+  totalEntries: number,
+  totalMatches: number,
+  count: number,
+  truncated: boolean,
+  targets: Array<"web" | "native" | "flutter">,
+  surfaces: string[],
+  entries: Array<{
+    id: string,
+    label: string,
+    category: string,
+    description: string,
+    support: object,
+    caveats: string[],
+    properties?: string[],
+    examples?: string[],
+    composition?: {
+      kind: "finalized-style" | "class-child-selector",
+      markers: string[],
+      outputProperties: string[],
+      notes: string[]
+    }
+  }>
+}
+```
+
+**Example:**
+
+Default compact input:
+
+```json
+{ "target": "native", "level": "unsupported", "limit": 2 }
+```
+
+`content[0].text` parsed:
+
+```json
+{
+  "sourceExport": "getDotAxCatalog",
+  "filters": { "target": "native", "level": "unsupported", "limit": 2 },
+  "entries": [
+    {
+      "id": "animation",
+      "support": { "target": "native", "level": "unsupported" }
+    },
+    {
+      "id": "backdropFilter",
+      "support": { "target": "native", "level": "unsupported" }
+    }
+  ]
+}
+```
+
+Composition metadata is opt-in and remains separate from property details:
+
+```json
+{ "family": "ring", "includeComposition": true }
+```
+
+```json
+{
+  "entries": [
+    {
+      "id": "ring",
+      "composition": {
+        "kind": "finalized-style",
+        "markers": ["__dot_ringLayer"],
+        "outputProperties": ["boxShadow"]
+      }
+    }
+  ]
+}
+```
+
+---
+
+### dot_validate
+
+Validate a dot utility string. Checks whether each token resolves to at least one property. When `target` is provided, the response also includes the same target capability caveats as `dot_explain`.
+
+**Parameters:**
+
+| Name         | Type                                    | Required | Description                                    |
+| ------------ | --------------------------------------- | -------- | ---------------------------------------------- |
+| `input`      | `string`                                | Yes      | Space-separated dot utility string to validate |
+| `target`     | `"web" \| "native" \| "flutter"`        | No       | Target platform for capability caveats         |
+| `dark`       | `boolean`                               | No       | Apply dark mode styles                         |
+| `breakpoint` | `"sm" \| "md" \| "lg" \| "xl" \| "2xl"` | No       | Active breakpoint for responsive styles        |
 
 **Validation Logic:**
 
 - Each token is stripped of variant prefixes (e.g. `dark:`, `hover:`) and `!` (important flag) before resolution.
-- A token is flagged as unrecognized if `dot(token)` returns an empty object, except for `sr-only` and `not-sr-only` (which produce no inline CSS properties but are valid).
-- The `resolved_count` reflects how many CSS properties the full input string resolves to.
+- A token is flagged as unrecognized if `dot(token)` returns an empty object, except for `sr-only` and `not-sr-only` (which produce no inline properties but are valid).
+- The `resolved_count` reflects how many properties the full input string resolves to for the requested target.
+- If `target` is present, `report` and `summary` mirror `dot_explain` so target-specific drops, approximations, and capability notes are visible without marking recognized tokens invalid.
 
 **Response Shape:**
 
@@ -317,7 +430,9 @@ Validate a dot utility string. Checks whether each token resolves to at least on
 {
   valid: boolean,
   errors: string[],      // empty array when valid
-  resolved_count: number // number of CSS properties in the resolved web output
+  resolved_count: number, // number of properties in the resolved output
+  report?: DotCapabilityReport,
+  summary?: string
 }
 ```
 
@@ -336,6 +451,31 @@ Input:
   "valid": true,
   "errors": [],
   "resolved_count": 3
+}
+```
+
+**Example — native target caveat:**
+
+Input:
+
+```json
+{ "input": "p-4 blur-md", "target": "native" }
+```
+
+`content[0].text` parsed:
+
+```json
+{
+  "valid": true,
+  "errors": [],
+  "resolved_count": 1,
+  "report": {
+    "_dropped": ["filter"],
+    "_capabilities": {
+      "filter": "unsupported"
+    }
+  },
+  "summary": "1 properties dropped, 0 approximated"
 }
 ```
 
@@ -400,13 +540,22 @@ Any MCP client that supports stdio transport can run `dot-mcp`. Configure the cl
 
 ### Chaining Tools
 
-The four tools are designed to be used together in workflows. Parse `content[0].text` as JSON after each call to access the result before passing it to the next tool.
+The five tools are designed to be used together in workflows. Parse `content[0].text` as JSON after each call to access the result before passing it to the next tool.
 
-### Cross-Platform Workflow: resolve → explain → validate
+### Cross-Platform Workflow: capabilities → validate → resolve → explain
 
 A common pattern when targeting non-web platforms:
 
-**Step 1 — Validate the utility string first:**
+**Step 1 — Inspect target capability families first:**
+
+```json
+{ "tool": "dot_capabilities", "target": "native", "level": "unsupported" }
+```
+
+This is a read-only package metadata query. It does not execute `dot()` or a
+target adapter.
+
+**Step 2 — Validate the utility string:**
 
 ```json
 { "tool": "dot_validate", "input": "p-4 blur-md grid grid-cols-3" }
@@ -414,7 +563,7 @@ A common pattern when targeting non-web platforms:
 
 Confirms all tokens are recognized before committing to a target.
 
-**Step 2 — Resolve for the target platform:**
+**Step 3 — Resolve for the target platform:**
 
 ```json
 {
@@ -426,7 +575,7 @@ Confirms all tokens are recognized before committing to a target.
 
 Returns the style object that will actually be applied.
 
-**Step 3 — Explain what was dropped:**
+**Step 4 — Explain what was dropped:**
 
 ```json
 {
@@ -438,7 +587,7 @@ Returns the style object that will actually be applied.
 
 The `report._dropped` list shows which properties from Step 2 are absent on the native target, and `summary` provides a human-readable count. Use this information to substitute platform-compatible alternatives.
 
-**Step 4 — Complete alternative tokens if needed:**
+**Step 5 — Complete alternative tokens if needed:**
 
 ```json
 { "tool": "dot_complete", "partial": "shadow" }
