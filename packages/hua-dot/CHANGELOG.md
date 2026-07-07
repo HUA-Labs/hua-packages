@@ -1,5 +1,11 @@
 # @hua-labs/dot
 
+## 0.2.0
+
+### Minor Changes
+
+- Dot style engine improvements: semantic tokens (info/success/warning), space-y auto-flex, native codegen (Swift & Compose), test stability fixes.
+
 ## 0.1.1
 
 ### Patch Changes

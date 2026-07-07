@@ -30,6 +30,16 @@ interface DocYaml {
   features: string[];
   quickStart: string;
   codeBlockLang?: string;
+  readme?: {
+    features?: string[];
+    featureLimit?: number;
+    quickStart?: string;
+    codeBlockLang?: string;
+    hideApi?: boolean;
+    hideSections?: boolean;
+    detailedGuide?: string;
+    aiGuide?: string;
+  };
   docsUrl?: string;
   apiNotes?: Record<string, { description: string; kind?: string }>;
   apiFilter?: "all" | "notes-only"; // 'notes-only' = only show exports in apiNotes
@@ -59,6 +69,11 @@ interface PackageData {
   peerDepsList: string;
   reactMajor?: string;
   exports: ExportInfo[];
+  readmeFeatures: string[];
+  showReadmeApi: boolean;
+  showReadmeSections: boolean;
+  detailedGuide?: string;
+  aiGuide?: string;
   // from doc.yaml
   overview: string;
   features: string[];
@@ -197,6 +212,15 @@ function loadPackageData(dirName: string): PackageData | null {
 
   // Parse doc.yaml
   const docYaml: DocYaml = parseYaml(readFileSync(docYamlPath, "utf-8"));
+  const readmeFeatureLimit =
+    typeof docYaml.readme?.featureLimit === "number"
+      ? docYaml.readme.featureLimit
+      : undefined;
+  const readmeFeatures =
+    docYaml.readme?.features ??
+    (readmeFeatureLimit
+      ? (docYaml.features ?? []).slice(0, readmeFeatureLimit)
+      : (docYaml.features ?? []));
 
   // Parse exports (filter to apiNotes-only when configured)
   let exports = parseExports(indexPath, docYaml.apiNotes);
@@ -226,10 +250,16 @@ function loadPackageData(dirName: string): PackageData | null {
     peerDepsList,
     reactMajor,
     exports,
+    readmeFeatures,
+    showReadmeApi: docYaml.readme?.hideApi !== true,
+    showReadmeSections: docYaml.readme?.hideSections !== true,
+    detailedGuide: docYaml.readme?.detailedGuide,
+    aiGuide: docYaml.readme?.aiGuide,
     overview: docYaml.overview,
     features: docYaml.features ?? [],
-    quickStart: docYaml.quickStart ?? "",
-    codeBlockLang: docYaml.codeBlockLang ?? "tsx",
+    quickStart: docYaml.readme?.quickStart ?? docYaml.quickStart ?? "",
+    codeBlockLang:
+      docYaml.readme?.codeBlockLang ?? docYaml.codeBlockLang ?? "tsx",
     docsUrl: docYaml.docsUrl,
     related: docYaml.related,
     sections: docYaml.sections,

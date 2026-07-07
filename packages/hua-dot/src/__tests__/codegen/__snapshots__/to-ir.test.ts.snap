@@ -1,0 +1,110 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`toIR() > converts a complex button style 1`] = `
+{
+  "border": {
+    "radius": {
+      "bottomLeft": 9999,
+      "bottomRight": 9999,
+      "topLeft": 9999,
+      "topRight": 9999,
+    },
+  },
+  "colors": {
+    "background": "#2b6cd6",
+    "text": "#ffffff",
+  },
+  "input": "px-6 py-3 bg-primary-500 text-white rounded-full font-semibold shadow-lg",
+  "name": "test",
+  "padding": {
+    "bottom": 12,
+    "left": 24,
+    "right": 24,
+    "top": 12,
+  },
+  "shadows": [
+    {
+      "blur": 15,
+      "color": "#000000",
+      "offsetX": 0,
+      "offsetY": 10,
+      "opacity": 0.1,
+      "spread": -3,
+    },
+    {
+      "blur": 6,
+      "color": "#000000",
+      "offsetX": 0,
+      "offsetY": 4,
+      "opacity": 0.1,
+      "spread": -4,
+    },
+  ],
+  "typography": {
+    "fontWeight": "600",
+  },
+}
+`;
+
+exports[`toIR() > converts a complex card style 1`] = `
+{
+  "border": {
+    "radius": {
+      "bottomLeft": 8,
+      "bottomRight": 8,
+      "topLeft": 8,
+      "topRight": 8,
+    },
+  },
+  "colors": {
+    "background": "#ffffff",
+  },
+  "input": "p-4 bg-white rounded-lg shadow-md flex flex-col gap-2",
+  "layout": {
+    "direction": "column",
+    "display": "flex",
+    "gap": 8,
+  },
+  "name": "test",
+  "padding": {
+    "bottom": 16,
+    "left": 16,
+    "right": 16,
+    "top": 16,
+  },
+  "shadows": [
+    {
+      "blur": 6,
+      "color": "#000000",
+      "offsetX": 0,
+      "offsetY": 4,
+      "opacity": 0.1,
+      "spread": -1,
+    },
+    {
+      "blur": 4,
+      "color": "#000000",
+      "offsetX": 0,
+      "offsetY": 2,
+      "opacity": 0.1,
+      "spread": -2,
+    },
+  ],
+}
+`;
+
+exports[`toIR() > converts a complex heading style 1`] = `
+{
+  "colors": {
+    "text": "#121418",
+  },
+  "input": "text-2xl font-bold text-gray-900 leading-tight tracking-tight",
+  "name": "test",
+  "typography": {
+    "fontSize": 24,
+    "fontWeight": "700",
+    "letterSpacing": -0.4,
+    "lineHeight": 1.25,
+  },
+}
+`;

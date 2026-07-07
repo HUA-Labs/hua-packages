@@ -1648,6 +1648,7 @@ const VARIANTS = [
 // ---------------------------------------------------------------------------
 
 let _allCompletions: CompletionEntry[] | null = null;
+let _completionByLabel: Map<string, CompletionEntry> | null = null;
 
 export function getAllCompletions(): CompletionEntry[] {
   if (_allCompletions) return _allCompletions;
@@ -1693,6 +1694,9 @@ export function getAllCompletions(): CompletionEntry[] {
   }
 
   _allCompletions = withVariants;
+  _completionByLabel = new Map(
+    withVariants.map((entry) => [entry.label, entry] as const),
+  );
   return _allCompletions;
 }
 
@@ -1707,5 +1711,6 @@ export function getCompletionsForPrefix(prefix: string): CompletionEntry[] {
 export function getCompletionByLabel(
   label: string,
 ): CompletionEntry | undefined {
-  return getAllCompletions().find((e) => e.label === label);
+  getAllCompletions();
+  return _completionByLabel?.get(label);
 }

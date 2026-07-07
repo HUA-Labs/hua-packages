@@ -1,28 +1,35 @@
 {
   "name": "@hua-labs/dot-lsp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "LSP server for the dot style engine — autocomplete, hover, diagnostics",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "dot-lsp": "./dist/index.js"
   },
+  "files": [
+    "CHANGELOG.md",
+    "DETAILED_GUIDE.md",
+    "dist/index.js"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --shims",
+    "build": "tsup src/index.ts --format esm --shims && rm -f dist/index.d.ts",
     "dev": "tsx src/index.ts --stdio",
+    "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:*",
-    "vscode-languageserver": "^10.0.1",
+    "@hua-labs/dot": "workspace:0.2.0",
+    "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
-    "tsx": "^4.22.4",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -36,6 +43,7 @@
     "url": "https://github.com/HUA-Labs/hua-packages/issues"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

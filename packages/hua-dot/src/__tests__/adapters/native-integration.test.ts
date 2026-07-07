@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { dot, createDotConfig, clearDotCache } from '../../index';
+import { describe, it, expect, beforeEach } from "vitest";
+import { dot, createDotConfig, clearDotCache } from "../../index";
 
-describe('dot() with target: native — integration', () => {
+describe("dot() with target: native — integration", () => {
   beforeEach(() => {
     createDotConfig();
     clearDotCache();
@@ -10,13 +10,13 @@ describe('dot() with target: native — integration', () => {
   // -----------------------------------------------------------------------
   // Basic conversion
   // -----------------------------------------------------------------------
-  it('converts spacing to numbers', () => {
-    const result = dot('p-4 m-2', { target: 'native' });
+  it("converts spacing to numbers", () => {
+    const result = dot("p-4 m-2", { target: "native" });
     expect(result).toEqual({ padding: 16, margin: 8 });
   });
 
-  it('converts directional spacing', () => {
-    const result = dot('px-4 py-2', { target: 'native' });
+  it("converts directional spacing", () => {
+    const result = dot("px-4 py-2", { target: "native" });
     expect(result).toEqual({
       paddingLeft: 16,
       paddingRight: 16,
@@ -25,225 +25,257 @@ describe('dot() with target: native — integration', () => {
     });
   });
 
-  it('resolves colors (passthrough)', () => {
-    const result = dot('bg-primary-500 text-white', { target: 'native' });
+  it("resolves colors (passthrough)", () => {
+    const result = dot("bg-primary-500 text-white", { target: "native" });
     expect(result).toEqual({
-      backgroundColor: '#2b6cd6',
-      color: '#ffffff',
+      backgroundColor: "#2b6cd6",
+      color: "#ffffff",
     });
   });
 
-  it('resolves typography', () => {
-    const result = dot('text-sm font-bold', { target: 'native' });
-    expect(result).toHaveProperty('fontSize', 14);
-    expect(result).toHaveProperty('fontWeight', '700');
+  it("resolves typography", () => {
+    const result = dot("text-sm font-bold", { target: "native" });
+    expect(result).toHaveProperty("fontSize", 14);
+    expect(result).toHaveProperty("fontWeight", "700");
   });
 
-  it('resolves layout (flex)', () => {
-    const result = dot('flex items-center justify-between', {
-      target: 'native',
+  it("resolves layout (flex)", () => {
+    const result = dot("flex items-center justify-between", {
+      target: "native",
     });
     expect(result).toEqual({
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
     });
   });
 
-  it('hides elements', () => {
-    expect(dot('hidden', { target: 'native' })).toEqual({
-      display: 'none',
+  it("hides elements", () => {
+    expect(dot("hidden", { target: "native" })).toEqual({
+      display: "none",
     });
   });
 
-  it('resolves sizing', () => {
-    const result = dot('w-full h-12', { target: 'native' });
-    expect(result).toEqual({ width: '100%', height: 48 });
+  it("resolves sizing", () => {
+    const result = dot("w-full h-12", { target: "native" });
+    expect(result).toEqual({ width: "100%", height: 48 });
   });
 
-  it('resolves border-radius', () => {
-    const result = dot('rounded-lg', { target: 'native' });
-    expect(result).toHaveProperty('borderRadius', 8);
+  it("resolves border-radius", () => {
+    const result = dot("rounded-lg", { target: "native" });
+    expect(result).toHaveProperty("borderRadius", 8);
   });
 
-  it('resolves z-index as number', () => {
-    const result = dot('z-10', { target: 'native' });
+  it("resolves z-index as number", () => {
+    const result = dot("z-10", { target: "native" });
     expect(result).toEqual({ zIndex: 10 });
   });
 
-  it('resolves opacity as number', () => {
-    const result = dot('opacity-50', { target: 'native' });
+  it("resolves opacity as number", () => {
+    const result = dot("opacity-50", { target: "native" });
     expect(result).toEqual({ opacity: 0.5 });
   });
 
   // -----------------------------------------------------------------------
   // Transform
   // -----------------------------------------------------------------------
-  it('converts rotate to RN transform array', () => {
-    const result = dot('rotate-45', { target: 'native' });
+  it("converts rotate to RN transform array", () => {
+    const result = dot("rotate-45", { target: "native" });
     expect(result).toEqual({
-      transform: [{ rotate: '45deg' }],
+      transform: [{ rotate: "45deg" }],
     });
   });
 
-  it('converts scale to RN transform array', () => {
-    const result = dot('scale-110', { target: 'native' });
+  it("converts scale to RN transform array", () => {
+    const result = dot("scale-110", { target: "native" });
     expect(result).toEqual({
       transform: [{ scale: 1.1 }],
     });
   });
 
-  it('accumulates multiple transforms', () => {
-    const result = dot('rotate-45 scale-110', { target: 'native' });
+  it("accumulates multiple transforms", () => {
+    const result = dot("rotate-45 scale-110", { target: "native" });
     // dot() merges transform strings before adapter converts
-    expect(result).toHaveProperty('transform');
+    expect(result).toHaveProperty("transform");
     const transforms = result.transform as Array<Record<string, unknown>>;
-    expect(transforms).toContainEqual({ rotate: '45deg' });
+    expect(transforms).toContainEqual({ rotate: "45deg" });
     expect(transforms).toContainEqual({ scale: 1.1 });
   });
 
   // -----------------------------------------------------------------------
   // Shadow
   // -----------------------------------------------------------------------
-  it('converts shadow to RN properties', () => {
-    const result = dot('shadow-sm', { target: 'native' });
-    expect(result).toHaveProperty('shadowColor');
-    expect(result).toHaveProperty('shadowOffset');
-    expect(result).toHaveProperty('shadowOpacity');
-    expect(result).toHaveProperty('shadowRadius');
-    expect(result).toHaveProperty('elevation');
-    expect(result).not.toHaveProperty('boxShadow');
+  it("converts shadow to RN properties", () => {
+    const result = dot("shadow-sm", { target: "native" });
+    expect(result).toHaveProperty("shadowColor");
+    expect(result).toHaveProperty("shadowOffset");
+    expect(result).toHaveProperty("shadowOpacity");
+    expect(result).toHaveProperty("shadowRadius");
+    expect(result).toHaveProperty("elevation");
+    expect(result).not.toHaveProperty("boxShadow");
   });
 
-  it('shadow-none produces no shadow props', () => {
-    const result = dot('shadow-none', { target: 'native' });
-    expect(result).not.toHaveProperty('shadowColor');
-    expect(result).not.toHaveProperty('boxShadow');
+  it("preserves real shadow props when ring is combined with shadow", () => {
+    const result = dot("shadow-xl ring-2", { target: "native" });
+    expect(result).toHaveProperty("shadowColor");
+    expect(result).toHaveProperty("shadowOffset");
+    expect(result).toHaveProperty("shadowOpacity");
+    expect(result).toHaveProperty("shadowRadius");
+    expect(result).toHaveProperty("elevation");
+    expect(result).not.toHaveProperty("boxShadow");
+  });
+
+  it("preserves real shadow props when ring-0 is combined with shadow", () => {
+    const result = dot("shadow-xl ring-0", { target: "native" });
+    expect(result).toHaveProperty("shadowColor", "#000000");
+    expect(result).toHaveProperty("shadowOffset", { width: 0, height: 20 });
+    expect(result).toHaveProperty("shadowOpacity", 0.1);
+    expect(result).toHaveProperty("shadowRadius", 12.5);
+    expect(result).toHaveProperty("elevation", 23);
+    expect(result).not.toHaveProperty("boxShadow");
+  });
+
+  it("drops arbitrary native shadow when the renderable shadow color is a CSS variable", () => {
+    const result = dot("shadow-[0_4px_6px_var(--shadow-color)]", {
+      target: "native",
+    });
+    expect(result).toEqual({});
+  });
+
+  it("drops spread-only ring when no native shadow is present", () => {
+    const result = dot("ring-2", { target: "native" });
+    expect(result).toEqual({});
+  });
+
+  it("shadow-none produces no shadow props", () => {
+    const result = dot("shadow-none", { target: "native" });
+    expect(result).not.toHaveProperty("shadowColor");
+    expect(result).not.toHaveProperty("boxShadow");
   });
 
   // -----------------------------------------------------------------------
   // Unsupported stripped
   // -----------------------------------------------------------------------
-  it('strips transition properties', () => {
-    const result = dot('transition-all duration-300 ease-in-out', {
-      target: 'native',
+  it("strips transition properties", () => {
+    const result = dot("transition-all duration-300 ease-in-out", {
+      target: "native",
     });
-    expect(result).not.toHaveProperty('transitionProperty');
-    expect(result).not.toHaveProperty('transitionDuration');
-    expect(result).not.toHaveProperty('transitionTimingFunction');
+    expect(result).not.toHaveProperty("transitionProperty");
+    expect(result).not.toHaveProperty("transitionDuration");
+    expect(result).not.toHaveProperty("transitionTimingFunction");
   });
 
-  it('strips backdrop-blur', () => {
-    const result = dot('backdrop-blur-sm', { target: 'native' });
-    expect(result).not.toHaveProperty('backdropFilter');
-    expect(result).not.toHaveProperty('WebkitBackdropFilter');
+  it("strips backdrop-blur", () => {
+    const result = dot("backdrop-blur-sm", { target: "native" });
+    expect(result).not.toHaveProperty("backdropFilter");
+    expect(result).not.toHaveProperty("WebkitBackdropFilter");
   });
 
   // -----------------------------------------------------------------------
   // Dark + native
   // -----------------------------------------------------------------------
-  it('applies dark mode with native target', () => {
-    const result = dot('bg-white dark:bg-gray-900', {
+  it("applies dark mode with native target", () => {
+    const result = dot("bg-white dark:bg-gray-900", {
       dark: true,
-      target: 'native',
+      target: "native",
     });
-    expect(result).toHaveProperty('backgroundColor', '#121418');
+    expect(result).toHaveProperty("backgroundColor", "#121418");
   });
 
-  it('ignores dark tokens in light mode', () => {
-    const result = dot('bg-white dark:bg-gray-900', {
+  it("ignores dark tokens in light mode", () => {
+    const result = dot("bg-white dark:bg-gray-900", {
       dark: false,
-      target: 'native',
+      target: "native",
     });
-    expect(result).toHaveProperty('backgroundColor', '#ffffff');
+    expect(result).toHaveProperty("backgroundColor", "#ffffff");
   });
 
   // -----------------------------------------------------------------------
   // Responsive + native
   // -----------------------------------------------------------------------
-  it('applies responsive cascade with native target', () => {
-    const result = dot('p-4 md:p-8', {
-      breakpoint: 'md',
-      target: 'native',
+  it("applies responsive cascade with native target", () => {
+    const result = dot("p-4 md:p-8", {
+      breakpoint: "md",
+      target: "native",
     });
     expect(result).toEqual({ padding: 32 });
   });
 
-  it('dark + responsive + native combined', () => {
-    const result = dot('p-4 md:p-8 dark:bg-gray-900', {
+  it("dark + responsive + native combined", () => {
+    const result = dot("p-4 md:p-8 dark:bg-gray-900", {
       dark: true,
-      breakpoint: 'md',
-      target: 'native',
+      breakpoint: "md",
+      target: "native",
     });
     expect(result.padding).toBe(32);
-    expect(result.backgroundColor).toBe('#121418');
+    expect(result.backgroundColor).toBe("#121418");
   });
 
   // -----------------------------------------------------------------------
   // Cache separation
   // -----------------------------------------------------------------------
-  it('caches web and native separately', () => {
-    const webResult = dot('p-4');
-    const nativeResult = dot('p-4', { target: 'native' });
+  it("caches web and native separately", () => {
+    const webResult = dot("p-4");
+    const nativeResult = dot("p-4", { target: "native" });
 
-    expect(webResult).toEqual({ padding: '16px' });
+    expect(webResult).toEqual({ padding: "16px" });
     expect(nativeResult).toEqual({ padding: 16 });
 
     // Second call (from cache) should return same results
-    expect(dot('p-4')).toEqual({ padding: '16px' });
-    expect(dot('p-4', { target: 'native' })).toEqual({ padding: 16 });
+    expect(dot("p-4")).toEqual({ padding: "16px" });
+    expect(dot("p-4", { target: "native" })).toEqual({ padding: 16 });
   });
 
-  it('does not mix dark+native and dark+web caches', () => {
-    const webDark = dot('bg-white dark:bg-gray-900', { dark: true });
-    const nativeDark = dot('bg-white dark:bg-gray-900', {
+  it("does not mix dark+native and dark+web caches", () => {
+    const webDark = dot("bg-white dark:bg-gray-900", { dark: true });
+    const nativeDark = dot("bg-white dark:bg-gray-900", {
       dark: true,
-      target: 'native',
+      target: "native",
     });
 
-    expect(webDark).toEqual({ backgroundColor: '#121418' });
-    expect(nativeDark).toEqual({ backgroundColor: '#121418' });
+    expect(webDark).toEqual({ backgroundColor: "#121418" });
+    expect(nativeDark).toEqual({ backgroundColor: "#121418" });
   });
 
   // -----------------------------------------------------------------------
   // Config-level runtime
   // -----------------------------------------------------------------------
-  it('respects config-level runtime: native', () => {
-    createDotConfig({ runtime: 'native' });
-    const result = dot('p-4');
+  it("respects config-level runtime: native", () => {
+    createDotConfig({ runtime: "native" });
+    const result = dot("p-4");
     expect(result).toEqual({ padding: 16 });
   });
 
-  it('options.target overrides config runtime', () => {
-    createDotConfig({ runtime: 'native' });
-    const result = dot('p-4', { target: 'web' });
-    expect(result).toEqual({ padding: '16px' });
+  it("options.target overrides config runtime", () => {
+    createDotConfig({ runtime: "native" });
+    const result = dot("p-4", { target: "web" });
+    expect(result).toEqual({ padding: "16px" });
   });
 
   // -----------------------------------------------------------------------
   // Edge cases
   // -----------------------------------------------------------------------
-  it('returns empty object for empty input', () => {
-    expect(dot('', { target: 'native' })).toEqual({});
-    expect(dot('   ', { target: 'native' })).toEqual({});
+  it("returns empty object for empty input", () => {
+    expect(dot("", { target: "native" })).toEqual({});
+    expect(dot("   ", { target: "native" })).toEqual({});
   });
 
-  it('negative spacing converts correctly', () => {
-    const result = dot('-m-4', { target: 'native' });
+  it("negative spacing converts correctly", () => {
+    const result = dot("-m-4", { target: "native" });
     expect(result).toEqual({ margin: -16 });
   });
 
-  it('border with arbitrary color does not set borderWidth to string', () => {
-    const result = dot('border border-[#dadce0]', { target: 'native' });
+  it("border with arbitrary color does not set borderWidth to string", () => {
+    const result = dot("border border-[#dadce0]", { target: "native" });
     expect(result.borderWidth).toBe(1);
-    expect(result.borderColor).toBe('#dadce0');
+    expect(result.borderColor).toBe("#dadce0");
   });
 
-  it('color shade tokens work on native', () => {
-    const result = dot('bg-teal-500 text-red-300', { target: 'native' });
+  it("color shade tokens work on native", () => {
+    const result = dot("bg-teal-500 text-red-300", { target: "native" });
     expect(result).toEqual({
-      backgroundColor: '#008284',
-      color: '#fa7c6a',
+      backgroundColor: "#008284",
+      color: "#fa7c6a",
     });
   });
 });

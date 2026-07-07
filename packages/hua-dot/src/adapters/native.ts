@@ -1,10 +1,14 @@
-import type { StyleObject } from '../types';
-import type { RNStyleObject, RNTransformEntry, AdaptNativeOptions } from './native-types';
-import { toNumericValue, parseShadowLayers } from './shared';
-import type { ParsedShadowLayer } from './shared';
+import type { StyleObject } from "../types";
+import type {
+  RNStyleObject,
+  RNTransformEntry,
+  AdaptNativeOptions,
+} from "./native-types";
+import { splitShadowLayers, toNumericValue, parseShadowLayers } from "./shared";
+import type { ParsedShadowLayer } from "./shared";
 
 // Re-export types for consumers importing from this module
-export type { AdaptNativeOptions } from './native-types';
+export type { AdaptNativeOptions } from "./native-types";
 
 // ---------------------------------------------------------------------------
 // Property classification sets
@@ -13,168 +17,175 @@ export type { AdaptNativeOptions } from './native-types';
 /** Properties to silently drop (unsupported in RN) */
 const SKIP_PROPS = new Set([
   // Internal dot markers (child-combinator divide — class mode only)
-  '__dot_divideY',
-  '__dot_divideX',
-  '__dot_divideYReverse',
-  '__dot_divideXReverse',
-  'animation',
-  'animationName',
-  'animationDuration',
-  'animationTimingFunction',
-  'animationDelay',
-  'animationIterationCount',
-  'animationFillMode',
-  'transitionProperty',
-  'transitionDuration',
-  'transitionTimingFunction',
-  'transitionDelay',
-  'transition',
-  'backdropFilter',
-  'WebkitBackdropFilter',
-  'cursor',
-  'outline',
-  'outlineWidth',
-  'outlineStyle',
-  'outlineColor',
-  'outlineOffset',
-  'gridTemplateColumns',
-  'gridTemplateRows',
-  'gridColumn',
-  'gridRow',
-  'insetInlineStart',
-  'insetInlineEnd',
-  'userSelect',
-  'resize',
-  'whiteSpace',
-  'textOverflow',
-  'WebkitBoxOrient',
-  'clip',
-  'visibility',
-  'filter',
-  'mixBlendMode',
+  "__dot_divideY",
+  "__dot_divideX",
+  "__dot_divideYReverse",
+  "__dot_divideXReverse",
+  "animation",
+  "animationName",
+  "animationDuration",
+  "animationTimingFunction",
+  "animationDelay",
+  "animationIterationCount",
+  "animationFillMode",
+  "transitionProperty",
+  "transitionDuration",
+  "transitionTimingFunction",
+  "transitionDelay",
+  "transition",
+  "backdropFilter",
+  "WebkitBackdropFilter",
+  "cursor",
+  "outline",
+  "outlineWidth",
+  "outlineStyle",
+  "outlineColor",
+  "outlineOffset",
+  "gridTemplateColumns",
+  "gridTemplateRows",
+  "gridAutoFlow",
+  "gridAutoColumns",
+  "gridAutoRows",
+  "gridColumn",
+  "gridRow",
+  "gridColumnStart",
+  "gridColumnEnd",
+  "gridRowStart",
+  "gridRowEnd",
+  "insetInlineStart",
+  "insetInlineEnd",
+  "userSelect",
+  "resize",
+  "whiteSpace",
+  "textOverflow",
+  "WebkitBoxOrient",
+  "clip",
+  "visibility",
+  "filter",
+  "mixBlendMode",
   // Wave 2: web-only properties
-  'float',
-  'clear',
-  'isolation',
-  'tableLayout',
-  'borderCollapse',
-  'borderSpacing',
-  'captionSide',
-  'listStyleType',
-  'listStylePosition',
-  'scrollBehavior',
-  'scrollMarginTop',
-  'scrollMarginRight',
-  'scrollMarginBottom',
-  'scrollMarginLeft',
-  'scrollPaddingTop',
-  'scrollPaddingRight',
-  'scrollPaddingBottom',
-  'scrollPaddingLeft',
-  'willChange',
-  'touchAction',
-  'textIndent',
-  'textDecorationThickness',
-  'textUnderlineOffset',
-  'placeContent',
-  'placeItems',
-  'placeSelf',
-  'objectPosition',
-  'overflowWrap',
-  'wordBreak',
-  'backgroundImage',
+  "float",
+  "clear",
+  "isolation",
+  "tableLayout",
+  "borderCollapse",
+  "borderSpacing",
+  "captionSide",
+  "listStyleType",
+  "listStylePosition",
+  "scrollBehavior",
+  "scrollMarginTop",
+  "scrollMarginRight",
+  "scrollMarginBottom",
+  "scrollMarginLeft",
+  "scrollPaddingTop",
+  "scrollPaddingRight",
+  "scrollPaddingBottom",
+  "scrollPaddingLeft",
+  "willChange",
+  "touchAction",
+  "textIndent",
+  "textDecorationThickness",
+  "textUnderlineOffset",
+  "placeContent",
+  "placeItems",
+  "placeSelf",
+  "objectPosition",
+  "overflowWrap",
+  "wordBreak",
+  "backgroundImage",
   // Phase 0: web-only properties
-  'backgroundClip',
-  'WebkitBackgroundClip',
-  'WebkitFontSmoothing',
-  'MozOsxFontSmoothing',
-  'overflowX',
-  'overflowY',
+  "backgroundClip",
+  "WebkitBackgroundClip",
+  "WebkitFontSmoothing",
+  "MozOsxFontSmoothing",
+  "overflowX",
+  "overflowY",
 ]);
 
 /** Properties whose px/number values should be converted to plain numbers */
 const NUMERIC_PROPS = new Set([
-  'padding',
-  'paddingTop',
-  'paddingRight',
-  'paddingBottom',
-  'paddingLeft',
-  'paddingHorizontal',
-  'paddingVertical',
-  'margin',
-  'marginTop',
-  'marginRight',
-  'marginBottom',
-  'marginLeft',
-  'marginHorizontal',
-  'marginVertical',
-  'gap',
-  'rowGap',
-  'columnGap',
-  'width',
-  'height',
-  'minWidth',
-  'minHeight',
-  'maxWidth',
-  'maxHeight',
-  'borderRadius',
-  'borderTopLeftRadius',
-  'borderTopRightRadius',
-  'borderBottomLeftRadius',
-  'borderBottomRightRadius',
-  'borderWidth',
-  'borderTopWidth',
-  'borderRightWidth',
-  'borderBottomWidth',
-  'borderLeftWidth',
-  'top',
-  'right',
-  'bottom',
-  'left',
-  'fontSize',
-  'letterSpacing',
-  'lineHeight',
-  'flexBasis',
+  "padding",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft",
+  "paddingHorizontal",
+  "paddingVertical",
+  "margin",
+  "marginTop",
+  "marginRight",
+  "marginBottom",
+  "marginLeft",
+  "marginHorizontal",
+  "marginVertical",
+  "gap",
+  "rowGap",
+  "columnGap",
+  "width",
+  "height",
+  "minWidth",
+  "minHeight",
+  "maxWidth",
+  "maxHeight",
+  "borderRadius",
+  "borderTopLeftRadius",
+  "borderTopRightRadius",
+  "borderBottomLeftRadius",
+  "borderBottomRightRadius",
+  "borderWidth",
+  "borderTopWidth",
+  "borderRightWidth",
+  "borderBottomWidth",
+  "borderLeftWidth",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "fontSize",
+  "letterSpacing",
+  "lineHeight",
+  "flexBasis",
 ]);
 
 /** Properties that should be parseFloat'd */
-const FLOAT_PROPS = new Set(['opacity', 'flexGrow', 'flexShrink']);
+const FLOAT_PROPS = new Set(["opacity", "flexGrow", "flexShrink"]);
 
 /** Properties that should be parseInt'd */
-const INT_PROPS = new Set(['zIndex', 'order']);
+const INT_PROPS = new Set(["zIndex", "order"]);
 
 /** Properties that pass through unchanged */
 const PASSTHROUGH_PROPS = new Set([
-  'color',
-  'backgroundColor',
-  'borderColor',
-  'borderTopColor',
-  'borderRightColor',
-  'borderBottomColor',
-  'borderLeftColor',
-  'borderStyle',
-  'flexDirection',
-  'flexWrap',
-  'alignItems',
-  'alignSelf',
-  'alignContent',
-  'justifyContent',
-  'textAlign',
-  'textDecorationLine',
-  'textDecorationColor',
-  'textDecorationStyle',
-  'textTransform',
-  'position',
-  'fontWeight',
-  'fontFamily',
-  'fontStyle',
-  'overflow',
-  'overflowX',
-  'overflowY',
-  'pointerEvents',
-  'textTransform',
-  'backfaceVisibility',
-  'textAlignVertical',
+  "color",
+  "backgroundColor",
+  "borderColor",
+  "borderTopColor",
+  "borderRightColor",
+  "borderBottomColor",
+  "borderLeftColor",
+  "borderStyle",
+  "flexDirection",
+  "flexWrap",
+  "alignItems",
+  "alignSelf",
+  "alignContent",
+  "justifyContent",
+  "textAlign",
+  "textDecorationLine",
+  "textDecorationColor",
+  "textDecorationStyle",
+  "textTransform",
+  "position",
+  "fontWeight",
+  "fontFamily",
+  "fontStyle",
+  "overflow",
+  "overflowX",
+  "overflowY",
+  "pointerEvents",
+  "textTransform",
+  "backfaceVisibility",
+  "textAlignVertical",
 ]);
 
 // ---------------------------------------------------------------------------
@@ -202,17 +213,17 @@ export function parseTransformString(str: string): RNTransformEntry[] {
     const fn = match[1];
     const raw = match[2].trim();
 
-    if (fn.startsWith('rotate') || fn.startsWith('skew')) {
+    if (fn.startsWith("rotate") || fn.startsWith("skew")) {
       // Angular values — keep as string (e.g., '45deg')
       result.push({ [fn]: raw });
-    } else if (fn.startsWith('scale')) {
+    } else if (fn.startsWith("scale")) {
       result.push({ [fn]: parseFloat(raw) });
-    } else if (fn.startsWith('translate')) {
+    } else if (fn.startsWith("translate")) {
       // translateX/Y — strip px
       const num = parseFloat(raw);
-      if (raw.endsWith('px') || (!isNaN(num) && !raw.endsWith('%'))) {
+      if (raw.endsWith("px") || (!isNaN(num) && !raw.endsWith("%"))) {
         result.push({ [fn]: num });
-      } else if (raw.endsWith('%')) {
+      } else if (raw.endsWith("%")) {
         result.push({ [fn]: raw });
       } else {
         result.push({ [fn]: raw });
@@ -244,39 +255,65 @@ export function parseBoxShadow(
   str: string,
   warnFn?: (prop: string, reason: string) => void,
 ): Record<string, string | number | { width: number; height: number }> {
-  if (!str || str === 'none') return {};
+  if (!str || str === "none") return {};
 
+  const rawLayers = splitShadowLayers(str);
   // Use shared parser
   const layers: ParsedShadowLayer[] = parseShadowLayers(str);
 
   const hasInset = layers.some((l) => l.inset);
-  const nonInset = layers.filter((l) => !l.inset);
-  const first = nonInset[0];
+  const nonInset = layers
+    .map((layer, index) => ({ layer, raw: rawLayers[index] ?? "" }))
+    .filter(({ layer }) => !layer.inset);
+  // RN cannot represent Tailwind ring layers because they are spread-only
+  // or zero-geometry shadows. When a ring is prepended before a real shadow,
+  // keep the first renderable shadow layer instead of losing the whole shadow.
+  const isNonRenderableShadow = (layer: ParsedShadowLayer) =>
+    layer.offsetX === 0 && layer.offsetY === 0 && layer.blur === 0;
+  const first = nonInset.find(({ layer }) => !isNonRenderableShadow(layer));
   if (!first) {
-    // All layers were inset — nothing to render
-    if (warnFn && hasInset) warnFn('boxShadow', 'inset shadows unsupported on RN');
+    // All layers were inset, spread-only, or zero-geometry — nothing RN can render.
+    if (warnFn && hasInset)
+      warnFn("boxShadow", "inset shadows unsupported on RN");
+    if (warnFn && nonInset.some(({ layer }) => isNonRenderableShadow(layer))) {
+      warnFn("boxShadow:spread", "spread-only shadows unsupported on RN");
+    }
+    return {};
+  }
+
+  if (first.raw.includes("var(")) {
+    if (warnFn) {
+      warnFn("boxShadow", "CSS variable shadow color unsupported on RN");
+    }
     return {};
   }
 
   // Dev warnings for approximation details
   if (warnFn) {
-    if (hasInset) warnFn('boxShadow:inset', 'inset shadows dropped on RN');
-    if (nonInset.length > 1) warnFn('boxShadow:multi', `${nonInset.length} layers → 1 (RN single-layer)`);
-    if (first.spread !== 0) warnFn('boxShadow:spread', 'spread radius ignored on RN');
+    if (hasInset) warnFn("boxShadow:inset", "inset shadows dropped on RN");
+    if (nonInset.length > 1)
+      warnFn(
+        "boxShadow:multi",
+        `${nonInset.length} layers → 1 (RN single-layer)`,
+      );
+    if (nonInset.some(({ layer }) => isNonRenderableShadow(layer)))
+      warnFn("boxShadow:spread", "spread-only shadows dropped on RN");
+    else if (first.layer.spread !== 0)
+      warnFn("boxShadow:spread", "spread radius ignored on RN");
   }
 
   // Elevation approximation for Android (Material Design heuristic)
   // blur contributes most (depth perception), offset adds subtle lift
   const elevation = Math.min(
-    Math.round(first.blur * 0.5 + Math.abs(first.offsetY) * 0.5),
+    Math.round(first.layer.blur * 0.5 + Math.abs(first.layer.offsetY) * 0.5),
     24,
   );
 
   return {
-    shadowColor: first.color,
-    shadowOffset: { width: first.offsetX, height: first.offsetY },
-    shadowOpacity: first.opacity,
-    shadowRadius: first.blur / 2,
+    shadowColor: first.layer.color,
+    shadowOffset: { width: first.layer.offsetX, height: first.layer.offsetY },
+    shadowOpacity: first.layer.opacity,
+    shadowRadius: first.layer.blur / 2,
     elevation,
   };
 }
@@ -296,7 +333,7 @@ export function _resetNativeWarnings(): void {
 function warnOnce(prop: string, reason?: string): void {
   if (_warnedProps.has(prop)) return;
   _warnedProps.add(prop);
-  const suffix = reason ? ` (${reason})` : '';
+  const suffix = reason ? ` (${reason})` : "";
   console.warn(`[dot/native] Dropped: "${prop}"${suffix}`);
 }
 
@@ -310,14 +347,20 @@ function warnOnce(prop: string, reason?: string): void {
  * This is a pure post-processing function — no side effects, no Dimensions API.
  * Unsupported properties are silently dropped (with optional dev warnings).
  */
-export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions): RNStyleObject {
+export function adaptNative(
+  webStyle: StyleObject,
+  options?: AdaptNativeOptions,
+): RNStyleObject {
   const remBase = options?.remBase ?? 16;
   const warn = options?.warnDropped === true;
   const result: RNStyleObject = {};
 
   for (const [key, rawValue] of Object.entries(webStyle)) {
     // Strip !important — not meaningful in RN
-    const value = typeof rawValue === 'string' ? rawValue.replace(/\s*!important\s*$/, '') : rawValue;
+    const value =
+      typeof rawValue === "string"
+        ? rawValue.replace(/\s*!important\s*$/, "")
+        : rawValue;
 
     // Skip unsupported
     if (SKIP_PROPS.has(key)) {
@@ -326,53 +369,50 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
     }
 
     // Skip CSS custom property declarations (e.g. --tw-enter-opacity) — not supported in RN
-    if (key.startsWith('--')) {
-      if (warn) warnOnce(key, 'CSS custom property not supported in RN');
-      continue;
-    }
-
-    // Skip CSS variable values — not supported in React Native
-    // Uses includes() to catch wrapped forms like color-mix(in srgb, var(...) ...)
-    if (typeof value === 'string' && value.includes('var(')) {
-      if (warn) warnOnce(key, `CSS variable value "${value}" not supported in RN`);
+    if (key.startsWith("--")) {
+      if (warn) warnOnce(key, "CSS custom property not supported in RN");
       continue;
     }
 
     // objectFit → RN resizeMode
-    if (key === 'objectFit') {
+    if (key === "objectFit") {
       const resizeModeMap: Record<string, string> = {
-        contain: 'contain',
-        cover: 'cover',
-        fill: 'stretch',
-        none: 'center',
-        'scale-down': 'contain',
+        contain: "contain",
+        cover: "cover",
+        fill: "stretch",
+        none: "center",
+        "scale-down": "contain",
       };
       const mapped = resizeModeMap[String(value)];
-      if (mapped) result['resizeMode'] = mapped;
+      if (mapped) result["resizeMode"] = mapped;
       continue;
     }
 
     // Display — only flex/none (skip -webkit-box from line-clamp)
-    if (key === 'display') {
-      if (value === 'flex' || value === 'none') {
+    if (key === "display") {
+      if (value === "flex" || value === "none") {
         result[key] = value;
       } else if (warn) {
-        warnOnce(`display:${String(value)}`, `unsupported display value "${String(value)}"`);
+        warnOnce(
+          `display:${String(value)}`,
+          `unsupported display value "${String(value)}"`,
+        );
       }
       continue;
     }
 
     // WebkitLineClamp → RN numberOfLines
-    if (key === 'WebkitLineClamp') {
-      const num = typeof value === 'number' ? value : parseInt(String(value), 10);
+    if (key === "WebkitLineClamp") {
+      const num =
+        typeof value === "number" ? value : parseInt(String(value), 10);
       if (!isNaN(num) && num > 0) {
-        result['numberOfLines'] = num;
+        result["numberOfLines"] = num;
       }
       continue;
     }
 
     // Transform — CSS string → RN array
-    if (key === 'transform') {
+    if (key === "transform") {
       const arr = parseTransformString(String(value));
       if (arr.length > 0) {
         result[key] = arr;
@@ -381,7 +421,7 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
     }
 
     // Box shadow → RN shadow properties
-    if (key === 'boxShadow') {
+    if (key === "boxShadow") {
       const shadow = parseBoxShadow(String(value), warn ? warnOnce : undefined);
       for (const [sk, sv] of Object.entries(shadow)) {
         result[sk] = sv as RNStyleObject[string];
@@ -389,10 +429,20 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
       continue;
     }
 
+    // Skip CSS variable values — not supported in React Native.
+    // boxShadow is handled above because mixed ring+shadow values can contain
+    // an unsupported var(...) ring layer while still preserving a later real
+    // shadow layer.
+    if (typeof value === "string" && value.includes("var(")) {
+      if (warn)
+        warnOnce(key, `CSS variable value "${value}" not supported in RN`);
+      continue;
+    }
+
     // Flex shorthand
-    if (key === 'flex') {
+    if (key === "flex") {
       const sv = String(value);
-      if (sv === 'none') {
+      if (sv === "none") {
         result.flexGrow = 0;
         result.flexShrink = 0;
       } else {
@@ -406,14 +456,23 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
     // Numeric conversion (px → number)
     if (NUMERIC_PROPS.has(key)) {
       // lineHeight: unitless multiplier → absolute px (RN requires absolute values)
-      if (key === 'lineHeight') {
+      if (key === "lineHeight") {
         const strVal = String(value).trim();
         const num = parseFloat(strVal);
         // Unitless (e.g., '1.5', '2') — multiply by fontSize or default 16
-        if (!isNaN(num) && String(num) === strVal && !strVal.endsWith('px') && !strVal.endsWith('em') && !strVal.endsWith('rem')) {
-          const fontSize = typeof webStyle.fontSize === 'string'
-            ? parseFloat(webStyle.fontSize) || remBase
-            : (typeof webStyle.fontSize === 'number' ? webStyle.fontSize : remBase);
+        if (
+          !isNaN(num) &&
+          String(num) === strVal &&
+          !strVal.endsWith("px") &&
+          !strVal.endsWith("em") &&
+          !strVal.endsWith("rem")
+        ) {
+          const fontSize =
+            typeof webStyle.fontSize === "string"
+              ? parseFloat(webStyle.fontSize) || remBase
+              : typeof webStyle.fontSize === "number"
+                ? webStyle.fontSize
+                : remBase;
           result[key] = Math.round(num * fontSize * 100) / 100;
           continue;
         }
@@ -427,7 +486,7 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
 
     // Float conversion
     if (FLOAT_PROPS.has(key)) {
-      const num = typeof value === 'number' ? value : parseFloat(String(value));
+      const num = typeof value === "number" ? value : parseFloat(String(value));
       if (!isNaN(num)) {
         result[key] = num;
       }
@@ -436,7 +495,8 @@ export function adaptNative(webStyle: StyleObject, options?: AdaptNativeOptions)
 
     // Integer conversion
     if (INT_PROPS.has(key)) {
-      const num = typeof value === 'number' ? value : parseInt(String(value), 10);
+      const num =
+        typeof value === "number" ? value : parseInt(String(value), 10);
       if (!isNaN(num)) {
         result[key] = num;
       }

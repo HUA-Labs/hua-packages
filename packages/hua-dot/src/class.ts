@@ -16,6 +16,8 @@ export {
   dotClass,
   dotCSS,
   dotFlush,
+  dotRunInScope,
+  dotRunInScopeAsync,
   dotReset,
   syncClassConfig,
 } from "./adapters/class";

@@ -1,4 +1,4 @@
-overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 1176+ tests. ~90% Tailwind parity across 33 resolver families."
+overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. ~90% Tailwind parity across 33 resolver families."
 
 features:
   # ── Core Styling ──
@@ -39,6 +39,7 @@ features:
   - "CAPABILITY_MATRIX — static map of utility family → target → support level (native/approximate/recipe-only/plugin-backed/unsupported)"
   - "PROPERTY_TO_FAMILY — static map of CSS property → utility family for capability lookup"
   - "getCapability(property, target, value?) — programmatic per-property capability query"
+  - "getDotAxCatalog() — package-owned read-only AX catalog derived from capability metadata for AI/tooling guidance"
   # ── Customization ──
   - "createDotConfig() — token overrides (colors, spacing, borderRadius, fontSize, gridCols, breakpoints, remBase, etc.)"
   - "CSS variable bridge — 17 semantic color tokens (background, foreground, card, muted, accent, etc.)"
@@ -141,10 +142,29 @@ quickStart: |
   dot('bg-brand-500 p-18');
   // { backgroundColor: '#6630E6', padding: '72px' }
 
+readme:
+  features:
+    - "dot() converts utility strings into web, React Native, or Flutter style data"
+    - "dotExplain() reports dropped, approximated, and unsupported target properties"
+    - "getDotAxCatalog() exposes package-owned capability metadata for tools"
+    - "dotMap(), dotCx(), and dotVariants() cover state maps and composition helpers"
+    - "dot-codegen emits Swift or Compose style code from dot style definitions"
+  quickStart: |
+    import { dot, dotExplain } from '@hua-labs/dot';
+
+    const web = dot('flex items-center gap-3 rounded-lg bg-white p-4');
+    const native = dotExplain('p-4 grid grid-cols-3', { target: 'native' });
+
+    console.log(web);
+    console.log(native.report);
+  hideApi: true
+  hideSections: true
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "hua"
   - "ui"
-  - "@hua-labs/dot-aot"
+  - "dot-aot"
 
 apiNotes:
   dot:
@@ -173,6 +193,8 @@ apiNotes:
     description: "Static constant: Record<string, string>. Maps CSS property name (e.g. 'backgroundImage') to utility family name (e.g. 'gradient') for use with CAPABILITY_MATRIX."
   getCapability:
     description: "getCapability(property, target, value?) → CapabilityLevel. Programmatic per-property capability query. Checks value-level overrides first (e.g. display:flex is 'native' on RN), then family-level lookup."
+  getDotAxCatalog:
+    description: "getDotAxCatalog() → DotAxCatalog. Read-only package AX catalog derived from CAPABILITY_MATRIX / PROPERTY_TO_FAMILY, with composition metadata for internal marker families such as ring and divide. Stable, JSON-serializable, and intended for AI/tooling guidance without executing dot() or dotExplain()."
   "@hua-labs/dot/native":
     description: "Native subpath entry — dot() and dotMap() pre-bound to target: 'native'. Also auto-resolved via 'react-native' package.json condition in Metro."
   _resetNativeWarnings:

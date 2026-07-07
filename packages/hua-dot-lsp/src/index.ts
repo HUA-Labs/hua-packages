@@ -22,13 +22,14 @@ import {
   TextDocumentPositionParams,
   Hover,
   MarkupKind,
-  Diagnostic,
-  DiagnosticSeverity,
-  Range,
   Position,
-} from "vscode-languageserver/node";
+  DidChangeConfigurationParams,
+} from "vscode-languageserver/node.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { dot } from "@hua-labs/dot";
+import { findDotRegions, type DotRegion } from "./dot-regions.js";
+import { buildDotDiagnostics } from "./diagnostics.js";
+import { readDotLspSettings, type DotLspSettings } from "./settings.js";
 import {
   getAllCompletions,
   getCompletionsForPrefix,
@@ -42,8 +43,11 @@ import {
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
+let currentSettings: DotLspSettings = {};
 
-connection.onInitialize((_params: InitializeParams): InitializeResult => {
+connection.onInitialize((params: InitializeParams): InitializeResult => {
+  currentSettings = readDotLspSettings(params.initializationOptions);
+
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -66,53 +70,12 @@ connection.onInitialized(() => {
   setImmediate(() => getAllCompletions());
 });
 
-// ---------------------------------------------------------------------------
-// Dot string detection helpers
-// ---------------------------------------------------------------------------
-
-/** Patterns to find dot('...') / dot="..." / dot={`...`} regions.
- *  Each quote type has its own pattern to allow nested quotes of other types
- *  (e.g., dot("font-['Inter']") should capture the full string). */
-const DOT_STRING_PATTERNS: RegExp[] = [
-  /dot\s*\(\s*"([^"]*)"/g, // dot("...")
-  /dot\s*\(\s*'([^']*)'/g, // dot('...')
-  /dot\s*\(\s*`([^`]*)`/g, // dot(`...`)
-  /dot\s*=\s*"([^"]*)"/g, // dot="..."
-  /dot\s*=\s*'([^']*)'/g, // dot='...'
-  /dot\s*=\s*\{"([^"]*)"\}/g, // dot={"..."}
-  /dot\s*=\s*\{'([^']*)'\}/g, // dot={'...'}
-  /dot\s*=\s*\{`([^`]*)`\}/g, // dot={`...`}
-];
-
-interface DotRegion {
-  /** The utility string content */
-  content: string;
-  /** Start offset of content (not including quote) in the document */
-  contentStart: number;
-  /** End offset of content */
-  contentEnd: number;
-}
-
-function findDotRegions(text: string): DotRegion[] {
-  const regions: DotRegion[] = [];
-  for (const pattern of DOT_STRING_PATTERNS) {
-    pattern.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text)) !== null) {
-      const full = match[0];
-      const content = match[1];
-      // Find the actual content start (after the opening quote)
-      const quoteIdx = full.indexOf(content);
-      const contentStart = match.index + quoteIdx;
-      regions.push({
-        content,
-        contentStart,
-        contentEnd: contentStart + content.length,
-      });
-    }
+connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
+  currentSettings = readDotLspSettings(change.settings);
+  for (const document of documents.all()) {
+    validateDocument(document);
   }
-  return regions;
-}
+});
 
 /**
  * Given a cursor offset, find the dot region it falls in and return:
@@ -247,54 +210,13 @@ documents.onDidOpen((event) => {
 
 async function validateDocument(doc: TextDocument): Promise<void> {
   const text = doc.getText();
-  const regions = findDotRegions(text);
-  const diagnostics: Diagnostic[] = [];
   const allCompletions = getAllCompletions();
-  const validLabels = new Set(allCompletions.map((e) => e.label));
-
-  for (const region of regions) {
-    const tokens = region.content.trim().split(/\s+/).filter(Boolean);
-    let searchFrom = 0;
-    for (const token of tokens) {
-      // Strip variant prefixes (hover:, dark:, sm:, etc.) and !important prefix
-      let baseToken = token;
-      if (baseToken.includes(":")) {
-        baseToken = baseToken.split(":").pop()!;
-      }
-      if (baseToken.startsWith("!")) {
-        baseToken = baseToken.slice(1);
-      }
-
-      if (!validLabels.has(baseToken)) {
-        // Try to resolve the base token via dot()
-        let resolved: Record<string, unknown> = {};
-        try {
-          resolved = dot(baseToken) as Record<string, unknown>;
-        } catch {
-          // ignore
-        }
-        if (Object.keys(resolved).length === 0) {
-          // Track search position to handle duplicate tokens correctly
-          const tokenOffset = region.content.indexOf(token, searchFrom);
-          if (tokenOffset === -1) continue;
-          const start = doc.positionAt(region.contentStart + tokenOffset);
-          const end = doc.positionAt(
-            region.contentStart + tokenOffset + token.length,
-          );
-          diagnostics.push({
-            severity: DiagnosticSeverity.Warning,
-            range: Range.create(start, end),
-            message: `Unknown dot utility: "${token}"`,
-            source: "dot-lsp",
-          });
-        }
-      }
-      // Always advance searchFrom regardless of validity
-      const idx = region.content.indexOf(token, searchFrom);
-      if (idx !== -1) searchFrom = idx + token.length;
-    }
-  }
-
+  const diagnostics = buildDotDiagnostics(
+    text,
+    doc.positionAt.bind(doc),
+    allCompletions,
+    currentSettings,
+  );
   connection.sendDiagnostics({ uri: doc.uri, diagnostics });
 }
 

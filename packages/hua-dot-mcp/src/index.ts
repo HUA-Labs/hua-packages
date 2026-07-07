@@ -3,11 +3,131 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { dot, dotExplain } from "@hua-labs/dot";
+import {
+  buildDotCapabilitiesResponse,
+  DOT_CAPABILITY_CATEGORIES,
+  DOT_CAPABILITY_LEVELS,
+} from "./capabilities";
 
 const server = new McpServer({
   name: "dot-mcp",
   version: "0.1.0",
 });
+
+type DotTarget = "web" | "native" | "flutter";
+type DotBreakpoint = "sm" | "md" | "lg" | "xl" | "2xl";
+const GRADIENT_DIRECTION_VALUES = new Set([
+  "r",
+  "l",
+  "t",
+  "b",
+  "tr",
+  "tl",
+  "br",
+  "bl",
+]);
+
+function isGradientToken(token: string): boolean {
+  return (
+    token.startsWith("bg-gradient-to-") ||
+    token.startsWith("from-") ||
+    token.startsWith("via-") ||
+    token.startsWith("to-")
+  );
+}
+
+function isGradientPositionToken(token: string): boolean {
+  const value = token.slice(token.indexOf("-") + 1);
+  if (value.endsWith("%")) return true;
+  return value.startsWith("[") && value.endsWith("%]");
+}
+
+function hasDifferentBackgroundImage(input: string, baseline: string): boolean {
+  const result = dot(input) as Record<string, unknown>;
+  const baselineResult = dot(baseline) as Record<string, unknown>;
+  return result.backgroundImage !== baselineResult.backgroundImage;
+}
+
+function isRecognizedGradientToken(token: string): boolean {
+  if (token.startsWith("bg-gradient-to-")) {
+    return GRADIENT_DIRECTION_VALUES.has(token.slice("bg-gradient-to-".length));
+  }
+
+  if (token.startsWith("from-")) {
+    return isGradientPositionToken(token)
+      ? hasDifferentBackgroundImage(
+          `bg-gradient-to-r from-red-500 ${token} to-blue-500`,
+          "bg-gradient-to-r from-red-500 to-blue-500",
+        )
+      : hasDifferentBackgroundImage(
+          `bg-gradient-to-r ${token} to-blue-500`,
+          "bg-gradient-to-r to-blue-500",
+        );
+  }
+
+  if (token.startsWith("via-")) {
+    return isGradientPositionToken(token)
+      ? hasDifferentBackgroundImage(
+          `bg-gradient-to-r from-red-500 via-yellow-500 ${token} to-blue-500`,
+          "bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500",
+        )
+      : hasDifferentBackgroundImage(
+          `bg-gradient-to-r from-red-500 ${token} to-blue-500`,
+          "bg-gradient-to-r from-red-500 to-blue-500",
+        );
+  }
+
+  if (token.startsWith("to-")) {
+    return isGradientPositionToken(token)
+      ? hasDifferentBackgroundImage(
+          `bg-gradient-to-r from-red-500 to-blue-500 ${token}`,
+          "bg-gradient-to-r from-red-500 to-blue-500",
+        )
+      : hasDifferentBackgroundImage(
+          `bg-gradient-to-r from-red-500 ${token}`,
+          "bg-gradient-to-r from-red-500",
+        );
+  }
+
+  return false;
+}
+
+function hasAggregateGradientEvidence(
+  input: string,
+  options: {
+    target?: DotTarget;
+    dark?: boolean;
+    breakpoint?: DotBreakpoint;
+  },
+): boolean {
+  const styles = dot(input, options);
+  const decoration = (styles as Record<string, unknown>).decoration;
+  const hasGradientDecoration =
+    decoration && typeof decoration === "object" && "gradient" in decoration;
+  if (
+    "backgroundImage" in styles ||
+    hasGradientDecoration ||
+    (
+      (styles as Record<string, unknown>)._dropped as string[] | undefined
+    )?.includes("backgroundImage")
+  ) {
+    return true;
+  }
+
+  if (!options.target) return false;
+
+  const explain = dotExplain(
+    input,
+    options as typeof options & {
+      target: DotTarget;
+    },
+  );
+  return Boolean(
+    explain.report._dropped?.includes("backgroundImage") ||
+    explain.report._approximated?.includes("backgroundImage") ||
+    explain.report._capabilities?.backgroundImage,
+  );
+}
 
 // Token completion data organized by category
 const COMPLETION_TOKENS: Record<string, string[]> = {
@@ -765,8 +885,10 @@ server.tool(
         report: result.report,
       };
 
-      if (result.report._dropped && result.report._dropped.length > 0) {
-        output.summary = `${result.report._dropped.length} properties dropped, ${result.report._approximated?.length ?? 0} approximated`;
+      const droppedCount = result.report._dropped?.length ?? 0;
+      const approximatedCount = result.report._approximated?.length ?? 0;
+      if (droppedCount > 0 || approximatedCount > 0) {
+        output.summary = `${droppedCount} properties dropped, ${approximatedCount} approximated`;
       } else {
         output.summary = "All properties supported on this target";
       }
@@ -861,12 +983,77 @@ server.tool(
 );
 
 server.tool(
+  "dot_capabilities",
+  "Query the package-owned dot AX capability catalog without resolving styles or executing adapters",
+  {
+    target: z
+      .enum(["web", "native", "flutter"])
+      .optional()
+      .describe("Optional target platform filter"),
+    category: z
+      .enum(DOT_CAPABILITY_CATEGORIES)
+      .optional()
+      .describe("Optional capability category filter"),
+    level: z
+      .enum(DOT_CAPABILITY_LEVELS)
+      .optional()
+      .describe(
+        "Optional support level filter. With target, matches that target only; without target, matches any target row.",
+      ),
+    family: z
+      .string()
+      .optional()
+      .describe("Optional exact capability family id, such as 'gradient'"),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe("Maximum number of capability rows to return (default: 20)"),
+    includeProperties: z
+      .boolean()
+      .optional()
+      .describe("Include source CSS property names for each family"),
+    includeExamples: z
+      .boolean()
+      .optional()
+      .describe("Include representative utility examples for each family"),
+    includeComposition: z
+      .boolean()
+      .optional()
+      .describe(
+        "Include internal marker composition metadata for composed families such as ring and divide",
+      ),
+  },
+  async (args) => {
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(buildDotCapabilitiesResponse(args), null, 2),
+        },
+      ],
+    };
+  },
+);
+
+server.tool(
   "dot_validate",
   "Validate a dot utility string and check if all utilities resolve successfully",
   {
     input: z
       .string()
       .describe("Space-separated dot utility string to validate"),
+    target: z
+      .enum(["web", "native", "flutter"])
+      .optional()
+      .describe("Target platform for capability caveats"),
+    dark: z.boolean().optional().describe("Apply dark mode styles"),
+    breakpoint: z
+      .enum(["sm", "md", "lg", "xl", "2xl"])
+      .optional()
+      .describe("Active breakpoint for responsive styles"),
   },
   async (args) => {
     const input = args.input.trim();
@@ -889,9 +1076,17 @@ server.tool(
     }
 
     try {
-      // Try resolving as web target to check for issues
-      const result = dot(input);
+      const targetOptions = {
+        target: args.target as DotTarget | undefined,
+        dark: args.dark,
+        breakpoint: args.breakpoint,
+      };
+      const result = dot(input, targetOptions);
       resolvedCount = Object.keys(result).length;
+      const hasGradientEvidence = hasAggregateGradientEvidence(
+        input,
+        targetOptions,
+      );
 
       // Also check each token individually for empty results (unrecognized tokens)
       const tokens = input.split(/\s+/).filter(Boolean);
@@ -901,6 +1096,13 @@ server.tool(
         const strippedToken = baseToken.startsWith("!")
           ? baseToken.slice(1)
           : baseToken;
+        if (
+          hasGradientEvidence &&
+          isGradientToken(strippedToken) &&
+          isRecognizedGradientToken(strippedToken)
+        ) {
+          continue;
+        }
 
         try {
           const tokenResult = dot(strippedToken);
@@ -921,19 +1123,33 @@ server.tool(
       );
     }
 
+    const output: Record<string, unknown> = {
+      valid: errors.length === 0,
+      errors,
+      resolved_count: resolvedCount,
+    };
+
+    if (args.target) {
+      const explain = dotExplain(input, {
+        target: args.target as DotTarget,
+        dark: args.dark,
+        breakpoint: args.breakpoint,
+      });
+      const droppedCount = explain.report._dropped?.length ?? 0;
+      const approximatedCount = explain.report._approximated?.length ?? 0;
+
+      output.report = explain.report;
+      output.summary =
+        droppedCount > 0 || approximatedCount > 0
+          ? `${droppedCount} properties dropped, ${approximatedCount} approximated`
+          : "All properties supported on this target";
+    }
+
     return {
       content: [
         {
           type: "text",
-          text: JSON.stringify(
-            {
-              valid: errors.length === 0,
-              errors,
-              resolved_count: resolvedCount,
-            },
-            null,
-            2,
-          ),
+          text: JSON.stringify(output, null, 2),
         },
       ],
     };

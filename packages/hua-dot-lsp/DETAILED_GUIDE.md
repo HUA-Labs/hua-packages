@@ -162,6 +162,35 @@ The `!` important prefix is also stripped before validation, so `!p-4` is checke
 
 All diagnostic messages emitted by the server carry the source identifier **`dot-lsp`**. Editors that allow filtering diagnostics by source use this string. The severity level is always `Warning` — the server never emits errors or information-level diagnostics for unknown tokens.
 
+### Target Caveat Diagnostics
+
+By default, `dot-lsp` validates only token recognition and CSS-only variant
+usage. If an LSP client supplies a target, diagnostics also include target
+capability caveats from `dotExplain()`:
+
+```json
+{
+  "initializationOptions": {
+    "dot": {
+      "target": "native"
+    }
+  }
+}
+```
+
+Supported target values are `"web"`, `"native"`, and `"flutter"`. Invalid or
+missing target values are ignored, preserving the no-target diagnostic path.
+Clients may also send `workspace/didChangeConfiguration` with either
+`{ "target": "native" }` or `{ "dot": { "target": "native" } }`; open
+documents are revalidated after the setting changes.
+
+When a caveat property is covered by the package-owned `@hua-labs/dot` AX
+catalog, the diagnostic appends the AX family label and category. For example,
+`filter=unsupported` may be shown as `filter=unsupported (Filter,
+visual-effect)`. This is editor/AI diagnostic context only; it does not change
+resolver output, target adapters, VS Code runtime behavior, or platform
+support.
+
 ---
 
 ## Editor Configuration
@@ -191,8 +220,10 @@ If you are already using a multi-LSP extension (such as `neovim.vscode-neovim` o
 
 - **command:** `["dot-lsp", "--stdio"]`
 - **filetypes:** the four TS/JS file types listed above
+- **initializationOptions.dot.target:** optional `"web"`, `"native"`, or
+  `"flutter"` for target caveat diagnostics
 
-Note: A first-party VS Code extension (`@hua-labs/dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
+Note: A first-party VS Code extension (`hua-labs.dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
 
 ### Neovim — nvim-lspconfig
 
@@ -212,7 +243,13 @@ if not configs.dot_lsp then
   }
 end
 
-lspconfig.dot_lsp.setup({})
+lspconfig.dot_lsp.setup({
+  init_options = {
+    dot = {
+      target = "native",
+    },
+  },
+})
 ```
 
 Place this block in your Neovim config after `lspconfig` is loaded. The `root_dir` pattern anchors the server to the nearest `package.json` or `.git` directory, which is the standard convention for JavaScript/TypeScript projects.
