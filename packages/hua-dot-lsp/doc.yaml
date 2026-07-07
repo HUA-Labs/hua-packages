@@ -15,10 +15,24 @@ quickStart: |
   # Run as stdio LSP server (used by editor extensions)
   dot-lsp --stdio
 
-  # For VS Code, install the hua-labs.dot-vscode extension (VSIX) which auto-resolves this server.
+  # For VS Code, use the dot-vscode VSIX when it is packaged for your environment.
   # For other editors, configure your LSP client to use `dot-lsp --stdio`.
 
 codeBlockLang: "bash"
+
+readme:
+  features:
+    - "stdio LSP server for dot utility completion, hover, and diagnostics"
+    - "Recognizes dot() calls and dot= JSX attribute forms"
+    - "Optional web/native/flutter target caveat diagnostics"
+    - "AX family/category metadata in target diagnostics"
+  quickStart: |
+    npm install -g @hua-labs/dot-lsp
+    dot-lsp --stdio
+  codeBlockLang: "bash"
+  hideApi: true
+  hideSections: true
+  detailedGuide: "./DETAILED_GUIDE.md"
 
 related:
   - "dot"
@@ -78,6 +92,6 @@ sections:
 
   - title: "Editor Integration"
     content: |
-      - **VS Code**: Install `hua-labs.dot-vscode` extension from VSIX (auto-resolves this server and forwards `dot.target`)
+      - **VS Code**: Use the `dot-vscode` VSIX when it is packaged for your environment; the extension bundles or resolves this server and forwards `dot.target`.
       - **Neovim**: Configure `nvim-lspconfig` with `cmd = {"dot-lsp", "--stdio"}`
       - **Other editors**: Any LSP client can connect via `dot-lsp --stdio`

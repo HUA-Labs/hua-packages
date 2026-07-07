@@ -68,7 +68,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HUA-Labs/hua-packages.git"
+    "url": "https://github.com/HUA-Labs/hua-packages.git",
+    "directory": "packages/hua-dot"
   },
   "sideEffects": false,
   "engines": {
