@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/dot-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": false,
   "publishConfig": {
     "access": "public",
@@ -25,7 +25,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:0.2.0",
+    "@hua-labs/dot": "workspace:0.2.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
   },
