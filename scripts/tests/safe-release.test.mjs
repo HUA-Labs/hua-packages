@@ -21,7 +21,9 @@ import {
   loadPolicy,
   loadReleaseState,
   parseStrictJsonBytes,
+  runClose,
   runPublish,
+  runRefresh,
   runVersion,
   sha256,
   validatePolicy,
@@ -276,6 +278,7 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     "utf8",
   );
   assert.match(workflow, /pnpm install --frozen-lockfile/);
+  assert.match(workflow, /pnpm safe-release:refresh/);
   assert.match(workflow, /version: pnpm safe-release:version/);
   assert.match(
     workflow,
@@ -284,13 +287,24 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
   assert.match(workflow, /if: steps\.release-plan\.outputs\.publish == 'true'/);
   assert.match(workflow, /pnpm safe-release:publish > "\$published"/);
   assert.match(workflow, /check:npm-provenance -- --published/);
+  assert.match(workflow, /pnpm safe-release:close --published/);
   assert.doesNotMatch(workflow, /--no-frozen-lockfile/);
   assert.doesNotMatch(workflow, /changeset publish/);
   const planIndex = workflow.indexOf("Validate durable exact release plan");
+  const refreshIndex = workflow.indexOf(
+    "Refresh verified empty release snapshot",
+  );
+  const versionIndex = workflow.indexOf("Create or update version PR");
   const credentialIndex = workflow.indexOf(
     "NPM_TOKEN: ${{ secrets.NPM_TOKEN }}",
   );
+  const provenanceIndex = workflow.indexOf(
+    "Check exact published-set npm provenance",
+  );
+  const closeIndex = workflow.indexOf("Close exact published plan");
+  assert.ok(refreshIndex >= 0 && versionIndex > refreshIndex);
   assert.ok(planIndex >= 0 && credentialIndex > planIndex);
+  assert.ok(provenanceIndex >= 0 && closeIndex > provenanceIndex);
 
   const changesetConfig = JSON.parse(
     readFileSync(join(CURRENT_ROOT, ".changeset/config.json"), "utf8"),
@@ -843,6 +857,181 @@ test("version mode captures source bytes then writes a deterministic UI-only dur
     readFileSync(join(first.root, "config/release-plan.json"), "utf8"),
     readFileSync(join(second.root, "config/release-plan.json"), "utf8"),
   );
+});
+
+test("two release cycles close and refresh empty authority without weakening planned exactness", async (t) => {
+  const fixture = makeFixture();
+  t.after(() => fixture.cleanup());
+  const publishedPath = join(fixture.root, "published.json");
+
+  mutateJson(join(fixture.root, "packages/hua-ui/package.json"), (manifest) => {
+    manifest.exports = { ".": "./dist/index.mjs" };
+  });
+  assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
+  const refreshed = runRefresh({ root: fixture.root });
+  assert.equal(refreshed.status, "empty");
+
+  for (const [cycle, expectedVersion] of [
+    ["first", "2.3.1"],
+    ["second", "2.3.2"],
+  ]) {
+    const id = `${cycle}-ui-release`;
+    writeFileSync(
+      join(fixture.root, `.changeset/${id}.md`),
+      `---\n"@hua-labs/ui": patch\n---\n\n${cycle} cycle.\n`,
+    );
+    const currentVersion = JSON.parse(
+      readFileSync(join(fixture.root, "packages/hua-ui/package.json"), "utf8"),
+    ).version;
+    const status = versionStatus("@hua-labs/ui", {
+      id,
+      releases: [
+        {
+          name: "@hua-labs/ui",
+          type: "patch",
+          oldVersion: currentVersion,
+          changesets: [id],
+          newVersion: expectedVersion,
+        },
+      ],
+    });
+    const { result } = runVersionFixture(fixture, status);
+    assert.deepEqual(
+      result.releases.map((entry) => entry.name),
+      ["@hua-labs/ui"],
+    );
+
+    const published = runPublish({
+      root: fixture.root,
+      execFile() {
+        return "";
+      },
+    });
+    writeFileSync(publishedPath, canonicalJson(published));
+    await checkPublishedProvenance({
+      root: fixture.root,
+      publishedPath,
+      attempts: 1,
+      delayMs: 0,
+      execFile() {
+        return JSON.stringify({
+          provenance: { predicateType: "https://slsa.dev/provenance/v1" },
+        });
+      },
+    });
+    const closed = runClose({ root: fixture.root, publishedPath });
+    assert.equal(closed.status, "empty");
+    assert.deepEqual(closed.releases, []);
+
+    if (cycle === "first") {
+      mutateJson(
+        join(fixture.root, "packages/hua-ui/package.json"),
+        (manifest) => {
+          manifest.exports["./theme"] = "./dist/theme.mjs";
+        },
+      );
+      assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
+      runRefresh({ root: fixture.root });
+    }
+  }
+});
+
+test("refresh and close reject planned, tampered, unknown, and ineligible authority", async (t) => {
+  await t.test("planned", () => {
+    const fixture = createPlannedFixture();
+    try {
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "refresh-nonempty-plan",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("tampered empty digest", () => {
+    const fixture = makeFixture();
+    try {
+      mutateJson(join(fixture.root, "config/release-plan.json"), (plan) => {
+        plan.planDigest = "0".repeat(64);
+      });
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "plan-digest-mismatch",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("unknown workspace", () => {
+    const fixture = makeFixture();
+    try {
+      mkdirSync(join(fixture.root, "packages/unknown"), { recursive: true });
+      writeFileSync(
+        join(fixture.root, "packages/unknown/package.json"),
+        canonicalJson({ name: "@hua-labs/unknown", version: "1.0.0" }),
+      );
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "policy-workspace-count",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("version drift", () => {
+    const fixture = makeFixture();
+    try {
+      mutateJson(
+        join(fixture.root, "packages/hua-ui/package.json"),
+        (manifest) => {
+          manifest.version = "2.3.1";
+        },
+      );
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "refresh-version-drift",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("ineligible workspace drift", () => {
+    const fixture = makeFixture();
+    try {
+      mutateJson(
+        join(fixture.root, "packages/hua/package.json"),
+        (manifest) => {
+          manifest.description = "Reviewed but held authority drift";
+        },
+      );
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "refresh-ineligible-workspace",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("ineligible published set", () => {
+    const fixture = createPlannedFixture();
+    try {
+      const publishedPath = join(fixture.root, "published.json");
+      writeFileSync(
+        publishedPath,
+        canonicalJson({
+          schemaVersion: 1,
+          publishedPackages: [{ name: "@hua-labs/hua", version: "1.2.3" }],
+        }),
+      );
+      assertCode(
+        () => runClose({ root: fixture.root, publishedPath }),
+        "published-package-set",
+      );
+      assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+    } finally {
+      fixture.cleanup();
+    }
+  });
 });
 
 test("version mode rejects empty, implicit, held, never, Dot, unknown, and source-set drift before version", async (t) => {

@@ -41,6 +41,9 @@ jobs:
       - name: Build workspace packages
         run: pnpm build --filter "@hua-labs/*"
 
+      - name: Refresh verified empty release snapshot
+        run: pnpm safe-release:refresh
+
       - name: Create or update version PR without npm credentials
         id: changesets
         uses: changesets/action@v1
@@ -92,3 +95,9 @@ jobs:
       - name: Check exact published-set npm provenance
         if: steps.release-plan.outputs.publish == 'true'
         run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}"
+
+      - name: Close exact published plan to an empty snapshot
+        if: steps.release-plan.outputs.publish == 'true'
+        run: |
+          pnpm safe-release:close --published "${{ steps.safe-publish.outputs.published_path }}"
+          node scripts/safe-release.mjs check --format=github --allow-empty

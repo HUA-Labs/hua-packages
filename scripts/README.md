@@ -26,9 +26,11 @@ monorepo state.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `check-pack-artifacts.js`    | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload. |
 | `check-publish-allowlist.js` | Validate the versioned platform-policy projection against every workspace manifest.                               |
+| `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
 | `safe-release.mjs publish`   | Publish only the nonempty exact validated plan through fixed `pnpm publish` argv and package directories.         |
+| `safe-release.mjs close`     | Replace an exact planned set with an empty current snapshot after exact publish/provenance completion.            |
 | `check-npm-provenance.mjs`   | Check provenance only for the exact published `package@version` output matching the durable plan.                 |
 | `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
 | `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
@@ -42,6 +44,16 @@ version command captures Changeset IDs and bytes before Changesets deletes the
 source files, rejects implicit dependent releases, runs the version command,
 then binds the complete post-version workspace manifest set.
 
+An empty plan is deliberately not release authority. `refresh` first verifies
+the old empty plan's policy tuple, schema, roster, and digest, then captures the
+current reviewed manifest bytes only when changed manifests remain at the same
+version and belong to policy-eligible packages. It never refreshes blocked
+held, never-publish, pending, private, or no-publish authority, never overwrites
+a planned set, and cannot add or select a package. This lets a later reviewed
+source/manifest sync plus a new Changeset enter `version` without weakening the
+planned-plan check. A planned plan remains manifest-exact in `check`, `publish`,
+provenance, and `close`.
+
 The ordinary main-push path is intentionally token-free while it creates or
 updates a version PR. Its explicit `check --format=github --allow-empty` lane
 may classify an exact empty plan only as `publish=false`; ordinary `check`,
@@ -51,6 +63,12 @@ Empty, stale, held, never-publish,
 pending, private, wrong-authority, unknown, missing, extra, or tampered sets
 stop before any publish or provenance command. Provenance is execution evidence
 for the exact published output; historical attestations never select a release.
+After exact publish and provenance, `close --published <file>` accepts only the
+complete planned `package@version` output and produces the next empty snapshot.
+The workflow-local close must be persisted through a separate reviewed source
+change before another release cycle; ephemeral runner bytes are not durable
+repository authority. A failed or partial publication must retain the planned
+file and be resolved by the operator, never auto-refreshed.
 
 The current committed plan is empty. Choosing a version, selecting UI alone or
 an explicit cohort, approving npm publication, and choosing token versus OIDC
@@ -60,9 +78,10 @@ eligible only when an explicit reviewed Changeset selects it.
 
 After a successful version run, review the version diff, packed artifacts,
 policy SHA, plan digest, exact `fromVersion`/`toVersion` set, and the complete
-manifest snapshot before merging the version PR. There is no true npm rollback;
-post-publication recovery requires deprecation and a separately authorized
-corrective version.
+manifest snapshot before merging the version PR. After publication and exact
+provenance, review and persist the `close` delta before the next source or
+version cycle. There is no true npm rollback; post-publication recovery requires
+deprecation and a separately authorized corrective version.
 
 ## Manual Analysis
 

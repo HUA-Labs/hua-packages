@@ -43,6 +43,7 @@ const PLAN_MAX_BYTES = 2 * 1024 * 1024;
 const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
+const PUBLISHED_MAX_BYTES = 128 * 1024;
 const MAX_JSON_DEPTH = 32;
 const MAX_JSON_NODES = 50000;
 const MAX_STRING_BYTES = 8 * 1024;
@@ -764,7 +765,7 @@ export function finalizeReleasePlan(value) {
 }
 
 export function validateReleasePlan(value, policyState, options = {}) {
-  const { requireNonempty = false } = options;
+  const { requireNonempty = false, allowEmptyWorkspaceDrift = false } = options;
   exactKeys(
     value,
     [
@@ -822,12 +823,24 @@ export function validateReleasePlan(value, policyState, options = {}) {
     const snapshot = workspaceManifests[index];
     const current = policyState.manifests[index];
     assert(
-      snapshot.name === current.name &&
-        snapshot.path === current.path &&
-        snapshot.version === current.version &&
-        snapshot.sha256 === current.sha256,
-      "plan-workspace-drift",
+      snapshot.name === current.name && snapshot.path === current.path,
+      "plan-workspace-identity",
     );
+    if (allowEmptyWorkspaceDrift && releases.length === 0) {
+      assert(snapshot.version === current.version, "refresh-version-drift");
+      if (snapshot.sha256 !== current.sha256) {
+        assert(
+          policyState.policy.packages[index].eligibility === "eligible",
+          "refresh-ineligible-workspace",
+        );
+      }
+    } else {
+      assert(
+        snapshot.version === current.version &&
+          snapshot.sha256 === current.sha256,
+        "plan-workspace-drift",
+      );
+    }
   }
   for (const release of releases) {
     const policyEntry = policyByName.get(release.name);
@@ -893,6 +906,20 @@ export function loadReleaseState(root = DEFAULT_ROOT, options = {}) {
   const plan = validateReleasePlan(value, policyState, options);
   assert(Buffer.from(canonicalJson(plan)).equals(bytes), "plan-noncanonical");
   return { ...policyState, plan, planBytes: bytes };
+}
+
+export function runRefresh(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const releaseState = loadReleaseState(root, {
+    allowEmptyWorkspaceDrift: true,
+  });
+  assert(releaseState.plan.status === "empty", "refresh-nonempty-plan");
+  const refreshed = createEmptyReleasePlan(releaseState);
+  writeFileAtomically(
+    join(root, PLAN_RELATIVE_PATH),
+    Buffer.from(canonicalJson(refreshed)),
+  );
+  return refreshed;
 }
 
 function normalizeChangesetsStatus(value) {
@@ -1259,6 +1286,35 @@ export function validatePublishedPackages(value, releaseState) {
   return { schemaVersion: 1, publishedPackages };
 }
 
+export function runClose(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const publishedPath = options.publishedPath;
+  assert(
+    typeof publishedPath === "string" && publishedPath.length > 0,
+    "close-published-path",
+  );
+  validateScalarString(publishedPath, "close-published-path");
+  const releaseState = loadReleaseState(root, { requireNonempty: true });
+  const publishedBytes = readRegularFile(
+    resolve(publishedPath),
+    PUBLISHED_MAX_BYTES,
+    "published-output",
+  );
+  validatePublishedPackages(
+    parseStrictJsonBytes(publishedBytes, {
+      maxBytes: PUBLISHED_MAX_BYTES,
+      label: "published-output",
+    }),
+    releaseState,
+  );
+  const closed = createEmptyReleasePlan(releaseState);
+  writeFileAtomically(
+    join(root, PLAN_RELATIVE_PATH),
+    Buffer.from(canonicalJson(closed)),
+  );
+  return closed;
+}
+
 export function runPublish(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -1298,9 +1354,23 @@ export function checkPolicyCommand(root = DEFAULT_ROOT) {
 function parseCliArguments(argv) {
   assert(argv.length >= 1, "cli-mode-missing");
   const [mode, ...argumentsList] = argv;
-  assert(["version", "check", "publish"].includes(mode), "cli-mode");
+  assert(
+    ["version", "refresh", "check", "publish", "close"].includes(mode),
+    "cli-mode",
+  );
   let format = "json";
   let allowEmpty = false;
+  let publishedPath = null;
+  if (mode === "close") {
+    assert(
+      argumentsList.length === 2 && argumentsList[0] === "--published",
+      "cli-close-arguments",
+    );
+    publishedPath = argumentsList[1];
+    validateScalarString(publishedPath, "cli-close-published");
+    assert(publishedPath.length > 0, "cli-close-published");
+    return { mode, format, allowEmpty, publishedPath };
+  }
   for (const argument of argumentsList) {
     if (argument === "--format=github" && mode === "check") {
       format = "github";
@@ -1311,11 +1381,11 @@ function parseCliArguments(argv) {
     }
   }
   assert(!allowEmpty || format === "github", "cli-allow-empty-format");
-  return { mode, format, allowEmpty };
+  return { mode, format, allowEmpty, publishedPath };
 }
 
 export function main(argv = process.argv.slice(2), options = {}) {
-  const { mode, format, allowEmpty } = parseCliArguments(argv);
+  const { mode, format, allowEmpty, publishedPath } = parseCliArguments(argv);
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
   if (mode === "version") {
@@ -1324,6 +1394,16 @@ export function main(argv = process.argv.slice(2), options = {}) {
       JSON.stringify({
         status: "planned",
         releaseCount: plan.releases.length,
+        planDigest: plan.planDigest,
+      }) + "\n",
+    );
+    return;
+  }
+  if (mode === "refresh") {
+    const plan = runRefresh({ root });
+    process.stdout.write(
+      JSON.stringify({
+        status: "empty-refreshed",
         planDigest: plan.planDigest,
       }) + "\n",
     );
@@ -1346,6 +1426,14 @@ export function main(argv = process.argv.slice(2), options = {}) {
         }) + "\n",
       );
     }
+    return;
+  }
+  if (mode === "close") {
+    const plan = runClose({ root, publishedPath });
+    process.stdout.write(
+      JSON.stringify({ status: "empty-closed", planDigest: plan.planDigest }) +
+        "\n",
+    );
     return;
   }
   const published = runPublish({ root, execFile });
