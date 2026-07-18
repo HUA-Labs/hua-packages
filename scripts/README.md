@@ -31,9 +31,9 @@ monorepo state.
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
 | `safe-release.mjs pack`      | Build, pack, inspect, and hash every exact planned package into one external immutable artifact bundle.           |
-| `safe-release.mjs claim`     | Commit and push one exact planned-to-publishing transition bound to the verified artifact-manifest SHA.           |
+| `safe-release.mjs claim`     | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.     |
 | `safe-release.mjs publish`   | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                 |
-| `check-npm-provenance.mjs`   | Check provenance for the exact published set and optionally close that exact plan only after every check passes.  |
+| `check-npm-provenance.mjs`   | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                 |
 | `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
 | `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
 
@@ -81,22 +81,24 @@ both claim and publish. The uploaded artifact is evidence only until the claim
 is durably pushed.
 
 After that credential-free artifact check and upload, the prepare job commits
-and pushes a single plan-only `planned` to `publishing` claim that additionally
-binds the exact artifact-manifest SHA-256. Local and remote heads must match
-before the commit, must still match before push, and the normal
-non-fast-forward push remains the final race gate. Any claim failure happens
-before an OIDC-capable job, npm credentials, or publish.
-Any later workflow run that starts from the claim commit sees `publishing`,
-skips refresh, versioning, claim, credentials, and publish, and performs no
-second release attempt. GitHub-token pushes are not relied on to recursively
-start another workflow.
+a single plan-only `planned` to `publishing` claim that additionally binds the
+exact artifact-manifest SHA-256. It pushes only a unique transition branch,
+requires remote `main` to remain exact before and after that push, and opens a
+reviewed claim PR. It never pushes protected `main` directly. The claim PR must
+be squash-merged so the resulting main commit has the planned source head as
+its single parent and changes only `config/release-plan.json`. Any claim or PR
+failure happens before an OIDC-capable job, npm credentials, or publish.
 
-A separate publish job is the only job with `id-token: write`; it cannot start
-until the prepare job reports the exact pushed claim head. It checks out that
-head, requires both local `HEAD` and remote `main` to remain that exact claim,
-downloads the run-scoped bundle, and revalidates the plan, claim, canonical
-manifest, complete directory population, tarball bytes, hashes, and internal
-package name/version before any npm command. It publishes the exact
+A separate publish job is the only job with `id-token: write`. It starts only
+on the first workflow attempt for the reviewed claim merge, never on the
+planned run that created the PR. The publishing run reads the original
+artifact run ID and source head from the durable claim, downloads that exact
+cross-run bundle. Before that OIDC-capable job is admitted, the no-OIDC prepare
+check requires local `HEAD` and remote `main` to match and requires a
+single-parent plan-only claim transition. The publish job repeats those checks
+and revalidates the plan, claim,
+canonical manifest, complete directory population, tarball bytes, hashes, and
+internal package name/version before any npm command. It publishes the exact
 tarball paths with `npm publish --ignore-scripts`, never mutable package
 directories, so package lifecycle hooks cannot rerun after credential
 exposure. The npm token is present only on that publish step. Its temporary
@@ -111,17 +113,18 @@ After exact publish, only `check-npm-provenance --published <file> --close-plan`
 may produce the next empty snapshot, and only after every exact published
 `package@version` has passed the current provenance check. There is no separate
 close CLI or package script. A failed or partial publication or provenance
-check retains the planned file and must be resolved by the operator, never
-auto-refreshed. The same provenance command runs in a separate no-OIDC,
-no-npm-credential closure job, then commits and pushes only the canonical empty
-plan. It requires the exact claim head to remain both local and remote
-authority before commit and push. A head drift or non-fast-forward failure
-leaves remote main in `publishing`, so later workflow runs use zero npm
-credentials and cannot publish the same plan again. Operator reconciliation is
-required before another release. A successful closure commit restores the
-next Changesets cycle; the next externally triggered run starts from exact
-`empty` authority and uses publish/token zero. No recursive workflow trigger is
-claimed.
+check retains the durable `publishing` claim on main and must be resolved by the
+operator, never auto-refreshed. The same provenance command runs in a separate no-OIDC,
+no-npm-credential closure job. After every exact provenance check succeeds, it
+commits the canonical empty plan to a unique transition branch while requiring
+the claim head to remain remote `main`, then opens a reviewed closure PR. It
+never pushes protected `main` directly. Failure or head drift leaves durable
+main in `publishing`; the failed run cannot overwrite release authority.
+Squash-merging the plan-only closure PR restores exact empty authority. That
+merge's follow-up workflow has no publishing claim, starts no OIDC job,
+receives no npm token, and executes zero publish commands. Operator
+reconciliation is required before another release if either reviewed
+transition is not merged.
 
 The current committed plan is empty. Choosing a version, selecting UI alone or
 an explicit cohort, approving npm publication, and choosing token versus OIDC
@@ -152,8 +155,10 @@ claims the planned merge before credentials, and durably pushes the resulting
 empty plan. A distinct workflow-order RED proved that unconditional refresh
 blocked every planned merge and that runner-local closure left main permanently
 planned. The final Git fixtures lock claim/closure head equality,
-non-fast-forward failure, plan-only commits, publishing-run suppression, and
-the next empty cycle. This exact-12 implementation has no devlog path; this
+protected-main preservation, unique transition branches, reviewed
+claim/closure merges, single-parent plan-only publish admission, head-drift
+failure, and the next empty zero-publish cycle. This exact-12 implementation
+has no devlog path; this
 durable contract plus the frozen-tuple report records the RED/GREEN provenance
 without adding a thirteenth path.
 

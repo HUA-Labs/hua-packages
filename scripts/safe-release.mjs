@@ -965,6 +965,23 @@ export function runPreflight(options = {}) {
   return { ...releaseState, refreshRequired };
 }
 
+export function runCheck(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  const releaseState = loadReleaseState(root);
+  if (releaseState.plan.status === "publishing") {
+    const claimHead = gitOutput(execFile, root, ["rev-parse", "HEAD"]);
+    assertRemoteHead(execFile, root, releaseState.plan.claim.branch, claimHead);
+    assertExactClaimTransition(
+      execFile,
+      root,
+      claimHead,
+      releaseState.plan.claim.sourceHead,
+    );
+  }
+  return releaseState;
+}
+
 export function runRefresh(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const releaseState = loadReleaseState(root, {
@@ -1556,15 +1573,61 @@ function assertRemoteHead(execFile, root, branch, expectedHead) {
   );
 }
 
+function assertRemoteReferenceAbsent(execFile, root, reference) {
+  assert(
+    gitOutput(execFile, root, ["ls-remote", "origin", reference]) === "",
+    "release-transition-exists",
+  );
+}
+
+function assertExactClaimTransition(execFile, root, claimHead, sourceHead) {
+  assert(claimHead !== sourceHead, "publish-unclaimed-head");
+  assert(
+    gitOutput(execFile, root, [
+      "rev-list",
+      "--parents",
+      "-n",
+      "1",
+      claimHead,
+    ]) === `${claimHead} ${sourceHead}`,
+    "publish-claim-topology",
+  );
+  assert(
+    gitOutput(execFile, root, [
+      "diff",
+      "--name-only",
+      sourceHead,
+      claimHead,
+    ]) === PLAN_RELATIVE_PATH,
+    "publish-claim-scope",
+  );
+}
+
 function persistExactPlanMutation(options) {
-  const { root, execFile, branch, expectedHead, commitMessage } = options;
+  const {
+    root,
+    execFile,
+    branch,
+    expectedHead,
+    commitMessage,
+    runId,
+    transitionKind,
+  } = options;
   assert(branch === "main", "release-branch");
   assert(GIT_SHA_PATTERN.test(expectedHead), "release-expected-head");
+  assert(RUN_ID_PATTERN.test(runId), "release-transition-run-id");
+  assert(
+    transitionKind === "claim" || transitionKind === "close",
+    "release-transition-kind",
+  );
+  const transitionBranch = `release/${transitionKind}-${expectedHead.slice(0, 12)}`;
+  const transitionReference = `refs/heads/${transitionBranch}`;
   assert(
     gitOutput(execFile, root, ["rev-parse", "HEAD"]) === expectedHead,
     "release-local-head-drift",
   );
   assertRemoteHead(execFile, root, branch, expectedHead);
+  assertRemoteReferenceAbsent(execFile, root, transitionReference);
   assert(
     gitOutput(execFile, root, [
       "status",
@@ -1599,9 +1662,10 @@ function persistExactPlanMutation(options) {
   gitOutput(execFile, root, [
     "push",
     "origin",
-    `${committedHead}:refs/heads/${branch}`,
+    `${committedHead}:${transitionReference}`,
   ]);
-  assertRemoteHead(execFile, root, branch, committedHead);
+  assertRemoteHead(execFile, root, branch, expectedHead);
+  assertRemoteHead(execFile, root, transitionBranch, committedHead);
   assert(
     gitOutput(execFile, root, [
       "status",
@@ -1610,7 +1674,7 @@ function persistExactPlanMutation(options) {
     ]) === "",
     "release-post-commit-drift",
   );
-  return committedHead;
+  return { head: committedHead, branch: transitionBranch };
 }
 
 function normalizeClaimInput(options) {
@@ -1789,14 +1853,20 @@ export function runClaim(options = {}) {
     join(root, PLAN_RELATIVE_PATH),
     Buffer.from(canonicalJson(publishingPlan)),
   );
-  const claimHead = persistExactPlanMutation({
+  const transition = persistExactPlanMutation({
     root,
     execFile,
     branch: claim.branch,
     expectedHead: claim.sourceHead,
     commitMessage: "chore(release): claim exact publish plan",
+    runId: claim.runId,
+    transitionKind: "claim",
   });
-  return { plan: publishingPlan, claimHead };
+  return {
+    plan: publishingPlan,
+    claimHead: transition.head,
+    transitionBranch: transition.branch,
+  };
 }
 
 export function persistProvenanceClosure(options = {}) {
@@ -1818,6 +1888,8 @@ export function persistProvenanceClosure(options = {}) {
     branch: claim.branch,
     expectedHead: claimHead,
     commitMessage: "chore(release): close exact published plan",
+    runId: claim.runId,
+    transitionKind: "close",
   });
 }
 
@@ -1960,6 +2032,7 @@ export function runPublish(options = {}) {
     "publish-local-claim-head-drift",
   );
   assertRemoteHead(gitExecFile, root, claim.branch, claimHead);
+  assertExactClaimTransition(gitExecFile, root, claimHead, claim.sourceHead);
   const bundle = readArtifactBundle({
     root,
     execFile,
@@ -2139,7 +2212,7 @@ export function main(argv = process.argv.slice(2), options = {}) {
       artifactManifestPath,
     });
     process.stdout.write(
-      `claimed=true\nclaim_head=${result.claimHead}\nplan_digest=${result.plan.planDigest}\n`,
+      `claimed=false\ntransition_head=${result.claimHead}\ntransition_branch=${result.transitionBranch}\nplan_digest=${result.plan.planDigest}\n`,
     );
     return;
   }
@@ -2158,12 +2231,16 @@ export function main(argv = process.argv.slice(2), options = {}) {
     return;
   }
   if (mode === "check") {
-    const state = loadReleaseState(root);
+    const state = runCheck({ root, execFile });
     const publish = state.plan.status === "planned";
     assert(publish || allowEmpty, "plan-empty");
     if (format === "github") {
+      const resume = state.plan.status === "publishing";
+      const claimOutput = resume
+        ? `claim_run_id=${state.plan.claim.runId}\nclaim_source_head=${state.plan.claim.sourceHead}\nartifact_manifest_sha256=${state.plan.claim.artifactManifestSha256}\n`
+        : "";
       process.stdout.write(
-        `status=${state.plan.status}\npublish=${publish}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
+        `status=${state.plan.status}\npublish=${publish}\nresume=${resume}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n${claimOutput}`,
       );
     } else {
       process.stdout.write(

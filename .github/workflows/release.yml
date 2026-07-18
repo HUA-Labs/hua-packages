@@ -19,10 +19,11 @@ jobs:
       contents: write
       pull-requests: write
     outputs:
-      claimed: ${{ steps.release-claim.outputs.claimed }}
-      claim_head: ${{ steps.release-claim.outputs.claim_head }}
-      source_head: ${{ github.sha }}
-      artifact_name: hua-release-${{ github.run_id }}
+      claimed: ${{ steps.release-plan.outputs.resume }}
+      claim_head: ${{ github.sha }}
+      source_head: ${{ steps.release-plan.outputs.claim_source_head }}
+      artifact_name: hua-release-${{ steps.release-plan.outputs.claim_run_id }}
+      artifact_run_id: ${{ steps.release-plan.outputs.claim_run_id }}
 
     steps:
       - name: Checkout repo
@@ -87,18 +88,27 @@ jobs:
           name: hua-release-${{ github.run_id }}
           path: ${{ steps.artifact-pack.outputs.artifact_dir }}
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
 
       - name: Claim exact artifact-bound release
         id: release-claim
         if: steps.release-plan.outputs.status == 'planned'
         run: node scripts/safe-release.mjs claim --artifact-manifest "${{ steps.artifact-pack.outputs.artifact_manifest }}" --source-head "$GITHUB_SHA" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Open reviewed claim transition PR
+        if: steps.release-plan.outputs.status == 'planned'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRANSITION_BRANCH: ${{ steps.release-claim.outputs.transition_branch }}
+        run: |
+          gh pr create --base main --head "$TRANSITION_BRANCH" --title "chore(release): claim exact publish plan" --body "Credential-free plan-only transition. Review and squash-merge this PR to start the exact artifact-bound publish run."
+
   publish:
     needs: prepare
-    if: needs.prepare.outputs.claimed == 'true'
+    if: needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       id-token: write
 
@@ -119,6 +129,8 @@ jobs:
         with:
           name: ${{ needs.prepare.outputs.artifact_name }}
           path: ${{ runner.temp }}/hua-release-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
 
       - name: Publish immutable verified tarballs
         id: safe-publish
@@ -126,7 +138,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           HUA_RELEASE_ARTIFACT_MANIFEST: ${{ runner.temp }}/hua-release-artifacts/release-artifacts.json
           HUA_RELEASE_BRANCH: ${{ github.ref_name }}
-          HUA_RELEASE_RUN_ID: ${{ github.run_id }}
+          HUA_RELEASE_RUN_ID: ${{ needs.prepare.outputs.artifact_run_id }}
           HUA_RELEASE_SOURCE_HEAD: ${{ needs.prepare.outputs.source_head }}
           HUA_RELEASE_CLAIM_HEAD: ${{ needs.prepare.outputs.claim_head }}
         run: |
@@ -159,6 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout exact pushed claim for credential-free closure
@@ -179,7 +192,15 @@ jobs:
           path: ${{ runner.temp }}/hua-published
 
       - name: Check exact published-set npm provenance and close exact published plan
-        run: node scripts/check-npm-provenance.mjs --published "$RUNNER_TEMP/hua-published/hua-published-packages.json" --close-plan --persist-head "${{ needs.prepare.outputs.claim_head }}" --source-head "${{ needs.prepare.outputs.source_head }}" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID"
+        id: release-close
+        run: node scripts/check-npm-provenance.mjs --published "$RUNNER_TEMP/hua-published/hua-published-packages.json" --close-plan --persist-head "${{ needs.prepare.outputs.claim_head }}" --source-head "${{ needs.prepare.outputs.source_head }}" --branch "$GITHUB_REF_NAME" --run-id "${{ needs.prepare.outputs.artifact_run_id }}" >> "$GITHUB_OUTPUT"
 
-      - name: Validate provenance-closed empty plan
+      - name: Validate reviewed empty-plan transition
         run: node scripts/safe-release.mjs check --format=github --allow-empty
+
+      - name: Open reviewed closure transition PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRANSITION_BRANCH: ${{ steps.release-close.outputs.transition_branch }}
+        run: |
+          gh pr create --base main --head "$TRANSITION_BRANCH" --title "chore(release): close exact published plan" --body "Provenance-verified plan-only transition. Review and squash-merge this PR to restore empty release authority; its follow-up run has publish and npm-token authority disabled."

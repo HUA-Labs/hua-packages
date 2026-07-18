@@ -23,6 +23,7 @@ import {
   loadPolicy,
   loadReleaseState,
   parseStrictJsonBytes,
+  runCheck,
   runClaim,
   runPack,
   runPreflight,
@@ -341,7 +342,9 @@ function claimFixturePlan(fixture, claim = TEST_CLAIM) {
     join(fixture.root, "config/release-plan.json"),
     canonicalJson(plan),
   );
-  fixture.claimHead ??= "c".repeat(40);
+  if (fixture.claimHead === undefined) {
+    fixture.claimHead = "c".repeat(40);
+  }
   return plan;
 }
 
@@ -366,6 +369,12 @@ function publishingOptions(fixture, execFile) {
       if (args[0] === "rev-parse") return `${fixture.claimHead}\n`;
       if (args[0] === "ls-remote") {
         return `${fixture.claimHead}\trefs/heads/main\n`;
+      }
+      if (args[0] === "rev-list") {
+        return `${fixture.claimHead} ${fixture.claim.sourceHead}\n`;
+      }
+      if (args[0] === "diff") {
+        return "config/release-plan.json\n";
       }
       throw new Error("unexpected-git-command");
     },
@@ -436,8 +445,7 @@ function git(root, argumentsList) {
   }).trimEnd();
 }
 
-function createGitPlannedFixture(t) {
-  const fixture = createPlannedFixture();
+function initializeGitFixture(t, fixture, commitMessage) {
   const remoteRoot = mkdtempSync(join(tmpdir(), "hua-safe-release-remote-"));
   const remote = join(remoteRoot, "origin.git");
   t.after(() => {
@@ -453,7 +461,7 @@ function createGitPlannedFixture(t) {
     "safe-release-test@example.invalid",
   ]);
   git(fixture.root, ["add", "--all"]);
-  git(fixture.root, ["commit", "-m", "seed planned release"]);
+  git(fixture.root, ["commit", "-m", commitMessage]);
   git(fixture.root, ["remote", "add", "origin", remote]);
   git(fixture.root, ["push", "-u", "origin", "main"]);
   const sourceHead = git(fixture.root, ["rev-parse", "HEAD"]);
@@ -463,6 +471,19 @@ function createGitPlannedFixture(t) {
     remoteRoot,
     sourceHead,
   };
+}
+
+function createGitPlannedFixture(t) {
+  return initializeGitFixture(
+    t,
+    createPlannedFixture(),
+    "seed planned release",
+  );
+}
+
+function mergeReviewedTransition(remote, expectedHead, transitionHead) {
+  git(remote, ["update-ref", "refs/heads/main", transitionHead, expectedHead]);
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), transitionHead);
 }
 
 function assertCode(callback, code) {
@@ -558,7 +579,7 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     "Check exact published-set npm provenance",
   );
   const closedValidationIndex = workflow.indexOf(
-    "Validate provenance-closed empty plan",
+    "Validate reviewed empty-plan transition",
   );
   assert.ok(refreshIndex >= 0 && versionIndex > refreshIndex);
   assert.ok(planIndex >= 0 && credentialIndex > planIndex);
@@ -587,11 +608,13 @@ test("workflow withholds OIDC and npm credentials until an immutable artifact cl
     "pull-requests": "write",
   });
   assert.deepEqual(workflowAuthority.jobs.publish.permissions, {
+    actions: "read",
     contents: "read",
     "id-token": "write",
   });
   assert.deepEqual(workflowAuthority.jobs.close.permissions, {
     contents: "write",
+    "pull-requests": "write",
   });
   assert.deepEqual(
     Object.entries(workflowAuthority.jobs)
@@ -629,7 +652,7 @@ test("workflow withholds OIDC and npm credentials until an immutable artifact cl
   );
   assert.match(workflow, /prepare:[\s\S]+?permissions:[\s\S]+?contents: write/);
   assert.doesNotMatch(
-    workflow.match(/prepare:[\s\S]+?(?=\n  publish:)/)?.[0] ?? "",
+    workflow.match(/prepare:[\s\S]+?(?=\n {2}publish:)/)?.[0] ?? "",
     /id-token:\s*write|NPM_TOKEN/,
   );
   assert.match(
@@ -855,6 +878,95 @@ test("workflow durably claims and closes a published plan without a second publi
   assert.ok(provenanceIndex > credentialIndex);
 });
 
+test("workflow routes claim and closure through reviewed protected-main transitions", () => {
+  const workflow = readFileSync(
+    join(CURRENT_ROOT, ".github/workflows/release.yml"),
+    "utf8",
+  );
+  const document = parseDocument(workflow, { uniqueKeys: true });
+  assert.equal(document.errors.length, 0);
+  const authority = document.toJS();
+  const prepareSteps = authority.jobs.prepare.steps;
+  const publishSteps = authority.jobs.publish.steps;
+  const closeSteps = authority.jobs.close.steps;
+  assert.equal(
+    prepareSteps.some(
+      (step) => step.name === "Open reviewed claim transition PR",
+    ),
+    true,
+  );
+  assert.equal(
+    closeSteps.some(
+      (step) => step.name === "Open reviewed closure transition PR",
+    ),
+    true,
+  );
+  const download = publishSteps.find(
+    (step) => step.name === "Download exact claimed artifacts",
+  );
+  assert.equal(
+    download.with["run-id"],
+    "${{ needs.prepare.outputs.artifact_run_id }}",
+  );
+  assert.equal(
+    authority.jobs.publish.if,
+    "needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1",
+  );
+  assert.match(
+    workflow,
+    /gh pr create --base main --head "\$TRANSITION_BRANCH" --title "chore\(release\): claim exact publish plan"/,
+  );
+  assert.match(
+    workflow,
+    /gh pr create --base main --head "\$TRANSITION_BRANCH" --title "chore\(release\): close exact published plan"/,
+  );
+  assert.doesNotMatch(workflow, /gh pr merge|--auto/);
+  const source = readFileSync(
+    join(CURRENT_ROOT, "scripts/safe-release.mjs"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /committedHead}:refs\/heads\/\$\{branch\}/);
+});
+
+test("planned claim creates a reviewed transition branch without moving protected main", (t) => {
+  const { fixture, remote, sourceHead } = createGitPlannedFixture(t);
+  const claim = { branch: "main", runId: "7654320", sourceHead };
+  createTestArtifactBundle(fixture, claim);
+  const claimed = runClaim({
+    root: fixture.root,
+    artifactManifestPath: fixture.artifactManifestPath,
+    ...claim,
+  });
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), sourceHead);
+  assert.match(claimed.transitionBranch, /^release\/claim-[0-9a-f]{12}$/);
+  assert.equal(
+    git(remote, ["rev-parse", `refs/heads/${claimed.transitionBranch}`]),
+    claimed.claimHead,
+  );
+});
+
+test("no-OIDC prepare check rejects a later main commit before publish job admission", (t) => {
+  const { fixture, remote, sourceHead } = createGitPlannedFixture(t);
+  const claim = { branch: "main", runId: "7654324", sourceHead };
+  createTestArtifactBundle(fixture, claim);
+  const claimed = runClaim({
+    root: fixture.root,
+    artifactManifestPath: fixture.artifactManifestPath,
+    ...claim,
+  });
+  mergeReviewedTransition(remote, sourceHead, claimed.claimHead);
+  writeFileSync(join(fixture.root, "unrelated.md"), "unrelated main drift\n");
+  git(fixture.root, ["add", "unrelated.md"]);
+  git(fixture.root, ["commit", "-m", "docs: unrelated main drift"]);
+  git(fixture.root, ["push", "origin", "HEAD:refs/heads/main"]);
+  let oidcPublishJobs = 0;
+  assertCode(() => {
+    runCheck({ root: fixture.root });
+    oidcPublishJobs += 1;
+  }, "publish-claim-topology");
+  assert.equal(oidcPublishJobs, 0);
+});
+
 test("planned merge claim and provenance closure are durable exact Git transitions", async (t) => {
   const { fixture, remote, remoteRoot, sourceHead } =
     createGitPlannedFixture(t);
@@ -878,12 +990,24 @@ test("planned merge claim and provenance closure are durable exact Git transitio
     artifactManifestPath: fixture.artifactManifestPath,
     ...claim,
   });
+  workflowSequence.push("open-claim-pr");
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), sourceHead);
+  assert.equal(
+    git(remote, ["rev-parse", `refs/heads/${claimed.transitionBranch}`]),
+    claimed.claimHead,
+  );
+  mergeReviewedTransition(remote, sourceHead, claimed.claimHead);
+  workflowSequence.push("claim-pr-merge");
   fixture.claimHead = claimed.claimHead;
+  workflowSequence.push("publishing-run");
   workflowSequence.push("publish");
   assert.deepEqual(workflowSequence, [
     "preflight",
     "validate",
     "claim",
+    "open-claim-pr",
+    "claim-pr-merge",
+    "publishing-run",
     "publish",
   ]);
   assert.equal(refreshCalls, 0);
@@ -914,12 +1038,29 @@ test("planned merge claim and provenance closure are durable exact Git transitio
       });
     },
   });
+  workflowSequence.push("provenance");
   assert.equal(result.releasePlanClosure.status, "empty");
   assert.equal(loadReleaseState(fixture.root).plan.status, "empty");
   assert.equal(
-    git(remote, ["rev-parse", "refs/heads/main"]),
+    git(remote, [
+      "rev-parse",
+      `refs/heads/${result.releasePlanClosure.transitionBranch}`,
+    ]),
     result.releasePlanClosure.head,
   );
+  assert.equal(
+    git(remote, ["rev-parse", "refs/heads/main"]),
+    claimed.claimHead,
+  );
+  workflowSequence.push("open-close-pr");
+  mergeReviewedTransition(
+    remote,
+    claimed.claimHead,
+    result.releasePlanClosure.head,
+  );
+  workflowSequence.push("close-pr-merge");
+  assert.equal(runPreflight({ root: fixture.root }).plan.status, "empty");
+  workflowSequence.push("empty-follow-up");
   let publishCalls = 0;
   assertCode(
     () =>
@@ -933,6 +1074,159 @@ test("planned merge claim and provenance closure are durable exact Git transitio
     "plan-empty",
   );
   assert.equal(publishCalls, 0);
+  assert.deepEqual(workflowSequence.slice(-4), [
+    "provenance",
+    "open-close-pr",
+    "close-pr-merge",
+    "empty-follow-up",
+  ]);
+});
+
+test("parsed workflow executes reviewed version, claim, publish, closure, and empty follow-up lifecycle", async (t) => {
+  const workflow = parseDocument(
+    readFileSync(join(CURRENT_ROOT, ".github/workflows/release.yml"), "utf8"),
+    { uniqueKeys: true },
+  ).toJS();
+  const prepareNames = workflow.jobs.prepare.steps.map((step) => step.name);
+  const expectedPrepareOrder = [
+    "Read durable release plan state",
+    "Refresh verified empty release snapshot",
+    "Create or update version PR without npm credentials",
+    "Validate durable exact release plan",
+    "Prepare and verify exact release artifacts",
+    "Upload exact verified artifacts",
+    "Claim exact artifact-bound release",
+    "Open reviewed claim transition PR",
+  ];
+  assert.deepEqual(
+    prepareNames.filter((name) => expectedPrepareOrder.includes(name)),
+    expectedPrepareOrder,
+  );
+
+  const fixture = makeFixture();
+  const initialized = initializeGitFixture(
+    t,
+    fixture,
+    "seed empty release authority",
+  );
+  const { remote, remoteRoot } = initialized;
+  mutateJson(join(fixture.root, "packages/hua-ui/package.json"), (manifest) => {
+    manifest.exports = { ".": "./dist/index.mjs" };
+  });
+  writeFileSync(
+    join(fixture.root, ".changeset/ui-workflow-release.md"),
+    '---\n"@hua-labs/ui": patch\n---\n\nWorkflow lifecycle fixture.\n',
+  );
+  git(fixture.root, ["add", "--all"]);
+  git(fixture.root, ["commit", "-m", "feat(ui): reviewed manifest drift"]);
+  git(fixture.root, ["push", "origin", "main"]);
+  const reviewedHead = git(fixture.root, ["rev-parse", "HEAD"]);
+
+  const emptyPreflight = runPreflight({ root: fixture.root });
+  assert.equal(emptyPreflight.plan.status, "empty");
+  assert.equal(emptyPreflight.refreshRequired, true);
+  runRefresh({ root: fixture.root });
+  const status = versionStatus("@hua-labs/ui", {
+    id: "ui-workflow-release",
+  });
+  runVersionFixture(fixture, status);
+  assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+  git(fixture.root, ["add", "--all"]);
+  git(fixture.root, ["commit", "-m", "chore: version packages"]);
+  const versionHead = git(fixture.root, ["rev-parse", "HEAD"]);
+  git(fixture.root, [
+    "push",
+    "origin",
+    `${versionHead}:refs/heads/release/version-fixture`,
+  ]);
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), reviewedHead);
+  mergeReviewedTransition(remote, reviewedHead, versionHead);
+
+  const plannedPreflight = runPreflight({ root: fixture.root });
+  assert.equal(plannedPreflight.plan.status, "planned");
+  assert.equal(plannedPreflight.refreshRequired, false);
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const artifactCalls = [];
+  const packed = runPack({
+    root: fixture.root,
+    artifactDirectory,
+    branch: "main",
+    runId: "7654323",
+    sourceHead: versionHead,
+    execFile: packExecFixture(artifactCalls),
+  });
+  fixture.artifactManifestPath = packed.artifactManifestPath;
+  const claimed = runClaim({
+    root: fixture.root,
+    artifactManifestPath: packed.artifactManifestPath,
+    branch: "main",
+    runId: "7654323",
+    sourceHead: versionHead,
+  });
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), versionHead);
+  mergeReviewedTransition(remote, versionHead, claimed.claimHead);
+  fixture.claimHead = claimed.claimHead;
+  fixture.claim = loadReleaseState(fixture.root).plan.claim;
+  assert.equal(runCheck({ root: fixture.root }).plan.status, "publishing");
+
+  let publishCalls = 0;
+  const published = runPublish({
+    root: fixture.root,
+    artifactManifestPath: packed.artifactManifestPath,
+    claimHead: claimed.claimHead,
+    ...fixture.claim,
+    execFile(file, args, options) {
+      if (file === "tar") return execFileSync(file, args, options);
+      assert.equal(file, "npm");
+      publishCalls += 1;
+      return "";
+    },
+  });
+  assert.equal(publishCalls, 1);
+  const publishedPath = join(remoteRoot, "workflow-published.json");
+  writeFileSync(publishedPath, canonicalJson(published));
+  const closure = await checkPublishedProvenance({
+    root: fixture.root,
+    publishedPath,
+    closePlan: true,
+    persistence: {
+      branch: "main",
+      runId: "7654323",
+      sourceHead: versionHead,
+      claimHead: claimed.claimHead,
+    },
+    attempts: 1,
+    delayMs: 0,
+    execFile() {
+      return JSON.stringify({
+        provenance: { predicateType: "https://slsa.dev/provenance/v1" },
+      });
+    },
+  });
+  assert.equal(
+    git(remote, ["rev-parse", "refs/heads/main"]),
+    claimed.claimHead,
+  );
+  mergeReviewedTransition(
+    remote,
+    claimed.claimHead,
+    closure.releasePlanClosure.head,
+  );
+  const followUp = runPreflight({ root: fixture.root });
+  assert.equal(followUp.plan.status, "empty");
+  assert.equal(followUp.refreshRequired, false);
+  let repeatedPublishCalls = 0;
+  assertCode(
+    () =>
+      runPublish({
+        root: fixture.root,
+        execFile() {
+          repeatedPublishCalls += 1;
+        },
+      }),
+    "plan-empty",
+  );
+  assert.equal(repeatedPublishCalls, 0);
 });
 
 test("closure remote drift preserves the publishing authority and cannot republish", async (t) => {
@@ -946,6 +1240,7 @@ test("closure remote drift preserves the publishing authority and cannot republi
     ...claim,
   });
   fixture.claimHead = claimed.claimHead;
+  mergeReviewedTransition(remote, sourceHead, claimed.claimHead);
   const tree = git(fixture.root, ["rev-parse", `${claimed.claimHead}^{tree}`]);
   const driftHead = git(fixture.root, [
     "commit-tree",
@@ -1258,6 +1553,46 @@ test("publish verifies the exact local and remote pushed claim head before npm",
           if (args[0] === "ls-remote") {
             return `${remoteHead}\trefs/heads/main\n`;
           }
+          throw new Error("unexpected-git-command");
+        };
+        assertCode(() => runPublish(options), code);
+        assert.equal(npmCalls, 0);
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("publish rejects non-reviewed claim topology or non-plan scope before npm", async (t) => {
+  for (const [name, topology, scope, code] of [
+    [
+      "wrong parent",
+      `${"c".repeat(40)} ${"e".repeat(40)}\n`,
+      "config/release-plan.json\n",
+      "publish-claim-topology",
+    ],
+    [
+      "extra scope",
+      `${"c".repeat(40)} ${TEST_CLAIM.sourceHead}\n`,
+      "config/release-plan.json\npackages/hua-ui/package.json\n",
+      "publish-claim-scope",
+    ],
+  ]) {
+    await t.test(name, () => {
+      const fixture = createPublishingFixture();
+      try {
+        let npmCalls = 0;
+        const options = publishingOptions(fixture, () => {
+          npmCalls += 1;
+        });
+        options.gitExecFile = (_file, args) => {
+          if (args[0] === "rev-parse") return `${fixture.claimHead}\n`;
+          if (args[0] === "ls-remote") {
+            return `${fixture.claimHead}\trefs/heads/main\n`;
+          }
+          if (args[0] === "rev-list") return topology;
+          if (args[0] === "diff") return scope;
           throw new Error("unexpected-git-command");
         };
         assertCode(() => runPublish(options), code);
@@ -1689,7 +2024,10 @@ test("two release cycles close and refresh empty authority without weakening pla
       closePlan: true,
       persistence: { ...TEST_CLAIM, claimHead: "b".repeat(40) },
       persistClosure() {
-        return "c".repeat(40);
+        return {
+          head: "c".repeat(40),
+          branch: `release/close-${"b".repeat(12)}`,
+        };
       },
       execFile() {
         return JSON.stringify({

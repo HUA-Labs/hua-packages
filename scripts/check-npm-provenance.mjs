@@ -139,6 +139,8 @@ export async function checkPublishedProvenance(options = {}) {
   const execFile = options.execFile ?? execFileSync;
   const gitExecFile = options.gitExecFile ?? execFileSync;
   const persistClosure = options.persistClosure ?? persistProvenanceClosure;
+  const log = options.log ?? console.log;
+  const logError = options.logError ?? console.error;
   const attempts =
     options.attempts ??
     boundedInteger(
@@ -213,26 +215,35 @@ export async function checkPublishedProvenance(options = {}) {
       if (attempt < attempts) await sleep(delayMs);
     }
     if (passed) {
-      console.log(`PASS ${spec} provenance`);
+      log(`PASS ${spec} provenance`);
     } else {
       failures.push(spec);
-      console.error(`FAIL ${spec}: provenance-unavailable`);
+      logError(`FAIL ${spec}: provenance-unavailable`);
     }
   }
   if (failures.length > 0) fail("provenance-incomplete");
   if (closePlan) {
     const closedPlan = closeProvenanceVerifiedPlan(root, releaseState);
-    const closureHead = persistClosure({
+    const closureTransition = persistClosure({
       root,
       execFile: gitExecFile,
       ...persistence,
     });
+    if (
+      typeof closureTransition !== "object" ||
+      closureTransition === null ||
+      typeof closureTransition.head !== "string" ||
+      typeof closureTransition.branch !== "string"
+    ) {
+      fail("provenance-closure-transition");
+    }
     return {
       ...published,
       releasePlanClosure: {
         status: closedPlan.status,
         planDigest: closedPlan.planDigest,
-        head: closureHead,
+        head: closureTransition.head,
+        transitionBranch: closureTransition.branch,
       },
     };
   }
@@ -244,10 +255,18 @@ const isDirectExecution =
   pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 
 if (isDirectExecution) {
-  checkPublishedProvenance().catch((error) => {
-    const code =
-      typeof error?.code === "string" ? error.code : "provenance-failed";
-    console.error(`npm provenance check failed: ${code}`);
-    process.exitCode = 1;
-  });
+  checkPublishedProvenance({ log: console.error, logError: console.error })
+    .then((result) => {
+      if (result.releasePlanClosure !== undefined) {
+        process.stdout.write(
+          `closed=true\ntransition_head=${result.releasePlanClosure.head}\ntransition_branch=${result.releasePlanClosure.transitionBranch}\nplan_digest=${result.releasePlanClosure.planDigest}\n`,
+        );
+      }
+    })
+    .catch((error) => {
+      const code =
+        typeof error?.code === "string" ? error.code : "provenance-failed";
+      console.error(`npm provenance check failed: ${code}`);
+      process.exitCode = 1;
+    });
 }
