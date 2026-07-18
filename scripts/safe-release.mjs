@@ -942,6 +942,18 @@ export function loadReleaseState(root = DEFAULT_ROOT, options = {}) {
   return { ...policyState, plan, planBytes: bytes };
 }
 
+export function runPreflight(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const releaseState = loadReleaseState(root, {
+    allowEmptyWorkspaceDrift: true,
+  });
+  const refreshRequired = releaseState.plan.workspaceManifests.some(
+    (snapshot, index) =>
+      snapshot.sha256 !== releaseState.manifests[index].sha256,
+  );
+  return { ...releaseState, refreshRequired };
+}
+
 export function runRefresh(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const releaseState = loadReleaseState(root, {
@@ -1519,7 +1531,9 @@ function parseCliArguments(argv) {
   assert(argv.length >= 1, "cli-mode-missing");
   const [mode, ...argumentsList] = argv;
   assert(
-    ["version", "refresh", "check", "claim", "publish"].includes(mode),
+    ["version", "refresh", "preflight", "check", "claim", "publish"].includes(
+      mode,
+    ),
     "cli-mode",
   );
   let format = "json";
@@ -1542,7 +1556,10 @@ function parseCliArguments(argv) {
     };
   }
   for (const argument of argumentsList) {
-    if (argument === "--format=github" && mode === "check") {
+    if (
+      argument === "--format=github" &&
+      (mode === "check" || mode === "preflight")
+    ) {
       format = "github";
     } else if (argument === "--allow-empty" && mode === "check") {
       allowEmpty = true;
@@ -1578,6 +1595,24 @@ export function main(argv = process.argv.slice(2), options = {}) {
         planDigest: plan.planDigest,
       }) + "\n",
     );
+    return;
+  }
+  if (mode === "preflight") {
+    const state = runPreflight({ root });
+    if (format === "github") {
+      process.stdout.write(
+        `status=${state.plan.status}\nrefresh_required=${state.refreshRequired}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
+      );
+    } else {
+      process.stdout.write(
+        JSON.stringify({
+          status: state.plan.status,
+          refreshRequired: state.refreshRequired,
+          releaseCount: state.plan.releases.length,
+          planDigest: state.plan.planDigest,
+        }) + "\n",
+      );
+    }
     return;
   }
   if (mode === "claim") {

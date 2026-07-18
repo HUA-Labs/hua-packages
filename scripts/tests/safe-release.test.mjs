@@ -23,6 +23,7 @@ import {
   loadReleaseState,
   parseStrictJsonBytes,
   runClaim,
+  runPreflight,
   runPublish,
   runRefresh,
   runVersion,
@@ -377,13 +378,17 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     join(CURRENT_ROOT, ".github/workflows/release.yml"),
     "utf8",
   );
+  const rootManifest = JSON.parse(
+    readFileSync(join(CURRENT_ROOT, "package.json"), "utf8"),
+  );
   assert.match(workflow, /pnpm install --frozen-lockfile/);
+  assert.equal(
+    rootManifest.scripts["safe-release:preflight"],
+    "node scripts/safe-release.mjs preflight --format=github",
+  );
+  assert.match(workflow, /pnpm --silent safe-release:preflight/);
   assert.match(workflow, /pnpm safe-release:refresh/);
   assert.match(workflow, /version: pnpm safe-release:version/);
-  assert.match(
-    workflow,
-    /safe-release\.mjs check --format=github --allow-empty/,
-  );
   assert.match(
     workflow,
     /if: steps\.release-claim\.outputs\.claimed == 'true'/,
@@ -446,6 +451,28 @@ test("workflow admits a planned merge without running empty-plan refresh", () =>
     /Create or update version PR without npm credentials[\s\S]+?if: steps\.plan-preflight\.outputs\.status == 'empty'/,
   );
   assert.ok(validationIndex > refreshIndex);
+});
+
+test("credential-free preflight admits only bounded empty manifest drift before refresh", () => {
+  const fixture = makeFixture();
+  try {
+    mutateJson(
+      join(fixture.root, "packages/hua-ui/package.json"),
+      (manifest) => {
+        manifest.exports = { ".": "./dist/index.mjs" };
+      },
+    );
+    assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
+    const preflight = runPreflight({ root: fixture.root });
+    assert.equal(preflight.plan.status, "empty");
+    assert.equal(preflight.refreshRequired, true);
+    const refreshed = runRefresh({ root: fixture.root });
+    assert.equal(refreshed.status, "empty");
+    assert.equal(runPreflight({ root: fixture.root }).refreshRequired, false);
+    assert.equal(loadReleaseState(fixture.root).plan.status, "empty");
+  } finally {
+    fixture.cleanup();
+  }
 });
 
 test("workflow durably claims and closes a published plan without a second publish", () => {
@@ -886,6 +913,7 @@ test("manifest and release-plan drift fail closed", async (t) => {
       try {
         mutate(join(fixture.root, "packages/hua-ui/package.json"));
         assertCode(() => loadReleaseState(fixture.root), code);
+        assertCode(() => runPreflight({ root: fixture.root }), code);
       } finally {
         fixture.cleanup();
       }
@@ -1156,13 +1184,6 @@ test("two release cycles close and refresh empty authority without weakening pla
   t.after(() => fixture.cleanup());
   const publishedPath = join(fixture.root, "published.json");
 
-  mutateJson(join(fixture.root, "packages/hua-ui/package.json"), (manifest) => {
-    manifest.exports = { ".": "./dist/index.mjs" };
-  });
-  assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
-  const refreshed = runRefresh({ root: fixture.root });
-  assert.equal(refreshed.status, "empty");
-
   for (const [cycle, expectedVersion] of [
     ["first", "2.3.1"],
     ["second", "2.3.2"],
@@ -1224,11 +1245,19 @@ test("two release cycles close and refresh empty authority without weakening pla
       mutateJson(
         join(fixture.root, "packages/hua-ui/package.json"),
         (manifest) => {
-          manifest.exports["./theme"] = "./dist/theme.mjs";
+          manifest.exports = {
+            ".": "./dist/index.mjs",
+            "./theme": "./dist/theme.mjs",
+          };
         },
       );
       assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
-      runRefresh({ root: fixture.root });
+      const preflight = runPreflight({ root: fixture.root });
+      assert.equal(preflight.plan.status, "empty");
+      assert.equal(preflight.refreshRequired, true);
+      const refreshed = runRefresh({ root: fixture.root });
+      assert.equal(refreshed.status, "empty");
+      assert.equal(runPreflight({ root: fixture.root }).refreshRequired, false);
     }
   }
 });
@@ -1300,6 +1329,27 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
         (manifest) => {
           manifest.description = "Reviewed but held authority drift";
         },
+      );
+      assertCode(
+        () => runRefresh({ root: fixture.root }),
+        "refresh-ineligible-workspace",
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("never-publish workspace drift", () => {
+    const fixture = makeFixture();
+    try {
+      mutateJson(
+        join(fixture.root, "packages/hua-security/package.json"),
+        (manifest) => {
+          manifest.description = "Reviewed but never-publish authority drift";
+        },
+      );
+      assertCode(
+        () => runPreflight({ root: fixture.root }),
+        "refresh-ineligible-workspace",
       );
       assertCode(
         () => runRefresh({ root: fixture.root }),

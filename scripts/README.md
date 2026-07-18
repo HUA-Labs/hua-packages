@@ -26,6 +26,7 @@ monorepo state.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `check-pack-artifacts.js`    | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload. |
 | `check-publish-allowlist.js` | Validate the versioned platform-policy projection against every workspace manifest.                               |
+| `safe-release.mjs preflight` | Classify plan state while admitting only bounded same-version eligible drift for an empty snapshot.               |
 | `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
@@ -55,10 +56,14 @@ planned-plan check. A planned plan remains manifest-exact in `check` and cannot
 publish directly.
 
 The ordinary main-push path is intentionally token-free while it creates or
-updates a version PR. Plan preflight classifies exact `empty`, `planned`, and
-`publishing` states before refresh. Only `empty` runs refresh and the Changesets
-action. A merged version PR is already `planned`, so it skips both and proceeds
-to exact plan validation instead of failing the empty-only refresh boundary.
+updates a version PR. Its dedicated preflight classifies exact `empty`,
+`planned`, and `publishing` states before refresh. Only an exact empty plan may
+admit same-version manifest-byte drift, and only for policy-eligible packages;
+policy, roster, identity, version, plan digest, and canonical-byte authority
+remain exact. The following credential-free refresh binds those reviewed
+manifest bytes before Changesets status/version executes. A merged version PR
+is already `planned`, so preflight remains manifest-exact, skips refresh and
+the Changesets action, and proceeds to exact plan validation.
 Its explicit `check --format=github --allow-empty` lane classifies an exact
 empty plan only as `publish=false`; ordinary `check`, `version`, and `publish`
 reject empty release authority.

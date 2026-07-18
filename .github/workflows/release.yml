@@ -47,7 +47,7 @@ jobs:
 
       - name: Read durable release plan state
         id: plan-preflight
-        run: node scripts/safe-release.mjs check --format=github --allow-empty >> "$GITHUB_OUTPUT"
+        run: pnpm --silent safe-release:preflight >> "$GITHUB_OUTPUT"
 
       - name: Refresh verified empty release snapshot
         if: steps.plan-preflight.outputs.status == 'empty'

@@ -16,6 +16,7 @@
     "check:pack-artifacts": "node scripts/check-pack-artifacts.js",
     "check:public-exposure": "node scripts/check-public-exposure.js",
     "check:publish-allowlist": "node scripts/check-publish-allowlist.js",
+    "safe-release:preflight": "node scripts/safe-release.mjs preflight --format=github",
     "safe-release:check": "node scripts/safe-release.mjs check",
     "safe-release:refresh": "node scripts/safe-release.mjs refresh",
     "safe-release:version": "node scripts/safe-release.mjs version",
