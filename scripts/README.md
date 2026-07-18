@@ -30,8 +30,9 @@ monorepo state.
 | `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
-| `safe-release.mjs claim`     | Atomically commit and push one exact planned-to-publishing ownership transition before npm credentials.           |
-| `safe-release.mjs publish`   | Publish only the exact publishing plan owned by the current source head and workflow run.                         |
+| `safe-release.mjs pack`      | Build, pack, inspect, and hash every exact planned package into one external immutable artifact bundle.           |
+| `safe-release.mjs claim`     | Commit and push one exact planned-to-publishing transition bound to the verified artifact-manifest SHA.           |
+| `safe-release.mjs publish`   | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                 |
 | `check-npm-provenance.mjs`   | Check provenance for the exact published set and optionally close that exact plan only after every check passes.  |
 | `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
 | `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
@@ -68,19 +69,40 @@ Its explicit `check --format=github --allow-empty` lane classifies an exact
 empty plan only as `publish=false`; ordinary `check`, `version`, and `publish`
 reject empty release authority.
 
-Before npm credentials exist, the planned run commits and pushes a single
-plan-only `planned` to `publishing` claim bound to the exact source head,
-`main`, and GitHub run ID. Local and remote heads must match before the commit,
-must still match before push, and the normal non-fast-forward push remains the
-final race gate. Any claim failure happens before npm credentials or publish.
+The prepare job has neither npm credentials nor OIDC `id-token` authority. For
+an exact planned set it builds every selected package, including an unscoped
+package such as `create-hua` when explicitly selected, packs each package into
+a caller-owned external directory, and runs `check-pack-artifacts.js` against
+the complete exact tarball set. A bounded canonical manifest binds every
+tarball filename, byte count, SHA-256, package name and version to the planned
+plan digest, exact source head, `main`, and GitHub run ID. Package-check failure,
+missing or extra artifacts, tarball substitution, or manifest drift prevents
+both claim and publish. The uploaded artifact is evidence only until the claim
+is durably pushed.
+
+After that credential-free artifact check and upload, the prepare job commits
+and pushes a single plan-only `planned` to `publishing` claim that additionally
+binds the exact artifact-manifest SHA-256. Local and remote heads must match
+before the commit, must still match before push, and the normal
+non-fast-forward push remains the final race gate. Any claim failure happens
+before an OIDC-capable job, npm credentials, or publish.
 Any later workflow run that starts from the claim commit sees `publishing`,
 skips refresh, versioning, claim, credentials, and publish, and performs no
 second release attempt. GitHub-token pushes are not relied on to recursively
-start another workflow. The original claiming run alone receives the matching
-claim environment required by `safe-release.mjs publish`.
+start another workflow.
 
-A later main push may expose npm credentials only after that exact claim is
-durably present and owned by the current run.
+A separate publish job is the only job with `id-token: write`; it cannot start
+until the prepare job reports the exact pushed claim head. It checks out that
+head, requires both local `HEAD` and remote `main` to remain that exact claim,
+downloads the run-scoped bundle, and revalidates the plan, claim, canonical
+manifest, complete directory population, tarball bytes, hashes, and internal
+package name/version before any npm command. It publishes the exact
+tarball paths with `npm publish --ignore-scripts`, never mutable package
+directories, so package lifecycle hooks cannot rerun after credential
+exposure. The npm token is present only on that publish step. Its temporary
+`RUNNER_TEMP` npmrc is removed before the step completes; neither the sanitized
+result upload nor the later closure job receives the npm token.
+
 Empty, stale, held, never-publish,
 pending, private, wrong-authority, unknown, missing, extra, or tampered sets
 stop before any publish or provenance command. Provenance is execution evidence
@@ -90,10 +112,11 @@ may produce the next empty snapshot, and only after every exact published
 `package@version` has passed the current provenance check. There is no separate
 close CLI or package script. A failed or partial publication or provenance
 check retains the planned file and must be resolved by the operator, never
-auto-refreshed. The same provenance command then commits and pushes only the
-canonical empty plan. It requires the exact claim head to remain both local and
-remote authority before commit and push. A head drift or non-fast-forward
-failure leaves remote main in `publishing`, so later workflow runs use zero npm
+auto-refreshed. The same provenance command runs in a separate no-OIDC,
+no-npm-credential closure job, then commits and pushes only the canonical empty
+plan. It requires the exact claim head to remain both local and remote
+authority before commit and push. A head drift or non-fast-forward failure
+leaves remote main in `publishing`, so later workflow runs use zero npm
 credentials and cannot publish the same plan again. Operator reconciliation is
 required before another release. A successful closure commit restores the
 next Changesets cycle; the next externally triggered run starts from exact
@@ -133,6 +156,18 @@ non-fast-forward failure, plan-only commits, publishing-run suppression, and
 the next empty cycle. This exact-12 implementation has no devlog path; this
 durable contract plus the frozen-tuple report records the RED/GREEN provenance
 without adding a thirteenth path.
+
+The credential/artifact RED then proved two further execution gaps: job-level
+OIDC authority existed during checkout/build/versioning, and directory publish
+could rerun package lifecycle code after npm credentials while bypassing the
+existing pack checker. On the exact checkpoint, a locally built current UI
+tarball was rejected by that checker for the three missing type references
+`dist/landing.d.ts`, `dist/native.d.ts`, and `dist/sdui.d.ts`; this is a truthful
+pre-publication blocker, not a reason to weaken the checker. The final boundary
+splits prepare, publish, and closure permissions; binds checked artifact bytes
+into the durable claim; and publishes only reverified tarballs with lifecycle
+scripts disabled. No npm query, publish, token use, OIDC request, or workflow
+dispatch was executed while implementing or testing this contract.
 
 ## Manual Analysis
 

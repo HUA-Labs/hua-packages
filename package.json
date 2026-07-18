@@ -20,6 +20,7 @@
     "safe-release:check": "node scripts/safe-release.mjs check",
     "safe-release:refresh": "node scripts/safe-release.mjs refresh",
     "safe-release:version": "node scripts/safe-release.mjs version",
+    "safe-release:pack": "node scripts/safe-release.mjs pack",
     "safe-release:publish": "node scripts/safe-release.mjs publish",
     "generate:docs": "tsx scripts/generate-docs.ts",
     "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",

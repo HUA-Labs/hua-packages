@@ -7,6 +7,7 @@ import {
   constants as fsConstants,
   fstatSync,
   fsyncSync,
+  linkSync,
   lstatSync,
   mkdtempSync,
   openSync,
@@ -25,6 +26,7 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_ROOT = resolve(moduleDirectory, "..");
 export const POLICY_RELATIVE_PATH = "config/publish-allowlist.json";
 export const PLAN_RELATIVE_PATH = "config/release-plan.json";
+export const ARTIFACT_MANIFEST_FILENAME = "release-artifacts.json";
 
 export const PLATFORM_AUTHORITY = Object.freeze({
   authorityKind: "platform-release-registry",
@@ -42,6 +44,9 @@ const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
 const GIT_OUTPUT_MAX_BYTES = 128 * 1024;
+const ARTIFACT_MANIFEST_MAX_BYTES = 2 * 1024 * 1024;
+const ARTIFACT_MAX_BYTES = 128 * 1024 * 1024;
+const ARTIFACT_TOTAL_MAX_BYTES = 512 * 1024 * 1024;
 const MAX_JSON_DEPTH = 32;
 const MAX_JSON_NODES = 50000;
 const MAX_STRING_BYTES = 8 * 1024;
@@ -51,6 +56,7 @@ const RUN_ID_PATTERN = /^[1-9][0-9]{0,19}$/;
 const PACKAGE_NAME_PATTERN = /^(?:@[a-z0-9-]+\/[a-z0-9-]+|[a-z0-9-]+)$/;
 const PACKAGE_PATH_PATTERN = /^packages\/[a-z0-9-]+$/;
 const CHANGESET_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,79}$/;
+const ARTIFACT_FILENAME_PATTERN = /^[a-z0-9][a-z0-9._+-]{0,199}\.tgz$/;
 const SEMVER_PATTERN =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const RELEASE_TYPES = new Set(["patch", "minor", "major"]);
@@ -808,10 +814,15 @@ export function validateReleasePlan(value, policyState, options = {}) {
   if (value.claim !== null) {
     exactKeys(
       value.claim,
-      ["branch", "runId", "sourceHead"],
+      ["artifactManifestSha256", "branch", "runId", "sourceHead"],
       "plan-claim-shape",
     );
     claim = {
+      artifactManifestSha256: stringValue(
+        value.claim.artifactManifestSha256,
+        SHA256_PATTERN,
+        "plan-claim-artifact-manifest-sha256",
+      ),
       branch: stringValue(value.claim.branch, /^main$/, "plan-claim-branch"),
       runId: stringValue(
         value.claim.runId,
@@ -1222,6 +1233,305 @@ function writeFileAtomically(filePath, bytes) {
   }
 }
 
+function pathIsAbsent(filePath) {
+  try {
+    lstatSync(filePath);
+    return false;
+  } catch (error) {
+    if (error?.code === "ENOENT") return true;
+    fail("artifact-path-state");
+  }
+}
+
+function writeNewFileAtomically(filePath, bytes) {
+  assert(pathIsAbsent(filePath), "artifact-manifest-exists");
+  const parent = dirname(filePath);
+  const temporaryPath = join(
+    parent,
+    `.release-artifacts.${process.pid}.${Date.now()}.tmp`,
+  );
+  let descriptor;
+  try {
+    descriptor = openSync(
+      temporaryPath,
+      fsConstants.O_WRONLY | fsConstants.O_CREAT | fsConstants.O_EXCL,
+      0o600,
+    );
+    let offset = 0;
+    while (offset < bytes.length) {
+      offset += writeSync(
+        descriptor,
+        bytes,
+        offset,
+        bytes.length - offset,
+        offset,
+      );
+    }
+    fsyncSync(descriptor);
+    closeSync(descriptor);
+    descriptor = undefined;
+    linkSync(temporaryPath, filePath);
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(temporaryPath, { force: true });
+  }
+}
+
+function validateArtifactDirectory(root, directoryPath, requireEmpty = false) {
+  assert(typeof directoryPath === "string", "artifact-directory");
+  validateScalarString(directoryPath, "artifact-directory");
+  assert(isAbsolute(directoryPath), "artifact-directory-absolute");
+  const stats = lstatSync(directoryPath);
+  assert(
+    stats.isDirectory() && !stats.isSymbolicLink(),
+    "artifact-directory-non-directory",
+  );
+  const absoluteDirectory = realpathSync(directoryPath);
+  assert(
+    absoluteDirectory === resolve(directoryPath),
+    "artifact-directory-link",
+  );
+  const absoluteRoot = realpathSync(root);
+  const rootRelative = relative(absoluteRoot, absoluteDirectory);
+  assert(
+    rootRelative === ".." || rootRelative.startsWith(`..${sep}`),
+    "artifact-directory-repository",
+  );
+  if (requireEmpty) {
+    assert(
+      readdirSync(absoluteDirectory).length === 0,
+      "artifact-directory-not-empty",
+    );
+  }
+  return absoluteDirectory;
+}
+
+function artifactPlannedDigest(plan) {
+  if (plan.status === "planned") return plan.planDigest;
+  assert(plan.status === "publishing", "artifact-plan-status");
+  return finalizeReleasePlan({
+    ...plan,
+    status: "planned",
+    claim: null,
+  }).planDigest;
+}
+
+function normalizeArtifactRecord(value) {
+  exactKeys(
+    value,
+    ["bytes", "file", "name", "sha256", "version"],
+    "artifact-record-shape",
+  );
+  assert(
+    Number.isSafeInteger(value.bytes) &&
+      value.bytes > 0 &&
+      value.bytes <= ARTIFACT_MAX_BYTES,
+    "artifact-record-bytes",
+  );
+  return {
+    bytes: value.bytes,
+    file: stringValue(
+      value.file,
+      ARTIFACT_FILENAME_PATTERN,
+      "artifact-record-file",
+      256,
+    ),
+    name: stringValue(value.name, PACKAGE_NAME_PATTERN, "artifact-record-name"),
+    sha256: stringValue(value.sha256, SHA256_PATTERN, "artifact-record-sha256"),
+    version: stringValue(
+      value.version,
+      SEMVER_PATTERN,
+      "artifact-record-version",
+    ),
+  };
+}
+
+export function validateArtifactManifest(value, releaseState, binding) {
+  exactKeys(
+    value,
+    [
+      "artifacts",
+      "branch",
+      "planDigest",
+      "runId",
+      "schemaVersion",
+      "sourceHead",
+    ],
+    "artifact-manifest-shape",
+  );
+  assert(value.schemaVersion === 1, "artifact-manifest-schema-version");
+  const normalizedBinding = normalizeClaimInput(binding);
+  assert(value.branch === normalizedBinding.branch, "artifact-manifest-branch");
+  assert(value.runId === normalizedBinding.runId, "artifact-manifest-run-id");
+  assert(
+    value.sourceHead === normalizedBinding.sourceHead,
+    "artifact-manifest-source-head",
+  );
+  assert(
+    value.planDigest === artifactPlannedDigest(releaseState.plan),
+    "artifact-manifest-plan-digest",
+  );
+  assert(Array.isArray(value.artifacts), "artifact-manifest-artifacts");
+  const artifacts = value.artifacts.map(normalizeArtifactRecord);
+  assertSortedUnique(artifacts, "name", "artifact-manifest-name-order");
+  const byFile = [...artifacts].sort((left, right) =>
+    compareUtf8(left.file, right.file),
+  );
+  assertSortedUnique(byFile, "file", "artifact-manifest-file-order");
+  const expected = releaseState.plan.releases.map((release) => ({
+    name: release.name,
+    version: release.toVersion,
+  }));
+  assert(
+    JSON.stringify(
+      artifacts.map(({ name, version }) => ({ name, version })),
+    ) === JSON.stringify(expected),
+    "artifact-manifest-release-set",
+  );
+  return {
+    schemaVersion: 1,
+    branch: normalizedBinding.branch,
+    runId: normalizedBinding.runId,
+    sourceHead: normalizedBinding.sourceHead,
+    planDigest: value.planDigest,
+    artifacts,
+  };
+}
+
+function readPackedPackageManifest(execFile, root, artifactPath) {
+  const output = execFile(
+    "tar",
+    ["-xOf", artifactPath, "package/package.json"],
+    {
+      cwd: root,
+      encoding: null,
+      stdio: ["ignore", "pipe", "pipe"],
+      maxBuffer: MANIFEST_MAX_BYTES,
+    },
+  );
+  const bytes = Buffer.isBuffer(output) ? output : Buffer.from(output ?? "");
+  const value = parseStrictJsonBytes(bytes, {
+    maxBytes: MANIFEST_MAX_BYTES,
+    label: "artifact-package-manifest",
+  });
+  assert(isRecord(value), "artifact-package-manifest-shape");
+  return {
+    name: stringValue(
+      value.name,
+      PACKAGE_NAME_PATTERN,
+      "artifact-package-name",
+    ),
+    version: stringValue(
+      value.version,
+      SEMVER_PATTERN,
+      "artifact-package-version",
+    ),
+  };
+}
+
+export function readArtifactBundle(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  assert(
+    typeof options.artifactManifestPath === "string",
+    "artifact-manifest-path",
+  );
+  validateScalarString(options.artifactManifestPath, "artifact-manifest-path");
+  assert(
+    isAbsolute(options.artifactManifestPath),
+    "artifact-manifest-absolute",
+  );
+  assert(
+    options.artifactManifestPath === resolve(options.artifactManifestPath),
+    "artifact-manifest-normalized",
+  );
+  assert(
+    options.artifactManifestPath.endsWith(
+      `${sep}${ARTIFACT_MANIFEST_FILENAME}`,
+    ),
+    "artifact-manifest-filename",
+  );
+  const directory = validateArtifactDirectory(
+    root,
+    dirname(options.artifactManifestPath),
+  );
+  assert(
+    !pathIsAbsent(options.artifactManifestPath),
+    "artifact-manifest-missing",
+  );
+  const manifestBytes = readRegularFile(
+    options.artifactManifestPath,
+    ARTIFACT_MANIFEST_MAX_BYTES,
+    "artifact-manifest",
+  );
+  const manifest = validateArtifactManifest(
+    parseStrictJsonBytes(manifestBytes, {
+      maxBytes: ARTIFACT_MANIFEST_MAX_BYTES,
+      label: "artifact-manifest",
+    }),
+    options.releaseState,
+    options,
+  );
+  assert(
+    Buffer.from(canonicalJson(manifest)).equals(manifestBytes),
+    "artifact-manifest-noncanonical",
+  );
+  const artifactManifestSha256 = sha256(manifestBytes);
+  if (options.artifactManifestSha256 !== undefined) {
+    assert(
+      stringValue(
+        options.artifactManifestSha256,
+        SHA256_PATTERN,
+        "artifact-manifest-expected-sha256",
+      ) === artifactManifestSha256,
+      "artifact-manifest-sha256",
+    );
+  }
+  const expectedEntries = [
+    ARTIFACT_MANIFEST_FILENAME,
+    ...manifest.artifacts.map((artifact) => artifact.file),
+  ].sort(compareUtf8);
+  const actualEntries = readdirSync(directory).sort(compareUtf8);
+  assert(
+    JSON.stringify(actualEntries) === JSON.stringify(expectedEntries),
+    "artifact-directory-entries",
+  );
+  let totalBytes = 0;
+  const artifacts = manifest.artifacts.map((artifact) => {
+    const artifactPath = join(directory, artifact.file);
+    const before = readRegularFile(
+      artifactPath,
+      ARTIFACT_MAX_BYTES,
+      "artifact-tarball",
+    );
+    totalBytes += before.byteLength;
+    assert(totalBytes <= ARTIFACT_TOTAL_MAX_BYTES, "artifact-total-oversize");
+    assert(before.byteLength === artifact.bytes, "artifact-byte-count");
+    assert(sha256(before) === artifact.sha256, "artifact-sha256");
+    const packageManifest = readPackedPackageManifest(
+      execFile,
+      root,
+      artifactPath,
+    );
+    assert(
+      packageManifest.name === artifact.name,
+      "artifact-package-name-drift",
+    );
+    assert(
+      packageManifest.version === artifact.version,
+      "artifact-package-version-drift",
+    );
+    const after = readRegularFile(
+      artifactPath,
+      ARTIFACT_MAX_BYTES,
+      "artifact-tarball-postcheck",
+    );
+    assert(before.equals(after), "artifact-tarball-drift");
+    return { ...artifact, artifactPath };
+  });
+  return { manifest, manifestBytes, artifactManifestSha256, artifacts };
+}
+
 function gitOutput(execFile, root, argumentsList) {
   const output = execFile("git", argumentsList, {
     cwd: root,
@@ -1315,12 +1625,153 @@ function normalizeClaimInput(options) {
   };
 }
 
+function normalizeArtifactClaim(options) {
+  return {
+    artifactManifestSha256: stringValue(
+      options.artifactManifestSha256,
+      SHA256_PATTERN,
+      "release-claim-artifact-manifest-sha256",
+    ),
+    ...normalizeClaimInput(options),
+  };
+}
+
+export function runPack(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  const binding = normalizeClaimInput(options);
+  const releaseState = loadReleaseState(root, { requireNonempty: true });
+  assert(releaseState.plan.status === "planned", "pack-plan-status");
+  const artifactDirectory = validateArtifactDirectory(
+    root,
+    options.artifactDirectory,
+    true,
+  );
+  const artifactRecords = [];
+  for (const release of releaseState.plan.releases) {
+    const packageDirectory = safeRelativePath(root, release.path);
+    execFile("pnpm", ["--filter", release.name, "run", "build"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const beforeEntries = new Set(readdirSync(artifactDirectory));
+    execFile("pnpm", ["pack", "--pack-destination", artifactDirectory], {
+      cwd: packageDirectory,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const addedEntries = readdirSync(artifactDirectory).filter(
+      (entry) => !beforeEntries.has(entry),
+    );
+    assert(addedEntries.length === 1, "pack-artifact-count");
+    const file = stringValue(
+      addedEntries[0],
+      ARTIFACT_FILENAME_PATTERN,
+      "pack-artifact-file",
+      256,
+    );
+    const artifactPath = join(artifactDirectory, file);
+    const bytes = readRegularFile(
+      artifactPath,
+      ARTIFACT_MAX_BYTES,
+      "pack-artifact",
+    );
+    const packageManifest = readPackedPackageManifest(
+      execFile,
+      root,
+      artifactPath,
+    );
+    assert(packageManifest.name === release.name, "pack-artifact-name");
+    assert(
+      packageManifest.version === release.toVersion,
+      "pack-artifact-version",
+    );
+    artifactRecords.push({
+      bytes: bytes.byteLength,
+      file,
+      name: release.name,
+      sha256: sha256(bytes),
+      version: release.toVersion,
+    });
+  }
+  artifactRecords.sort((left, right) => compareUtf8(left.name, right.name));
+  const artifactPaths = artifactRecords.map((artifact) =>
+    join(artifactDirectory, artifact.file),
+  );
+  execFile(
+    "node",
+    [join(root, "scripts/check-pack-artifacts.js"), ...artifactPaths],
+    {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  for (const artifact of artifactRecords) {
+    const bytes = readRegularFile(
+      join(artifactDirectory, artifact.file),
+      ARTIFACT_MAX_BYTES,
+      "pack-artifact-postcheck",
+    );
+    assert(
+      bytes.byteLength === artifact.bytes,
+      "pack-artifact-byte-count-drift",
+    );
+    assert(sha256(bytes) === artifact.sha256, "pack-artifact-sha256-drift");
+  }
+  const manifest = validateArtifactManifest(
+    {
+      schemaVersion: 1,
+      branch: binding.branch,
+      runId: binding.runId,
+      sourceHead: binding.sourceHead,
+      planDigest: releaseState.plan.planDigest,
+      artifacts: artifactRecords,
+    },
+    releaseState,
+    binding,
+  );
+  const artifactManifestPath = join(
+    artifactDirectory,
+    ARTIFACT_MANIFEST_FILENAME,
+  );
+  const manifestBytes = Buffer.from(canonicalJson(manifest));
+  writeNewFileAtomically(artifactManifestPath, manifestBytes);
+  const artifactManifestSha256 = sha256(manifestBytes);
+  readArtifactBundle({
+    root,
+    execFile,
+    releaseState,
+    artifactManifestPath,
+    artifactManifestSha256,
+    ...binding,
+  });
+  return {
+    artifactManifestPath,
+    artifactManifestSha256,
+    artifactCount: artifactRecords.length,
+    planDigest: releaseState.plan.planDigest,
+  };
+}
+
 export function runClaim(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
-  const claim = normalizeClaimInput(options);
+  const binding = normalizeClaimInput(options);
   const releaseState = loadReleaseState(root, { requireNonempty: true });
   assert(releaseState.plan.status === "planned", "claim-plan-status");
+  const bundle = readArtifactBundle({
+    root,
+    execFile,
+    releaseState,
+    artifactManifestPath: options.artifactManifestPath,
+    ...binding,
+  });
+  const claim = normalizeArtifactClaim({
+    ...binding,
+    artifactManifestSha256: bundle.artifactManifestSha256,
+  });
   assert(
     gitOutput(execFile, root, [
       "status",
@@ -1484,30 +1935,58 @@ export function validatePublishedPackages(value, releaseState) {
 export function runPublish(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
+  const gitExecFile = options.gitExecFile ?? execFileSync;
   const releaseState = loadReleaseState(root, { requireNonempty: true });
   assert(releaseState.plan.status === "publishing", "publish-plan-unclaimed");
-  const claim = normalizeClaimInput({
+  const claimIdentity = normalizeClaimInput({
     branch: options.branch,
     runId: options.runId,
     sourceHead: options.sourceHead,
   });
+  const claim = normalizeArtifactClaim(releaseState.plan.claim);
   assert(
-    JSON.stringify(releaseState.plan.claim) === JSON.stringify(claim),
+    claim.branch === claimIdentity.branch &&
+      claim.runId === claimIdentity.runId &&
+      claim.sourceHead === claimIdentity.sourceHead,
     "publish-claim-owner",
   );
+  const claimHead = stringValue(
+    options.claimHead,
+    GIT_SHA_PATTERN,
+    "publish-claim-head",
+  );
+  assert(
+    gitOutput(gitExecFile, root, ["rev-parse", "HEAD"]) === claimHead,
+    "publish-local-claim-head-drift",
+  );
+  assertRemoteHead(gitExecFile, root, claim.branch, claimHead);
+  const bundle = readArtifactBundle({
+    root,
+    execFile,
+    releaseState,
+    artifactManifestPath: options.artifactManifestPath,
+    ...claim,
+  });
   const publishedPackages = [];
-  for (const release of releaseState.plan.releases) {
-    const packageDirectory = safeRelativePath(root, release.path);
+  for (const artifact of bundle.artifacts) {
+    const artifactPath = artifact.artifactPath;
     execFile(
-      "pnpm",
-      ["publish", "--no-git-checks", "--access", "public", "--provenance"],
+      "npm",
+      [
+        "publish",
+        artifactPath,
+        "--ignore-scripts",
+        "--access",
+        "public",
+        "--provenance",
+      ],
       {
-        cwd: packageDirectory,
+        cwd: root,
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
       },
     );
-    publishedPackages.push({ name: release.name, version: release.toVersion });
+    publishedPackages.push({ name: artifact.name, version: artifact.version });
   }
   return validatePublishedPackages(
     { schemaVersion: 1, publishedPackages },
@@ -1531,28 +2010,55 @@ function parseCliArguments(argv) {
   assert(argv.length >= 1, "cli-mode-missing");
   const [mode, ...argumentsList] = argv;
   assert(
-    ["version", "refresh", "preflight", "check", "claim", "publish"].includes(
-      mode,
-    ),
+    [
+      "version",
+      "refresh",
+      "preflight",
+      "check",
+      "pack",
+      "claim",
+      "publish",
+    ].includes(mode),
     "cli-mode",
   );
   let format = "json";
   let allowEmpty = false;
   if (mode === "claim") {
     assert(
-      argumentsList.length === 6 &&
-        argumentsList[0] === "--source-head" &&
-        argumentsList[2] === "--branch" &&
-        argumentsList[4] === "--run-id",
+      argumentsList.length === 8 &&
+        argumentsList[0] === "--artifact-manifest" &&
+        argumentsList[2] === "--source-head" &&
+        argumentsList[4] === "--branch" &&
+        argumentsList[6] === "--run-id",
       "cli-claim-arguments",
     );
     return {
       mode,
       format,
       allowEmpty,
-      sourceHead: argumentsList[1],
-      branch: argumentsList[3],
-      runId: argumentsList[5],
+      artifactManifestPath: argumentsList[1],
+      sourceHead: argumentsList[3],
+      branch: argumentsList[5],
+      runId: argumentsList[7],
+    };
+  }
+  if (mode === "pack") {
+    assert(
+      argumentsList.length === 8 &&
+        argumentsList[0] === "--artifact-dir" &&
+        argumentsList[2] === "--source-head" &&
+        argumentsList[4] === "--branch" &&
+        argumentsList[6] === "--run-id",
+      "cli-pack-arguments",
+    );
+    return {
+      mode,
+      format,
+      allowEmpty,
+      artifactDirectory: argumentsList[1],
+      sourceHead: argumentsList[3],
+      branch: argumentsList[5],
+      runId: argumentsList[7],
     };
   }
   for (const argument of argumentsList) {
@@ -1572,8 +2078,16 @@ function parseCliArguments(argv) {
 }
 
 export function main(argv = process.argv.slice(2), options = {}) {
-  const { mode, format, allowEmpty, sourceHead, branch, runId } =
-    parseCliArguments(argv);
+  const {
+    mode,
+    format,
+    allowEmpty,
+    artifactDirectory,
+    artifactManifestPath,
+    sourceHead,
+    branch,
+    runId,
+  } = parseCliArguments(argv);
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
   if (mode === "version") {
@@ -1622,9 +2136,24 @@ export function main(argv = process.argv.slice(2), options = {}) {
       sourceHead,
       branch,
       runId,
+      artifactManifestPath,
     });
     process.stdout.write(
       `claimed=true\nclaim_head=${result.claimHead}\nplan_digest=${result.plan.planDigest}\n`,
+    );
+    return;
+  }
+  if (mode === "pack") {
+    const result = runPack({
+      root,
+      execFile,
+      sourceHead,
+      branch,
+      runId,
+      artifactDirectory,
+    });
+    process.stdout.write(
+      `artifact_manifest=${result.artifactManifestPath}\nartifact_manifest_sha256=${result.artifactManifestSha256}\nartifact_count=${result.artifactCount}\nplan_digest=${result.planDigest}\n`,
     );
     return;
   }
@@ -1653,6 +2182,8 @@ export function main(argv = process.argv.slice(2), options = {}) {
     branch: process.env.HUA_RELEASE_BRANCH,
     runId: process.env.HUA_RELEASE_RUN_ID,
     sourceHead: process.env.HUA_RELEASE_SOURCE_HEAD,
+    claimHead: process.env.HUA_RELEASE_CLAIM_HEAD,
+    artifactManifestPath: process.env.HUA_RELEASE_ARTIFACT_MANIFEST,
   });
   process.stdout.write(`${JSON.stringify(published)}\n`);
 }

@@ -13,6 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { parseDocument } from "yaml";
 import { checkPublishedProvenance } from "../check-npm-provenance.mjs";
 import {
   PLATFORM_AUTHORITY,
@@ -23,6 +24,7 @@ import {
   loadReleaseState,
   parseStrictJsonBytes,
   runClaim,
+  runPack,
   runPreflight,
   runPublish,
   runRefresh,
@@ -169,8 +171,12 @@ function makeFixture(options = {}) {
   return {
     root,
     definitions,
+    artifactRoots: [],
     cleanup() {
       rmSync(root, { recursive: true, force: true });
+      for (const artifactRoot of this.artifactRoots) {
+        rmSync(artifactRoot, { recursive: true, force: true });
+      }
     },
   };
 }
@@ -248,23 +254,94 @@ function createPlannedFixture(
 }
 
 const TEST_CLAIM = Object.freeze({
+  artifactManifestSha256: "f".repeat(64),
   branch: "main",
   runId: "123456",
   sourceHead: "a".repeat(40),
 });
 
+function createTestArtifactBundle(fixture, claim = TEST_CLAIM) {
+  const state = loadReleaseState(fixture.root, { requireNonempty: true });
+  const artifactRoot = realpathSync(
+    mkdtempSync(join(tmpdir(), "hua-safe-artifacts-")),
+  );
+  const stagingRoot = mkdtempSync(join(tmpdir(), "hua-safe-artifact-stage-"));
+  fixture.artifactRoots.push(artifactRoot);
+  try {
+    const artifacts = state.plan.releases.map((release) => {
+      const file = `${release.name.replaceAll("@", "").replaceAll("/", "-")}-${release.toVersion}.tgz`;
+      const packageRoot = join(stagingRoot, file, "package");
+      mkdirSync(packageRoot, { recursive: true });
+      writeFileSync(
+        join(packageRoot, "package.json"),
+        canonicalJson({ name: release.name, version: release.toVersion }),
+      );
+      const artifactPath = join(artifactRoot, file);
+      execFileSync(
+        "tar",
+        [
+          "-czf",
+          artifactPath,
+          "-C",
+          join(stagingRoot, file),
+          "package/package.json",
+        ],
+        { stdio: "ignore" },
+      );
+      const bytes = readFileSync(artifactPath);
+      return {
+        bytes: bytes.byteLength,
+        file,
+        name: release.name,
+        sha256: sha256(bytes),
+        version: release.toVersion,
+      };
+    });
+    const manifest = {
+      schemaVersion: 1,
+      branch: claim.branch,
+      runId: claim.runId,
+      sourceHead: claim.sourceHead,
+      planDigest:
+        state.plan.status === "planned"
+          ? state.plan.planDigest
+          : finalizeReleasePlan({
+              ...state.plan,
+              status: "planned",
+              claim: null,
+            }).planDigest,
+      artifacts,
+    };
+    const artifactManifestPath = join(artifactRoot, "release-artifacts.json");
+    const manifestBytes = Buffer.from(canonicalJson(manifest));
+    writeFileSync(artifactManifestPath, manifestBytes);
+    fixture.artifactManifestPath = artifactManifestPath;
+    fixture.claim = {
+      artifactManifestSha256: sha256(manifestBytes),
+      branch: claim.branch,
+      runId: claim.runId,
+      sourceHead: claim.sourceHead,
+    };
+    return fixture.claim;
+  } finally {
+    rmSync(stagingRoot, { recursive: true, force: true });
+  }
+}
+
 function claimFixturePlan(fixture, claim = TEST_CLAIM) {
   const state = loadReleaseState(fixture.root, { requireNonempty: true });
   assert.equal(state.plan.status, "planned");
+  const artifactClaim = createTestArtifactBundle(fixture, claim);
   const plan = finalizeReleasePlan({
     ...state.plan,
     status: "publishing",
-    claim,
+    claim: artifactClaim,
   });
   writeFileSync(
     join(fixture.root, "config/release-plan.json"),
     canonicalJson(plan),
   );
+  fixture.claimHead ??= "c".repeat(40);
   return plan;
 }
 
@@ -274,14 +351,80 @@ function createPublishingFixture(
 ) {
   const fixture = createPlannedFixture(names, definitions);
   claimFixturePlan(fixture);
+  fixture.claimHead = "c".repeat(40);
   return fixture;
 }
 
 function publishingOptions(fixture, execFile) {
   return {
     root: fixture.root,
-    execFile,
-    ...TEST_CLAIM,
+    execFile(file, args, options) {
+      if (file === "tar") return execFileSync(file, args, options);
+      return execFile(file, args, options);
+    },
+    gitExecFile(_file, args) {
+      if (args[0] === "rev-parse") return `${fixture.claimHead}\n`;
+      if (args[0] === "ls-remote") {
+        return `${fixture.claimHead}\trefs/heads/main\n`;
+      }
+      throw new Error("unexpected-git-command");
+    },
+    artifactManifestPath: fixture.artifactManifestPath,
+    claimHead: fixture.claimHead,
+    ...fixture.claim,
+  };
+}
+
+function createExternalArtifactDirectory(fixture) {
+  const artifactDirectory = realpathSync(
+    mkdtempSync(join(tmpdir(), "hua-safe-pack-output-")),
+  );
+  fixture.artifactRoots.push(artifactDirectory);
+  return artifactDirectory;
+}
+
+function writePackedFixture(artifactDirectory, packageManifest) {
+  const stagingRoot = mkdtempSync(join(tmpdir(), "hua-safe-pack-stage-"));
+  try {
+    const packageRoot = join(stagingRoot, "package");
+    mkdirSync(packageRoot, { recursive: true });
+    writeFileSync(
+      join(packageRoot, "package.json"),
+      canonicalJson(packageManifest),
+    );
+    const file = `${packageManifest.name.replaceAll("@", "").replaceAll("/", "-")}-${packageManifest.version}.tgz`;
+    const artifactPath = join(artifactDirectory, file);
+    execFileSync(
+      "tar",
+      ["-czf", artifactPath, "-C", stagingRoot, "package/package.json"],
+      { stdio: "ignore" },
+    );
+    return artifactPath;
+  } finally {
+    rmSync(stagingRoot, { recursive: true, force: true });
+  }
+}
+
+function packExecFixture(calls, options = {}) {
+  return (file, args, commandOptions) => {
+    if (file === "tar") return execFileSync(file, args, commandOptions);
+    calls.push({ file, args, cwd: commandOptions.cwd });
+    if (file === "pnpm" && args[0] === "pack") {
+      const packageManifest = JSON.parse(
+        readFileSync(join(commandOptions.cwd, "package.json"), "utf8"),
+      );
+      writePackedFixture(args[2], packageManifest);
+      return "";
+    }
+    if (file === "node" && args[0].endsWith("check-pack-artifacts.js")) {
+      if (options.failChecker) {
+        const error = new Error("pack-check-failed");
+        error.code = "pack-check-failed";
+        throw error;
+      }
+      return "";
+    }
+    return "";
   };
 }
 
@@ -313,11 +456,12 @@ function createGitPlannedFixture(t) {
   git(fixture.root, ["commit", "-m", "seed planned release"]);
   git(fixture.root, ["remote", "add", "origin", remote]);
   git(fixture.root, ["push", "-u", "origin", "main"]);
+  const sourceHead = git(fixture.root, ["rev-parse", "HEAD"]);
   return {
     fixture,
     remote,
     remoteRoot,
-    sourceHead: git(fixture.root, ["rev-parse", "HEAD"]),
+    sourceHead,
   };
 }
 
@@ -389,15 +533,15 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
   assert.match(workflow, /pnpm --silent safe-release:preflight/);
   assert.match(workflow, /pnpm safe-release:refresh/);
   assert.match(workflow, /version: pnpm safe-release:version/);
+  assert.match(workflow, /if: needs\.prepare\.outputs\.claimed == 'true'/);
   assert.match(
     workflow,
-    /if: steps\.release-claim\.outputs\.claimed == 'true'/,
+    /node scripts\/safe-release\.mjs publish > "\$published"/,
   );
-  assert.match(workflow, /pnpm safe-release:publish > "\$published"/);
-  assert.match(workflow, /check:npm-provenance -- --published/);
+  assert.match(workflow, /check-npm-provenance\.mjs --published/);
   assert.match(
     workflow,
-    /check:npm-provenance -- --published[^\n]+--close-plan/,
+    /check-npm-provenance\.mjs --published[^\n]+--close-plan/,
   );
   assert.doesNotMatch(workflow, /--no-frozen-lockfile/);
   assert.doesNotMatch(workflow, /changeset publish/);
@@ -427,6 +571,221 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     "@hua-labs/hua",
     "@hua-labs/security",
   ]);
+});
+
+test("workflow withholds OIDC and npm credentials until an immutable artifact claim", () => {
+  const workflow = readFileSync(
+    join(CURRENT_ROOT, ".github/workflows/release.yml"),
+    "utf8",
+  );
+  const document = parseDocument(workflow, { uniqueKeys: true });
+  assert.deepEqual(document.errors, []);
+  const workflowAuthority = document.toJS();
+  assert.deepEqual(workflowAuthority.permissions, { contents: "read" });
+  assert.deepEqual(workflowAuthority.jobs.prepare.permissions, {
+    contents: "write",
+    "pull-requests": "write",
+  });
+  assert.deepEqual(workflowAuthority.jobs.publish.permissions, {
+    contents: "read",
+    "id-token": "write",
+  });
+  assert.deepEqual(workflowAuthority.jobs.close.permissions, {
+    contents: "write",
+  });
+  assert.deepEqual(
+    Object.entries(workflowAuthority.jobs)
+      .filter(([, job]) => job.permissions?.["id-token"] === "write")
+      .map(([name]) => name),
+    ["publish"],
+  );
+  assert.equal(
+    workflowAuthority.jobs.publish.steps.find(
+      (step) => step.name === "Checkout exact pushed claim",
+    ).with.ref,
+    "${{ needs.prepare.outputs.claim_head }}",
+  );
+  assert.equal(
+    workflowAuthority.jobs.publish.steps.find(
+      (step) => step.name === "Publish immutable verified tarballs",
+    ).env.HUA_RELEASE_CLAIM_HEAD,
+    "${{ needs.prepare.outputs.claim_head }}",
+  );
+  assert.equal(
+    workflowAuthority.jobs.prepare.steps.some(
+      (step) => step.env?.NPM_TOKEN !== undefined,
+    ),
+    false,
+  );
+  assert.equal(
+    workflowAuthority.jobs.close.steps.some(
+      (step) => step.env?.NPM_TOKEN !== undefined,
+    ),
+    false,
+  );
+  assert.doesNotMatch(
+    workflow.slice(0, workflow.indexOf("jobs:")),
+    /id-token:\s*write/,
+  );
+  assert.match(workflow, /prepare:[\s\S]+?permissions:[\s\S]+?contents: write/);
+  assert.doesNotMatch(
+    workflow.match(/prepare:[\s\S]+?(?=\n  publish:)/)?.[0] ?? "",
+    /id-token:\s*write|NPM_TOKEN/,
+  );
+  assert.match(
+    workflow,
+    /Prepare and verify exact release artifacts[\s\S]+?Upload exact verified artifacts[\s\S]+?Claim exact artifact-bound release/,
+  );
+  assert.match(workflow, /publish:[\s\S]+?permissions:[\s\S]+?id-token: write/);
+  assert.match(
+    workflow,
+    /Publish immutable verified tarballs[\s\S]+?--ignore-scripts/,
+  );
+  assert.doesNotMatch(workflow, /\$HOME\/\.npmrc/);
+  assert.match(workflow, /close:[\s\S]+?permissions:[\s\S]+?contents: write/);
+  assert.doesNotMatch(
+    workflow.match(/close:[\s\S]+$/)?.[0] ?? "",
+    /id-token:\s*write|NPM_TOKEN/,
+  );
+});
+
+test("release source binds checked tarballs and never publishes mutable package directories", () => {
+  const source = readFileSync(
+    join(CURRENT_ROOT, "scripts/safe-release.mjs"),
+    "utf8",
+  );
+  assert.match(source, /check-pack-artifacts\.js/);
+  assert.match(source, /artifactManifestSha256/);
+  assert.match(source, /"npm",\s*\[\s*"publish",\s*artifactPath/);
+  assert.match(source, /"--ignore-scripts"/);
+  assert.doesNotMatch(source, /"pnpm",\s*\["publish",\s*"--no-git-checks"/);
+});
+
+test("pack builds every exact planned package including create-hua before one artifact check", (t) => {
+  const definitions = [
+    ...structuredClone(packageDefinitions),
+    {
+      name: "create-hua",
+      path: "packages/create-hua",
+      version: "0.3.0",
+      release: {
+        mode: "public-npm",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(
+    ["@hua-labs/ui", "create-hua"],
+    definitions,
+  );
+  t.after(() => fixture.cleanup());
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const calls = [];
+  const result = runPack({
+    root: fixture.root,
+    artifactDirectory,
+    branch: "main",
+    runId: "777",
+    sourceHead: "7".repeat(40),
+    execFile: packExecFixture(calls),
+  });
+  assert.equal(result.artifactCount, 2);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/ui", "create-hua"],
+  );
+  const checkerCalls = calls.filter(
+    ({ file, args }) =>
+      file === "node" && args[0].endsWith("check-pack-artifacts.js"),
+  );
+  assert.equal(checkerCalls.length, 1);
+  assert.equal(checkerCalls[0].args.length, 3);
+  assert.equal(readFileSync(result.artifactManifestPath).byteLength > 0, true);
+});
+
+test("pack-check failure creates no claim authority and executes zero publish", () => {
+  const fixture = createPlannedFixture();
+  try {
+    const artifactDirectory = createExternalArtifactDirectory(fixture);
+    const calls = [];
+    assertCode(
+      () =>
+        runPack({
+          root: fixture.root,
+          artifactDirectory,
+          branch: "main",
+          runId: "778",
+          sourceHead: "8".repeat(40),
+          execFile: packExecFixture(calls, { failChecker: true }),
+        }),
+      "pack-check-failed",
+    );
+    const manifestPath = join(artifactDirectory, "release-artifacts.json");
+    assert.equal(
+      calls.some(({ file }) => file === "npm"),
+      false,
+    );
+    let gitCalls = 0;
+    assertCode(
+      () =>
+        runClaim({
+          root: fixture.root,
+          artifactManifestPath: manifestPath,
+          branch: "main",
+          runId: "778",
+          sourceHead: "8".repeat(40),
+          execFile() {
+            gitCalls += 1;
+          },
+        }),
+      "artifact-manifest-missing",
+    );
+    assert.equal(gitCalls, 0);
+    assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("UI missing type references fail the exact pack checker before claim authority", () => {
+  const fixture = createPlannedFixture();
+  try {
+    const artifactDirectory = createExternalArtifactDirectory(fixture);
+    const artifactPath = writePackedFixture(artifactDirectory, {
+      name: "@hua-labs/ui",
+      version: "2.3.1",
+      exports: {
+        "./landing": { types: "./dist/landing.d.ts" },
+        "./native": { types: "./dist/native.d.ts" },
+        "./sdui": { types: "./dist/sdui.d.ts" },
+      },
+    });
+    assert.throws(
+      () =>
+        execFileSync(
+          "node",
+          [join(CURRENT_ROOT, "scripts/check-pack-artifacts.js"), artifactPath],
+          { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        ),
+      (error) =>
+        error?.status === 1 &&
+        error.stdout.includes("package/dist/landing.d.ts") &&
+        error.stdout.includes("package/dist/native.d.ts") &&
+        error.stdout.includes("package/dist/sdui.d.ts") &&
+        error.stdout.includes("3 issue(s)"),
+    );
+    assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+  } finally {
+    fixture.cleanup();
+  }
 });
 
 test("workflow admits a planned merge without running empty-plan refresh", () => {
@@ -480,7 +839,7 @@ test("workflow durably claims and closes a published plan without a second publi
     join(CURRENT_ROOT, ".github/workflows/release.yml"),
     "utf8",
   );
-  const claimIndex = workflow.indexOf("Claim exact planned release");
+  const claimIndex = workflow.indexOf("Claim exact artifact-bound release");
   const credentialIndex = workflow.indexOf(
     "NPM_TOKEN: ${{ secrets.NPM_TOKEN }}",
   );
@@ -488,13 +847,10 @@ test("workflow durably claims and closes a published plan without a second publi
     "Check exact published-set npm provenance",
   );
   assert.ok(claimIndex >= 0 && credentialIndex > claimIndex);
+  assert.match(workflow, /if: needs\.prepare\.outputs\.claimed == 'true'/);
   assert.match(
     workflow,
-    /if: steps\.release-claim\.outputs\.claimed == 'true'/,
-  );
-  assert.match(
-    workflow,
-    /check:npm-provenance[^\n]+--persist-head[^\n]+--source-head[^\n]+--run-id/,
+    /check-npm-provenance\.mjs[^\n]+--persist-head[^\n]+--source-head[^\n]+--run-id/,
   );
   assert.ok(provenanceIndex > credentialIndex);
 });
@@ -503,6 +859,7 @@ test("planned merge claim and provenance closure are durable exact Git transitio
   const { fixture, remote, remoteRoot, sourceHead } =
     createGitPlannedFixture(t);
   const claim = { branch: "main", runId: "7654321", sourceHead };
+  createTestArtifactBundle(fixture, claim);
   const workflowSequence = [];
   let refreshCalls = 0;
   let changesetsActionCalls = 0;
@@ -516,7 +873,12 @@ test("planned merge claim and provenance closure are durable exact Git transitio
   workflowSequence.push("validate");
   assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
   workflowSequence.push("claim");
-  const claimed = runClaim({ root: fixture.root, ...claim });
+  const claimed = runClaim({
+    root: fixture.root,
+    artifactManifestPath: fixture.artifactManifestPath,
+    ...claim,
+  });
+  fixture.claimHead = claimed.claimHead;
   workflowSequence.push("publish");
   assert.deepEqual(workflowSequence, [
     "preflight",
@@ -532,13 +894,11 @@ test("planned merge claim and provenance closure are durable exact Git transitio
     claimed.claimHead,
   );
 
-  const published = runPublish({
-    root: fixture.root,
-    ...claim,
-    execFile() {
+  const published = runPublish(
+    publishingOptions(fixture, () => {
       return "";
-    },
-  });
+    }),
+  );
   const publishedPath = join(remoteRoot, "published.json");
   writeFileSync(publishedPath, canonicalJson(published));
   const result = await checkPublishedProvenance({
@@ -579,7 +939,13 @@ test("closure remote drift preserves the publishing authority and cannot republi
   const { fixture, remote, remoteRoot, sourceHead } =
     createGitPlannedFixture(t);
   const claim = { branch: "main", runId: "7654322", sourceHead };
-  const claimed = runClaim({ root: fixture.root, ...claim });
+  createTestArtifactBundle(fixture, claim);
+  const claimed = runClaim({
+    root: fixture.root,
+    artifactManifestPath: fixture.artifactManifestPath,
+    ...claim,
+  });
+  fixture.claimHead = claimed.claimHead;
   const tree = git(fixture.root, ["rev-parse", `${claimed.claimHead}^{tree}`]);
   const driftHead = git(fixture.root, [
     "commit-tree",
@@ -757,7 +1123,7 @@ test("empty and invalid plans execute zero publish commands", async (t) => {
   assert.equal(calls, 0);
 });
 
-test("UI-only publish uses one exact claimed directory and fixed execFile argv", (t) => {
+test("UI-only publish uses one exact immutable tarball and fixed execFile argv", (t) => {
   const fixture = createPublishingFixture();
   t.after(() => fixture.cleanup());
   const calls = [];
@@ -773,15 +1139,16 @@ test("UI-only publish uses one exact claimed directory and fixed execFile argv",
   });
   assert.deepEqual(calls, [
     {
-      file: "pnpm",
+      file: "npm",
       args: [
         "publish",
-        "--no-git-checks",
+        join(fixture.artifactManifestPath, "..", "hua-labs-ui-2.3.1.tgz"),
+        "--ignore-scripts",
         "--access",
         "public",
         "--provenance",
       ],
-      cwd: join(realpathSync(fixture.root), "packages/hua-ui"),
+      cwd: fixture.root,
     },
   ]);
 });
@@ -807,6 +1174,99 @@ test("explicit UI and Motion publish is exact while Dot is never inferred", (t) 
     directories.some((path) => path.endsWith("hua-dot")),
     false,
   );
+});
+
+test("tarball byte or manifest SHA substitution fails before npm and lifecycle execution", async (t) => {
+  await t.test("tarball bytes", () => {
+    const fixture = createPublishingFixture();
+    try {
+      const manifest = JSON.parse(
+        readFileSync(fixture.artifactManifestPath, "utf8"),
+      );
+      const artifactPath = join(
+        fixture.artifactManifestPath,
+        "..",
+        manifest.artifacts[0].file,
+      );
+      writeFileSync(
+        artifactPath,
+        Buffer.concat([readFileSync(artifactPath), Buffer.from("x")]),
+      );
+      let executionCalls = 0;
+      assertCode(
+        () =>
+          runPublish(
+            publishingOptions(fixture, () => {
+              executionCalls += 1;
+            }),
+          ),
+        "artifact-byte-count",
+      );
+      assert.equal(executionCalls, 0);
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  await t.test("manifest digest", () => {
+    const fixture = createPublishingFixture();
+    try {
+      mutateJson(fixture.artifactManifestPath, (manifest) => {
+        manifest.artifacts[0].sha256 = "0".repeat(64);
+      });
+      let executionCalls = 0;
+      assertCode(
+        () =>
+          runPublish(
+            publishingOptions(fixture, () => {
+              executionCalls += 1;
+            }),
+          ),
+        "artifact-manifest-sha256",
+      );
+      assert.equal(executionCalls, 0);
+    } finally {
+      fixture.cleanup();
+    }
+  });
+});
+
+test("publish verifies the exact local and remote pushed claim head before npm", async (t) => {
+  for (const [name, localHead, remoteHead, code] of [
+    [
+      "local drift",
+      "d".repeat(40),
+      "c".repeat(40),
+      "publish-local-claim-head-drift",
+    ],
+    [
+      "remote drift",
+      "c".repeat(40),
+      "d".repeat(40),
+      "release-remote-head-drift",
+    ],
+  ]) {
+    await t.test(name, () => {
+      const fixture = createPublishingFixture();
+      try {
+        let npmCalls = 0;
+        const options = publishingOptions(fixture, () => {
+          npmCalls += 1;
+        });
+        options.gitExecFile = (_file, args) => {
+          if (args[0] === "rev-parse") return `${localHead}\n`;
+          if (args[0] === "ls-remote") {
+            return `${remoteHead}\trefs/heads/main\n`;
+          }
+          throw new Error("unexpected-git-command");
+        };
+        assertCode(() => runPublish(options), code);
+        assert.equal(npmCalls, 0);
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
 });
 
 test("held, never-publish, and no-publish packages fail before publish", async (t) => {

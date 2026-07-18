@@ -173,12 +173,9 @@ export async function checkPublishedProvenance(options = {}) {
       fail("provenance-plan-unclaimed");
     }
     if (
-      JSON.stringify(releaseState.plan.claim) !==
-      JSON.stringify({
-        branch: persistence.branch,
-        runId: persistence.runId,
-        sourceHead: persistence.sourceHead,
-      })
+      releaseState.plan.claim.branch !== persistence.branch ||
+      releaseState.plan.claim.runId !== persistence.runId ||
+      releaseState.plan.claim.sourceHead !== persistence.sourceHead
     ) {
       fail("provenance-claim-owner");
     }
