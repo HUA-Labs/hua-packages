@@ -30,7 +30,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Check public exposure guard
         run: pnpm check:public-exposure
@@ -38,19 +38,37 @@ jobs:
       - name: Check publish allowlist
         run: pnpm check:publish-allowlist
 
-      - name: Build publishable packages
+      - name: Build workspace packages
         run: pnpm build --filter "@hua-labs/*"
 
-      - name: Create .npmrc for npm token
+      - name: Create or update version PR without npm credentials
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm safe-release:version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate durable exact release plan
+        id: release-plan
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: node scripts/safe-release.mjs check --format=github --allow-empty >> "$GITHUB_OUTPUT"
+
+      - name: Create .npmrc for authorized nonempty release
+        if: steps.release-plan.outputs.publish == 'true'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          umask 077
           for npmrc in "$HOME/.npmrc" .npmrc; do
-            echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > "$npmrc"
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$npmrc"
             echo "access=public" >> "$npmrc"
             echo "registry=https://registry.npmjs.org/" >> "$npmrc"
             echo "provenance=true" >> "$npmrc"
           done
 
       - name: Verify publish provenance config
+        if: steps.release-plan.outputs.publish == 'true'
         env:
           NPM_CONFIG_PROVENANCE: "true"
           PNPM_CONFIG_PROVENANCE: "true"
@@ -58,15 +76,19 @@ jobs:
           test "$(npm config get provenance)" = "true"
           test "$(pnpm config get provenance)" = "true"
 
-      - name: Create release (changesets)
-        uses: changesets/action@v1
-        with:
-          publish: pnpm changeset publish
+      - name: Publish exact validated release plan
+        id: safe-publish
+        if: steps.release-plan.outputs.publish == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
           PNPM_CONFIG_PROVENANCE: "true"
+        run: |
+          published="$RUNNER_TEMP/hua-published-packages.json"
+          pnpm safe-release:publish > "$published"
+          test -s "$published"
+          echo "published_path=$published" >> "$GITHUB_OUTPUT"
 
-      - name: Check npm provenance
-        run: pnpm check:npm-provenance
+      - name: Check exact published-set npm provenance
+        if: steps.release-plan.outputs.publish == 'true'
+        run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}"

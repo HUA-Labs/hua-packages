@@ -1,0 +1,115 @@
+{
+  "planDigest": "001660f02d7ad3c33c3b78eaa94c5ad62ab7c4d2b0689e659fe95bc6fd1804ce",
+  "policy": {
+    "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
+    "policySha256": "9702bdbf552a6fba9e1a00d2ed218640f05a941b0bf69f64003d1144ce5025a1",
+    "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac"
+  },
+  "releases": [],
+  "schemaVersion": 1,
+  "status": "empty",
+  "workspaceManifests": [
+    {
+      "name": "@hua-labs/dot",
+      "path": "packages/hua-dot",
+      "sha256": "bf024fa4bd2351557fa816694a05620e571b43c832753b73225983fcb47711ac",
+      "version": "0.2.2"
+    },
+    {
+      "name": "@hua-labs/dot-aot",
+      "path": "packages/hua-dot-aot",
+      "sha256": "56911510cb40126ae9f37a95c0a69e455ee213d6b1a8784c22378834da1fa038",
+      "version": "0.1.3"
+    },
+    {
+      "name": "@hua-labs/dot-lsp",
+      "path": "packages/hua-dot-lsp",
+      "sha256": "ed67b1b14570fc1a37adf6b3b1725e0621282148bb1c72770a89839b52fe9860",
+      "version": "0.1.3"
+    },
+    {
+      "name": "@hua-labs/dot-mcp",
+      "path": "packages/hua-dot-mcp",
+      "sha256": "977e8ec2f964a0837ce152929b318dbd9d03ac6933fba361063d59946a2740aa",
+      "version": "0.1.3"
+    },
+    {
+      "name": "@hua-labs/eslint-plugin-i18n",
+      "path": "packages/eslint-plugin-i18n",
+      "sha256": "4cbb7cc2948387d521f2aed18ee7c0ce97293eed5c75f73694c2b24b415a2e80",
+      "version": "0.1.2"
+    },
+    {
+      "name": "@hua-labs/hooks",
+      "path": "packages/hua-hooks",
+      "sha256": "cb12784b68b5a3ff785b041931d4a9d1aa91fbe1b5a683cc4ac83d7fe6020dcf",
+      "version": "1.1.4"
+    },
+    {
+      "name": "@hua-labs/hua",
+      "path": "packages/hua",
+      "sha256": "4086b4714a5e08e72d01b5e7f37a5ce115ffa2ff28bb1a8a31db9ead81155ea6",
+      "version": "1.2.2"
+    },
+    {
+      "name": "@hua-labs/i18n-core",
+      "path": "packages/hua-i18n-core",
+      "sha256": "076b5a01c982ae93d2a0918fbce45a6ca96fc512054885b9198d391f0f7e6d36",
+      "version": "2.2.1"
+    },
+    {
+      "name": "@hua-labs/i18n-core-zustand",
+      "path": "packages/hua-i18n-core-zustand",
+      "sha256": "31fa4aebbb5d2970f61cfc1ab4894ce8fc713c73509f289433362e92d55d7a51",
+      "version": "2.2.1"
+    },
+    {
+      "name": "@hua-labs/i18n-formatters",
+      "path": "packages/hua-i18n-formatters",
+      "sha256": "eb99e3c318e512ea66dd034e08ae679beedd334d02548db4e9c8feaef08f8616",
+      "version": "2.2.1"
+    },
+    {
+      "name": "@hua-labs/i18n-loaders",
+      "path": "packages/hua-i18n-loaders",
+      "sha256": "3497c37c3f7ec413b785636c748647be9beadbf2431997d4c12e9d0651a629df",
+      "version": "2.2.1"
+    },
+    {
+      "name": "@hua-labs/motion-core",
+      "path": "packages/hua-motion-core",
+      "sha256": "e0e94a2931a48ad99e3407bc1a3468d2fd6ba02b29074c578a5da2efa939aa20",
+      "version": "2.4.2"
+    },
+    {
+      "name": "@hua-labs/security",
+      "path": "packages/hua-security",
+      "sha256": "4d4a6fbfd885b40428ed6320851b1340d741e50bf6d16bcd19d558bb8d6e61db",
+      "version": "1.0.0-alpha.1"
+    },
+    {
+      "name": "@hua-labs/state",
+      "path": "packages/hua-state",
+      "sha256": "47a7420254132869f772d9c32c489eeb319012c0235188ae0e0c3cf1a780fb94",
+      "version": "1.0.4"
+    },
+    {
+      "name": "@hua-labs/ui",
+      "path": "packages/hua-ui",
+      "sha256": "4e7172ee5d923a87cbf6809f97be9e448a8ad495bbe09e58c19c5f0a1315aa4f",
+      "version": "2.3.0"
+    },
+    {
+      "name": "@hua-labs/utils",
+      "path": "packages/hua-utils",
+      "sha256": "a429f0751de091a11388f326d14e68e37c5911d3e6cfd86cf98ee548826f6f8b",
+      "version": "1.1.4"
+    },
+    {
+      "name": "create-hua",
+      "path": "packages/create-hua",
+      "sha256": "db8b15f9263227b3cb5a5b96d1da2cf09dba5afaee7182417a7611f5abb9680a",
+      "version": "1.4.0"
+    }
+  ]
+}
