@@ -92,12 +92,10 @@ jobs:
           test -s "$published"
           echo "published_path=$published" >> "$GITHUB_OUTPUT"
 
-      - name: Check exact published-set npm provenance
+      - name: Check exact published-set npm provenance and close exact published plan
         if: steps.release-plan.outputs.publish == 'true'
-        run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}"
+        run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}" --close-plan
 
-      - name: Close exact published plan to an empty snapshot
+      - name: Validate provenance-closed empty plan
         if: steps.release-plan.outputs.publish == 'true'
-        run: |
-          pnpm safe-release:close --published "${{ steps.safe-publish.outputs.published_path }}"
-          node scripts/safe-release.mjs check --format=github --allow-empty
+        run: node scripts/safe-release.mjs check --format=github --allow-empty

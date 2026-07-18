@@ -20,7 +20,6 @@
     "safe-release:refresh": "node scripts/safe-release.mjs refresh",
     "safe-release:version": "node scripts/safe-release.mjs version",
     "safe-release:publish": "node scripts/safe-release.mjs publish",
-    "safe-release:close": "node scripts/safe-release.mjs close",
     "generate:docs": "tsx scripts/generate-docs.ts",
     "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
     "check:npm-provenance": "node scripts/check-npm-provenance.mjs",

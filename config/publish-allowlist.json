@@ -316,13 +316,11 @@
     }
   ],
   "platformAuthority": {
+    "authorityKind": "private-workspace-release-intent",
     "commit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac",
     "registryPath": "config/workspaceRegistry.yaml",
     "registrySha256": "81d27860b099f1e9aecd80c909687cfa88c3d4c2769df92a650d5ca19732ba38",
-    "repositoryOwner": "HUA-Labs",
-    "repositorySlugPrefix": "hua-",
-    "repositorySlugSuffix": "platform",
     "tree": "33bf31608b735a66d8b7ce3571d8bdcc66a78ffc"
   },
   "schemaVersion": 1

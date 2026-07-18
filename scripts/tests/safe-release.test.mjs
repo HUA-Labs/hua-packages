@@ -21,7 +21,6 @@ import {
   loadPolicy,
   loadReleaseState,
   parseStrictJsonBytes,
-  runClose,
   runPublish,
   runRefresh,
   runVersion,
@@ -272,6 +271,34 @@ test("current policy blocks HUA, Security, Dot, and Dot AOT while the empty plan
   }
 });
 
+test("public policy binds opaque authority facts without repository-name fragments", () => {
+  const policyBytes = readFileSync(
+    join(CURRENT_ROOT, "config/publish-allowlist.json"),
+    "utf8",
+  );
+  const sourceBytes = readFileSync(
+    join(CURRENT_ROOT, "scripts/safe-release.mjs"),
+    "utf8",
+  );
+  const policy = JSON.parse(policyBytes);
+  assert.deepEqual(Object.keys(policy.platformAuthority).sort(), [
+    "authorityKind",
+    "commit",
+    "registryBlob",
+    "registryPath",
+    "registrySha256",
+    "tree",
+  ]);
+  assert.equal(
+    policy.platformAuthority.authorityKind,
+    "private-workspace-release-intent",
+  );
+  assert.match(
+    sourceBytes,
+    /authorityKind: "private-workspace-release-intent"/,
+  );
+});
+
 test("workflow keeps versioning token-free and gates exact publish/provenance after plan", () => {
   const workflow = readFileSync(
     join(CURRENT_ROOT, ".github/workflows/release.yml"),
@@ -287,7 +314,10 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
   assert.match(workflow, /if: steps\.release-plan\.outputs\.publish == 'true'/);
   assert.match(workflow, /pnpm safe-release:publish > "\$published"/);
   assert.match(workflow, /check:npm-provenance -- --published/);
-  assert.match(workflow, /pnpm safe-release:close --published/);
+  assert.match(
+    workflow,
+    /check:npm-provenance -- --published[^\n]+--close-plan/,
+  );
   assert.doesNotMatch(workflow, /--no-frozen-lockfile/);
   assert.doesNotMatch(workflow, /changeset publish/);
   const planIndex = workflow.indexOf("Validate durable exact release plan");
@@ -301,10 +331,12 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
   const provenanceIndex = workflow.indexOf(
     "Check exact published-set npm provenance",
   );
-  const closeIndex = workflow.indexOf("Close exact published plan");
+  const closedValidationIndex = workflow.indexOf(
+    "Validate provenance-closed empty plan",
+  );
   assert.ok(refreshIndex >= 0 && versionIndex > refreshIndex);
   assert.ok(planIndex >= 0 && credentialIndex > planIndex);
-  assert.ok(provenanceIndex >= 0 && closeIndex > provenanceIndex);
+  assert.ok(provenanceIndex >= 0 && closedValidationIndex > provenanceIndex);
 
   const changesetConfig = JSON.parse(
     readFileSync(join(CURRENT_ROOT, ".changeset/config.json"), "utf8"),
@@ -913,13 +945,14 @@ test("two release cycles close and refresh empty authority without weakening pla
       publishedPath,
       attempts: 1,
       delayMs: 0,
+      closePlan: true,
       execFile() {
         return JSON.stringify({
           provenance: { predicateType: "https://slsa.dev/provenance/v1" },
         });
       },
     });
-    const closed = runClose({ root: fixture.root, publishedPath });
+    const closed = loadReleaseState(fixture.root).plan;
     assert.equal(closed.status, "empty");
     assert.deepEqual(closed.releases, []);
 
@@ -1012,7 +1045,7 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
       fixture.cleanup();
     }
   });
-  await t.test("ineligible published set", () => {
+  await t.test("ineligible published set", async () => {
     const fixture = createPlannedFixture();
     try {
       const publishedPath = join(fixture.root, "published.json");
@@ -1023,9 +1056,47 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
           publishedPackages: [{ name: "@hua-labs/hua", version: "1.2.3" }],
         }),
       );
-      assertCode(
-        () => runClose({ root: fixture.root, publishedPath }),
-        "published-package-set",
+      await assert.rejects(
+        checkPublishedProvenance({
+          root: fixture.root,
+          publishedPath,
+          attempts: 1,
+          delayMs: 0,
+          closePlan: true,
+          execFile() {
+            throw new Error("must-not-query");
+          },
+        }),
+        (error) => error?.code === "published-package-set",
+      );
+      assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+    } finally {
+      fixture.cleanup();
+    }
+  });
+  await t.test("failed provenance retains planned authority", async () => {
+    const fixture = createPlannedFixture();
+    try {
+      const publishedPath = join(fixture.root, "published.json");
+      writeFileSync(
+        publishedPath,
+        canonicalJson({
+          schemaVersion: 1,
+          publishedPackages: [{ name: "@hua-labs/ui", version: "2.3.1" }],
+        }),
+      );
+      await assert.rejects(
+        checkPublishedProvenance({
+          root: fixture.root,
+          publishedPath,
+          attempts: 1,
+          delayMs: 0,
+          closePlan: true,
+          execFile() {
+            return "{}";
+          },
+        }),
+        (error) => error?.code === "provenance-incomplete",
       );
       assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
     } finally {

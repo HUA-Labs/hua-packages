@@ -1,10 +1,23 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { resolve } from "node:path";
+import {
+  closeSync,
+  constants as fsConstants,
+  fsyncSync,
+  lstatSync,
+  openSync,
+  renameSync,
+  rmSync,
+  writeSync,
+} from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   DEFAULT_ROOT,
+  PLAN_RELATIVE_PATH,
+  canonicalJson,
+  createEmptyReleasePlan,
   loadReleaseState,
   parseStrictJsonBytes,
   readRegularFile,
@@ -30,10 +43,14 @@ function boundedInteger(value, fallback, minimum, maximum, code) {
 }
 
 function parseArguments(argv) {
-  if (argv.length !== 2 || argv[0] !== "--published") {
+  if (
+    (argv.length !== 2 && argv.length !== 3) ||
+    argv[0] !== "--published" ||
+    (argv.length === 3 && argv[2] !== "--close-plan")
+  ) {
     fail("provenance-arguments");
   }
-  return resolve(argv[1]);
+  return { publishedPath: resolve(argv[1]), closePlan: argv.length === 3 };
 }
 
 function npmViewAttestations(spec, execFile, root) {
@@ -58,6 +75,48 @@ function sleep(milliseconds) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
 }
 
+function closeProvenanceVerifiedPlan(root, releaseState) {
+  const filePath = join(root, PLAN_RELATIVE_PATH);
+  const parent = dirname(filePath);
+  const existing = lstatSync(filePath);
+  if (!existing.isFile() || existing.isSymbolicLink()) {
+    fail("plan-target-non-regular");
+  }
+  const temporaryPath = join(
+    parent,
+    `.release-plan.${process.pid}.${Date.now()}.tmp`,
+  );
+  const bytes = Buffer.from(
+    canonicalJson(createEmptyReleasePlan(releaseState)),
+  );
+  let descriptor;
+  try {
+    descriptor = openSync(
+      temporaryPath,
+      fsConstants.O_WRONLY | fsConstants.O_CREAT | fsConstants.O_EXCL,
+      0o600,
+    );
+    let offset = 0;
+    while (offset < bytes.length) {
+      offset += writeSync(
+        descriptor,
+        bytes,
+        offset,
+        bytes.length - offset,
+        offset,
+      );
+    }
+    fsyncSync(descriptor);
+    closeSync(descriptor);
+    descriptor = undefined;
+    renameSync(temporaryPath, filePath);
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(temporaryPath, { force: true });
+  }
+  return loadReleaseState(root).plan;
+}
+
 export async function checkPublishedProvenance(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -79,8 +138,12 @@ export async function checkPublishedProvenance(options = {}) {
       60000,
       "provenance-delay",
     );
-  const publishedPath =
-    options.publishedPath ?? parseArguments(process.argv.slice(2));
+  const cliArguments =
+    options.publishedPath === undefined
+      ? parseArguments(process.argv.slice(2))
+      : undefined;
+  const publishedPath = options.publishedPath ?? cliArguments.publishedPath;
+  const closePlan = options.closePlan ?? cliArguments?.closePlan ?? false;
   const releaseState = loadReleaseState(root, { requireNonempty: true });
   const publishedBytes = readRegularFile(
     publishedPath,
@@ -122,6 +185,16 @@ export async function checkPublishedProvenance(options = {}) {
     }
   }
   if (failures.length > 0) fail("provenance-incomplete");
+  if (closePlan) {
+    const closedPlan = closeProvenanceVerifiedPlan(root, releaseState);
+    return {
+      ...published,
+      releasePlanClosure: {
+        status: closedPlan.status,
+        planDigest: closedPlan.planDigest,
+      },
+    };
+  }
   return published;
 }
 

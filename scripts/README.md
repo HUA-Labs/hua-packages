@@ -30,8 +30,7 @@ monorepo state.
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
 | `safe-release.mjs publish`   | Publish only the nonempty exact validated plan through fixed `pnpm publish` argv and package directories.         |
-| `safe-release.mjs close`     | Replace an exact planned set with an empty current snapshot after exact publish/provenance completion.            |
-| `check-npm-provenance.mjs`   | Check provenance only for the exact published `package@version` output matching the durable plan.                 |
+| `check-npm-provenance.mjs`   | Check provenance for the exact published set and optionally close that exact plan only after every check passes.  |
 | `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
 | `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
 
@@ -52,7 +51,7 @@ held, never-publish, pending, private, or no-publish authority, never overwrites
 a planned set, and cannot add or select a package. This lets a later reviewed
 source/manifest sync plus a new Changeset enter `version` without weakening the
 planned-plan check. A planned plan remains manifest-exact in `check`, `publish`,
-provenance, and `close`.
+and provenance.
 
 The ordinary main-push path is intentionally token-free while it creates or
 updates a version PR. Its explicit `check --format=github --allow-empty` lane
@@ -63,12 +62,14 @@ Empty, stale, held, never-publish,
 pending, private, wrong-authority, unknown, missing, extra, or tampered sets
 stop before any publish or provenance command. Provenance is execution evidence
 for the exact published output; historical attestations never select a release.
-After exact publish and provenance, `close --published <file>` accepts only the
-complete planned `package@version` output and produces the next empty snapshot.
-The workflow-local close must be persisted through a separate reviewed source
-change before another release cycle; ephemeral runner bytes are not durable
-repository authority. A failed or partial publication must retain the planned
-file and be resolved by the operator, never auto-refreshed.
+After exact publish, only `check-npm-provenance --published <file> --close-plan`
+may produce the next empty snapshot, and only after every exact published
+`package@version` has passed the current provenance check. There is no separate
+close CLI or package script. A failed or partial publication or provenance
+check retains the planned file and must be resolved by the operator, never
+auto-refreshed. The workflow-local empty snapshot is not durable repository
+authority: a separate credential-free reviewed source change must commit that
+exact plan delta before the next source or version cycle can proceed.
 
 The current committed plan is empty. Choosing a version, selecting UI alone or
 an explicit cohort, approving npm publication, and choosing token versus OIDC
@@ -79,9 +80,26 @@ eligible only when an explicit reviewed Changeset selects it.
 After a successful version run, review the version diff, packed artifacts,
 policy SHA, plan digest, exact `fromVersion`/`toVersion` set, and the complete
 manifest snapshot before merging the version PR. After publication and exact
-provenance, review and persist the `close` delta before the next source or
+provenance, review and persist the provenance-owned empty-plan delta before the next source or
 version cycle. There is no true npm rollback; post-publication recovery requires
 deprecation and a separately authorized corrective version.
+
+### Pre-freeze boundary corrections
+
+The first public-exposure RED stored a private repository identity as three
+separately reconstructable fields. The public checker correctly rejected that
+bypass. The policy now binds only a public `authorityKind` and exact opaque
+commit, tree, registry blob, and registry SHA facts; the exposure checker was
+not weakened or excepted.
+
+The first lifecycle RED left a successful published plan permanently planned,
+and an intermediate correction exposed a separately callable close command.
+The final boundary makes close an internal consequence of the exact provenance
+check, preserves the planned bytes on every publication/provenance failure,
+and requires the resulting empty plan to land as a reviewed credential-free
+source change before the next release cycle. This exact-12 implementation has
+no devlog path; this durable contract plus the frozen-tuple report records the
+RED/GREEN provenance without adding a thirteenth path.
 
 ## Manual Analysis
 

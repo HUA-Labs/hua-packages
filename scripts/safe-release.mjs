@@ -27,9 +27,7 @@ export const POLICY_RELATIVE_PATH = "config/publish-allowlist.json";
 export const PLAN_RELATIVE_PATH = "config/release-plan.json";
 
 export const PLATFORM_AUTHORITY = Object.freeze({
-  repositoryOwner: "HUA-Labs",
-  repositorySlugPrefix: "hua-",
-  repositorySlugSuffix: "platform",
+  authorityKind: "private-workspace-release-intent",
   commit: "049aa34d8b6ea06316f126310ebc89a16b445e86",
   tree: "33bf31608b735a66d8b7ce3571d8bdcc66a78ffc",
   registryPath: "config/workspaceRegistry.yaml",
@@ -43,7 +41,6 @@ const PLAN_MAX_BYTES = 2 * 1024 * 1024;
 const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
-const PUBLISHED_MAX_BYTES = 128 * 1024;
 const MAX_JSON_DEPTH = 32;
 const MAX_JSON_NODES = 50000;
 const MAX_STRING_BYTES = 8 * 1024;
@@ -456,9 +453,7 @@ export function validatePolicy(value, expectedAuthority = PLATFORM_AUTHORITY) {
   exactKeys(
     value.platformAuthority,
     [
-      "repositoryOwner",
-      "repositorySlugPrefix",
-      "repositorySlugSuffix",
+      "authorityKind",
       "commit",
       "tree",
       "registryPath",
@@ -1286,35 +1281,6 @@ export function validatePublishedPackages(value, releaseState) {
   return { schemaVersion: 1, publishedPackages };
 }
 
-export function runClose(options = {}) {
-  const root = options.root ?? DEFAULT_ROOT;
-  const publishedPath = options.publishedPath;
-  assert(
-    typeof publishedPath === "string" && publishedPath.length > 0,
-    "close-published-path",
-  );
-  validateScalarString(publishedPath, "close-published-path");
-  const releaseState = loadReleaseState(root, { requireNonempty: true });
-  const publishedBytes = readRegularFile(
-    resolve(publishedPath),
-    PUBLISHED_MAX_BYTES,
-    "published-output",
-  );
-  validatePublishedPackages(
-    parseStrictJsonBytes(publishedBytes, {
-      maxBytes: PUBLISHED_MAX_BYTES,
-      label: "published-output",
-    }),
-    releaseState,
-  );
-  const closed = createEmptyReleasePlan(releaseState);
-  writeFileAtomically(
-    join(root, PLAN_RELATIVE_PATH),
-    Buffer.from(canonicalJson(closed)),
-  );
-  return closed;
-}
-
 export function runPublish(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -1354,23 +1320,9 @@ export function checkPolicyCommand(root = DEFAULT_ROOT) {
 function parseCliArguments(argv) {
   assert(argv.length >= 1, "cli-mode-missing");
   const [mode, ...argumentsList] = argv;
-  assert(
-    ["version", "refresh", "check", "publish", "close"].includes(mode),
-    "cli-mode",
-  );
+  assert(["version", "refresh", "check", "publish"].includes(mode), "cli-mode");
   let format = "json";
   let allowEmpty = false;
-  let publishedPath = null;
-  if (mode === "close") {
-    assert(
-      argumentsList.length === 2 && argumentsList[0] === "--published",
-      "cli-close-arguments",
-    );
-    publishedPath = argumentsList[1];
-    validateScalarString(publishedPath, "cli-close-published");
-    assert(publishedPath.length > 0, "cli-close-published");
-    return { mode, format, allowEmpty, publishedPath };
-  }
   for (const argument of argumentsList) {
     if (argument === "--format=github" && mode === "check") {
       format = "github";
@@ -1381,11 +1333,11 @@ function parseCliArguments(argv) {
     }
   }
   assert(!allowEmpty || format === "github", "cli-allow-empty-format");
-  return { mode, format, allowEmpty, publishedPath };
+  return { mode, format, allowEmpty };
 }
 
 export function main(argv = process.argv.slice(2), options = {}) {
-  const { mode, format, allowEmpty, publishedPath } = parseCliArguments(argv);
+  const { mode, format, allowEmpty } = parseCliArguments(argv);
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
   if (mode === "version") {
@@ -1426,14 +1378,6 @@ export function main(argv = process.argv.slice(2), options = {}) {
         }) + "\n",
       );
     }
-    return;
-  }
-  if (mode === "close") {
-    const plan = runClose({ root, publishedPath });
-    process.stdout.write(
-      JSON.stringify({ status: "empty-closed", planDigest: plan.planDigest }) +
-        "\n",
-    );
     return;
   }
   const published = runPublish({ root, execFile });
