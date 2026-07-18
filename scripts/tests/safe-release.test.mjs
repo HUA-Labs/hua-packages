@@ -291,12 +291,9 @@ test("public policy binds opaque authority facts without repository-name fragmen
   ]);
   assert.equal(
     policy.platformAuthority.authorityKind,
-    "private-workspace-release-intent",
+    "platform-release-registry",
   );
-  assert.match(
-    sourceBytes,
-    /authorityKind: "private-workspace-release-intent"/,
-  );
+  assert.match(sourceBytes, /authorityKind: "platform-release-registry"/);
 });
 
 test("workflow keeps versioning token-free and gates exact publish/provenance after plan", () => {

@@ -1,8 +1,8 @@
 {
-  "planDigest": "534a40c978d8bec09c68abdf2c7670d6e17ad5710524b0133f185a270ee411b4",
+  "planDigest": "66b6703c33c22ae8cf4f68ca541c6d7ea46fe99f215780e6d6c8803040240286",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
-    "policySha256": "5999572bcacb09799aafd2a71655fede327ddfa034a638e7279fade8ce6a7789",
+    "policySha256": "9be7d2474035c21c930af8c6dcfd364336c91afe490096761cb5369ce2bf64e3",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac"
   },
   "releases": [],

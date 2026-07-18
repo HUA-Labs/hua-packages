@@ -88,9 +88,9 @@ deprecation and a separately authorized corrective version.
 
 The first public-exposure RED stored a private repository identity as three
 separately reconstructable fields. The public checker correctly rejected that
-bypass. The policy now binds only a public `authorityKind` and exact opaque
-commit, tree, registry blob, and registry SHA facts; the exposure checker was
-not weakened or excepted.
+bypass. The policy now binds only public authority kind
+`platform-release-registry` and exact opaque commit, tree, registry blob, and
+registry SHA facts; the exposure checker was not weakened or excepted.
 
 The first lifecycle RED left a successful published plan permanently planned,
 and an intermediate correction exposed a separately callable close command.

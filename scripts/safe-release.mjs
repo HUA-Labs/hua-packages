@@ -27,7 +27,7 @@ export const POLICY_RELATIVE_PATH = "config/publish-allowlist.json";
 export const PLAN_RELATIVE_PATH = "config/release-plan.json";
 
 export const PLATFORM_AUTHORITY = Object.freeze({
-  authorityKind: "private-workspace-release-intent",
+  authorityKind: "platform-release-registry",
   commit: "049aa34d8b6ea06316f126310ebc89a16b445e86",
   tree: "33bf31608b735a66d8b7ce3571d8bdcc66a78ffc",
   registryPath: "config/workspaceRegistry.yaml",

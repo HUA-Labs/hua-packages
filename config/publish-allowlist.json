@@ -316,7 +316,7 @@
     }
   ],
   "platformAuthority": {
-    "authorityKind": "private-workspace-release-intent",
+    "authorityKind": "platform-release-registry",
     "commit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac",
     "registryPath": "config/workspaceRegistry.yaml",
