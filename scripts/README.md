@@ -29,7 +29,8 @@ monorepo state.
 | `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
-| `safe-release.mjs publish`   | Publish only the nonempty exact validated plan through fixed `pnpm publish` argv and package directories.         |
+| `safe-release.mjs claim`     | Atomically commit and push one exact planned-to-publishing ownership transition before npm credentials.           |
+| `safe-release.mjs publish`   | Publish only the exact publishing plan owned by the current source head and workflow run.                         |
 | `check-npm-provenance.mjs`   | Check provenance for the exact published set and optionally close that exact plan only after every check passes.  |
 | `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
 | `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
@@ -50,14 +51,31 @@ version and belong to policy-eligible packages. It never refreshes blocked
 held, never-publish, pending, private, or no-publish authority, never overwrites
 a planned set, and cannot add or select a package. This lets a later reviewed
 source/manifest sync plus a new Changeset enter `version` without weakening the
-planned-plan check. A planned plan remains manifest-exact in `check`, `publish`,
-and provenance.
+planned-plan check. A planned plan remains manifest-exact in `check` and cannot
+publish directly.
 
 The ordinary main-push path is intentionally token-free while it creates or
-updates a version PR. Its explicit `check --format=github --allow-empty` lane
-may classify an exact empty plan only as `publish=false`; ordinary `check`,
-`version`, and `publish` reject empty release authority. A later main push may
-expose npm credentials only after the checked plan is nonempty and exact.
+updates a version PR. Plan preflight classifies exact `empty`, `planned`, and
+`publishing` states before refresh. Only `empty` runs refresh and the Changesets
+action. A merged version PR is already `planned`, so it skips both and proceeds
+to exact plan validation instead of failing the empty-only refresh boundary.
+Its explicit `check --format=github --allow-empty` lane classifies an exact
+empty plan only as `publish=false`; ordinary `check`, `version`, and `publish`
+reject empty release authority.
+
+Before npm credentials exist, the planned run commits and pushes a single
+plan-only `planned` to `publishing` claim bound to the exact source head,
+`main`, and GitHub run ID. Local and remote heads must match before the commit,
+must still match before push, and the normal non-fast-forward push remains the
+final race gate. Any claim failure happens before npm credentials or publish.
+Any later workflow run that starts from the claim commit sees `publishing`,
+skips refresh, versioning, claim, credentials, and publish, and performs no
+second release attempt. GitHub-token pushes are not relied on to recursively
+start another workflow. The original claiming run alone receives the matching
+claim environment required by `safe-release.mjs publish`.
+
+A later main push may expose npm credentials only after that exact claim is
+durably present and owned by the current run.
 Empty, stale, held, never-publish,
 pending, private, wrong-authority, unknown, missing, extra, or tampered sets
 stop before any publish or provenance command. Provenance is execution evidence
@@ -67,9 +85,15 @@ may produce the next empty snapshot, and only after every exact published
 `package@version` has passed the current provenance check. There is no separate
 close CLI or package script. A failed or partial publication or provenance
 check retains the planned file and must be resolved by the operator, never
-auto-refreshed. The workflow-local empty snapshot is not durable repository
-authority: a separate credential-free reviewed source change must commit that
-exact plan delta before the next source or version cycle can proceed.
+auto-refreshed. The same provenance command then commits and pushes only the
+canonical empty plan. It requires the exact claim head to remain both local and
+remote authority before commit and push. A head drift or non-fast-forward
+failure leaves remote main in `publishing`, so later workflow runs use zero npm
+credentials and cannot publish the same plan again. Operator reconciliation is
+required before another release. A successful closure commit restores the
+next Changesets cycle; the next externally triggered run starts from exact
+`empty` authority and uses publish/token zero. No recursive workflow trigger is
+claimed.
 
 The current committed plan is empty. Choosing a version, selecting UI alone or
 an explicit cohort, approving npm publication, and choosing token versus OIDC
@@ -96,10 +120,14 @@ The first lifecycle RED left a successful published plan permanently planned,
 and an intermediate correction exposed a separately callable close command.
 The final boundary makes close an internal consequence of the exact provenance
 check, preserves the planned bytes on every publication/provenance failure,
-and requires the resulting empty plan to land as a reviewed credential-free
-source change before the next release cycle. This exact-12 implementation has
-no devlog path; this durable contract plus the frozen-tuple report records the
-RED/GREEN provenance without adding a thirteenth path.
+claims the planned merge before credentials, and durably pushes the resulting
+empty plan. A distinct workflow-order RED proved that unconditional refresh
+blocked every planned merge and that runner-local closure left main permanently
+planned. The final Git fixtures lock claim/closure head equality,
+non-fast-forward failure, plan-only commits, publishing-run suppression, and
+the next empty cycle. This exact-12 implementation has no devlog path; this
+durable contract plus the frozen-tuple report records the RED/GREEN provenance
+without adding a thirteenth path.
 
 ## Manual Analysis
 

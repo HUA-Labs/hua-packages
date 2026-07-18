@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import {
   mkdtempSync,
   mkdirSync,
@@ -21,6 +22,7 @@ import {
   loadPolicy,
   loadReleaseState,
   parseStrictJsonBytes,
+  runClaim,
   runPublish,
   runRefresh,
   runVersion,
@@ -244,6 +246,80 @@ function createPlannedFixture(
   return fixture;
 }
 
+const TEST_CLAIM = Object.freeze({
+  branch: "main",
+  runId: "123456",
+  sourceHead: "a".repeat(40),
+});
+
+function claimFixturePlan(fixture, claim = TEST_CLAIM) {
+  const state = loadReleaseState(fixture.root, { requireNonempty: true });
+  assert.equal(state.plan.status, "planned");
+  const plan = finalizeReleasePlan({
+    ...state.plan,
+    status: "publishing",
+    claim,
+  });
+  writeFileSync(
+    join(fixture.root, "config/release-plan.json"),
+    canonicalJson(plan),
+  );
+  return plan;
+}
+
+function createPublishingFixture(
+  names = ["@hua-labs/ui"],
+  definitions = packageDefinitions,
+) {
+  const fixture = createPlannedFixture(names, definitions);
+  claimFixturePlan(fixture);
+  return fixture;
+}
+
+function publishingOptions(fixture, execFile) {
+  return {
+    root: fixture.root,
+    execFile,
+    ...TEST_CLAIM,
+  };
+}
+
+function git(root, argumentsList) {
+  return execFileSync("git", argumentsList, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trimEnd();
+}
+
+function createGitPlannedFixture(t) {
+  const fixture = createPlannedFixture();
+  const remoteRoot = mkdtempSync(join(tmpdir(), "hua-safe-release-remote-"));
+  const remote = join(remoteRoot, "origin.git");
+  t.after(() => {
+    fixture.cleanup();
+    rmSync(remoteRoot, { recursive: true, force: true });
+  });
+  execFileSync("git", ["init", "--bare", remote], { stdio: "ignore" });
+  git(fixture.root, ["init", "-b", "main"]);
+  git(fixture.root, ["config", "user.name", "safe-release-test"]);
+  git(fixture.root, [
+    "config",
+    "user.email",
+    "safe-release-test@example.invalid",
+  ]);
+  git(fixture.root, ["add", "--all"]);
+  git(fixture.root, ["commit", "-m", "seed planned release"]);
+  git(fixture.root, ["remote", "add", "origin", remote]);
+  git(fixture.root, ["push", "-u", "origin", "main"]);
+  return {
+    fixture,
+    remote,
+    remoteRoot,
+    sourceHead: git(fixture.root, ["rev-parse", "HEAD"]),
+  };
+}
+
 function assertCode(callback, code) {
   assert.throws(callback, (error) => error?.code === code);
 }
@@ -308,7 +384,10 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     workflow,
     /safe-release\.mjs check --format=github --allow-empty/,
   );
-  assert.match(workflow, /if: steps\.release-plan\.outputs\.publish == 'true'/);
+  assert.match(
+    workflow,
+    /if: steps\.release-claim\.outputs\.claimed == 'true'/,
+  );
   assert.match(workflow, /pnpm safe-release:publish > "\$published"/);
   assert.match(workflow, /check:npm-provenance -- --published/);
   assert.match(
@@ -317,6 +396,7 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
   );
   assert.doesNotMatch(workflow, /--no-frozen-lockfile/);
   assert.doesNotMatch(workflow, /changeset publish/);
+  assert.doesNotMatch(workflow, /for npmrc in "\$HOME\/\.npmrc" \.npmrc/);
   const planIndex = workflow.indexOf("Validate durable exact release plan");
   const refreshIndex = workflow.indexOf(
     "Refresh verified empty release snapshot",
@@ -342,6 +422,191 @@ test("workflow keeps versioning token-free and gates exact publish/provenance af
     "@hua-labs/hua",
     "@hua-labs/security",
   ]);
+});
+
+test("workflow admits a planned merge without running empty-plan refresh", () => {
+  const workflow = readFileSync(
+    join(CURRENT_ROOT, ".github/workflows/release.yml"),
+    "utf8",
+  );
+  const preflightIndex = workflow.indexOf("Read durable release plan state");
+  const refreshIndex = workflow.indexOf(
+    "Refresh verified empty release snapshot",
+  );
+  const validationIndex = workflow.indexOf(
+    "Validate durable exact release plan",
+  );
+  assert.ok(preflightIndex >= 0 && refreshIndex > preflightIndex);
+  assert.match(
+    workflow,
+    /Refresh verified empty release snapshot[\s\S]+?if: steps\.plan-preflight\.outputs\.status == 'empty'/,
+  );
+  assert.match(
+    workflow,
+    /Create or update version PR without npm credentials[\s\S]+?if: steps\.plan-preflight\.outputs\.status == 'empty'/,
+  );
+  assert.ok(validationIndex > refreshIndex);
+});
+
+test("workflow durably claims and closes a published plan without a second publish", () => {
+  const workflow = readFileSync(
+    join(CURRENT_ROOT, ".github/workflows/release.yml"),
+    "utf8",
+  );
+  const claimIndex = workflow.indexOf("Claim exact planned release");
+  const credentialIndex = workflow.indexOf(
+    "NPM_TOKEN: ${{ secrets.NPM_TOKEN }}",
+  );
+  const provenanceIndex = workflow.indexOf(
+    "Check exact published-set npm provenance",
+  );
+  assert.ok(claimIndex >= 0 && credentialIndex > claimIndex);
+  assert.match(
+    workflow,
+    /if: steps\.release-claim\.outputs\.claimed == 'true'/,
+  );
+  assert.match(
+    workflow,
+    /check:npm-provenance[^\n]+--persist-head[^\n]+--source-head[^\n]+--run-id/,
+  );
+  assert.ok(provenanceIndex > credentialIndex);
+});
+
+test("planned merge claim and provenance closure are durable exact Git transitions", async (t) => {
+  const { fixture, remote, remoteRoot, sourceHead } =
+    createGitPlannedFixture(t);
+  const claim = { branch: "main", runId: "7654321", sourceHead };
+  const workflowSequence = [];
+  let refreshCalls = 0;
+  let changesetsActionCalls = 0;
+  workflowSequence.push("preflight");
+  const preflight = loadReleaseState(fixture.root).plan;
+  if (preflight.status === "empty") {
+    refreshCalls += 1;
+    runRefresh({ root: fixture.root });
+    changesetsActionCalls += 1;
+  }
+  workflowSequence.push("validate");
+  assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+  workflowSequence.push("claim");
+  const claimed = runClaim({ root: fixture.root, ...claim });
+  workflowSequence.push("publish");
+  assert.deepEqual(workflowSequence, [
+    "preflight",
+    "validate",
+    "claim",
+    "publish",
+  ]);
+  assert.equal(refreshCalls, 0);
+  assert.equal(changesetsActionCalls, 0);
+  assert.equal(loadReleaseState(fixture.root).plan.status, "publishing");
+  assert.equal(
+    git(remote, ["rev-parse", "refs/heads/main"]),
+    claimed.claimHead,
+  );
+
+  const published = runPublish({
+    root: fixture.root,
+    ...claim,
+    execFile() {
+      return "";
+    },
+  });
+  const publishedPath = join(remoteRoot, "published.json");
+  writeFileSync(publishedPath, canonicalJson(published));
+  const result = await checkPublishedProvenance({
+    root: fixture.root,
+    publishedPath,
+    closePlan: true,
+    persistence: { ...claim, claimHead: claimed.claimHead },
+    attempts: 1,
+    delayMs: 0,
+    execFile() {
+      return JSON.stringify({
+        provenance: { predicateType: "https://slsa.dev/provenance/v1" },
+      });
+    },
+  });
+  assert.equal(result.releasePlanClosure.status, "empty");
+  assert.equal(loadReleaseState(fixture.root).plan.status, "empty");
+  assert.equal(
+    git(remote, ["rev-parse", "refs/heads/main"]),
+    result.releasePlanClosure.head,
+  );
+  let publishCalls = 0;
+  assertCode(
+    () =>
+      runPublish({
+        root: fixture.root,
+        ...claim,
+        execFile() {
+          publishCalls += 1;
+        },
+      }),
+    "plan-empty",
+  );
+  assert.equal(publishCalls, 0);
+});
+
+test("closure remote drift preserves the publishing authority and cannot republish", async (t) => {
+  const { fixture, remote, remoteRoot, sourceHead } =
+    createGitPlannedFixture(t);
+  const claim = { branch: "main", runId: "7654322", sourceHead };
+  const claimed = runClaim({ root: fixture.root, ...claim });
+  const tree = git(fixture.root, ["rev-parse", `${claimed.claimHead}^{tree}`]);
+  const driftHead = git(fixture.root, [
+    "commit-tree",
+    tree,
+    "-p",
+    claimed.claimHead,
+    "-m",
+    "concurrent remote drift",
+  ]);
+  git(fixture.root, ["push", "origin", `${driftHead}:refs/heads/main`]);
+
+  const publishedPath = join(remoteRoot, "published.json");
+  writeFileSync(
+    publishedPath,
+    canonicalJson({
+      schemaVersion: 1,
+      publishedPackages: [{ name: "@hua-labs/ui", version: "2.3.1" }],
+    }),
+  );
+  await assert.rejects(
+    checkPublishedProvenance({
+      root: fixture.root,
+      publishedPath,
+      closePlan: true,
+      persistence: { ...claim, claimHead: claimed.claimHead },
+      attempts: 1,
+      delayMs: 0,
+      execFile() {
+        return JSON.stringify({
+          provenance: { predicateType: "https://slsa.dev/provenance/v1" },
+        });
+      },
+    }),
+    (error) => error?.code === "release-remote-head-drift",
+  );
+  assert.equal(git(remote, ["rev-parse", "refs/heads/main"]), driftHead);
+
+  git(fixture.root, ["reset", "--hard", driftHead]);
+  assert.equal(loadReleaseState(fixture.root).plan.status, "publishing");
+  let publishCalls = 0;
+  assertCode(
+    () =>
+      runPublish({
+        root: fixture.root,
+        branch: "main",
+        runId: claim.runId,
+        sourceHead: driftHead,
+        execFile() {
+          publishCalls += 1;
+        },
+      }),
+    "publish-claim-owner",
+  );
+  assert.equal(publishCalls, 0);
 });
 
 test("strict JSON rejects malformed authority before schema projection", async (t) => {
@@ -465,17 +730,16 @@ test("empty and invalid plans execute zero publish commands", async (t) => {
   assert.equal(calls, 0);
 });
 
-test("UI-only publish uses one exact directory and fixed execFile argv", (t) => {
-  const fixture = createPlannedFixture();
+test("UI-only publish uses one exact claimed directory and fixed execFile argv", (t) => {
+  const fixture = createPublishingFixture();
   t.after(() => fixture.cleanup());
   const calls = [];
-  const published = runPublish({
-    root: fixture.root,
-    execFile(file, args, options) {
+  const published = runPublish(
+    publishingOptions(fixture, (file, args, options) => {
       calls.push({ file, args, cwd: options.cwd });
       return "";
-    },
-  });
+    }),
+  );
   assert.deepEqual(published, {
     schemaVersion: 1,
     publishedPackages: [{ name: "@hua-labs/ui", version: "2.3.1" }],
@@ -496,19 +760,18 @@ test("UI-only publish uses one exact directory and fixed execFile argv", (t) => 
 });
 
 test("explicit UI and Motion publish is exact while Dot is never inferred", (t) => {
-  const fixture = createPlannedFixture([
+  const fixture = createPublishingFixture([
     "@hua-labs/motion-core",
     "@hua-labs/ui",
   ]);
   t.after(() => fixture.cleanup());
   const directories = [];
-  const result = runPublish({
-    root: fixture.root,
-    execFile(_file, _args, options) {
+  const result = runPublish(
+    publishingOptions(fixture, (_file, _args, options) => {
       directories.push(options.cwd);
       return "";
-    },
-  });
+    }),
+  );
   assert.deepEqual(
     result.publishedPackages.map((entry) => entry.name),
     ["@hua-labs/motion-core", "@hua-labs/ui"],
@@ -929,13 +1192,13 @@ test("two release cycles close and refresh empty authority without weakening pla
       result.releases.map((entry) => entry.name),
       ["@hua-labs/ui"],
     );
+    claimFixturePlan(fixture);
 
-    const published = runPublish({
-      root: fixture.root,
-      execFile() {
+    const published = runPublish(
+      publishingOptions(fixture, () => {
         return "";
-      },
-    });
+      }),
+    );
     writeFileSync(publishedPath, canonicalJson(published));
     await checkPublishedProvenance({
       root: fixture.root,
@@ -943,6 +1206,10 @@ test("two release cycles close and refresh empty authority without weakening pla
       attempts: 1,
       delayMs: 0,
       closePlan: true,
+      persistence: { ...TEST_CLAIM, claimHead: "b".repeat(40) },
+      persistClosure() {
+        return "c".repeat(40);
+      },
       execFile() {
         return JSON.stringify({
           provenance: { predicateType: "https://slsa.dev/provenance/v1" },
@@ -1043,7 +1310,7 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
     }
   });
   await t.test("ineligible published set", async () => {
-    const fixture = createPlannedFixture();
+    const fixture = createPublishingFixture();
     try {
       const publishedPath = join(fixture.root, "published.json");
       writeFileSync(
@@ -1060,19 +1327,23 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
           attempts: 1,
           delayMs: 0,
           closePlan: true,
+          persistence: { ...TEST_CLAIM, claimHead: "b".repeat(40) },
+          persistClosure() {
+            throw new Error("must-not-persist");
+          },
           execFile() {
             throw new Error("must-not-query");
           },
         }),
         (error) => error?.code === "published-package-set",
       );
-      assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+      assert.equal(loadReleaseState(fixture.root).plan.status, "publishing");
     } finally {
       fixture.cleanup();
     }
   });
   await t.test("failed provenance retains planned authority", async () => {
-    const fixture = createPlannedFixture();
+    const fixture = createPublishingFixture();
     try {
       const publishedPath = join(fixture.root, "published.json");
       writeFileSync(
@@ -1089,13 +1360,17 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
           attempts: 1,
           delayMs: 0,
           closePlan: true,
+          persistence: { ...TEST_CLAIM, claimHead: "b".repeat(40) },
+          persistClosure() {
+            throw new Error("must-not-persist");
+          },
           execFile() {
             return "{}";
           },
         }),
         (error) => error?.code === "provenance-incomplete",
       );
-      assert.equal(loadReleaseState(fixture.root).plan.status, "planned");
+      assert.equal(loadReleaseState(fixture.root).plan.status, "publishing");
     } finally {
       fixture.cleanup();
     }
@@ -1254,7 +1529,7 @@ test("one-byte policy, plan, and manifest tamper are rejected", async (t) => {
 });
 
 test("symlinked package directories fail closed before any publish command", (t) => {
-  const fixture = createPlannedFixture();
+  const fixture = createPublishingFixture();
   t.after(() => fixture.cleanup());
   const target = join(fixture.root, "packages/hua-ui-real");
   const packagePath = join(fixture.root, "packages/hua-ui");
@@ -1264,12 +1539,11 @@ test("symlinked package directories fail closed before any publish command", (t)
   let calls = 0;
   assertCode(
     () =>
-      runPublish({
-        root: fixture.root,
-        execFile() {
+      runPublish(
+        publishingOptions(fixture, () => {
           calls += 1;
-        },
-      }),
+        }),
+      ),
     "workspace-entry-non-directory",
   );
   assert.equal(calls, 0);

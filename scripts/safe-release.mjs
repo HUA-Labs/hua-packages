@@ -41,10 +41,13 @@ const PLAN_MAX_BYTES = 2 * 1024 * 1024;
 const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
+const GIT_OUTPUT_MAX_BYTES = 128 * 1024;
 const MAX_JSON_DEPTH = 32;
 const MAX_JSON_NODES = 50000;
 const MAX_STRING_BYTES = 8 * 1024;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
+const GIT_SHA_PATTERN = /^[a-f0-9]{40}$/;
+const RUN_ID_PATTERN = /^[1-9][0-9]{0,19}$/;
 const PACKAGE_NAME_PATTERN = /^(?:@[a-z0-9-]+\/[a-z0-9-]+|[a-z0-9-]+)$/;
 const PACKAGE_PATH_PATTERN = /^packages\/[a-z0-9-]+$/;
 const CHANGESET_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,79}$/;
@@ -739,6 +742,7 @@ function planDigestBody(plan) {
     schemaVersion: plan.schemaVersion,
     policy: plan.policy,
     status: plan.status,
+    claim: plan.claim,
     workspaceManifests: plan.workspaceManifests,
     releases: plan.releases,
   };
@@ -753,6 +757,7 @@ export function finalizeReleasePlan(value) {
     schemaVersion: 1,
     policy: value.policy,
     status: value.status,
+    claim: value.claim ?? null,
     workspaceManifests: value.workspaceManifests,
     releases: value.releases,
   };
@@ -767,6 +772,7 @@ export function validateReleasePlan(value, policyState, options = {}) {
       "schemaVersion",
       "policy",
       "status",
+      "claim",
       "workspaceManifests",
       "releases",
       "planDigest",
@@ -792,7 +798,33 @@ export function validateReleasePlan(value, policyState, options = {}) {
     value.policy.policySha256 === policyState.policySha256,
     "plan-policy-sha256",
   );
-  assert(value.status === "empty" || value.status === "planned", "plan-status");
+  assert(
+    value.status === "empty" ||
+      value.status === "planned" ||
+      value.status === "publishing",
+    "plan-status",
+  );
+  let claim = null;
+  if (value.claim !== null) {
+    exactKeys(
+      value.claim,
+      ["branch", "runId", "sourceHead"],
+      "plan-claim-shape",
+    );
+    claim = {
+      branch: stringValue(value.claim.branch, /^main$/, "plan-claim-branch"),
+      runId: stringValue(
+        value.claim.runId,
+        RUN_ID_PATTERN,
+        "plan-claim-run-id",
+      ),
+      sourceHead: stringValue(
+        value.claim.sourceHead,
+        GIT_SHA_PATTERN,
+        "plan-claim-source-head",
+      ),
+    };
+  }
   assert(Array.isArray(value.workspaceManifests), "plan-workspace-manifests");
   assert(Array.isArray(value.releases), "plan-releases");
   assert(
@@ -803,10 +835,15 @@ export function validateReleasePlan(value, policyState, options = {}) {
   assertSortedUnique(workspaceManifests, "name", "plan-workspace-order");
   const releases = value.releases.map(normalizeRelease);
   assertSortedUnique(releases, "name", "plan-release-name-order");
-  assert(
-    value.status === (releases.length === 0 ? "empty" : "planned"),
-    "plan-status-releases",
-  );
+  if (releases.length === 0) {
+    assert(value.status === "empty", "plan-status-releases");
+    assert(claim === null, "plan-empty-claim");
+  } else if (value.status === "planned") {
+    assert(claim === null, "plan-planned-claim");
+  } else {
+    assert(value.status === "publishing", "plan-status-releases");
+    assert(claim !== null, "plan-publishing-claim");
+  }
   if (requireNonempty) assert(releases.length > 0, "plan-empty");
   const policyByName = new Map(
     policyState.policy.packages.map((entry) => [entry.name, entry]),
@@ -861,6 +898,7 @@ export function validateReleasePlan(value, policyState, options = {}) {
       policySha256: value.policy.policySha256,
     },
     status: value.status,
+    claim,
     workspaceManifests,
     releases,
     planDigest: stringValue(value.planDigest, SHA256_PATTERN, "plan-digest"),
@@ -889,6 +927,7 @@ export function createEmptyReleasePlan(policyState) {
       policySha256: policyState.policySha256,
     },
     status: "empty",
+    claim: null,
     workspaceManifests: workspaceSnapshots(policyState.manifests),
     releases: [],
   });
@@ -1171,6 +1210,154 @@ function writeFileAtomically(filePath, bytes) {
   }
 }
 
+function gitOutput(execFile, root, argumentsList) {
+  const output = execFile("git", argumentsList, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    maxBuffer: GIT_OUTPUT_MAX_BYTES,
+  });
+  assert(typeof output === "string", "git-output");
+  return output.trimEnd();
+}
+
+function assertRemoteHead(execFile, root, branch, expectedHead) {
+  const reference = `refs/heads/${branch}`;
+  assert(
+    gitOutput(execFile, root, [
+      "ls-remote",
+      "--exit-code",
+      "origin",
+      reference,
+    ]) === `${expectedHead}\t${reference}`,
+    "release-remote-head-drift",
+  );
+}
+
+function persistExactPlanMutation(options) {
+  const { root, execFile, branch, expectedHead, commitMessage } = options;
+  assert(branch === "main", "release-branch");
+  assert(GIT_SHA_PATTERN.test(expectedHead), "release-expected-head");
+  assert(
+    gitOutput(execFile, root, ["rev-parse", "HEAD"]) === expectedHead,
+    "release-local-head-drift",
+  );
+  assertRemoteHead(execFile, root, branch, expectedHead);
+  assert(
+    gitOutput(execFile, root, [
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all",
+    ]) === ` M ${PLAN_RELATIVE_PATH}`,
+    "release-plan-only-drift",
+  );
+  gitOutput(execFile, root, ["add", "--", PLAN_RELATIVE_PATH]);
+  assert(
+    gitOutput(execFile, root, [
+      "diff",
+      "--cached",
+      "--name-only",
+      "--diff-filter=ACMRTUXB",
+    ]) === PLAN_RELATIVE_PATH,
+    "release-staged-scope",
+  );
+  gitOutput(execFile, root, [
+    "-c",
+    "user.name=hua-release-guard",
+    "-c",
+    "user.email=release-guard@users.noreply.github.com",
+    "commit",
+    "-m",
+    commitMessage,
+  ]);
+  const committedHead = gitOutput(execFile, root, ["rev-parse", "HEAD"]);
+  assert(GIT_SHA_PATTERN.test(committedHead), "release-commit-head");
+  assert(committedHead !== expectedHead, "release-commit-unchanged");
+  assertRemoteHead(execFile, root, branch, expectedHead);
+  gitOutput(execFile, root, [
+    "push",
+    "origin",
+    `${committedHead}:refs/heads/${branch}`,
+  ]);
+  assertRemoteHead(execFile, root, branch, committedHead);
+  assert(
+    gitOutput(execFile, root, [
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all",
+    ]) === "",
+    "release-post-commit-drift",
+  );
+  return committedHead;
+}
+
+function normalizeClaimInput(options) {
+  return {
+    branch: stringValue(options.branch, /^main$/, "release-claim-branch"),
+    runId: stringValue(options.runId, RUN_ID_PATTERN, "release-claim-run-id"),
+    sourceHead: stringValue(
+      options.sourceHead,
+      GIT_SHA_PATTERN,
+      "release-claim-source-head",
+    ),
+  };
+}
+
+export function runClaim(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  const claim = normalizeClaimInput(options);
+  const releaseState = loadReleaseState(root, { requireNonempty: true });
+  assert(releaseState.plan.status === "planned", "claim-plan-status");
+  assert(
+    gitOutput(execFile, root, [
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all",
+    ]) === "",
+    "claim-worktree-drift",
+  );
+  const publishingPlan = finalizeReleasePlan({
+    ...releaseState.plan,
+    status: "publishing",
+    claim,
+  });
+  writeFileAtomically(
+    join(root, PLAN_RELATIVE_PATH),
+    Buffer.from(canonicalJson(publishingPlan)),
+  );
+  const claimHead = persistExactPlanMutation({
+    root,
+    execFile,
+    branch: claim.branch,
+    expectedHead: claim.sourceHead,
+    commitMessage: "chore(release): claim exact publish plan",
+  });
+  return { plan: publishingPlan, claimHead };
+}
+
+export function persistProvenanceClosure(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  const claim = normalizeClaimInput(options);
+  const releaseState = loadReleaseState(root);
+  assert(releaseState.plan.status === "empty", "closure-plan-status");
+  const claimHead = gitOutput(execFile, root, ["rev-parse", "HEAD"]);
+  assert(
+    stringValue(options.claimHead, GIT_SHA_PATTERN, "closure-claim-head") ===
+      claimHead,
+    "closure-claim-head-drift",
+  );
+  assert(claimHead !== claim.sourceHead, "closure-unclaimed-head");
+  return persistExactPlanMutation({
+    root,
+    execFile,
+    branch: claim.branch,
+    expectedHead: claimHead,
+    commitMessage: "chore(release): close exact published plan",
+  });
+}
+
 export function runVersion(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -1236,6 +1423,7 @@ export function runVersion(options = {}) {
         policySha256: finalPolicyState.policySha256,
       },
       status: "planned",
+      claim: null,
       workspaceManifests: workspaceSnapshots(finalPolicyState.manifests),
       releases: plannedReleases,
     });
@@ -1285,6 +1473,16 @@ export function runPublish(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
   const releaseState = loadReleaseState(root, { requireNonempty: true });
+  assert(releaseState.plan.status === "publishing", "publish-plan-unclaimed");
+  const claim = normalizeClaimInput({
+    branch: options.branch,
+    runId: options.runId,
+    sourceHead: options.sourceHead,
+  });
+  assert(
+    JSON.stringify(releaseState.plan.claim) === JSON.stringify(claim),
+    "publish-claim-owner",
+  );
   const publishedPackages = [];
   for (const release of releaseState.plan.releases) {
     const packageDirectory = safeRelativePath(root, release.path);
@@ -1320,9 +1518,29 @@ export function checkPolicyCommand(root = DEFAULT_ROOT) {
 function parseCliArguments(argv) {
   assert(argv.length >= 1, "cli-mode-missing");
   const [mode, ...argumentsList] = argv;
-  assert(["version", "refresh", "check", "publish"].includes(mode), "cli-mode");
+  assert(
+    ["version", "refresh", "check", "claim", "publish"].includes(mode),
+    "cli-mode",
+  );
   let format = "json";
   let allowEmpty = false;
+  if (mode === "claim") {
+    assert(
+      argumentsList.length === 6 &&
+        argumentsList[0] === "--source-head" &&
+        argumentsList[2] === "--branch" &&
+        argumentsList[4] === "--run-id",
+      "cli-claim-arguments",
+    );
+    return {
+      mode,
+      format,
+      allowEmpty,
+      sourceHead: argumentsList[1],
+      branch: argumentsList[3],
+      runId: argumentsList[5],
+    };
+  }
   for (const argument of argumentsList) {
     if (argument === "--format=github" && mode === "check") {
       format = "github";
@@ -1337,7 +1555,8 @@ function parseCliArguments(argv) {
 }
 
 export function main(argv = process.argv.slice(2), options = {}) {
-  const { mode, format, allowEmpty } = parseCliArguments(argv);
+  const { mode, format, allowEmpty, sourceHead, branch, runId } =
+    parseCliArguments(argv);
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
   if (mode === "version") {
@@ -1361,18 +1580,31 @@ export function main(argv = process.argv.slice(2), options = {}) {
     );
     return;
   }
+  if (mode === "claim") {
+    const result = runClaim({
+      root,
+      execFile,
+      sourceHead,
+      branch,
+      runId,
+    });
+    process.stdout.write(
+      `claimed=true\nclaim_head=${result.claimHead}\nplan_digest=${result.plan.planDigest}\n`,
+    );
+    return;
+  }
   if (mode === "check") {
     const state = loadReleaseState(root);
-    const publish = state.plan.releases.length > 0;
+    const publish = state.plan.status === "planned";
     assert(publish || allowEmpty, "plan-empty");
     if (format === "github") {
       process.stdout.write(
-        `publish=${publish}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
+        `status=${state.plan.status}\npublish=${publish}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
       );
     } else {
       process.stdout.write(
         JSON.stringify({
-          status: publish ? "planned" : "no-release",
+          status: state.plan.status,
           releaseCount: state.plan.releases.length,
           planDigest: state.plan.planDigest,
         }) + "\n",
@@ -1380,7 +1612,13 @@ export function main(argv = process.argv.slice(2), options = {}) {
     }
     return;
   }
-  const published = runPublish({ root, execFile });
+  const published = runPublish({
+    root,
+    execFile,
+    branch: process.env.HUA_RELEASE_BRANCH,
+    runId: process.env.HUA_RELEASE_RUN_ID,
+    sourceHead: process.env.HUA_RELEASE_SOURCE_HEAD,
+  });
   process.stdout.write(`${JSON.stringify(published)}\n`);
 }
 

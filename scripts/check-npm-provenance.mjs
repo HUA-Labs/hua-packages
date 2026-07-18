@@ -20,6 +20,7 @@ import {
   createEmptyReleasePlan,
   loadReleaseState,
   parseStrictJsonBytes,
+  persistProvenanceClosure,
   readRegularFile,
   validatePublishedPackages,
 } from "./safe-release.mjs";
@@ -43,14 +44,30 @@ function boundedInteger(value, fallback, minimum, maximum, code) {
 }
 
 function parseArguments(argv) {
+  if (argv.length === 2 && argv[0] === "--published") {
+    return { publishedPath: resolve(argv[1]), closePlan: false };
+  }
   if (
-    (argv.length !== 2 && argv.length !== 3) ||
+    argv.length !== 11 ||
     argv[0] !== "--published" ||
-    (argv.length === 3 && argv[2] !== "--close-plan")
+    argv[2] !== "--close-plan" ||
+    argv[3] !== "--persist-head" ||
+    argv[5] !== "--source-head" ||
+    argv[7] !== "--branch" ||
+    argv[9] !== "--run-id"
   ) {
     fail("provenance-arguments");
   }
-  return { publishedPath: resolve(argv[1]), closePlan: argv.length === 3 };
+  return {
+    publishedPath: resolve(argv[1]),
+    closePlan: true,
+    persistence: {
+      claimHead: argv[4],
+      sourceHead: argv[6],
+      branch: argv[8],
+      runId: argv[10],
+    },
+  };
 }
 
 function npmViewAttestations(spec, execFile, root) {
@@ -120,6 +137,8 @@ function closeProvenanceVerifiedPlan(root, releaseState) {
 export async function checkPublishedProvenance(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
+  const gitExecFile = options.gitExecFile ?? execFileSync;
+  const persistClosure = options.persistClosure ?? persistProvenanceClosure;
   const attempts =
     options.attempts ??
     boundedInteger(
@@ -144,7 +163,26 @@ export async function checkPublishedProvenance(options = {}) {
       : undefined;
   const publishedPath = options.publishedPath ?? cliArguments.publishedPath;
   const closePlan = options.closePlan ?? cliArguments?.closePlan ?? false;
+  const persistence = options.persistence ?? cliArguments?.persistence;
+  if (closePlan && persistence === undefined) {
+    fail("provenance-persistence-required");
+  }
   const releaseState = loadReleaseState(root, { requireNonempty: true });
+  if (closePlan) {
+    if (releaseState.plan.status !== "publishing") {
+      fail("provenance-plan-unclaimed");
+    }
+    if (
+      JSON.stringify(releaseState.plan.claim) !==
+      JSON.stringify({
+        branch: persistence.branch,
+        runId: persistence.runId,
+        sourceHead: persistence.sourceHead,
+      })
+    ) {
+      fail("provenance-claim-owner");
+    }
+  }
   const publishedBytes = readRegularFile(
     publishedPath,
     PUBLISHED_MAX_BYTES,
@@ -187,11 +225,17 @@ export async function checkPublishedProvenance(options = {}) {
   if (failures.length > 0) fail("provenance-incomplete");
   if (closePlan) {
     const closedPlan = closeProvenanceVerifiedPlan(root, releaseState);
+    const closureHead = persistClosure({
+      root,
+      execFile: gitExecFile,
+      ...persistence,
+    });
     return {
       ...published,
       releasePlanClosure: {
         status: closedPlan.status,
         planDigest: closedPlan.planDigest,
+        head: closureHead,
       },
     };
   }

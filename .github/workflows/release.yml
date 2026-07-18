@@ -10,6 +10,10 @@ permissions:
   pull-requests: write
   id-token: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -41,11 +45,17 @@ jobs:
       - name: Build workspace packages
         run: pnpm build --filter "@hua-labs/*"
 
+      - name: Read durable release plan state
+        id: plan-preflight
+        run: node scripts/safe-release.mjs check --format=github --allow-empty >> "$GITHUB_OUTPUT"
+
       - name: Refresh verified empty release snapshot
+        if: steps.plan-preflight.outputs.status == 'empty'
         run: pnpm safe-release:refresh
 
       - name: Create or update version PR without npm credentials
         id: changesets
+        if: steps.plan-preflight.outputs.status == 'empty'
         uses: changesets/action@v1
         with:
           version: pnpm safe-release:version
@@ -54,24 +64,28 @@ jobs:
 
       - name: Validate durable exact release plan
         id: release-plan
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.plan-preflight.outputs.status != 'empty' || steps.changesets.outputs.hasChangesets == 'false'
         run: node scripts/safe-release.mjs check --format=github --allow-empty >> "$GITHUB_OUTPUT"
 
+      - name: Claim exact planned release before npm credentials
+        id: release-claim
+        if: steps.release-plan.outputs.status == 'planned'
+        run: node scripts/safe-release.mjs claim --source-head "$GITHUB_SHA" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+
       - name: Create .npmrc for authorized nonempty release
-        if: steps.release-plan.outputs.publish == 'true'
+        if: steps.release-claim.outputs.claimed == 'true'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           umask 077
-          for npmrc in "$HOME/.npmrc" .npmrc; do
-            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$npmrc"
-            echo "access=public" >> "$npmrc"
-            echo "registry=https://registry.npmjs.org/" >> "$npmrc"
-            echo "provenance=true" >> "$npmrc"
-          done
+          npmrc="$HOME/.npmrc"
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$npmrc"
+          echo "access=public" >> "$npmrc"
+          echo "registry=https://registry.npmjs.org/" >> "$npmrc"
+          echo "provenance=true" >> "$npmrc"
 
       - name: Verify publish provenance config
-        if: steps.release-plan.outputs.publish == 'true'
+        if: steps.release-claim.outputs.claimed == 'true'
         env:
           NPM_CONFIG_PROVENANCE: "true"
           PNPM_CONFIG_PROVENANCE: "true"
@@ -81,11 +95,14 @@ jobs:
 
       - name: Publish exact validated release plan
         id: safe-publish
-        if: steps.release-plan.outputs.publish == 'true'
+        if: steps.release-claim.outputs.claimed == 'true'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
           PNPM_CONFIG_PROVENANCE: "true"
+          HUA_RELEASE_BRANCH: ${{ github.ref_name }}
+          HUA_RELEASE_RUN_ID: ${{ github.run_id }}
+          HUA_RELEASE_SOURCE_HEAD: ${{ github.sha }}
         run: |
           published="$RUNNER_TEMP/hua-published-packages.json"
           pnpm safe-release:publish > "$published"
@@ -93,9 +110,9 @@ jobs:
           echo "published_path=$published" >> "$GITHUB_OUTPUT"
 
       - name: Check exact published-set npm provenance and close exact published plan
-        if: steps.release-plan.outputs.publish == 'true'
-        run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}" --close-plan
+        if: steps.release-claim.outputs.claimed == 'true'
+        run: pnpm check:npm-provenance -- --published "${{ steps.safe-publish.outputs.published_path }}" --close-plan --persist-head "${{ steps.release-claim.outputs.claim_head }}" --source-head "$GITHUB_SHA" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID"
 
       - name: Validate provenance-closed empty plan
-        if: steps.release-plan.outputs.publish == 'true'
+        if: steps.release-claim.outputs.claimed == 'true'
         run: node scripts/safe-release.mjs check --format=github --allow-empty
