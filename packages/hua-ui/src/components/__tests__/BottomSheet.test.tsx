@@ -1,67 +1,90 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BottomSheet, BottomSheetHeader, BottomSheetContent } from '../BottomSheet';
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import {
+  BottomSheet,
+  BottomSheetHeader,
+  BottomSheetContent,
+} from "../BottomSheet";
 
-describe('BottomSheet', () => {
-  it('should render when isOpen is true', () => {
+describe("BottomSheet", () => {
+  it("exposes a truthful labelled dialog without claiming modal isolation", () => {
+    render(
+      <BottomSheet
+        isOpen
+        onClose={vi.fn()}
+        aria-labelledby="sheet-title"
+        aria-describedby="sheet-description"
+      >
+        <h2 id="sheet-title">Preferences</h2>
+        <p id="sheet-description">Choose the visible columns.</p>
+      </BottomSheet>,
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Preferences" });
+    expect(dialog).toHaveAttribute("aria-labelledby", "sheet-title");
+    expect(dialog).toHaveAttribute("aria-describedby", "sheet-description");
+    expect(dialog).not.toHaveAttribute("aria-modal");
+  });
+
+  it("should render when isOpen is true", () => {
     render(
       <BottomSheet isOpen={true} onClose={vi.fn()}>
         <BottomSheetContent>Bottom sheet content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
-    expect(screen.getByText('Bottom sheet content')).toBeInTheDocument();
+    expect(screen.getByText("Bottom sheet content")).toBeInTheDocument();
   });
 
-  it('should not render when isOpen is false', () => {
+  it("should not render when isOpen is false", () => {
     render(
       <BottomSheet isOpen={false} onClose={vi.fn()}>
         <BottomSheetContent>Bottom sheet content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
-    expect(screen.queryByText('Bottom sheet content')).not.toBeInTheDocument();
+    expect(screen.queryByText("Bottom sheet content")).not.toBeInTheDocument();
   });
 
-  it('should render content from children', () => {
+  it("should render content from children", () => {
     render(
       <BottomSheet isOpen={true} onClose={vi.fn()}>
         <BottomSheetHeader>Header</BottomSheetHeader>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
-    expect(screen.getByText('Header')).toBeInTheDocument();
-    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(screen.getByText("Header")).toBeInTheDocument();
+    expect(screen.getByText("Content")).toBeInTheDocument();
   });
 
-  it('should show drag handle by default', () => {
+  it("should show drag handle by default", () => {
     render(
       <BottomSheet isOpen={true} onClose={vi.fn()}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Drag handle is a rounded bar element — verify via its parent "flex justify-center" wrapper
     // by checking it exists as sibling of content
-    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(screen.getByText("Content")).toBeInTheDocument();
     // The drag handle wrapper div will be present — check via style (w-12 h-1.5)
     // Since it's now inline style, just verify the structure renders without error
-    const content = screen.getByText('Content').closest('[style]');
+    const content = screen.getByText("Content").closest("[style]");
     expect(content).toBeInTheDocument();
   });
 
-  it('should not show drag handle when showDragHandle is false', () => {
+  it("should not show drag handle when showDragHandle is false", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()} showDragHandle={false}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // With showDragHandle=false, there should be one fewer div inside the sheet
     // We verify content still renders correctly
-    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(screen.getByText("Content")).toBeInTheDocument();
     // The outer fixed container has 2 children (backdrop + sheet) when showBackdrop=true
     // The sheet should not have the drag handle flex wrapper as its first child
     const outerDiv = container.firstChild as HTMLElement;
@@ -70,14 +93,18 @@ describe('BottomSheet', () => {
     expect(sheet).toBeInTheDocument();
   });
 
-  it('should call onClose when backdrop is clicked', async () => {
+  it("should call onClose when backdrop is clicked", async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     const { container } = render(
-      <BottomSheet isOpen={true} onClose={handleClose} closeOnBackdropClick={true}>
+      <BottomSheet
+        isOpen={true}
+        onClose={handleClose}
+        closeOnBackdropClick={true}
+      >
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Backdrop is the first child of the fixed outer container
@@ -89,14 +116,18 @@ describe('BottomSheet', () => {
     }
   });
 
-  it('should not call onClose when backdrop is clicked if closeOnBackdropClick is false', async () => {
+  it("should not call onClose when backdrop is clicked if closeOnBackdropClick is false", async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
 
     const { container } = render(
-      <BottomSheet isOpen={true} onClose={handleClose} closeOnBackdropClick={false}>
+      <BottomSheet
+        isOpen={true}
+        onClose={handleClose}
+        closeOnBackdropClick={false}
+      >
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Backdrop is the first child of the fixed outer container (no onClick when closeOnBackdropClick=false)
@@ -108,41 +139,41 @@ describe('BottomSheet', () => {
     }
   });
 
-  it('should call onClose when Escape key is pressed', async () => {
+  it("should call onClose when Escape key is pressed", async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
 
     render(
       <BottomSheet isOpen={true} onClose={handleClose} closeOnEscape={true}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
-    await user.keyboard('{Escape}');
+    await user.keyboard("{Escape}");
 
     expect(handleClose).toHaveBeenCalled();
   });
 
-  it('should not call onClose when Escape key is pressed if closeOnEscape is false', async () => {
+  it("should not call onClose when Escape key is pressed if closeOnEscape is false", async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
 
     render(
       <BottomSheet isOpen={true} onClose={handleClose} closeOnEscape={false}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
-    await user.keyboard('{Escape}');
+    await user.keyboard("{Escape}");
 
     expect(handleClose).not.toHaveBeenCalled();
   });
 
-  it('should render backdrop when showBackdrop is true', () => {
+  it("should render backdrop when showBackdrop is true", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()} showBackdrop={true}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // When showBackdrop=true, the outer fixed div has 2 children: backdrop + sheet
@@ -150,11 +181,11 @@ describe('BottomSheet', () => {
     expect(outerDiv?.childNodes).toHaveLength(2);
   });
 
-  it('should not render backdrop when showBackdrop is false', () => {
+  it("should not render backdrop when showBackdrop is false", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()} showBackdrop={false}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // When showBackdrop=false, the outer fixed div has 1 child: sheet only
@@ -162,33 +193,60 @@ describe('BottomSheet', () => {
     expect(outerDiv?.childNodes).toHaveLength(1);
   });
 
-  it('should apply different height styles', () => {
+  it("should apply different height styles", () => {
     const { container, rerender } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()} height="sm">
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Sheet is the last child of the outer fixed container
     const outerDiv = container.firstChild as HTMLElement;
     let sheet = outerDiv?.lastChild as HTMLElement;
-    expect(sheet.style.height).toBe('16rem');
+    expect(sheet).toHaveStyle({ height: "16rem" });
+    expect(sheet.style.maxHeight).toBe("");
+    expect(screen.getByText("Content")).toBeInTheDocument();
 
     rerender(
       <BottomSheet isOpen={true} onClose={vi.fn()} height="lg">
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     sheet = (container.firstChild as HTMLElement)?.lastChild as HTMLElement;
-    expect(sheet.style.height).toBe('32rem');
+    expect(sheet).toHaveStyle({ height: "32rem" });
+    expect(sheet.style.maxHeight).toBe("");
   });
 
-  it('should apply custom dot style', () => {
+  it("applies snap height only to full sheets and advances upward", () => {
+    const { container } = render(
+      <BottomSheet
+        isOpen
+        onClose={vi.fn()}
+        height="full"
+        snapPoints={[25, 50, 75, 100]}
+        defaultSnap={50}
+      >
+        <BottomSheetContent>Content</BottomSheetContent>
+      </BottomSheet>,
+    );
+
+    const sheet = (container.firstChild as HTMLElement)
+      ?.lastChild as HTMLElement;
+    expect(sheet).toHaveStyle({ height: "50%", maxHeight: "100%" });
+
+    fireEvent.touchStart(sheet, { touches: [{ clientY: 250 }] });
+    fireEvent.touchMove(sheet, { touches: [{ clientY: 100 }] });
+    fireEvent.touchEnd(sheet);
+
+    expect(sheet).toHaveStyle({ height: "75%", maxHeight: "100%" });
+  });
+
+  it("should apply custom dot style", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()} dot="rounded-lg">
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Sheet should be rendered
@@ -197,11 +255,11 @@ describe('BottomSheet', () => {
     expect(sheet).toBeInTheDocument();
   });
 
-  it('should handle touch start event', () => {
+  it("should handle touch start event", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     // Sheet is the last child of the outer fixed container
@@ -217,11 +275,11 @@ describe('BottomSheet', () => {
     }
   });
 
-  it('should handle touch move event', () => {
+  it("should handle touch move event", () => {
     const { container } = render(
       <BottomSheet isOpen={true} onClose={vi.fn()}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     const outerDiv = container.firstChild as HTMLElement;
@@ -240,12 +298,12 @@ describe('BottomSheet', () => {
     }
   });
 
-  it('should call onClose when dragged down beyond threshold', () => {
+  it("should call onClose when dragged down beyond threshold", () => {
     const handleClose = vi.fn();
     const { container } = render(
       <BottomSheet isOpen={true} onClose={handleClose}>
         <BottomSheetContent>Content</BottomSheetContent>
-      </BottomSheet>
+      </BottomSheet>,
     );
 
     const outerDiv = container.firstChild as HTMLElement;
@@ -264,78 +322,119 @@ describe('BottomSheet', () => {
       expect(handleClose).toHaveBeenCalled();
     }
   });
+
+  it("composes consumer touch handlers with the internal drag lifecycle exactly once", () => {
+    const handleClose = vi.fn();
+    const handleTouchStart = vi.fn();
+    const handleTouchMove = vi.fn();
+    const handleTouchEnd = vi.fn();
+    const { container } = render(
+      <BottomSheet
+        isOpen
+        onClose={handleClose}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <BottomSheetContent>Content</BottomSheetContent>
+      </BottomSheet>,
+    );
+
+    const sheet = (container.firstChild as HTMLElement)
+      ?.lastChild as HTMLElement;
+    fireEvent.touchStart(sheet, { touches: [{ clientY: 100 }] });
+    fireEvent.touchMove(sheet, { touches: [{ clientY: 250 }] });
+    fireEvent.touchEnd(sheet);
+
+    expect(handleTouchStart).toHaveBeenCalledTimes(1);
+    expect(handleTouchMove).toHaveBeenCalledTimes(1);
+    expect(handleTouchEnd).toHaveBeenCalledTimes(1);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
 });
 
-describe('BottomSheetHeader', () => {
-  it('should render header with children', () => {
+describe("BottomSheetHeader", () => {
+  it("gives the close control a deterministic accessible name", () => {
+    render(
+      <BottomSheetHeader onClose={vi.fn()} closeButtonLabel="Close preferences">
+        <h2>Preferences</h2>
+      </BottomSheetHeader>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Close preferences" }),
+    ).toBeInTheDocument();
+  });
+
+  it("should render header with children", () => {
     render(
       <BottomSheetHeader>
         <h2>Header Title</h2>
-      </BottomSheetHeader>
+      </BottomSheetHeader>,
     );
 
-    expect(screen.getByText('Header Title')).toBeInTheDocument();
+    expect(screen.getByText("Header Title")).toBeInTheDocument();
   });
 
-  it('should render close button by default', () => {
+  it("should render close button by default", () => {
     const { container } = render(
       <BottomSheetHeader onClose={vi.fn()}>
         <h2>Header</h2>
-      </BottomSheetHeader>
+      </BottomSheetHeader>,
     );
 
-    const closeButton = container.querySelector('button');
+    const closeButton = container.querySelector("button");
     expect(closeButton).toBeInTheDocument();
   });
 
-  it('should call onClose when close button is clicked', async () => {
+  it("should call onClose when close button is clicked", async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
 
     const { container } = render(
       <BottomSheetHeader onClose={handleClose}>
         <h2>Header</h2>
-      </BottomSheetHeader>
+      </BottomSheetHeader>,
     );
 
-    const closeButton = container.querySelector('button');
+    const closeButton = container.querySelector("button");
     if (closeButton) {
       await user.click(closeButton);
       expect(handleClose).toHaveBeenCalledTimes(1);
     }
   });
 
-  it('should not render close button when showCloseButton is false', () => {
+  it("should not render close button when showCloseButton is false", () => {
     const { container } = render(
       <BottomSheetHeader showCloseButton={false}>
         <h2>Header</h2>
-      </BottomSheetHeader>
+      </BottomSheetHeader>,
     );
 
-    const closeButton = container.querySelector('button');
+    const closeButton = container.querySelector("button");
     expect(closeButton).not.toBeInTheDocument();
   });
 });
 
-describe('BottomSheetContent', () => {
-  it('should render content', () => {
+describe("BottomSheetContent", () => {
+  it("should render content", () => {
     render(
       <BottomSheetContent>
         <p>Bottom sheet content text</p>
-      </BottomSheetContent>
+      </BottomSheetContent>,
     );
 
-    expect(screen.getByText('Bottom sheet content text')).toBeInTheDocument();
+    expect(screen.getByText("Bottom sheet content text")).toBeInTheDocument();
   });
 
-  it('should apply custom style', () => {
+  it("should apply custom style", () => {
     const { container } = render(
-      <BottomSheetContent style={{ padding: '2rem' }}>
+      <BottomSheetContent style={{ padding: "2rem" }}>
         <p>Content</p>
-      </BottomSheetContent>
+      </BottomSheetContent>,
     );
 
     const content = container.firstChild as HTMLElement;
-    expect(content).toHaveStyle({ padding: '2rem' });
+    expect(content).toHaveStyle({ padding: "2rem" });
   });
 });

@@ -1,5 +1,5 @@
 {
-  "mapDigest": "90b435a1ad11e8dc6a0f4cc1dbfe92648d630220e815576744da2b5be45cada6",
+  "mapDigest": "e5a0f87759e918195c7ade04b60d62bad83b900b1c5fe7ce5adace54998e58a7",
   "publicBase": {
     "commit": "742da1e7dd5d53d06b0614ee53cea70c514e29ff",
     "packageTree": "c9e9eda885dfbbde9956167dd4ab514122f0ad69",
@@ -80,9 +80,9 @@
       "sourceSha256": "b9021c207c3d95c872b0776f0b3df4337342992d6f9abee048d2d6a66bb18bdf"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "8dfc7a5839b2be8ebb0146a21efb09226e305a716d0029c02cdb4fcd451e98d9",
       "path": "packages/hua-ui/src/components/BottomSheet.tsx",
       "publicBaseSha256": "b23f95e1e5764353561c675727011dbd2959aed48af4d0b42fcf750c7de803a0",
       "sourceSha256": "8dfc7a5839b2be8ebb0146a21efb09226e305a716d0029c02cdb4fcd451e98d9"
@@ -120,9 +120,9 @@
       "sourceSha256": "90e92d86a5c1694e3529c64d1a7fb666eb9444618024f89c05bbb98e43bacf0d"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "fbf8e251feae10437599582709997e7409424a7222aed89cd78dea7d098f8c41",
       "path": "packages/hua-ui/src/components/Drawer.tsx",
       "publicBaseSha256": "35ed4321c1c12e4044196182448493efc37f1d4a85273f5d217c5f8611cbca60",
       "sourceSha256": "fbf8e251feae10437599582709997e7409424a7222aed89cd78dea7d098f8c41"
@@ -200,25 +200,25 @@
       "sourceSha256": "fba4203bdd249becca4cea1417101de5cd8a312c609ed600a4733677ce51c2eb"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "9b14dcf8ffbc72c960e7c2e526111207f0d85ca22c22045a3a52a70d0f7511dd",
       "path": "packages/hua-ui/src/components/Textarea.tsx",
       "publicBaseSha256": "10ef303fe9af73a0b0891918a89b3e60c762d2c8e09ed121bb0086cf9d3ea931",
       "sourceSha256": "9b14dcf8ffbc72c960e7c2e526111207f0d85ca22c22045a3a52a70d0f7511dd"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "27b3e1659d3fdde0b2be4140f98d351fec5e2341abcdeb55211b4fd8f0db9515",
       "path": "packages/hua-ui/src/components/Toast.tsx",
       "publicBaseSha256": "caca5ed51cd324c0b56c847c1417477dc056165374cd1cc2661d426f8c9c2cb9",
       "sourceSha256": "27b3e1659d3fdde0b2be4140f98d351fec5e2341abcdeb55211b4fd8f0db9515"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "f602b36967627e75e57cbb45c309db082bc9eb60592e2ff77c7c2f61b23159fa",
       "path": "packages/hua-ui/src/components/Tooltip.tsx",
       "publicBaseSha256": "3e71024341dbae76ca01c0a28f0cb07f00af16b33ffb63c00af3fdcc278c0ef5",
       "sourceSha256": "f602b36967627e75e57cbb45c309db082bc9eb60592e2ff77c7c2f61b23159fa"
@@ -272,9 +272,9 @@
       "sourceSha256": "d8981581b9b51c30aa39e37156a7442342d4a3ab4b7435139a34cf0fbf2fb6e3"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": "1a866380cd52fe6fc3648b5456b59873ae3cfe184016e566770e0f3e2eb2e9ea",
+      "outputSha256": "4917db5fa88a4ad3b707773e6f6254327a2e9addabf6d757f43bcc2f327699e3",
       "path": "packages/hua-ui/src/components/__tests__/BottomSheet.test.tsx",
       "publicBaseSha256": "1a866380cd52fe6fc3648b5456b59873ae3cfe184016e566770e0f3e2eb2e9ea",
       "sourceSha256": "4917db5fa88a4ad3b707773e6f6254327a2e9addabf6d757f43bcc2f327699e3"
@@ -320,9 +320,9 @@
       "sourceSha256": "40e88c94dfe8e195b28ba648a3424c47dcc534e305560112d19f172d369f7b31"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "baf17b9c5a5750017b133536017a9b8cb744ace6ab7ba507dd1b95f8b5a5d8c7",
       "path": "packages/hua-ui/src/components/__tests__/Drawer.test.tsx",
       "publicBaseSha256": "330767782a76b4b7b29170b755a903b3f414ae80cbe7f70acf2c8c9913590d76",
       "sourceSha256": "baf17b9c5a5750017b133536017a9b8cb744ace6ab7ba507dd1b95f8b5a5d8c7"
@@ -568,25 +568,25 @@
       "sourceSha256": "5a744114f21acf502a65611059bcfb8b5061a588ea3a40e32f8b10ce7c87cccc"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": "022c45857948ef0775ccaa34152fa3483825783064f06f04915a3e268171c5b4",
+      "outputSha256": "e90ee6d786394e123d0d5b98a125dbf242dc508adf2011a525417984c57453f5",
       "path": "packages/hua-ui/src/components/__tests__/Textarea.test.tsx",
       "publicBaseSha256": "022c45857948ef0775ccaa34152fa3483825783064f06f04915a3e268171c5b4",
       "sourceSha256": "e90ee6d786394e123d0d5b98a125dbf242dc508adf2011a525417984c57453f5"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "7a458dfdd3b7408aa65446183fcc5a51a2bc616c8a4db31940443e86c1f6ea0e",
       "path": "packages/hua-ui/src/components/__tests__/Toast.test.tsx",
       "publicBaseSha256": "be317895d6c95098dd093ca17a8359a242de9c2b5cdd73e8fb9e6c668465ad0e",
       "sourceSha256": "7a458dfdd3b7408aa65446183fcc5a51a2bc616c8a4db31940443e86c1f6ea0e"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "259837b8bcb212e424d1e495c9b40703bdb2fb8df64d1ad64baa23723b31db5e",
       "path": "packages/hua-ui/src/components/__tests__/Tooltip.test.tsx",
       "publicBaseSha256": "d04d3534659aa27865df22784605818a5e508395e5d525fda9cd6d07c54c17aa",
       "sourceSha256": "259837b8bcb212e424d1e495c9b40703bdb2fb8df64d1ad64baa23723b31db5e"

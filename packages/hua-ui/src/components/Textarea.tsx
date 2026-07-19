@@ -145,7 +145,8 @@ export interface TextareaProps extends Omit<
  * @param {React.Ref<HTMLTextAreaElement>} ref - textarea 요소 ref / textarea element ref
  * @returns {JSX.Element} Textarea 컴포넌트 / Textarea component
  *
- * @todo 접근성 개선: aria-invalid 속성 자동 추가 필요 / Accessibility improvement: auto-add aria-invalid attribute
+ * Booleanish aria-invalid tokens are preserved, while error forces true and
+ * invalid styling follows the emitted semantic state.
  */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
@@ -157,6 +158,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       error = false,
       success = false,
       resize = "vertical",
+      "aria-invalid": ariaInvalid,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
       ...props
     },
     ref,
@@ -164,11 +170,13 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [isHovered, setIsHovered] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
-    const ariaInvalid = props["aria-invalid" as keyof typeof props] as
-      | boolean
-      | undefined;
-    const isInvalid =
-      error || (ariaInvalid !== undefined ? ariaInvalid : false);
+    const isAriaInvalid =
+      ariaInvalid === true ||
+      ariaInvalid === "true" ||
+      ariaInvalid === "grammar" ||
+      ariaInvalid === "spelling";
+    const isInvalid = error || isAriaInvalid;
+    const emittedAriaInvalid = error ? true : ariaInvalid;
     const isDisabled = props.disabled ?? false;
 
     const computedStyle = useMemo(() => {
@@ -227,16 +235,22 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <textarea
         style={computedStyle}
         ref={ref}
-        aria-invalid={isInvalid || undefined}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        aria-invalid={emittedAriaInvalid}
+        onMouseEnter={(event) => {
+          setIsHovered(true);
+          onMouseEnter?.(event);
+        }}
+        onMouseLeave={(event) => {
+          setIsHovered(false);
+          onMouseLeave?.(event);
+        }}
         onFocus={(e) => {
           setIsFocused(true);
-          props.onFocus?.(e);
+          onFocus?.(e);
         }}
         onBlur={(e) => {
           setIsFocused(false);
-          props.onBlur?.(e);
+          onBlur?.(e);
         }}
         {...props}
       />

@@ -3,6 +3,66 @@
 import React, { useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
+function composeCleanupAwareRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
+  return (node) => {
+    const cleanupCallbacks: (() => void)[] = [];
+
+    for (const ref of refs) {
+      if (typeof ref === "function") {
+        const cleanup = ref(node);
+        if (node !== null) {
+          cleanupCallbacks.push(
+            typeof cleanup === "function" ? cleanup : () => ref(null),
+          );
+        }
+      } else if (ref != null) {
+        ref.current = node;
+        if (node !== null) {
+          cleanupCallbacks.push(() => {
+            ref.current = null;
+          });
+        }
+      }
+    }
+
+    if (node === null) return;
+    return () => {
+      for (const cleanup of cleanupCallbacks) cleanup();
+    };
+  };
+}
+
+type TooltipTriggerProps = React.HTMLAttributes<HTMLElement> & {
+  ref?: React.Ref<HTMLElement>;
+};
+
+type TooltipTriggerElement = React.ReactElement<TooltipTriggerProps>;
+
+type TooltipTriggerOwnership = Readonly<{
+  mode: "empty" | "direct" | "wrapper";
+  type: unknown;
+  key: React.Key | null;
+}>;
+
+function collectRenderableChildren(
+  children: React.ReactNode,
+  output: React.ReactNode[] = [],
+): React.ReactNode[] {
+  React.Children.forEach(children, (child) => {
+    if (child == null || typeof child === "boolean" || child === "") return;
+    if (React.isValidElement<{ children?: React.ReactNode }>(child)) {
+      if (child.type === React.Fragment) {
+        collectRenderableChildren(child.props.children, output);
+        return;
+      }
+    }
+    output.push(child);
+  });
+  return output;
+}
+
 // ---------------------------------------------------------------------------
 // Variant style maps
 // ---------------------------------------------------------------------------
@@ -133,7 +193,7 @@ function getPopupTransform(position: TooltipProps["position"]): string {
  * Tooltip 컴포넌트의 props / Tooltip component props
  * @typedef {Object} TooltipProps
  * @property {string} content - Tooltip 내용 / Tooltip content
- * @property {React.ReactNode} children - Tooltip이 연결될 요소 / Element to attach tooltip to
+ * @property {React.ReactNode} children - Tooltip trigger content. A single element is used directly; legacy text/groups use the wrapper.
  * @property {"top" | "bottom" | "left" | "right"} [position="top"] - Tooltip 표시 위치 / Tooltip display position
  * @property {"default" | "light" | "dark"} [variant="default"] - Tooltip 스타일 변형 / Tooltip style variant
  * @property {number} [delay=300] - Tooltip 표시 지연 시간(ms) / Tooltip display delay (ms)
@@ -162,11 +222,11 @@ export interface TooltipProps extends Omit<
 /**
  * Tooltip 컴포넌트 / Tooltip component
  *
- * 호버 시 추가 정보를 표시하는 툴팁 컴포넌트입니다.
- * 마우스 호버 시 지연 시간 후 표시됩니다.
+ * 단일 trigger의 hover 또는 keyboard focus 시 추가 정보를 표시합니다.
+ * trigger의 기존 handler, ref, aria-describedby를 보존해 합성합니다.
  *
- * Tooltip component that displays additional information on hover.
- * Appears after a delay when the mouse hovers over the element.
+ * Displays additional information for one trigger on hover or keyboard focus.
+ * Existing trigger handlers, refs, and aria-describedby tokens are composed.
  *
  * @component
  * @example
@@ -190,10 +250,6 @@ export interface TooltipProps extends Omit<
  * @param {TooltipProps} props - Tooltip 컴포넌트의 props / Tooltip component props
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} Tooltip 컴포넌트 / Tooltip component
- *
- * @todo 접근성 개선: role="tooltip" 추가 필요 / Accessibility: Add role="tooltip"
- * @todo 접근성 개선: aria-describedby 연결 필요 / Accessibility: Connect aria-describedby
- * @todo 접근성 개선: 키보드 포커스 시 Tooltip 표시 필요 / Accessibility: Show tooltip on keyboard focus
  */
 const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   (
@@ -206,63 +262,225 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       variant = "default",
       delay = 300,
       disabled = false,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      onKeyDown,
       ...props
     },
     ref,
   ) => {
-    const [isVisible, setIsVisible] = React.useState(false);
+    const [visibleOwnership, setVisibleOwnership] =
+      React.useState<TooltipTriggerOwnership | null>(null);
     const [coords, setCoords] = React.useState({ x: 0, y: 0 });
     const timeoutRef = React.useRef<number | undefined>(undefined);
     const tooltipRef = React.useRef<HTMLDivElement>(null);
+    const triggerRef = React.useRef<HTMLElement>(null);
+    const isHoveredRef = React.useRef(false);
+    const isFocusedRef = React.useRef(false);
+    const generatedId = React.useId();
+    const tooltipId = `${generatedId}-tooltip`;
 
-    const showTooltip = (e: React.MouseEvent) => {
-      if (disabled) return;
+    const renderableChildren = useMemo(
+      () => collectRenderableChildren(children),
+      [children],
+    );
+    const hasRenderableChildren = renderableChildren.length > 0;
+    const trigger =
+      renderableChildren.length === 1 &&
+      React.isValidElement<TooltipTriggerProps>(renderableChildren[0]) &&
+      renderableChildren[0].type !== React.Fragment
+        ? (renderableChildren[0] as TooltipTriggerElement)
+        : null;
+    const usesDirectTrigger = trigger !== null;
+    const triggerOwnership = useMemo<TooltipTriggerOwnership>(
+      () =>
+        usesDirectTrigger
+          ? {
+              mode: "direct",
+              type: trigger.type,
+              key: trigger.key,
+            }
+          : {
+              mode: hasRenderableChildren ? "wrapper" : "empty",
+              type: null,
+              key: null,
+            },
+      [hasRenderableChildren, trigger?.key, trigger?.type, usesDirectTrigger],
+    );
+    const previousTriggerOwnershipRef = React.useRef(triggerOwnership);
+    const triggerProps = trigger?.props ?? {};
+    const composedTriggerRef = useMemo(
+      () => composeCleanupAwareRefs(triggerRef, triggerProps.ref),
+      [triggerProps.ref],
+    );
 
-      const rect = e.currentTarget.getBoundingClientRect();
-
-      let x = 0;
-      let y = 0;
-
-      switch (position) {
-        case "top":
-          x = rect.left + rect.width / 2;
-          y = rect.top - 8;
-          break;
-        case "bottom":
-          x = rect.left + rect.width / 2;
-          y = rect.bottom + 8;
-          break;
-        case "left":
-          x = rect.left - 8;
-          y = rect.top + rect.height / 2;
-          break;
-        case "right":
-          x = rect.right + 8;
-          y = rect.top + rect.height / 2;
-          break;
+    const clearShowTimer = React.useCallback(() => {
+      if (timeoutRef.current !== undefined) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = undefined;
       }
+    }, []);
 
-      setCoords({ x, y });
+    const updateCoords = React.useCallback(
+      (target: HTMLElement) => {
+        const rect = target.getBoundingClientRect();
 
-      timeoutRef.current = window.setTimeout(() => {
-        setIsVisible(true);
-      }, delay);
-    };
+        switch (position) {
+          case "top":
+            setCoords({ x: rect.left + rect.width / 2, y: rect.top - 8 });
+            break;
+          case "bottom":
+            setCoords({ x: rect.left + rect.width / 2, y: rect.bottom + 8 });
+            break;
+          case "left":
+            setCoords({ x: rect.left - 8, y: rect.top + rect.height / 2 });
+            break;
+          case "right":
+            setCoords({ x: rect.right + 8, y: rect.top + rect.height / 2 });
+            break;
+        }
+      },
+      [position],
+    );
 
-    const hideTooltip = () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      setIsVisible(false);
-    };
+    const scheduleShow = React.useCallback(
+      (target: HTMLElement) => {
+        if (disabled || !hasRenderableChildren) return;
+        clearShowTimer();
+        updateCoords(target);
+        timeoutRef.current = window.setTimeout(() => {
+          timeoutRef.current = undefined;
+          setVisibleOwnership(triggerOwnership);
+        }, delay);
+      },
+      [
+        clearShowTimer,
+        delay,
+        disabled,
+        hasRenderableChildren,
+        triggerOwnership,
+        updateCoords,
+      ],
+    );
+
+    const hideIfInactive = React.useCallback(() => {
+      if (isHoveredRef.current || isFocusedRef.current) return;
+      clearShowTimer();
+      setVisibleOwnership(null);
+    }, [clearShowTimer]);
+
+    const dismissTooltip = React.useCallback(() => {
+      clearShowTimer();
+      setVisibleOwnership(null);
+    }, [clearShowTimer]);
 
     React.useEffect(() => {
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }, []);
+      if (previousTriggerOwnershipRef.current === triggerOwnership) return;
+      previousTriggerOwnershipRef.current = triggerOwnership;
+      isHoveredRef.current = false;
+      isFocusedRef.current = false;
+      dismissTooltip();
+    }, [dismissTooltip, triggerOwnership]);
+
+    React.useEffect(() => {
+      if (disabled) {
+        isHoveredRef.current = false;
+        isFocusedRef.current = false;
+        dismissTooltip();
+      }
+    }, [disabled, dismissTooltip]);
+
+    React.useEffect(() => dismissTooltip, [dismissTooltip]);
+
+    const existingDescribedBy = usesDirectTrigger
+      ? triggerProps["aria-describedby"]
+      : props["aria-describedby"];
+    const isTooltipVisible =
+      visibleOwnership === triggerOwnership &&
+      !disabled &&
+      hasRenderableChildren;
+    const describedBy = useMemo(() => {
+      if (!isTooltipVisible) return existingDescribedBy;
+      const tokens =
+        existingDescribedBy?.trim().split(/\s+/).filter(Boolean) ?? [];
+      if (tokens.includes(tooltipId)) return existingDescribedBy;
+      return existingDescribedBy
+        ? `${existingDescribedBy} ${tooltipId}`
+        : tooltipId;
+    }, [existingDescribedBy, isTooltipVisible, tooltipId]);
+
+    const handleTriggerMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+      triggerProps.onMouseEnter?.(event);
+      onMouseEnter?.(event as unknown as React.MouseEvent<HTMLDivElement>);
+      isHoveredRef.current = true;
+      scheduleShow(event.currentTarget);
+    };
+
+    const handleTriggerMouseLeave = (event: React.MouseEvent<HTMLElement>) => {
+      triggerProps.onMouseLeave?.(event);
+      onMouseLeave?.(event as unknown as React.MouseEvent<HTMLDivElement>);
+      isHoveredRef.current = false;
+      hideIfInactive();
+    };
+
+    const handleTriggerFocus = (event: React.FocusEvent<HTMLElement>) => {
+      triggerProps.onFocus?.(event);
+      onFocus?.(event as unknown as React.FocusEvent<HTMLDivElement>);
+      isFocusedRef.current = true;
+      scheduleShow(event.currentTarget);
+    };
+
+    const handleTriggerBlur = (event: React.FocusEvent<HTMLElement>) => {
+      triggerProps.onBlur?.(event);
+      onBlur?.(event as unknown as React.FocusEvent<HTMLDivElement>);
+      isFocusedRef.current = false;
+      hideIfInactive();
+    };
+
+    const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+      triggerProps.onKeyDown?.(event);
+      onKeyDown?.(event as unknown as React.KeyboardEvent<HTMLDivElement>);
+      if (event.key === "Escape") dismissTooltip();
+    };
+
+    const handleWrapperMouseEnter = (
+      event: React.MouseEvent<HTMLDivElement>,
+    ) => {
+      onMouseEnter?.(event);
+      isHoveredRef.current = true;
+      scheduleShow(event.currentTarget);
+    };
+
+    const handleWrapperMouseLeave = (
+      event: React.MouseEvent<HTMLDivElement>,
+    ) => {
+      onMouseLeave?.(event);
+      isHoveredRef.current = false;
+      hideIfInactive();
+    };
+
+    const handleWrapperFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+      onFocus?.(event);
+      if (event.target !== event.currentTarget) return;
+      isFocusedRef.current = true;
+      scheduleShow(event.currentTarget);
+    };
+
+    const handleWrapperBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+      onBlur?.(event);
+      if (event.target !== event.currentTarget) return;
+      isFocusedRef.current = false;
+      hideIfInactive();
+    };
+
+    const handleWrapperKeyDown = (
+      event: React.KeyboardEvent<HTMLDivElement>,
+    ) => {
+      onKeyDown?.(event);
+      if (event.key === "Escape") dismissTooltip();
+    };
 
     const wrapperStyle = useMemo(
       (): React.CSSProperties =>
@@ -300,23 +518,48 @@ const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       [position, variant],
     );
 
-    return (
-      <div
-        ref={ref}
-        style={wrapperStyle}
-        onMouseEnter={showTooltip}
-        onMouseLeave={hideTooltip}
-        {...props}
-      >
-        {children}
+    const composedTrigger = trigger
+      ? React.cloneElement(trigger, {
+          ref: composedTriggerRef,
+          "aria-describedby": describedBy,
+          onMouseEnter: handleTriggerMouseEnter,
+          onMouseLeave: handleTriggerMouseLeave,
+          onFocus: handleTriggerFocus,
+          onBlur: handleTriggerBlur,
+          onKeyDown: handleTriggerKeyDown,
+        })
+      : null;
 
-        {isVisible && (
-          <div ref={tooltipRef} style={popupStyle}>
-            {content}
-            {/* Arrow */}
-            <div style={arrowStyle} />
-          </div>
-        )}
+    const popup = isTooltipVisible ? (
+      <div ref={tooltipRef} id={tooltipId} role="tooltip" style={popupStyle}>
+        {content}
+        <div style={arrowStyle} />
+      </div>
+    ) : null;
+
+    if (!usesDirectTrigger) {
+      return (
+        <div
+          ref={ref}
+          style={wrapperStyle}
+          {...props}
+          aria-describedby={describedBy}
+          onMouseEnter={handleWrapperMouseEnter}
+          onMouseLeave={handleWrapperMouseLeave}
+          onFocus={handleWrapperFocus}
+          onBlur={handleWrapperBlur}
+          onKeyDown={handleWrapperKeyDown}
+        >
+          {children}
+          {popup}
+        </div>
+      );
+    }
+
+    return (
+      <div ref={ref} style={wrapperStyle} {...props}>
+        {composedTrigger}
+        {popup}
       </div>
     );
   },

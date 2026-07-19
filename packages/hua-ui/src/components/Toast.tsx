@@ -161,8 +161,8 @@ interface ToastProviderProps {
  * @param {ToastProviderProps} props - ToastProvider 컴포넌트의 props / ToastProvider component props
  * @returns {JSX.Element} ToastProvider 컴포넌트 / ToastProvider component
  *
- * @todo 접근성 개선: ToastItem에 role="alert" 또는 role="status" 추가 필요 / Accessibility: Add role="alert" or role="status" to ToastItem
- * @todo 접근성 개선: aria-live="polite" 또는 aria-live="assertive" 추가 필요 / Accessibility: Add aria-live="polite" or aria-live="assertive"
+ * Info/success items use status with polite announcements. Warning/error
+ * items use alert with assertive announcements. Every item is atomic.
  */
 export function ToastProvider({
   children,
@@ -402,8 +402,15 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
     outline: "none",
   };
 
+  const isUrgent = toast.type === "warning" || toast.type === "error";
+
   return (
-    <div style={itemStyle}>
+    <div
+      style={itemStyle}
+      role={isUrgent ? "alert" : "status"}
+      aria-live={isUrgent ? "assertive" : "polite"}
+      aria-atomic="true"
+    >
       {/* 아이콘 */}
       <div style={iconStyle}>{getToastIcon(toast.type)}</div>
 
