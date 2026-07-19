@@ -1,21 +1,327 @@
 {
   "packages": [
-    "@hua-labs/dot",
-    "@hua-labs/dot-aot",
-    "@hua-labs/dot-lsp",
-    "@hua-labs/dot-mcp",
-    "@hua-labs/eslint-plugin-i18n",
-    "@hua-labs/hooks",
-    "@hua-labs/hua",
-    "@hua-labs/i18n-core",
-    "@hua-labs/i18n-core-zustand",
-    "@hua-labs/i18n-formatters",
-    "@hua-labs/i18n-loaders",
-    "@hua-labs/motion-core",
-    "@hua-labs/security",
-    "@hua-labs/state",
-    "@hua-labs/ui",
-    "@hua-labs/utils",
-    "create-hua"
-  ]
+    {
+      "eligibility": "blocked",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/dot",
+      "path": "packages/hua-dot",
+      "reason": "release-mode-no-publish",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "no-publish"
+      }
+    },
+    {
+      "eligibility": "blocked",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/dot-aot",
+      "path": "packages/hua-dot-aot",
+      "reason": "release-mode-no-publish",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "no-publish"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/dot-lsp",
+      "path": "packages/hua-dot-lsp",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/dot-mcp",
+      "path": "packages/hua-dot-mcp",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": null
+      },
+      "name": "@hua-labs/eslint-plugin-i18n",
+      "path": "packages/eslint-plugin-i18n",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/hooks",
+      "path": "packages/hua-hooks",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "blocked",
+      "expectedManifest": {
+        "private": true,
+        "publishConfig": null
+      },
+      "name": "@hua-labs/hua",
+      "path": "packages/hua",
+      "reason": "held",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "held",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/i18n-core",
+      "path": "packages/hua-i18n-core",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/i18n-core-zustand",
+      "path": "packages/hua-i18n-core-zustand",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/i18n-formatters",
+      "path": "packages/hua-i18n-formatters",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/i18n-loaders",
+      "path": "packages/hua-i18n-loaders",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/motion-core",
+      "path": "packages/hua-motion-core",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "blocked",
+      "expectedManifest": {
+        "private": true,
+        "publishConfig": null
+      },
+      "name": "@hua-labs/security",
+      "path": "packages/hua-security",
+      "reason": "never-publish",
+      "release": {
+        "authority": "none",
+        "channel": "none",
+        "intent": "never-publish",
+        "mode": "private-workspace"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/state",
+      "path": "packages/hua-state",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/ui",
+      "path": "packages/hua-ui",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "@hua-labs/utils",
+      "path": "packages/hua-utils",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    },
+    {
+      "eligibility": "eligible",
+      "expectedManifest": {
+        "private": false,
+        "publishConfig": {
+          "access": "public",
+          "provenance": true
+        }
+      },
+      "name": "create-hua",
+      "path": "packages/create-hua",
+      "reason": "active-public",
+      "release": {
+        "authority": "hua-packages",
+        "channel": "npm-public",
+        "intent": "active-public",
+        "mode": "public-npm"
+      }
+    }
+  ],
+  "platformAuthority": {
+    "authorityKind": "platform-release-registry",
+    "commit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
+    "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac",
+    "registryPath": "config/workspaceRegistry.yaml",
+    "registrySha256": "81d27860b099f1e9aecd80c909687cfa88c3d4c2769df92a650d5ca19732ba38",
+    "tree": "33bf31608b735a66d8b7ce3571d8bdcc66a78ffc"
+  },
+  "schemaVersion": 1
 }

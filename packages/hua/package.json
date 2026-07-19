@@ -1,6 +1,7 @@
 {
   "name": "@hua-labs/hua",
   "version": "1.2.2",
+  "private": true,
   "description": "HUA - Ship UX faster: UI + motion + i18n, pre-wired. A framework for React product teams.",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -161,10 +162,6 @@
   "sideEffects": false,
   "engines": {
     "node": ">=20.0.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

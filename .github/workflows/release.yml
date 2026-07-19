@@ -6,13 +6,24 @@ on:
       - main
 
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  prepare:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      claimed: ${{ steps.release-plan.outputs.resume }}
+      claim_head: ${{ github.sha }}
+      source_head: ${{ steps.release-plan.outputs.claim_source_head }}
+      artifact_name: hua-release-${{ steps.release-plan.outputs.claim_run_id }}
+      artifact_run_id: ${{ steps.release-plan.outputs.claim_run_id }}
 
     steps:
       - name: Checkout repo
@@ -30,7 +41,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Check public exposure guard
         run: pnpm check:public-exposure
@@ -38,35 +49,175 @@ jobs:
       - name: Check publish allowlist
         run: pnpm check:publish-allowlist
 
-      - name: Build publishable packages
-        run: pnpm build --filter "@hua-labs/*"
+      - name: Read durable release plan state
+        id: plan-preflight
+        run: pnpm --silent safe-release:preflight >> "$GITHUB_OUTPUT"
 
-      - name: Create .npmrc for npm token
-        run: |
-          for npmrc in "$HOME/.npmrc" .npmrc; do
-            echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > "$npmrc"
-            echo "access=public" >> "$npmrc"
-            echo "registry=https://registry.npmjs.org/" >> "$npmrc"
-            echo "provenance=true" >> "$npmrc"
-          done
-
-      - name: Verify publish provenance config
+      - name: Check current GitHub release authority
+        if: steps.plan-preflight.outputs.authority_required == 'true'
         env:
-          NPM_CONFIG_PROVENANCE: "true"
-          PNPM_CONFIG_PROVENANCE: "true"
-        run: |
-          test "$(npm config get provenance)" = "true"
-          test "$(pnpm config get provenance)" = "true"
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
 
-      - name: Create release (changesets)
+      - name: Refresh verified empty release snapshot
+        if: steps.plan-preflight.outputs.status == 'empty'
+        run: pnpm safe-release:refresh
+
+      - name: Create or update version PR without npm credentials
+        id: changesets
+        if: steps.plan-preflight.outputs.status == 'empty'
         uses: changesets/action@v1
         with:
-          publish: pnpm changeset publish
+          version: pnpm safe-release:version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
-          PNPM_CONFIG_PROVENANCE: "true"
 
-      - name: Check npm provenance
-        run: pnpm check:npm-provenance
+      - name: Validate durable exact release plan
+        id: release-plan
+        if: steps.plan-preflight.outputs.status != 'empty' || steps.changesets.outputs.hasChangesets == 'false'
+        run: node scripts/safe-release.mjs check --format=github --allow-empty >> "$GITHUB_OUTPUT"
+
+      - name: Prepare and verify exact release artifacts
+        id: artifact-pack
+        if: steps.release-plan.outputs.status == 'planned'
+        run: |
+          artifact_dir="$RUNNER_TEMP/hua-release-artifacts"
+          install -d -m 0700 "$artifact_dir"
+          node scripts/safe-release.mjs pack --artifact-dir "$artifact_dir" --source-head "$GITHUB_SHA" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+          test -s "$artifact_dir/release-artifacts.json"
+          echo "artifact_dir=$artifact_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Upload exact verified artifacts
+        if: steps.release-plan.outputs.status == 'planned'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hua-release-${{ github.run_id }}
+          path: ${{ steps.artifact-pack.outputs.artifact_dir }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Claim exact artifact-bound release
+        id: release-claim
+        if: steps.release-plan.outputs.status == 'planned'
+        run: node scripts/safe-release.mjs claim --artifact-manifest "${{ steps.artifact-pack.outputs.artifact_manifest }}" --source-head "$GITHUB_SHA" --branch "$GITHUB_REF_NAME" --run-id "$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Open reviewed claim transition PR
+        if: steps.release-plan.outputs.status == 'planned'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRANSITION_BRANCH: ${{ steps.release-claim.outputs.transition_branch }}
+        run: |
+          gh pr create --base main --head "$TRANSITION_BRANCH" --title "chore(release): claim exact publish plan" --body "Credential-free plan-only transition. Review and squash-merge this PR to start the exact artifact-bound publish run."
+
+  publish:
+    needs: prepare
+    if: needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout exact pushed claim
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.claim_head }}
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Recheck exact reviewed claim authority
+        env:
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
+
+      - name: Download exact claimed artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ needs.prepare.outputs.artifact_name }}
+          path: ${{ runner.temp }}/hua-release-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.prepare.outputs.artifact_run_id }}
+
+      - name: Publish immutable verified tarballs
+        id: safe-publish
+        env:
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HUA_RELEASE_ARTIFACT_MANIFEST: ${{ runner.temp }}/hua-release-artifacts/release-artifacts.json
+          HUA_RELEASE_BRANCH: ${{ github.ref_name }}
+          HUA_RELEASE_RUN_ID: ${{ needs.prepare.outputs.artifact_run_id }}
+          HUA_RELEASE_SOURCE_HEAD: ${{ needs.prepare.outputs.source_head }}
+          HUA_RELEASE_CLAIM_HEAD: ${{ needs.prepare.outputs.claim_head }}
+        run: |
+          set -euo pipefail
+          npmrc="$RUNNER_TEMP/hua-release.npmrc"
+          cleanup() { rm -f "$npmrc"; }
+          trap cleanup EXIT
+          umask 077
+          printf '%s\n' "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" "registry=https://registry.npmjs.org/" "provenance=true" > "$npmrc"
+          published="$RUNNER_TEMP/hua-published-packages.json"
+          # safe-release invokes npm publish <artifactPath> --ignore-scripts.
+          NPM_CONFIG_USERCONFIG="$npmrc" node scripts/safe-release.mjs publish > "$published"
+          test -s "$published"
+          rm -f "$npmrc"
+          trap - EXIT
+          test ! -e "$npmrc"
+          echo "published_path=$published" >> "$GITHUB_OUTPUT"
+
+      - name: Upload sanitized exact published set
+        uses: actions/upload-artifact@v4
+        with:
+          name: hua-published-${{ github.run_id }}
+          path: ${{ steps.safe-publish.outputs.published_path }}
+          if-no-files-found: error
+          retention-days: 1
+
+  close:
+    needs: [prepare, publish]
+    if: needs.prepare.outputs.claimed == 'true' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout exact pushed claim for credential-free closure
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.claim_head }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Recheck exact reviewed claim authority for closure
+        env:
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
+
+      - name: Download sanitized exact published set
+        uses: actions/download-artifact@v5
+        with:
+          name: hua-published-${{ github.run_id }}
+          path: ${{ runner.temp }}/hua-published
+
+      - name: Check exact published-set npm provenance and close exact published plan
+        id: release-close
+        run: node scripts/check-npm-provenance.mjs --published "$RUNNER_TEMP/hua-published/hua-published-packages.json" --close-plan --persist-head "${{ needs.prepare.outputs.claim_head }}" --source-head "${{ needs.prepare.outputs.source_head }}" --branch "$GITHUB_REF_NAME" --run-id "${{ needs.prepare.outputs.artifact_run_id }}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate reviewed empty-plan transition
+        run: node scripts/safe-release.mjs check --format=github --allow-empty
+
+      - name: Open reviewed closure transition PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRANSITION_BRANCH: ${{ steps.release-close.outputs.transition_branch }}
+        run: |
+          gh pr create --base main --head "$TRANSITION_BRANCH" --title "chore(release): close exact published plan" --body "Provenance-verified plan-only transition. Review and squash-merge this PR to restore empty release authority; its follow-up run has publish and npm-token authority disabled."
