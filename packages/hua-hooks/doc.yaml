@@ -22,8 +22,10 @@ quickStart: |
     );
   }
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
-  - "hua"
   - "ui"
 
 apiNotes:

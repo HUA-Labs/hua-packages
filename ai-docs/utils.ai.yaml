@@ -8,7 +8,7 @@ package:
   description: "Common utility functions for the hua ecosystem"
   license: "MIT"
 
-overview: "A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions."
+overview: "A utility library for the hua ecosystem. Includes Tailwind-aware class merging, formatters, async helpers, validation, string manipulation, and bounded input-cleanup helpers."
 
 exports:
   main:
@@ -94,7 +94,7 @@ exports:
         description: "Capitalize the first character of every word in a string."
       - name: "sanitizeInput"
         type: "function"
-        description: "XSS prevention input sanitizer"
+        description: "Basic UI input cleanup that removes HTML tags and selected dangerous patterns; not a security boundary."
       - name: "sanitizeTitle"
         type: "function"
         description: "Sanitize a title string — removes HTML tags and dangerous patterns, enforces optional maxLength (default: 100)."
@@ -106,7 +106,7 @@ exports:
         description: "Sanitize a name string — removes HTML tags and XSS patterns."
       - name: "escapeHtml"
         type: "function"
-        description: "Escape HTML special characters (&, <, >, ", '). Intended for email body rendering, not general React output."
+        description: "Escape ampersands, angle brackets, quotation marks, and apostrophes for HTML text. Intended for email body rendering, not general React output."
       - name: "maskEmailForLog"
         type: "function"
         description: "Mask an email address for safe logging (GDPR/CCPA). Shows only the first N local-part characters (default: 3), e.g. 'use***@***'."
@@ -117,10 +117,9 @@ features:
   - "Performance — debounce, throttle, memoize, delay, retry"
   - "Validation — Email, password, URL, phone number, range checks"
   - "String utils — UUID, slugify, truncate, case conversion (camel/pascal/snake/kebab)"
-  - "Sanitization — XSS prevention, HTML escaping, email masking"
+  - "Input cleanup — Basic tag/pattern removal, HTML escaping, and email masking; not a security boundary"
 
 related_packages:
-  - "@hua-labs/hua"
   - "@hua-labs/hooks"
 
 compatibility:

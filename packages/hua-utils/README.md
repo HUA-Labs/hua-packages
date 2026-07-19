@@ -1,6 +1,6 @@
 # @hua-labs/utils
 
-A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions.
+A utility library for the hua ecosystem. Includes Tailwind-aware class merging, formatters, async helpers, validation, string manipulation, and bounded input-cleanup helpers.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/utils.svg)](https://www.npmjs.com/package/@hua-labs/utils)
@@ -15,7 +15,7 @@ A comprehensive utility library for the hua ecosystem. Includes class name mergi
 - **Performance — debounce, throttle, memoize, delay, retry**
 - **Validation — Email, password, URL, phone number, range checks**
 - **String utils — UUID, slugify, truncate, case conversion (camel/pascal/snake/kebab)**
-- **Sanitization — XSS prevention, HTML escaping, email masking**
+- **Input cleanup — Basic tag/pattern removal, HTML escaping, and email masking; not a security boundary**
 
 ## Installation
 
@@ -41,7 +41,7 @@ const debouncedSearch = debounce(search, 300);
 
 // Validation & sanitization
 validateEmail('test@example.com'); // true
-sanitizeInput('<script>alert("xss")</script>'); // safe string
+sanitizeInput('<b>Hello</b>'); // "Hello"
 
 ```
 
@@ -75,16 +75,19 @@ sanitizeInput('<script>alert("xss")</script>'); // safe string
 | `toKebabCase` | function | Convert a string to kebab-case. |
 | `capitalize` | function | Capitalize the first character and lowercase the rest of a string. |
 | `titleCase` | function | Capitalize the first character of every word in a string. |
-| `sanitizeInput` | function | XSS prevention input sanitizer |
+| `sanitizeInput` | function | Basic UI input cleanup that removes HTML tags and selected dangerous patterns; not a security boundary. |
 | `sanitizeTitle` | function | Sanitize a title string — removes HTML tags and dangerous patterns, enforces optional maxLength (default: 100). |
 | `sanitizeEmail` | function | Sanitize an email address — trims whitespace and lowercases. |
 | `sanitizeName` | function | Sanitize a name string — removes HTML tags and XSS patterns. |
-| `escapeHtml` | function | Escape HTML special characters (&, <, >, ", '). Intended for email body rendering, not general React output. |
+| `escapeHtml` | function | Escape ampersands, angle brackets, quotation marks, and apostrophes for HTML text. Intended for email body rendering, not general React output. |
 | `maskEmailForLog` | function | Mask an email address for safe logging (GDPR/CCPA). Shows only the first N local-part characters (default: 3), e.g. 'use***@***'. |
+
+## Documentation
+
+- [Detailed Guide](./DETAILED_GUIDE.md)
 
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
 - [`@hua-labs/hooks`](https://www.npmjs.com/package/@hua-labs/hooks)
 
 ## License

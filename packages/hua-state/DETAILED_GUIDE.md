@@ -1,9 +1,9 @@
 # @hua-labs/state Detailed Guide
 
-`@hua-labs/state` wraps Zustand with defaults for React applications that need
-typed stores, optional persistence, SSR-aware hydration, and a small i18n store
+`@hua-labs/state` wraps Zustand for React applications that need typed stores,
+optional persistence, persistence-rehydration status, and a small i18n store
 integration. It is useful when you want Zustand's direct store model but do not
-want every application to repeat the same hydration and persistence glue.
+want every application to repeat the same persistence glue.
 
 ---
 
@@ -18,7 +18,7 @@ React 19, React DOM 19, and Zustand 5 are peer dependencies.
 ## Create A Store
 
 Use `createHuaStore` the same way you would define a Zustand store, then opt in
-to persistence or SSR behavior through the config object.
+to persistence through the config object.
 
 ```tsx
 import { createHuaStore } from "@hua-labs/state";
@@ -36,7 +36,6 @@ export const useAppStore = createHuaStore<AppState>(
   {
     persist: true,
     persistKey: "app-storage",
-    ssr: true,
     partialize: (state) => ({ theme: state.theme }),
   },
 );
@@ -65,8 +64,9 @@ Use selectors to keep components subscribed only to the state they render.
 ## Persistence And Hydration
 
 When `persist` is enabled, the store writes selected state to `localStorage`.
-When `ssr` is enabled, the helpers avoid treating server-rendered output as
-fully hydrated before the browser storage pass completes.
+The `ssr` option is accepted for compatibility but currently has no runtime effect.
+Do not use it as a server-rendering or hydration guarantee. Instead, use the
+rehydration helpers below when UI must wait for Zustand persistence to finish.
 
 The package exports helpers for hydration-sensitive UI. These helpers are keyed
 by the store's `persistKey` string:
@@ -137,4 +137,4 @@ that interface.
 `@hua-labs/state` does not replace application architecture. Keep domain data,
 server cache, routing state, and form libraries in their appropriate tools. Use
 this package for compact client-side state that benefits from Zustand,
-persistence, and SSR hydration helpers.
+persistence, and explicit persistence-rehydration status.
