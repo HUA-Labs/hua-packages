@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { execFileSync } = require("node:child_process");
+const { execFileSync, spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -11,6 +11,19 @@ if (tarballs.length === 0) {
     "Usage: node scripts/check-pack-artifacts.js <package.tgz> [...package.tgz]",
   );
   process.exit(2);
+}
+
+const authorityChecker = path.join(__dirname, "check-ui-source-authority.mjs");
+const authorityResult = spawnSync(process.execPath, [authorityChecker], {
+  cwd: path.join(__dirname, ".."),
+  encoding: "utf8",
+});
+
+if (authorityResult.status !== 0) {
+  process.stdout.write(authorityResult.stdout || "");
+  process.stderr.write(authorityResult.stderr || "");
+  console.error("Pack artifact check blocked by UI source authority.");
+  process.exit(1);
 }
 
 const allowedSourcePayloads = new Map([

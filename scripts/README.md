@@ -22,23 +22,45 @@ monorepo state.
 
 ## Release Helpers
 
-| Script                       | Purpose                                                                                                           |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `check-pack-artifacts.js`    | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload. |
-| `check-publish-allowlist.js` | Validate the versioned platform-policy projection against every workspace manifest.                               |
-| `safe-release.mjs preflight` | Classify plan state while admitting only bounded same-version eligible drift for an empty snapshot.               |
-| `safe-release.mjs authority` | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.   |
-| `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
-| `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
-| `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
-| `safe-release.mjs pack`      | Build, pack, inspect, and hash every exact planned package into one external immutable artifact bundle.           |
-| `safe-release.mjs claim`     | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.     |
-| `safe-release.mjs publish`   | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                 |
-| `check-npm-provenance.mjs`   | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                 |
-| `prepare-publish.js`         | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.         |
-| `restore-workspace.js`       | Restore `workspace:` dependencies after manual publish preparation.                                               |
+| Script                          | Purpose                                                                                                               |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `check-ui-source-authority.mjs` | Validate the opaque platform/public HUA UI path map and fail closed on unmapped or disposition-breaking source drift. |
+| `check-pack-artifacts.js`       | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload.     |
+| `check-publish-allowlist.js`    | Validate the versioned platform-policy projection against every workspace manifest.                                   |
+| `safe-release.mjs preflight`    | Classify plan state while admitting only bounded same-version eligible drift for an empty snapshot.                   |
+| `safe-release.mjs authority`    | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.       |
+| `safe-release.mjs refresh`      | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                    |
+| `safe-release.mjs version`      | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                       |
+| `safe-release.mjs check`        | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.         |
+| `safe-release.mjs pack`         | Build, pack, inspect, and hash every exact planned package into one external immutable artifact bundle.               |
+| `safe-release.mjs claim`        | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.         |
+| `safe-release.mjs publish`      | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                     |
+| `check-npm-provenance.mjs`      | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                     |
+| `prepare-publish.js`            | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.             |
+| `restore-workspace.js`          | Restore `workspace:` dependencies after manual publish preparation.                                                   |
 
 ## Safe release boundary
+
+`config/ui-source-authority.json` is the deterministic path-level boundary for
+the reviewed HUA UI source synchronization train. It stores no repository slug,
+host path, owner identity, credential, or release selection. Instead it binds
+opaque source and public-base commits/trees plus every currently different UI
+source path, its exact byte hashes, and one disposition:
+`platform-exact`, `public-preserved`, `derived-reviewed`, or `deferred`.
+Canonical ordering, exact keys, duplicate/unknown paths, map digests, current
+worktree bytes, and public-base Git objects fail closed. The checker uses a
+fixed Git executable with a minimal process environment, requires the complete
+tracked UI source manifest to match HEAD and an ordinary stage-zero index, and
+hashes every tracked raw worktree file rather than trusting index stat hints.
+Authority-tree presence, bounded blob size, bounded content read, and absence
+are distinct outcomes; a failed or oversized blob read cannot become nullable
+absence. A reviewer with the exact source repository may additionally pass
+`--source-repo <path>` to verify the source commit/tree/blobs and prove the
+150-row difference set is complete.
+The pack-artifact checker always runs the current public-side gate first, so a
+source sync cannot reach immutable tarball evidence with an unreviewed byte or
+an unupdated disposition. This authority map is verification evidence only: it
+does not select a version, Changeset, npm package, credential, or publication.
 
 `config/publish-allowlist.json` is a checked projection of the exact HUA
 platform release-intent authority. It records policy, not npm visibility.
