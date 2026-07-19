@@ -290,16 +290,7 @@ function githubAuthorityFixture(transition = githubTransition()) {
       allow_force_pushes: { enabled: false },
       allow_deletions: { enabled: false },
     },
-    rules: [
-      {
-        type: "pull_request",
-        parameters: {
-          dismiss_stale_reviews_on_push: true,
-          require_last_push_approval: true,
-          required_approving_review_count: 1,
-        },
-      },
-    ],
+    rules: [],
     rulesets: [],
     actions: {
       default_workflow_permissions: "write",
@@ -1134,6 +1125,7 @@ test("workflow routes claim and closure through reviewed protected-main transiti
   assert.match(source, /const GITHUB_CLI = "\/usr\/bin\/gh"/);
   assert.match(source, /process\.env\.HUA_GITHUB_POLICY_TOKEN/);
   assert.doesNotMatch(source, /process\.env\.GITHUB_TOKEN/);
+  assert.doesNotMatch(source, /rulesets\/\$\{summary\.id\}/);
   const documentation = readFileSync(
     join(CURRENT_ROOT, "scripts/README.md"),
     "utf8",
@@ -1148,15 +1140,32 @@ test("workflow routes claim and closure through reviewed protected-main transiti
   );
   assert.match(
     documentation,
-    /ordinary workflow `GITHUB_TOKEN` is never accepted/,
+    /ordinary workflow\s+`GITHUB_TOKEN` is never accepted/,
   );
+  assert.match(documentation, /Administration\(read\)/);
+  assert.match(
+    documentation,
+    /effective branch rules[\s\S]+?ruleset summaries[\s\S]+?exactly empty/,
+  );
+  assert.match(documentation, /avoids granting Administration\(write\)/);
 });
 
 test("GitHub release authority fails closed before OIDC or publish on every unreviewed boundary", async (t) => {
   const transition = githubTransition("claim");
   const cases = [
     ["absent protection", (value) => (value.protection = null)],
-    ["absent effective rules", (value) => (value.rules = [])],
+    [
+      "effective ruleset rule present",
+      (value) =>
+        value.rules.push({
+          type: "pull_request",
+          parameters: {
+            dismiss_stale_reviews_on_push: true,
+            require_last_push_approval: true,
+            required_approving_review_count: 1,
+          },
+        }),
+    ],
     [
       "classic bypass actor",
       (value) =>
@@ -1169,29 +1178,29 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
       (value) => (value.protection.enforce_admins.enabled = false),
     ],
     [
-      "ruleset bypass actor",
+      "repository ruleset summary present",
       (value) =>
         value.rulesets.push({
           id: 9,
           enforcement: "active",
-          bypass_actors: [{ actor_type: "Integration", actor_id: 4 }],
+          bypass_actors: [],
         }),
     ],
     [
-      "ruleset bypass authority omitted",
+      "parent ruleset summary present",
       (value) =>
         value.rulesets.push({
           id: 10,
           enforcement: "active",
+          source_type: "Organization",
         }),
     ],
     [
-      "ruleset bypass authority malformed",
+      "malformed ruleset summary present",
       (value) =>
         value.rulesets.push({
           id: 11,
-          enforcement: "active",
-          bypass_actors: null,
+          enforcement: null,
         }),
     ],
     [

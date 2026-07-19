@@ -1667,37 +1667,8 @@ function validateExternalPolicy(authority) {
   externalBooleanField(protection, "allow_force_pushes", false);
   externalBooleanField(protection, "allow_deletions", false);
 
-  const effectiveRules = externalArray(authority.rules);
-  externalPolicyAssert(effectiveRules.length > 0);
-  const pullRequestRules = effectiveRules.filter(
-    (rule) => externalRecord(rule).type === "pull_request",
-  );
-  externalPolicyAssert(pullRequestRules.length > 0);
-  externalPolicyAssert(
-    pullRequestRules.some((rule) => {
-      const parameters = externalRecord(rule.parameters);
-      return (
-        parameters.dismiss_stale_reviews_on_push === true &&
-        parameters.require_last_push_approval === true &&
-        Number.isSafeInteger(parameters.required_approving_review_count) &&
-        parameters.required_approving_review_count >= 1
-      );
-    }),
-  );
-
-  const rulesetIds = new Set();
-  for (const rulesetValue of externalArray(authority.rulesets)) {
-    const ruleset = externalRecord(rulesetValue);
-    externalPolicyAssert(Number.isSafeInteger(ruleset.id) && ruleset.id > 0);
-    externalPolicyAssert(!rulesetIds.has(ruleset.id));
-    rulesetIds.add(ruleset.id);
-    externalPolicyAssert(
-      ruleset.enforcement === "active" ||
-        ruleset.enforcement === "evaluate" ||
-        ruleset.enforcement === "disabled",
-    );
-    externalPolicyAssert(externalArray(ruleset.bypass_actors).length === 0);
-  }
+  externalPolicyAssert(externalArray(authority.rules).length === 0);
+  externalPolicyAssert(externalArray(authority.rulesets).length === 0);
 
   const actions = externalRecord(authority.actions);
   externalPolicyAssert(
@@ -1866,22 +1837,13 @@ function readGitHubReleaseAuthority(options, transition) {
     token,
     `repos/${repository}/rules/branches/main`,
   );
-  const rulesetSummaries = githubApiJson(
+  const rulesets = githubApiJson(
     execFile,
     token,
     `repos/${repository}/rulesets?includes_parents=true&per_page=100`,
   );
-  externalPolicyAssert(Array.isArray(rulesetSummaries));
-  externalPolicyAssert(rulesetSummaries.length < 100);
-  const rulesets = rulesetSummaries.map((summaryValue) => {
-    const summary = externalRecord(summaryValue);
-    externalPolicyAssert(Number.isSafeInteger(summary.id) && summary.id > 0);
-    return githubApiJson(
-      execFile,
-      token,
-      `repos/${repository}/rulesets/${summary.id}`,
-    );
-  });
+  externalPolicyAssert(Array.isArray(rulesets));
+  externalPolicyAssert(rulesets.length < 100);
   const actions = githubApiJson(
     execFile,
     token,

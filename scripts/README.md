@@ -77,15 +77,21 @@ reject empty release authority.
 The prepare job has neither npm credentials nor OIDC `id-token` authority.
 Release-bearing states use only the separately provisioned
 `HUA_GITHUB_POLICY_TOKEN` for bounded reads of the exact public repository's
-`main` protection, effective rules, complete ruleset bypass authority, Actions
-review setting, and, when applicable, the one merged claim or closure PR. The
-ordinary workflow `GITHUB_TOKEN` is never accepted as this policy credential.
-The source invokes fixed `/usr/bin/gh`, bounds every JSON response, reports a
-missing dedicated credential as exact `policy-credential-unavailable`,
-collapses unauthorized, malformed, partial, or inconsistent API authority to
-exact `external-policy-blocked`, and rechecks remote `main` before and after
-the read. An omitted ruleset `bypass_actors` field is unknown and fails closed;
-no API error or incomplete response becomes an empty allowlist. For
+classic `main` branch protection, effective branch rules, repository/parent
+ruleset summaries, the Actions review setting, and, when applicable, the one
+merged claim or closure PR. This v1 positive path requires Administration(read)
+plus the additional read permissions needed for PR association, review, head,
+and tree facts. Both effective branch rules and repository/parent ruleset
+summaries must be exactly empty; any ruleset presence is unsupported and fails
+closed. This avoids granting Administration(write) merely to observe the
+intentionally omitted ruleset `bypass_actors` field. Supporting rulesets later
+requires a separate reviewed authorization lane. The ordinary workflow
+`GITHUB_TOKEN` is never accepted as this policy credential. The source invokes
+fixed `/usr/bin/gh`, bounds every JSON response, reports a missing dedicated
+credential as exact `policy-credential-unavailable`, collapses unauthorized,
+malformed, partial, or inconsistent API authority to exact
+`external-policy-blocked`, and rechecks remote `main` before and after the read.
+No API error or incomplete response becomes an empty allowlist. For
 an exact planned set it builds every selected package, including an unscoped
 package such as `create-hua` when explicitly selected, packs each package into
 a caller-owned external directory, and runs `check-pack-artifacts.js` against
@@ -203,12 +209,14 @@ dispatch was executed while implementing or testing this contract.
 The later policy-credential RED proved that the ordinary workflow
 `GITHUB_TOKEN` cannot establish the Administration- and ruleset-level facts
 required by this contract. The source no longer falls back to that token. A
-missing `HUA_GITHUB_POLICY_TOKEN`, a 403 response, an omitted bypass field, or a
-partial policy response fails closed before every privileged release action.
-Preflight skips that unavailable external credential only for an ordinary
-empty plan; planned, publishing, and exact closure-transition states require it.
-No policy secret or GitHub App was provisioned, read, rotated, or configured by
-this source change.
+missing `HUA_GITHUB_POLICY_TOKEN`, a 403 response, any effective rule or
+ruleset summary, or a partial policy response fails closed before every
+privileged release action. The positive v1 contract derives bypass authority
+only from classic protection's exact empty user/team/app allowances and does
+not fetch ruleset details. Preflight skips that unavailable external credential
+only for an ordinary empty plan; planned, publishing, and exact
+closure-transition states require it. No policy secret or GitHub App was
+provisioned, read, rotated, or configured by this source change.
 
 The GitHub authority fixtures prove only the future protected/reviewed source
 contract. They are not current live GitHub authority and do not establish
@@ -222,9 +230,10 @@ authorizes both the repository settings change and least-privilege policy
 credential provisioning, then tower verifies active PR-required protection,
 at least one exact-head approval from a GitHub identity distinct from the PR
 author, stale-review dismissal, last-push approval, administrator enforcement,
-zero classic/ruleset/Actions bypass, Actions review approval disabled, and the
-credential's ability to read every required authority field. Shared agent
-display names and tap review artifacts are not GitHub approval authority.
+zero classic bypass allowance, effective branch rules and repository/parent
+ruleset summaries exactly empty, Actions review approval disabled, and the
+read-only credential's ability to read every required authority field. Shared
+agent display names and tap review artifacts are not GitHub approval authority.
 Source tests intentionally keep the positive protected state synthetic and
 require every live-negative shape to admit zero privileged release actions.
 
