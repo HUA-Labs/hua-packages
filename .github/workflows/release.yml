@@ -40,11 +40,6 @@ jobs:
           node-version: "24"
           cache: "pnpm"
 
-      - name: Check current GitHub release authority
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/safe-release.mjs authority --format=github
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -57,6 +52,12 @@ jobs:
       - name: Read durable release plan state
         id: plan-preflight
         run: pnpm --silent safe-release:preflight >> "$GITHUB_OUTPUT"
+
+      - name: Check current GitHub release authority
+        if: steps.plan-preflight.outputs.authority_required == 'true'
+        env:
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
 
       - name: Refresh verified empty release snapshot
         if: steps.plan-preflight.outputs.status == 'empty'
@@ -131,7 +132,7 @@ jobs:
 
       - name: Recheck exact reviewed claim authority
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download exact claimed artifacts
@@ -145,7 +146,7 @@ jobs:
       - name: Publish immutable verified tarballs
         id: safe-publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           HUA_RELEASE_ARTIFACT_MANIFEST: ${{ runner.temp }}/hua-release-artifacts/release-artifacts.json
           HUA_RELEASE_BRANCH: ${{ github.ref_name }}
@@ -198,7 +199,7 @@ jobs:
 
       - name: Recheck exact reviewed claim authority for closure
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUA_GITHUB_POLICY_TOKEN: ${{ secrets.HUA_GITHUB_POLICY_TOKEN }}
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download sanitized exact published set

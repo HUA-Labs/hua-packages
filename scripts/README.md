@@ -57,28 +57,35 @@ source/manifest sync plus a new Changeset enter `version` without weakening the
 planned-plan check. A planned plan remains manifest-exact in `check` and cannot
 publish directly.
 
-The ordinary main-push path is intentionally token-free while it creates or
-updates a version PR. Its dedicated preflight classifies exact `empty`,
-`planned`, and `publishing` states before refresh. Only an exact empty plan may
-admit same-version manifest-byte drift, and only for policy-eligible packages;
-policy, roster, identity, version, plan digest, and canonical-byte authority
-remain exact. The following credential-free refresh binds those reviewed
-manifest bytes before Changesets status/version executes. A merged version PR
-is already `planned`, so preflight remains manifest-exact, skips refresh and
-the Changesets action, and proceeds to exact plan validation.
+The ordinary empty-plan main-push path does not require the external policy
+credential while it creates or updates a version PR. Its dedicated preflight
+classifies exact `empty`, `planned`, and `publishing` states and detects an
+exact publishing-to-empty closure transition before refresh. Only an ordinary
+exact empty plan may admit same-version manifest-byte drift, and only for
+policy-eligible packages; policy, roster, identity, version, plan digest, and
+canonical-byte authority remain exact. The following credential-free refresh
+binds those reviewed manifest bytes before Changesets status/version executes.
+A merged version PR is already `planned`, and a reviewed closure merge is an
+external-policy-bearing transition, so both require the policy gate before any
+artifact, claim, OIDC, publish, or closure admission. A planned plan remains
+manifest-exact, skips refresh and the Changesets action, and proceeds to exact
+plan validation only after that gate.
 Its explicit `check --format=github --allow-empty` lane classifies an exact
 empty plan only as `publish=false`; ordinary `check`, `version`, and `publish`
 reject empty release authority.
 
-The prepare job has neither npm credentials nor OIDC `id-token` authority. Its
-first source gate uses the existing GitHub control-plane token only for bounded
-reads of the exact public repository's `main` protection, effective rules,
-rulesets, Actions review setting, and, when applicable, the one merged claim or
-closure PR. The source invokes fixed `/usr/bin/gh`, bounds every JSON response,
-collapses missing, unauthorized, malformed, or inconsistent API authority to
-exact `external-policy-blocked`, and rechecks remote `main` before and after the
-read. It never treats an API error or incomplete response as an empty
-allowlist. For
+The prepare job has neither npm credentials nor OIDC `id-token` authority.
+Release-bearing states use only the separately provisioned
+`HUA_GITHUB_POLICY_TOKEN` for bounded reads of the exact public repository's
+`main` protection, effective rules, complete ruleset bypass authority, Actions
+review setting, and, when applicable, the one merged claim or closure PR. The
+ordinary workflow `GITHUB_TOKEN` is never accepted as this policy credential.
+The source invokes fixed `/usr/bin/gh`, bounds every JSON response, reports a
+missing dedicated credential as exact `policy-credential-unavailable`,
+collapses unauthorized, malformed, partial, or inconsistent API authority to
+exact `external-policy-blocked`, and rechecks remote `main` before and after
+the read. An omitted ruleset `bypass_actors` field is unknown and fails closed;
+no API error or incomplete response becomes an empty allowlist. For
 an exact planned set it builds every selected package, including an unscoped
 package such as `create-hua` when explicitly selected, packs each package into
 a caller-owned external directory, and runs `check-pack-artifacts.js` against
@@ -193,19 +200,33 @@ into the durable claim; and publishes only reverified tarballs with lifecycle
 scripts disabled. No npm query, publish, token use, OIDC request, or workflow
 dispatch was executed while implementing or testing this contract.
 
+The later policy-credential RED proved that the ordinary workflow
+`GITHUB_TOKEN` cannot establish the Administration- and ruleset-level facts
+required by this contract. The source no longer falls back to that token. A
+missing `HUA_GITHUB_POLICY_TOKEN`, a 403 response, an omitted bypass field, or a
+partial policy response fails closed before every privileged release action.
+Preflight skips that unavailable external credential only for an ordinary
+empty plan; planned, publishing, and exact closure-transition states require it.
+No policy secret or GitHub App was provisioned, read, rotated, or configured by
+this source change.
+
 The GitHub authority fixtures prove only the future protected/reviewed source
 contract. They are not current live GitHub authority and do not establish
 release readiness. Tower's pre-freeze readback found `main` protection absent,
-effective branch rules empty, and Actions review approval enabled. Therefore
-the real `authority` command currently stops at exact
-`external-policy-blocked`, before OIDC or publish admission. Live release stays
-HOLD until Devin separately authorizes the repository settings change and
-tower verifies active PR-required protection, at least one exact-head approval,
-stale-review dismissal, last-push approval, administrator enforcement, zero
-classic/ruleset/Actions bypass, Actions review approval disabled, and the
-workflow token's ability to read that authority. Source tests intentionally
-keep the positive protected state synthetic and require every live-negative
-shape to admit zero OIDC starts and zero publish calls.
+effective branch rules empty, Actions review approval enabled, and no
+separately provisioned policy credential. Therefore a release-bearing live
+path currently stops at exact `policy-credential-unavailable` or
+`external-policy-blocked`, before artifact download, claim, OIDC, npm auth,
+publish, or closure admission. Live release stays HOLD until Devin separately
+authorizes both the repository settings change and least-privilege policy
+credential provisioning, then tower verifies active PR-required protection,
+at least one exact-head approval from a GitHub identity distinct from the PR
+author, stale-review dismissal, last-push approval, administrator enforcement,
+zero classic/ruleset/Actions bypass, Actions review approval disabled, and the
+credential's ability to read every required authority field. Shared agent
+display names and tap review artifacts are not GitHub approval authority.
+Source tests intentionally keep the positive protected state synthetic and
+require every live-negative shape to admit zero privileged release actions.
 
 ## Manual Analysis
 

@@ -966,7 +966,22 @@ export function runPreflight(options = {}) {
     (snapshot, index) =>
       snapshot.sha256 !== releaseState.manifests[index].sha256,
   );
-  return { ...releaseState, refreshRequired };
+  let authorityRequired = releaseState.plan.status !== "empty";
+  if (!authorityRequired && options.execFile !== undefined) {
+    const currentHead = gitOutput(options.execFile, root, [
+      "rev-parse",
+      "HEAD",
+    ]);
+    externalPolicyAssert(GIT_SHA_PATTERN.test(currentHead));
+    authorityRequired =
+      detectReviewedTransition(
+        options.execFile,
+        root,
+        releaseState,
+        currentHead,
+      )?.kind === "close";
+  }
+  return { ...releaseState, authorityRequired, refreshRequired };
 }
 
 export function runCheck(options = {}) {
@@ -1836,7 +1851,10 @@ function githubApiJson(execFile, token, endpoint) {
 
 function readGitHubReleaseAuthority(options, transition) {
   const execFile = options.githubExecFile ?? execFileSync;
-  const token = options.githubToken ?? process.env.GITHUB_TOKEN;
+  const token = options.policyToken ?? process.env.HUA_GITHUB_POLICY_TOKEN;
+  if (typeof token !== "string" || token.length === 0) {
+    fail("policy-credential-unavailable");
+  }
   const repository = RELEASE_REPOSITORY;
   const protection = githubApiJson(
     execFile,
@@ -1994,7 +2012,8 @@ export function runAuthority(options = {}) {
     const result = validateGitHubReleaseAuthority(authority, transition);
     assertRemoteHead(execFile, root, "main", currentHead);
     return result;
-  } catch {
+  } catch (error) {
+    if (error?.code === "policy-credential-unavailable") throw error;
     fail("external-policy-blocked");
   }
 }
@@ -2434,7 +2453,7 @@ export function runPublish(options = {}) {
     execFile: gitExecFile,
     githubAuthority: options.githubAuthority,
     githubExecFile: options.githubExecFile,
-    githubToken: options.githubToken,
+    policyToken: options.policyToken,
   });
   const bundle = readArtifactBundle({
     root,
@@ -2589,15 +2608,16 @@ export function main(argv = process.argv.slice(2), options = {}) {
     return;
   }
   if (mode === "preflight") {
-    const state = runPreflight({ root });
+    const state = runPreflight({ root, execFile });
     if (format === "github") {
       process.stdout.write(
-        `status=${state.plan.status}\nrefresh_required=${state.refreshRequired}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
+        `status=${state.plan.status}\nauthority_required=${state.authorityRequired}\nrefresh_required=${state.refreshRequired}\nrelease_count=${state.plan.releases.length}\nplan_digest=${state.plan.planDigest}\n`,
       );
     } else {
       process.stdout.write(
         JSON.stringify({
           status: state.plan.status,
+          authorityRequired: state.authorityRequired,
           refreshRequired: state.refreshRequired,
           releaseCount: state.plan.releases.length,
           planDigest: state.plan.planDigest,
@@ -2612,7 +2632,7 @@ export function main(argv = process.argv.slice(2), options = {}) {
       execFile,
       githubAuthority: options.githubAuthority,
       githubExecFile: options.githubExecFile,
-      githubToken: options.githubToken,
+      policyToken: options.policyToken,
     });
     if (format === "github") {
       process.stdout.write(

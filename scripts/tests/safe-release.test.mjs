@@ -938,6 +938,7 @@ test("credential-free preflight admits only bounded empty manifest drift before 
     const preflight = runPreflight({ root: fixture.root });
     assert.equal(preflight.plan.status, "empty");
     assert.equal(preflight.refreshRequired, true);
+    assert.equal(preflight.authorityRequired, false);
     const refreshed = runRefresh({ root: fixture.root });
     assert.equal(refreshed.status, "empty");
     assert.equal(runPreflight({ root: fixture.root }).refreshRequired, false);
@@ -945,6 +946,50 @@ test("credential-free preflight admits only bounded empty manifest drift before 
   } finally {
     fixture.cleanup();
   }
+});
+
+test("preflight requires external policy only for release-bearing and closure states", (t) => {
+  const emptyFixture = makeFixture();
+  t.after(() => emptyFixture.cleanup());
+  assert.equal(
+    runPreflight({ root: emptyFixture.root }).authorityRequired,
+    false,
+  );
+
+  const plannedFixture = createPlannedFixture();
+  t.after(() => plannedFixture.cleanup());
+  assert.equal(
+    runPreflight({ root: plannedFixture.root }).authorityRequired,
+    true,
+  );
+
+  const publishingFixture = createPublishingFixture();
+  t.after(() => publishingFixture.cleanup());
+  assert.equal(
+    runPreflight({ root: publishingFixture.root }).authorityRequired,
+    true,
+  );
+
+  const initialized = initializeGitFixture(
+    t,
+    createPublishingFixture(),
+    "seed publishing release",
+  );
+  const empty = createEmptyReleasePlan(loadPolicy(initialized.fixture.root));
+  writeFileSync(
+    join(initialized.fixture.root, "config/release-plan.json"),
+    canonicalJson(empty),
+  );
+  git(initialized.fixture.root, ["add", "config/release-plan.json"]);
+  git(initialized.fixture.root, ["commit", "-m", "close exact release plan"]);
+  git(initialized.fixture.root, ["push", "origin", "main"]);
+  assert.equal(
+    runPreflight({
+      root: initialized.fixture.root,
+      execFile: execFileSync,
+    }).authorityRequired,
+    true,
+  );
 });
 
 test("workflow durably claims and closes a published plan without a second publish", () => {
@@ -1002,20 +1047,32 @@ test("workflow routes claim and closure through reviewed protected-main transiti
     "node scripts/safe-release.mjs authority --format=github",
   );
   assert.equal(
-    prepareAuthority.env.GITHUB_TOKEN,
-    "${{ secrets.GITHUB_TOKEN }}",
+    prepareAuthority.env.HUA_GITHUB_POLICY_TOKEN,
+    "${{ secrets.HUA_GITHUB_POLICY_TOKEN }}",
   );
   assert.equal(
-    publishAuthority.env.GITHUB_TOKEN,
-    "${{ secrets.GITHUB_TOKEN }}",
+    publishAuthority.env.HUA_GITHUB_POLICY_TOKEN,
+    "${{ secrets.HUA_GITHUB_POLICY_TOKEN }}",
   );
   assert.equal(
-    closureAuthority.env.GITHUB_TOKEN,
-    "${{ secrets.GITHUB_TOKEN }}",
+    closureAuthority.env.HUA_GITHUB_POLICY_TOKEN,
+    "${{ secrets.HUA_GITHUB_POLICY_TOKEN }}",
+  );
+  assert.equal(
+    prepareAuthority.if,
+    "steps.plan-preflight.outputs.authority_required == 'true'",
+  );
+  assert.ok(
+    prepareSteps.indexOf(prepareAuthority) >
+      prepareSteps.findIndex(
+        (step) => step.name === "Read durable release plan state",
+      ),
   );
   assert.ok(
     prepareSteps.indexOf(prepareAuthority) <
-      prepareSteps.findIndex((step) => step.name === "Install dependencies"),
+      prepareSteps.findIndex(
+        (step) => step.name === "Prepare and verify exact release artifacts",
+      ),
   );
   assert.ok(
     publishSteps.indexOf(publishAuthority) <
@@ -1063,12 +1120,36 @@ test("workflow routes claim and closure through reviewed protected-main transiti
     /gh pr create --base main --head "\$TRANSITION_BRANCH" --title "chore\(release\): close exact published plan"/,
   );
   assert.doesNotMatch(workflow, /gh pr merge|--auto/);
+  assert.doesNotMatch(
+    [prepareAuthority, publishAuthority, closureAuthority]
+      .map((step) => JSON.stringify(step.env))
+      .join("\n"),
+    /GITHUB_TOKEN/,
+  );
   const source = readFileSync(
     join(CURRENT_ROOT, "scripts/safe-release.mjs"),
     "utf8",
   );
   assert.doesNotMatch(source, /committedHead}:refs\/heads\/\$\{branch\}/);
   assert.match(source, /const GITHUB_CLI = "\/usr\/bin\/gh"/);
+  assert.match(source, /process\.env\.HUA_GITHUB_POLICY_TOKEN/);
+  assert.doesNotMatch(source, /process\.env\.GITHUB_TOKEN/);
+  const documentation = readFileSync(
+    join(CURRENT_ROOT, "scripts/README.md"),
+    "utf8",
+  );
+  assert.match(
+    documentation,
+    /separately provisioned[\s\S]+?HUA_GITHUB_POLICY_TOKEN/,
+  );
+  assert.match(
+    documentation,
+    /tap review artifacts are not GitHub approval authority/,
+  );
+  assert.match(
+    documentation,
+    /ordinary workflow `GITHUB_TOKEN` is never accepted/,
+  );
 });
 
 test("GitHub release authority fails closed before OIDC or publish on every unreviewed boundary", async (t) => {
@@ -1095,6 +1176,27 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
           enforcement: "active",
           bypass_actors: [{ actor_type: "Integration", actor_id: 4 }],
         }),
+    ],
+    [
+      "ruleset bypass authority omitted",
+      (value) =>
+        value.rulesets.push({
+          id: 10,
+          enforcement: "active",
+        }),
+    ],
+    [
+      "ruleset bypass authority malformed",
+      (value) =>
+        value.rulesets.push({
+          id: 11,
+          enforcement: "active",
+          bypass_actors: null,
+        }),
+    ],
+    [
+      "partial workflow policy",
+      (value) => delete value.actions.can_approve_pull_request_reviews,
     ],
     [
       "Actions review approval",
@@ -1143,6 +1245,112 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
       assert.equal(publishCalls, 0);
     });
   }
+});
+
+test("missing dedicated policy credential cannot fall back to the workflow token", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const transition = githubTransition("claim");
+  const previousWorkflowToken = process.env.GITHUB_TOKEN;
+  const previousPolicyToken = process.env.HUA_GITHUB_POLICY_TOKEN;
+  process.env.GITHUB_TOKEN = "ambient-workflow-token-must-not-authorize-policy";
+  delete process.env.HUA_GITHUB_POLICY_TOKEN;
+  t.after(() => {
+    if (previousWorkflowToken === undefined) delete process.env.GITHUB_TOKEN;
+    else process.env.GITHUB_TOKEN = previousWorkflowToken;
+    if (previousPolicyToken === undefined) {
+      delete process.env.HUA_GITHUB_POLICY_TOKEN;
+    } else {
+      process.env.HUA_GITHUB_POLICY_TOKEN = previousPolicyToken;
+    }
+  });
+
+  let githubCalls = 0;
+  const privileged = {
+    artifactDownloads: 0,
+    claims: 0,
+    closures: 0,
+    npmAuth: 0,
+    oidc: 0,
+    publishes: 0,
+  };
+  assertCode(() => {
+    runAuthority({
+      root: fixture.root,
+      githubExecFile() {
+        githubCalls += 1;
+        return "{}";
+      },
+      execFile(_file, args) {
+        if (args[0] === "rev-parse" && args[1] === "HEAD") {
+          return `${transition.currentHead}\n`;
+        }
+        if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+          return `${transition.currentTree}\n`;
+        }
+        if (args[0] === "ls-remote") {
+          return `${transition.currentHead}\trefs/heads/main\n`;
+        }
+        if (args[0] === "rev-list") {
+          return `${transition.currentHead} ${transition.baseHead}\n`;
+        }
+        if (args[0] === "diff") return "config/release-plan.json\n";
+        throw new Error("unexpected-git-command");
+      },
+    });
+    privileged.oidc += 1;
+    privileged.artifactDownloads += 1;
+    privileged.npmAuth += 1;
+    privileged.publishes += 1;
+    privileged.claims += 1;
+    privileged.closures += 1;
+  }, "policy-credential-unavailable");
+  assert.equal(githubCalls, 0);
+  assert.deepEqual(privileged, {
+    artifactDownloads: 0,
+    claims: 0,
+    closures: 0,
+    npmAuth: 0,
+    oidc: 0,
+    publishes: 0,
+  });
+});
+
+test("insufficient dedicated policy credential fails as a bounded external block", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const transition = githubTransition("claim");
+  let githubCalls = 0;
+  let privilegedCalls = 0;
+  assertCode(() => {
+    runAuthority({
+      root: fixture.root,
+      policyToken: "separate-policy-token",
+      githubExecFile() {
+        githubCalls += 1;
+        throw new Error("raw 403 administration scope body must not escape");
+      },
+      execFile(_file, args) {
+        if (args[0] === "rev-parse" && args[1] === "HEAD") {
+          return `${transition.currentHead}\n`;
+        }
+        if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+          return `${transition.currentTree}\n`;
+        }
+        if (args[0] === "ls-remote") {
+          return `${transition.currentHead}\trefs/heads/main\n`;
+        }
+        if (args[0] === "rev-list") {
+          return `${transition.currentHead} ${transition.baseHead}\n`;
+        }
+        if (args[0] === "diff") return "config/release-plan.json\n";
+        throw new Error("unexpected-git-command");
+      },
+    });
+    privilegedCalls += 1;
+  }, "external-policy-blocked");
+  assert.equal(githubCalls, 1);
+  assert.equal(privilegedCalls, 0);
 });
 
 test("synthetic protected claim and closure authorities prove contract shape only", () => {
@@ -1240,6 +1448,26 @@ test("direct publish rejects the current unprotected authority before npm", (t) 
   assertCode(() => runPublish(options), "external-policy-blocked");
 });
 
+test("direct publish with no dedicated policy credential reaches no artifact or npm boundary", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  let artifactOrNpmCalls = 0;
+  let githubCalls = 0;
+  const options = publishingOptions(fixture, () => {
+    artifactOrNpmCalls += 1;
+    return "";
+  });
+  delete options.githubAuthority;
+  options.policyToken = "";
+  options.githubExecFile = () => {
+    githubCalls += 1;
+    return "{}";
+  };
+  assertCode(() => runPublish(options), "policy-credential-unavailable");
+  assert.equal(githubCalls, 0);
+  assert.equal(artifactOrNpmCalls, 0);
+});
+
 test("fixed GitHub reader binds the exact policy and transition endpoints", (t) => {
   const fixture = createPublishingFixture();
   t.after(() => fixture.cleanup());
@@ -1276,7 +1504,7 @@ test("fixed GitHub reader binds the exact policy and transition endpoints", (t) 
   const endpoints = [];
   const result = runAuthority({
     root: fixture.root,
-    githubToken: "bounded-test-token",
+    policyToken: "bounded-test-token",
     githubExecFile(file, args, options) {
       assert.equal(file, "/usr/bin/gh");
       assert.equal(options.env.GH_HOST, "github.com");
@@ -1316,7 +1544,7 @@ test("GitHub protection 404 collapses to one bounded blocked result", (t) => {
     () =>
       runAuthority({
         root: fixture.root,
-        githubToken: "bounded-test-token",
+        policyToken: "bounded-test-token",
         githubExecFile() {
           githubCalls += 1;
           throw new Error("raw 404 body must not escape");
