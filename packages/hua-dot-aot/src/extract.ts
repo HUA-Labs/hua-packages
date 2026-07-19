@@ -7,12 +7,12 @@
  *
  * Limitations:
  * - Only extracts calls where the argument is a string literal (no variables/templates)
- * - Calls with breakpoint option are left as runtime (breakpoint is inherently dynamic)
+ * - Only flat literal target/dark options are admitted; every other option shape stays at runtime
  * - dotMap() is not extracted (state variants need runtime)
  */
 
-import { dot } from '@hua-labs/dot';
-import type { DotOptions } from '@hua-labs/dot';
+import { dot } from "@hua-labs/dot";
+import type { DotOptions } from "@hua-labs/dot";
 
 /** A single extraction result */
 export interface ExtractedCall {
@@ -33,7 +33,7 @@ export interface ExtractOptions {
   /** Function names to extract. Default: ['dot'] */
   functionNames?: string[];
   /** Default target for extraction. Default: 'web' */
-  target?: 'web' | 'native' | 'flutter';
+  target?: "web" | "native" | "flutter";
 }
 
 /**
@@ -51,10 +51,12 @@ export interface ExtractOptions {
  *   obj.dot('...') — negative lookbehind blocks [.\w$]
  */
 function buildPattern(fnNames: string[]): RegExp {
-  const names = fnNames.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const names = fnNames
+    .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
   return new RegExp(
-    `(?<![\\w$.])(?:${names})\\(\\s*(['"])([^'"]*)\\1\\s*(?:,\\s*(\\{[^}]*\\}))?\\s*\\)`,
-    'g',
+    `(?<![\\w$.])(?:${names})\\(\\s*(['"])([^'"]*)\\1\\s*(?:,\\s*(\\{[^}]*\\})?)?\\s*\\)`,
+    "g",
   );
 }
 
@@ -68,11 +70,11 @@ function buildPattern(fnNames: string[]): RegExp {
  */
 function isInsideStringOrComment(source: string, matchIndex: number): boolean {
   // Get the line containing the match
-  const lineStart = source.lastIndexOf('\n', matchIndex - 1) + 1;
+  const lineStart = source.lastIndexOf("\n", matchIndex - 1) + 1;
   const beforeMatch = source.slice(lineStart, matchIndex);
 
   // Single-line comment: // appears before match on the same line
-  const commentIdx = beforeMatch.indexOf('//');
+  const commentIdx = beforeMatch.indexOf("//");
   if (commentIdx !== -1) {
     // Make sure the // isn't inside a string on this line
     // Simple check: count quotes before //
@@ -84,8 +86,8 @@ function isInsideStringOrComment(source: string, matchIndex: number): boolean {
 
   // Block comment: last /* before match has no matching */ after it
   const beforeAll = source.slice(0, matchIndex);
-  const lastBlockOpen = beforeAll.lastIndexOf('/*');
-  const lastBlockClose = beforeAll.lastIndexOf('*/');
+  const lastBlockOpen = beforeAll.lastIndexOf("/*");
+  const lastBlockClose = beforeAll.lastIndexOf("*/");
   if (lastBlockOpen > lastBlockClose) return true;
 
   // String literal: odd number of unescaped quotes before match on same line
@@ -93,12 +95,16 @@ function isInsideStringOrComment(source: string, matchIndex: number): boolean {
   let doubleQuotes = 0;
   let backticks = 0;
   for (let i = 0; i < beforeMatch.length; i++) {
-    if (beforeMatch[i] === '\\') { i++; continue; }
+    if (beforeMatch[i] === "\\") {
+      i++;
+      continue;
+    }
     if (beforeMatch[i] === "'") singleQuotes++;
     if (beforeMatch[i] === '"') doubleQuotes++;
-    if (beforeMatch[i] === '`') backticks++;
+    if (beforeMatch[i] === "`") backticks++;
   }
-  if (singleQuotes % 2 !== 0 || doubleQuotes % 2 !== 0 || backticks % 2 !== 0) return true;
+  if (singleQuotes % 2 !== 0 || doubleQuotes % 2 !== 0 || backticks % 2 !== 0)
+    return true;
 
   return false;
 }
@@ -108,31 +114,70 @@ function isInsideStringOrComment(source: string, matchIndex: number): boolean {
 // ---------------------------------------------------------------------------
 
 /** Parsed static options from source code */
-interface ParsedStaticOptions {
-  opts: DotOptions;
-  /** Whether extraction should be skipped (e.g., breakpoint present) */
-  skipExtraction: boolean;
+type ParsedStaticOptions =
+  | {
+      admitted: true;
+      opts: DotOptions;
+    }
+  | {
+      admitted: false;
+    };
+
+const STATIC_TARGETS = new Set(["web", "native", "flutter"]);
+
+function parseStaticOptionKey(value: string): "target" | "dark" | null {
+  if (value === "target" || value === "dark") return value;
+
+  const quoted = value.match(/^(['"])(target|dark)\1$/);
+  return (quoted?.[2] as "target" | "dark" | undefined) ?? null;
 }
 
 /**
- * Try to parse a static options object literal.
- * Only handles simple { key: 'value' } patterns — no expressions.
- *
- * If breakpoint is present, signals to skip extraction (runtime-dependent).
+ * Parse the exact flat object-literal subset that the heuristic extractor can
+ * prove without evaluating JavaScript. Every unsupported shape fails closed
+ * and leaves the original call for the runtime resolver.
  */
 function parseStaticOptions(str: string): ParsedStaticOptions {
-  const targetMatch = str.match(/target\s*:\s*['"](\w+)['"]/);
-  const darkMatch = str.match(/dark\s*:\s*(true|false)/);
-  const breakpointMatch = str.match(/breakpoint\s*:/);
+  const trimmed = str.trim();
+  if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+    return { admitted: false };
+  }
 
-  // Breakpoint is inherently dynamic — skip extraction
-  if (breakpointMatch) return { opts: {}, skipExtraction: true };
+  const body = trimmed.slice(1, -1).trim();
+  if (!body) return { admitted: true, opts: {} };
 
+  const entries = body.split(",");
+  if (entries[entries.length - 1]?.trim() === "") entries.pop();
+  if (entries.length === 0 || entries.some((entry) => !entry.trim())) {
+    return { admitted: false };
+  }
+
+  const seen = new Set<"target" | "dark">();
   const opts: DotOptions = {};
-  if (targetMatch) opts.target = targetMatch[1] as DotOptions['target'];
-  if (darkMatch) opts.dark = darkMatch[1] === 'true';
 
-  return { opts: Object.keys(opts).length > 0 ? opts : {}, skipExtraction: false };
+  for (const rawEntry of entries) {
+    const parts = rawEntry.split(":");
+    if (parts.length !== 2) return { admitted: false };
+
+    const key = parseStaticOptionKey(parts[0].trim());
+    if (!key || seen.has(key)) return { admitted: false };
+    seen.add(key);
+
+    const value = parts[1].trim();
+    if (key === "target") {
+      const target = value.match(/^(['"])(web|native|flutter)\1$/)?.[2];
+      if (!target || !STATIC_TARGETS.has(target)) return { admitted: false };
+      opts.target = target as DotOptions["target"];
+      continue;
+    }
+
+    if (value !== "true" && value !== "false") {
+      return { admitted: false };
+    }
+    opts.dark = value === "true";
+  }
+
+  return { admitted: true, opts };
 }
 
 // ---------------------------------------------------------------------------
@@ -144,24 +189,25 @@ function parseStaticOptions(str: string): ParsedStaticOptions {
  * Handles primitives, arrays, and nested objects (RN transforms, Flutter recipes).
  */
 function valueToLiteral(value: unknown): string {
-  if (value === null) return 'null';
-  if (value === undefined) return 'undefined';
-  if (typeof value === 'string') return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-  if (typeof value === 'number') return String(value);
-  if (typeof value === 'boolean') return String(value);
+  if (value === null) return "null";
+  if (value === undefined) return "undefined";
+  if (typeof value === "string")
+    return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return String(value);
 
   if (Array.isArray(value)) {
-    return `[${value.map(valueToLiteral).join(', ')}]`;
+    return `[${value.map(valueToLiteral).join(", ")}]`;
   }
 
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>);
-    if (entries.length === 0) return '{}';
+    if (entries.length === 0) return "{}";
     const parts = entries.map(([k, v]) => {
       const safeKey = /^[a-zA-Z_$][\w$]*$/.test(k) ? k : `"${k}"`;
       return `${safeKey}: ${valueToLiteral(v)}`;
     });
-    return `{${parts.join(', ')}}`;
+    return `{${parts.join(", ")}}`;
   }
 
   return String(value);
@@ -173,14 +219,14 @@ function valueToLiteral(value: unknown): string {
  */
 export function styleToObjectLiteral(style: Record<string, unknown>): string {
   const entries = Object.entries(style);
-  if (entries.length === 0) return '({})';
+  if (entries.length === 0) return "({})";
 
   const parts = entries.map(([key, value]) => {
     const safeKey = /^[a-zA-Z_$][\w$]*$/.test(key) ? key : `"${key}"`;
     return `${safeKey}: ${valueToLiteral(value)}`;
   });
 
-  return `({${parts.join(', ')}})`;
+  return `({${parts.join(", ")}})`;
 }
 
 // ---------------------------------------------------------------------------
@@ -197,8 +243,8 @@ export function extractStaticCalls(
   source: string,
   options?: ExtractOptions,
 ): ExtractedCall[] {
-  const fnNames = options?.functionNames ?? ['dot'];
-  const defaultTarget = options?.target ?? 'web';
+  const fnNames = options?.functionNames ?? ["dot"];
+  const defaultTarget = options?.target ?? "web";
   const pattern = buildPattern(fnNames);
 
   const results: ExtractedCall[] = [];
@@ -212,10 +258,13 @@ export function extractStaticCalls(
     const optionsStr = match[3];
 
     // Parse static options if present
-    const parsed = optionsStr ? parseStaticOptions(optionsStr) : null;
-    if (parsed?.skipExtraction) continue;
+    const parsed = optionsStr
+      ? parseStaticOptions(optionsStr)
+      : { admitted: true as const, opts: {} };
+    if (!parsed.admitted) continue;
 
-    const callOpts = parsed?.opts;
+    const callOpts =
+      Object.keys(parsed.opts).length > 0 ? parsed.opts : undefined;
     const resolveOpts: DotOptions = {
       target: callOpts?.target ?? defaultTarget,
       ...(callOpts?.dark !== undefined ? { dark: callOpts.dark } : {}),
@@ -227,7 +276,8 @@ export function extractStaticCalls(
         start: match.index,
         end: match.index + match[0].length,
         input,
-        options: callOpts && Object.keys(callOpts).length > 0 ? callOpts : undefined,
+        options:
+          callOpts && Object.keys(callOpts).length > 0 ? callOpts : undefined,
         result,
       });
     } catch {
@@ -255,7 +305,10 @@ export function transformSource(
   let code = source;
   for (const call of calls) {
     // calls are sorted last-first, so offsets remain valid
-    code = code.slice(0, call.start) + styleToObjectLiteral(call.result) + code.slice(call.end);
+    code =
+      code.slice(0, call.start) +
+      styleToObjectLiteral(call.result) +
+      code.slice(call.end);
   }
 
   return { code, extractions: calls.length };

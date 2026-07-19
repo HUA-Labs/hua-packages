@@ -107,6 +107,50 @@ describe("dotAotBabel — options object argument", () => {
     expect(code).toContain("dot(");
     expect(code).toContain("breakpoint");
   });
+
+  it.each([
+    [`{}`, undefined],
+    [`{ target: "native" }`, "padding: 16"],
+    [`{ dark: true }`, 'padding: "16px"'],
+    [`{ "target": "flutter", 'dark': false }`, "padding"],
+  ])("extracts the bounded literal shape %s", (options, expected) => {
+    const code = transform(`const s = dot("p-4", ${options});`);
+
+    expect(code).not.toContain("dot(");
+    if (expected) expect(code).toContain(expected);
+  });
+
+  it("extracts a safe call with a trailing comma", () => {
+    const code = transform(`const s = dot("p-4",);`);
+
+    expect(code).not.toContain("dot(");
+    expect(code).toContain('padding: "16px"');
+  });
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown key", `{ target: "web", cache: true }`],
+    ["spread", `{ ...options }`],
+    ["computed key", `{ [key]: "native" }`],
+    ["nested value", `{ target: { value: "native" } }`],
+    ["duplicate key", `{ target: "web", target: "native" }`],
+    ["unsupported target", `{ target: "desktop" }`],
+    ["object method", `{ target() { return "native"; } }`],
+  ])("leaves %s at runtime", (_name, options) => {
+    const code = transform(`const s = dot("p-4", ${options});`);
+
+    expect(code).toContain("dot(");
+  });
+
+  it.each([
+    ["identifier options", `const s = dot("p-4", options);`],
+    ["extra argument", `const s = dot("p-4", { dark: true }, extra);`],
+  ])("leaves %s at runtime", (_name, source) => {
+    const code = transform(source);
+
+    expect(code).toContain("dot(");
+  });
 });
 
 // ---------------------------------------------------------------------------

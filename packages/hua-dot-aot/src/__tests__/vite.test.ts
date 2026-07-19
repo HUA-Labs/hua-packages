@@ -241,6 +241,38 @@ describe("dotAotVite — transform output", () => {
     );
     expect(result).toBeNull();
   });
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown option", `{ cache: true }`],
+    ["spread options", `{ ...options }`],
+  ])("leaves %s calls for the runtime resolver", (_name, options) => {
+    const plugin = dotAotVite();
+    const result = runTransform(
+      plugin,
+      `const s = dot("p-4", ${options});`,
+      "/src/foo.ts",
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it("extracts safe calls without consuming unsafe siblings", () => {
+    const plugin = dotAotVite();
+    const result = runTransform(
+      plugin,
+      [
+        `const safe = dot("p-4", { target: "web" });`,
+        `const runtime = dot("dark:bg-black", { dark: enabled });`,
+      ].join("\n"),
+      "/src/foo.ts",
+    );
+
+    expect(result).not.toBeNull();
+    expect(result!.code).not.toContain(`dot("p-4"`);
+    expect(result!.code).toContain(`dot("dark:bg-black", { dark: enabled })`);
+  });
 });
 
 // ---------------------------------------------------------------------------

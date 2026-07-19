@@ -958,6 +958,59 @@ describe("breakpoint option handling", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Static option admission — fail closed on shapes the heuristic cannot prove
+// ---------------------------------------------------------------------------
+describe("static option admission", () => {
+  it.each([
+    [`{}`, undefined],
+    [`{ target: "native" }`, { target: "native" }],
+    [`{ dark: true }`, { dark: true }],
+    [
+      `{ "target": "flutter", 'dark': false, }`,
+      { target: "flutter", dark: false },
+    ],
+  ])("extracts the bounded literal shape %s", (options, expected) => {
+    const calls = extractStaticCalls(`const style = dot("p-4", ${options});`);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].options).toEqual(expected);
+  });
+
+  it("keeps a trailing call comma aligned with the Babel path", () => {
+    const calls = extractStaticCalls(`const style = dot("p-4",);`);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].options).toBeUndefined();
+  });
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown key", `{ target: "web", cache: true }`],
+    ["spread", `{ ...options }`],
+    ["computed key", `{ [key]: "native" }`],
+    ["nested value", `{ target: { value: "native" } }`],
+    ["duplicate key", `{ target: "web", target: "native" }`],
+    ["unsupported target", `{ target: "desktop" }`],
+    ["malformed supported value", `{ dark: }`],
+    ["breakpoint", `{ breakpoint: "md" }`],
+  ])("leaves %s at runtime", (_name, options) => {
+    const source = `const style = dot("p-4", ${options});`;
+
+    expect(extractStaticCalls(source)).toHaveLength(0);
+    expect(transformSource(source)).toBeNull();
+  });
+
+  it.each([
+    ["identifier options", `const style = dot("p-4", options);`],
+    ["extra argument", `const style = dot("p-4", { dark: true }, extra);`],
+  ])("leaves %s at runtime", (_name, source) => {
+    expect(extractStaticCalls(source)).toHaveLength(0);
+    expect(transformSource(source)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // styleToObjectLiteral
 // ---------------------------------------------------------------------------
 describe("styleToObjectLiteral", () => {
