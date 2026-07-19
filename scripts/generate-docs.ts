@@ -39,6 +39,7 @@ interface DocYaml {
     hideSections?: boolean;
     detailedGuide?: string;
     aiGuide?: string;
+    peerDependenciesNote?: string;
   };
   docsUrl?: string;
   apiNotes?: Record<string, { description: string; kind?: string }>;
@@ -67,6 +68,7 @@ interface PackageData {
   description: string;
   peerDeps: Record<string, string>;
   peerDepsList: string;
+  peerDependenciesNote?: string;
   reactMajor?: string;
   exports: ExportInfo[];
   readmeFeatures: string[];
@@ -248,6 +250,7 @@ function loadPackageData(dirName: string): PackageData | null {
     description: pkgJson.description ?? "",
     peerDeps,
     peerDepsList,
+    peerDependenciesNote: docYaml.readme?.peerDependenciesNote,
     reactMajor,
     exports,
     readmeFeatures,

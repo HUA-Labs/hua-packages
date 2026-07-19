@@ -24,7 +24,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/.tsbuildinfo",
+    "DETAILED_GUIDE.md"
   ],
   "scripts": {
     "build": "tsup",

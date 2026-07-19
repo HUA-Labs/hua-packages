@@ -1,826 +1,320 @@
 # @hua-labs/motion-core Detailed Guide
 
-Complete technical reference for the ref-based motion engine.
+`@hua-labs/motion-core` provides React motion hooks, a small motion engine,
+easing and spring utilities, motion profiles, and a dedicated React Native
+entry point. This guide documents the package's current public entry points and
+the contracts that applications must own.
 
----
-
-### Table of Contents
-
-- [Architecture](#architecture)
-- [Installation & Setup](#installation--setup)
-- [Core Concepts](#core-concepts)
-- [API Reference](#api-reference)
-- [Advanced Usage](#advanced-usage)
-- [Integration Examples](#integration-examples)
-- [Troubleshooting](#troubleshooting)
-
----
-
-## Architecture
-
-### Design Philosophy
-
-`@hua-labs/motion-core` is built on three core principles:
-
-1. **Performance First** - Direct ref manipulation bypasses React's reconciliation, achieving consistent 60fps animations
-2. **Zero Dependencies** - Pure JavaScript motion engine with no external animation libraries
-3. **Developer Experience** - Simple, predictable API with full TypeScript support
-
-### Motion Engine
-
-The core engine uses a frame-based animation system:
-
-```tsx
-// Internal architecture (simplified)
-MotionEngine {
-  - TransitionEffects: Handles easing and interpolation
-  - MotionStateManager: Tracks animation lifecycle
-}
-```
-
-All hooks return a consistent interface:
-```tsx
-{
-  ref: RefObject<HTMLElement>,
-  style: CSSProperties,
-  controls?: {
-    start: () => void,
-    stop: () => void,
-    reset: () => void
-  }
-}
-```
-
----
-
-## Installation & Setup
-
-### Basic Installation
+## Installation
 
 ```bash
-npm install @hua-labs/motion-core
+pnpm add @hua-labs/motion-core
 ```
 
-### Peer Dependencies
+The package requires React 19. `react-dom` and `react-native` are optional,
+target-specific peers. Web hooks import from the package root. React Native
+hooks import from the explicit `/native` entry point and require a compatible
+`react-native` peer in the consuming application.
 
-```json
-{
-  "react": ">=19.0.0",
-  "react-dom": ">=19.0.0"
-}
+```ts
+import { useFadeIn } from "@hua-labs/motion-core";
+import { useFadeIn as useNativeFadeIn } from "@hua-labs/motion-core/native";
+
+void useFadeIn;
+void useNativeFadeIn;
 ```
 
-### TypeScript Configuration
+Do not mix the root and `/native` hooks in one renderer. They return styles for
+different runtime targets: CSS properties on the web and `Animated`-compatible
+styles on React Native.
 
-The library includes comprehensive type definitions. No additional setup required.
+## Web entrance hooks
 
----
-
-## Core Concepts
-
-### Common Options
-
-All motion hooks accept a base set of options:
+The web entrance hooks return a `ref`, a `style` object, lifecycle state, and
+imperative `start`, `stop`, and `reset` controls. Attach both `ref` and `style`
+to the same supported HTML element.
 
 ```tsx
-interface BaseMotionOptions {
-  duration?: number;        // Animation duration in ms (default: 400)
-  delay?: number;          // Start delay in ms (default: 0)
-  easing?: EasingType;     // Easing function (default: 'easeOut')
-  autoPlay?: boolean;      // Auto-start animation (default: true)
-  threshold?: number;      // Intersection threshold 0-1 (default: 0.1)
-}
-```
-
-### Easing Functions
-
-Built-in easing options:
-- `linear` `easeIn` `easeOut` `easeInOut`
-- `easeInQuad` `easeOutQuad` `easeInOutQuad`
-- `spring` `bounce` `elastic`
-
-Custom easing:
-```tsx
-const customEasing = (t: number) => t * t * t;
-useFadeIn({ easing: customEasing });
-```
-
----
-
-## API Reference
-
-### Entrance Animations
-
-#### useFadeIn
-
-Animate opacity from 0 to 1.
-
-```tsx
-import { useFadeIn } from '@hua-labs/motion-core';
-
-const fadeIn = useFadeIn({
-  duration: 600,
-  delay: 0,
-  easing: 'easeOut'
-});
-
-<div ref={fadeIn.ref} style={fadeIn.style}>Content</div>
-```
-
-**Options:**
-- All base options
-- `from?: number` - Starting opacity (default: 0)
-- `to?: number` - Ending opacity (default: 1)
-
----
-
-#### useSlideUp
-
-Slide element from bottom to top.
-
-```tsx
-const slideUp = useSlideUp({
-  distance: 20,    // Slide distance in pixels
-  duration: 500
-});
-```
-
-**Options:**
-- All base options
-- `distance?: number` - Slide distance in px (default: 20)
-
-**Similar hooks:**
-- `useSlideDown` - Slide from top
-- `useSlideLeft` - Slide from right
-- `useSlideRight` - Slide from left
-
----
-
-#### useScaleIn
-
-Scale element from smaller to normal size.
-
-```tsx
-const scaleIn = useScaleIn({
-  from: 0.8,
-  to: 1,
-  duration: 400
-});
-```
-
-**Options:**
-- All base options
-- `from?: number` - Starting scale (default: 0.95)
-- `to?: number` - Ending scale (default: 1)
-
----
-
-#### useBounceIn
-
-Entrance with elastic bounce effect.
-
-```tsx
-const bounceIn = useBounceIn({
-  intensity: 0.3,
-  duration: 600
-});
-```
-
-**Options:**
-- All base options
-- `intensity?: number` - Bounce intensity 0-1 (default: 0.2)
-
----
-
-### Interaction Hooks
-
-#### useHoverMotion
-
-Trigger animation on hover state.
-
-```tsx
-const hover = useHoverMotion({
-  scale: 1.05,
-  duration: 200
-});
-
-<button
-  ref={hover.ref}
-  style={hover.style}
-  onMouseEnter={hover.onMouseEnter}
-  onMouseLeave={hover.onMouseLeave}
->
-  Hover me
-</button>
-```
-
-**Returns:**
-- `ref` `style` (standard)
-- `onMouseEnter: () => void`
-- `onMouseLeave: () => void`
-
-**Options:**
-- `scale?: number` - Hover scale (default: 1.02)
-- `translateY?: number` - Vertical shift
-- `duration?: number`
-
----
-
-#### useClickToggle
-
-Toggle animation on click.
-
-```tsx
-const toggle = useClickToggle({
-  duration: 300
-});
-
-<div
-  ref={toggle.ref}
-  style={toggle.style}
-  onClick={toggle.onClick}
->
-  {toggle.isActive ? 'Active' : 'Inactive'}
-</div>
-```
-
-**Returns:**
-- `ref` `style` (standard)
-- `onClick: () => void`
-- `isActive: boolean`
-
----
-
-#### useGesture / useGestureMotion
-
-Track drag and swipe gestures.
-
-```tsx
-const gesture = useGestureMotion({
-  axis: 'x',        // 'x' | 'y' | 'both'
-  bounds: {
-    left: -100,
-    right: 100
-  }
-});
-
-<div
-  ref={gesture.ref}
-  style={gesture.style}
-  onMouseDown={gesture.onStart}
-  onMouseMove={gesture.onMove}
-  onMouseUp={gesture.onEnd}
-/>
-```
-
-**Options:**
-- `axis?: 'x' | 'y' | 'both'` - Drag direction
-- `bounds?: { left?, right?, top?, bottom? }` - Movement limits
-
----
-
-### Scroll Effects
-
-#### useScrollReveal
-
-Reveal element when scrolled into view.
-
-```tsx
-const reveal = useScrollReveal({
-  threshold: 0.2,
-  once: true
-});
-```
-
-**Options:**
-- All base options
-- `threshold?: number` - Trigger point 0-1 (default: 0.1)
-- `once?: boolean` - Trigger once (default: true)
-
----
-
-#### useScrollProgress
-
-Track scroll position as percentage.
-
-```tsx
-const progress = useScrollProgress();
-
-<div ref={progress.ref} style={progress.style}>
-  {/* Progress: {progress.value}% */}
-</div>
-```
-
-**Returns:**
-- `ref` `style` (standard)
-- `value: number` - Scroll progress 0-100
-
----
-
-### Advanced Hooks
-
-#### useSpringMotion
-
-Physics-based spring animation.
-
-```tsx
-const spring = useSpringMotion({
-  tension: 180,
-  friction: 12,
-  mass: 1
-});
-```
-
-**Options:**
-- `tension?: number` - Spring stiffness (default: 170)
-- `friction?: number` - Spring damping (default: 26)
-- `mass?: number` - Spring mass (default: 1)
-
----
-
-#### usePulse
-
-Continuous pulsing animation.
-
-```tsx
-const pulse = usePulse({
-  scale: 1.1,
-  duration: 1000
-});
-
-// Manual control
-pulse.controls.start();
-pulse.controls.stop();
-pulse.controls.reset();
-```
-
-**Options:**
-- `scale?: number` - Pulse scale (default: 1.05)
-- `duration?: number` - Pulse cycle duration
-- `autoPlay?: boolean`
-
----
-
-#### usePageMotions
-
-Orchestrate page-level transitions.
-
-```tsx
-const page = usePageMotions({
-  pageType: 'landing',
-  motionType: 'fade-slide',
-  stagger: 100
-});
-
-<div ref={page.containerRef}>
-  <h1 ref={page.titleRef} style={page.titleStyle}>Title</h1>
-  <p ref={page.contentRef} style={page.contentStyle}>Content</p>
-</div>
-```
-
-**Options:**
-- `pageType?: 'landing' | 'content' | 'minimal'`
-- `motionType?: 'fade' | 'slide' | 'fade-slide'`
-- `stagger?: number` - Delay between elements
-
----
-
-### Interaction Hooks (Advanced)
-
-#### useButtonEffect
-
-Multi-type button interaction effects with scale, ripple, glow, shake, bounce, and slide.
-
-```tsx
-import { useButtonEffect } from '@hua-labs/motion-core';
-
-const button = useButtonEffect({
-  type: 'scale',
-  scaleAmount: 0.95,
-  hoverScale: 1.05,
-  duration: 200
-});
-
-<button ref={button.ref} style={button.style}>
-  Click me
-</button>
-```
-
-**Options:**
-- `type?: 'scale' | 'ripple' | 'glow' | 'shake' | 'bounce' | 'slide' | 'custom'` - Effect type (default: `'scale'`)
-- `scaleAmount?: number` - Press scale for scale type (default: 0.95)
-- `rippleColor?: string` - Ripple color (default: `'rgba(255,255,255,0.6)'`)
-- `glowColor?: string` - Glow color (default: `'#3b82f6'`)
-- `shakeAmount?: number` - Shake distance in px (default: 5)
-- `bounceHeight?: number` - Bounce height in px (default: 10)
-- `slideDistance?: number` - Slide distance in px (default: 5)
-- `slideDirection?: 'left' | 'right' | 'up' | 'down'` (default: `'down'`)
-- `hoverScale?: number` - Scale on hover (default: 1.05)
-- `disabled?: boolean` - Disable interactions (default: false)
-- `disabledOpacity?: number` (default: 0.5)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` (standard)
-- `buttonType: string` - Current effect type
-- `isPressed: boolean` - Press state
-- `isHovered: boolean` - Hover state
-- `isFocused: boolean` - Focus state
-- `pressButton: () => void` - Trigger press
-- `releaseButton: () => void` - Release press
-- `setButtonState: (state) => void` - Set button state programmatically
-
----
-
-#### useVisibilityToggle
-
-Programmatic show/hide/toggle with scale and opacity transitions.
-
-```tsx
-import { useVisibilityToggle } from '@hua-labs/motion-core';
-
-const panel = useVisibilityToggle({
-  showScale: 1,
-  hideScale: 0.8,
-  hideOpacity: 0,
-  duration: 300
-});
-
-<button onClick={panel.toggle}>Toggle</button>
-<div ref={panel.ref} style={panel.style}>Content</div>
-```
-
-**Options:**
-- `showScale?: number` (default: 1)
-- `showOpacity?: number` (default: 1)
-- `showTranslateY?: number` (default: 0)
-- `hideScale?: number` (default: 0.8)
-- `hideOpacity?: number` (default: 0)
-- `hideTranslateY?: number` (default: 20)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` (standard)
-- `toggle: () => void` - Toggle visibility
-- `show: () => void` - Show element
-- `hide: () => void` - Hide element
-
----
-
-### Scroll Hooks (Advanced)
-
-#### useScrollToggle
-
-Show/hide elements based on scroll direction with shared scroll listener.
-
-```tsx
-import { useScrollToggle } from '@hua-labs/motion-core';
-
-const header = useScrollToggle({
-  scrollDirection: 'down',
-  scrollThreshold: 0.1,
-  showScale: 1,
-  hideTranslateY: -100
-});
-
-<header ref={header.ref} style={header.style}>
-  Navigation
-</header>
-```
-
-**Options:**
-- `scrollDirection?: 'up' | 'down' | 'both'` - Trigger direction (default: `'both'`)
-- `scrollThreshold?: number` - Viewport fraction threshold (default: 0.1)
-- `showScale?: number` (default: 1)
-- `showOpacity?: number` (default: 1)
-- `hideScale?: number` (default: 0.8)
-- `hideOpacity?: number` (default: 0)
-- `hideTranslateY?: number` (default: 20)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` `pause` `resume` (standard)
-
----
-
-### Layout Motion Hooks
-
-#### useCardList
-
-Staggered entrance animation for card grids with IntersectionObserver auto-trigger.
-
-```tsx
-import { useCardList } from '@hua-labs/motion-core';
-
-const grid = useCardList({
-  gridColumns: 3,
-  gridGap: 20,
-  staggerDelay: 100
-});
-
-<div ref={grid.ref} style={grid.style}>
-  {items.map((item, i) => (
-    <div key={item.id} data-card style={grid.cardStyles[i]}>
-      {item.content}
-    </div>
-  ))}
-</div>
-```
-
-**Options:**
-- `gridColumns?: number` - Grid columns (default: 3)
-- `gridGap?: number` - Gap in px (default: 20)
-- `staggerDelay?: number` - Delay between cards in ms (default: 100)
-- `initialScale?: number` (default: 0.8)
-- `initialOpacity?: number` (default: 0)
-- `initialTranslateY?: number` (default: 30)
-- `cardScale?: number` - Visible scale (default: 1)
-- `cardOpacity?: number` - Visible opacity (default: 1)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` (standard)
-- `cardStyles: CSSProperties[]` - Per-card animated styles
-- `staggerDelay: number`
-- `gridColumns: number`
-- `gridGap: number`
-
----
-
-#### useLoadingSpinner
-
-Multi-type loading spinner with rotate, pulse, bounce, wave, dots, and bars animations.
-
-```tsx
-import { useLoadingSpinner } from '@hua-labs/motion-core';
-
-const spinner = useLoadingSpinner({
-  type: 'rotate',
-  size: 40,
-  color: '#3b82f6',
-  thickness: 4
-});
-
-<div ref={spinner.ref} style={spinner.style} />
-```
-
-**Options:**
-- `type?: 'rotate' | 'pulse' | 'bounce' | 'wave' | 'dots' | 'bars' | 'custom'` (default: `'rotate'`)
-- `color?: string` (default: `'#3b82f6'`)
-- `size?: number` - Size in px (default: 40)
-- `thickness?: number` - Border/bar thickness (default: 4)
-- `autoStart?: boolean` (default: true)
-- `infinite?: boolean` (default: true)
-- `rotationSpeed?: number` (default: 1)
-- `pulseSpeed?: number` (default: 1)
-- `bounceHeight?: number` (default: 20)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` (standard)
-- `isLoading: boolean`
-- `spinnerType: string`
-- `startLoading: () => void`
-- `stopLoading: () => void`
-- `setLoadingState: (loading: boolean) => void`
-
----
-
-#### useNavigation
-
-Menu animation with stagger entrance and active item management.
-
-```tsx
-import { useNavigation } from '@hua-labs/motion-core';
-
-const nav = useNavigation({
-  type: 'slide',
-  slideDirection: 'left',
-  itemCount: 5,
-  staggerDelay: 50
-});
-
-<nav ref={nav.ref} style={nav.style}>
-  {nav.itemStyles.map((style, i) => (
-    <a key={i} style={style} onClick={() => nav.setActiveItem(i)}>
-      Item {i + 1}
-    </a>
-  ))}
-</nav>
-<button onClick={nav.toggleMenu}>Menu</button>
-```
-
-**Options:**
-- `type?: 'slide' | 'fade' | 'scale' | 'rotate' | 'custom'` (default: `'slide'`)
-- `slideDirection?: 'left' | 'right' | 'up' | 'down'` (default: `'left'`)
-- `itemCount?: number` (default: 5)
-- `staggerDelay?: number` (default: 50)
-- `activeScale?: number` (default: 1.05)
-- `hoverScale?: number` (default: 1.1)
-- `autoStart?: boolean` (default: false)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` (standard)
-- `isOpen: boolean`
-- `activeIndex: number`
-- `itemStyles: CSSProperties[]`
-- `openMenu: () => void`
-- `closeMenu: () => void`
-- `toggleMenu: () => void`
-- `setActiveItem: (index: number) => void`
-- `goToNext: () => void`
-- `goToPrevious: () => void`
-
----
-
-#### useSkeleton
-
-Wave/pulse skeleton loading placeholder with CSS keyframe animations.
-
-```tsx
-import { useSkeleton } from '@hua-labs/motion-core';
-
-const skeleton = useSkeleton({
-  height: 20,
-  width: '100%',
-  wave: true,
-  borderRadius: 4
-});
-
-<div ref={skeleton.ref} style={skeleton.style} />
-```
-
-**Options:**
-- `wave?: boolean` - Enable wave shimmer (default: true)
-- `pulse?: boolean` - Enable pulse effect (default: false)
-- `height?: number` - Height in px (default: 20)
-- `width?: number | string` (default: `'100%'`)
-- `borderRadius?: number` (default: 4)
-- `backgroundColor?: string` (default: `'#f0f0f0'`)
-- `highlightColor?: string` (default: `'#e0e0e0'`)
-- `motionSpeed?: number` - Animation cycle in ms (default: 1500)
-- `autoStart?: boolean` (default: true)
-
-**Returns:**
-- `ref` `style` `start` `stop` `reset` `pause` `resume` (standard)
-
----
-
-## Advanced Usage
-
-### Combining Multiple Animations
-
-```tsx
-function Hero() {
-  const fade = useFadeIn({ duration: 800 });
-  const slideUp = useSlideUp({ delay: 200 });
+"use client";
+
+import { useFadeIn } from "@hua-labs/motion-core";
+
+export function Hero() {
+  const fade = useFadeIn<HTMLDivElement>({
+    autoStart: true,
+    initialOpacity: 0,
+    targetOpacity: 1,
+    duration: 500,
+    delay: 100,
+    threshold: 0.2,
+    triggerOnce: true,
+    easing: "ease-out",
+  });
 
   return (
-    <section ref={fade.ref} style={fade.style}>
-      <h1 ref={slideUp.ref} style={slideUp.style}>
-        Welcome
-      </h1>
+    <div ref={fade.ref} style={fade.style}>
+      Motion that follows the current hook contract
+    </div>
+  );
+}
+```
+
+### Common options
+
+The entrance hooks share these base options:
+
+| Option                                       | Meaning                                                              |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| `autoStart`                                  | Observe or start the motion automatically when supported by the hook |
+| `duration`                                   | Transition duration in milliseconds                                  |
+| `delay`                                      | Delay before the visible state is committed                          |
+| `threshold`                                  | `IntersectionObserver` threshold for web entrance hooks              |
+| `triggerOnce`                                | Disconnect the shared observer after the first intersection          |
+| `easing`                                     | CSS easing string used by the web entrance style                     |
+| `onStart`, `onComplete`, `onStop`, `onReset` | Lifecycle callbacks                                                  |
+
+Defaults can come from the active motion profile. Treat the returned style as
+the hook's render contract instead of copying profile defaults into application
+code.
+
+### Fade
+
+`useFadeIn` uses `initialOpacity` and `targetOpacity`.
+
+```tsx
+import { useFadeIn } from "@hua-labs/motion-core";
+
+export function FadingNotice() {
+  const motion = useFadeIn<HTMLParagraphElement>({
+    initialOpacity: 0.15,
+    targetOpacity: 0.9,
+    autoStart: false,
+  });
+
+  return (
+    <p ref={motion.ref} style={motion.style} onClick={motion.start}>
+      Click to start
+    </p>
+  );
+}
+```
+
+### Slide
+
+`useSlideUp` accepts `direction` and `distance`. The directional helpers
+`useSlideDown`, `useSlideLeft`, and `useSlideRight` are also exported.
+
+```tsx
+import { useSlideUp } from "@hua-labs/motion-core";
+
+export function SlidingPanel() {
+  const motion = useSlideUp<HTMLDivElement>({
+    direction: "left",
+    distance: 32,
+    duration: 420,
+  });
+
+  return (
+    <section ref={motion.ref} style={motion.style}>
+      Panel
     </section>
   );
 }
 ```
 
-### Sequential Animations
+### Scale and bounce
+
+`useScaleIn` uses `initialScale` and `targetScale`. `useBounceIn` uses
+`intensity` for the overshoot amount.
 
 ```tsx
-function CardList({ items }) {
-  return items.map((item, index) => {
-    const animation = useFadeIn({
-      delay: index * 100
-    });
+import { useBounceIn, useScaleIn } from "@hua-labs/motion-core";
 
-    return (
-      <div key={item.id} ref={animation.ref} style={animation.style}>
-        {item.content}
-      </div>
-    );
+export function Emphasis() {
+  const scale = useScaleIn<HTMLDivElement>({
+    initialScale: 0.88,
+    targetScale: 1,
+    autoStart: true,
   });
-}
-```
-
-### Programmatic Control
-
-```tsx
-function ControlledAnimation() {
-  const pulse = usePulse({ autoPlay: false });
+  const bounce = useBounceIn<HTMLSpanElement>({
+    intensity: 0.16,
+    autoStart: true,
+  });
 
   return (
-    <>
-      <div ref={pulse.ref} style={pulse.style}>Element</div>
-      <button onClick={pulse.controls.start}>Start</button>
-      <button onClick={pulse.controls.stop}>Stop</button>
-      <button onClick={pulse.controls.reset}>Reset</button>
-    </>
+    <div ref={scale.ref} style={scale.style}>
+      <span ref={bounce.ref} style={bounce.style}>
+        Ready
+      </span>
+    </div>
   );
 }
 ```
 
----
+## Manual lifecycle control
 
-## Integration Examples
-
-### Next.js App Router
+Set `autoStart: false` when the application should own the start event. The
+entrance hooks expose `start`, `stop`, and `reset`. Their `pause` and `resume`
+members are currently no-ops because these hooks render CSS transitions rather
+than a resumable JavaScript timeline.
 
 ```tsx
-// app/page.tsx
-'use client';
+import { useFadeIn } from "@hua-labs/motion-core";
 
-import { useFadeIn } from '@hua-labs/motion-core';
+export function ManualFade() {
+  const motion = useFadeIn<HTMLDivElement>({ autoStart: false });
 
-export default function Page() {
-  const fadeIn = useFadeIn();
-  return <div ref={fadeIn.ref} style={fadeIn.style}>Content</div>;
+  return (
+    <div>
+      <div ref={motion.ref} style={motion.style}>
+        Controlled content
+      </div>
+      <button type="button" onClick={motion.start}>
+        Start
+      </button>
+      <button type="button" onClick={motion.stop}>
+        Stop
+      </button>
+      <button type="button" onClick={motion.reset}>
+        Reset
+      </button>
+    </div>
+  );
 }
 ```
 
-### Next.js Pages Router
+## Motion profiles
+
+`MotionProfileProvider` supplies defaults to profile-aware hooks. Use the
+`neutral` or `hua` built-in profile, or pass a complete `MotionProfile` object.
+`overrides` deep-merges selected values over the chosen profile.
 
 ```tsx
-// pages/index.tsx
-import { usePageMotions } from '@hua-labs/motion-core';
+import { MotionProfileProvider, useFadeIn } from "@hua-labs/motion-core";
 
-export default function Home() {
-  const page = usePageMotions({ pageType: 'landing' });
-  return <main ref={page.containerRef}>...</main>;
+function ProfiledCard() {
+  const motion = useFadeIn<HTMLDivElement>();
+  return (
+    <article ref={motion.ref} style={motion.style}>
+      Card
+    </article>
+  );
+}
+
+export function ProfiledApp() {
+  return (
+    <MotionProfileProvider
+      profile="neutral"
+      overrides={{ base: { duration: 240 } }}
+    >
+      <ProfiledCard />
+    </MotionProfileProvider>
+  );
 }
 ```
 
-### React SPA
+The provider is optional. Outside a provider, hooks use the built-in neutral
+profile.
+
+## Reduced motion
+
+`useReducedMotion()` returns a boolean and follows changes to the browser's
+`prefers-reduced-motion` media query after mount. The deprecated
+`useReducedMotionObject()` exists only for the older object-shaped return.
 
 ```tsx
-import { useSlideUp } from '@hua-labs/motion-core';
+import { useFadeIn, useReducedMotion } from "@hua-labs/motion-core";
 
-function Component() {
-  const slideUp = useSlideUp();
-  return <div ref={slideUp.ref} style={slideUp.style}>Content</div>;
+export function AccessibleEntrance() {
+  const reduce = useReducedMotion();
+  const motion = useFadeIn<HTMLDivElement>({
+    duration: reduce ? 0 : 400,
+    initialOpacity: reduce ? 1 : 0,
+  });
+
+  return (
+    <div ref={motion.ref} style={motion.style}>
+      Content
+    </div>
+  );
 }
 ```
 
----
+Reduced-motion detection does not certify a whole interface. The application
+still owns decisions about which motion to remove, shorten, or replace.
+
+## React Native entry point
+
+React Native hooks use `Animated` values and do not return a DOM `ref`. Render
+their style on an `Animated` component. The available native hooks are exported
+only from `@hua-labs/motion-core/native`.
+
+```tsx
+import { Animated, Text } from "react-native";
+import { useFadeIn } from "@hua-labs/motion-core/native";
+
+export function NativeWelcome() {
+  const motion = useFadeIn({
+    autoStart: true,
+    initialOpacity: 0,
+    targetOpacity: 1,
+    duration: 400,
+    useNativeDriver: true,
+  });
+
+  return (
+    <Animated.View style={motion.style}>
+      <Text>Welcome</Text>
+    </Animated.View>
+  );
+}
+```
+
+The `/native` surface also exports slide, scale, bounce, spring, pulse, and
+stagger hooks. Web and React Native implementations share some option names,
+but their style objects and lifecycle mechanics are target-specific. Browser
+tests are not evidence of physical React Native behavior.
+
+## Server rendering and hydration boundary
+
+The web hooks are React hooks and must be called from a client component in
+frameworks that distinguish server and client components. Initial styles can
+be present in server-rendered markup, but observation, media-query updates,
+timers, and animation lifecycle begin in the browser. Test the exact rendered
+route for hydration stability; package types and unit tests alone do not prove
+application-level hydration behavior.
 
 ## Troubleshooting
 
-### Animations Not Triggering
+### Nothing starts automatically
 
-**Issue:** Animation doesn't start on mount.
+- Confirm that `ref` and `style` are attached to the same element.
+- Confirm that `autoStart` is not `false`.
+- Web entrance hooks use `IntersectionObserver`; verify that the target crosses
+  the configured `threshold`.
+- For deterministic tests, use `autoStart: false` and call `start()` explicitly,
+  or provide an `IntersectionObserver` test double.
 
-**Solution:** Check `autoPlay` option (default is `true`).
+### The option compiles but has no visible effect
 
-```tsx
-// Ensure autoPlay is enabled
-const animation = useFadeIn({ autoPlay: true });
-```
+- Use `initialOpacity`/`targetOpacity` for fade and
+  `initialScale`/`targetScale` for scale.
+- Use `direction`/`distance` for slide and `intensity` for bounce.
+- Do not use the older `autoPlay`, `from`, or `to` names for these entrance
+  hooks.
+- `pause()` and `resume()` do not pause CSS transitions in the entrance hooks.
 
----
+### Native imports or styles fail
 
-### Performance Issues
+- Import from `@hua-labs/motion-core/native`, not the web root.
+- Install a compatible `react-native` peer.
+- Apply the returned style to an `Animated` component.
+- Keep web CSS style objects and React Native animated style objects separate.
 
-**Issue:** Lag with many animated elements.
+## Verification boundary
 
-**Solution:** Use staggered delays and limit concurrent animations.
-
-```tsx
-// Good: Stagger animations
-items.map((item, i) => useFadeIn({ delay: i * 50 }))
-
-// Avoid: All at once
-items.map(() => useFadeIn())
-```
-
----
-
-### SSR Hydration Mismatch
-
-**Issue:** Warning about server/client mismatch.
-
-**Solution:** Use `'use client'` directive in Next.js.
-
-```tsx
-'use client';
-
-import { useFadeIn } from '@hua-labs/motion-core';
-```
-
----
-
-### TypeScript Errors
-
-**Issue:** Type errors with refs.
-
-**Solution:** Ensure proper element typing.
-
-```tsx
-const animation = useFadeIn();
-// Ref is typed as RefObject<HTMLElement>
-<div ref={animation.ref}>Content</div>
-```
-
----
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](https://github.com/HUA-Labs/hua-packages/blob/main/CONTRIBUTING.md).
-
-## License
-
-MIT © HUA Labs
+The package's focused tests, type declarations, and packed entry-point checks
+cover source and distribution contracts. They do not by themselves prove
+browser frame rate, physical-device animation quality, screen-reader speech,
+or React Native behavior on every device. Verify those properties in the
+actual application and target runtime.

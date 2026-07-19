@@ -1,6 +1,6 @@
 # @hua-labs/motion-core
 
-A collection of 60+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API.
+React 19 motion hooks, motion profiles, easing and spring utilities, and a dedicated React Native entry point. Web and native surfaces are documented separately so consumers can verify the exact renderer contract they use.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/motion-core.svg)](https://www.npmjs.com/package/@hua-labs/motion-core)
@@ -10,12 +10,12 @@ A collection of 60+ React animation hooks built on a ref-based engine. Direct DO
 
 ## Features
 
-- **60+ animation hooks — Fade, slide, scale, scroll, interactions, gestures, orchestration**
-- **Zero dependencies — Pure JavaScript motion engine**
-- **Ref-based — Direct DOM manipulation for consistent performance**
-- **SSR compatible — Works with Next.js, Remix, and SSR frameworks**
-- **React Native — 10 native hooks via Animated API (separate entry point)**
-- **Fully tested — Comprehensive test coverage**
+- **Web entrance hooks — Ref, style, lifecycle state, and explicit controls**
+- **Motion profiles — Neutral and expressive defaults with bounded overrides**
+- **Reduced-motion signal — Browser preference tracking for application policy**
+- **React Native entry — Animated-based hooks from the explicit /native route**
+- **TypeScript declarations — Root and native entry-point types ship with the package**
+- **Framework-neutral utilities — Motion engine, easing, and spring calculations**
 
 ## Installation
 
@@ -23,34 +23,25 @@ A collection of 60+ React animation hooks built on a ref-based engine. Direct DO
 pnpm add @hua-labs/motion-core
 ```
 
-> Peer dependencies: react >=19.0.0, react-dom >=19.0.0, react-native >=0.73.0
+> Required peer: `react >=19.0.0`. Optional, target-specific peers: `react-dom >=19.0.0` for DOM integrations and `react-native >=0.73.0` for the `/native` entry.
 
 ## Quick Start
 
 ```tsx
-import { useFadeIn, useSlideUp } from '@hua-labs/motion-core';
+import { useFadeIn } from '@hua-labs/motion-core';
 
 function Hero() {
-  const fadeIn = useFadeIn({ duration: 800 });
-  const slideUp = useSlideUp({ delay: 200 });
+  const fade = useFadeIn<HTMLDivElement>({
+    autoStart: true,
+    initialOpacity: 0,
+    targetOpacity: 1,
+    duration: 500,
+  });
 
   return (
-    <div>
-      <h1 ref={fadeIn.ref} style={fadeIn.style}>Welcome</h1>
-      <p ref={slideUp.ref} style={slideUp.style}>Animated content</p>
+    <div ref={fade.ref} style={fade.style}>
+      Welcome
     </div>
-  );
-}
-
-// React Native — import from /native
-import { useFadeIn, useStagger } from '@hua-labs/motion-core/native';
-
-function ListItem() {
-  const fadeIn = useFadeIn({ duration: 400 });
-  return (
-    <Animated.View style={fadeIn.style}>
-      <Text>Hello</Text>
-    </Animated.View>
   );
 }
 
@@ -66,7 +57,7 @@ function ListItem() {
 | `transitionEffects` | variable | Singleton instance of TransitionEffects |
 | `useSimplePageMotion` | hook | Simple fade+slide page entrance animation |
 | `usePageMotions` | hook | Multi-element page entrance orchestration |
-| `useSmartMotion` | hook | Adaptive motion based on device performance |
+| `useSmartMotion` | hook | Preset-based single-element entrance and interaction motion |
 | `useUnifiedMotion` | hook | All-in-one motion hook with presets |
 | `useFadeIn` | hook | Fade-in animation hook |
 | `useSlideUp` | hook | Slide-up entrance animation |
@@ -81,7 +72,7 @@ function ListItem() {
 | `useClickToggle` | hook | Click-triggered toggle animation |
 | `useFocusToggle` | hook | Focus-triggered toggle animation |
 | `useScrollReveal` | hook | Scroll-triggered reveal animation |
-| `useScrollProgress` | hook | Scroll position as 0-1 progress value |
+| `useScrollProgress` | hook | Document scroll position as a clamped 0-100 progress value |
 | `useMotionState` | hook | Animation state tracking (idle, running, complete) |
 | `useRepeat` | hook | Repeating animation with configurable count |
 | `useToggleMotion` | hook | Toggle between two animation states |
@@ -89,7 +80,7 @@ function ListItem() {
 | `useInView` | hook | IntersectionObserver-based visibility detection |
 | `useMouse` | hook | Mouse position tracking |
 | `useReducedMotion` | hook | Detect prefers-reduced-motion setting |
-| `useReducedMotionObject` | hook | Returns { prefersReducedMotion } object (extended form of useReducedMotion) |
+| `useReducedMotionObject` | hook | Deprecated object-shaped wrapper around useReducedMotion |
 | `useWindowSize` | hook | Responsive window size tracking |
 | `useGesture` | hook | Multi-gesture handler (drag, swipe, pinch) |
 | `useGestureMotion` | hook | Gesture-driven motion animation |
@@ -167,11 +158,8 @@ function ListItem() {
 
 ## Documentation
 
-[Full Documentation](https://docs.hua-labs.com)
-
-## Related Packages
-
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
+- [Detailed Guide](./DETAILED_GUIDE.md)
+- [Full Documentation](https://docs.hua-labs.com)
 
 ## License
 
