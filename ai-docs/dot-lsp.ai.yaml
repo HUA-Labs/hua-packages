@@ -19,12 +19,12 @@ exports:
         description: "CLI binary — starts the LSP server via stdio transport. Provides completion, hover, and diagnostic capabilities for dot utility strings."
 
 features:
-  - "Autocomplete — real-time suggestions for all dot utility tokens + variant prefixes (hover:, dark:, md:, etc.)"
+  - "Autocomplete — package-local, hand-maintained token suggestions plus bounded variant-prefix projections"
   - "Hover Preview — shows resolved CSS property values (e.g., p-4 → padding: 16px)"
-  - "Diagnostics — flags unrecognized utility tokens as warnings on file open and change"
+  - "Diagnostics — flags unrecognized utilities and CSS-only variants as warnings on file open and change"
   - "Target Caveats — optional web/native/flutter diagnostics for dropped, approximated, and recipe-only output, annotated with package-owned AX family/category metadata"
   - "Pattern Detection — works inside dot(), dot='', dot={''}, and template literal forms"
-  - "500+ built-in token suggestions across 15 categories (spacing, color, sizing, typography, layout, flexbox, grid, border, shadow, background, transition, animation, transform, filter, interactivity)"
+  - "Completion boundary — the server returns at most 500 matching entries per request from its inlined catalog; it is not a generated or exhaustive Dot registry"
 
 related_packages:
   - "@hua-labs/dot"

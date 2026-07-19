@@ -3,7 +3,7 @@ overview: "MCP (Model Context Protocol) server for the dot style engine — enab
 features:
   - "dot_resolve — convert utility strings to style objects (web CSSProperties, RN StyleSheet, Flutter recipe)"
   - "dot_explain — resolve + capability report (dropped/approximated properties per target)"
-  - "dot_complete — autocomplete suggestions with category labels (prefix + substring matching)"
+  - "dot_complete — suggestions from a package-local completion catalog with category labels (prefix + substring matching)"
   - "dot_capabilities — query the package-owned AX capability catalog without resolving styles"
   - "dot_validate — check utility strings for unrecognized tokens"
   - "Cross-platform support — web, native (React Native), and flutter targets"
@@ -15,6 +15,8 @@ quickStart: |
 
   # Or use with npx
   npx @hua-labs/dot-mcp
+
+  # Pin an exact published version in reproducible client configurations.
 
   # Claude Desktop config (~/.claude/claude_desktop_config.json):
   {
@@ -32,6 +34,7 @@ readme:
   features:
     - "stdio MCP server for resolving, explaining, completing, and validating dot utilities"
     - "Target-aware web, native, and Flutter style projections"
+    - "Package-local completion suggestions kept distinct from resolver and capability truth"
     - "Capability catalog queries via dot_capabilities"
     - "CLI-first package surface through the dot-mcp binary"
   quickStart: |
@@ -56,7 +59,7 @@ apiNotes:
     description: "Resolve + return capability report showing dropped/approximated properties for the target platform."
     kind: "function"
   dot_complete:
-    description: "Get autocomplete suggestions for a partial token. Params: partial (string), limit? (number, default 20)."
+    description: "Get suggestions from this package's local completion catalog. Params: partial (string), limit? (number, default 20). The catalog is not an exhaustive Dot token authority."
     kind: "function"
   dot_capabilities:
     description: "Query the package-owned dot AX capability catalog. Params: target?, category?, level?, family?, limit?, includeProperties?, includeExamples?, includeComposition?."
@@ -91,7 +94,7 @@ sections:
       **dot_validate:**
       ```json
       { "input": "p-4 bg-bogus flex" }
-      → { "valid": false, "errors": ["bg-bogus"], "resolved_count": 2 }
+      → { "valid": false, "errors": ["Unrecognized or unsupported utility: \"bg-bogus\""], "resolved_count": 2 }
       ```
 
       **dot_capabilities:**
@@ -99,3 +102,16 @@ sections:
       { "family": "ring", "includeComposition": true }
       → { "sourceExport": "getDotAxCatalog", "entries": [{ "id": "ring", "composition": { "kind": "finalized-style", ... } }] }
       ```
+
+  - title: "Response Boundary"
+    content: |
+      Successful calls produced by the five package handlers place a
+      JSON-stringified result in `content[0].text`. Handler failures and schema
+      validation failures are MCP errors: their exact text and outer error
+      envelope may be produced by this package or by the client/SDK boundary.
+      Consumers must check the MCP error signal before parsing successful text
+      as JSON and must not require every error string to begin with `Error:`.
+
+      `dot_complete` uses a package-local, hand-maintained completion catalog.
+      Use `dot_validate`, `dot_explain`, or `dot_capabilities` for resolver and
+      capability evidence; completion output is not an exhaustive token SSOT.

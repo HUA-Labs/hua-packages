@@ -11,6 +11,7 @@ LSP server for the dot style engine — autocomplete, hover, and diagnostics for
 
 - **stdio LSP server for dot utility completion, hover, and diagnostics**
 - **Recognizes dot() calls and dot= JSX attribute forms**
+- **Hand-maintained inlined completion catalog with a 500-result request cap**
 - **Optional web/native/flutter target caveat diagnostics**
 - **AX family/category metadata in target diagnostics**
 

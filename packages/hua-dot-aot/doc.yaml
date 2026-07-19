@@ -1,14 +1,14 @@
-overview: "Build-time static extraction for @hua-labs/dot. Replaces static dot() calls with pre-computed style objects at build time, eliminating runtime parsing overhead. Provides a Vite plugin and a Babel plugin (Metro, Next.js compatible). AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
+overview: "Build-time static extraction for @hua-labs/dot. Provides a heuristic Vite transform, an AST-based Babel plugin for explicit Babel pipelines, and core extraction helpers. AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
 
 features:
-  - "Zero-runtime CSS — static dot() calls replaced with inline object literals at build time"
+  - "Static-call projection — admitted dot() calls are replaced with inline object literals at build time"
   - "Vite plugin — enforce: 'pre' transform hook, fast path skips files with no dot calls"
-  - "Babel plugin — AST-accurate CallExpression visitor, works with Metro and Next.js"
-  - "Regex-based extraction engine — skips calls in strings, comments, template literals, and chained methods"
-  - "Static options support — extracts target and dark when literal values; skips breakpoint (dynamic)"
-  - "Cross-platform output — correct serialization for web, native, and flutter targets"
+  - "Babel plugin — AST CallExpression visitor for Metro and other explicit Babel pipelines"
+  - "Regex-based Vite extraction — heuristic scanner for bounded plain-string call sites"
+  - "Static options support — literal target and dark values are admitted; breakpoint remains at runtime"
+  - "Cross-platform output — serializes the @hua-labs/dot result for the admitted web, native, or flutter target"
   - "AX boundary — delegates capability truth to @hua-labs/dot/getDotAxCatalog() and preserves target output parity without creating an AOT-specific catalog"
-  - "Graceful fallback — malformed or unresolvable calls silently left as runtime"
+  - "Compiler boundary — the Babel plugin does not run inside Next.js SWC; a custom Babel configuration is required"
   - "styleToObjectLiteral — handles nested structures (RN transform arrays, Flutter recipe objects)"
 
 quickStart: |
@@ -16,7 +16,7 @@ quickStart: |
   import dotAot from '@hua-labs/dot-aot/vite';
   export default defineConfig({ plugins: [dotAot()] });
 
-  // Babel / Metro / Next.js
+  // Babel / Metro (and Next.js only with a custom Babel configuration)
   module.exports = { plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]] };
 
   // Before build:
@@ -30,9 +30,9 @@ readme:
     - "Build-time extraction for static dot() calls"
     - "Vite and Babel plugin entrypoints"
     - "Target-aware output parity with @hua-labs/dot"
-    - "Dynamic or unsafe calls remain at runtime"
-  quickStart: |
-    import dotAot from '@hua-labs/dot-aot/vite';
+    - "Heuristic Vite and AST-based Babel compiler boundaries documented separately"
+  quickStart: |-
+    import dotAot from "@hua-labs/dot-aot/vite";
 
     export default defineConfig({
       plugins: [dotAot()],
@@ -49,9 +49,9 @@ apiNotes:
   extractStaticCalls:
     description: "Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' | 'native' | 'flutter' }"
   transformSource:
-    description: "Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline."
+    description: "Apply all regex-extractor replacements in a single pass. Returns { code, extractions: number } or null if no changes."
   styleToObjectLiteral:
-    description: "Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets."
+    description: "Serialize one already-resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects; it does not accept a target parameter."
   ExtractedCall:
     description: "Single extraction result: { start, end, input, options?, result }. start/end are character offsets in the source string."
   ExtractOptions:
@@ -63,7 +63,7 @@ apiNotes:
   "@hua-labs/dot-aot/vite":
     description: "Default export: dotAotVite(options?) — returns a Vite Plugin. Logs extraction count in buildEnd hook."
   "@hua-labs/dot-aot/babel":
-    description: "Default export: dotAotBabel(_babel, options?) — standard Babel plugin factory. Uses CallExpression AST visitor."
+    description: "Default export: dotAotBabel(_babel, options?) — Babel plugin factory with a CallExpression AST visitor. It runs only in an explicit Babel pipeline and does not run inside Next.js SWC."
 
 sections:
   - title: "AX Boundary"
@@ -77,5 +77,20 @@ sections:
       diagnostic source of truth. If a target property is unsupported,
       approximate, recipe-only, or plugin-backed, the runtime resolver and the
       package-owned dot AX catalog remain the authority. AOT should preserve
-      target output parity and leave dynamic or unsafe calls at runtime rather
-      than inventing alternate capability semantics.
+      target output parity. Dynamic or unsupported JavaScript option shapes are
+      outside the current heuristic contract and must stay on a separately
+      verified runtime path rather than being inferred as safe AOT input.
+
+  - title: "Compiler Boundaries"
+    content: |
+      The Vite entry uses the package's regex/heuristic core extractor. The
+      Babel entry has its own AST visitor; it does not route source through the
+      regex pipeline. A Babel plugin only runs when the host toolchain executes
+      Babel. In Next.js, adding a custom Babel configuration opts out of the
+      built-in SWC compilation path for that code; this package does not run
+      inside Next.js SWC.
+
+      Use only the documented plain-string and supported literal-option shapes.
+      Do not treat the heuristic scanner as a parser or as proof that arbitrary
+      dynamic option objects are safe to precompute. Inspect transformed output
+      before adopting the Vite path in a release build.

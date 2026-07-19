@@ -11,6 +11,7 @@ MCP (Model Context Protocol) server for the dot style engine — enables AI assi
 
 - **stdio MCP server for resolving, explaining, completing, and validating dot utilities**
 - **Target-aware web, native, and Flutter style projections**
+- **Package-local completion suggestions kept distinct from resolver and capability truth**
 - **Capability catalog queries via dot_capabilities**
 - **CLI-first package surface through the dot-mcp binary**
 

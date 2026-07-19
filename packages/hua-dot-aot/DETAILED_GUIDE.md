@@ -25,16 +25,22 @@ The extraction engine is the central piece of `@hua-labs/dot-aot`. At its core i
 1. **Scan** — `extractStaticCalls` walks the source string and identifies all call sites that qualify for static replacement. It returns an array of `ExtractedCall` objects sorted last-to-first by source position so that downstream replacements never shift earlier offsets.
 2. **Replace** — `transformSource` iterates the extracted calls and splices each one out of the source, substituting the pre-computed object literal string produced by `styleToObjectLiteral`.
 
-Both the Vite plugin and the Babel plugin are thin adapters that route file source text through this pipeline. The core logic lives in a single, framework-agnostic extraction module.
+The Vite plugin routes source text through this regex-based pipeline. The Babel
+plugin is a separate adapter with its own `CallExpression` AST visitor; it does
+not route parsed source back through `extractStaticCalls`.
 
 ### Regex-Based Scanning
 
-`extractStaticCalls` uses regular expressions to locate candidate call sites rather than a full parser. The regex approach is intentional: it is significantly faster than parsing an AST for every file and it avoids a hard compile-time dependency on any specific JS parser version.
+`extractStaticCalls` uses regular expressions plus string/comment heuristics to
+locate candidate call sites rather than a full parser. It avoids a hard
+compile-time dependency on a JavaScript parser, but it must not be treated as
+an AST-equivalent correctness boundary.
 
 The scanner applies the following heuristics to decide whether a call is extractable:
 
 - The call must match one of the configured function names (default: `dot`).
-- The entire argument list must be statically resolvable: string literals only, no identifiers or expressions.
+- The first argument must match the scanner's plain single- or double-quoted
+  string grammar.
 - The call must not appear inside a comment (`//`, `/* */`), inside another string literal, inside a template literal `` ` `` expression, or as the target of a chained method call (e.g. `.map(dot)`).
 
 ### Static Analysis Limitations
@@ -49,7 +55,11 @@ Because the scanner does not build a full AST, there are categories of calls it 
 | Chained: `tokens.map(dot)`                        | Left as runtime |
 | Nested call: `dot(getClass())`                    | Left as runtime |
 
-All unresolvable calls are silently left intact. There is no error or warning — the call simply continues to run at runtime, so the output is always correct even when extraction is partial.
+Calls that do not match the scanner, include `breakpoint`, or throw during Dot
+resolution are left intact without a warning. That fallback is not proof that
+every arbitrary options object is safely classified: use only the documented
+literal shapes and inspect transformed output before enabling the Vite plugin
+in a release build.
 
 ### Vite Plugin Lifecycle
 
@@ -65,11 +75,15 @@ Because the plugin runs before JSX compilation, it operates on the original sour
 
 `dotAotBabel` returns a Babel plugin whose visitor targets `CallExpression` nodes. Unlike the regex engine, the Babel visitor has access to the fully-parsed AST, so it can precisely identify:
 
-- The function name (callee identifier or member expression).
+- The configured callee identifier.
 - Whether every argument is a `StringLiteral` node.
-- Whether option arguments are object expressions with literal values.
+- Whether the second argument is an object expression and whether supported
+  `target`/`dark` properties use recognized literal nodes.
 
-When a qualifying node is found, the visitor replaces it with an `ObjectExpression` AST node built from the resolved style object. This makes the Babel plugin suitable for toolchains where source accuracy matters more than raw speed — Metro (React Native) and Next.js both fall into this category.
+When a qualifying node is found, the visitor replaces it with an
+`ObjectExpression` AST node built from the resolved style object. This entry is
+for toolchains that actually execute Babel, including Metro. It does not run
+inside the Next.js SWC compiler.
 
 ---
 
@@ -128,7 +142,9 @@ module.exports = {
 
 ### Next.js
 
-Next.js uses Babel by default (Pages Router) and SWC by default (App Router). Use the Babel plugin for both setups.
+The Babel plugin runs only when Next.js is configured to execute a custom Babel
+pipeline. It does not run inside Next.js SWC. If a project chooses this route,
+configure `next/babel` explicitly:
 
 ```js
 // .babelrc or babel.config.js
@@ -138,7 +154,9 @@ module.exports = {
 };
 ```
 
-> Note: Using a custom Babel config in Next.js disables the built-in SWC compiler. This is an accepted trade-off for projects that require Babel plugins.
+> Adding a custom Babel config makes Next.js use Babel for affected compilation
+> instead of the built-in SWC path. Confirm that trade-off against the exact
+> Next.js version and build mode used by your application.
 
 ---
 
@@ -146,12 +164,15 @@ module.exports = {
 
 ### What Gets Extracted
 
-A `dot()` call is extracted at build time when all of the following are true:
+A `dot()` call is within the documented extraction contract when all of the
+following are true:
 
 1. The function name matches (default `dot`, configurable via `functionNames`).
 2. The first argument is a plain string literal — no template literals, no concatenation.
-3. If a second argument (options object) is present, every value in it is a literal: string, boolean, or number.
-4. The `target` option — if present — is a string literal (`"web"`, `"native"`, or `"flutter"`).
+3. If a second argument is present, it uses only the supported `target` and
+   `dark` keys with literal values.
+4. `target` is one of `"web"`, `"native"`, or `"flutter"`; `dark` is a boolean
+   literal. Any `breakpoint` key keeps the call at runtime.
 
 ```ts
 // Extracted — static string, static options
@@ -176,11 +197,14 @@ const style = dot("p-4", { breakpoint: currentBreakpoint });
 const styles = tokens.map(dot);
 ```
 
-The `breakpoint` option is always left as runtime because it depends on the current viewport state, which is inherently dynamic and cannot be resolved at build time.
+The `breakpoint` option is always left at runtime. Other dynamic, computed,
+spread, unknown, or otherwise unsupported option shapes are outside the
+regex/Vite extraction contract; do not rely on the heuristic scanner to
+classify them safely.
 
 ### How Options Are Handled Statically
 
-When the extractor encounters an options object it inspects each key individually:
+For supported literal option shapes, the extractor handles these keys:
 
 | Option key   | Static extraction       | Notes                                  |
 | ------------ | ----------------------- | -------------------------------------- |
@@ -189,6 +213,10 @@ When the extractor encounters an options object it inspects each key individuall
 | `breakpoint` | Never                   | Always runtime — viewport-dependent    |
 
 If `target` is not present in the call site options, the value from `ExtractOptions.target` (passed to the plugin) is used as the default.
+
+The current regex scanner is not a general object-literal parser. A project
+that needs broader option syntax should leave that call on the runtime path or
+use a separately verified AST transform.
 
 ---
 
@@ -233,7 +261,7 @@ const result = transformSource(sourceCode, {
 if (result !== null) {
   const { code, extractions } = result;
   // code: transformed source string
-  // extractions: ExtractedCall[] that were applied
+  // extractions: number of replacements that were applied
 }
 ```
 
@@ -248,23 +276,20 @@ Serializes a resolved style object to a JavaScript object literal string, with w
 ```ts
 import { styleToObjectLiteral } from "@hua-labs/dot-aot";
 
-const literal = styleToObjectLiteral(
-  { padding: "16px", display: "flex" },
-  "web",
-);
-// → '({ padding: "16px", display: "flex" })'
+const literal = styleToObjectLiteral({ padding: "16px", display: "flex" });
+// → '({padding: "16px", display: "flex"})'
 ```
 
 Handles nested structures required by `native` and `flutter` targets:
 
 ```ts
 // React Native transform arrays
-styleToObjectLiteral({ transform: [{ translateX: 0 }] }, "native");
-// → '({ transform: [{ translateX: 0 }] })'
+styleToObjectLiteral({ transform: [{ translateX: 0 }] });
+// → '({transform: [{translateX: 0}]})'
 
 // Flutter recipe objects
-styleToObjectLiteral({ decoration: { color: 0xff3b82f6 } }, "flutter");
-// → '({ decoration: { color: 0xff3b82f6 } })'
+styleToObjectLiteral({ decoration: { color: 0xff3b82f6 } });
+// → '({decoration: {color: 4282090230}})'
 ```
 
 ---
@@ -274,9 +299,10 @@ styleToObjectLiteral({ decoration: { color: 0xff3b82f6 } }, "flutter");
 Vite plugin factory. Returns a plugin with `enforce: 'pre'`.
 
 ```ts
-import dotAot from "@hua-labs/dot-aot/vite";
+import dotAot, { type DotAotViteOptions } from "@hua-labs/dot-aot/vite";
 
-dotAot(options?: DotAotViteOptions)
+const options: DotAotViteOptions = { target: "web" };
+const plugin = dotAot(options); // Vite Plugin
 ```
 
 **`DotAotViteOptions`** extends `ExtractOptions`:
@@ -286,7 +312,7 @@ dotAot(options?: DotAotViteOptions)
 | `functionNames` | `string[]`                       | `["dot"]`                        | Function names to scan for   |
 | `target`        | `'web' \| 'native' \| 'flutter'` | `"web"`                          | Default output target        |
 | `include`       | `string[]`                       | `[".ts", ".tsx", ".js", ".jsx"]` | File extensions to transform |
-| `exclude`       | `string[]`                       | `[]`                             | File extensions to skip      |
+| `exclude`       | `string[]`                       | `["node_modules"]`               | Path substrings to skip      |
 
 ---
 
@@ -313,18 +339,15 @@ module.exports = {
 ### Types
 
 ```ts
-import type {
-  ExtractedCall,
-  ExtractOptions,
-  DotAotViteOptions,
-  DotAotBabelOptions,
-} from "@hua-labs/dot-aot";
+import type { ExtractedCall, ExtractOptions } from "@hua-labs/dot-aot";
+import type { DotAotViteOptions } from "@hua-labs/dot-aot/vite";
+import type { DotAotBabelOptions } from "@hua-labs/dot-aot/babel";
 
 // A single resolved extraction
 type ExtractedCall = {
   start: number; // Start offset in source string
   end: number; // End offset in source string
-  input: string; // Original call site source text
+  input: string; // Original utility string argument
   options?: DotOptions; // Resolved options from the call
   result: Record<string, unknown>; // Pre-computed style object
 };
@@ -346,10 +369,14 @@ If your codebase aliases `dot` to a different name, configure `functionNames`:
 
 ```ts
 // vite.config.ts
-dotAot({ functionNames: ["dot", "s", "style"] })[
-  // babel.config.js
-  ("@hua-labs/dot-aot/babel", { functionNames: ["dot", "css"] })
-];
+dotAot({ functionNames: ["dot", "s", "style"] });
+```
+
+```js
+// babel.config.js
+module.exports = {
+  plugins: [["@hua-labs/dot-aot/babel", { functionNames: ["dot", "css"] }]],
+};
 ```
 
 Any call matching one of the names and satisfying static-resolvability will be extracted.
@@ -365,7 +392,10 @@ dotAot({
 });
 ```
 
-Files not matching the `include` list are returned from the transform hook immediately — they never enter the extraction pipeline, keeping build performance predictable.
+Files not matching the `include` list, or whose path contains an `exclude`
+substring, return `null` before extraction. Supplying `exclude` replaces the
+default `["node_modules"]`; include that value yourself if it should remain
+excluded.
 
 ### Cross-Platform Targets
 
@@ -445,7 +475,7 @@ export default defineConfig({
 import { dot } from "@hua-labs/dot";
 
 export function Card({ children }: { children: React.ReactNode }) {
-  // This call is replaced at build time — zero runtime overhead
+  // This admitted call is replaced at build time by this plugin.
   const style = dot("rounded-xl p-6 bg-surface shadow-md");
 
   return <div style={style}>{children}</div>;
@@ -493,7 +523,9 @@ export default function Page() {
 }
 ```
 
-> Because this extraction happens in the Babel transform step, it works with both Pages Router and App Router. Server Components are fully supported — there is no runtime import to tree-shake.
+> This example is valid only when the Next.js build actually runs the custom
+> Babel configuration. It does not prove SWC execution, React Server Component
+> compatibility, import removal, tree-shaking, or browser/runtime parity.
 
 ### React Native with Metro
 
@@ -619,6 +651,10 @@ const styles = [dot("p-2"), dot("p-4"), dot("p-6")];
 
 ### Malformed or Unresolvable Calls
 
-When `dot()` is called with arguments the extractor cannot resolve — wrong arity, unexpected node types, or an option value it cannot serialize — the call is silently left as runtime. There is no build error. This is intentional: graceful fallback means a single unresolvable call never blocks the build.
+Calls that fail the documented literal grammar, contain `breakpoint`, or throw
+during resolution may remain at runtime without a build error. The regex path
+does not validate every JavaScript options shape. Dynamic values, spreads,
+computed or unknown keys, nested objects, and extra arguments are outside the
+supported AOT contract; keep those calls at runtime and inspect emitted code.
 
 If you suspect a specific call is not being extracted when it should be, use `extractStaticCalls` in a debug script (see [Debugging Extractions](#debugging-extractions)) to inspect the extractor's view of that source file.
