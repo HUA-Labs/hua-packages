@@ -569,7 +569,35 @@ function normalizeManifest(value, label) {
     value.publishConfig === undefined
       ? null
       : validatePublishConfig(value.publishConfig, `${label}-publish-config`);
-  return { name, version, private: isPrivate, publishConfig };
+  const dependencyNames = new Set();
+  for (const field of ["dependencies", "optionalDependencies"]) {
+    const dependencies = value[field];
+    if (dependencies === undefined) continue;
+    assert(isRecord(dependencies), `${label}-${field}-shape`);
+    for (const dependencyName of Object.keys(dependencies).sort(compareUtf8)) {
+      stringValue(
+        dependencyName,
+        PACKAGE_NAME_PATTERN,
+        `${label}-${field}-name`,
+      );
+      const dependencySpec = stringValue(
+        dependencies[dependencyName],
+        /^.{1,512}$/u,
+        `${label}-${field}-spec`,
+      );
+      if (dependencySpec.startsWith("workspace:")) {
+        dependencyNames.add(dependencyName);
+      }
+    }
+  }
+  const workspaceDependencies = [...dependencyNames].sort(compareUtf8);
+  return {
+    name,
+    version,
+    private: isPrivate,
+    publishConfig,
+    workspaceDependencies,
+  };
 }
 
 export function discoverWorkspaceManifests(root) {
@@ -596,6 +624,7 @@ export function discoverWorkspaceManifests(root) {
       version: manifest.version,
       private: manifest.private,
       publishConfig: manifest.publishConfig,
+      workspaceDependencies: manifest.workspaceDependencies,
       sha256: sha256(bytes),
     });
   }
@@ -2149,14 +2178,38 @@ export function runPack(options = {}) {
     options.artifactDirectory,
     true,
   );
-  const artifactRecords = [];
+  const manifestsByName = new Map(
+    releaseState.manifests.map((manifest) => [manifest.name, manifest]),
+  );
+  const visited = new Set();
+  const visiting = new Set();
+  const buildOrder = [];
+  const visitBuild = (name) => {
+    const manifest = manifestsByName.get(name);
+    assert(manifest !== undefined, "pack-workspace-dependency-unknown");
+    if (visited.has(name)) return;
+    assert(!visiting.has(name), "pack-workspace-dependency-cycle");
+    visiting.add(name);
+    for (const dependencyName of manifest.workspaceDependencies) {
+      visitBuild(dependencyName);
+    }
+    visiting.delete(name);
+    visited.add(name);
+    buildOrder.push(manifest);
+  };
   for (const release of releaseState.plan.releases) {
-    const packageDirectory = safeRelativePath(root, release.path);
-    execFile("pnpm", ["--filter", release.name, "run", "build"], {
+    visitBuild(release.name);
+  }
+  for (const manifest of buildOrder) {
+    execFile("pnpm", ["--filter", manifest.name, "run", "build"], {
       cwd: root,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });
+  }
+  const artifactRecords = [];
+  for (const release of releaseState.plan.releases) {
+    const packageDirectory = safeRelativePath(root, release.path);
     const beforeEntries = new Set(readdirSync(artifactDirectory));
     execFile("pnpm", ["pack", "--pack-destination", artifactDirectory], {
       cwd: packageDirectory,

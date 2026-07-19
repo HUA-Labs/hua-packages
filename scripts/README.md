@@ -32,7 +32,7 @@ monorepo state.
 | `safe-release.mjs refresh`      | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                    |
 | `safe-release.mjs version`      | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                       |
 | `safe-release.mjs check`        | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.         |
-| `safe-release.mjs pack`         | Build, pack, inspect, and hash every exact planned package into one external immutable artifact bundle.               |
+| `safe-release.mjs pack`         | Build the deterministic workspace-prerequisite closure, then pack, inspect, and hash only the exact planned packages. |
 | `safe-release.mjs claim`        | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.         |
 | `safe-release.mjs publish`      | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                     |
 | `check-npm-provenance.mjs`      | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                     |
@@ -131,11 +131,15 @@ fixed `/usr/bin/gh`, bounds every JSON response, reports a missing dedicated
 credential as exact `policy-credential-unavailable`, collapses unauthorized,
 malformed, partial, or inconsistent API authority to exact
 `external-policy-blocked`, and rechecks remote `main` before and after the read.
-No API error or incomplete response becomes an empty allowlist. For
-an exact planned set it builds every selected package, including an unscoped
-package such as `create-hua` when explicitly selected, packs each package into
-a caller-owned external directory, and runs `check-pack-artifacts.js` against
-the complete exact tarball set. A bounded canonical manifest binds every
+No API error or incomplete response becomes an empty allowlist. For an exact
+planned set it resolves each selected package's `workspace:` dependencies and
+optional dependencies, builds that complete dependency-first closure once,
+then packs only the selected release rows. A blocked package such as Dot may be
+built as a prerequisite without becoming selected, eligible, packed, or
+publishable. An unscoped package such as `create-hua` is built and packed only
+when explicitly selected. The guard writes every tarball into a caller-owned
+external directory and runs `check-pack-artifacts.js` against the complete
+exact selected tarball set. A bounded canonical manifest binds every
 tarball filename, byte count, SHA-256, package name and version to the planned
 plan digest, exact source head, `main`, and GitHub run ID. Package-check failure,
 missing or extra artifacts, tarball substitution, or manifest drift prevents
@@ -200,8 +204,9 @@ transition is not merged.
 
 The current committed plan is empty. Choosing a version, selecting UI alone or
 an explicit cohort, approving npm publication, and choosing token versus OIDC
-remain operator release decisions. Dot and Motion are not inferred from UI
-dependencies: Dot is blocked by its current `no-publish` mode, and Motion is
+remain operator release decisions. UI's workspace dependency makes Dot a build
+prerequisite only; Dot remains blocked by its current `no-publish` mode and is
+never added to the release or artifact set. Motion is a peer and remains
 eligible only when an explicit reviewed Changeset selects it.
 
 After a successful version run, review the version diff, packed artifacts,

@@ -104,6 +104,8 @@ const packageDefinitions = [
     name: "@hua-labs/ui",
     path: "packages/hua-ui",
     version: "2.3.0",
+    dependencies: { "@hua-labs/dot": "workspace:*" },
+    peerDependencies: { "@hua-labs/motion-core": ">=2.4.0" },
     release: {
       mode: "public-npm",
       intent: "active-public",
@@ -125,6 +127,15 @@ function manifestFor(definition, version = definition.version) {
   if (definition.private) manifest.private = true;
   if (definition.publishConfig !== null) {
     manifest.publishConfig = definition.publishConfig;
+  }
+  if (definition.dependencies !== undefined) {
+    manifest.dependencies = definition.dependencies;
+  }
+  if (definition.optionalDependencies !== undefined) {
+    manifest.optionalDependencies = definition.optionalDependencies;
+  }
+  if (definition.peerDependencies !== undefined) {
+    manifest.peerDependencies = definition.peerDependencies;
   }
   return manifest;
 }
@@ -804,7 +815,12 @@ test("pack builds every exact planned package including create-hua before one ar
     calls
       .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
       .map(({ args }) => args[1]),
-    ["@hua-labs/ui", "create-hua"],
+    ["@hua-labs/dot", "@hua-labs/ui", "create-hua"],
+  );
+  assert.equal(
+    calls.filter(({ file, args }) => file === "pnpm" && args[0] === "pack")
+      .length,
+    2,
   );
   const checkerCalls = calls.filter(
     ({ file, args }) =>
@@ -813,6 +829,192 @@ test("pack builds every exact planned package including create-hua before one ar
   assert.equal(checkerCalls.length, 1);
   assert.equal(checkerCalls[0].args.length, 3);
   assert.equal(readFileSync(result.artifactManifestPath).byteLength > 0, true);
+});
+
+test("pack builds blocked and unselected workspace prerequisites once in deterministic dependency order", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const publicManifest = { access: "public", provenance: true };
+  const definitions = [
+    {
+      ...structuredClone(packageDefinitions[0]),
+    },
+    {
+      name: "@hua-labs/dot-lsp",
+      path: "packages/hua-dot-lsp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/dot-mcp",
+      path: "packages/hua-dot-mcp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-core",
+      path: "packages/hua-i18n-core",
+      version: "2.2.1",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-core-zustand",
+      path: "packages/hua-i18n-core-zustand",
+      version: "2.2.1",
+      dependencies: {
+        "@hua-labs/i18n-core": "workspace:*",
+        "@hua-labs/state": "workspace:*",
+      },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-formatters",
+      path: "packages/hua-i18n-formatters",
+      version: "2.2.1",
+      dependencies: { "@hua-labs/i18n-core": "workspace:*" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-loaders",
+      path: "packages/hua-i18n-loaders",
+      version: "2.2.1",
+      dependencies: { "@hua-labs/i18n-core": "workspace:*" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/state",
+      path: "packages/hua-state",
+      version: "1.0.4",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+  ].sort((left, right) =>
+    Buffer.compare(Buffer.from(left.name), Buffer.from(right.name)),
+  );
+  const releases = [
+    "@hua-labs/dot-lsp",
+    "@hua-labs/dot-mcp",
+    "@hua-labs/i18n-core-zustand",
+    "@hua-labs/i18n-formatters",
+    "@hua-labs/i18n-loaders",
+  ];
+  const fixture = createPlannedFixture(releases, definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const result = runPack({
+    root: fixture.root,
+    artifactDirectory: createExternalArtifactDirectory(fixture),
+    branch: "main",
+    runId: "776",
+    sourceHead: "6".repeat(40),
+    execFile: packExecFixture(calls),
+  });
+  assert.equal(result.artifactCount, releases.length);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    [
+      "@hua-labs/dot",
+      "@hua-labs/dot-lsp",
+      "@hua-labs/dot-mcp",
+      "@hua-labs/i18n-core",
+      "@hua-labs/state",
+      "@hua-labs/i18n-core-zustand",
+      "@hua-labs/i18n-formatters",
+      "@hua-labs/i18n-loaders",
+    ],
+  );
+  assert.deepEqual(
+    JSON.parse(readFileSync(result.artifactManifestPath, "utf8")).artifacts.map(
+      ({ name }) => name,
+    ),
+    [...releases].sort((left, right) =>
+      Buffer.compare(Buffer.from(left), Buffer.from(right)),
+    ),
+  );
+});
+
+test("pack rejects a workspace build-dependency cycle before build, pack, or artifact checks", (t) => {
+  const release = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/alpha",
+      path: "packages/alpha",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/beta": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/beta",
+      path: "packages/beta",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/alpha": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@hua-labs/alpha"], definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "775",
+        sourceHead: "5".repeat(40),
+        execFile: packExecFixture(calls),
+      }),
+    "pack-workspace-dependency-cycle",
+  );
+  assert.deepEqual(calls, []);
 });
 
 test("pack-check failure creates no claim authority and executes zero publish", () => {
