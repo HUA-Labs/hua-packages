@@ -48,9 +48,15 @@ opaque source and public-base commits/trees plus every currently different UI
 source path, its exact byte hashes, and one disposition:
 `platform-exact`, `public-preserved`, `derived-reviewed`, or `deferred`.
 Canonical ordering, exact keys, duplicate/unknown paths, map digests, current
-worktree bytes, and public-base Git objects fail closed. A reviewer with the
-exact source repository may additionally pass `--source-repo <path>` to verify
-the source commit/tree/blobs and prove the 150-row difference set is complete.
+worktree bytes, and public-base Git objects fail closed. The checker uses a
+fixed Git executable with a minimal process environment, requires the complete
+tracked UI source manifest to match HEAD and an ordinary stage-zero index, and
+hashes every tracked raw worktree file rather than trusting index stat hints.
+Authority-tree presence, bounded blob size, bounded content read, and absence
+are distinct outcomes; a failed or oversized blob read cannot become nullable
+absence. A reviewer with the exact source repository may additionally pass
+`--source-repo <path>` to verify the source commit/tree/blobs and prove the
+150-row difference set is complete.
 The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it

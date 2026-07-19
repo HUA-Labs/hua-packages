@@ -192,6 +192,44 @@ function runChecker(fixture, ...extra) {
   );
 }
 
+function createOversizedSourceFixture() {
+  const fixtureRoot = mkdtempSync(
+    join(tmpdir(), "hua-ui-authority-large-test-"),
+  );
+  ownedRoots.push(fixtureRoot);
+  const publicRoot = join(fixtureRoot, "public");
+  const sourceRoot = join(fixtureRoot, "source");
+  const shared = "export const shared = true;\n";
+  const publicCommit = initRepo(publicRoot, {
+    "packages/hua-ui/src/shared.ts": shared,
+  });
+  const sourceCommit = initRepo(sourceRoot, {
+    "packages/hua-ui/src/Huge.ts": Buffer.alloc(4 * 1024 * 1024 + 2, 0x61),
+    "packages/hua-ui/src/shared.ts": shared,
+  });
+  const rows = [
+    {
+      disposition: "deferred",
+      kind: "production",
+      outputSha256: null,
+      path: "packages/hua-ui/src/Huge.ts",
+      publicBaseSha256: null,
+      sourceSha256: null,
+    },
+  ];
+  const config = {
+    mapDigest: sha256(canonicalJson(rows)),
+    publicBase: authority(publicRoot, publicCommit),
+    rows,
+    schema: "hua-ui-source-authority.v1",
+    sourceAuthority: authority(sourceRoot, sourceCommit),
+  };
+  const configPath = join(publicRoot, "config", "ui-source-authority.json");
+  mkdirSync(dirname(configPath), { recursive: true });
+  writeFileSync(configPath, canonicalJson(config));
+  return { config, configPath, publicRoot, sourceRoot };
+}
+
 test("accepts an exact complete cross-repository authority map", () => {
   const fixture = createFixture();
   const result = runChecker(fixture, "--json");
@@ -223,6 +261,61 @@ test("rejects an unmapped current source change", () => {
   const result = runChecker(fixture);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /unmapped-current-source-change/);
+});
+
+test("rejects hidden assume-unchanged and skip-worktree source state", () => {
+  for (const flag of ["--assume-unchanged", "--skip-worktree"]) {
+    const fixture = createFixture();
+    const path = "packages/hua-ui/src/shared.ts";
+    runGit(fixture.publicRoot, ["update-index", flag, path]);
+    writeFileSync(
+      join(fixture.publicRoot, ...path.split("/")),
+      "export const shared = false;\n",
+    );
+    assert.equal(
+      runGit(fixture.publicRoot, [
+        "diff",
+        "--name-only",
+        fixture.config.publicBase.commit,
+        "--",
+        "packages/hua-ui/src",
+      ]),
+      "",
+    );
+
+    const result = runChecker(fixture);
+    assert.equal(result.status, 1, `${flag}: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /index-entry-not-ordinary/);
+  }
+});
+
+test("ignores caller Git repository and index redirection", () => {
+  const fixture = createFixture();
+  const result = spawnSync(
+    process.execPath,
+    [
+      checker,
+      "--config",
+      fixture.configPath,
+      "--public-root",
+      fixture.publicRoot,
+      "--source-repo",
+      fixture.sourceRoot,
+      "--json",
+    ],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        GIT_DIR: join(fixture.sourceRoot, ".git"),
+        GIT_INDEX_FILE: join(fixture.sourceRoot, ".git", "index"),
+        GIT_WORK_TREE: fixture.sourceRoot,
+      },
+    },
+  );
+
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /"sourceVerified": true/);
 });
 
 test("rejects an incomplete map even when its digest is recomputed", () => {
@@ -264,6 +357,38 @@ test("rejects a source authority byte mismatch", () => {
   const result = runChecker(fixture);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /source-authority-blob-mismatch/);
+});
+
+test("rejects a present authority blob larger than the byte ceiling", () => {
+  const fixture = createOversizedSourceFixture();
+  const result = runChecker(fixture);
+
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stderr, /authority-file-too-large/);
+  assert.doesNotMatch(result.stdout, /sourceVerified/);
+});
+
+test("distinguishes an unreadable authority blob from an absent path", () => {
+  const fixture = createFixture();
+  const path = "packages/hua-ui/src/components/A.ts";
+  const object = runGit(fixture.sourceRoot, [
+    "rev-parse",
+    `${fixture.config.sourceAuthority.commit}:${path}`,
+  ]);
+  rmSync(
+    join(
+      fixture.sourceRoot,
+      ".git",
+      "objects",
+      object.slice(0, 2),
+      object.slice(2),
+    ),
+  );
+
+  const result = runChecker(fixture);
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stderr, /authority-blob-size-read-failed/);
+  assert.doesNotMatch(result.stderr, /source-authority-blob-mismatch/);
 });
 
 test("rejects symlink substitution at the current public boundary", () => {
