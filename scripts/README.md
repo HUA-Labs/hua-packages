@@ -137,7 +137,12 @@ optional dependencies, builds that complete dependency-first closure once,
 then packs only the selected release rows. A blocked package such as Dot may be
 built as a prerequisite without becoming selected, eligible, packed, or
 publishable. An unscoped package such as `create-hua` is built and packed only
-when explicitly selected. The guard writes every tarball into a caller-owned
+when explicitly selected. After the complete build closure, the guard re-reads
+the canonical policy, release plan, and every workspace manifest and requires
+the exact planned bytes and manifest hashes captured before any build. It
+repeats that check after each pack and after the artifact checker, so a build or
+pack lifecycle cannot change planned package metadata or release authority
+before artifact admission. The guard writes every tarball into a caller-owned
 external directory and runs `check-pack-artifacts.js` against the complete
 exact selected tarball set. A bounded canonical manifest binds every
 tarball filename, byte count, SHA-256, package name and version to the planned

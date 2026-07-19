@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -1025,6 +1026,121 @@ test("pack rejects planned workspace manifest drift caused by a prerequisite bui
   );
 });
 
+test("pack rejects release-plan authority drift caused by a prerequisite build", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "772",
+        sourceHead: "2".repeat(40),
+        execFile(file, args, options) {
+          const output = executeFixture(file, args, options);
+          if (
+            !mutated &&
+            file === "pnpm" &&
+            args[0] === "--filter" &&
+            args[1] === "@hua-labs/dot"
+          ) {
+            const state = loadReleaseState(fixture.root, {
+              requireNonempty: true,
+            });
+            const releases = structuredClone(state.plan.releases);
+            releases[0].changesets[0].sha256 = "3".repeat(64);
+            writeFileSync(
+              join(fixture.root, "config/release-plan.json"),
+              canonicalJson(
+                finalizeReleasePlan({
+                  ...state.plan,
+                  releases,
+                }),
+              ),
+            );
+            mutated = true;
+          }
+          return output;
+        },
+      }),
+    "pack-plan-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.some(({ file, args }) => file === "pnpm" && args[0] === "pack"),
+    false,
+  );
+});
+
+test("pack rejects selected manifest drift introduced by pack before artifact admission", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory,
+        branch: "main",
+        runId: "773",
+        sourceHead: "3".repeat(40),
+        execFile(file, args, options) {
+          if (!mutated && file === "pnpm" && args[0] === "pack") {
+            mutateJson(
+              join(fixture.root, "packages/hua-ui/package.json"),
+              (manifest) => {
+                manifest.description = "mutated while packing";
+              },
+            );
+            mutated = true;
+          }
+          return executeFixture(file, args, options);
+        },
+      }),
+    "plan-workspace-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.filter(({ file, args }) => file === "pnpm" && args[0] === "pack")
+      .length,
+    1,
+  );
+  assert.equal(
+    calls.some(
+      ({ file, args }) =>
+        file === "node" && args[0].endsWith("check-pack-artifacts.js"),
+    ),
+    false,
+  );
+  assert.equal(
+    existsSync(join(artifactDirectory, "release-artifacts.json")),
+    false,
+  );
+});
+
 test("pack rejects a workspace build-dependency cycle before build, pack, or artifact checks", (t) => {
   const release = {
     mode: "public-npm",
@@ -1070,6 +1186,45 @@ test("pack rejects a workspace build-dependency cycle before build, pack, or art
         execFile: packExecFixture(calls),
       }),
     "pack-workspace-dependency-cycle",
+  );
+  assert.deepEqual(calls, []);
+});
+
+test("pack rejects an unknown workspace build dependency before any execution", (t) => {
+  const release = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/alpha",
+      path: "packages/alpha",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/absent": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@hua-labs/alpha"], definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "771",
+        sourceHead: "1".repeat(40),
+        execFile: packExecFixture(calls),
+      }),
+    "pack-workspace-dependency-unknown",
   );
   assert.deepEqual(calls, []);
 });

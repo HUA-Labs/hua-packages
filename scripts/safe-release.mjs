@@ -2207,6 +2207,7 @@ export function runPack(options = {}) {
       stdio: ["ignore", "pipe", "pipe"],
     });
   }
+  assertPackReleaseStateUnchanged(root, releaseState);
   const artifactRecords = [];
   for (const release of releaseState.plan.releases) {
     const packageDirectory = safeRelativePath(root, release.path);
@@ -2216,6 +2217,7 @@ export function runPack(options = {}) {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });
+    assertPackReleaseStateUnchanged(root, releaseState);
     const addedEntries = readdirSync(artifactDirectory).filter(
       (entry) => !beforeEntries.has(entry),
     );
@@ -2263,6 +2265,7 @@ export function runPack(options = {}) {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  assertPackReleaseStateUnchanged(root, releaseState);
   for (const artifact of artifactRecords) {
     const bytes = readRegularFile(
       join(artifactDirectory, artifact.file),
@@ -2308,6 +2311,13 @@ export function runPack(options = {}) {
     artifactCount: artifactRecords.length,
     planDigest: releaseState.plan.planDigest,
   };
+}
+
+function assertPackReleaseStateUnchanged(root, expected) {
+  const current = loadReleaseState(root, { requireNonempty: true });
+  assert(current.plan.status === "planned", "pack-plan-status");
+  assert(current.policyBytes.equals(expected.policyBytes), "pack-policy-drift");
+  assert(current.planBytes.equals(expected.planBytes), "pack-plan-drift");
 }
 
 export function runClaim(options = {}) {
