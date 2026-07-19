@@ -29,6 +29,9 @@ quickStart: |
     loadTranslations: loader,
   });
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "i18n-core"
   - "i18n-core-zustand"

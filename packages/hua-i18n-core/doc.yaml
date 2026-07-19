@@ -37,6 +37,9 @@ quickStart: |
     );
   }
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "i18n-core-zustand"
   - "eslint-plugin-i18n"

@@ -6,6 +6,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
+    "DETAILED_GUIDE.md",
     "dist",
     "src"
   ],
