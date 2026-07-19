@@ -23,6 +23,7 @@ import {
   loadPolicy,
   loadReleaseState,
   parseStrictJsonBytes,
+  runAuthority,
   runCheck,
   runClaim,
   runPack,
@@ -32,6 +33,7 @@ import {
   runVersion,
   sha256,
   validatePolicy,
+  validateGitHubReleaseAuthority,
   validatePublishedPackages,
 } from "../safe-release.mjs";
 
@@ -261,6 +263,83 @@ const TEST_CLAIM = Object.freeze({
   sourceHead: "a".repeat(40),
 });
 
+const TEST_RELEASE_REPOSITORY = "HUA-Labs/hua-packages";
+
+function githubTransition(kind = "claim") {
+  const baseHead = kind === "claim" ? "a".repeat(40) : "c".repeat(40);
+  return {
+    kind,
+    baseHead,
+    currentHead: kind === "claim" ? "c".repeat(40) : "d".repeat(40),
+    currentTree: "9".repeat(40),
+    expectedBranch: `release/${kind}-${baseHead.slice(0, 12)}`,
+  };
+}
+
+function githubAuthorityFixture(transition = githubTransition()) {
+  const pullRequestHead = kindHead(transition.kind);
+  return {
+    protection: {
+      required_pull_request_reviews: {
+        dismiss_stale_reviews: true,
+        require_last_push_approval: true,
+        required_approving_review_count: 1,
+        bypass_pull_request_allowances: { users: [], teams: [], apps: [] },
+      },
+      enforce_admins: { enabled: true },
+      allow_force_pushes: { enabled: false },
+      allow_deletions: { enabled: false },
+    },
+    rules: [
+      {
+        type: "pull_request",
+        parameters: {
+          dismiss_stale_reviews_on_push: true,
+          require_last_push_approval: true,
+          required_approving_review_count: 1,
+        },
+      },
+    ],
+    rulesets: [],
+    actions: {
+      default_workflow_permissions: "write",
+      can_approve_pull_request_reviews: false,
+    },
+    associations: [{ number: 17 }],
+    pullRequest: {
+      number: 17,
+      state: "closed",
+      merged: true,
+      merged_at: "2026-07-19T00:00:00Z",
+      merge_commit_sha: transition.currentHead,
+      user: { login: "release-author" },
+      base: {
+        ref: "main",
+        sha: transition.baseHead,
+        repo: { full_name: TEST_RELEASE_REPOSITORY },
+      },
+      head: {
+        ref: transition.expectedBranch,
+        sha: pullRequestHead,
+        repo: { full_name: TEST_RELEASE_REPOSITORY },
+      },
+    },
+    reviews: [
+      {
+        id: 1,
+        state: "APPROVED",
+        commit_id: pullRequestHead,
+        user: { login: "independent-reviewer" },
+      },
+    ],
+    headCommit: { tree: { sha: transition.currentTree } },
+  };
+}
+
+function kindHead(kind) {
+  return kind === "claim" ? "b".repeat(40) : "e".repeat(40);
+}
+
 function createTestArtifactBundle(fixture, claim = TEST_CLAIM) {
   const state = loadReleaseState(fixture.root, { requireNonempty: true });
   const artifactRoot = realpathSync(
@@ -359,6 +438,13 @@ function createPublishingFixture(
 }
 
 function publishingOptions(fixture, execFile) {
+  const transition = {
+    kind: "claim",
+    baseHead: fixture.claim.sourceHead,
+    currentHead: fixture.claimHead,
+    currentTree: "9".repeat(40),
+    expectedBranch: `release/claim-${fixture.claim.sourceHead.slice(0, 12)}`,
+  };
   return {
     root: fixture.root,
     execFile(file, args, options) {
@@ -366,6 +452,9 @@ function publishingOptions(fixture, execFile) {
       return execFile(file, args, options);
     },
     gitExecFile(_file, args) {
+      if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+        return `${transition.currentTree}\n`;
+      }
       if (args[0] === "rev-parse") return `${fixture.claimHead}\n`;
       if (args[0] === "ls-remote") {
         return `${fixture.claimHead}\trefs/heads/main\n`;
@@ -378,6 +467,7 @@ function publishingOptions(fixture, execFile) {
       }
       throw new Error("unexpected-git-command");
     },
+    githubAuthority: githubAuthorityFixture(transition),
     artifactManifestPath: fixture.artifactManifestPath,
     claimHead: fixture.claimHead,
     ...fixture.claim,
@@ -889,6 +979,58 @@ test("workflow routes claim and closure through reviewed protected-main transiti
   const prepareSteps = authority.jobs.prepare.steps;
   const publishSteps = authority.jobs.publish.steps;
   const closeSteps = authority.jobs.close.steps;
+  const prepareAuthority = prepareSteps.find(
+    (step) => step.name === "Check current GitHub release authority",
+  );
+  const publishAuthority = publishSteps.find(
+    (step) => step.name === "Recheck exact reviewed claim authority",
+  );
+  const closureAuthority = closeSteps.find(
+    (step) =>
+      step.name === "Recheck exact reviewed claim authority for closure",
+  );
+  assert.equal(
+    prepareAuthority.run,
+    "node scripts/safe-release.mjs authority --format=github",
+  );
+  assert.equal(
+    publishAuthority.run,
+    "node scripts/safe-release.mjs authority --format=github",
+  );
+  assert.equal(
+    closureAuthority.run,
+    "node scripts/safe-release.mjs authority --format=github",
+  );
+  assert.equal(
+    prepareAuthority.env.GITHUB_TOKEN,
+    "${{ secrets.GITHUB_TOKEN }}",
+  );
+  assert.equal(
+    publishAuthority.env.GITHUB_TOKEN,
+    "${{ secrets.GITHUB_TOKEN }}",
+  );
+  assert.equal(
+    closureAuthority.env.GITHUB_TOKEN,
+    "${{ secrets.GITHUB_TOKEN }}",
+  );
+  assert.ok(
+    prepareSteps.indexOf(prepareAuthority) <
+      prepareSteps.findIndex((step) => step.name === "Install dependencies"),
+  );
+  assert.ok(
+    publishSteps.indexOf(publishAuthority) <
+      publishSteps.findIndex(
+        (step) => step.name === "Download exact claimed artifacts",
+      ),
+  );
+  assert.ok(
+    closeSteps.indexOf(closureAuthority) <
+      closeSteps.findIndex(
+        (step) =>
+          step.name ===
+          "Check exact published-set npm provenance and close exact published plan",
+      ),
+  );
   assert.equal(
     prepareSteps.some(
       (step) => step.name === "Open reviewed claim transition PR",
@@ -926,6 +1068,311 @@ test("workflow routes claim and closure through reviewed protected-main transiti
     "utf8",
   );
   assert.doesNotMatch(source, /committedHead}:refs\/heads\/\$\{branch\}/);
+  assert.match(source, /const GITHUB_CLI = "\/usr\/bin\/gh"/);
+});
+
+test("GitHub release authority fails closed before OIDC or publish on every unreviewed boundary", async (t) => {
+  const transition = githubTransition("claim");
+  const cases = [
+    ["absent protection", (value) => (value.protection = null)],
+    ["absent effective rules", (value) => (value.rules = [])],
+    [
+      "classic bypass actor",
+      (value) =>
+        value.protection.required_pull_request_reviews.bypass_pull_request_allowances.users.push(
+          { login: "bypass-user" },
+        ),
+    ],
+    [
+      "administrator bypass",
+      (value) => (value.protection.enforce_admins.enabled = false),
+    ],
+    [
+      "ruleset bypass actor",
+      (value) =>
+        value.rulesets.push({
+          id: 9,
+          enforcement: "active",
+          bypass_actors: [{ actor_type: "Integration", actor_id: 4 }],
+        }),
+    ],
+    [
+      "Actions review approval",
+      (value) => (value.actions.can_approve_pull_request_reviews = true),
+    ],
+    ["zero approval", (value) => (value.reviews = [])],
+    [
+      "self-only approval",
+      (value) => (value.reviews[0].user.login = "release-author"),
+    ],
+    [
+      "stale approval",
+      (value) => (value.reviews[0].commit_id = "7".repeat(40)),
+    ],
+    ["wrong PR base", (value) => (value.pullRequest.base.sha = "7".repeat(40))],
+    ["wrong associated PR", (value) => (value.pullRequest.number = 18)],
+    [
+      "wrong transition branch",
+      (value) => (value.pullRequest.head.ref = "release/claim-wrong"),
+    ],
+    [
+      "wrong PR head tree",
+      (value) => (value.headCommit.tree.sha = "7".repeat(40)),
+    ],
+    [
+      "wrong merge commit",
+      (value) => (value.pullRequest.merge_commit_sha = "7".repeat(40)),
+    ],
+    [
+      "duplicate association",
+      (value) => value.associations.push({ number: 18 }),
+    ],
+  ];
+  for (const [name, mutate] of cases) {
+    await t.test(name, () => {
+      const authority = githubAuthorityFixture(transition);
+      mutate(authority);
+      let oidcStarts = 0;
+      let publishCalls = 0;
+      assertCode(() => {
+        validateGitHubReleaseAuthority(authority, transition);
+        oidcStarts += 1;
+        publishCalls += 1;
+      }, "external-policy-blocked");
+      assert.equal(oidcStarts, 0);
+      assert.equal(publishCalls, 0);
+    });
+  }
+});
+
+test("synthetic protected claim and closure authorities prove contract shape only", () => {
+  for (const kind of ["claim", "close"]) {
+    const transition = githubTransition(kind);
+    const result = validateGitHubReleaseAuthority(
+      githubAuthorityFixture(transition),
+      transition,
+    );
+    assert.equal(result.repository, TEST_RELEASE_REPOSITORY);
+    assert.equal(result.transition, kind);
+    assert.equal(result.status, "protected");
+  }
+});
+
+test("credential-free resume authority binds the exact claim merge and remote head", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  let remoteReads = 0;
+  const transition = githubTransition("claim");
+  const result = runAuthority({
+    root: fixture.root,
+    githubAuthority: githubAuthorityFixture(transition),
+    execFile(_file, args) {
+      if (args[0] === "rev-parse" && args[1] === "HEAD") {
+        return `${transition.currentHead}\n`;
+      }
+      if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+        return `${transition.currentTree}\n`;
+      }
+      if (args[0] === "ls-remote") {
+        remoteReads += 1;
+        return `${transition.currentHead}\trefs/heads/main\n`;
+      }
+      if (args[0] === "rev-list") {
+        return `${transition.currentHead} ${transition.baseHead}\n`;
+      }
+      if (args[0] === "diff") return "config/release-plan.json\n";
+      throw new Error("unexpected-git-command");
+    },
+  });
+  assert.equal(result.status, "protected");
+  assert.equal(result.transition, "claim");
+  assert.equal(remoteReads, 2);
+});
+
+test("external authority head drift fails before OIDC or publish admission", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const transition = githubTransition("claim");
+  let remoteReads = 0;
+  let oidcStarts = 0;
+  let publishCalls = 0;
+  assertCode(() => {
+    runAuthority({
+      root: fixture.root,
+      githubAuthority: githubAuthorityFixture(transition),
+      execFile(_file, args) {
+        if (args[0] === "rev-parse" && args[1] === "HEAD") {
+          return `${transition.currentHead}\n`;
+        }
+        if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+          return `${transition.currentTree}\n`;
+        }
+        if (args[0] === "ls-remote") {
+          remoteReads += 1;
+          const head =
+            remoteReads === 1 ? transition.currentHead : "7".repeat(40);
+          return `${head}\trefs/heads/main\n`;
+        }
+        if (args[0] === "rev-list") {
+          return `${transition.currentHead} ${transition.baseHead}\n`;
+        }
+        if (args[0] === "diff") return "config/release-plan.json\n";
+        throw new Error("unexpected-git-command");
+      },
+    });
+    oidcStarts += 1;
+    publishCalls += 1;
+  }, "external-policy-blocked");
+  assert.equal(remoteReads, 2);
+  assert.equal(oidcStarts, 0);
+  assert.equal(publishCalls, 0);
+});
+
+test("direct publish rejects the current unprotected authority before npm", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const options = publishingOptions(fixture, () => {
+    assert.fail("npm must not execute");
+  });
+  options.githubAuthority.protection = null;
+  options.githubAuthority.rules = [];
+  options.githubAuthority.actions.can_approve_pull_request_reviews = true;
+  assertCode(() => runPublish(options), "external-policy-blocked");
+});
+
+test("fixed GitHub reader binds the exact policy and transition endpoints", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const transition = githubTransition("claim");
+  const authority = githubAuthorityFixture(transition);
+  const responses = new Map([
+    [
+      "repos/HUA-Labs/hua-packages/branches/main/protection",
+      authority.protection,
+    ],
+    ["repos/HUA-Labs/hua-packages/rules/branches/main", authority.rules],
+    [
+      "repos/HUA-Labs/hua-packages/rulesets?includes_parents=true&per_page=100",
+      [],
+    ],
+    [
+      "repos/HUA-Labs/hua-packages/actions/permissions/workflow",
+      authority.actions,
+    ],
+    [
+      `repos/HUA-Labs/hua-packages/commits/${transition.currentHead}/pulls?per_page=100`,
+      authority.associations,
+    ],
+    ["repos/HUA-Labs/hua-packages/pulls/17", authority.pullRequest],
+    [
+      "repos/HUA-Labs/hua-packages/pulls/17/reviews?per_page=100",
+      authority.reviews,
+    ],
+    [
+      `repos/HUA-Labs/hua-packages/git/commits/${authority.pullRequest.head.sha}`,
+      authority.headCommit,
+    ],
+  ]);
+  const endpoints = [];
+  const result = runAuthority({
+    root: fixture.root,
+    githubToken: "bounded-test-token",
+    githubExecFile(file, args, options) {
+      assert.equal(file, "/usr/bin/gh");
+      assert.equal(options.env.GH_HOST, "github.com");
+      assert.equal(options.env.GH_TOKEN, "bounded-test-token");
+      const endpoint = args.at(-1);
+      endpoints.push(endpoint);
+      assert.equal(responses.has(endpoint), true);
+      return JSON.stringify(responses.get(endpoint));
+    },
+    execFile(_file, args) {
+      if (args[0] === "rev-parse" && args[1] === "HEAD") {
+        return `${transition.currentHead}\n`;
+      }
+      if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+        return `${transition.currentTree}\n`;
+      }
+      if (args[0] === "ls-remote") {
+        return `${transition.currentHead}\trefs/heads/main\n`;
+      }
+      if (args[0] === "rev-list") {
+        return `${transition.currentHead} ${transition.baseHead}\n`;
+      }
+      if (args[0] === "diff") return "config/release-plan.json\n";
+      throw new Error("unexpected-git-command");
+    },
+  });
+  assert.equal(result.status, "protected");
+  assert.deepEqual(endpoints, [...responses.keys()]);
+});
+
+test("GitHub protection 404 collapses to one bounded blocked result", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const transition = githubTransition("claim");
+  let githubCalls = 0;
+  assertCode(
+    () =>
+      runAuthority({
+        root: fixture.root,
+        githubToken: "bounded-test-token",
+        githubExecFile() {
+          githubCalls += 1;
+          throw new Error("raw 404 body must not escape");
+        },
+        execFile(_file, args) {
+          if (args[0] === "rev-parse" && args[1] === "HEAD") {
+            return `${transition.currentHead}\n`;
+          }
+          if (args[0] === "rev-parse" && args[1] === "HEAD^{tree}") {
+            return `${transition.currentTree}\n`;
+          }
+          if (args[0] === "ls-remote") {
+            return `${transition.currentHead}\trefs/heads/main\n`;
+          }
+          if (args[0] === "rev-list") {
+            return `${transition.currentHead} ${transition.baseHead}\n`;
+          }
+          if (args[0] === "diff") return "config/release-plan.json\n";
+          throw new Error("unexpected-git-command");
+        },
+      }),
+    "external-policy-blocked",
+  );
+  assert.equal(githubCalls, 1);
+});
+
+test("credential-free authority detects and binds an exact closure merge", (t) => {
+  const initialized = initializeGitFixture(
+    t,
+    createPublishingFixture(),
+    "seed publishing release",
+  );
+  const { fixture, sourceHead } = initialized;
+  const empty = createEmptyReleasePlan(loadPolicy(fixture.root));
+  writeFileSync(
+    join(fixture.root, "config/release-plan.json"),
+    canonicalJson(empty),
+  );
+  git(fixture.root, ["add", "config/release-plan.json"]);
+  git(fixture.root, ["commit", "-m", "close exact release plan"]);
+  git(fixture.root, ["push", "origin", "main"]);
+  const currentHead = git(fixture.root, ["rev-parse", "HEAD"]);
+  const currentTree = git(fixture.root, ["rev-parse", "HEAD^{tree}"]);
+  const transition = {
+    kind: "close",
+    baseHead: sourceHead,
+    currentHead,
+    currentTree,
+    expectedBranch: `release/close-${sourceHead.slice(0, 12)}`,
+  };
+  const result = runAuthority({
+    root: fixture.root,
+    githubAuthority: githubAuthorityFixture(transition),
+  });
+  assert.equal(result.status, "protected");
+  assert.equal(result.transition, "close");
 });
 
 test("planned claim creates a reviewed transition branch without moving protected main", (t) => {
@@ -1170,10 +1617,18 @@ test("parsed workflow executes reviewed version, claim, publish, closure, and em
   assert.equal(runCheck({ root: fixture.root }).plan.status, "publishing");
 
   let publishCalls = 0;
+  const publishTransition = {
+    kind: "claim",
+    baseHead: versionHead,
+    currentHead: claimed.claimHead,
+    currentTree: git(fixture.root, ["rev-parse", "HEAD^{tree}"]),
+    expectedBranch: `release/claim-${versionHead.slice(0, 12)}`,
+  };
   const published = runPublish({
     root: fixture.root,
     artifactManifestPath: packed.artifactManifestPath,
     claimHead: claimed.claimHead,
+    githubAuthority: githubAuthorityFixture(publishTransition),
     ...fixture.claim,
     execFile(file, args, options) {
       if (file === "tar") return execFileSync(file, args, options);

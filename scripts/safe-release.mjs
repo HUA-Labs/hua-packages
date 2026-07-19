@@ -27,6 +27,7 @@ export const DEFAULT_ROOT = resolve(moduleDirectory, "..");
 export const POLICY_RELATIVE_PATH = "config/publish-allowlist.json";
 export const PLAN_RELATIVE_PATH = "config/release-plan.json";
 export const ARTIFACT_MANIFEST_FILENAME = "release-artifacts.json";
+export const RELEASE_REPOSITORY = "HUA-Labs/hua-packages";
 
 export const PLATFORM_AUTHORITY = Object.freeze({
   authorityKind: "platform-release-registry",
@@ -44,6 +45,7 @@ const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
 const GIT_OUTPUT_MAX_BYTES = 128 * 1024;
+const GITHUB_OUTPUT_MAX_BYTES = 1024 * 1024;
 const ARTIFACT_MANIFEST_MAX_BYTES = 2 * 1024 * 1024;
 const ARTIFACT_MAX_BYTES = 128 * 1024 * 1024;
 const ARTIFACT_TOTAL_MAX_BYTES = 512 * 1024 * 1024;
@@ -53,6 +55,7 @@ const MAX_STRING_BYTES = 8 * 1024;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 const GIT_SHA_PATTERN = /^[a-f0-9]{40}$/;
 const RUN_ID_PATTERN = /^[1-9][0-9]{0,19}$/;
+const GITHUB_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/;
 const PACKAGE_NAME_PATTERN = /^(?:@[a-z0-9-]+\/[a-z0-9-]+|[a-z0-9-]+)$/;
 const PACKAGE_PATH_PATTERN = /^packages\/[a-z0-9-]+$/;
 const CHANGESET_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,79}$/;
@@ -74,6 +77,7 @@ const RELEASE_MODES = new Set([
 const RELEASE_AUTHORITIES = new Set(["hua-packages", "none", "unresolved"]);
 const RELEASE_CHANNELS = new Set(["npm-public", "none", "pending"]);
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+const GITHUB_CLI = "/usr/bin/gh";
 
 export function compareUtf8(left, right) {
   return Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
@@ -1603,6 +1607,398 @@ function assertExactClaimTransition(execFile, root, claimHead, sourceHead) {
   );
 }
 
+function externalPolicyAssert(condition) {
+  if (!condition) fail("external-policy-blocked");
+}
+
+function externalRecord(value) {
+  externalPolicyAssert(isRecord(value));
+  return value;
+}
+
+function externalString(value, pattern, maxBytes = 512) {
+  externalPolicyAssert(typeof value === "string");
+  externalPolicyAssert(Buffer.byteLength(value, "utf8") <= maxBytes);
+  externalPolicyAssert(pattern.test(value));
+  return value;
+}
+
+function externalArray(value, maximum = 99) {
+  externalPolicyAssert(Array.isArray(value));
+  externalPolicyAssert(value.length <= maximum);
+  return value;
+}
+
+function externalBooleanField(record, key, expected) {
+  const value = externalRecord(record)[key];
+  externalPolicyAssert(isRecord(value));
+  externalPolicyAssert(value.enabled === expected);
+}
+
+function validateExternalPolicy(authority) {
+  const protection = externalRecord(authority.protection);
+  const reviews = externalRecord(protection.required_pull_request_reviews);
+  externalPolicyAssert(reviews.dismiss_stale_reviews === true);
+  externalPolicyAssert(reviews.require_last_push_approval === true);
+  externalPolicyAssert(
+    Number.isSafeInteger(reviews.required_approving_review_count) &&
+      reviews.required_approving_review_count >= 1,
+  );
+  const classicBypass = externalRecord(reviews.bypass_pull_request_allowances);
+  for (const key of ["users", "teams", "apps"]) {
+    externalPolicyAssert(externalArray(classicBypass[key]).length === 0);
+  }
+  externalBooleanField(protection, "enforce_admins", true);
+  externalBooleanField(protection, "allow_force_pushes", false);
+  externalBooleanField(protection, "allow_deletions", false);
+
+  const effectiveRules = externalArray(authority.rules);
+  externalPolicyAssert(effectiveRules.length > 0);
+  const pullRequestRules = effectiveRules.filter(
+    (rule) => externalRecord(rule).type === "pull_request",
+  );
+  externalPolicyAssert(pullRequestRules.length > 0);
+  externalPolicyAssert(
+    pullRequestRules.some((rule) => {
+      const parameters = externalRecord(rule.parameters);
+      return (
+        parameters.dismiss_stale_reviews_on_push === true &&
+        parameters.require_last_push_approval === true &&
+        Number.isSafeInteger(parameters.required_approving_review_count) &&
+        parameters.required_approving_review_count >= 1
+      );
+    }),
+  );
+
+  const rulesetIds = new Set();
+  for (const rulesetValue of externalArray(authority.rulesets)) {
+    const ruleset = externalRecord(rulesetValue);
+    externalPolicyAssert(Number.isSafeInteger(ruleset.id) && ruleset.id > 0);
+    externalPolicyAssert(!rulesetIds.has(ruleset.id));
+    rulesetIds.add(ruleset.id);
+    externalPolicyAssert(
+      ruleset.enforcement === "active" ||
+        ruleset.enforcement === "evaluate" ||
+        ruleset.enforcement === "disabled",
+    );
+    externalPolicyAssert(externalArray(ruleset.bypass_actors).length === 0);
+  }
+
+  const actions = externalRecord(authority.actions);
+  externalPolicyAssert(
+    actions.default_workflow_permissions === "read" ||
+      actions.default_workflow_permissions === "write",
+  );
+  externalPolicyAssert(actions.can_approve_pull_request_reviews === false);
+}
+
+function validateTransitionAuthority(authority, transition) {
+  externalPolicyAssert(isRecord(transition));
+  externalPolicyAssert(
+    transition.kind === "claim" || transition.kind === "close",
+  );
+  const baseHead = externalString(transition.baseHead, GIT_SHA_PATTERN);
+  const currentHead = externalString(transition.currentHead, GIT_SHA_PATTERN);
+  const currentTree = externalString(transition.currentTree, GIT_SHA_PATTERN);
+  const expectedBranch = `release/${transition.kind}-${baseHead.slice(0, 12)}`;
+  externalPolicyAssert(transition.expectedBranch === expectedBranch);
+
+  const associations = externalArray(authority.associations);
+  externalPolicyAssert(associations.length === 1);
+  const association = externalRecord(associations[0]);
+  externalPolicyAssert(
+    Number.isSafeInteger(association.number) && association.number > 0,
+  );
+
+  const pullRequest = externalRecord(authority.pullRequest);
+  externalPolicyAssert(pullRequest.number === association.number);
+  externalPolicyAssert(pullRequest.state === "closed");
+  externalPolicyAssert(pullRequest.merged === true);
+  externalString(
+    pullRequest.merged_at,
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
+  );
+  externalPolicyAssert(pullRequest.merge_commit_sha === currentHead);
+  const pullRequestAuthor = externalString(
+    externalRecord(pullRequest.user).login,
+    GITHUB_LOGIN_PATTERN,
+  );
+  const base = externalRecord(pullRequest.base);
+  externalPolicyAssert(base.ref === "main");
+  externalPolicyAssert(base.sha === baseHead);
+  externalPolicyAssert(
+    externalRecord(base.repo).full_name === RELEASE_REPOSITORY,
+  );
+  const head = externalRecord(pullRequest.head);
+  externalPolicyAssert(head.ref === expectedBranch);
+  const pullRequestHead = externalString(head.sha, GIT_SHA_PATTERN);
+  externalPolicyAssert(
+    externalRecord(head.repo).full_name === RELEASE_REPOSITORY,
+  );
+  externalPolicyAssert(
+    externalRecord(externalRecord(authority.headCommit).tree).sha ===
+      currentTree,
+  );
+
+  const latestReviewByActor = new Map();
+  for (const reviewValue of externalArray(authority.reviews)) {
+    const review = externalRecord(reviewValue);
+    externalPolicyAssert(Number.isSafeInteger(review.id) && review.id > 0);
+    const actor = externalString(
+      externalRecord(review.user).login,
+      GITHUB_LOGIN_PATTERN,
+    );
+    externalPolicyAssert(
+      review.state === "APPROVED" ||
+        review.state === "CHANGES_REQUESTED" ||
+        review.state === "COMMENTED" ||
+        review.state === "DISMISSED" ||
+        review.state === "PENDING",
+    );
+    if (review.state === "APPROVED") {
+      externalPolicyAssert(review.commit_id === pullRequestHead);
+    }
+    const previous = latestReviewByActor.get(actor.toLowerCase());
+    if (previous === undefined || review.id > previous.id) {
+      latestReviewByActor.set(actor.toLowerCase(), {
+        id: review.id,
+        actor,
+        state: review.state,
+        commitId: review.commit_id,
+      });
+    }
+  }
+  externalPolicyAssert(
+    [...latestReviewByActor.values()].some(
+      (review) =>
+        review.state === "APPROVED" &&
+        review.commitId === pullRequestHead &&
+        review.actor.toLowerCase() !== pullRequestAuthor.toLowerCase(),
+    ),
+  );
+}
+
+export function validateGitHubReleaseAuthority(authority, transition = null) {
+  try {
+    externalPolicyAssert(isRecord(authority));
+    validateExternalPolicy(authority);
+    if (transition !== null) {
+      validateTransitionAuthority(authority, transition);
+    }
+    return {
+      repository: RELEASE_REPOSITORY,
+      status: "protected",
+      transition: transition?.kind ?? "none",
+    };
+  } catch {
+    fail("external-policy-blocked");
+  }
+}
+
+function githubApiJson(execFile, token, endpoint) {
+  externalString(token, /^\S+$/u, 8192);
+  let output;
+  try {
+    output = execFile(
+      GITHUB_CLI,
+      [
+        "api",
+        "--method",
+        "GET",
+        "-H",
+        "Accept: application/vnd.github+json",
+        "-H",
+        "X-GitHub-Api-Version: 2022-11-28",
+        endpoint,
+      ],
+      {
+        encoding: "utf8",
+        env: { GH_HOST: "github.com", GH_TOKEN: token, NO_COLOR: "1" },
+        maxBuffer: GITHUB_OUTPUT_MAX_BYTES,
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+  } catch {
+    fail("external-policy-blocked");
+  }
+  externalPolicyAssert(typeof output === "string");
+  const bytes = Buffer.from(output, "utf8");
+  externalPolicyAssert(bytes.byteLength <= GITHUB_OUTPUT_MAX_BYTES);
+  try {
+    return parseStrictJsonBytes(bytes, {
+      maxBytes: GITHUB_OUTPUT_MAX_BYTES,
+      label: "github-authority",
+    });
+  } catch {
+    fail("external-policy-blocked");
+  }
+}
+
+function readGitHubReleaseAuthority(options, transition) {
+  const execFile = options.githubExecFile ?? execFileSync;
+  const token = options.githubToken ?? process.env.GITHUB_TOKEN;
+  const repository = RELEASE_REPOSITORY;
+  const protection = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/branches/main/protection`,
+  );
+  const rules = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/rules/branches/main`,
+  );
+  const rulesetSummaries = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/rulesets?includes_parents=true&per_page=100`,
+  );
+  externalPolicyAssert(Array.isArray(rulesetSummaries));
+  externalPolicyAssert(rulesetSummaries.length < 100);
+  const rulesets = rulesetSummaries.map((summaryValue) => {
+    const summary = externalRecord(summaryValue);
+    externalPolicyAssert(Number.isSafeInteger(summary.id) && summary.id > 0);
+    return githubApiJson(
+      execFile,
+      token,
+      `repos/${repository}/rulesets/${summary.id}`,
+    );
+  });
+  const actions = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/actions/permissions/workflow`,
+  );
+  const authority = { protection, rules, rulesets, actions };
+  if (transition === null) return authority;
+
+  const associations = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/commits/${transition.currentHead}/pulls?per_page=100`,
+  );
+  externalPolicyAssert(Array.isArray(associations));
+  externalPolicyAssert(associations.length < 100);
+  if (associations.length !== 1) return { ...authority, associations };
+  const association = externalRecord(associations[0]);
+  externalPolicyAssert(
+    Number.isSafeInteger(association.number) && association.number > 0,
+  );
+  const pullRequest = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/pulls/${association.number}`,
+  );
+  const reviews = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/pulls/${association.number}/reviews?per_page=100`,
+  );
+  externalPolicyAssert(Array.isArray(reviews));
+  externalPolicyAssert(reviews.length < 100);
+  const pullRequestHead = externalString(
+    externalRecord(externalRecord(pullRequest).head).sha,
+    GIT_SHA_PATTERN,
+  );
+  const headCommit = githubApiJson(
+    execFile,
+    token,
+    `repos/${repository}/git/commits/${pullRequestHead}`,
+  );
+  return {
+    ...authority,
+    associations,
+    pullRequest,
+    reviews,
+    headCommit,
+  };
+}
+
+function readPlanFromGit(execFile, root, revision, policyState) {
+  const output = gitOutput(execFile, root, [
+    "show",
+    `${revision}:${PLAN_RELATIVE_PATH}`,
+  ]);
+  const bytes = Buffer.from(`${output}\n`, "utf8");
+  const value = parseStrictJsonBytes(bytes, {
+    maxBytes: PLAN_MAX_BYTES,
+    label: "transition-plan",
+  });
+  const plan = validateReleasePlan(value, policyState);
+  externalPolicyAssert(Buffer.from(canonicalJson(plan)).equals(bytes));
+  return plan;
+}
+
+function detectReviewedTransition(execFile, root, releaseState, currentHead) {
+  const currentTree = gitOutput(execFile, root, ["rev-parse", "HEAD^{tree}"]);
+  externalPolicyAssert(GIT_SHA_PATTERN.test(currentTree));
+  if (releaseState.plan.status === "publishing") {
+    const baseHead = releaseState.plan.claim.sourceHead;
+    assertExactClaimTransition(execFile, root, currentHead, baseHead);
+    return {
+      kind: "claim",
+      baseHead,
+      currentHead,
+      currentTree,
+      expectedBranch: `release/claim-${baseHead.slice(0, 12)}`,
+    };
+  }
+  if (releaseState.plan.status !== "empty") return null;
+  const parents = gitOutput(execFile, root, [
+    "rev-list",
+    "--parents",
+    "-n",
+    "1",
+    currentHead,
+  ]).split(" ");
+  externalPolicyAssert(parents.length === 2);
+  const parentHead = parents[1];
+  const changedPaths = gitOutput(execFile, root, [
+    "diff",
+    "--name-only",
+    parentHead,
+    currentHead,
+  ]);
+  if (changedPaths !== PLAN_RELATIVE_PATH) return null;
+  const parentPlan = readPlanFromGit(execFile, root, parentHead, releaseState);
+  externalPolicyAssert(parentPlan.status === "publishing");
+  assertExactClaimTransition(execFile, root, currentHead, parentHead);
+  return {
+    kind: "close",
+    baseHead: parentHead,
+    currentHead,
+    currentTree,
+    expectedBranch: `release/close-${parentHead.slice(0, 12)}`,
+  };
+}
+
+export function runAuthority(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const execFile = options.execFile ?? execFileSync;
+  const releaseState = loadReleaseState(root, {
+    allowEmptyWorkspaceDrift: true,
+  });
+  try {
+    const currentHead = gitOutput(execFile, root, ["rev-parse", "HEAD"]);
+    externalPolicyAssert(GIT_SHA_PATTERN.test(currentHead));
+    assertRemoteHead(execFile, root, "main", currentHead);
+    const transition = detectReviewedTransition(
+      execFile,
+      root,
+      releaseState,
+      currentHead,
+    );
+    const authority =
+      options.githubAuthority ??
+      readGitHubReleaseAuthority(options, transition);
+    const result = validateGitHubReleaseAuthority(authority, transition);
+    assertRemoteHead(execFile, root, "main", currentHead);
+    return result;
+  } catch {
+    fail("external-policy-blocked");
+  }
+}
+
 function persistExactPlanMutation(options) {
   const {
     root,
@@ -2033,6 +2429,13 @@ export function runPublish(options = {}) {
   );
   assertRemoteHead(gitExecFile, root, claim.branch, claimHead);
   assertExactClaimTransition(gitExecFile, root, claimHead, claim.sourceHead);
+  runAuthority({
+    root,
+    execFile: gitExecFile,
+    githubAuthority: options.githubAuthority,
+    githubExecFile: options.githubExecFile,
+    githubToken: options.githubToken,
+  });
   const bundle = readArtifactBundle({
     root,
     execFile,
@@ -2087,6 +2490,7 @@ function parseCliArguments(argv) {
       "version",
       "refresh",
       "preflight",
+      "authority",
       "check",
       "pack",
       "claim",
@@ -2137,7 +2541,7 @@ function parseCliArguments(argv) {
   for (const argument of argumentsList) {
     if (
       argument === "--format=github" &&
-      (mode === "check" || mode === "preflight")
+      (mode === "authority" || mode === "check" || mode === "preflight")
     ) {
       format = "github";
     } else if (argument === "--allow-empty" && mode === "check") {
@@ -2199,6 +2603,23 @@ export function main(argv = process.argv.slice(2), options = {}) {
           planDigest: state.plan.planDigest,
         }) + "\n",
       );
+    }
+    return;
+  }
+  if (mode === "authority") {
+    const result = runAuthority({
+      root,
+      execFile,
+      githubAuthority: options.githubAuthority,
+      githubExecFile: options.githubExecFile,
+      githubToken: options.githubToken,
+    });
+    if (format === "github") {
+      process.stdout.write(
+        `external_policy=${result.status}\ntransition=${result.transition}\nrepository=${result.repository}\n`,
+      );
+    } else {
+      process.stdout.write(`${JSON.stringify(result)}\n`);
     }
     return;
   }

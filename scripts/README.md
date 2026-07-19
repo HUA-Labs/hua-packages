@@ -27,6 +27,7 @@ monorepo state.
 | `check-pack-artifacts.js`    | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload. |
 | `check-publish-allowlist.js` | Validate the versioned platform-policy projection against every workspace manifest.                               |
 | `safe-release.mjs preflight` | Classify plan state while admitting only bounded same-version eligible drift for an empty snapshot.               |
+| `safe-release.mjs authority` | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.   |
 | `safe-release.mjs refresh`   | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                |
 | `safe-release.mjs version`   | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                   |
 | `safe-release.mjs check`     | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.     |
@@ -69,7 +70,15 @@ Its explicit `check --format=github --allow-empty` lane classifies an exact
 empty plan only as `publish=false`; ordinary `check`, `version`, and `publish`
 reject empty release authority.
 
-The prepare job has neither npm credentials nor OIDC `id-token` authority. For
+The prepare job has neither npm credentials nor OIDC `id-token` authority. Its
+first source gate uses the existing GitHub control-plane token only for bounded
+reads of the exact public repository's `main` protection, effective rules,
+rulesets, Actions review setting, and, when applicable, the one merged claim or
+closure PR. The source invokes fixed `/usr/bin/gh`, bounds every JSON response,
+collapses missing, unauthorized, malformed, or inconsistent API authority to
+exact `external-policy-blocked`, and rechecks remote `main` before and after the
+read. It never treats an API error or incomplete response as an empty
+allowlist. For
 an exact planned set it builds every selected package, including an unscoped
 package such as `create-hua` when explicitly selected, packs each package into
 a caller-owned external directory, and runs `check-pack-artifacts.js` against
@@ -80,14 +89,20 @@ missing or extra artifacts, tarball substitution, or manifest drift prevents
 both claim and publish. The uploaded artifact is evidence only until the claim
 is durably pushed.
 
-After that credential-free artifact check and upload, the prepare job commits
+After that release-credential-free artifact check and upload, the prepare job commits
 a single plan-only `planned` to `publishing` claim that additionally binds the
 exact artifact-manifest SHA-256. It pushes only a unique transition branch,
 requires remote `main` to remain exact before and after that push, and opens a
 reviewed claim PR. It never pushes protected `main` directly. The claim PR must
 be squash-merged so the resulting main commit has the planned source head as
-its single parent and changes only `config/release-plan.json`. Any claim or PR
-failure happens before an OIDC-capable job, npm credentials, or publish.
+its single parent and changes only `config/release-plan.json`. Before the
+OIDC-capable job can be admitted, the authority gate additionally requires one
+unique merged PR association, exact `main` base/source, exact deterministic
+`release/claim-<source>` branch, exact PR-head tree and current merge commit,
+and a latest exact-head approval from a reviewer distinct from the PR author.
+Zero, self-only, stale, wrong-head, wrong-branch, duplicate, or head-drifting
+associations fail closed. Any claim or PR failure happens before an
+OIDC-capable job, npm credentials, or publish.
 
 A separate publish job is the only job with `id-token: write`. It starts only
 on the first workflow attempt for the reviewed claim merge, never on the
@@ -120,9 +135,13 @@ commits the canonical empty plan to a unique transition branch while requiring
 the claim head to remain remote `main`, then opens a reviewed closure PR. It
 never pushes protected `main` directly. Failure or head drift leaves durable
 main in `publishing`; the failed run cannot overwrite release authority.
-Squash-merging the plan-only closure PR restores exact empty authority. That
-merge's follow-up workflow has no publishing claim, starts no OIDC job,
-receives no npm token, and executes zero publish commands. Operator
+Squash-merging the plan-only closure PR restores exact empty authority. The
+follow-up prepare gate recognizes the publishing-to-empty plan-only parent
+transition and applies the same unique merged-PR, deterministic
+`release/close-<claim>` branch, exact-head independent-approval, tree, merge,
+and remote-head checks. That merge's follow-up workflow has no publishing
+claim, starts no OIDC job, receives no npm token, and executes zero publish
+commands. Operator
 reconciliation is required before another release if either reviewed
 transition is not merged.
 
@@ -173,6 +192,20 @@ splits prepare, publish, and closure permissions; binds checked artifact bytes
 into the durable claim; and publishes only reverified tarballs with lifecycle
 scripts disabled. No npm query, publish, token use, OIDC request, or workflow
 dispatch was executed while implementing or testing this contract.
+
+The GitHub authority fixtures prove only the future protected/reviewed source
+contract. They are not current live GitHub authority and do not establish
+release readiness. Tower's pre-freeze readback found `main` protection absent,
+effective branch rules empty, and Actions review approval enabled. Therefore
+the real `authority` command currently stops at exact
+`external-policy-blocked`, before OIDC or publish admission. Live release stays
+HOLD until Devin separately authorizes the repository settings change and
+tower verifies active PR-required protection, at least one exact-head approval,
+stale-review dismissal, last-push approval, administrator enforcement, zero
+classic/ruleset/Actions bypass, Actions review approval disabled, and the
+workflow token's ability to read that authority. Source tests intentionally
+keep the positive protected state synthetic and require every live-negative
+shape to admit zero OIDC starts and zero publish calls.
 
 ## Manual Analysis
 

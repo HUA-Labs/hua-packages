@@ -40,6 +40,11 @@ jobs:
           node-version: "24"
           cache: "pnpm"
 
+      - name: Check current GitHub release authority
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -124,6 +129,11 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Recheck exact reviewed claim authority
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
+
       - name: Download exact claimed artifacts
         uses: actions/download-artifact@v5
         with:
@@ -135,6 +145,7 @@ jobs:
       - name: Publish immutable verified tarballs
         id: safe-publish
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           HUA_RELEASE_ARTIFACT_MANIFEST: ${{ runner.temp }}/hua-release-artifacts/release-artifacts.json
           HUA_RELEASE_BRANCH: ${{ github.ref_name }}
@@ -184,6 +195,11 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+
+      - name: Recheck exact reviewed claim authority for closure
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download sanitized exact published set
         uses: actions/download-artifact@v5
