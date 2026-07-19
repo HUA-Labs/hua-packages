@@ -1340,6 +1340,7 @@ test("pack normalizes conflicting lifecycle settings before a real pnpm child", 
   );
   const expectedPackedManifest = JSON.parse(sourceManifestBytes);
   expectedPackedManifest.dependencies["@fixture/dependency"] = "1.2.3";
+  expectedPackedManifest.scripts = {};
   assert.deepEqual(packedManifest, expectedPackedManifest);
   assert.equal(packedManifest.dependencies["@fixture/dependency"], "1.2.3");
 });

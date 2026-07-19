@@ -2167,6 +2167,22 @@ function normalizeArtifactClaim(options) {
   };
 }
 
+function lifecycleFreePackEnvironment(environment) {
+  const ignoreScriptKeys = new Set([
+    "npm_config_ignore_scripts",
+    "pnpm_config_ignore_scripts",
+  ]);
+  return {
+    ...Object.fromEntries(
+      Object.entries(environment).filter(
+        ([key]) => !ignoreScriptKeys.has(key.toLowerCase()),
+      ),
+    ),
+    npm_config_ignore_scripts: "true",
+    pnpm_config_ignore_scripts: "true",
+  };
+}
+
 export function runPack(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -2215,11 +2231,7 @@ export function runPack(options = {}) {
     execFile("pnpm", ["pack", "--pack-destination", artifactDirectory], {
       cwd: packageDirectory,
       encoding: "utf8",
-      env: {
-        ...process.env,
-        npm_config_ignore_scripts: "true",
-        pnpm_config_ignore_scripts: "true",
-      },
+      env: lifecycleFreePackEnvironment(process.env),
       stdio: ["ignore", "pipe", "pipe"],
     });
     assertPackReleaseStateUnchanged(root, releaseState);
