@@ -107,6 +107,7 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
       glowColor = "rgba(91,140,255,.8)",
       loading = false,
       iconOnly = false,
+      unstyled = false,
       disabled,
       ...rest
     },
@@ -308,11 +309,11 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
         <Button
           ref={ref as React.Ref<AnchorEl>}
           href={href}
-          dot={cls}
-          style={styleVars}
-          loading={loading}
+          dot={unstyled ? dot : cls}
+          style={unstyled ? undefined : styleVars}
+          unstyled={unstyled}
           onClick={handleClick}
-          aria-busy={loading || undefined}
+          loading={loading}
           aria-label={
             iconOnly ? (anchorRest["aria-label"] as string) : undefined
           }
@@ -342,12 +343,12 @@ export const Action = React.forwardRef<AnchorOrButton, ActionProps>(
     return (
       <Button
         ref={ref as React.Ref<ButtonEl>}
-        dot={cls}
-        style={styleVars}
-        loading={loading}
+        dot={unstyled ? dot : cls}
+        style={unstyled ? undefined : styleVars}
+        unstyled={unstyled}
         onClick={handleClick}
         disabled={disabled}
-        aria-busy={loading || undefined}
+        loading={loading}
         aria-label={iconOnly ? (btnRest["aria-label"] as string) : undefined}
         data-action={actionType}
         data-feedback={feedback}
