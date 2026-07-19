@@ -63,6 +63,11 @@ const ARTIFACT_FILENAME_PATTERN = /^[a-z0-9][a-z0-9._+-]{0,199}\.tgz$/;
 const SEMVER_PATTERN =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const RELEASE_TYPES = new Set(["patch", "minor", "major"]);
+const RELEASE_TYPE_RANK = new Map([
+  ["patch", 0],
+  ["minor", 1],
+  ["major", 2],
+]);
 const RELEASE_INTENTS = new Set([
   "active-public",
   "held",
@@ -1124,7 +1129,7 @@ function normalizeChangesetsStatus(value) {
   return { changesets, releases };
 }
 
-function readChangesetDigests(root, status) {
+function readChangesetSourceIds(root) {
   const changesetDirectory = join(root, ".changeset");
   const sourceFiles = readdirSync(changesetDirectory, {
     withFileTypes: true,
@@ -1136,6 +1141,15 @@ function readChangesetDigests(root, status) {
   const sourceIds = sourceFiles
     .map((entry) => entry.name.slice(0, -3))
     .sort(compareUtf8);
+  for (const id of sourceIds) {
+    stringValue(id, CHANGESET_ID_PATTERN, "changeset-source-id");
+  }
+  return sourceIds;
+}
+
+function readChangesetDigests(root, status) {
+  const changesetDirectory = join(root, ".changeset");
+  const sourceIds = readChangesetSourceIds(root);
   const statusIds = status.changesets
     .map((entry) => entry.id)
     .sort(compareUtf8);
@@ -1145,7 +1159,6 @@ function readChangesetDigests(root, status) {
   );
   const digestById = new Map();
   for (const id of sourceIds) {
-    stringValue(id, CHANGESET_ID_PATTERN, "changeset-source-id");
     const bytes = readRegularFile(
       join(changesetDirectory, `${id}.md`),
       CHANGESET_MAX_BYTES,
@@ -1154,6 +1167,53 @@ function readChangesetDigests(root, status) {
     digestById.set(id, sha256(bytes));
   }
   return digestById;
+}
+
+function validateChangesetReleaseRelations(status) {
+  const releaseByName = new Map(
+    status.releases.map((release) => [release.name, release]),
+  );
+  const selectionsByName = new Map();
+  for (const changeset of status.changesets) {
+    for (const selection of changeset.releases) {
+      assert(
+        releaseByName.has(selection.name),
+        "version-changeset-release-missing",
+      );
+      const selections = selectionsByName.get(selection.name) ?? [];
+      selections.push({ id: changeset.id, type: selection.type });
+      selectionsByName.set(selection.name, selections);
+    }
+  }
+  for (const release of status.releases) {
+    const selections = selectionsByName.get(release.name) ?? [];
+    if (release.type === "none") {
+      assert(selections.length === 0, "version-changeset-release-type");
+      continue;
+    }
+    const expectedIds = selections.map((selection) => selection.id);
+    assert(
+      JSON.stringify(release.changesets) === JSON.stringify(expectedIds),
+      "version-changeset-release-ids",
+    );
+    const expectedType = selections.reduce((selectedType, selection) => {
+      if (selectedType === null) return selection.type;
+      return RELEASE_TYPE_RANK.get(selection.type) >
+        RELEASE_TYPE_RANK.get(selectedType)
+        ? selection.type
+        : selectedType;
+    }, null);
+    assert(release.type === expectedType, "version-changeset-release-type");
+  }
+}
+
+function validateConsumedChangesetSources(root, status) {
+  const remainingIds = readChangesetSourceIds(root);
+  const remainingSet = new Set(remainingIds);
+  for (const changeset of status.changesets) {
+    assert(!remainingSet.has(changeset.id), "version-changeset-source-set");
+  }
+  assert(remainingIds.length === 0, "version-changeset-source-set");
 }
 
 function buildPlannedReleases(
@@ -1167,6 +1227,7 @@ function buildPlannedReleases(
     status.changesets.length > 0 && status.releases.length > 0,
     "version-empty",
   );
+  validateChangesetReleaseRelations(status);
   const policyByName = new Map(
     policyState.policy.packages.map((entry) => [entry.name, entry]),
   );
@@ -2304,6 +2365,7 @@ export function runVersion(options = {}) {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
     });
+    validateConsumedChangesetSources(root, status);
     const finalPolicyState = loadPolicy(root);
     const sourceByName = new Map(
       sourceManifests.map((entry) => [entry.name, entry]),

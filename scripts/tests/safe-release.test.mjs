@@ -2666,6 +2666,108 @@ test("version mode captures source bytes then writes a deterministic UI-only dur
   );
 });
 
+test("version mode admits the exact aggregate Changeset type and complete ID relation", (t) => {
+  const fixture = makeFixture();
+  t.after(() => fixture.cleanup());
+  const status = {
+    changesets: [
+      {
+        id: "ui-minor-release",
+        summary: "UI minor selection",
+        releases: [{ name: "@hua-labs/ui", type: "minor" }],
+      },
+      {
+        id: "ui-patch-release",
+        summary: "UI patch selection",
+        releases: [{ name: "@hua-labs/ui", type: "patch" }],
+      },
+    ],
+    releases: [
+      {
+        name: "@hua-labs/ui",
+        type: "minor",
+        oldVersion: "2.3.0",
+        changesets: ["ui-minor-release", "ui-patch-release"],
+        newVersion: "2.4.0",
+      },
+    ],
+  };
+  for (const changeset of status.changesets) {
+    writeFileSync(
+      join(fixture.root, `.changeset/${changeset.id}.md`),
+      `---\n"@hua-labs/ui": ${changeset.releases[0].type}\n---\n`,
+    );
+  }
+  const { result } = runVersionFixture(fixture, status);
+  assert.equal(result.releases.length, 1);
+  assert.equal(result.releases[0].name, "@hua-labs/ui");
+  assert.equal(result.releases[0].type, "minor");
+  assert.equal(result.releases[0].fromVersion, "2.3.0");
+  assert.equal(result.releases[0].toVersion, "2.4.0");
+  assert.deepEqual(
+    result.releases[0].changesets.map(({ id }) => id),
+    ["ui-minor-release", "ui-patch-release"],
+  );
+});
+
+test("version mode writes no planned authority when Changeset sources survive versioning", async (t) => {
+  const cases = [
+    ["consumed source remains", false],
+    ["unexpected source remains", true],
+  ];
+  for (const [name, replaceSource] of cases) {
+    await t.test(name, () => {
+      const fixture = makeFixture();
+      try {
+        const status = versionStatus();
+        const sourcePath = join(fixture.root, ".changeset/ui-safe-release.md");
+        writeFileSync(
+          sourcePath,
+          '---\n"@hua-labs/ui": patch\n---\n\nSafe release fixture.\n',
+        );
+        assertCode(
+          () =>
+            runVersion({
+              root: fixture.root,
+              execFile(_file, args) {
+                if (args.includes("status")) {
+                  writeFileSync(args.at(-1), canonicalJson(status));
+                  return "";
+                }
+                mutateJson(
+                  join(fixture.root, "packages/hua-ui/package.json"),
+                  (manifest) => {
+                    manifest.version = "2.3.1";
+                  },
+                );
+                if (replaceSource) {
+                  unlinkSync(sourcePath);
+                  writeFileSync(
+                    join(fixture.root, ".changeset/unexpected-release.md"),
+                    '---\n"@hua-labs/ui": patch\n---\n',
+                  );
+                }
+                return "";
+              },
+            }),
+          "version-changeset-source-set",
+        );
+        assert.equal(
+          JSON.parse(
+            readFileSync(
+              join(fixture.root, "config/release-plan.json"),
+              "utf8",
+            ),
+          ).status,
+          "empty",
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
 test("two release cycles close and refresh empty authority without weakening planned exactness", async (t) => {
   const fixture = makeFixture();
   t.after(() => fixture.cleanup());
@@ -2920,6 +3022,106 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
 test("version mode rejects empty, implicit, held, never, Dot, unknown, and source-set drift before version", async (t) => {
   const cases = [
     ["empty", { changesets: [], releases: [] }, "version-empty", []],
+    [
+      "partial selected cohort",
+      {
+        changesets: [
+          {
+            id: "ui-motion-release",
+            summary: "UI and Motion",
+            releases: [
+              { name: "@hua-labs/ui", type: "patch" },
+              { name: "@hua-labs/motion-core", type: "patch" },
+            ],
+          },
+        ],
+        releases: [
+          {
+            name: "@hua-labs/ui",
+            type: "patch",
+            oldVersion: "2.3.0",
+            changesets: ["ui-motion-release"],
+            newVersion: "2.3.1",
+          },
+        ],
+      },
+      "version-changeset-release-missing",
+      ["ui-motion-release"],
+    ],
+    [
+      "release row missing selected id",
+      {
+        changesets: [
+          {
+            id: "ui-first-release",
+            summary: "First UI selection",
+            releases: [{ name: "@hua-labs/ui", type: "patch" }],
+          },
+          {
+            id: "ui-second-release",
+            summary: "Second UI selection",
+            releases: [{ name: "@hua-labs/ui", type: "patch" }],
+          },
+        ],
+        releases: [
+          {
+            name: "@hua-labs/ui",
+            type: "patch",
+            oldVersion: "2.3.0",
+            changesets: ["ui-first-release"],
+            newVersion: "2.3.1",
+          },
+        ],
+      },
+      "version-changeset-release-ids",
+      ["ui-first-release", "ui-second-release"],
+    ],
+    [
+      "release row type differs from Changeset semantics",
+      {
+        changesets: [
+          {
+            id: "ui-minor-release",
+            summary: "UI minor selection",
+            releases: [{ name: "@hua-labs/ui", type: "minor" }],
+          },
+        ],
+        releases: [
+          {
+            name: "@hua-labs/ui",
+            type: "patch",
+            oldVersion: "2.3.0",
+            changesets: ["ui-minor-release"],
+            newVersion: "2.3.1",
+          },
+        ],
+      },
+      "version-changeset-release-type",
+      ["ui-minor-release"],
+    ],
+    [
+      "selected release cannot become neutral",
+      {
+        changesets: [
+          {
+            id: "ui-neutral-release",
+            summary: "UI patch selection",
+            releases: [{ name: "@hua-labs/ui", type: "patch" }],
+          },
+        ],
+        releases: [
+          {
+            name: "@hua-labs/ui",
+            type: "none",
+            oldVersion: "2.3.0",
+            changesets: [],
+            newVersion: "2.3.0",
+          },
+        ],
+      },
+      "version-changeset-release-type",
+      ["ui-neutral-release"],
+    ],
     [
       "implicit dependent",
       versionStatus("@hua-labs/ui", {

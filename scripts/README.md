@@ -44,8 +44,16 @@ monorepo state.
 platform release-intent authority. It records policy, not npm visibility.
 `config/release-plan.json` is the generated durable selection authority. The
 version command captures Changeset IDs and bytes before Changesets deletes the
-source files, rejects implicit dependent releases, runs the version command,
-then binds the complete post-version workspace manifest set.
+source files, rejects implicit dependent releases, and requires an exact
+bidirectional relation between every normalized Changeset selection and every
+release row. Each selected package must have one release row containing the
+exact selecting Changeset IDs, the release type must equal the strongest
+selected `patch`/`minor`/`major` type, and a neutral row cannot consume a
+selection. After the version command returns, the guard re-reads the exact
+`.changeset/*.md` source set and requires it to be empty before it can bind the
+complete post-version workspace manifest set or write planned authority. The
+pre-version source-set equality means this proves both that every admitted
+source was consumed and that no unexpected source remains.
 
 An empty plan is deliberately not release authority. `refresh` first verifies
 the old empty plan's policy tuple, schema, roster, and digest, then captures the
@@ -236,6 +244,21 @@ read-only credential's ability to read every required authority field. Shared
 agent display names and tap review artifacts are not GitHub approval authority.
 Source tests intentionally keep the positive protected state synthetic and
 require every live-negative shape to admit zero privileged release actions.
+
+Canonical initial review
+`reviews/written/pr82/initial-findings-결-8276396e95e0.md` (SHA-256
+`3a76f70e99cdee1e9d5eb587d16a63b0b716150ecc7d74f57f9d94c41761f065`)
+found two version-boundary P2s on exact head `8aae71cc`: a partial Changesets
+status could omit an explicitly selected package, and a version command could
+leave an admitted source file while still writing planned authority. The
+closure RED was `129 tests / 122 PASS / 7 FAIL`: three relation variants
+reached a later manifest check, and consumed/unexpected source residue was
+accepted. The final focused suite is `131/131 PASS`, covering UI+Motion partial
+selection, missing IDs, aggregate and mismatched type semantics, neutral-row
+misclassification, and consumed/unexpected source residue. Any post-version
+source failure leaves the previous empty plan bytes intact; because Changesets
+may already have changed manifests, the documented reviewed partial-version
+recovery boundary still applies and is not presented as automatic rollback.
 
 ## Manual Analysis
 
