@@ -139,6 +139,9 @@ function manifestFor(definition, version = definition.version) {
   if (definition.peerDependencies !== undefined) {
     manifest.peerDependencies = definition.peerDependencies;
   }
+  if (definition.scripts !== undefined) {
+    manifest.scripts = definition.scripts;
+  }
   return manifest;
 }
 
@@ -1200,44 +1203,55 @@ test("pack disables package lifecycle before artifact bytes are created", (t) =>
   assert.equal(packedManifest.description, undefined);
 });
 
-test("pnpm lifecycle-free pack preserves workspace manifest normalization", (t) => {
-  const root = mkdtempSync(join(tmpdir(), "hua-safe-pack-lifecycle-"));
-  const artifactDirectory = join(root, "artifacts");
-  const dependencyDirectory = join(root, "packages/dependency");
-  const selectedDirectory = join(root, "packages/selected");
-  const lifecycleLog = join(selectedDirectory, "lifecycle.log");
-  t.after(() => rmSync(root, { recursive: true, force: true }));
-  mkdirSync(artifactDirectory, { recursive: true });
-  mkdirSync(dependencyDirectory, { recursive: true });
-  mkdirSync(selectedDirectory, { recursive: true });
-  writeFileSync(
-    join(root, "package.json"),
-    canonicalJson({ name: "pack-lifecycle-root", private: true }),
-  );
-  writeFileSync(
-    join(root, "pnpm-workspace.yaml"),
-    'packages:\n  - "packages/*"\n',
-  );
-  writeFileSync(
-    join(dependencyDirectory, "package.json"),
-    canonicalJson({ name: "@fixture/dependency", version: "1.2.3" }),
-  );
-  writeFileSync(
-    join(selectedDirectory, "lifecycle.mjs"),
-    'import { appendFileSync } from "node:fs";\n' +
-      'appendFileSync(new URL("./lifecycle.log", import.meta.url), `${process.argv[2]}\\n`);\n',
-  );
-  writeFileSync(
-    join(selectedDirectory, "package.json"),
-    canonicalJson({
+test("pack normalizes conflicting lifecycle settings before a real pnpm child", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@fixture/dependency",
+      path: "packages/dependency",
+      version: "1.2.3",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
       name: "@fixture/selected",
+      path: "packages/selected",
       version: "1.0.0",
       dependencies: { "@fixture/dependency": "workspace:*" },
       scripts: {
         prepack: "node lifecycle.mjs prepack",
         postpack: "node lifecycle.mjs postpack",
       },
-    }),
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@fixture/selected"], definitions);
+  t.after(() => fixture.cleanup());
+  const root = fixture.root;
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const dependencyDirectory = join(root, "packages/dependency");
+  const selectedDirectory = join(root, "packages/selected");
+  const lifecycleLog = join(selectedDirectory, "lifecycle.log");
+  writeFileSync(
+    join(root, "pnpm-workspace.yaml"),
+    'packages:\n  - "packages/*"\n',
+  );
+  writeFileSync(
+    join(selectedDirectory, "lifecycle.mjs"),
+    'import { appendFileSync } from "node:fs";\n' +
+      'appendFileSync(new URL("./lifecycle.log", import.meta.url), `${process.argv[2]}\\n`);\n',
   );
   const installedScopeDirectory = join(
     selectedDirectory,
@@ -1249,28 +1263,84 @@ test("pnpm lifecycle-free pack preserves workspace manifest normalization", (t) 
     join(installedScopeDirectory, "dependency"),
     "dir",
   );
-
-  execFileSync("pnpm", ["pack", "--pack-destination", artifactDirectory], {
-    cwd: selectedDirectory,
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      npm_config_ignore_scripts: "true",
-      pnpm_config_ignore_scripts: "true",
+  const sourceManifestPath = join(selectedDirectory, "package.json");
+  const sourceManifestBytes = readFileSync(sourceManifestPath);
+  const conflictingSettings = {
+    npm_config_ignore_scripts: "false",
+    NPM_CONFIG_IGNORE_SCRIPTS: "false",
+    NpM_CoNfIg_Ignore_Scripts: "false",
+    pnpm_config_ignore_scripts: "false",
+    PNPM_CONFIG_IGNORE_SCRIPTS: "false",
+    PnPm_CoNfIg_Ignore_Scripts: "false",
+  };
+  const originalSettings = new Map(
+    Object.keys(conflictingSettings).map((key) => [key, process.env[key]]),
+  );
+  Object.assign(process.env, conflictingSettings);
+  t.after(() => {
+    for (const [key, value] of originalSettings) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let packEnvironment;
+  const result = runPack({
+    root,
+    artifactDirectory,
+    branch: "main",
+    runId: "770",
+    sourceHead: "0".repeat(40),
+    execFile(file, args, options) {
+      if (file === "pnpm" && args[0] === "pack") {
+        packEnvironment = options.env;
+        return execFileSync(file, args, options);
+      }
+      return executeFixture(file, args, options);
     },
-    stdio: ["ignore", "pipe", "pipe"],
   });
 
-  assert.equal(existsSync(lifecycleLog), false);
+  assert.equal(result.artifactCount, 1);
+  const lifecycleEvents = existsSync(lifecycleLog)
+    ? readFileSync(lifecycleLog, "utf8").trim().split("\n")
+    : [];
+  assert.deepEqual(lifecycleEvents, []);
+  assert.deepEqual(
+    Object.entries(packEnvironment)
+      .filter(([key]) =>
+        ["npm_config_ignore_scripts", "pnpm_config_ignore_scripts"].includes(
+          key.toLowerCase(),
+        ),
+      )
+      .sort(([left], [right]) =>
+        Buffer.compare(Buffer.from(left), Buffer.from(right)),
+      ),
+    [
+      ["npm_config_ignore_scripts", "true"],
+      ["pnpm_config_ignore_scripts", "true"],
+    ],
+  );
+  assert.deepEqual(readFileSync(sourceManifestPath), sourceManifestBytes);
   const artifacts = readdirSync(artifactDirectory);
-  assert.equal(artifacts.length, 1);
+  assert.equal(artifacts.filter((entry) => entry.endsWith(".tgz")).length, 1);
   const packedManifest = JSON.parse(
     execFileSync(
       "tar",
-      ["-xOf", join(artifactDirectory, artifacts[0]), "package/package.json"],
+      [
+        "-xOf",
+        join(
+          artifactDirectory,
+          artifacts.find((entry) => entry.endsWith(".tgz")),
+        ),
+        "package/package.json",
+      ],
       { encoding: "utf8" },
     ),
   );
+  const expectedPackedManifest = JSON.parse(sourceManifestBytes);
+  expectedPackedManifest.dependencies["@fixture/dependency"] = "1.2.3";
+  assert.deepEqual(packedManifest, expectedPackedManifest);
   assert.equal(packedManifest.dependencies["@fixture/dependency"], "1.2.3");
 });
 
