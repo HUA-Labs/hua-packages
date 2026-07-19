@@ -8,7 +8,7 @@ package:
   description: "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Swift / Compose"
   license: "MIT"
 
-overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. Broad Tailwind-inspired utility coverage across common style families."
+overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero runtime dependencies and framework-agnostic APIs. Target support is explicit through the capability matrix and dotExplain()."
 
 exports:
   main:
@@ -46,7 +46,7 @@ exports:
         description: "getDotAxCatalog() → DotAxCatalog. Read-only package AX catalog derived from CAPABILITY_MATRIX / PROPERTY_TO_FAMILY, with composition metadata for internal marker families such as ring and divide. Stable, JSON-serializable, and intended for AI/tooling guidance without executing dot() or dotExplain()."
       - name: "adaptNative"
         type: "function"
-        description: "Convert web CSSProperties to RN StyleSheet format. px→number, transform→array, boxShadow→RN shadow props, 45+ unsupported props silently dropped. Supports warnDropped option for dev warnings."
+        description: "Convert web CSSProperties to RN StyleSheet format. px→number, transform→array, and boxShadow→RN shadow props. Unsupported output is omitted by default. Supports warnDropped for deduplicated development warnings; use dotExplain() for structured capability evidence."
       - name: "_resetNativeWarnings"
         type: "function"
         description: "Reset native adapter warning dedup set. For testing only."
@@ -208,13 +208,13 @@ exports:
         description: "Convert utility string to flat style object. Type-safe overloads narrow return type by target literal: dot(input, { target: 'native' }) → RNStyleObject, dot(input, { target: 'flutter' }) → FlutterRecipe, dot(input) → StyleObject. Options: { dark?: boolean, breakpoint?: string, target?: 'web' | 'native' | 'flutter' }"
       - name: "dotExplain"
         type: "function"
-        description: "Resolve a utility string and return both styles and a capability report. Returns DotExplainResult { styles, report: { _dropped?, _approximated?, _capabilities?, _details? } }. For web target returns empty report. Useful for debugging cross-platform compatibility."
+        description: "Resolve a utility string and return both styles and a capability report. Returns DotExplainResult { styles, report: { _dropped?, _approximated?, _capabilities?, _details? } }. Web currently returns an empty report by design; that empty report is not browser-support evidence."
       - name: "createDotConfig"
         type: "function"
         description: "Set global token configuration with deep merge. Accepts theme overrides (colors, spacing, borderRadius, fontSize, gridCols), runtime target, breakpoints (custom array), remBase, cache settings, strictMode, warnUnknown."
       - name: "clearDotCache"
         type: "function"
-        description: "Clear both input and token caches. Call after config changes or for memory management."
+        description: "Clear the current input and token caches explicitly for isolated runs or memory management. createDotConfig() already replaces the active cache when configuration changes."
       - name: "dotMap"
         type: "function"
         description: "Convert utility string to style map with state variants. Same type-safe overloads as dot(). Returns { base, hover?, focus?, active?, 'focus-visible'?, 'focus-within'?, disabled? }"
@@ -243,7 +243,7 @@ features:
   - "dotVariants() — CVA-style variant factory (base, variants, defaultVariants, compoundVariants)"
   - "dotCx() — clsx replacement for filtering falsy values and joining utility strings"
   - "Shared resolver pipeline — one resolver, target-specific adapters (adaptNative / adaptWeb / adaptFlutter)"
-  - "adaptNative() — px→number, transform→array, boxShadow→RN shadow props, 45+ unsupported props silently dropped"
+  - "adaptNative() — px→number, transform→array, boxShadow→RN shadow props; unsupported output is omitted and can be inspected with dotExplain() or warnDropped"
   - "RN native subpath — import from '@hua-labs/dot/native' (auto target: 'native')"
   - "RN conditional export — Metro resolves 'react-native' condition automatically"
   - "adaptFlutter() — CSSProperties → FlutterRecipe (structured widget composition map)"
@@ -256,13 +256,12 @@ features:
   - "getCapability(property, target, value?) — programmatic per-property capability query"
   - "getDotAxCatalog() — package-owned read-only AX catalog derived from capability metadata for AI/tooling guidance"
   - "createDotConfig() — token overrides (colors, spacing, borderRadius, fontSize, gridCols, breakpoints, remBase, etc.)"
-  - "CSS variable bridge — 17 semantic color tokens (background, foreground, card, muted, accent, etc.)"
+  - "CSS variable bridge — built-in semantic color tokens plus project-defined semanticColors mappings"
   - "strictMode — throws on unknown tokens; warnUnknown — dev console.warn"
   - "2-layer FIFO cache — input-level (500) + token-level (1000) caching"
-  - "clearDotCache() — reset after config changes or for memory management"
+  - "clearDotCache() — explicitly reset the current caches for isolation or memory management"
 
 related_packages:
-  - "@hua-labs/hua"
   - "@hua-labs/ui"
   - "@hua-labs/dot-aot"
 

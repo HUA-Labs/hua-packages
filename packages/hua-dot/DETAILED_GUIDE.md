@@ -32,7 +32,7 @@ Input string
  resolver.ts         — dispatches each token to the matching resolver module
     │
     ▼
- [26 resolver modules]  — spacing, color, typography, layout, border, flexbox,
+ resolver modules       — spacing, color, typography, layout, border, flexbox,
                           grid, shadow, ring, filter, backdrop, transform,
                           animation, transition, opacity, z-index, positioning,
                           gradient, line-clamp, interactivity, divide, object-fit,
@@ -43,13 +43,18 @@ Input string
     │                      (base → sm → md → lg → dark → dark:sm → ...)
     │
     ├─ adaptWeb()        — identity, returns merged StyleObject as-is
-    ├─ adaptNative()     — px→number, transform→array, boxShadow→RN shadow props,
-    │                      45+ unsupported props silently dropped
+    ├─ adaptNative()     — px→number, transform→array, boxShadow→RN shadow props;
+    │                      unsupported output is omitted and reportable
     └─ adaptFlutter()    — StyleObject → FlutterRecipe (BoxDecoration, EdgeInsets,
                            TextStyle, Matrix4, FlutterConstraints, ...)
 ```
 
-The entire pipeline is synchronous and pure. No DOM access, no Dimensions API, no global state beyond the module-level config singleton and 2-layer FIFO cache.
+Inline `dot()` / `dotMap()` resolution runs synchronously without DOM or
+`Dimensions` access. It is not a stateless pure boundary: module-level
+configuration and two FIFO caches affect subsequent calls. `createDotConfig()`
+replaces the active configuration and cache, while `clearDotCache()` clears the
+current cache explicitly. Class mode is a separate entry point with its own
+browser/SSR behavior.
 
 ---
 
@@ -150,7 +155,9 @@ createDotConfig({
 });
 ```
 
-After calling `createDotConfig`, all subsequent `dot()` / `dotMap()` calls use the new config. Call `clearDotCache()` if you change config at runtime and need the cache cleared.
+After calling `createDotConfig`, all subsequent `dot()` / `dotMap()` calls use
+the new config and a newly created cache. Use `clearDotCache()` when you need to
+clear the current cache explicitly, such as between isolated runs.
 
 ---
 
@@ -264,7 +271,9 @@ dotExplain("p-4 blur-md grid grid-cols-3 transition-all", { target: "native" });
 // }
 ```
 
-For `target: 'web'`, the report is always empty `{}` — all properties are natively supported.
+For `target: 'web'`, the current implementation returns an empty report by
+design. That empty object does not prove browser support, CSS parsing, or visual
+parity; use browser-level evidence for those claims.
 
 ---
 
@@ -345,7 +354,11 @@ adaptNative({
 - `lineHeight` unitless multiplier → absolute pixels (`fontSize * multiplier`)
 - CSS custom properties (`--*`) → dropped
 - CSS variable values (`var(...)`) → dropped
-- **45+ unsupported props dropped silently** — see full list: animation, transition, backdropFilter, cursor, outline, grid\*, filter, userSelect, float, clear, isolation, table/border-collapse/list-style/scroll-\*, willChange, touchAction, textIndent, wordBreak, backgroundImage, backgroundClip, overflow-x/y, visibility
+- Unsupported web-only output is omitted by default. Use `dotExplain()` for a
+  structured `_dropped` report before adaptation, or pass
+  `{ warnDropped: true }` to `adaptNative()` for deduplicated development
+  warnings. The exact property boundary is owned by the Native adapter and
+  capability metadata rather than a duplicated count in this guide.
 
 **Options:**
 

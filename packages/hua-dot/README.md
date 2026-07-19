@@ -1,6 +1,6 @@
 # @hua-labs/dot
 
-Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. Broad Tailwind-inspired utility coverage across common style families.
+Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero runtime dependencies and framework-agnostic APIs. Target support is explicit through the capability matrix and dotExplain().
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot.svg)](https://www.npmjs.com/package/@hua-labs/dot)
@@ -22,14 +22,13 @@ pnpm add @hua-labs/dot
 ## Quick Start
 
 ```ts
-import { dot, dotExplain } from '@hua-labs/dot';
+import { dot, dotExplain } from "@hua-labs/dot";
 
-const web = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
-const native = dot('p-4 rounded-lg shadow-lg', { target: 'native' });
-const report = dotExplain('grid grid-cols-3 gap-4', { target: 'native' });
+const web = dot("p-4 flex items-center bg-primary-500 text-white rounded-lg");
+const native = dot("p-4 rounded-lg shadow-lg", { target: "native" });
+const report = dotExplain("grid grid-cols-3 gap-4", { target: "native" });
 
 console.log(web, native, report.report._dropped);
-
 ```
 
 ## Documentation
@@ -38,7 +37,6 @@ console.log(web, native, report.report._dropped);
 
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
 - [`@hua-labs/ui`](https://www.npmjs.com/package/@hua-labs/ui)
 - [`@hua-labs/dot-aot`](https://www.npmjs.com/package/@hua-labs/dot-aot)
 
