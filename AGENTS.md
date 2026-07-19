@@ -26,12 +26,15 @@ HUA Labs packages. It is not a parallel product-development workspace.
   explicitly includes them.
 - Mirror-local work must not silently change package product behavior or
   promote public-preserved bytes into product authority.
+- Scope eligibility in this file does not itself authorize a public edit,
+  version change, merge, or publication.
 - Preserve unrelated worktrees, branches, stashes, and dirty changes.
 
 ## Version, Merge, and Publication Gates
 
-- Version and Changeset work starts only after exact source projection and the
-  package README/Detailed Guide gates are independently reviewed clean.
+- Version and Changeset work requires a separately assigned bounded
+  release-preparation task after exact source projection and the package
+  README/Detailed Guide gates are independently reviewed clean.
 - A Changeset, release plan, successful workflow, npm visibility, or package
   access setting is not publication authority by itself.
 - PR merge authority belongs to the tower/operator after independent clean
