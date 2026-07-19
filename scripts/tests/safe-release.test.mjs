@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
@@ -1139,6 +1140,138 @@ test("pack rejects selected manifest drift introduced by pack before artifact ad
     existsSync(join(artifactDirectory, "release-artifacts.json")),
     false,
   );
+});
+
+test("pack disables package lifecycle before artifact bytes are created", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  const packageManifestPath = join(
+    fixture.root,
+    "packages/hua-ui/package.json",
+  );
+  const originalManifestBytes = readFileSync(packageManifestPath);
+  let prepackCalls = 0;
+  let postpackCalls = 0;
+
+  const result = runPack({
+    root: fixture.root,
+    artifactDirectory,
+    branch: "main",
+    runId: "771",
+    sourceHead: "1".repeat(40),
+    execFile(file, args, options) {
+      if (file !== "pnpm" || args[0] !== "pack") {
+        return executeFixture(file, args, options);
+      }
+
+      const lifecycleDisabled =
+        options.env?.npm_config_ignore_scripts === "true";
+      if (!lifecycleDisabled) {
+        prepackCalls += 1;
+        mutateJson(packageManifestPath, (manifest) => {
+          manifest.description = "tarball-only lifecycle drift";
+        });
+      }
+      const output = executeFixture(file, args, options);
+      if (!lifecycleDisabled) {
+        postpackCalls += 1;
+        writeFileSync(packageManifestPath, originalManifestBytes);
+      }
+      return output;
+    },
+  });
+
+  assert.equal(result.artifactCount, 1);
+  assert.equal(prepackCalls, 0);
+  assert.equal(postpackCalls, 0);
+  const artifact = readdirSync(artifactDirectory).find((entry) =>
+    entry.endsWith(".tgz"),
+  );
+  const packedManifest = JSON.parse(
+    execFileSync(
+      "tar",
+      ["-xOf", join(artifactDirectory, artifact), "package/package.json"],
+      { encoding: "utf8" },
+    ),
+  );
+  assert.equal(packedManifest.description, undefined);
+});
+
+test("pnpm lifecycle-free pack preserves workspace manifest normalization", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "hua-safe-pack-lifecycle-"));
+  const artifactDirectory = join(root, "artifacts");
+  const dependencyDirectory = join(root, "packages/dependency");
+  const selectedDirectory = join(root, "packages/selected");
+  const lifecycleLog = join(selectedDirectory, "lifecycle.log");
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  mkdirSync(artifactDirectory, { recursive: true });
+  mkdirSync(dependencyDirectory, { recursive: true });
+  mkdirSync(selectedDirectory, { recursive: true });
+  writeFileSync(
+    join(root, "package.json"),
+    canonicalJson({ name: "pack-lifecycle-root", private: true }),
+  );
+  writeFileSync(
+    join(root, "pnpm-workspace.yaml"),
+    'packages:\n  - "packages/*"\n',
+  );
+  writeFileSync(
+    join(dependencyDirectory, "package.json"),
+    canonicalJson({ name: "@fixture/dependency", version: "1.2.3" }),
+  );
+  writeFileSync(
+    join(selectedDirectory, "lifecycle.mjs"),
+    'import { appendFileSync } from "node:fs";\n' +
+      'appendFileSync(new URL("./lifecycle.log", import.meta.url), `${process.argv[2]}\\n`);\n',
+  );
+  writeFileSync(
+    join(selectedDirectory, "package.json"),
+    canonicalJson({
+      name: "@fixture/selected",
+      version: "1.0.0",
+      dependencies: { "@fixture/dependency": "workspace:*" },
+      scripts: {
+        prepack: "node lifecycle.mjs prepack",
+        postpack: "node lifecycle.mjs postpack",
+      },
+    }),
+  );
+  const installedScopeDirectory = join(
+    selectedDirectory,
+    "node_modules/@fixture",
+  );
+  mkdirSync(installedScopeDirectory, { recursive: true });
+  symlinkSync(
+    dependencyDirectory,
+    join(installedScopeDirectory, "dependency"),
+    "dir",
+  );
+
+  execFileSync("pnpm", ["pack", "--pack-destination", artifactDirectory], {
+    cwd: selectedDirectory,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      npm_config_ignore_scripts: "true",
+      pnpm_config_ignore_scripts: "true",
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  assert.equal(existsSync(lifecycleLog), false);
+  const artifacts = readdirSync(artifactDirectory);
+  assert.equal(artifacts.length, 1);
+  const packedManifest = JSON.parse(
+    execFileSync(
+      "tar",
+      ["-xOf", join(artifactDirectory, artifacts[0]), "package/package.json"],
+      { encoding: "utf8" },
+    ),
+  );
+  assert.equal(packedManifest.dependencies["@fixture/dependency"], "1.2.3");
 });
 
 test("pack rejects a workspace build-dependency cycle before build, pack, or artifact checks", (t) => {
