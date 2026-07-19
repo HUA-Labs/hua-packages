@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Icon } from "./Icon"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { Icon } from "./Icon";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 
 /**
  * Drawer 컴포넌트의 props / Drawer component props
@@ -18,31 +18,34 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {boolean} [closeOnBackdropClick=true] - 배경 클릭 시 닫기 여부 / Close on backdrop click
  * @property {boolean} [closeOnEscape=true] - ESC 키로 닫기 여부 / Close on ESC key
  */
-interface DrawerProps {
+interface DrawerProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "style"
+> {
   /** Drawer 열림/닫힘 상태 / Drawer open/close state */
-  isOpen?: boolean
+  isOpen?: boolean;
   /** Drawer 닫기 콜백 / Drawer close callback */
-  onClose?: () => void
+  onClose?: () => void;
   /** Drawer 내용 / Drawer content */
-  children: React.ReactNode
+  children: React.ReactNode;
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
+  dot?: string;
   /** 인라인 스타일 / Inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
   /** Drawer 표시 위치 / Drawer display position */
-  side?: "left" | "right" | "top" | "bottom"
+  side?: "left" | "right" | "top" | "bottom";
   /** Drawer 크기 / Drawer size */
-  size?: "sm" | "md" | "lg" | "xl" | "full"
+  size?: "sm" | "md" | "lg" | "xl" | "full";
   /** 배경 오버레이 표시 여부 / Show backdrop overlay */
-  showBackdrop?: boolean
+  showBackdrop?: boolean;
   /** 배경 오버레이 추가 dot 스트링 / Backdrop overlay additional dot string */
-  backdropDot?: string
+  backdropDot?: string;
   /** 배경 클릭 시 닫기 여부 / Close on backdrop click */
-  closeOnBackdropClick?: boolean
+  closeOnBackdropClick?: boolean;
   /** ESC 키로 닫기 여부 / Close on ESC key */
-  closeOnEscape?: boolean
+  closeOnEscape?: boolean;
   /** 닫기 버튼 표시 여부 / Show close button */
-  closable?: boolean
+  closable?: boolean;
 }
 
 /**
@@ -79,109 +82,130 @@ interface DrawerProps {
  * @param {React.Ref<HTMLDivElement>} ref - Drawer 컨테이너 ref / Drawer container ref
  * @returns {JSX.Element} Drawer 컴포넌트 / Drawer component
  *
- * @todo 접근성 개선: role="dialog", aria-modal="true" 추가 필요 / Accessibility: Add role="dialog", aria-modal="true"
- * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
+ * Consumers must provide aria-label or aria-labelledby for the dialog name.
+ * This component does not claim aria-modal because it does not yet isolate the
+ * background or contain and restore focus.
  */
 const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
-  ({
-    isOpen,
-    onClose,
-    children,
-    dot: dotProp,
-    style,
-    side = "right",
-    size = "md",
-    showBackdrop = true,
-    backdropDot,
-    closeOnBackdropClick = true,
-    closeOnEscape = true,
-    closable = true,
-    ...props
-  }, ref) => {
-    const _isOpen = isOpen ?? false
-    const handleClose = () => {
-      onClose?.()
-    }
+  (
+    {
+      isOpen,
+      onClose,
+      children,
+      dot: dotProp,
+      style,
+      side = "right",
+      size = "md",
+      showBackdrop = true,
+      backdropDot,
+      closeOnBackdropClick = true,
+      closeOnEscape = true,
+      closable: _closable = true,
+      ...props
+    },
+    ref,
+  ) => {
+    const _isOpen = isOpen ?? false;
+    const handleClose = React.useCallback(() => {
+      onClose?.();
+    }, [onClose]);
 
-    const [isVisible, setIsVisible] = React.useState(false)
-    const [isAnimating, setIsAnimating] = React.useState(false)
+    const [isVisible, setIsVisible] = React.useState(false);
+    const [isAnimating, setIsAnimating] = React.useState(false);
 
     React.useEffect(() => {
       if (_isOpen) {
-        setIsVisible(true)
-        setIsAnimating(true)
+        setIsVisible(true);
+        setIsAnimating(true);
         // 애니메이션 시작을 위한 지연
-        const timer = setTimeout(() => setIsAnimating(false), 50)
-        return () => clearTimeout(timer)
+        const timer = setTimeout(() => setIsAnimating(false), 50);
+        return () => clearTimeout(timer);
       } else {
-        setIsAnimating(true)
+        setIsAnimating(true);
         const timer = setTimeout(() => {
-          setIsVisible(false)
-          setIsAnimating(false)
-        }, 300) // 애니메이션 완료 후 숨김
-        return () => clearTimeout(timer)
+          setIsVisible(false);
+          setIsAnimating(false);
+        }, 300); // 애니메이션 완료 후 숨김
+        return () => clearTimeout(timer);
       }
-    }, [_isOpen])
+    }, [_isOpen]);
 
     React.useEffect(() => {
-      if (!closeOnEscape) return
+      if (!closeOnEscape) return;
 
       const handleEscapeKey = (e: KeyboardEvent) => {
         if (e.key === "Escape" && _isOpen) {
-          handleClose()
+          handleClose();
         }
-      }
+      };
 
       if (_isOpen) {
-        document.addEventListener("keydown", handleEscapeKey)
-        document.body.style.overflow = "hidden"
+        document.addEventListener("keydown", handleEscapeKey);
+        document.body.style.overflow = "hidden";
       }
 
       return () => {
-        document.removeEventListener("keydown", handleEscapeKey)
-        document.body.style.overflow = ""
-      }
-    }, [_isOpen, closeOnEscape])
+        document.removeEventListener("keydown", handleEscapeKey);
+        document.body.style.overflow = "";
+      };
+    }, [_isOpen, closeOnEscape, handleClose]);
 
-    if (!isVisible) return null
+    if (!isVisible) return null;
 
     const sizeStyles: Record<string, React.CSSProperties> = {
-      sm: side === "left" || side === "right" ? { width: '20rem' } : { height: '16rem' },
-      md: side === "left" || side === "right" ? { width: '24rem' } : { height: '24rem' },
-      lg: side === "left" || side === "right" ? { width: '28rem' } : { height: '32rem' },
-      xl: side === "left" || side === "right" ? { width: '32rem' } : { height: '40rem' },
-      full: side === "left" || side === "right" ? { width: '100%' } : { height: '100%' }
-    }
+      sm:
+        side === "left" || side === "right"
+          ? { width: "20rem" }
+          : { height: "16rem" },
+      md:
+        side === "left" || side === "right"
+          ? { width: "24rem" }
+          : { height: "24rem" },
+      lg:
+        side === "left" || side === "right"
+          ? { width: "28rem" }
+          : { height: "32rem" },
+      xl:
+        side === "left" || side === "right"
+          ? { width: "32rem" }
+          : { height: "40rem" },
+      full:
+        side === "left" || side === "right"
+          ? { width: "100%" }
+          : { height: "100%" },
+    };
 
     const sideStyles: Record<string, React.CSSProperties> = {
-      left: { left: 0, top: 0, height: '100%' },
-      right: { right: 0, top: 0, height: '100%' },
-      top: { top: 0, left: 0, width: '100%' },
-      bottom: { bottom: 0, left: 0, width: '100%' }
-    }
+      left: { left: 0, top: 0, height: "100%" },
+      right: { right: 0, top: 0, height: "100%" },
+      top: { top: 0, left: 0, width: "100%" },
+      bottom: { bottom: 0, left: 0, width: "100%" },
+    };
 
     // Transform: _isOpen=true -> visible position, _isOpen=false -> hidden position
     const transformStyles: Record<string, React.CSSProperties> = {
-      left: { transform: _isOpen ? 'translateX(0)' : 'translateX(-100%)' },
-      right: { transform: _isOpen ? 'translateX(0)' : 'translateX(100%)' },
-      top: { transform: _isOpen ? 'translateY(0)' : 'translateY(-100%)' },
-      bottom: { transform: _isOpen ? 'translateY(0)' : 'translateY(100%)' }
-    }
+      left: { transform: _isOpen ? "translateX(0)" : "translateX(-100%)" },
+      right: { transform: _isOpen ? "translateX(0)" : "translateX(100%)" },
+      top: { transform: _isOpen ? "translateY(0)" : "translateY(-100%)" },
+      bottom: { transform: _isOpen ? "translateY(0)" : "translateY(100%)" },
+    };
 
     // Backdrop opacity animation
-    const backdropOpacity = isAnimating
-      ? (_isOpen ? 1 : 0)
-      : undefined
+    const backdropOpacity = isAnimating ? (_isOpen ? 1 : 0) : undefined;
 
     return (
-      <div style={resolveDot('fixed inset-0 z-50')}>
+      <div style={resolveDot("fixed inset-0 z-50")}>
         {/* Backdrop */}
         {showBackdrop && (
           <div
             style={mergeStyles(
-              resolveDot('absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300'),
+              resolveDot(
+                "absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
+              ),
               resolveDot(backdropDot),
-              backdropOpacity !== undefined ? { opacity: backdropOpacity } : undefined
+              backdropOpacity !== undefined
+                ? { opacity: backdropOpacity }
+                : undefined,
             )}
             onClick={closeOnBackdropClick ? handleClose : undefined}
           />
@@ -191,22 +215,26 @@ const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(
         <div
           ref={ref}
           style={mergeStyles(
-            resolveDot('absolute bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl transition-transform duration-300 ease-out'),
+            resolveDot(
+              "absolute bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl transition-transform duration-300 ease-out",
+            ),
             sizeStyles[size],
             sideStyles[side],
             transformStyles[side],
             resolveDot(dotProp),
-            style
+            style,
           )}
           {...props}
+          role="dialog"
+          aria-modal={undefined}
         >
           {children}
         </div>
       </div>
-    )
-  }
-)
-Drawer.displayName = "Drawer"
+    );
+  },
+);
+Drawer.displayName = "Drawer";
 
 /**
  * DrawerHeader 컴포넌트의 props / DrawerHeader component props
@@ -217,11 +245,13 @@ Drawer.displayName = "Drawer"
  * @property {() => void} [onClose] - 닫기 버튼 클릭 콜백 / Close button click callback
  */
 interface DrawerHeaderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
   /** 인라인 스타일 / Inline style */
-  style?: React.CSSProperties
-  showCloseButton?: boolean
-  onClose?: () => void
+  style?: React.CSSProperties;
+  showCloseButton?: boolean;
+  onClose?: () => void;
+  /** Accessible name for the icon-only close button. */
+  closeButtonLabel?: string;
 }
 
 /**
@@ -235,27 +265,46 @@ interface DrawerHeaderProps {
  * @returns {JSX.Element} DrawerHeader 컴포넌트 / DrawerHeader component
  */
 const DrawerHeader = React.forwardRef<HTMLDivElement, DrawerHeaderProps>(
-  ({ children, style, showCloseButton = true, onClose, ...props }, ref) => {
+  (
+    {
+      children,
+      style,
+      showCloseButton = true,
+      onClose,
+      closeButtonLabel = "Close drawer",
+      ...props
+    },
+    ref,
+  ) => {
     return (
       <div
         ref={ref}
-        style={mergeStyles(resolveDot('flex items-center justify-between p-6 border-b border-border/50'), style)}
+        style={mergeStyles(
+          resolveDot(
+            "flex items-center justify-between p-6 border-b border-border/50",
+          ),
+          style,
+        )}
         {...props}
       >
-        <div style={resolveDot('flex-1')}>{children}</div>
+        <div style={resolveDot("flex-1")}>{children}</div>
         {showCloseButton && (
           <button
+            type="button"
             onClick={onClose}
-            style={resolveDot('p-2 rounded-lg hover:bg-muted transition-colors')}
+            aria-label={closeButtonLabel}
+            style={resolveDot(
+              "p-2 rounded-lg hover:bg-muted transition-colors",
+            )}
           >
             <Icon name="close" size={20} />
           </button>
         )}
       </div>
-    )
-  }
-)
-DrawerHeader.displayName = "DrawerHeader"
+    );
+  },
+);
+DrawerHeader.displayName = "DrawerHeader";
 
 /**
  * DrawerContent 컴포넌트의 props / DrawerContent component props
@@ -264,9 +313,9 @@ DrawerHeader.displayName = "DrawerHeader"
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
 interface DrawerContentProps {
-  children: React.ReactNode
+  children: React.ReactNode;
   /** 인라인 스타일 / Inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
 }
 
 /**
@@ -284,15 +333,15 @@ const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps>(
     return (
       <div
         ref={ref}
-        style={mergeStyles(resolveDot('flex-1 p-6 overflow-y-auto'), style)}
+        style={mergeStyles(resolveDot("flex-1 p-6 overflow-y-auto"), style)}
         {...props}
       >
         {children}
       </div>
-    )
-  }
-)
-DrawerContent.displayName = "DrawerContent"
+    );
+  },
+);
+DrawerContent.displayName = "DrawerContent";
 
 /**
  * DrawerFooter 컴포넌트의 props / DrawerFooter component props
@@ -301,9 +350,9 @@ DrawerContent.displayName = "DrawerContent"
  * @property {React.CSSProperties} [style] - 인라인 스타일 / Inline style
  */
 interface DrawerFooterProps {
-  children: React.ReactNode
+  children: React.ReactNode;
   /** 인라인 스타일 / Inline style */
-  style?: React.CSSProperties
+  style?: React.CSSProperties;
 }
 
 /**
@@ -321,14 +370,19 @@ const DrawerFooter = React.forwardRef<HTMLDivElement, DrawerFooterProps>(
     return (
       <div
         ref={ref}
-        style={mergeStyles(resolveDot('flex items-center justify-end gap-3 p-6 border-t border-border/50'), style)}
+        style={mergeStyles(
+          resolveDot(
+            "flex items-center justify-end gap-3 p-6 border-t border-border/50",
+          ),
+          style,
+        )}
         {...props}
       >
         {children}
       </div>
-    )
-  }
-)
-DrawerFooter.displayName = "DrawerFooter"
+    );
+  },
+);
+DrawerFooter.displayName = "DrawerFooter";
 
-export { Drawer, DrawerHeader, DrawerContent, DrawerFooter }
+export { Drawer, DrawerHeader, DrawerContent, DrawerFooter };

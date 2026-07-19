@@ -60,12 +60,13 @@ absence. A reviewer with the exact source repository may additionally pass
 M810 admits exactly 14 `platform-exact` core-interoperability paths from
 platform commit `f9ceddaa02c4b544b108d5ab68766a965e36b58d`: `Slot`,
 `web-classname`, `Box`, `Text`, `Pressable`, `Button`, and `Action`, paired with
-their focused tests. Every other mapped source path keeps its prior fail-closed
-disposition; this projection does not copy package, export, dependency, version,
+their focused tests. M814 admits 10 more byte-exact interaction and accessibility
+paths from that same authority: `BottomSheet`, `Drawer`, `Textarea`, `Toast`, and
+`Tooltip`, paired with their focused tests. The test locks all 24 admitted paths
+and independently rejects a self-consistent reclassification in the remaining
+126-row authority set. Every other mapped source path keeps its prior fail-closed
+disposition; these projections do not copy package, export, dependency, version,
 Changeset, lock, workflow, or generated-document authority.
-The newer named source commit also changes `Tooltip` and its focused test; those
-two rows re-lock only their source hashes and remain explicitly deferred with no
-admitted output bytes.
 The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it

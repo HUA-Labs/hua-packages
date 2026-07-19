@@ -20,7 +20,10 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap";
  * @property {number[]} [snapPoints=[25, 50, 75, 100]] - 스냅 포인트 (퍼센트) / Snap points (percentage)
  * @property {number} [defaultSnap=50] - 기본 스냅 포인트 (퍼센트) / Default snap point (percentage)
  */
-interface BottomSheetProps {
+interface BottomSheetProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "style"
+> {
   /** BottomSheet 열림/닫힘 상태 / BottomSheet open/close state */
   isOpen?: boolean;
   /** BottomSheet 닫기 콜백 / BottomSheet close callback */
@@ -87,8 +90,9 @@ interface BottomSheetProps {
  * @param {React.Ref<HTMLDivElement>} ref - BottomSheet 컨테이너 ref / BottomSheet container ref
  * @returns {JSX.Element} BottomSheet 컴포넌트 / BottomSheet component
  *
- * @todo 접근성 개선: role="dialog", aria-modal="true" 추가 필요 / Accessibility: Add role="dialog", aria-modal="true"
- * @todo 접근성 개선: aria-labelledby, aria-describedby 연결 필요 / Accessibility: Connect aria-labelledby, aria-describedby
+ * Consumers must provide aria-label or aria-labelledby for the dialog name.
+ * This component does not claim aria-modal because it does not yet isolate the
+ * background or contain and restore focus.
  */
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
   (
@@ -104,17 +108,20 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
       closeOnBackdropClick = true,
       closeOnEscape = true,
       showDragHandle = true,
-      closable = true,
+      closable: _closable = true,
       snapPoints = [25, 50, 75, 100],
       defaultSnap = 50,
+      onTouchStart: consumerOnTouchStart,
+      onTouchMove: consumerOnTouchMove,
+      onTouchEnd: consumerOnTouchEnd,
       ...props
     },
     ref,
   ) => {
     const _isOpen = isOpen ?? false;
-    const handleClose = () => {
+    const handleClose = React.useCallback(() => {
       onClose?.();
-    };
+    }, [onClose]);
 
     const [isVisible, setIsVisible] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
@@ -165,35 +172,40 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         document.removeEventListener("keydown", handleEscapeKey);
         document.body.style.overflow = "";
       };
-    }, [_isOpen, closeOnEscape]);
+    }, [_isOpen, closeOnEscape, handleClose]);
 
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
       setIsDragging(true);
       setStartY(e.touches[0].clientY);
       setCurrentY(e.touches[0].clientY);
+      consumerOnTouchStart?.(e);
     };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-      if (!isDragging) return;
-      setCurrentY(e.touches[0].clientY);
-    };
-
-    const handleTouchEnd = () => {
-      if (!isDragging) return;
-      setIsDragging(false);
-
-      const deltaY = currentY - startY;
-      const threshold = 100;
-
-      if (deltaY > threshold) {
-        // 아래로 드래그 - 닫기
-        handleClose();
-      } else if (deltaY < -threshold) {
-        // 위로 드래그 - 다음 스냅 포인트
-        const currentIndex = snapPoints.indexOf(currentHeight);
-        const nextIndex = Math.min(currentIndex + 1, snapPoints.length - 1);
-        setCurrentHeight(snapPoints[nextIndex]);
+    const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+      if (isDragging) {
+        setCurrentY(e.touches[0].clientY);
       }
+      consumerOnTouchMove?.(e);
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+      if (isDragging) {
+        setIsDragging(false);
+
+        const deltaY = currentY - startY;
+        const threshold = 100;
+
+        if (deltaY > threshold) {
+          // 아래로 드래그 - 닫기
+          handleClose();
+        } else if (deltaY < -threshold) {
+          // 위로 드래그 - 다음 스냅 포인트
+          const currentIndex = snapPoints.indexOf(currentHeight);
+          const nextIndex = Math.min(currentIndex + 1, snapPoints.length - 1);
+          setCurrentHeight(snapPoints[nextIndex]);
+        }
+      }
+      consumerOnTouchEnd?.(e);
     };
 
     if (!isVisible) return null;
@@ -236,7 +248,6 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
             heightStyles[height],
             height === "full"
               ? {
-                  // height prop이 "full"일 때만 퍼센트 높이 사용 (스냅 포인트)
                   height: `${currentHeight}%`,
                   maxHeight: "100%",
                 }
@@ -253,6 +264,8 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           {...props}
+          role="dialog"
+          aria-modal={undefined}
         >
           {/* Drag Handle */}
           {showDragHandle && (
@@ -287,6 +300,8 @@ interface BottomSheetHeaderProps {
   style?: React.CSSProperties;
   showCloseButton?: boolean;
   onClose?: () => void;
+  /** Accessible name for the icon-only close button. */
+  closeButtonLabel?: string;
 }
 
 /**
@@ -302,28 +317,44 @@ interface BottomSheetHeaderProps {
 const BottomSheetHeader = React.forwardRef<
   HTMLDivElement,
   BottomSheetHeaderProps
->(({ children, style, showCloseButton = true, onClose, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      style={mergeStyles(
-        resolveDot("flex items-center justify-between px-6 py-4"),
-        style,
-      )}
-      {...props}
-    >
-      <div style={resolveDot("flex-1")}>{children}</div>
-      {showCloseButton && (
-        <button
-          onClick={onClose}
-          style={resolveDot("p-2 rounded-lg hover:bg-muted transition-colors")}
-        >
-          <Icon name="close" size={20} />
-        </button>
-      )}
-    </div>
-  );
-});
+>(
+  (
+    {
+      children,
+      style,
+      showCloseButton = true,
+      onClose,
+      closeButtonLabel = "Close bottom sheet",
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <div
+        ref={ref}
+        style={mergeStyles(
+          resolveDot("flex items-center justify-between px-6 py-4"),
+          style,
+        )}
+        {...props}
+      >
+        <div style={resolveDot("flex-1")}>{children}</div>
+        {showCloseButton && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={closeButtonLabel}
+            style={resolveDot(
+              "p-2 rounded-lg hover:bg-muted transition-colors",
+            )}
+          >
+            <Icon name="close" size={20} />
+          </button>
+        )}
+      </div>
+    );
+  },
+);
 BottomSheetHeader.displayName = "BottomSheetHeader";
 
 /**

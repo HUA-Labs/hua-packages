@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { ToastProvider, useToast, useToastSafe } from '../Toast';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import React from "react";
+import { ToastProvider, useToast, useToastSafe } from "../Toast";
 
 // Helper component to trigger toast actions
 function ToastTrigger({
-  type = 'success',
-  message = 'Test message',
+  type = "success",
+  message = "Test message",
   title,
   duration,
   action,
 }: {
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type?: "success" | "error" | "warning" | "info";
   message?: string;
   title?: string;
   duration?: number;
@@ -42,7 +42,7 @@ function SafeToastConsumer() {
   const { addToast } = useToastSafe();
 
   return (
-    <button onClick={() => addToast({ type: 'info', message: 'safe toast' })}>
+    <button onClick={() => addToast({ type: "info", message: "safe toast" })}>
       Safe Add
     </button>
   );
@@ -56,19 +56,21 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('ToastProvider', () => {
-  it('should render children', () => {
+describe("ToastProvider", () => {
+  it("should render children", () => {
     render(
       <ToastProvider>
         <div>App Content</div>
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    expect(screen.getByText('App Content')).toBeInTheDocument();
+    expect(screen.getByText("App Content")).toBeInTheDocument();
   });
 
-  it('should throw when useToast is used outside provider', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it("should throw when useToast is used outside provider", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     function BadComponent() {
       useToast();
@@ -76,94 +78,119 @@ describe('ToastProvider', () => {
     }
 
     expect(() => render(<BadComponent />)).toThrow(
-      'useToast must be used within a ToastProvider'
+      "useToast must be used within a ToastProvider",
     );
 
     consoleError.mockRestore();
   });
 
-  it('should return no-op functions from useToastSafe without provider', () => {
+  it("should return no-op functions from useToastSafe without provider", () => {
     render(<SafeToastConsumer />);
 
     // Should not throw
-    const button = screen.getByText('Safe Add');
+    const button = screen.getByText("Safe Add");
     expect(button).toBeInTheDocument();
   });
 });
 
-describe('Toast - Adding', () => {
-  it('should add a success toast', async () => {
+describe("Toast - Adding", () => {
+  it.each([
+    ["success", "status", "polite"],
+    ["info", "status", "polite"],
+    ["warning", "alert", "assertive"],
+    ["error", "alert", "assertive"],
+  ] as const)(
+    "maps %s to role=%s and aria-live=%s with an atomic announcement",
+    async (type, role, live) => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+      render(
+        <ToastProvider>
+          <ToastTrigger type={type} message={`${type} semantics`} />
+        </ToastProvider>,
+      );
+
+      await user.click(screen.getByText("Add Toast"));
+
+      const toast = screen.getByRole(role);
+      expect(toast).toHaveAttribute("aria-live", live);
+      expect(toast).toHaveAttribute("aria-atomic", "true");
+      expect(toast).toHaveTextContent(`${type} semantics`);
+    },
+  );
+
+  it("should add a success toast", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger type="success" message="Saved!" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    expect(screen.getByText('Saved!')).toBeInTheDocument();
+    expect(screen.getByText("Saved!")).toBeInTheDocument();
   });
 
-  it('should add an error toast', async () => {
+  it("should add an error toast", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger type="error" message="Failed!" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    expect(screen.getByText('Failed!')).toBeInTheDocument();
+    expect(screen.getByText("Failed!")).toBeInTheDocument();
   });
 
-  it('should add a warning toast', async () => {
+  it("should add a warning toast", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger type="warning" message="Caution!" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    expect(screen.getByText('Caution!')).toBeInTheDocument();
+    expect(screen.getByText("Caution!")).toBeInTheDocument();
   });
 
-  it('should add an info toast', async () => {
+  it("should add an info toast", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger type="info" message="Notice" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    expect(screen.getByText('Notice')).toBeInTheDocument();
+    expect(screen.getByText("Notice")).toBeInTheDocument();
   });
 
-  it('should display title and message', async () => {
+  it("should display title and message", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger title="Success" message="Operation completed" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    expect(screen.getByText('Success')).toBeInTheDocument();
-    expect(screen.getByText('Operation completed')).toBeInTheDocument();
+    expect(screen.getByText("Success")).toBeInTheDocument();
+    expect(screen.getByText("Operation completed")).toBeInTheDocument();
   });
 
-  it('should render action button', async () => {
+  it("should render action button", async () => {
     const handleAction = vi.fn();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
@@ -171,94 +198,94 @@ describe('Toast - Adding', () => {
       <ToastProvider>
         <ToastTrigger
           message="Deleted"
-          action={{ label: 'Undo', onClick: handleAction }}
+          action={{ label: "Undo", onClick: handleAction }}
         />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    const undoButton = screen.getByText('Undo');
+    const undoButton = screen.getByText("Undo");
     expect(undoButton).toBeInTheDocument();
 
     await user.click(undoButton);
     expect(handleAction).toHaveBeenCalledTimes(1);
   });
 
-  it('should limit toasts to maxToasts', async () => {
+  it("should limit toasts to maxToasts", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider maxToasts={2}>
         <ToastTrigger duration={0} />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    const addButton = screen.getByText('Add Toast');
+    const addButton = screen.getByText("Add Toast");
 
     await user.click(addButton);
     await user.click(addButton);
     await user.click(addButton);
 
     // Only 2 toasts should be visible (maxToasts=2)
-    const messages = screen.getAllByText('Test message');
+    const messages = screen.getAllByText("Test message");
     expect(messages).toHaveLength(2);
   });
 });
 
-describe('Toast - Auto Close', () => {
-  it('should auto-remove after duration', async () => {
+describe("Toast - Auto Close", () => {
+  it("should auto-remove after duration", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger duration={3000} message="Temporary" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
-    expect(screen.getByText('Temporary')).toBeInTheDocument();
+    await user.click(screen.getByText("Add Toast"));
+    expect(screen.getByText("Temporary")).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(3500);
     });
 
-    expect(screen.queryByText('Temporary')).not.toBeInTheDocument();
+    expect(screen.queryByText("Temporary")).not.toBeInTheDocument();
   });
 
-  it('should not auto-remove when duration is 0', async () => {
+  it("should not auto-remove when duration is 0", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger duration={0} message="Persistent" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
     act(() => {
       vi.advanceTimersByTime(10000);
     });
 
-    expect(screen.getByText('Persistent')).toBeInTheDocument();
+    expect(screen.getByText("Persistent")).toBeInTheDocument();
   });
 });
 
-describe('Toast - Manual Close', () => {
-  it('should close on close button click', async () => {
+describe("Toast - Manual Close", () => {
+  it("should close on close button click", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger duration={0} message="Closeable" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
-    expect(screen.getByText('Closeable')).toBeInTheDocument();
+    await user.click(screen.getByText("Add Toast"));
+    expect(screen.getByText("Closeable")).toBeInTheDocument();
 
-    const closeButton = screen.getByRole('button', { name: '닫기' });
+    const closeButton = screen.getByRole("button", { name: "닫기" });
     await user.click(closeButton);
 
     // Wait for exit animation (300ms)
@@ -266,62 +293,62 @@ describe('Toast - Manual Close', () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(screen.queryByText('Closeable')).not.toBeInTheDocument();
+    expect(screen.queryByText("Closeable")).not.toBeInTheDocument();
   });
 
-  it('should clear all toasts', async () => {
+  it("should clear all toasts", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
         <ToastTrigger duration={0} message="Toast A" />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
-    expect(screen.getByText('Toast A')).toBeInTheDocument();
+    await user.click(screen.getByText("Add Toast"));
+    expect(screen.getByText("Toast A")).toBeInTheDocument();
 
-    await user.click(screen.getByText('Clear All'));
-    expect(screen.queryByText('Toast A')).not.toBeInTheDocument();
+    await user.click(screen.getByText("Clear All"));
+    expect(screen.queryByText("Toast A")).not.toBeInTheDocument();
   });
 });
 
-describe('Toast - Position', () => {
-  it('should render in top-right by default', async () => {
+describe("Toast - Position", () => {
+  it("should render in top-right by default", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     const { container } = render(
       <ToastProvider>
         <ToastTrigger duration={0} />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    const toastContainer = container.querySelector('[data-toast-container]');
+    const toastContainer = container.querySelector("[data-toast-container]");
     expect(toastContainer).toBeTruthy();
-    expect(toastContainer?.getAttribute('data-position')).toBe('top-right');
+    expect(toastContainer?.getAttribute("data-position")).toBe("top-right");
     const s = (toastContainer as HTMLElement)?.style;
-    expect(s.top).toBe('1rem');
-    expect(s.right).toBe('1rem');
+    expect(s.top).toBe("1rem");
+    expect(s.right).toBe("1rem");
   });
 
-  it('should render in specified position', async () => {
+  it("should render in specified position", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     const { container } = render(
       <ToastProvider position="bottom-left">
         <ToastTrigger duration={0} />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
-    await user.click(screen.getByText('Add Toast'));
+    await user.click(screen.getByText("Add Toast"));
 
-    const toastContainer = container.querySelector('[data-toast-container]');
+    const toastContainer = container.querySelector("[data-toast-container]");
     expect(toastContainer).toBeTruthy();
-    expect(toastContainer?.getAttribute('data-position')).toBe('bottom-left');
+    expect(toastContainer?.getAttribute("data-position")).toBe("bottom-left");
     const s = (toastContainer as HTMLElement)?.style;
-    expect(s.bottom).toBe('1rem');
-    expect(s.left).toBe('1rem');
+    expect(s.bottom).toBe("1rem");
+    expect(s.left).toBe("1rem");
   });
 });
