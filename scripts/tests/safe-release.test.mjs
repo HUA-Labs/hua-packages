@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
@@ -104,6 +106,8 @@ const packageDefinitions = [
     name: "@hua-labs/ui",
     path: "packages/hua-ui",
     version: "2.3.0",
+    dependencies: { "@hua-labs/dot": "workspace:*" },
+    peerDependencies: { "@hua-labs/motion-core": ">=2.4.0" },
     release: {
       mode: "public-npm",
       intent: "active-public",
@@ -125,6 +129,18 @@ function manifestFor(definition, version = definition.version) {
   if (definition.private) manifest.private = true;
   if (definition.publishConfig !== null) {
     manifest.publishConfig = definition.publishConfig;
+  }
+  if (definition.dependencies !== undefined) {
+    manifest.dependencies = definition.dependencies;
+  }
+  if (definition.optionalDependencies !== undefined) {
+    manifest.optionalDependencies = definition.optionalDependencies;
+  }
+  if (definition.peerDependencies !== undefined) {
+    manifest.peerDependencies = definition.peerDependencies;
+  }
+  if (definition.scripts !== undefined) {
+    manifest.scripts = definition.scripts;
   }
   return manifest;
 }
@@ -804,7 +820,12 @@ test("pack builds every exact planned package including create-hua before one ar
     calls
       .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
       .map(({ args }) => args[1]),
-    ["@hua-labs/ui", "create-hua"],
+    ["@hua-labs/dot", "@hua-labs/ui", "create-hua"],
+  );
+  assert.equal(
+    calls.filter(({ file, args }) => file === "pnpm" && args[0] === "pack")
+      .length,
+    2,
   );
   const checkerCalls = calls.filter(
     ({ file, args }) =>
@@ -813,6 +834,603 @@ test("pack builds every exact planned package including create-hua before one ar
   assert.equal(checkerCalls.length, 1);
   assert.equal(checkerCalls[0].args.length, 3);
   assert.equal(readFileSync(result.artifactManifestPath).byteLength > 0, true);
+});
+
+test("pack builds blocked and unselected workspace prerequisites once in deterministic dependency order", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const publicManifest = { access: "public", provenance: true };
+  const definitions = [
+    {
+      ...structuredClone(packageDefinitions[0]),
+    },
+    {
+      name: "@hua-labs/dot-lsp",
+      path: "packages/hua-dot-lsp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/dot-mcp",
+      path: "packages/hua-dot-mcp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-core",
+      path: "packages/hua-i18n-core",
+      version: "2.2.1",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-core-zustand",
+      path: "packages/hua-i18n-core-zustand",
+      version: "2.2.1",
+      dependencies: {
+        "@hua-labs/i18n-core": "workspace:*",
+        "@hua-labs/state": "workspace:*",
+      },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-formatters",
+      path: "packages/hua-i18n-formatters",
+      version: "2.2.1",
+      dependencies: { "@hua-labs/i18n-core": "workspace:*" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/i18n-loaders",
+      path: "packages/hua-i18n-loaders",
+      version: "2.2.1",
+      dependencies: { "@hua-labs/i18n-core": "workspace:*" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/state",
+      path: "packages/hua-state",
+      version: "1.0.4",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+  ].sort((left, right) =>
+    Buffer.compare(Buffer.from(left.name), Buffer.from(right.name)),
+  );
+  const releases = [
+    "@hua-labs/dot-lsp",
+    "@hua-labs/dot-mcp",
+    "@hua-labs/i18n-core-zustand",
+    "@hua-labs/i18n-formatters",
+    "@hua-labs/i18n-loaders",
+  ];
+  const fixture = createPlannedFixture(releases, definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const result = runPack({
+    root: fixture.root,
+    artifactDirectory: createExternalArtifactDirectory(fixture),
+    branch: "main",
+    runId: "776",
+    sourceHead: "6".repeat(40),
+    execFile: packExecFixture(calls),
+  });
+  assert.equal(result.artifactCount, releases.length);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    [
+      "@hua-labs/dot",
+      "@hua-labs/dot-lsp",
+      "@hua-labs/dot-mcp",
+      "@hua-labs/i18n-core",
+      "@hua-labs/state",
+      "@hua-labs/i18n-core-zustand",
+      "@hua-labs/i18n-formatters",
+      "@hua-labs/i18n-loaders",
+    ],
+  );
+  assert.deepEqual(
+    JSON.parse(readFileSync(result.artifactManifestPath, "utf8")).artifacts.map(
+      ({ name }) => name,
+    ),
+    [...releases].sort((left, right) =>
+      Buffer.compare(Buffer.from(left), Buffer.from(right)),
+    ),
+  );
+});
+
+test("pack rejects planned workspace manifest drift caused by a prerequisite build before packing", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "774",
+        sourceHead: "4".repeat(40),
+        execFile(file, args, options) {
+          const output = executeFixture(file, args, options);
+          if (
+            !mutated &&
+            file === "pnpm" &&
+            args[0] === "--filter" &&
+            args[1] === "@hua-labs/dot"
+          ) {
+            mutateJson(
+              join(fixture.root, "packages/hua-ui/package.json"),
+              (manifest) => {
+                manifest.description = "mutated by prerequisite build";
+              },
+            );
+            mutated = true;
+          }
+          return output;
+        },
+      }),
+    "plan-workspace-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.some(({ file, args }) => file === "pnpm" && args[0] === "pack"),
+    false,
+  );
+  assert.equal(
+    calls.some(
+      ({ file, args }) =>
+        file === "node" && args[0].endsWith("check-pack-artifacts.js"),
+    ),
+    false,
+  );
+});
+
+test("pack rejects release-plan authority drift caused by a prerequisite build", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "772",
+        sourceHead: "2".repeat(40),
+        execFile(file, args, options) {
+          const output = executeFixture(file, args, options);
+          if (
+            !mutated &&
+            file === "pnpm" &&
+            args[0] === "--filter" &&
+            args[1] === "@hua-labs/dot"
+          ) {
+            const state = loadReleaseState(fixture.root, {
+              requireNonempty: true,
+            });
+            const releases = structuredClone(state.plan.releases);
+            releases[0].changesets[0].sha256 = "3".repeat(64);
+            writeFileSync(
+              join(fixture.root, "config/release-plan.json"),
+              canonicalJson(
+                finalizeReleasePlan({
+                  ...state.plan,
+                  releases,
+                }),
+              ),
+            );
+            mutated = true;
+          }
+          return output;
+        },
+      }),
+    "pack-plan-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.some(({ file, args }) => file === "pnpm" && args[0] === "pack"),
+    false,
+  );
+});
+
+test("pack rejects selected manifest drift introduced by pack before artifact admission", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory,
+        branch: "main",
+        runId: "773",
+        sourceHead: "3".repeat(40),
+        execFile(file, args, options) {
+          if (!mutated && file === "pnpm" && args[0] === "pack") {
+            mutateJson(
+              join(fixture.root, "packages/hua-ui/package.json"),
+              (manifest) => {
+                manifest.description = "mutated while packing";
+              },
+            );
+            mutated = true;
+          }
+          return executeFixture(file, args, options);
+        },
+      }),
+    "plan-workspace-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.filter(({ file, args }) => file === "pnpm" && args[0] === "pack")
+      .length,
+    1,
+  );
+  assert.equal(
+    calls.some(
+      ({ file, args }) =>
+        file === "node" && args[0].endsWith("check-pack-artifacts.js"),
+    ),
+    false,
+  );
+  assert.equal(
+    existsSync(join(artifactDirectory, "release-artifacts.json")),
+    false,
+  );
+});
+
+test("pack disables package lifecycle before artifact bytes are created", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  const packageManifestPath = join(
+    fixture.root,
+    "packages/hua-ui/package.json",
+  );
+  const originalManifestBytes = readFileSync(packageManifestPath);
+  let prepackCalls = 0;
+  let postpackCalls = 0;
+
+  const result = runPack({
+    root: fixture.root,
+    artifactDirectory,
+    branch: "main",
+    runId: "771",
+    sourceHead: "1".repeat(40),
+    execFile(file, args, options) {
+      if (file !== "pnpm" || args[0] !== "pack") {
+        return executeFixture(file, args, options);
+      }
+
+      const lifecycleDisabled =
+        options.env?.npm_config_ignore_scripts === "true";
+      if (!lifecycleDisabled) {
+        prepackCalls += 1;
+        mutateJson(packageManifestPath, (manifest) => {
+          manifest.description = "tarball-only lifecycle drift";
+        });
+      }
+      const output = executeFixture(file, args, options);
+      if (!lifecycleDisabled) {
+        postpackCalls += 1;
+        writeFileSync(packageManifestPath, originalManifestBytes);
+      }
+      return output;
+    },
+  });
+
+  assert.equal(result.artifactCount, 1);
+  assert.equal(prepackCalls, 0);
+  assert.equal(postpackCalls, 0);
+  const artifact = readdirSync(artifactDirectory).find((entry) =>
+    entry.endsWith(".tgz"),
+  );
+  const packedManifest = JSON.parse(
+    execFileSync(
+      "tar",
+      ["-xOf", join(artifactDirectory, artifact), "package/package.json"],
+      { encoding: "utf8" },
+    ),
+  );
+  assert.equal(packedManifest.description, undefined);
+});
+
+test("pack normalizes conflicting lifecycle settings before a real pnpm child", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@fixture/dependency",
+      path: "packages/dependency",
+      version: "1.2.3",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@fixture/selected",
+      path: "packages/selected",
+      version: "1.0.0",
+      dependencies: { "@fixture/dependency": "workspace:*" },
+      scripts: {
+        prepack: "node lifecycle.mjs prepack",
+        postpack: "node lifecycle.mjs postpack",
+      },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@fixture/selected"], definitions);
+  t.after(() => fixture.cleanup());
+  const root = fixture.root;
+  const artifactDirectory = createExternalArtifactDirectory(fixture);
+  const dependencyDirectory = join(root, "packages/dependency");
+  const selectedDirectory = join(root, "packages/selected");
+  const lifecycleLog = join(selectedDirectory, "lifecycle.log");
+  writeFileSync(
+    join(root, "pnpm-workspace.yaml"),
+    'packages:\n  - "packages/*"\n',
+  );
+  writeFileSync(
+    join(selectedDirectory, "lifecycle.mjs"),
+    'import { appendFileSync } from "node:fs";\n' +
+      'appendFileSync(new URL("./lifecycle.log", import.meta.url), `${process.argv[2]}\\n`);\n',
+  );
+  const installedScopeDirectory = join(
+    selectedDirectory,
+    "node_modules/@fixture",
+  );
+  mkdirSync(installedScopeDirectory, { recursive: true });
+  symlinkSync(
+    dependencyDirectory,
+    join(installedScopeDirectory, "dependency"),
+    "dir",
+  );
+  const sourceManifestPath = join(selectedDirectory, "package.json");
+  const sourceManifestBytes = readFileSync(sourceManifestPath);
+  const conflictingSettings = {
+    npm_config_ignore_scripts: "false",
+    NPM_CONFIG_IGNORE_SCRIPTS: "false",
+    NpM_CoNfIg_Ignore_Scripts: "false",
+    pnpm_config_ignore_scripts: "false",
+    PNPM_CONFIG_IGNORE_SCRIPTS: "false",
+    PnPm_CoNfIg_Ignore_Scripts: "false",
+  };
+  const originalSettings = new Map(
+    Object.keys(conflictingSettings).map((key) => [key, process.env[key]]),
+  );
+  Object.assign(process.env, conflictingSettings);
+  t.after(() => {
+    for (const [key, value] of originalSettings) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let packEnvironment;
+  const result = runPack({
+    root,
+    artifactDirectory,
+    branch: "main",
+    runId: "770",
+    sourceHead: "0".repeat(40),
+    execFile(file, args, options) {
+      if (file === "pnpm" && args[0] === "pack") {
+        packEnvironment = options.env;
+        return execFileSync(file, args, options);
+      }
+      return executeFixture(file, args, options);
+    },
+  });
+
+  assert.equal(result.artifactCount, 1);
+  const lifecycleEvents = existsSync(lifecycleLog)
+    ? readFileSync(lifecycleLog, "utf8").trim().split("\n")
+    : [];
+  assert.deepEqual(lifecycleEvents, []);
+  assert.deepEqual(
+    Object.entries(packEnvironment)
+      .filter(([key]) =>
+        ["npm_config_ignore_scripts", "pnpm_config_ignore_scripts"].includes(
+          key.toLowerCase(),
+        ),
+      )
+      .sort(([left], [right]) =>
+        Buffer.compare(Buffer.from(left), Buffer.from(right)),
+      ),
+    [
+      ["npm_config_ignore_scripts", "true"],
+      ["pnpm_config_ignore_scripts", "true"],
+    ],
+  );
+  assert.deepEqual(readFileSync(sourceManifestPath), sourceManifestBytes);
+  const artifacts = readdirSync(artifactDirectory);
+  assert.equal(artifacts.filter((entry) => entry.endsWith(".tgz")).length, 1);
+  const packedManifest = JSON.parse(
+    execFileSync(
+      "tar",
+      [
+        "-xOf",
+        join(
+          artifactDirectory,
+          artifacts.find((entry) => entry.endsWith(".tgz")),
+        ),
+        "package/package.json",
+      ],
+      { encoding: "utf8" },
+    ),
+  );
+  const expectedPackedManifest = JSON.parse(sourceManifestBytes);
+  expectedPackedManifest.dependencies["@fixture/dependency"] = "1.2.3";
+  expectedPackedManifest.scripts = {};
+  assert.deepEqual(packedManifest, expectedPackedManifest);
+  assert.equal(packedManifest.dependencies["@fixture/dependency"], "1.2.3");
+});
+
+test("pack rejects a workspace build-dependency cycle before build, pack, or artifact checks", (t) => {
+  const release = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/alpha",
+      path: "packages/alpha",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/beta": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/beta",
+      path: "packages/beta",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/alpha": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@hua-labs/alpha"], definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "775",
+        sourceHead: "5".repeat(40),
+        execFile: packExecFixture(calls),
+      }),
+    "pack-workspace-dependency-cycle",
+  );
+  assert.deepEqual(calls, []);
+});
+
+test("pack rejects an unknown workspace build dependency before any execution", (t) => {
+  const release = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/alpha",
+      path: "packages/alpha",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/absent": "workspace:*" },
+      release,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPlannedFixture(["@hua-labs/alpha"], definitions);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "771",
+        sourceHead: "1".repeat(40),
+        execFile: packExecFixture(calls),
+      }),
+    "pack-workspace-dependency-unknown",
+  );
+  assert.deepEqual(calls, []);
 });
 
 test("pack-check failure creates no claim authority and executes zero publish", () => {
