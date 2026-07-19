@@ -8,6 +8,9 @@ import { parse as parseYaml } from "yaml";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const packageRoot = join(root, "packages", "hua-ui");
+const rootManifest = JSON.parse(
+  readFileSync(join(root, "package.json"), "utf8"),
+);
 const manifest = JSON.parse(
   readFileSync(join(packageRoot, "package.json"), "utf8"),
 );
@@ -171,6 +174,62 @@ function fencedCodeBlocks(markdown) {
   return [...markdown.matchAll(expression)].map((match) => match[1]);
 }
 
+function fencedCodeBlockAfterHeading(markdown, heading) {
+  const headingMarker = `### ${heading}`;
+  const headingIndex = markdown.indexOf(headingMarker);
+  assert.notEqual(headingIndex, -1, `missing guide heading: ${heading}`);
+
+  const marker = "`".repeat(3);
+  const expression = new RegExp(`${marker}tsx\\n([\\s\\S]*?)${marker}`);
+  const match = expression.exec(markdown.slice(headingIndex));
+  assert.ok(match, `missing TSX fence after guide heading: ${heading}`);
+  return match[1];
+}
+
+function diagnosticsForTsx(code, label) {
+  const fileName = join(root, `.virtual-${label}.tsx`);
+  const options = {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    jsx: ts.JsxEmit.ReactJSX,
+    strict: true,
+    skipLibCheck: true,
+    noEmit: true,
+    baseUrl: root,
+    paths: {
+      [manifest.name]: ["packages/hua-ui/src/index.ts"],
+    },
+  };
+  const host = ts.createCompilerHost(options);
+  const defaultFileExists = host.fileExists.bind(host);
+  const defaultReadFile = host.readFile.bind(host);
+  const defaultGetSourceFile = host.getSourceFile.bind(host);
+
+  host.fileExists = (candidate) =>
+    candidate === fileName || defaultFileExists(candidate);
+  host.readFile = (candidate) =>
+    candidate === fileName ? code : defaultReadFile(candidate);
+  host.getSourceFile = (candidate, languageVersion, onError, shouldCreate) =>
+    candidate === fileName
+      ? ts.createSourceFile(
+          candidate,
+          code,
+          languageVersion,
+          true,
+          ts.ScriptKind.TSX,
+        )
+      : defaultGetSourceFile(candidate, languageVersion, onError, shouldCreate);
+
+  const program = ts.createProgram([fileName], options, host);
+  return ts
+    .getPreEmitDiagnostics(program)
+    .filter((diagnostic) => diagnostic.file?.fileName === fileName)
+    .map((diagnostic) =>
+      ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
+    );
+}
+
 test("README exposes the distributed Detailed Guide through doc.yaml SSOT", () => {
   assert.equal(doc.readme?.detailedGuide, "./DETAILED_GUIDE.md");
   assert.equal(
@@ -278,4 +337,88 @@ test("Detailed Guide avoids stale certification, setup, modal, and Iconsax claim
   assert.match(guide, /Iconsax는 정확히 `line`과 `bold` 변형을 지원합니다\./);
   assert.match(guide, /The component runtime does not require Tailwind CSS\./);
   assert.match(guide, /컴포넌트 런타임에는 Tailwind CSS가 필수가 아닙니다\./);
+});
+
+test("English and Korean Micro Motion examples type-check against the shipped API", () => {
+  const examples = [
+    ["Micro Motion", "micro-motion-en"],
+    ["마이크로 모션", "micro-motion-ko"],
+  ];
+  const expectedPresets = ["subtle", "soft", "springy", "bouncy", "snappy"];
+  const issues = examples.flatMap(([heading, label]) => {
+    const code = fencedCodeBlockAfterHeading(guide, heading);
+
+    assert.match(
+      code,
+      /const \{ handlers, style, className \} = useMicroMotion\(\{\s*preset: "springy",?\s*\}\)/,
+    );
+    assert.match(
+      code,
+      /<button \{\.\.\.handlers\} style=\{style\} className=\{className\}>/,
+    );
+    for (const preset of expectedPresets) {
+      assert.match(code, new RegExp(`['"]${preset}['"]`));
+    }
+    assert.doesNotMatch(
+      code,
+      /button-press|hover-lift|card-hover|fade-in|slide-up/,
+    );
+
+    return diagnosticsForTsx(code, label).map(
+      (diagnostic) => `${heading}: ${diagnostic}`,
+    );
+  });
+
+  assert.deepEqual(issues, []);
+});
+
+test("Micro Motion type gate rejects the reviewed invalid example shape", () => {
+  const invalidExample = `
+import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
+
+function Component() {
+  const motion = useMicroMotion("button-press");
+  return <button {...motion.props}>Click me</button>;
+}
+
+const motionStyle = getMicroMotionClasses("hover-lift");
+<div style={motionStyle}>Hover me</div>;
+`;
+  const diagnostics = diagnosticsForTsx(
+    invalidExample,
+    "micro-motion-invalid-control",
+  );
+  const combined = diagnostics.join("\n");
+
+  assert.ok(diagnostics.length >= 4);
+  assert.match(combined, /button-press/);
+  assert.match(combined, /hover-lift/);
+  assert.match(combined, /props/);
+  assert.match(combined, /Properties<string \| number[^>]*>/);
+});
+
+test("Detailed Guide states the react-dom boundary for the compatibility root", () => {
+  assert.match(
+    guide,
+    /The compatibility root `@hua-labs\/ui` currently requires `react-dom` at runtime\s+because/,
+  );
+  assert.match(
+    guide,
+    /호환성 root `@hua-labs\/ui`는 현재 런타임에 `react-dom`이 필요합니다\.\s+root가/,
+  );
+  assert.doesNotMatch(
+    guide,
+    /Optional peers are installed only for the features that use them:[\s\S]*"react-dom"/,
+  );
+  assert.doesNotMatch(
+    guide,
+    /선택 peer는 해당 기능을 사용할 때만 설치합니다:[\s\S]*"react-dom"/,
+  );
+});
+
+test("ordinary docs validation runs the UI release-doc conformance suite", () => {
+  assert.match(
+    rootManifest.scripts?.["generate:docs:validate"] ?? "",
+    /node --test scripts\/tests\/hua-ui-release-docs-conformance\.test\.mjs/,
+  );
 });

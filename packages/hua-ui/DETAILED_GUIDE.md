@@ -79,9 +79,9 @@ published manifest and TypeScript declarations remain the exact API authority.
 ### Basic Installation
 
 ```bash
-pnpm add @hua-labs/ui
+pnpm add @hua-labs/ui react react-dom
 # or
-npm install @hua-labs/ui
+npm install @hua-labs/ui react react-dom
 ```
 
 ### Peer Dependencies
@@ -94,6 +94,12 @@ Required:
 }
 ```
 
+The compatibility root `@hua-labs/ui` currently requires `react-dom` at runtime
+because it exports portal-backed components. Install `react-dom` whenever you
+import the compatibility root. Package metadata keeps it optional so focused
+subpaths proven not to load portal code, such as `@hua-labs/ui/theme`, can be
+used without it.
+
 Optional peers are installed only for the features that use them:
 
 ```json
@@ -102,7 +108,6 @@ Optional peers are installed only for the features that use them:
   "@dnd-kit/sortable": "^10.0.0",
   "@dnd-kit/utilities": "^3.2.2",
   "@hua-labs/motion-core": ">=2.4.0",
-  "react-dom": ">=19.0.0",
   "react-native": ">=0.73.0"
 }
 ```
@@ -747,16 +752,22 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // Hook-based
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>Click me</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      Click me
+    </button>
+  );
 }
 
-// Style-based
-const motionStyle = getMicroMotionClasses("hover-lift");
-<div style={motionStyle}>Hover me</div>;
+// Class-based
+const classes = getMicroMotionClasses("soft");
+<div className={classes}>Hover me</div>;
 
 // Available presets:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
 
 ---
@@ -1415,9 +1426,9 @@ export default {
 ### 기본 설치
 
 ```bash
-pnpm add @hua-labs/ui
+pnpm add @hua-labs/ui react react-dom
 # 또는
-npm install @hua-labs/ui
+npm install @hua-labs/ui react react-dom
 ```
 
 ### Peer Dependencies
@@ -1430,6 +1441,12 @@ npm install @hua-labs/ui
 }
 ```
 
+호환성 root `@hua-labs/ui`는 현재 런타임에 `react-dom`이 필요합니다. root가
+portal 기반 컴포넌트를 내보내므로, 호환성 root를 import할 때는 `react-dom`을
+설치하세요. 패키지 메타데이터는 `@hua-labs/ui/theme`처럼 portal 코드를
+불러오지 않는다고 검증된 세부 경로를 `react-dom` 없이 사용할 수 있도록 이
+peer를 선택 사항으로 유지합니다.
+
 선택 peer는 해당 기능을 사용할 때만 설치합니다:
 
 ```json
@@ -1438,7 +1455,6 @@ npm install @hua-labs/ui
   "@dnd-kit/sortable": "^10.0.0",
   "@dnd-kit/utilities": "^3.2.2",
   "@hua-labs/motion-core": ">=2.4.0",
-  "react-dom": ">=19.0.0",
   "react-native": ">=0.73.0"
 }
 ```
@@ -2099,16 +2115,22 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // 훅 기반
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>클릭하세요</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      클릭하세요
+    </button>
+  );
 }
 
 // 클래스 기반
-const classes = getMicroMotionClasses("hover-lift");
+const classes = getMicroMotionClasses("soft");
 <div className={classes}>호버하세요</div>;
 
 // 사용 가능한 프리셋:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
 
 ---
