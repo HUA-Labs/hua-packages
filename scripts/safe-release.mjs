@@ -2215,6 +2215,11 @@ export function runPack(options = {}) {
     execFile("pnpm", ["pack", "--pack-destination", artifactDirectory], {
       cwd: packageDirectory,
       encoding: "utf8",
+      env: {
+        ...process.env,
+        npm_config_ignore_scripts: "true",
+        pnpm_config_ignore_scripts: "true",
+      },
       stdio: ["ignore", "pipe", "pipe"],
     });
     assertPackReleaseStateUnchanged(root, releaseState);
