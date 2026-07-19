@@ -120,6 +120,7 @@
     }
   },
   "files": [
+    "DETAILED_GUIDE.md",
     "dist",
     "src/styles",
     "src/components/icons",

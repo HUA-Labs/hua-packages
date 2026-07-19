@@ -12,10 +12,10 @@ Accessible, TypeScript-first component library for React applications. Provides 
 
 - **70+ components — Buttons, forms, tables, modals, overlays, and more**
 - **Modular entry points — Import only what you need for optimal bundle size**
-- **Accessible — ARIA attributes, keyboard navigation, WCAG compliant**
+- **Accessible contracts — Component-specific ARIA, keyboard, and naming behavior with explicit evidence limits**
 - **Dark mode — Built-in dark mode support**
 - **dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop**
-- **Tree-shakeable — Side-effect free (except CSS)**
+- **Tree-shakeable ESM — CSS and provider-registration entries retain their declared side effects**
 
 ## Installation
 
@@ -53,7 +53,7 @@ function App() {
 |--------|------|-------------|
 | `Box` | component | Base block primitive (renders as <div> on web, View on native via .native.tsx) |
 | `Text` | component | Base text primitive (renders as <span> on web, Text on native via .native.tsx) |
-| `Pressable` | component | Interactive primitive with hover/active feedback and WCAG 2.1 AA touch targets (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of touch targets. |
+| `Pressable` | component | Interactive primitive with hover/active feedback and a default 44px minimum touch target (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of the minimum target. |
 | `Button` | component | Primary action button with variants, sizes, and loading state |
 | `Action` | component | Compact icon action button |
 | `Input` | component | Text input with validation, prefix/suffix, and error states |
@@ -61,7 +61,7 @@ function App() {
 | `Link` | component | Styled anchor with router integration |
 | `Icon` | component | Universal icon component (Lucide, Phosphor, custom) |
 | `Avatar` | component | User avatar with image fallback |
-| `Modal` | component | Dialog overlay with backdrop and focus trap |
+| `Modal` | component | Portal dialog with backdrop, Escape and overlay close, scroll lock, and title/description ARIA linkage; focus trapping and restoration are not provided |
 | `Container` | component | Responsive max-width container |
 | `Section` | component | Page section wrapper with optional header config (title, description, action) |
 | `Grid` | component | CSS Grid layout wrapper |
@@ -135,9 +135,14 @@ function App() {
 | `mergeStyles` | function | Merge two CSSProperties / style objects, with the second taking precedence |
 | `resolveDot` | function | Resolve a dot-style string to a CSSProperties object at runtime |
 
+## Documentation
+
+- [Detailed Guide](./DETAILED_GUIDE.md)
+
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
+- [`@hua-labs/dot`](https://www.npmjs.com/package/@hua-labs/dot)
+- [`@hua-labs/motion-core`](https://www.npmjs.com/package/@hua-labs/motion-core)
 
 ## License
 
