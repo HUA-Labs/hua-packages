@@ -97,6 +97,20 @@ export default defineConfig([
       "@hua-labs/dot/native",
     ],
   },
+  // Icons barrels (Iconsax raw SVG components — regular + bold)
+  // Types served from source (300+ SVG components — DTS generation too heavy)
+  {
+    ...shared,
+    entry: {
+      icons: "src/components/icons/index.ts",
+      "icons-bold": "src/components/icons-bold/index.ts",
+    },
+    dts: false,
+    format: ["esm"],
+    splitting: false,
+    outDir: "dist",
+    clean: false,
+  },
   // Iconsax Essential ESM (only PROJECT_ICONS mapped icons)
   {
     ...shared,

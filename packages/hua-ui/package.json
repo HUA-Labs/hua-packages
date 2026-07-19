@@ -100,13 +100,13 @@
     "./styles/prose.css": "./src/styles/prose.css",
     "./icons": {
       "types": "./src/components/icons/index.ts",
-      "import": "./src/components/icons/index.ts",
-      "default": "./src/components/icons/index.ts"
+      "import": "./dist/icons.mjs",
+      "default": "./dist/icons.mjs"
     },
     "./icons-bold": {
       "types": "./src/components/icons-bold/index.ts",
-      "import": "./src/components/icons-bold/index.ts",
-      "default": "./src/components/icons-bold/index.ts"
+      "import": "./dist/icons-bold.mjs",
+      "default": "./dist/icons-bold.mjs"
     },
     "./iconsax": {
       "types": "./dist/iconsax.d.ts",

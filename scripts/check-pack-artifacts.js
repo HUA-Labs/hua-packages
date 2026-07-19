@@ -27,6 +27,12 @@ const allowedSourcePayloads = new Map([
 ]);
 
 const packageJsonCache = new Map();
+const runtimeConditions = new Set([
+  "import",
+  "default",
+  "require",
+  "react-native",
+]);
 
 function listTarball(tarball) {
   const output = execFileSync("tar", ["-tzf", tarball], {
@@ -98,6 +104,79 @@ function collectTypeRefs(pkg) {
   return [...refs].map(normalizePackagePath).filter(Boolean).sort();
 }
 
+function collectExportRuntimeRefs(
+  exportsValue,
+  refs = [],
+  activeCondition = null,
+  implicitDefault = true,
+) {
+  if (!exportsValue) return refs;
+
+  if (typeof exportsValue === "string") {
+    if (activeCondition || implicitDefault) {
+      refs.push({
+        condition: activeCondition || "default",
+        target: exportsValue,
+      });
+    }
+    return refs;
+  }
+
+  if (Array.isArray(exportsValue)) {
+    for (const item of exportsValue) {
+      collectExportRuntimeRefs(item, refs, activeCondition, implicitDefault);
+    }
+    return refs;
+  }
+
+  if (typeof exportsValue === "object") {
+    for (const [key, value] of Object.entries(exportsValue)) {
+      if (key === "types") continue;
+
+      const isRuntimeCondition = runtimeConditions.has(key);
+      const isSubpath = key === "." || key.startsWith("./");
+      const nextCondition = isRuntimeCondition
+        ? activeCondition === "react-native"
+          ? activeCondition
+          : key
+        : activeCondition;
+
+      collectExportRuntimeRefs(
+        value,
+        refs,
+        nextCondition,
+        isRuntimeCondition || isSubpath,
+      );
+    }
+  }
+
+  return refs;
+}
+
+function collectRuntimeRefs(pkg) {
+  const unique = new Map();
+
+  for (const ref of collectExportRuntimeRefs(pkg.exports)) {
+    const normalizedTarget = normalizePackagePath(ref.target);
+    if (!normalizedTarget) continue;
+    const key = `${ref.condition}\0${normalizedTarget}`;
+    unique.set(key, {
+      condition: ref.condition,
+      target: normalizedTarget,
+    });
+  }
+
+  return [...unique.values()].sort((a, b) => {
+    const aKey = `${a.condition}\0${a.target}`;
+    const bKey = `${b.condition}\0${b.target}`;
+    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+  });
+}
+
+function isUnsupportedRuntimeTarget(ref) {
+  return /\.(?:[cm]?ts|tsx)$/i.test(ref.target);
+}
+
 function collectWorkspaceSpecs(pkg) {
   const fields = [
     "dependencies",
@@ -153,10 +232,19 @@ for (const tarball of tarballs) {
   const pkg = getPackageJson(tarball);
   const typeRefs = collectTypeRefs(pkg);
   const missingTypeRefs = typeRefs.filter((ref) => !fileSet.has(ref));
+  const runtimeRefs = collectRuntimeRefs(pkg);
+  const missingRuntimeRefs = runtimeRefs.filter(
+    (ref) => !fileSet.has(ref.target),
+  );
+  const unsupportedRuntimeRefs = runtimeRefs.filter(isUnsupportedRuntimeTarget);
   const workspaceSpecs = collectWorkspaceSpecs(pkg);
   const payloadIssues = collectPayloadIssues(pkg, files);
   const issues =
-    missingTypeRefs.length + workspaceSpecs.length + payloadIssues.length;
+    missingTypeRefs.length +
+    missingRuntimeRefs.length +
+    unsupportedRuntimeRefs.length +
+    workspaceSpecs.length +
+    payloadIssues.length;
 
   issueCount += issues;
   results.push({
@@ -164,6 +252,8 @@ for (const tarball of tarballs) {
     name: pkg.name,
     version: pkg.version,
     missingTypeRefs,
+    missingRuntimeRefs,
+    unsupportedRuntimeRefs,
     workspaceSpecs,
     payloadIssues,
   });
@@ -172,6 +262,8 @@ for (const tarball of tarballs) {
 for (const result of results) {
   const status =
     result.missingTypeRefs.length === 0 &&
+    result.missingRuntimeRefs.length === 0 &&
+    result.unsupportedRuntimeRefs.length === 0 &&
     result.workspaceSpecs.length === 0 &&
     result.payloadIssues.length === 0
       ? "PASS"
@@ -183,6 +275,20 @@ for (const result of results) {
     console.log("  missing type refs:");
     for (const ref of result.missingTypeRefs) {
       console.log(`    - ${ref}`);
+    }
+  }
+
+  if (result.missingRuntimeRefs.length > 0) {
+    console.log("  missing runtime refs:");
+    for (const ref of result.missingRuntimeRefs) {
+      console.log(`    - ${ref.condition}: ${ref.target}`);
+    }
+  }
+
+  if (result.unsupportedRuntimeRefs.length > 0) {
+    console.log("  unsupported runtime refs:");
+    for (const ref of result.unsupportedRuntimeRefs) {
+      console.log(`    - ${ref.condition}: ${ref.target}`);
     }
   }
 
