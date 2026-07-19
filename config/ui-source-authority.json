@@ -1,0 +1,1218 @@
+{
+  "mapDigest": "d669254c84960bf81802c13956d2252ab0c5b7eecd2d5f81f0a79fad1754eaa8",
+  "publicBase": {
+    "commit": "742da1e7dd5d53d06b0614ee53cea70c514e29ff",
+    "packageTree": "c9e9eda885dfbbde9956167dd4ab514122f0ad69",
+    "sourceTree": "07a50d9fccf7363a884887f685edaf4f1f8ac033",
+    "tree": "d813bb3744a4c74f3b41c3fc31a7fedc0ebb8bf1"
+  },
+  "rows": [
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/__tests__/ax-catalog.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "67dbccbc386f3799385d51603853767c29a3f2c5dee1a5e60b209f3e1a3a7cb2"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/__tests__/bridge-subpaths.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "2c2f39f4544c20721649ff433bd6529a84b251fc0eca16a30fde70559f643dde"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/__tests__/lucide-entry.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "b92d5c67ce791f3a6e38aa87a4c071ce523a355cb1d2c3dd59b1b370a48545a4"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/advanced/Logo.tsx",
+      "publicBaseSha256": "1f8325628b95f37dc4be19474ffe3210d5a100df187a285a0d9601a89f5fb046",
+      "sourceSha256": "2f0ce6390ac3deacf0ecc1b691558a6866d8ea7c9edc5792892ede55bfde2ae1"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/ax-contract.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "c588633dcdd7eeff1e50f08ca8c3174ce986f805dc57f46380065d5b4bd883da"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/ax.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "5b84cc3e39de19f3b75187fbaf3e36006b84a8db5367abecee03c7c5b5c68e23"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Action.tsx",
+      "publicBaseSha256": "fb759ab24f41bb33ac7595d8fa15f48d68a3a5ba83d5d6f1099a76aa741cf681",
+      "sourceSha256": "d89ba903bbf64975c01f4363419dd7359fdbe105a7e06db5d15b3edc8b06dfe6"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/ActionToolbar.tsx",
+      "publicBaseSha256": "6f43883bb0c657fdab9a42d32d0dbee0a360e69b5762a2211a90e17f41a7a001",
+      "sourceSha256": "a3be957f0877aaa451ae7c138f596144447fb02a273b588f52a3cb7e88bb4005"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "a7a58e04f418846cf1d33ea47ec960c065efab26c5dc42144f97e01adafbbe4c",
+      "path": "packages/hua-ui/src/components/Bookmark.tsx",
+      "publicBaseSha256": "a7a58e04f418846cf1d33ea47ec960c065efab26c5dc42144f97e01adafbbe4c",
+      "sourceSha256": "b9021c207c3d95c872b0776f0b3df4337342992d6f9abee048d2d6a66bb18bdf"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/BottomSheet.tsx",
+      "publicBaseSha256": "b23f95e1e5764353561c675727011dbd2959aed48af4d0b42fcf750c7de803a0",
+      "sourceSha256": "8dfc7a5839b2be8ebb0146a21efb09226e305a716d0029c02cdb4fcd451e98d9"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Box.tsx",
+      "publicBaseSha256": "61de9516445a844c23f1a5e3bc565ad38a1151d23a4e92cd760c390215bdbf51",
+      "sourceSha256": "f40dc80112f035481151540f24fba22dcbb9d566bbef5f5ef664d6f127446130"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Button.tsx",
+      "publicBaseSha256": "6c89847143f274143ca0fb25de47d0d2fb2d0f6424125466a683edc4bd4320f2",
+      "sourceSha256": "11adf46e30fd0ba8e5f53cfa3877336e4db0baff9552c3e7ef45b3c4d1731856"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "019425701962fec549e6d52f657c89f912f485116f177ca8b11eddd955e1d719",
+      "path": "packages/hua-ui/src/components/Card.tsx",
+      "publicBaseSha256": "019425701962fec549e6d52f657c89f912f485116f177ca8b11eddd955e1d719",
+      "sourceSha256": "6bc5bf467efe7b24f775007f76bb50215af5f563610d88d59e35ea047cd192a3"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "20654176b824b46da9c4a7db251516ffa57c22294817d3ce3e25edd155d2f0de",
+      "path": "packages/hua-ui/src/components/Divider.tsx",
+      "publicBaseSha256": "20654176b824b46da9c4a7db251516ffa57c22294817d3ce3e25edd155d2f0de",
+      "sourceSha256": "90e92d86a5c1694e3529c64d1a7fb666eb9444618024f89c05bbb98e43bacf0d"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Drawer.tsx",
+      "publicBaseSha256": "35ed4321c1c12e4044196182448493efc37f1d4a85273f5d217c5f8611cbca60",
+      "sourceSha256": "fbf8e251feae10437599582709997e7409424a7222aed89cd78dea7d098f8c41"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "12ba9e8debf56fb6441869790ff25be682bddf4940d0075e9b1d9adf968c04c2",
+      "path": "packages/hua-ui/src/components/FormControl.tsx",
+      "publicBaseSha256": "12ba9e8debf56fb6441869790ff25be682bddf4940d0075e9b1d9adf968c04c2",
+      "sourceSha256": "a4580c6418166cc1ef4e58ee1ae3b3f6fea63d56f5800f12c56e1b3dfc342549"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "f2e2bb562aa1958ab3c0749818f3ccaa18d71111225d173c67649bb48b59436c",
+      "path": "packages/hua-ui/src/components/Icon/Icon.tsx",
+      "publicBaseSha256": "f2e2bb562aa1958ab3c0749818f3ccaa18d71111225d173c67649bb48b59436c",
+      "sourceSha256": "14ece378a0c8aeafc694f84ec2a686e2b7c6db79c87619690ddddf617923a6de"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "61680a72b52db94970afca53d2df85ee0024c1e0d8feefad3490490b11f9081c",
+      "path": "packages/hua-ui/src/components/Link.tsx",
+      "publicBaseSha256": "61680a72b52db94970afca53d2df85ee0024c1e0d8feefad3490490b11f9081c",
+      "sourceSha256": "813bd28a49fc1457e92c37f72a5d732633efbffd3e01670078bbfe5afca6686d"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "f33d89f3288c79338b4f018f30e1f4bd9097d233455b74275a12e46e7653db4e",
+      "path": "packages/hua-ui/src/components/LoadingSpinner.tsx",
+      "publicBaseSha256": "f33d89f3288c79338b4f018f30e1f4bd9097d233455b74275a12e46e7653db4e",
+      "sourceSha256": "ccdaab01caf07980bf9166bf754fe86084fb8ff885dd6ba73be48d7d8b10b2de"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "a9e5fd8c94621249c798b2f06e3d7ae2e618501fd5f32558f36b9cb12457ed38",
+      "path": "packages/hua-ui/src/components/PageTransition.tsx",
+      "publicBaseSha256": "a9e5fd8c94621249c798b2f06e3d7ae2e618501fd5f32558f36b9cb12457ed38",
+      "sourceSha256": "db70c27212b1aafb0f4e1347163fa386e043e007c403d7fcad0a14d1a1469870"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Pressable.tsx",
+      "publicBaseSha256": "283ffa671a95ef03c22181b13a19714fd974b307cde3da1657854432ec7c0b88",
+      "sourceSha256": "a875b9e4e68649dd5f221f6d155cad089435d93bdc915beaa686c72f2fa41914"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "e4a492be9be24b4c35b7fab37bced999ee0c25150cba33896823d024ae5acd77",
+      "path": "packages/hua-ui/src/components/ScrollProgress.tsx",
+      "publicBaseSha256": "e4a492be9be24b4c35b7fab37bced999ee0c25150cba33896823d024ae5acd77",
+      "sourceSha256": "4cc9ba3d170341edac1855342a8c951bbc93684154d7cac7ca86c4e5431be3d2"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "b09bac4402a08b9f7dd7b83b7041fd4643bac3a3aa312a626442d940ee07e8c4",
+      "path": "packages/hua-ui/src/components/Section.tsx",
+      "publicBaseSha256": "b09bac4402a08b9f7dd7b83b7041fd4643bac3a3aa312a626442d940ee07e8c4",
+      "sourceSha256": "dff7df68f1623aa7fe2129b7a5cf1311f92e7d8709e847ce620742ebc911e44d"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Text.tsx",
+      "publicBaseSha256": "9799423a1c5b8db11f0610f31b1417f635caef07a01457b3ec851fb7195cbeda",
+      "sourceSha256": "fba4203bdd249becca4cea1417101de5cd8a312c609ed600a4733677ce51c2eb"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Textarea.tsx",
+      "publicBaseSha256": "10ef303fe9af73a0b0891918a89b3e60c762d2c8e09ed121bb0086cf9d3ea931",
+      "sourceSha256": "9b14dcf8ffbc72c960e7c2e526111207f0d85ca22c22045a3a52a70d0f7511dd"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Toast.tsx",
+      "publicBaseSha256": "caca5ed51cd324c0b56c847c1417477dc056165374cd1cc2661d426f8c9c2cb9",
+      "sourceSha256": "27b3e1659d3fdde0b2be4140f98d351fec5e2341abcdeb55211b4fd8f0db9515"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/Tooltip.tsx",
+      "publicBaseSha256": "3e71024341dbae76ca01c0a28f0cb07f00af16b33ffb63c00af3fdcc278c0ef5",
+      "sourceSha256": "1d183ef25f1ce7ec151486dc7328593b7e6703317f496165c849e62e62281d09"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "81642530c80ff13d8d6bb1e73d57a5f55f16a8b53a0cea1d506a75bc335e6aba",
+      "path": "packages/hua-ui/src/components/__tests__/Action.test.tsx",
+      "publicBaseSha256": "81642530c80ff13d8d6bb1e73d57a5f55f16a8b53a0cea1d506a75bc335e6aba",
+      "sourceSha256": "fbbde8c56b33751945044aab863fe77fd8f1de2011ff26a1ef6d3394076e7deb"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "5ecf4bfcdb43456ac88925a8e85fff54a82641768c170ace90aea67bce1f36af",
+      "path": "packages/hua-ui/src/components/__tests__/Alert.test.tsx",
+      "publicBaseSha256": "5ecf4bfcdb43456ac88925a8e85fff54a82641768c170ace90aea67bce1f36af",
+      "sourceSha256": "ba579c9f8b7857f7b2d19771024e561b15d2fad97b85fba8a3a0e3f978db4f81"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "13d769f28eb4d77343a9adfe57220788d09dcc7b506f85eb76f0a15b1d075f5b",
+      "path": "packages/hua-ui/src/components/__tests__/Autocomplete.test.tsx",
+      "publicBaseSha256": "13d769f28eb4d77343a9adfe57220788d09dcc7b506f85eb76f0a15b1d075f5b",
+      "sourceSha256": "e45351c02d8c25f1dbd8d9a6c8e0249c4cb522aed77b952ebf1597570b91b32c"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "7a50ee43879b480fcb18ad987a9276b6ea223e573d0b161f5ed8a0aa22068dac",
+      "path": "packages/hua-ui/src/components/__tests__/Avatar.test.tsx",
+      "publicBaseSha256": "7a50ee43879b480fcb18ad987a9276b6ea223e573d0b161f5ed8a0aa22068dac",
+      "sourceSha256": "171e5baccb857cac5e0237aefa449f4b45053355d75c4d7678cadc2f22a7ec5d"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "6a7578406957be44fea7b17f230cb827f28a5c44a0d9d6127f721f867c181ad8",
+      "path": "packages/hua-ui/src/components/__tests__/Badge.test.tsx",
+      "publicBaseSha256": "6a7578406957be44fea7b17f230cb827f28a5c44a0d9d6127f721f867c181ad8",
+      "sourceSha256": "f6040a978da13c6ec5a4997318b34a232fa8fbe810a167be5abc8bfcf4ca23ca"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "1801c6792b6857af014b501428be3411c179ac4676f0de2deb6f8728e5d7ff87",
+      "path": "packages/hua-ui/src/components/__tests__/Bookmark.test.tsx",
+      "publicBaseSha256": "1801c6792b6857af014b501428be3411c179ac4676f0de2deb6f8728e5d7ff87",
+      "sourceSha256": "d8981581b9b51c30aa39e37156a7442342d4a3ab4b7435139a34cf0fbf2fb6e3"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "1a866380cd52fe6fc3648b5456b59873ae3cfe184016e566770e0f3e2eb2e9ea",
+      "path": "packages/hua-ui/src/components/__tests__/BottomSheet.test.tsx",
+      "publicBaseSha256": "1a866380cd52fe6fc3648b5456b59873ae3cfe184016e566770e0f3e2eb2e9ea",
+      "sourceSha256": "4917db5fa88a4ad3b707773e6f6254327a2e9addabf6d757f43bcc2f327699e3"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Box.test.tsx",
+      "publicBaseSha256": "f1f0d27f8937c35a552548b9cd381efec310e1f595d5498bf0d292c00c3c702b",
+      "sourceSha256": "a8599e596349afb584d955cffb85a4be07afbe8d806c2d08136b436ecc7cc517"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "58530f75dcfd8c35b985eda9c67da2b422dc710636017aa2ad79419d16deaaf2",
+      "path": "packages/hua-ui/src/components/__tests__/Button.test.tsx",
+      "publicBaseSha256": "58530f75dcfd8c35b985eda9c67da2b422dc710636017aa2ad79419d16deaaf2",
+      "sourceSha256": "55a23d73da09b4e6bf904564d72d7dea858a5351a6c90367dd790994514d5148"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "f4e95e6181ef6d06669c36a2621aa0b229ff25de56b35fdc5e144c27b62ef39c",
+      "path": "packages/hua-ui/src/components/__tests__/Card.test.tsx",
+      "publicBaseSha256": "f4e95e6181ef6d06669c36a2621aa0b229ff25de56b35fdc5e144c27b62ef39c",
+      "sourceSha256": "452e077ca43e6614b0bc5a15147c3618f595ebd6cad31cbb7acf695c858458e7"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "ff27f7179749ff4c37a6839755b92afdc74272d7d69b4bf50927f5ccc98fad4b",
+      "path": "packages/hua-ui/src/components/__tests__/Container.test.tsx",
+      "publicBaseSha256": "ff27f7179749ff4c37a6839755b92afdc74272d7d69b4bf50927f5ccc98fad4b",
+      "sourceSha256": "cb9d493cec7451083de9d24a9f14e9ebd71a653681bbc5cbcb2332cabd6f903a"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "f7ca450d9bca6155ae23eb9d6b903a7c10104b64bb45294f34a87cb3c4b0ff02",
+      "path": "packages/hua-ui/src/components/__tests__/Divider.test.tsx",
+      "publicBaseSha256": "f7ca450d9bca6155ae23eb9d6b903a7c10104b64bb45294f34a87cb3c4b0ff02",
+      "sourceSha256": "40e88c94dfe8e195b28ba648a3424c47dcc534e305560112d19f172d369f7b31"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Drawer.test.tsx",
+      "publicBaseSha256": "330767782a76b4b7b29170b755a903b3f414ae80cbe7f70acf2c8c9913590d76",
+      "sourceSha256": "baf17b9c5a5750017b133536017a9b8cb744ace6ab7ba507dd1b95f8b5a5d8c7"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "f47046e3aa9f7fb5957508991a9b21949146922861172e8232549251e89f4f14",
+      "path": "packages/hua-ui/src/components/__tests__/EmotionButton.test.tsx",
+      "publicBaseSha256": "f47046e3aa9f7fb5957508991a9b21949146922861172e8232549251e89f4f14",
+      "sourceSha256": "1a4741a7a8c7a3200ceddf5308e16f791d2a0c73e28b087d610f1bddeec3a4d8"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "60614d9cf863ec9b7c51dde59aafb6f6e2f5f9bda3db875098e600ed9864b9df",
+      "path": "packages/hua-ui/src/components/__tests__/EmotionMeter.test.tsx",
+      "publicBaseSha256": "60614d9cf863ec9b7c51dde59aafb6f6e2f5f9bda3db875098e600ed9864b9df",
+      "sourceSha256": "08d6d1b277955f12d687659feeff4bd6bd98f5ed5363b961882f0312865dfd7f"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "ff41077773cae4dd8aa0894d81218f8d2fd89245455b79e2f330a9937ece512f",
+      "path": "packages/hua-ui/src/components/__tests__/EmotionSelector.test.tsx",
+      "publicBaseSha256": "ff41077773cae4dd8aa0894d81218f8d2fd89245455b79e2f330a9937ece512f",
+      "sourceSha256": "342b97517e83323543e0a2d6c1b5ae6e1bf434ffcec2b6b0d538240a3efc78b9"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "72afb28727298766be411d9b0e895f549498eb60a8dea532d9bfc3f7bc7600b2",
+      "path": "packages/hua-ui/src/components/__tests__/FeatureCard.test.tsx",
+      "publicBaseSha256": "72afb28727298766be411d9b0e895f549498eb60a8dea532d9bfc3f7bc7600b2",
+      "sourceSha256": "d7db689337b72bc030f9132e35a66d15a9d5b6803858bc33e28689e15885ce47"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/FormControl.test.tsx",
+      "publicBaseSha256": "ccab1aadc66df2242f657801a0273eb5d3539af6ccfad9e265845e015bfe0a5a",
+      "sourceSha256": "bdb570dae591ba029b415798d3cb5a0fc31a3a0d0b544506368b1b23c1744d3f"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "690763b20282a11fb96ec46fc04f3fa99147a4d8dee6c95678b391d462318ac4",
+      "path": "packages/hua-ui/src/components/__tests__/Grid.test.tsx",
+      "publicBaseSha256": "690763b20282a11fb96ec46fc04f3fa99147a4d8dee6c95678b391d462318ac4",
+      "sourceSha256": "42a02c3bd85913eb42a81c68a03dd4d6306a48f6e121c0f6342e41dfa7e98de8"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Icon.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "990ef16c5181a479438c515260b60805abc540afe1f9a5c73e349edae34a048a"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "c39a3648044ec13149fb87cd256d6f26728abbd6dc0c1ef983c91acbe52e3c76",
+      "path": "packages/hua-ui/src/components/__tests__/InfoCard.test.tsx",
+      "publicBaseSha256": "c39a3648044ec13149fb87cd256d6f26728abbd6dc0c1ef983c91acbe52e3c76",
+      "sourceSha256": "cad1dd61a1ef7e6208662d51a07ed61845e538b37a708d2257a29909a8746d2e"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "8b81ae925e3ef3754c81a717e4a2bca4073152536675b130e919173faefa576f",
+      "path": "packages/hua-ui/src/components/__tests__/Input.test.tsx",
+      "publicBaseSha256": "8b81ae925e3ef3754c81a717e4a2bca4073152536675b130e919173faefa576f",
+      "sourceSha256": "807df4129ff6b030a229da80be73683adec1500edfabeb0f8a60b4fe79360204"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/KanbanBoard.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "514a071224e8b64fd541f2397e44a33cd3c20fc81de16251175811f56cf6d13b"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "9420cc01968584be7fc9191976155965894b24c1baf4495488c971a405090177",
+      "path": "packages/hua-ui/src/components/__tests__/Label.test.tsx",
+      "publicBaseSha256": "9420cc01968584be7fc9191976155965894b24c1baf4495488c971a405090177",
+      "sourceSha256": "ffced521bae2e12d227d0fd722002fa9dea872d667090665041c6825a82fdbf1"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "d7c33e3be73d3395dc09aaf8412a2a9242fbc7e6c153796de8be747c3e832ea4",
+      "path": "packages/hua-ui/src/components/__tests__/Link.test.tsx",
+      "publicBaseSha256": "d7c33e3be73d3395dc09aaf8412a2a9242fbc7e6c153796de8be747c3e832ea4",
+      "sourceSha256": "d3b8ee25b8b9cb018e21755f71f704e27d8df8080be829f8ded2b2547325f9b6"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "1521c9e9701a722fa29dd4aecef4664b2085a8252dc6df174df3aff1eee5f280",
+      "path": "packages/hua-ui/src/components/__tests__/LoadingSpinner.test.tsx",
+      "publicBaseSha256": "1521c9e9701a722fa29dd4aecef4664b2085a8252dc6df174df3aff1eee5f280",
+      "sourceSha256": "26eca414475a0433126b5970a1502865b36a0d209edee7cd256c40714d15d138"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "357c3d70bea764b9257b68ff5f50b9a31bafdd57f3a8c599869e802e82472f9e",
+      "path": "packages/hua-ui/src/components/__tests__/Navigation.test.tsx",
+      "publicBaseSha256": "357c3d70bea764b9257b68ff5f50b9a31bafdd57f3a8c599869e802e82472f9e",
+      "sourceSha256": "0fa329d91b0cb1ef6cdca8689bd83bf20f3a2f4cab92965fc7ef3055aef08d5f"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "73f7687c4de9eb99e9527cf25495cf14ae217ef0f83d1d7860f7394da4718488",
+      "path": "packages/hua-ui/src/components/__tests__/PageTransition.test.tsx",
+      "publicBaseSha256": "73f7687c4de9eb99e9527cf25495cf14ae217ef0f83d1d7860f7394da4718488",
+      "sourceSha256": "8725bfc8e3bb313d91846048514583d0d41a52656b319f73f6cfa0d10761395b"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "ef757e2f7d839dfd7dc23fb9f2b59626bcf368c4fac548e29419b5d354365ea0",
+      "path": "packages/hua-ui/src/components/__tests__/Pagination.test.tsx",
+      "publicBaseSha256": "ef757e2f7d839dfd7dc23fb9f2b59626bcf368c4fac548e29419b5d354365ea0",
+      "sourceSha256": "5985094bcefe80204b5efb05232451a22734d4148f79789d7cb26a0fe2cf39cf"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "562030a8db757db47ff6156abe39b9c88d42de57fe53a062eab8c6d622277526",
+      "path": "packages/hua-ui/src/components/__tests__/Panel.test.tsx",
+      "publicBaseSha256": "562030a8db757db47ff6156abe39b9c88d42de57fe53a062eab8c6d622277526",
+      "sourceSha256": "08f31af27e739888fd56fdba1769e613a4d8196919964f8c3ae4f29ef5438c93"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Pressable.test.tsx",
+      "publicBaseSha256": "993a0059558919dedf8f15aa77115a84e39fa985ecf9c552b90f032e1f5c9cc0",
+      "sourceSha256": "290b442b380f07bf6a23fb56f20f636b20605ebf7a0a9f85f43038c54d65ac2c"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "00c8a019860c6580743485e240fe1df90ee4b61b4a5c23579f89669cb4ebb899",
+      "path": "packages/hua-ui/src/components/__tests__/Progress.test.tsx",
+      "publicBaseSha256": "00c8a019860c6580743485e240fe1df90ee4b61b4a5c23579f89669cb4ebb899",
+      "sourceSha256": "86bf571a7904324a2b20bcfb5e06ea25692d2d4882763bed3334edf34d607292"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "911f76645728ce1bcceb8e920f82bdc061ab1eac6c00fff9146c3da498d5cf43",
+      "path": "packages/hua-ui/src/components/__tests__/Prose.test.tsx",
+      "publicBaseSha256": "911f76645728ce1bcceb8e920f82bdc061ab1eac6c00fff9146c3da498d5cf43",
+      "sourceSha256": "6fa1ce031d6e0d9c6aedc78921f0f9d7deef43717434e06fedc30f203b9fe9e4"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "88aa564cc309abb67f8b16c5ef3327405a1fd0b72757e0478f5eb16f910ead62",
+      "path": "packages/hua-ui/src/components/__tests__/ScrollArea.test.tsx",
+      "publicBaseSha256": "88aa564cc309abb67f8b16c5ef3327405a1fd0b72757e0478f5eb16f910ead62",
+      "sourceSha256": "b9edeb61e7d96120fd1fd2d4a5da5771e3d0123d5c9bf438c3dba605516d1e80"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "9bd5fab99ea25c9682c7af29ce3e7a46b146bd65c07391d82101ba3754aa3e48",
+      "path": "packages/hua-ui/src/components/__tests__/ScrollProgress.test.tsx",
+      "publicBaseSha256": "9bd5fab99ea25c9682c7af29ce3e7a46b146bd65c07391d82101ba3754aa3e48",
+      "sourceSha256": "0fcd3b7e2cd804d1a6c827ddd59bba1062cf1b45d15c883f0df37ef8999d84a9"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "fa33982ac0c9756a01d4aa052a6b10f7a3d739909af29ac00d85ca40138aef8e",
+      "path": "packages/hua-ui/src/components/__tests__/ScrollToTop.test.tsx",
+      "publicBaseSha256": "fa33982ac0c9756a01d4aa052a6b10f7a3d739909af29ac00d85ca40138aef8e",
+      "sourceSha256": "3316f6b1a33ab924238b97b1e8880bb7c3ad33e47c03f3338a8aea478c22f552"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "dc0265638525bdb0812b7aa72e77503e0d174106f1158d6c03cd82dfbe34482b",
+      "path": "packages/hua-ui/src/components/__tests__/Section.test.tsx",
+      "publicBaseSha256": "dc0265638525bdb0812b7aa72e77503e0d174106f1158d6c03cd82dfbe34482b",
+      "sourceSha256": "0e93c60a590db630840bd9cc832d20b1f76bb6fe75bf5ea50fe13af7b4af94af"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "8e5000c9f86b131387df13035a10c1fa3b43dc720baf156db63c907a116b61e0",
+      "path": "packages/hua-ui/src/components/__tests__/SectionHeader.test.tsx",
+      "publicBaseSha256": "8e5000c9f86b131387df13035a10c1fa3b43dc720baf156db63c907a116b61e0",
+      "sourceSha256": "5e9963a5fbf64947775c0ad58a4dec1245b7bb4f4857bbee20e03f6b8bbf7009"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "a124d9d2338fc66d694b4c25cddda1f23dc059cfa6e19b0c475681e3af7f5ead",
+      "path": "packages/hua-ui/src/components/__tests__/Select.test.tsx",
+      "publicBaseSha256": "a124d9d2338fc66d694b4c25cddda1f23dc059cfa6e19b0c475681e3af7f5ead",
+      "sourceSha256": "4bd6432f98adbc918b73eb1dc0f3b788d65088a581f1e3fac6ea06e9495d6701"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "2860261a88a218fe9f5cb06b51dfd8c449e294862ed71367838c78082d2547aa",
+      "path": "packages/hua-ui/src/components/__tests__/Skeleton.test.tsx",
+      "publicBaseSha256": "2860261a88a218fe9f5cb06b51dfd8c449e294862ed71367838c78082d2547aa",
+      "sourceSha256": "ea7c6f71776a7e3ecbcd336ced92270d880e4ed5d542fcc0c5149ce180dbf0d4"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "c58f69d60c4f6aa5bbacea55a9a2eb3053a57bc6a3fbacef069cd4efa76f0666",
+      "path": "packages/hua-ui/src/components/__tests__/Stack.test.tsx",
+      "publicBaseSha256": "c58f69d60c4f6aa5bbacea55a9a2eb3053a57bc6a3fbacef069cd4efa76f0666",
+      "sourceSha256": "b698ddea69ccca44a0018492b7e4dd58d173159ad1c006db8920dd4e801f1f87"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "dc3594121a5d6931c6e21c444a4d9856656b36e68637bf74d52f035d2f1bad0b",
+      "path": "packages/hua-ui/src/components/__tests__/StatsPanel.test.tsx",
+      "publicBaseSha256": "dc3594121a5d6931c6e21c444a4d9856656b36e68637bf74d52f035d2f1bad0b",
+      "sourceSha256": "d21a5946720831f13067c9b24b1595c15c3bed056b36542b9aff11afdba306b5"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Text.test.tsx",
+      "publicBaseSha256": "82feadc9ed60443c0726192d48899d86cbda3c82142f15577befa29cc6ffdbc1",
+      "sourceSha256": "5a744114f21acf502a65611059bcfb8b5061a588ea3a40e32f8b10ce7c87cccc"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "022c45857948ef0775ccaa34152fa3483825783064f06f04915a3e268171c5b4",
+      "path": "packages/hua-ui/src/components/__tests__/Textarea.test.tsx",
+      "publicBaseSha256": "022c45857948ef0775ccaa34152fa3483825783064f06f04915a3e268171c5b4",
+      "sourceSha256": "e90ee6d786394e123d0d5b98a125dbf242dc508adf2011a525417984c57453f5"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Toast.test.tsx",
+      "publicBaseSha256": "be317895d6c95098dd093ca17a8359a242de9c2b5cdd73e8fb9e6c668465ad0e",
+      "sourceSha256": "7a458dfdd3b7408aa65446183fcc5a51a2bc616c8a4db31940443e86c1f6ea0e"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/Tooltip.test.tsx",
+      "publicBaseSha256": "d04d3534659aa27865df22784605818a5e508395e5d525fda9cd6d07c54c17aa",
+      "sourceSha256": "0cadce1430bc6c033d50bd1314ed2cd14f84272d6f98471a2b2d525fe0dc6a22"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/__tests__/core-dot-conformance.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "b4715754fba8ce2deae8f57cde9a1f55808735f1f620165f4b08d41f166d230b"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/advanced/AnimatedGradient.tsx",
+      "publicBaseSha256": "d609fa4016cd908186966924899d0b4ca3cced92c9f30c607076bb1409549ea8",
+      "sourceSha256": "f240d87c3f56b58011e3558830ac5c3e406317df06a15fe7c220837e89cc8fd4"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/advanced/Marquee.tsx",
+      "publicBaseSha256": "3263d47cf4f3f6829c544158b289c05d77dbe03d885d313284fda4a23ea6607e",
+      "sourceSha256": "fab6266840c651e91eb593b320a4cef73de08ad3827cb903f3fb41ea18fd0955"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/advanced/TiltCard.tsx",
+      "publicBaseSha256": "3996c143a5926f61e92e737cb33eaaab1b6ca0232ad3dce55e347211ce7b1099",
+      "sourceSha256": "66bf40882a4c0c30f106b55720be2f7edcc699e30fad63de04e05edba7b30169"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/dashboard/kanban/KanbanBoard.tsx",
+      "publicBaseSha256": "032754d16a41c47dc3c38627c7dcad52b097ed363facc5d2ff94bd4e6bbeeb4f",
+      "sourceSha256": "96f6579614f38592ff344f8fc207f9e545262bcf398e6d20442f373b43bda2c7"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/dashboard/kanban/KanbanCard.tsx",
+      "publicBaseSha256": "c568e0d7a33db2f4819b8bad1f9b789e5d38809e09fd4585c0ce41e5e721bc13",
+      "sourceSha256": "fa25b544ce58285d68386b0f75b81aca070b8c4907ff89edf99038c39305368e"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "docs",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/components/dashboard/kanban/README.md",
+      "publicBaseSha256": "da0b4a19f6da8ad13e500fd6818fa57f33e2f9c12e41eabb8c76342be7e89afa",
+      "sourceSha256": "a02fda4cb93d216bb5d602f963a2c563f6d2bea0de53f74be8a104b32691ac2c"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/data.ts",
+      "publicBaseSha256": "956f11b975d7193651ea6019ef0618ee44a42a3f71abdd47a7ad1f0404112953",
+      "sourceSha256": "5c1a48dd818bb922b4e468d56f93c6e8050966ae1303608e92728bd59c04c6ee"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/hooks/useBreakpoint.ts",
+      "publicBaseSha256": "1690e0080ca1c40ad574de392e34fddbb339c8bf97f9648d24280a7903413782",
+      "sourceSha256": "0d7c45fa55d630d5055b9517d68da17b9e519a934273a1bd5a866d4d0678d035"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/hooks/useDotEnv.ts",
+      "publicBaseSha256": "55c57b275dc653bd0f2dd582ed3614a0e079bad334aacf52f7cf9467c6f79004",
+      "sourceSha256": "dad16207c46fb855b2ce71d1e38f7aa36fc8d50d855e4beb6b9bc7d588e96963"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/index.ts",
+      "publicBaseSha256": "7841329dc60274b0662e64099e228ddebf3590ebad9a6d2fae969973d3aa2f99",
+      "sourceSha256": "55c957327b0ffe1d4fc8d2db14665c4b8585a524c113338d5ec3d288edfa305c"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/landing/LandingAbout.tsx",
+      "publicBaseSha256": "d27a8f2d0714758daaa8bed33d793e094b7c8909c4583cde33b594d18e202b3d",
+      "sourceSha256": "aa634eff9e0ea0608d7014a03b05fc8e6a3ee00873f17940e0b5b564fc164310"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "de2fa9aa474c65c6248e9ebf20dd5d163472142be241df90ea9b623aa41526b4",
+      "path": "packages/hua-ui/src/landing/LandingCTA.tsx",
+      "publicBaseSha256": "de2fa9aa474c65c6248e9ebf20dd5d163472142be241df90ea9b623aa41526b4",
+      "sourceSha256": "78e28c7a34b8bc0344b9b5d1610078c8d89cb16fa3341c25e869fd7e1b17cae2"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/landing/LandingContact.tsx",
+      "publicBaseSha256": "0ad33951c0c1c94fc164e9f9d7ec22756fcf8c3669fe9cee482f335d9a479c5e",
+      "sourceSha256": "09b79c04b35165bf68b355576db3ca45debac956e40520db689de38a3a7fe9f7"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "c8909dbe0500d1781fc00891dd8462d47ae9030d00183b28d56b0ab01c7c442f",
+      "path": "packages/hua-ui/src/landing/LandingExperience.tsx",
+      "publicBaseSha256": "c8909dbe0500d1781fc00891dd8462d47ae9030d00183b28d56b0ab01c7c442f",
+      "sourceSha256": "44dab73a64db0087fe2c1373e5eb80617bc72d919d1b17cde6c15153ef696110"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "3e98763ce9aec5cc5f52c60d8118b0312e8e04d263e31511a3594ff9b1982596",
+      "path": "packages/hua-ui/src/landing/LandingFeatures.tsx",
+      "publicBaseSha256": "3e98763ce9aec5cc5f52c60d8118b0312e8e04d263e31511a3594ff9b1982596",
+      "sourceSha256": "a916f8b0a4869eb2daeb6bdd3f3c86dadf08ccccdbdba5de1afaab954ab59e0a"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "f3b78cdfa737c1ae150ebeb3ff5644ee7e74cbf9733ca8711e2eaea416946c7c",
+      "path": "packages/hua-ui/src/landing/LandingMetrics.tsx",
+      "publicBaseSha256": "f3b78cdfa737c1ae150ebeb3ff5644ee7e74cbf9733ca8711e2eaea416946c7c",
+      "sourceSha256": "6dd1db6f84917a35d7f159f4518696a92ad933e4a18b27c5250e060330a9eeff"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "65d44cae0acaa58480369f3d639a0e531c4f7014605122c7c0a25d39fe346bbf",
+      "path": "packages/hua-ui/src/landing/LandingProjects.tsx",
+      "publicBaseSha256": "65d44cae0acaa58480369f3d639a0e531c4f7014605122c7c0a25d39fe346bbf",
+      "sourceSha256": "eee8d3de52490863cc9eb21bafc1609a9c634a75acea70b64763f2387b4cc563"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "7b0c6bcb13cf9deb4fc7876abc5e80e8d4e80fa571a967a26c7b9f0306b53363",
+      "path": "packages/hua-ui/src/landing/LandingSkills.tsx",
+      "publicBaseSha256": "7b0c6bcb13cf9deb4fc7876abc5e80e8d4e80fa571a967a26c7b9f0306b53363",
+      "sourceSha256": "48fb6f4b861c31fcc723dbf4703ca23387f370a2b9781369c9b6867fd25ec766"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "811f3e08530c40897a3d3c44d52508c9081357a7a494e287c00d14cac0934e00",
+      "path": "packages/hua-ui/src/landing/LandingStats.tsx",
+      "publicBaseSha256": "811f3e08530c40897a3d3c44d52508c9081357a7a494e287c00d14cac0934e00",
+      "sourceSha256": "5f9c3820e793f4ce6db1bb9bb82877dde834742c04bf7b27d2a275440c7c87d4"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "47b36c7a801a2aa8afb5f436b1910aebe78d96d99dd537e266a7aab19edb235d",
+      "path": "packages/hua-ui/src/landing/LandingTestimonials.tsx",
+      "publicBaseSha256": "47b36c7a801a2aa8afb5f436b1910aebe78d96d99dd537e266a7aab19edb235d",
+      "sourceSha256": "2e49dba8e43131d91fc67e1413056df36e56055575b97db918d4d5edf0a92b1e"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "9af202148ef1f709fc6fb84135feb0c6950662dca469b41217254cf3eca220c4",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingCTA.test.tsx",
+      "publicBaseSha256": "9af202148ef1f709fc6fb84135feb0c6950662dca469b41217254cf3eca220c4",
+      "sourceSha256": "3e86d63f730762df8057f598164b19e858b8fb68d9fa21bf5b5eaab6a9230b63"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "e9ec564cead5caac6723b59cb060149dfff5ee8cc94d48be26d038cbfbc10f6c",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingExperience.test.tsx",
+      "publicBaseSha256": "e9ec564cead5caac6723b59cb060149dfff5ee8cc94d48be26d038cbfbc10f6c",
+      "sourceSha256": "e4d17d125e17c60ba8eaf82fd14f917c3f2ae9e28ea153641ba73cce0cfb7807"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "d6a27fcec44d97d044f0419c87028e9a8567421a399e4179451b60d4ac461050",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingFeatures.test.tsx",
+      "publicBaseSha256": "d6a27fcec44d97d044f0419c87028e9a8567421a399e4179451b60d4ac461050",
+      "sourceSha256": "571e39e97f6ab7869fc42028975bd81396939776181edd56ca1e97cc67fe3f13"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "664f838bd6f2e2fa337a25d4ef723ddb5f308ceafb828e067b78caf8e4446c1d",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingHero.test.tsx",
+      "publicBaseSha256": "664f838bd6f2e2fa337a25d4ef723ddb5f308ceafb828e067b78caf8e4446c1d",
+      "sourceSha256": "19e4bb46a3079e0aaba35b518440ec19385884e8fd7a5b987ef7318fd6ed68c8"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "46791cc56bda4c9c234641c4cfc5d2a9c130c9f75a7fbe1a2e9029e479cb917c",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingLogoCloud.test.tsx",
+      "publicBaseSha256": "46791cc56bda4c9c234641c4cfc5d2a9c130c9f75a7fbe1a2e9029e479cb917c",
+      "sourceSha256": "abaff02ca19cc5b58dba79c00f409b7ef3e7825853f6ef6dba29d01147f8943a"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "b11db1eb5b081c723f540d6d2d18c99d33ceaddabb70ca99c0f6205d9d1ee522",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingMetrics.test.tsx",
+      "publicBaseSha256": "b11db1eb5b081c723f540d6d2d18c99d33ceaddabb70ca99c0f6205d9d1ee522",
+      "sourceSha256": "2386bbca8db1008f08db7a9e9cc4c724ae0164c313d5940d6f085c4966a627da"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "cda9667236fe03bff67e9634a1f6b9294e4e5e9ccc03d1cc8ff00c1a15ac1b97",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingProjects.test.tsx",
+      "publicBaseSha256": "cda9667236fe03bff67e9634a1f6b9294e4e5e9ccc03d1cc8ff00c1a15ac1b97",
+      "sourceSha256": "2b77e91ec388fed61cc259a3ab17a108cca442dca092849789eff0968cd048ab"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "f0f855a01900b811827c246cdd2caa2840b29bc053d5c7f4fb2f9f88cc04fc24",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingShowcase.test.tsx",
+      "publicBaseSha256": "f0f855a01900b811827c246cdd2caa2840b29bc053d5c7f4fb2f9f88cc04fc24",
+      "sourceSha256": "0eb49500bba4562a07590c0a60aeee3f5d3c47d031b44cd4ac1e902e2ed4f82f"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "7f09e14e2bf1ffa39535a8de43ea7d5a7e9914b94efbe05e346d9ada92b9bbe8",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingSkills.test.tsx",
+      "publicBaseSha256": "7f09e14e2bf1ffa39535a8de43ea7d5a7e9914b94efbe05e346d9ada92b9bbe8",
+      "sourceSha256": "a084f14ef114a330b4b5c1536171941327e80eaab77e58a27a49b6f93f056ab4"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "df9fd0fdb2bd3256ab29a6dfb5f2c301e04af12caf2c8fb02a867cddaa8c5107",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingStats.test.tsx",
+      "publicBaseSha256": "df9fd0fdb2bd3256ab29a6dfb5f2c301e04af12caf2c8fb02a867cddaa8c5107",
+      "sourceSha256": "84a411a5ad7812eb6ecbee34ca3d3efba5b29b612b93636b8813d8c2b6d30932"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "test",
+      "outputSha256": "614c0bf45ba99f4047eb9a3836ce7c32bf446d33b6b18c57d43472b2e1cee38e",
+      "path": "packages/hua-ui/src/landing/__tests__/LandingTestimonials.test.tsx",
+      "publicBaseSha256": "614c0bf45ba99f4047eb9a3836ce7c32bf446d33b6b18c57d43472b2e1cee38e",
+      "sourceSha256": "2c0c3cb43b8082b41b5ed42639e4c8783d5aa2fb6d501071bb2fc13e5bbaad6e"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "production",
+      "outputSha256": "2cd5beee803c41bd48b715d717afd9fd22c0e2bef099ba7a54e07d044dc6eb3f",
+      "path": "packages/hua-ui/src/landing/types.ts",
+      "publicBaseSha256": "2cd5beee803c41bd48b715d717afd9fd22c0e2bef099ba7a54e07d044dc6eb3f",
+      "sourceSha256": "b5754ae85f0659d5c39290470910a12a91455d6189577dadd72f5773e3e961c1"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/layout.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "d45c4b7802c736b82e209aa2939272e3ab6e49c360a63a480954305762228439"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/Slot.tsx",
+      "publicBaseSha256": "2b81c7ec6f9239d3a68d49ad82d198a484b6bc17dd8d98718aa8c4c4ca0837e7",
+      "sourceSha256": "8f7a9171352ae4b2d80850fd0ab115dfbefed2e18404b51e84cf6348ec9d40dd"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/Slot.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "b6147daf8263e31a1ca88d1cbd6bc0497d45373d628c432f017b5cea488f5e9b"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/icon-aliases.test.ts",
+      "publicBaseSha256": "02a74dc041ad1ae92f033974a618eb24a1443d0b6cbfad6b71241be2204822b9",
+      "sourceSha256": "3a14731442ca6d8cd3434f93783003275be8a920ff77beeb2d2fc4d59c47927f"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/icon-catalog.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "046bcaa5080cbf1181f7851713dfa85530e183ef7e1d34290c0e0aed151ae44a"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/icon-providers.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "7203850595b0cbc454fe7490891a72322db4108f0e0c82b4aca5e5054b0462cf"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/normalize-icon-name.test.ts",
+      "publicBaseSha256": "389d7edf29db5f036061320d5e21161d55a28a45f6ab457462d558b4b3586a13",
+      "sourceSha256": "cdc6228429a99d961c8d51c4f23add1ccf7804f0d63cb352937f0d5f350412ed"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/__tests__/web-classname.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "d1be858ddae6b869bc23effc658988d8bf57e5feeaac52ef3aa76fb6671847f5"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/icon-aliases.ts",
+      "publicBaseSha256": "00f9c23196b1c8afdb44acac4ae140acae7b24aeed0c6bbab0fcb42ecc1d3507",
+      "sourceSha256": "1e090aacb8bc5bcda15f5bde0904f09ff728874488c506b89b19c5648823026d"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/icon-catalog.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "18f78a7c372993f4a11dd8a05e9b38c832aea3ea71554c788beb418b92a4457a"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/icon-names.ts",
+      "publicBaseSha256": "23eb713d00c172a082e3ab6ed788b7c64b9c86d942b6549a132cb62b6fb10ce3",
+      "sourceSha256": "c2a7fbd912280e2bf29bc52e27d6bbf54cfec41184eb0cee6e2c6e8f5764c902"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/icon-providers.ts",
+      "publicBaseSha256": "b0d70ff1281babf2b7dbbf5d349721784f25b0f86872800c90d7b2bd430daa1c",
+      "sourceSha256": "1c1e66d5e24ba27f9597506fce11a3139bdf2cfe0a073c90d4c93b99940800df"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/icons.ts",
+      "publicBaseSha256": "381ffaf413c747ef266a7e608eb7a3df7287c293d5b010ff2bc35c1d76cf8954",
+      "sourceSha256": "e9f666ece970670ae48272638adfffcacda754fd3a0cbf6987935d8cef0c855a"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/normalize-icon-name.ts",
+      "publicBaseSha256": "48bf58fd598791206d515ab26518ae25494f9f762e8974693c9481e182bab136",
+      "sourceSha256": "e97a377659797c2a853ce424517f542c858254acb8d58c6ad693b0b4efa8c752"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lib/web-classname.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "a8339235f9df832b64b10277450d97fbfabd692e380863d9a2b5567c1f846fab"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/lucide.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "6d6e753a1a1502ec8601ffbd69f8fdf9a1b182d8b83df6eb8a26425623ff8817"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/motion.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "99cc2713c362e2435fbfd315f432a41cc12c73f7f5eb1ddc6db8c5854574d414"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/native/Box.tsx",
+      "publicBaseSha256": "6dbb47e7aee1b34cfa10660b4f457610b0c8169c3bb438f41cdf73c932946d6c",
+      "sourceSha256": "77f4b2672f6c7e2c2e9f4859b4e3ad67dd5fb61ad14be692c2598a9afcb577b2"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/native/Pressable.tsx",
+      "publicBaseSha256": "5125db969139ab9303456f460dd14416988d44ddb1ff7a0166d67731080f79d5",
+      "sourceSha256": "184e482a94f1a84aadd6a8511bde891b7d2737e2eeb97cdd595b33fc84a1840f"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/native/Text.tsx",
+      "publicBaseSha256": "9d0f5886a17670391afadb4bc3f1eb1c8344edc85e077148f67bc24cc9555654",
+      "sourceSha256": "9c135c8c5155395ad918e23cb1ae07359b02bce1028066bb209e21a1357c5b68"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/native/__tests__/native-dot-conformance.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "063794db50ae2587571147ab8e871072e6862f3db59e8384eb408bf13cb5da91"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/native/useDotMap.ts",
+      "publicBaseSha256": "c9b046c5993a0a24fcec95898c5c6f3c36bf8a837c580e7706b4d60bab5f6673",
+      "sourceSha256": "2ece7657d753a1abb59d371290ad8b0a659e934c89fd32add0e300ead1f29de6"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/navigation.ts",
+      "publicBaseSha256": "f42e321e4b1d6a7b0e4260f85e84389d52455767cf31fd0e21f62e86031114f8",
+      "sourceSha256": "a6a9de9020fce1387216d24d49324402122dadc456ba907ef56c7b4f6784baae"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/primitives.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "81ab7d35d8a2d1e4f818b0ab3a903cd6b963bfe6cae5d0c7b7edb21a93fe57f0"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/SDUIRenderer.tsx",
+      "publicBaseSha256": "a9c9061762d0daad4395a49a335c5a950206a2139f60aa864e773f41755351c6",
+      "sourceSha256": "4ea89026c5c362735b1a80d0ba419e68303afdb7b2596e9d5884b43435ee74dc"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/core.test.ts",
+      "publicBaseSha256": "a18265a7cb2cff765eb9c9c3d293ad67c55fce1f4562531d0d6c5999df456729",
+      "sourceSha256": "b6e556a3d1396579dbe25323efce9a72475d21b2db2ebce5ce857b9d16cb455f"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/manifest.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "fd2d9fad1ce8bb2adc77fa52f16184689c692723bd3dd484a087c26135e51ea0"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/motion-core-validation.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "89e01d02251a91a50521a9677adcedefcf07b52f9e59d66a3044bfa450e33a70"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/normalize-v1.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "af30ff8963f69c5b724c2cf952a35e481df6d28466786532e0114b2172b558bd"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/renderer-behavior-lock.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "b49cf8893a524bc1e539c993c7e07d9302d007bd6b50e4686d0a7ebbf1a06a37"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/renderer-v1.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "aec571451b53dd56f691ab129a272d2a6d6634e5e8b9cc963ae549279a7234c8"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/__tests__/validation-v1.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "aa005dfddd914d634e6f7a84d84fc9a5ef8e12ef9930710476379a89e90ae26f"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/core.ts",
+      "publicBaseSha256": "c2f453448b3c245cf3a2fb6c315b1f751bc74ecb98c1cae6291d8b64aff61366",
+      "sourceSha256": "1d41d441f36f486bc17684417fddafd430e391625f92ee2e91322a7ee4f39874"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/index.ts",
+      "publicBaseSha256": "6d8131f41fa374a662a66a7a96d8c12666ef9d372526e4e621843e5bdc40090d",
+      "sourceSha256": "69de97b1e9bc5082f7dfb561ae04402d30e9eb5899e92e484c7fc5ba194c9b27"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/manifest.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "f8c1b244f7f97b75af95e1cba20bd1969fc2c56ae0e95b7d3f00486212f7fd94"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/motion-core-validation.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "91f295bdf271d81a5768a906ca382b473fcc9aebf8e5ecd2dce477ad13b28f82"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/registry.tsx",
+      "publicBaseSha256": "73857c2b09b08795f0b247d1ea947c48575f765eeda7014f5cbeed0b327954b6",
+      "sourceSha256": "b8ebfeb09927d9000f034717eac52e23e54bfd74ad310970e12c71da7facfc5c"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/types.ts",
+      "publicBaseSha256": "9bfe47c7713b68593b1c601b4fc4690d9056064d5ef0fca57c26755f0b30a7e6",
+      "sourceSha256": "c80a00f2b45cc98e316895920043af2265a8bc4e86b3bd9df6930c1f679c168e"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/sdui/validation.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "34abdd8f864db537251a926b38c1758f0dc3801a3d7cbe59e29af77f686308ae"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/styles/recommended-theme.css",
+      "publicBaseSha256": "42dd28bf76f1974ea6da373e5431b928a07a12320bb3304877200578dc78715b",
+      "sourceSha256": "e5fbc4d31a0d85938fe581b422608de12b5ca10f74a22d16b2539fd6a7d8653c"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/theme/__tests__/foundation-scoped-fixture.test.tsx",
+      "publicBaseSha256": null,
+      "sourceSha256": "a200ac4df735fad6a82f463310bc7244850078fc5ba1ffc6a30a85025b543417"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "test",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/theme/__tests__/foundation.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "372bccb610b05af27700c2adc2ce487726959add97a9940084106b02f16f89c0"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/theme/foundation.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "60b5609700b28994147ccb095fbb4f6b79783218e65c4bf92668b95c3cbe9afd"
+    },
+    {
+      "disposition": "deferred",
+      "kind": "production",
+      "outputSha256": null,
+      "path": "packages/hua-ui/src/utils.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "1038adfb55a3f6b32c04245efd319844f5711feb6a4dda95fb77232b79082728"
+    }
+  ],
+  "schema": "hua-ui-source-authority.v1",
+  "sourceAuthority": {
+    "commit": "375031f312860d4ddbf1bf1a47ac37b987971f51",
+    "packageTree": "7d1c7a9b2cce1205a60144a5204185d87bb03dc3",
+    "sourceTree": "f0015e4ae3a2ac6c856c3dcfe8a9ca443aaba921",
+    "tree": "c9a1e933ae7266141207e8b5998b10242c91653b"
+  }
+}
