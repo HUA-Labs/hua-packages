@@ -968,6 +968,63 @@ test("pack builds blocked and unselected workspace prerequisites once in determi
   );
 });
 
+test("pack rejects planned workspace manifest drift caused by a prerequisite build before packing", (t) => {
+  const fixture = createPlannedFixture();
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const executeFixture = packExecFixture(calls);
+  let mutated = false;
+
+  assertCode(
+    () =>
+      runPack({
+        root: fixture.root,
+        artifactDirectory: createExternalArtifactDirectory(fixture),
+        branch: "main",
+        runId: "774",
+        sourceHead: "4".repeat(40),
+        execFile(file, args, options) {
+          const output = executeFixture(file, args, options);
+          if (
+            !mutated &&
+            file === "pnpm" &&
+            args[0] === "--filter" &&
+            args[1] === "@hua-labs/dot"
+          ) {
+            mutateJson(
+              join(fixture.root, "packages/hua-ui/package.json"),
+              (manifest) => {
+                manifest.description = "mutated by prerequisite build";
+              },
+            );
+            mutated = true;
+          }
+          return output;
+        },
+      }),
+    "plan-workspace-drift",
+  );
+
+  assert.equal(mutated, true);
+  assert.deepEqual(
+    calls
+      .filter(({ file, args }) => file === "pnpm" && args[0] === "--filter")
+      .map(({ args }) => args[1]),
+    ["@hua-labs/dot", "@hua-labs/ui"],
+  );
+  assert.equal(
+    calls.some(({ file, args }) => file === "pnpm" && args[0] === "pack"),
+    false,
+  );
+  assert.equal(
+    calls.some(
+      ({ file, args }) =>
+        file === "node" && args[0].endsWith("check-pack-artifacts.js"),
+    ),
+    false,
+  );
+});
+
 test("pack rejects a workspace build-dependency cycle before build, pack, or artifact checks", (t) => {
   const release = {
     mode: "public-npm",
