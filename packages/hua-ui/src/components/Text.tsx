@@ -2,8 +2,10 @@
 
 import React, { useMemo } from "react";
 import { dot as dotFn } from "@hua-labs/dot";
+import { dotClass } from "@hua-labs/dot/class";
 import { useDotEnv } from "../hooks/useDotEnv";
 import { mergeStyles } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 
 type TextElement =
   | "span"
@@ -34,6 +36,12 @@ export interface TextProps extends Omit<
 > {
   as?: TextElement;
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
+  /** Opaque Web class bytes. No Dot parsing or utility conflict resolution. */
+  className?: string;
+  /** Remove Text-owned tag visuals while preserving dot and style. */
+  unstyled?: boolean;
   /** For as="label" — associates the label with a form control */
   htmlFor?: string;
 }
@@ -47,20 +55,44 @@ const TAG_DEFAULTS: Partial<Record<TextElement, React.CSSProperties>> = {
 };
 
 const Text = React.forwardRef<HTMLElement, TextProps>(
-  ({ as: Tag = "span", dot: dotProp, style, ...props }, ref) => {
+  (
+    {
+      as: Tag = "span",
+      dot: dotProp,
+      classDot,
+      className,
+      unstyled = false,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
     const env = useDotEnv();
     const computedStyle = useMemo(
       () =>
         mergeStyles(
-          TAG_DEFAULTS[Tag] ?? {},
+          unstyled ? {} : (TAG_DEFAULTS[Tag] ?? {}),
           dotProp ? (dotFn(dotProp, env) as React.CSSProperties) : {},
           style,
         ),
-      [Tag, dotProp, env, style],
+      [Tag, dotProp, env, style, unstyled],
+    );
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
+    const composedClassName = useMemo(
+      () => joinWebClassNames(classDotName, className),
+      [classDotName, className],
     );
 
     return (
-      <Tag ref={ref as React.Ref<never>} style={computedStyle} {...props} />
+      <Tag
+        ref={ref as React.Ref<never>}
+        className={composedClassName}
+        style={computedStyle}
+        {...props}
+      />
     );
   },
 );

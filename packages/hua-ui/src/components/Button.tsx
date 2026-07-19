@@ -2,8 +2,10 @@
 
 import React, { useState, useMemo } from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { dotClass } from "@hua-labs/dot/class";
 import { Slot } from "../lib/Slot";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { joinWebClassNames } from "../lib/web-classname";
 import {
   buttonVariantStyles,
   VARIANT_EXTRAS,
@@ -48,6 +50,11 @@ type CommonProps = {
   iconOnly?: boolean;
   "aria-label"?: string;
   dot?: string;
+  classDot?: string;
+  /** Opaque Web class bytes. No Dot parsing or utility conflict resolution. */
+  className?: string;
+  /** Remove Button-owned visual defaults while preserving semantics and explicit effects. */
+  unstyled?: boolean;
   disabled?: boolean;
   asChild?: boolean;
 };
@@ -99,10 +106,13 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
       customGradient,
       rounded = "md",
       shadow = "md",
-      hover = "springy",
+      hover,
       fullWidth,
       iconOnly,
       dot: dotProp,
+      classDot: classDotProp,
+      className,
+      unstyled = false,
       children,
       disabled,
       asChild = false,
@@ -112,14 +122,54 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
     ref,
   ) {
     const reduced = useReducedMotion();
-    const effectiveHover: HoverEffect = reduced ? "none" : hover;
+    const effectiveHover: HoverEffect = reduced
+      ? "none"
+      : (hover ?? (unstyled ? "none" : "springy"));
+    const classDotName = useMemo(
+      () => (classDotProp ? dotClass(classDotProp) : undefined),
+      [classDotProp],
+    );
+    const composedClassName = useMemo(
+      () => joinWebClassNames(classDotName, className),
+      [classDotName, className],
+    );
     const isDisabled = !!disabled || loading;
 
     const [isHovered, setIsHovered] = useState(false);
     const [isActive, setIsActive] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const explicitStyle = useMemo(
+      () => mergeStyles(resolveDot(dotProp), style),
+      [dotProp, style],
+    );
+
+    React.useEffect(() => {
+      if (isDisabled) {
+        setIsHovered(false);
+        setIsActive(false);
+      }
+    }, [isDisabled]);
 
     const baseStyle = useMemo(() => {
+      if (unstyled) {
+        const requestedTransition = hover
+          ? { transition: HOVER_TRANSITIONS[effectiveHover] }
+          : undefined;
+        const requestedGpuHint: React.CSSProperties | undefined =
+          hover &&
+          (effectiveHover === "springy" ||
+            effectiveHover === "scale" ||
+            effectiveHover === "slide")
+            ? { willChange: "transform" }
+            : undefined;
+
+        return mergeStyles(
+          requestedTransition,
+          requestedGpuHint,
+          explicitStyle,
+        );
+      }
+
       const variantBase = buttonVariantStyles({
         variant,
         size,
@@ -157,8 +207,7 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
         gradientStyle,
         transitionStyle,
         gpuHint,
-        resolveDot(dotProp),
-        style,
+        explicitStyle,
       );
     }, [
       variant,
@@ -169,34 +218,36 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
       gradient,
       customGradient,
       effectiveHover,
-      dotProp,
-      style,
+      explicitStyle,
+      unstyled,
+      hover,
     ]);
 
     const computedStyle = useMemo(() => {
-      if (isDisabled) return mergeStyles(baseStyle, DISABLED_STYLES);
+      if (isDisabled && !unstyled)
+        return mergeStyles(baseStyle, DISABLED_STYLES);
 
       let result = baseStyle;
 
-      if (isFocused) {
+      if (isFocused && !unstyled) {
         result = mergeStyles(result, getFocusRing(variant));
       }
 
-      if (isActive) {
+      if (!isDisabled && isActive) {
         result = mergeStyles(
           result,
-          VARIANT_HOVER[variant],
+          unstyled ? undefined : VARIANT_HOVER[variant],
           ACTIVE_STYLES[effectiveHover],
         );
-      } else if (isHovered) {
+      } else if (!isDisabled && isHovered) {
         result = mergeStyles(
           result,
-          VARIANT_HOVER[variant],
+          unstyled ? undefined : VARIANT_HOVER[variant],
           HOVER_STYLES[effectiveHover],
         );
       }
 
-      return result;
+      return unstyled ? mergeStyles(result, explicitStyle) : result;
     }, [
       baseStyle,
       isDisabled,
@@ -205,19 +256,42 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
       isFocused,
       variant,
       effectiveHover,
+      unstyled,
+      explicitStyle,
     ]);
 
-    const handleMouseEnter = () => {
+    const interactionProps = rest as React.HTMLAttributes<HTMLElement>;
+    const handleMouseEnter: React.MouseEventHandler<AnchorOrButton> = (
+      event,
+    ) => {
       if (!isDisabled) setIsHovered(true);
+      interactionProps.onMouseEnter?.(event);
     };
-    const handleMouseLeave = () => {
+    const handleMouseLeave: React.MouseEventHandler<AnchorOrButton> = (
+      event,
+    ) => {
       setIsHovered(false);
       setIsActive(false);
+      interactionProps.onMouseLeave?.(event);
     };
-    const handleMouseDown = () => {
+    const handleMouseDown: React.MouseEventHandler<AnchorOrButton> = (
+      event,
+    ) => {
       if (!isDisabled) setIsActive(true);
+      interactionProps.onMouseDown?.(event);
     };
-    const handleMouseUp = () => setIsActive(false);
+    const handleMouseUp: React.MouseEventHandler<AnchorOrButton> = (event) => {
+      setIsActive(false);
+      interactionProps.onMouseUp?.(event);
+    };
+    const handleFocus: React.FocusEventHandler<AnchorOrButton> = (event) => {
+      setIsFocused(true);
+      interactionProps.onFocus?.(event);
+    };
+    const handleBlur: React.FocusEventHandler<AnchorOrButton> = (event) => {
+      setIsFocused(false);
+      interactionProps.onBlur?.(event);
+    };
 
     const Spinner = (
       <span
@@ -279,21 +353,86 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
 
     // asChild: Slot을 사용하여 자식 요소에 props 병합
     if (asChild) {
+      const childArray = React.Children.toArray(children);
+      const slottableChild =
+        childArray.length === 1 && React.isValidElement(childArray[0])
+          ? (childArray[0] as React.ReactElement<{
+              children?: React.ReactNode;
+              "aria-busy"?: React.AriaAttributes["aria-busy"];
+              "aria-disabled"?: React.AriaAttributes["aria-disabled"];
+              tabIndex?: number;
+            }>)
+          : null;
+      const slottedContent = slottableChild ? (
+        <>
+          {loading && Spinner}
+          {!loading && icon && iconPosition === "left" && (
+            <span style={resolveDot("mr-2")}>{icon}</span>
+          )}
+          {slottableChild.props.children}
+          {!loading && icon && iconPosition === "right" && (
+            <span style={resolveDot("ml-2")}>{icon}</span>
+          )}
+        </>
+      ) : (
+        children
+      );
+      const guardedChildProps = {
+        ...(loading ? { "aria-busy": true } : {}),
+        ...(isDisabled ? { "aria-disabled": true, tabIndex: -1 } : {}),
+      };
+      const hasAdornment = loading || Boolean(icon);
+      const guardedChild = slottableChild
+        ? hasAdornment
+          ? React.cloneElement(
+              slottableChild,
+              guardedChildProps,
+              slottedContent,
+            )
+          : isDisabled
+            ? React.cloneElement(slottableChild, guardedChildProps)
+            : slottableChild
+        : children;
+      const slotOnClick = (rest as React.HTMLAttributes<HTMLElement>).onClick;
+      const slotOnClickCapture = (rest as React.HTMLAttributes<HTMLElement>)
+        .onClickCapture;
+      const handleSlotClick: React.MouseEventHandler<HTMLElement> = (event) => {
+        if (isDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        slotOnClick?.(event);
+      };
+      const handleSlotClickCapture: React.MouseEventHandler<HTMLElement> = (
+        event,
+      ) => {
+        if (isDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        slotOnClickCapture?.(event);
+      };
+
       return (
         <Slot
           ref={ref}
-          aria-busy={loading || undefined}
-          aria-disabled={isDisabled || undefined}
           {...rest}
+          className={composedClassName}
           style={computedStyle}
+          {...(loading ? { "aria-busy": true } : {})}
+          {...(isDisabled ? { "aria-disabled": true, tabIndex: -1 } : {})}
+          onClickCapture={handleSlotClickCapture}
+          onClick={handleSlotClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         >
-          {children}
+          {guardedChild}
         </Slot>
       );
     }
@@ -302,11 +441,12 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
     if ("href" in rest && rest.href) {
       const {
         onClick,
+        onClickCapture,
         target,
         rel,
         href,
-        onFocus: onFocusProp,
-        onBlur: onBlurProp,
+        onFocus: _onFocusProp,
+        onBlur: _onBlurProp,
         ...anchorProps
       } = rest as AnchorProps;
 
@@ -320,15 +460,27 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
         }
         onClick?.(e);
       };
+      const handleAnchorClickCapture: React.MouseEventHandler<
+        HTMLAnchorElement
+      > = (event) => {
+        if (isDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        onClickCapture?.(event);
+      };
 
       return (
         <a
           {...anchorProps}
           ref={ref as React.Ref<HTMLAnchorElement>}
           href={href}
+          className={composedClassName}
           style={computedStyle}
+          onClickCapture={handleAnchorClickCapture}
           onClick={handleAnchorClick}
-          aria-busy={loading || undefined}
+          {...(loading ? { "aria-busy": true } : {})}
           aria-disabled={isDisabled || undefined}
           tabIndex={isDisabled ? -1 : anchorProps.tabIndex}
           target={target}
@@ -337,14 +489,8 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
           onMouseLeave={handleMouseLeave}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
-          onFocus={(e) => {
-            setIsFocused(true);
-            onFocusProp?.(e);
-          }}
-          onBlur={(e) => {
-            setIsFocused(false);
-            onBlurProp?.(e);
-          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         >
           {content}
         </a>
@@ -353,8 +499,8 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
 
     // 버튼 모드
     const {
-      onFocus: onFocusProp,
-      onBlur: onBlurProp,
+      onFocus: _onFocusProp,
+      onBlur: _onBlurProp,
       ...btnProps
     } = rest as NativeButtonProps;
 
@@ -362,23 +508,18 @@ const ButtonInner = React.forwardRef<AnchorOrButton, ButtonProps>(
       <button
         {...btnProps}
         ref={ref as React.Ref<HTMLButtonElement>}
+        className={composedClassName}
         style={computedStyle}
         type="button"
         disabled={isDisabled}
-        aria-busy={loading || undefined}
+        {...(loading ? { "aria-busy": true } : {})}
         aria-disabled={isDisabled || undefined}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onFocus={(e) => {
-          setIsFocused(true);
-          onFocusProp?.(e);
-        }}
-        onBlur={(e) => {
-          setIsFocused(false);
-          onBlurProp?.(e);
-        }}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       >
         {content}
       </button>

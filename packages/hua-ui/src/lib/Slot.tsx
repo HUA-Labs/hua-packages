@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { joinWebClassNames } from "./web-classname";
 
 /**
  * Slot 컴포넌트
@@ -28,25 +29,42 @@ function composeRefs<T>(
   ...refs: (React.Ref<T> | undefined)[]
 ): React.RefCallback<T> {
   return (node) => {
-    refs.forEach((ref) => {
+    const cleanupCallbacks: (() => void)[] = [];
+
+    for (const ref of refs) {
       if (typeof ref === "function") {
-        ref(node);
+        const cleanup = ref(node);
+        if (node !== null) {
+          cleanupCallbacks.push(
+            typeof cleanup === "function" ? cleanup : () => ref(null),
+          );
+        }
       } else if (ref != null) {
-        (ref as React.MutableRefObject<T | null>).current = node;
+        ref.current = node;
+        if (node !== null) {
+          cleanupCallbacks.push(() => {
+            ref.current = null;
+          });
+        }
       }
-    });
+    }
+
+    if (node === null) return;
+    return () => {
+      for (const cleanup of cleanupCallbacks) cleanup();
+    };
   };
 }
 
 /**
  * 이벤트 핸들러를 합성합니다
- * 
+ *
  * 부모(slot) 핸들러를 먼저 실행하고, 그 다음 자식 핸들러를 실행합니다.
  * defaultPrevented가 true이면 자식 핸들러는 실행하지 않습니다.
  */
 function composeEventHandlers<E>(
   parentHandler?: (event: E) => void,
-  childHandler?: (event: E) => void
+  childHandler?: (event: E) => void,
 ): (event: E) => void {
   return (event) => {
     parentHandler?.(event);
@@ -61,10 +79,9 @@ function composeEventHandlers<E>(
  */
 function mergeClassName(
   slotClassName?: string,
-  childClassName?: string
+  childClassName?: string,
 ): string | undefined {
-  if (!slotClassName && !childClassName) return undefined;
-  return [slotClassName, childClassName].filter(Boolean).join(' ');
+  return joinWebClassNames(slotClassName, childClassName);
 }
 
 /**
@@ -72,7 +89,7 @@ function mergeClassName(
  */
 function mergeStyle(
   slotStyle?: React.CSSProperties,
-  childStyle?: React.CSSProperties
+  childStyle?: React.CSSProperties,
 ): React.CSSProperties | undefined {
   if (!slotStyle && !childStyle) return undefined;
   return { ...slotStyle, ...childStyle };
@@ -83,7 +100,7 @@ function mergeStyle(
  */
 function mergeProps(
   slotProps: Record<string, unknown>,
-  childProps: Record<string, unknown>
+  childProps: Record<string, unknown>,
 ): Record<string, unknown> {
   const mergedProps: Record<string, unknown> = { ...slotProps };
 
@@ -96,7 +113,7 @@ function mergeProps(
       if (slotValue && childValue) {
         mergedProps[propName] = composeEventHandlers(
           slotValue as (event: unknown) => void,
-          childValue as (event: unknown) => void
+          childValue as (event: unknown) => void,
         );
       } else {
         mergedProps[propName] = childValue || slotValue;
@@ -106,14 +123,14 @@ function mergeProps(
     else if (propName === "className") {
       mergedProps[propName] = mergeClassName(
         slotValue as string | undefined,
-        childValue as string | undefined
+        childValue as string | undefined,
       );
     }
     // style 병합
     else if (propName === "style") {
       mergedProps[propName] = mergeStyle(
         slotValue as React.CSSProperties | undefined,
-        childValue as React.CSSProperties | undefined
+        childValue as React.CSSProperties | undefined,
       );
     }
     // 그 외: 자식 값 우선
@@ -145,9 +162,7 @@ const Slot = React.forwardRef<HTMLElement, SlotProps>(
     // 유효한 단일 자식이 있는지 확인
     if (childArray.length !== 1) {
       if (process.env.NODE_ENV !== "production") {
-        console.warn(
-          "[Slot] asChild는 정확히 하나의 자식 요소가 필요합니다."
-        );
+        console.warn("[Slot] asChild는 정확히 하나의 자식 요소가 필요합니다.");
       }
       return null;
     }
@@ -163,7 +178,7 @@ const Slot = React.forwardRef<HTMLElement, SlotProps>(
 
     // 자식 요소의 props와 ref 추출
     const childProps = child.props as Record<string, unknown>;
-    const childRef = (child as unknown as { ref?: React.Ref<HTMLElement> }).ref;
+    const childRef = childProps.ref as React.Ref<HTMLElement> | undefined;
 
     // props와 ref 병합
     const mergedProps = mergeProps(slotProps, childProps);
@@ -173,7 +188,7 @@ const Slot = React.forwardRef<HTMLElement, SlotProps>(
       ...mergedProps,
       ref: mergedRef,
     } as React.Attributes);
-  }
+  },
 );
 
 Slot.displayName = "Slot";

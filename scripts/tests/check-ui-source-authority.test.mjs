@@ -18,6 +18,28 @@ import { afterEach, test } from "node:test";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const checker = join(root, "scripts", "check-ui-source-authority.mjs");
 const packChecker = join(root, "scripts", "check-pack-artifacts.js");
+const realConfig = join(root, "config", "ui-source-authority.json");
+const m810PlatformExactPaths = [
+  "packages/hua-ui/src/components/Action.tsx",
+  "packages/hua-ui/src/components/Box.tsx",
+  "packages/hua-ui/src/components/Button.tsx",
+  "packages/hua-ui/src/components/Pressable.tsx",
+  "packages/hua-ui/src/components/Text.tsx",
+  "packages/hua-ui/src/components/__tests__/Action.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Box.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Button.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Pressable.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Text.test.tsx",
+  "packages/hua-ui/src/lib/Slot.tsx",
+  "packages/hua-ui/src/lib/__tests__/Slot.test.tsx",
+  "packages/hua-ui/src/lib/__tests__/web-classname.test.ts",
+  "packages/hua-ui/src/lib/web-classname.ts",
+];
+const m810PlatformExactPathSet = new Set(m810PlatformExactPaths);
+const m810MapDigest =
+  "90b435a1ad11e8dc6a0f4cc1dbfe92648d630220e815576744da2b5be45cada6";
+const m810UnselectedDigest =
+  "1173a4aa182b727749b86ce53c7e566a9c12dbfccf7ddca260c27b58f652e623";
 const ownedRoots = [];
 
 afterEach(() => {
@@ -63,6 +85,23 @@ function canonicalValue(value) {
 
 function canonicalJson(value) {
   return `${JSON.stringify(canonicalValue(value), null, 2)}\n`;
+}
+
+function unselectedAuthorityRows(rows) {
+  return rows.filter((row) => !m810PlatformExactPathSet.has(row.path));
+}
+
+function unselectedAuthorityDigest(rows) {
+  return sha256(canonicalJson(unselectedAuthorityRows(rows)));
+}
+
+function assertM810AuthorityLock(config) {
+  assert.equal(config.mapDigest, sha256(canonicalJson(config.rows)));
+  assert.equal(config.mapDigest, m810MapDigest);
+
+  const unselectedRows = unselectedAuthorityRows(config.rows);
+  assert.equal(unselectedRows.length, 136);
+  assert.equal(unselectedAuthorityDigest(config.rows), m810UnselectedDigest);
 }
 
 function authority(root, commit) {
@@ -191,6 +230,61 @@ function runChecker(fixture, ...extra) {
     { encoding: "utf8" },
   );
 }
+
+test("locks the M810 core interoperability family to platform authority", () => {
+  const config = JSON.parse(readFileSync(realConfig, "utf8"));
+  assert.deepEqual(config.sourceAuthority, {
+    commit: "f9ceddaa02c4b544b108d5ab68766a965e36b58d",
+    packageTree: "b729f3205637d4cd5a83ad7950df5b4faca7c56f",
+    sourceTree: "a74dd5618d5535c5968092cc5db9dc6c4b4d5558",
+    tree: "a425145fa9c63a35b61e44885f37c962aa86d593",
+  });
+  assertM810AuthorityLock(config);
+
+  const platformExactRows = config.rows.filter(
+    (row) => row.disposition === "platform-exact",
+  );
+  assert.deepEqual(
+    platformExactRows.map((row) => row.path),
+    m810PlatformExactPaths,
+  );
+  for (const row of platformExactRows) {
+    assert.equal(row.outputSha256, row.sourceSha256, row.path);
+  }
+
+  for (const path of [
+    "packages/hua-ui/src/components/Tooltip.tsx",
+    "packages/hua-ui/src/components/__tests__/Tooltip.test.tsx",
+  ]) {
+    const row = config.rows.find((candidate) => candidate.path === path);
+    assert.equal(row?.disposition, "deferred", path);
+    assert.equal(row?.outputSha256, null, path);
+  }
+
+  const tampered = structuredClone(config);
+  const bottomSheet = tampered.rows.find(
+    (row) => row.path === "packages/hua-ui/src/components/BottomSheet.tsx",
+  );
+  assert.ok(bottomSheet);
+  assert.equal(bottomSheet.kind, "production");
+  assert.equal(bottomSheet.disposition, "deferred");
+  assert.equal(bottomSheet.outputSha256, null);
+  bottomSheet.disposition = "public-preserved";
+  bottomSheet.outputSha256 = bottomSheet.publicBaseSha256;
+  tampered.mapDigest = sha256(canonicalJson(tampered.rows));
+
+  assert.equal(
+    tampered.mapDigest,
+    "da728dd4de63c6acaef056ef1c4ed7be36fa85ba8a3476bf1aa94e50acf609f9",
+  );
+  assert.equal(
+    unselectedAuthorityDigest(tampered.rows),
+    "cb931382f0742feee7b02cdf73054fcfe460b8333ca3b37c67002f0b8853e47d",
+  );
+  assert.throws(() => assertM810AuthorityLock(tampered), {
+    name: "AssertionError",
+  });
+});
 
 function createOversizedSourceFixture() {
   const fixtureRoot = mkdtempSync(
