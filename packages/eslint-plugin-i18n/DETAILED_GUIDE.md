@@ -90,7 +90,7 @@ or translation sync process.
     'error',
     {
       keysFile: './types/i18n-types.generated.ts',
-      functions: ['t', 'tArray'],
+      functionNames: ['t', 'tArray'],
     },
   ],
 }
@@ -98,6 +98,12 @@ or translation sync process.
 
 When the rule finds a near match, it reports suggestions so common typos are
 easy to fix during review.
+
+Generated `I18nKeys` interfaces may use unquoted, single-quoted, or
+double-quoted namespace names. Static `strings` and `arrays` key literals may
+use either single or double quotes, including inline unions and the usual
+multiline `| "key"` form. The rule does not claim support for computed
+properties or other dynamic TypeScript expressions in the generated file.
 
 ### `i18n/no-raw-text`
 
@@ -167,9 +173,9 @@ and source tree.
 The package exposes an `i18n-lint` binary.
 
 ```bash
-pnpm exec i18n-lint unused-keys --translations ./lib/translations --src ./src
-pnpm exec i18n-lint common-report --translations ./lib/translations
-pnpm exec i18n-lint missing-translations --translations ./lib/translations
+pnpm exec i18n-lint unused-keys --translations-dir ./lib/translations --source-dir ./src
+pnpm exec i18n-lint common-report --translations-dir ./lib/translations
+pnpm exec i18n-lint missing --translations-dir ./lib/translations --languages en,ja
 ```
 
 Use the CLI for checks that need more context than a single ESLint file visit.
@@ -190,6 +196,8 @@ for project-level translation reports.
 
 If `no-missing-key` reports every key as missing, check that `keysFile` points
 to the generated type file visible from the ESLint working directory.
+For generated `I18nKeys` declarations, keep namespace and key members as
+static quoted or unquoted properties rather than computed expressions.
 
 If key suggestions are missing, confirm that `translationsDir` points to the
 directory containing the runtime translation JSON or TypeScript files.

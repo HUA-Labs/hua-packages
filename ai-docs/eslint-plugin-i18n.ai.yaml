@@ -14,6 +14,15 @@ exports:
   main:
     path: "@hua-labs/eslint-plugin-i18n"
     provides:
+      - name: "default"
+        type: "plugin"
+        description: "Default ESLint plugin object containing the package rules and configs"
+      - name: "rules"
+        type: "object"
+        description: "Six i18n rule modules keyed by their public rule names"
+      - name: "configs"
+        type: "object"
+        description: "Shareable ESLint configurations, including the recommended config"
 
 features:
   - "no-missing-key — Detect t() keys not found in generated types + did-you-mean suggestions (up to 3)"
@@ -22,7 +31,7 @@ features:
   - "no-unlocalized-field — Detect description/label/value fields with literal strings instead of i18n keys"
   - "prefer-common-key — Suggest common namespace keys when same value exists there"
   - "no-unused-key — Placeholder rule for unused translation key detection (CLI recommended)"
-  - "i18n-lint CLI — unused-keys, common-report, missing-translations commands"
+  - "i18n-lint CLI — Commands: unused-keys, common-report, and missing"
 
 related_packages:
   - "@hua-labs/i18n-core"
