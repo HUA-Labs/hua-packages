@@ -441,6 +441,19 @@ function derivedEligibility(release) {
     : "blocked";
 }
 
+function allowsEmptyManifestRefresh(policyEntry) {
+  if (policyEntry.eligibility === "eligible") return true;
+  const { release, expectedManifest } = policyEntry;
+  return (
+    release.mode === "no-publish" &&
+    release.intent === "active-public" &&
+    release.authority === "hua-packages" &&
+    release.channel === "npm-public" &&
+    expectedManifest.private === false &&
+    expectedManifest.publishConfig !== null
+  );
+}
+
 function assertSortedUnique(records, property, code) {
   for (let index = 0; index < records.length; index += 1) {
     if (index > 0) {
@@ -564,6 +577,10 @@ function normalizeManifest(value, label) {
     `${label}-version`,
   );
   parseSemver(version);
+  assert(
+    value.private === undefined || typeof value.private === "boolean",
+    `${label}-private`,
+  );
   const isPrivate = value.private === true;
   const publishConfig =
     value.publishConfig === undefined
@@ -911,7 +928,7 @@ export function validateReleasePlan(value, policyState, options = {}) {
       assert(snapshot.version === current.version, "refresh-version-drift");
       if (snapshot.sha256 !== current.sha256) {
         assert(
-          policyState.policy.packages[index].eligibility === "eligible",
+          allowsEmptyManifestRefresh(policyState.policy.packages[index]),
           "refresh-ineligible-workspace",
         );
       }

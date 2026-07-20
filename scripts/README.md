@@ -27,7 +27,7 @@ monorepo state.
 | `check-ui-source-authority.mjs` | Validate the opaque platform/public HUA UI path map and fail closed on unmapped or disposition-breaking source drift. |
 | `check-pack-artifacts.js`       | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload.     |
 | `check-publish-allowlist.js`    | Validate the versioned platform-policy projection against every workspace manifest.                                   |
-| `safe-release.mjs preflight`    | Classify plan state while admitting only bounded same-version eligible drift for an empty snapshot.                   |
+| `safe-release.mjs preflight`    | Classify plan state while admitting only bounded same-version reviewed-public drift for an empty snapshot.            |
 | `safe-release.mjs authority`    | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.       |
 | `safe-release.mjs refresh`      | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                    |
 | `safe-release.mjs version`      | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                       |
@@ -90,21 +90,31 @@ source was consumed and that no unexpected source remains.
 An empty plan is deliberately not release authority. `refresh` first verifies
 the old empty plan's policy tuple, schema, roster, and digest, then captures the
 current reviewed manifest bytes only when changed manifests remain at the same
-version and belong to policy-eligible packages. It never refreshes blocked
-held, never-publish, pending, private, or no-publish authority, never overwrites
-a planned set, and cannot add or select a package. This lets a later reviewed
-source/manifest sync plus a new Changeset enter `version` without weakening the
-planned-plan check. A planned plan remains manifest-exact in `check` and cannot
-publish directly.
+version and either belong to policy-eligible packages or match the exact
+`no-publish / active-public / hua-packages / npm-public` tuple with a public
+manifest. The latter admits a reviewed public projection such as Dot without
+changing its `blocked` eligibility or creating a release row. Refresh still
+rejects held, never-publish, pending, private, wrong-authority, and
+wrong-channel drift, never overwrites a planned set, and cannot add or select a
+package. This lets a later reviewed source/manifest sync plus a new Changeset
+enter `version` without weakening the planned-plan check. A planned plan remains
+manifest-exact in `check` and cannot publish directly.
+
+Workspace manifest `private` authority is accepted only when the field is
+absent or Boolean. Absent and explicit `false` are public manifest truth;
+strings, numbers, null, arrays, objects, and other malformed present values fail
+before normalization, preflight, or refresh.
 
 The ordinary empty-plan main-push path does not require the external policy
 credential while it creates or updates a version PR. Its dedicated preflight
 classifies exact `empty`, `planned`, and `publishing` states and detects an
 exact publishing-to-empty closure transition before refresh. Only an ordinary
 exact empty plan may admit same-version manifest-byte drift, and only for
-policy-eligible packages; policy, roster, identity, version, plan digest, and
-canonical-byte authority remain exact. The following credential-free refresh
-binds those reviewed manifest bytes before Changesets status/version executes.
+policy-eligible packages or the exact blocked public `no-publish` tuple above;
+policy, roster, identity, version, plan digest, and canonical-byte authority
+remain exact. The following credential-free refresh binds those reviewed
+manifest bytes before Changesets status/version executes without changing
+release eligibility.
 A merged version PR is already `planned`, and a reviewed closure merge is an
 external-policy-bearing transition, so both require the policy gate before any
 artifact, claim, OIDC, publish, or closure admission. A planned plan remains
