@@ -8,8 +8,8 @@
       },
       {
         "path": "package/DETAILED_GUIDE.md",
-        "sha256": "8423202b7328c1a5954d710caea75a280d48d0510b48e89187b183adfa76339c",
-        "size": 17463
+        "sha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834",
+        "size": 17542
       },
       {
         "path": "package/LICENSE",
@@ -23,31 +23,31 @@
       },
       {
         "path": "package/dist/index.js",
-        "sha256": "71f1a295db030556b1506286bce3e19f3d77d6d083df60302576e5993934ee75",
-        "size": 63875
+        "sha256": "385db2482e5c62d450795102d2bde951013d815cf45d304062c2536e8b9091ae",
+        "size": 63876
       },
       {
         "path": "package/package.json",
-        "sha256": "81eb5124bcff8183c8a279e53930e46f6f023fe8f19a34bb70f3c7858a987966",
-        "size": 1227
+        "sha256": "7871de75089ebebfde5ba05e98c82838128a4d42cee8dadeb5db1d9a4d21f93e",
+        "size": 1228
       }
     ],
     "packageName": "@hua-labs/dot-lsp",
     "packageVersion": "0.1.3",
-    "packedManifestSha256": "81eb5124bcff8183c8a279e53930e46f6f023fe8f19a34bb70f3c7858a987966",
+    "packedManifestSha256": "7871de75089ebebfde5ba05e98c82838128a4d42cee8dadeb5db1d9a4d21f93e",
     "requiredTargets": ["package/dist/index.js"],
-    "rosterDigest": "30b4f53a8b58014bd7c83d77254854787d87c530eef2735adbb82bb85a7c24b2",
-    "sourceManifestSha256": "06cd64f8d910218b94ea20ed37a51fe2c7b86bf3dbf0b24283211a34dc5ce6b2",
-    "tarballBytes": 24373,
-    "tarballSha256": "2c5fe47aa4f4777bc7fc025e04d52eeb467e66e3783484cc8a42832613095b50"
+    "rosterDigest": "42d1bfc732ddc320b31cc24160350d6e3626aa129e385ea9ab74a53d226973bb",
+    "sourceManifestSha256": "6e6af08a6641801bed3398661549a20c7318f392a3aca54c2763000896aea870",
+    "tarballBytes": 24397,
+    "tarballSha256": "d343f947f48fdba9b74cc87f6d2a668c9d7216c904f8ec8bc1e327d11177110b"
   },
   "authorityKind": "platform-dot-lsp-package-projection",
-  "mapDigest": "21f7a088b26b6b18bf7431834df55580878eee1b5d5577917086c79d47254fd2",
+  "mapDigest": "6fa078d9e8bc435d0cf499b83a24e38268aaff2a5b52087cf3fd8664a010a40c",
   "packagePath": "packages/hua-dot-lsp",
   "publicBase": {
-    "commit": "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
+    "commit": "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3",
     "packageTree": "9b2969174aa7c669176e9e9410a85347338a5e95",
-    "tree": "2ee07f511e2fa96814801e8cbde45f0c45875aff"
+    "tree": "ccf9dfa29a2cd515c8acb014f17eae3bfc619a5d"
   },
   "rows": [
     {
@@ -61,10 +61,10 @@
     {
       "disposition": "platform-exact",
       "kind": "docs",
-      "outputSha256": "8423202b7328c1a5954d710caea75a280d48d0510b48e89187b183adfa76339c",
+      "outputSha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834",
       "path": "packages/hua-dot-lsp/DETAILED_GUIDE.md",
       "publicBaseSha256": "26913af2abe6ff937355182fb9bfa2cc7bc4fec042a3bd32853966585c8103e3",
-      "sourceSha256": "8423202b7328c1a5954d710caea75a280d48d0510b48e89187b183adfa76339c"
+      "sourceSha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834"
     },
     {
       "disposition": "platform-exact",
@@ -93,10 +93,10 @@
     {
       "disposition": "derived-reviewed",
       "kind": "manifest",
-      "outputSha256": "06cd64f8d910218b94ea20ed37a51fe2c7b86bf3dbf0b24283211a34dc5ce6b2",
+      "outputSha256": "6e6af08a6641801bed3398661549a20c7318f392a3aca54c2763000896aea870",
       "path": "packages/hua-dot-lsp/package.json",
       "publicBaseSha256": "ed67b1b14570fc1a37adf6b3b1725e0621282148bb1c72770a89839b52fe9860",
-      "sourceSha256": "1fa18d0afc3b14e0cbed6a194cf96637c23a0dc277126a3fb8c828faf915a480"
+      "sourceSha256": "6a3a1d56799efb6a74621bef2f24b7fa44550b19cafebc193982a8a54ffef10f"
     },
     {
       "disposition": "platform-exact",
@@ -197,8 +197,8 @@
   ],
   "schema": "hua-dot-lsp-source-authority.v1",
   "sourceAuthority": {
-    "commit": "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",
-    "packageTree": "68028a09e18b5ffa1fcaf627652ca1f66e2ad0a6",
-    "tree": "a9f2436c625d56b4447885b70f6cd48257369199"
+    "commit": "19385e52e2f3694eb06fb15f2e13d5cce3270280",
+    "packageTree": "f173b259a9f4fc4834e2454fcf427e0c44251037",
+    "tree": "7ab93813e0e098c98379460be4acf3016e61a8d1"
   }
 }

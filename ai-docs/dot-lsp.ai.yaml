@@ -33,7 +33,7 @@ related_packages:
   - "@hua-labs/dot-mcp"
 
 compatibility:
-  node: ">=20.0.0"
+  node: ">=20.16.0"
 
 documentation:
   detailedGuide:

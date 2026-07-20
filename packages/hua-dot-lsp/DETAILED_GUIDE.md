@@ -357,7 +357,7 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 
 ### Node.js Version Requirements
 
-The server requires **Node.js 20 or later**. Running it on an older version will cause the process to exit immediately, which editors typically report as a server crash.
+The supported minimum is **Node.js 20.16.0**. Versions below that floor are unsupported. Package managers may warn or refuse installation when engine enforcement is enabled. Runtime behavior below the supported floor is not guaranteed.
 
 Check your version:
 
@@ -365,4 +365,4 @@ Check your version:
 node --version
 ```
 
-If you have multiple Node.js versions installed (e.g. via `nvm` or `fnm`), ensure the version active in the shell environment used by your editor is 20+. Editor processes do not always inherit the same shell environment as your terminal.
+If you have multiple Node.js versions installed (e.g. via `nvm` or `fnm`), ensure the version active in the shell environment used by your editor is 20.16.0 or later. Editor processes do not always inherit the same shell environment as your terminal.

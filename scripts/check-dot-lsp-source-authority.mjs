@@ -44,20 +44,20 @@ const GIT_ENV = Object.freeze({
 const GIT_HASH = /^[0-9a-f]{40}$/u;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const REVIEWED_MAP_DIGEST =
-  "21f7a088b26b6b18bf7431834df55580878eee1b5d5577917086c79d47254fd2";
+  "6fa078d9e8bc435d0cf499b83a24e38268aaff2a5b52087cf3fd8664a010a40c";
 const REVIEWED_ARTIFACT_ROSTER_DIGEST =
-  "30b4f53a8b58014bd7c83d77254854787d87c530eef2735adbb82bb85a7c24b2";
+  "42d1bfc732ddc320b31cc24160350d6e3626aa129e385ea9ab74a53d226973bb";
 const REVIEWED_TARBALL_SHA256 =
-  "2c5fe47aa4f4777bc7fc025e04d52eeb467e66e3783484cc8a42832613095b50";
+  "d343f947f48fdba9b74cc87f6d2a668c9d7216c904f8ec8bc1e327d11177110b";
 const REVIEWED_PUBLIC_BASE = Object.freeze({
-  commit: "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
+  commit: "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3",
   packageTree: "9b2969174aa7c669176e9e9410a85347338a5e95",
-  tree: "2ee07f511e2fa96814801e8cbde45f0c45875aff",
+  tree: "ccf9dfa29a2cd515c8acb014f17eae3bfc619a5d",
 });
 const REVIEWED_SOURCE_AUTHORITY = Object.freeze({
-  commit: "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",
-  packageTree: "68028a09e18b5ffa1fcaf627652ca1f66e2ad0a6",
-  tree: "a9f2436c625d56b4447885b70f6cd48257369199",
+  commit: "19385e52e2f3694eb06fb15f2e13d5cce3270280",
+  packageTree: "f173b259a9f4fc4834e2454fcf427e0c44251037",
+  tree: "7ab93813e0e098c98379460be4acf3016e61a8d1",
 });
 const ALLOWED_DISPOSITIONS = new Set([
   "platform-exact",

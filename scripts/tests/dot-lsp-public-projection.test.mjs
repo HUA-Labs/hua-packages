@@ -53,6 +53,18 @@ function digestCanonical(value) {
   return createHash("sha256").update(canonicalJson(value)).digest("hex");
 }
 
+function admitsExactLowerBound(range, version) {
+  const floor = /^>=(\d+)\.(\d+)\.(\d+)$/u.exec(range);
+  const candidate = /^(\d+)\.(\d+)\.(\d+)$/u.exec(version);
+  assert.ok(floor, `unsupported engine range: ${range}`);
+  assert.ok(candidate, `unsupported version: ${version}`);
+  for (let index = 1; index <= 3; index += 1) {
+    const difference = Number(candidate[index]) - Number(floor[index]);
+    if (difference !== 0) return difference > 0;
+  }
+  return true;
+}
+
 function runChecker(args = [], cwd = root) {
   return spawnSync(
     process.execPath,
@@ -89,14 +101,14 @@ test("derived public manifest preserves release authority and projects exact pro
       "git",
       [
         "show",
-        "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4:packages/hua-dot-lsp/package.json",
+        "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3:packages/hua-dot-lsp/package.json",
       ],
       { cwd: root, encoding: "utf8" },
     ),
   );
 
   assert.equal(manifest.version, "0.1.3");
-  assert.equal(manifest.engines.node, ">=20.0.0");
+  assert.equal(manifest.engines.node, ">=20.16.0");
   assert.equal(manifest.dependencies["@hua-labs/dot"], "workspace:0.2.2");
   assert.equal(
     manifest.scripts.build,
@@ -108,6 +120,7 @@ test("derived public manifest preserves release authority and projects exact pro
 
   const normalized = structuredClone(manifest);
   normalized.scripts.build = publicBase.scripts.build;
+  normalized.engines = publicBase.engines;
   assert.deepEqual(normalized, publicBase);
 
   assert.equal(
@@ -180,7 +193,7 @@ test("platform docs and derived projections preserve bounded LSP release truth",
   assert.notEqual(row.outputSha256, row.publicBaseSha256);
 
   assert.match(readme, /dot-lsp --stdio/u);
-  assert.match(ai, /node: ">=20\.0\.0"/u);
+  assert.match(ai, /node: ">=20\.16\.0"/u);
 });
 
 test("the generated public README and AI projection bind the exact doc semantics", () => {
@@ -196,7 +209,41 @@ test("the generated public README and AI projection bind the exact doc semantics
     assert.ok(ai.includes(marker), marker);
   }
   assert.match(ai, /# Version: 0\.1\.3/u);
-  assert.match(ai, /node: ">=20\.0\.0"/u);
+  assert.match(ai, /node: ">=20\.16\.0"/u);
+});
+
+test("the public manifest and release docs bind the exact Node 20.16 floor", () => {
+  const manifest = JSON.parse(text("packages/hua-dot-lsp/package.json"));
+  const dotManifest = JSON.parse(text("packages/hua-dot/package.json"));
+  const guide = text("packages/hua-dot-lsp/DETAILED_GUIDE.md");
+  const doc = text("packages/hua-dot-lsp/doc.yaml");
+  const readme = text("packages/hua-dot-lsp/README.md");
+  const ai = text("ai-docs/dot-lsp.ai.yaml");
+
+  assert.equal(manifest.engines.node, ">=20.16.0");
+  assert.equal(dotManifest.engines.node, ">=20.16.0");
+  assert.deepEqual(
+    ["20.0.0", "20.15.1", "20.16.0"].map((version) => [
+      version,
+      admitsExactLowerBound(manifest.engines.node, version),
+      admitsExactLowerBound(dotManifest.engines.node, version),
+    ]),
+    [
+      ["20.0.0", false, false],
+      ["20.15.1", false, false],
+      ["20.16.0", true, true],
+    ],
+  );
+  assert.match(guide, /supported minimum is \*\*Node\.js 20\.16\.0\*\*/u);
+  assert.match(guide, /Package managers may warn or refuse installation/u);
+  assert.match(
+    guide,
+    /Runtime behavior below the supported floor is not guaranteed/u,
+  );
+  assert.doesNotMatch(guide, /exit immediately|server crash/u);
+  assert.match(ai, /node: ">=20\.16\.0"/u);
+  assert.doesNotMatch(doc, />=20\.0\.0|Node\.js 20 or later/u);
+  assert.doesNotMatch(readme, />=20\.0\.0|Node\.js 20 or later/u);
 });
 
 test("server identity is manifest-derived and ambient inputs are non-authority", () => {
@@ -223,11 +270,11 @@ test("stale public-first provenance is not source or base authority", () => {
   const config = JSON.parse(readFileSync(configPath, "utf8"));
   assert.equal(
     config.publicBase.commit,
-    "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
+    "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3",
   );
   assert.equal(
     config.sourceAuthority.commit,
-    "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",
+    "19385e52e2f3694eb06fb15f2e13d5cce3270280",
   );
   assert.notEqual(
     config.publicBase.commit,
