@@ -4,7 +4,9 @@ import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdtempSync,
+  mkdirSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -12,7 +14,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gzipSync } from "node:zlib";
+import { gunzipSync, gzipSync } from "node:zlib";
 import { test } from "node:test";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -370,6 +372,75 @@ test("tar authority binds the decompressed stream instead of the host gzip envel
   assert.match(source, /sha256\(tarStream\)/u);
   assert.doesNotMatch(source, /sha256\(compressed\)/u);
   assert.doesNotMatch(source, /artifact\.tarball(?:Bytes|Sha256)/u);
+});
+
+test("two gzip envelopes of the canonical tar pass while one tar byte rejects", () => {
+  const { clone, parent } = cloneFixture();
+  const packDirectory = join(parent, "pack");
+  mkdirSync(packDirectory);
+  const childEnvironment = Object.fromEntries(
+    Object.entries(process.env).filter(
+      ([key]) => !/(?:token|auth|credential)/iu.test(key),
+    ),
+  );
+  Object.assign(childEnvironment, {
+    CI: "true",
+    npm_config_ignore_scripts: "true",
+  });
+  const run = (args) =>
+    execFileSync("pnpm", args, {
+      cwd: clone,
+      env: childEnvironment,
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: "ignore",
+      timeout: 120000,
+    });
+
+  try {
+    run(["install", "--offline", "--frozen-lockfile", "--ignore-scripts"]);
+    run(["--filter", "@hua-labs/dot", "build"]);
+    run(["--filter", "@hua-labs/dot-mcp", "build"]);
+    run([
+      "--dir",
+      "packages/hua-dot-mcp",
+      "pack",
+      "--pack-destination",
+      packDirectory,
+    ]);
+
+    const originalPath = join(
+      packDirectory,
+      readdirSync(packDirectory).find((entry) => entry.endsWith(".tgz")),
+    );
+    const originalEnvelope = readFileSync(originalPath);
+    const tarStream = gunzipSync(originalEnvelope);
+    const alternateEnvelope = gzipSync(tarStream, { level: 1 });
+    const alternatePath = join(packDirectory, "alternate-envelope.tgz");
+    writeFileSync(alternatePath, alternateEnvelope);
+
+    assert.notEqual(
+      createHash("sha256").update(originalEnvelope).digest("hex"),
+      createHash("sha256").update(alternateEnvelope).digest("hex"),
+    );
+    assert.equal(
+      createHash("sha256").update(tarStream).digest("hex"),
+      "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+    );
+    for (const tarball of [originalPath, alternatePath]) {
+      const result = runChecker(["--tarball", tarball], clone);
+      assert.equal(result.status, 0, result.stderr);
+    }
+
+    const tamperedTarStream = Buffer.from(tarStream);
+    tamperedTarStream[600] ^= 1;
+    const tamperedPath = join(packDirectory, "tampered-stream.tgz");
+    writeFileSync(tamperedPath, gzipSync(tamperedTarStream));
+    const rejected = runChecker(["--tarball", tamperedPath], clone);
+    assert.notEqual(rejected.status, 0);
+    assert.match(rejected.stderr, /tar-stream-bytes-mismatch/u);
+  } finally {
+    rmSync(parent, { force: true, recursive: true });
+  }
 });
 
 test("self-consistent row reclassification and semantic drift reject", () => {
