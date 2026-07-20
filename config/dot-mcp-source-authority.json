@@ -1,0 +1,180 @@
+{
+  "artifact": {
+    "files": [
+      {
+        "path": "package/CHANGELOG.md",
+        "sha256": "58a1a6fe32b6b0c887eaff3ade2e90730ff3948ce7c2ad6b8568a12209162bff",
+        "size": 1134
+      },
+      {
+        "path": "package/DETAILED_GUIDE.md",
+        "sha256": "2e128121a3b987ac5e983510a953d3870f8d486978f0f3a1b4b9f06d7bdc148c",
+        "size": 23697
+      },
+      {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "788830a6848d5fef5897f13f0c5bc30c81bd5ca967bdde0e0342f1e8c054591e",
+        "size": 5769
+      },
+      {
+        "path": "package/dist/index.js",
+        "sha256": "d01cb9ec82b801396d9112c82b51b0d7b5ed2960bc15b6fb308b98a28243fdeb",
+        "size": 29016
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "d02de0d3310cb5651310a97b0ea404b891c7efccd2652eadc72ca0fe559b4a5c",
+        "size": 1155
+      }
+    ],
+    "packageName": "@hua-labs/dot-mcp",
+    "packageVersion": "0.1.3",
+    "packedManifestSha256": "d02de0d3310cb5651310a97b0ea404b891c7efccd2652eadc72ca0fe559b4a5c",
+    "requiredTargets": ["package/dist/index.js"],
+    "rosterDigest": "a964b63ab9077d04aa27ef0fad9aafe2ebd536d2626a9311c0556f84297a5e33",
+    "sourceManifestSha256": "f102cae6a77c00ed552db38a2bbd7710992914b8e1aaf9069957ec3d52f4d984",
+    "tarStreamBytes": 68096,
+    "tarStreamSha256": "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073"
+  },
+  "authorityKind": "platform-dot-mcp-package-projection",
+  "mapDigest": "6ac70499d787987ec91ea7e8ff2cd867e7f23183a949d18cdaa32dfca74056eb",
+  "packagePath": "packages/hua-dot-mcp",
+  "publicBase": {
+    "commit": "5f0fa9feb54de4cfc343c5c7c4fe73a54c4e14a9",
+    "packageTree": "70942905900e26e8c14e8d6bd4bf0ace8759f867",
+    "tree": "36a9a87cc14d85b2ec016fa648ecc35c549082a2"
+  },
+  "rows": [
+    {
+      "disposition": "public-preserved",
+      "kind": "docs",
+      "outputSha256": "58a1a6fe32b6b0c887eaff3ade2e90730ff3948ce7c2ad6b8568a12209162bff",
+      "path": "packages/hua-dot-mcp/CHANGELOG.md",
+      "publicBaseSha256": "58a1a6fe32b6b0c887eaff3ade2e90730ff3948ce7c2ad6b8568a12209162bff",
+      "sourceSha256": "4e465ded2a0b99cd066d07791c07a90e3b92a8ce8a845962c314bab07c5bdd75"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "2e128121a3b987ac5e983510a953d3870f8d486978f0f3a1b4b9f06d7bdc148c",
+      "path": "packages/hua-dot-mcp/DETAILED_GUIDE.md",
+      "publicBaseSha256": "8b3e650d30c0f2decf2bc9009f7dd806cc6afcd3609f86b657fc3b4a9b6508f8",
+      "sourceSha256": "2e128121a3b987ac5e983510a953d3870f8d486978f0f3a1b4b9f06d7bdc148c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "path": "packages/hua-dot-mcp/LICENSE",
+      "publicBaseSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "sourceSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "docs",
+      "outputSha256": "788830a6848d5fef5897f13f0c5bc30c81bd5ca967bdde0e0342f1e8c054591e",
+      "path": "packages/hua-dot-mcp/README.md",
+      "publicBaseSha256": "18d38deffd0a188f2577cc8d7c1d9c6741e14bd9946bc452274487399ba95dc4",
+      "sourceSha256": "788830a6848d5fef5897f13f0c5bc30c81bd5ca967bdde0e0342f1e8c054591e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "f62c12a8dd0fb7c355df028d854e5282452f0898a8783cd08da68f87ac00d551",
+      "path": "packages/hua-dot-mcp/doc.yaml",
+      "publicBaseSha256": "c7370d2d911dcfbdc068553819be6bc171f9967ff42cd3a6c4ae6ede7e989ec7",
+      "sourceSha256": "f62c12a8dd0fb7c355df028d854e5282452f0898a8783cd08da68f87ac00d551"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "manifest",
+      "outputSha256": "f102cae6a77c00ed552db38a2bbd7710992914b8e1aaf9069957ec3d52f4d984",
+      "path": "packages/hua-dot-mcp/package.json",
+      "publicBaseSha256": "977e8ec2f964a0837ce152929b318dbd9d03ac6933fba361063d59946a2740aa",
+      "sourceSha256": "a7241accbe46b89e4b3957c90bc07e8436e740730ae373ce47a2d8e2166a295c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "1fb6e7d504a352b2dc6f53bc28a9fb9d15910fd346e76fa91174820e8a008e16",
+      "path": "packages/hua-dot-mcp/src/__tests__/flutter-wire.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "1fb6e7d504a352b2dc6f53bc28a9fb9d15910fd346e76fa91174820e8a008e16"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "43cf055d2d0540df2652322266aa6e9b1aecdd1bb27a946fcfdfe3f81fbb5d60",
+      "path": "packages/hua-dot-mcp/src/__tests__/server-info.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "43cf055d2d0540df2652322266aa6e9b1aecdd1bb27a946fcfdfe3f81fbb5d60"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "18bf5c446caf6879380411ba2566e00ca5a94b302fde138cfba490b08d4068df",
+      "path": "packages/hua-dot-mcp/src/__tests__/tools.test.ts",
+      "publicBaseSha256": "18bf5c446caf6879380411ba2566e00ca5a94b302fde138cfba490b08d4068df",
+      "sourceSha256": "18bf5c446caf6879380411ba2566e00ca5a94b302fde138cfba490b08d4068df"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "45756de420b395900288593df05166ba65dcc14f44185e3003e14bd4055a90c5",
+      "path": "packages/hua-dot-mcp/src/capabilities.ts",
+      "publicBaseSha256": "45756de420b395900288593df05166ba65dcc14f44185e3003e14bd4055a90c5",
+      "sourceSha256": "45756de420b395900288593df05166ba65dcc14f44185e3003e14bd4055a90c5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "33b194c3aa20c5771628bda00565b2eb3d67eb81415cd620ff2ac13d9837b1ce",
+      "path": "packages/hua-dot-mcp/src/flutter-wire.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "33b194c3aa20c5771628bda00565b2eb3d67eb81415cd620ff2ac13d9837b1ce"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "870d8db6536464ef19358737e4ff7193afa211d380ee8ff3f525c5e530ac147b",
+      "path": "packages/hua-dot-mcp/src/index.ts",
+      "publicBaseSha256": "65bf2439de17b8bd2f2f40be9eda4b901522c32fb8c1a661ecb72c8a73e55702",
+      "sourceSha256": "870d8db6536464ef19358737e4ff7193afa211d380ee8ff3f525c5e530ac147b"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "2126da899c21c4e5a21b8b02ea0dc5e76b09fbbd7957a6812b87397493f4ffa3",
+      "path": "packages/hua-dot-mcp/src/server-info.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "2126da899c21c4e5a21b8b02ea0dc5e76b09fbbd7957a6812b87397493f4ffa3"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "2ecfb929098cf922fe7518af8a01feb4d341c8b413cd619c671d2d4bc1213303",
+      "path": "packages/hua-dot-mcp/tsconfig.json",
+      "publicBaseSha256": "2ecfb929098cf922fe7518af8a01feb4d341c8b413cd619c671d2d4bc1213303",
+      "sourceSha256": "2ecfb929098cf922fe7518af8a01feb4d341c8b413cd619c671d2d4bc1213303"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "build",
+      "outputSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324",
+      "path": "packages/hua-dot-mcp/vitest.config.ts",
+      "publicBaseSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324",
+      "sourceSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324"
+    }
+  ],
+  "schema": "hua-dot-mcp-source-authority.v1",
+  "sourceAuthority": {
+    "commit": "19385e52e2f3694eb06fb15f2e13d5cce3270280",
+    "packageTree": "10aa33008bd5c46d141a1ad2dbc14d20f62a2de2",
+    "tree": "7ab93813e0e098c98379460be4acf3016e61a8d1"
+  }
+}

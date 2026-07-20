@@ -8,11 +8,13 @@ import {
   DOT_CAPABILITY_CATEGORIES,
   DOT_CAPABILITY_LEVELS,
 } from "./capabilities";
+import {
+  DOT_FLUTTER_WIRE_BREAKPOINTS,
+  runDotFlutterWireTool,
+} from "./flutter-wire";
+import { DOT_MCP_SERVER_INFO } from "./server-info";
 
-const server = new McpServer({
-  name: "dot-mcp",
-  version: "0.1.0",
-});
+const server = new McpServer(DOT_MCP_SERVER_INFO);
 
 type DotTarget = "web" | "native" | "flutter";
 type DotBreakpoint = "sm" | "md" | "lg" | "xl" | "2xl";
@@ -913,6 +915,29 @@ server.tool(
       };
     }
   },
+);
+
+server.registerTool(
+  "dot_flutter_wire",
+  {
+    description:
+      "Produce the canonical versioned Flutter recipe wire bytes. This returns recipe data only; it does not prove a Dart runtime, widget, renderer, or device parity.",
+    inputSchema: z
+      .object({
+        input: z
+          .string()
+          .describe(
+            "Space-separated dot utility string for the fixed Flutter recipe target",
+          ),
+        dark: z.boolean().optional().describe("Apply dark mode styles"),
+        breakpoint: z
+          .enum(DOT_FLUTTER_WIRE_BREAKPOINTS)
+          .optional()
+          .describe("Active breakpoint for responsive styles"),
+      })
+      .strict(),
+  },
+  async (args) => runDotFlutterWireTool(args),
 );
 
 server.tool(

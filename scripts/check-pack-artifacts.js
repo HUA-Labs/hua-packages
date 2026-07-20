@@ -82,6 +82,26 @@ if (dotLspAuthorityResult.status !== 0) {
   process.exit(1);
 }
 
+const dotMcpAuthorityChecker = path.join(
+  __dirname,
+  "check-dot-mcp-source-authority.mjs",
+);
+const dotMcpAuthorityResult = spawnSync(
+  process.execPath,
+  [dotMcpAuthorityChecker],
+  {
+    cwd: path.join(__dirname, ".."),
+    encoding: "utf8",
+  },
+);
+
+if (dotMcpAuthorityResult.status !== 0) {
+  process.stdout.write(dotMcpAuthorityResult.stdout || "");
+  process.stderr.write(dotMcpAuthorityResult.stderr || "");
+  console.error("Pack artifact check blocked by Dot MCP source authority.");
+  process.exit(1);
+}
+
 const allowedSourcePayloads = new Map([
   ["create-hua", ["package/templates/"]],
   ["@hua-labs/hua", ["package/.hua-agent-docs/"]],
@@ -344,6 +364,22 @@ for (const tarball of tarballs) {
       process.stdout.write(artifactAuthority.stdout || "");
       process.stderr.write(artifactAuthority.stderr || "");
       console.error("Pack artifact check blocked by Dot LSP tar authority.");
+      process.exit(1);
+    }
+  }
+  if (pkg.name === "@hua-labs/dot-mcp") {
+    const artifactAuthority = spawnSync(
+      process.execPath,
+      [dotMcpAuthorityChecker, "--tarball", path.resolve(tarball)],
+      {
+        cwd: path.join(__dirname, ".."),
+        encoding: "utf8",
+      },
+    );
+    if (artifactAuthority.status !== 0) {
+      process.stdout.write(artifactAuthority.stdout || "");
+      process.stderr.write(artifactAuthority.stderr || "");
+      console.error("Pack artifact check blocked by Dot MCP tar authority.");
       process.exit(1);
     }
   }

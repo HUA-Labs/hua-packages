@@ -1,6 +1,6 @@
 # @hua-labs/dot-mcp
 
-MCP (Model Context Protocol) server for the dot style engine — enables AI assistants to resolve, explain, complete, and validate dot utility strings.
+MCP (Model Context Protocol) server for the dot style engine — enables AI assistants to resolve, explain, complete, validate, and produce canonical Flutter recipe wire data from dot utility strings.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/dot-mcp.svg)](https://www.npmjs.com/package/@hua-labs/dot-mcp)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot-mcp.svg)](https://www.npmjs.com/package/@hua-labs/dot-mcp)
@@ -9,10 +9,15 @@ MCP (Model Context Protocol) server for the dot style engine — enables AI assi
 
 ## Features
 
-- **stdio MCP server for resolving, explaining, completing, and validating dot utilities**
-- **Target-aware web, native, and Flutter style projections**
-- **Capability catalog queries via dot_capabilities**
-- **CLI-first package surface through the dot-mcp binary**
+- **dot_resolve — convert utility strings to style objects (web CSSProperties, RN StyleSheet, Flutter recipe)**
+- **dot_explain — resolve + capability report (dropped/approximated properties per target)**
+- **dot_flutter_wire — produce the canonical versioned Flutter recipe wire bytes owned by @hua-labs/dot/flutter**
+- **dot_complete — autocomplete suggestions with category labels (prefix + substring matching)**
+- **dot_complete authority — package-local bounded completion catalog, not the resolver or token SSOT**
+- **dot_capabilities — query the package-owned AX capability catalog without resolving styles**
+- **dot_validate — check utility strings for unrecognized tokens**
+- **Cross-platform support — web, native (React Native), and flutter targets**
+- **MCP error boundary — SDK or schema validation can fail before a registered handler; handler error text is not universal**
 
 ## Installation
 
@@ -23,14 +28,104 @@ pnpm add @hua-labs/dot-mcp
 ## Quick Start
 
 ```bash
+# Install and run as MCP server
 npm install -g @hua-labs/dot-mcp
 dot-mcp
 
+# Or use with npx
+npx @hua-labs/dot-mcp
+
+# Claude Desktop config (~/.claude/claude_desktop_config.json):
+{
+  "mcpServers": {
+    "dot": {
+      "command": "npx",
+      "args": ["@hua-labs/dot-mcp"]
+    }
+  }
+}
+
 ```
 
-## Documentation
+## API
 
-- [Detailed Guide](./DETAILED_GUIDE.md)
+| Export | Type | Description |
+|--------|------|-------------|
+| `dot_resolve` | function | Resolve a dot utility string into a platform-specific style object. Params: input, target, dark, and breakpoint. |
+| `dot_explain` | function | Resolve + return capability report showing dropped/approximated properties for the target platform. |
+| `dot_flutter_wire` | function | Produce the canonical Flutter recipe wire string. Params: input, dark?, breakpoint?. Flutter is fixed; target selectors and other unknown members are rejected. |
+| `dot_complete` | function | Get autocomplete suggestions for a partial token. Params: partial (string), limit? (number, default 20). |
+| `dot_capabilities` | function | Query the package-owned dot AX capability catalog. Params: target?, category?, level?, family?, limit?, includeProperties?, includeExamples?, includeComposition?. |
+| `dot_validate` | function | Validate a utility string — returns `{ valid, errors[], resolved_count }`. |
+
+## Detailed Guide
+
+[Detailed Guide](./DETAILED_GUIDE.md) — Tool contracts, Flutter wire delegation, completion boundaries, and MCP error handling.
+
+The Detailed Guide is included in the package tarball.
+
+## Package Surface
+
+`@hua-labs/dot-mcp` is installed and executed as a CLI/MCP server package.
+Its public package surface is the `dot-mcp` binary, which exposes MCP
+tools over stdio. The package does not publish a stable JavaScript import
+API or TypeScript type surface; tool contracts are documented as MCP
+runtime capabilities.
+
+## Tool Authority Boundaries
+
+`dot_flutter_wire` imports `createFlutterRecipeWire` and
+`serializeFlutterRecipeWire` from `@hua-labs/dot/flutter`; the Dot Flutter
+entry owns the executable recipe schema and canonical bytes.
+
+`dot_complete` reads a package-local bounded completion catalog. That
+catalog supports MCP suggestions only and is not the resolver or token SSOT.
+
+SDK or schema validation can fail before a registered handler runs. Those
+failures use the MCP SDK's protocol envelope. Handler-owned failures use
+the bounded text/error shapes implemented by the individual tool; neither
+boundary is a universal response-wrapper or `Error: ` prefix guarantee.
+
+## Tool Examples
+
+**dot_resolve:**
+```json
+{ "input": "p-4 flex items-center bg-blue-500", "target": "web" }
+→ { "padding": "16px", "display": "flex", "alignItems": "center", "backgroundColor": "#3b82f6" }
+```
+
+**dot_explain (native target):**
+```json
+{ "input": "p-4 blur-md grid", "target": "native" }
+→ { "styles": {...}, "report": { "_dropped": ["filter", "gridTemplateColumns"], "_capabilities": {...} } }
+```
+
+**dot_flutter_wire:**
+```json
+{ "input": "p-4 cursor-pointer", "dark": false, "breakpoint": "md" }
+→ "<canonical @hua-labs/dot/flutter recipe wire JSON>"
+```
+
+The exact wire schema, version, recipe, and metadata fields are owned by
+the exported `createFlutterRecipeWire` and `serializeFlutterRecipeWire`
+helpers from `@hua-labs/dot/flutter`. This MCP tool returns those exact
+serialized bytes; it does not implement or prove a Dart runtime, Flutter
+widget, renderer, or device-parity path.
+
+The input object is strict. `target` and every other unknown member fail
+MCP input validation instead of being stripped or ignored.
+
+**dot_validate:**
+```json
+{ "input": "p-4 bg-bogus flex" }
+→ { "valid": false, "errors": ["bg-bogus"], "resolved_count": 2 }
+```
+
+**dot_capabilities:**
+```json
+{ "family": "ring", "includeComposition": true }
+→ { "sourceExport": "getDotAxCatalog", "entries": [{ "id": "ring", "composition": { "kind": "finalized-style", ... } }] }
+```
 
 ## Related Packages
 
