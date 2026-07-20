@@ -335,6 +335,7 @@ test("a self-consistent platform semantic digest drift rejects", () => {
     row.sourceSha256 = createHash("sha256")
       .update("foreign platform semantic authority")
       .digest("hex");
+    row.outputSha256 = row.sourceSha256;
     config.mapDigest = digestCanonical(config.rows);
   });
   try {
