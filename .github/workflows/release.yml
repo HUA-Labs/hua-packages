@@ -22,7 +22,7 @@ jobs:
       claimed: ${{ steps.release-plan.outputs.resume }}
       claim_head: ${{ github.sha }}
       source_head: ${{ steps.release-plan.outputs.claim_source_head }}
-      artifact_name: hua-release-${{ steps.release-plan.outputs.claim_run_id }}
+      artifact_name: hua-release-${{ steps.release-plan.outputs.artifact_manifest_sha256 }}
       artifact_run_id: ${{ steps.release-plan.outputs.claim_run_id }}
 
     steps:
@@ -91,9 +91,10 @@ jobs:
         if: steps.release-plan.outputs.status == 'planned'
         uses: actions/upload-artifact@v4
         with:
-          name: hua-release-${{ github.run_id }}
+          name: hua-release-${{ steps.artifact-pack.outputs.artifact_manifest_sha256 }}
           path: ${{ steps.artifact-pack.outputs.artifact_dir }}
           if-no-files-found: error
+          overwrite: true
           retention-days: 7
 
       - name: Claim exact artifact-bound release
@@ -111,12 +112,14 @@ jobs:
 
   publish:
     needs: prepare
-    if: needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1
+    if: needs.prepare.outputs.claimed == 'true'
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       id-token: write
+    outputs:
+      published_artifact_name: ${{ steps.safe-publish.outputs.artifact_name }}
 
     steps:
       - name: Checkout exact pushed claim
@@ -168,11 +171,12 @@ jobs:
           trap - EXIT
           test ! -e "$npmrc"
           echo "published_path=$published" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=hua-published-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
 
       - name: Upload sanitized exact published set
         uses: actions/upload-artifact@v4
         with:
-          name: hua-published-${{ github.run_id }}
+          name: ${{ steps.safe-publish.outputs.artifact_name }}
           path: ${{ steps.safe-publish.outputs.published_path }}
           if-no-files-found: error
           retention-days: 1
@@ -205,7 +209,7 @@ jobs:
       - name: Download sanitized exact published set
         uses: actions/download-artifact@v5
         with:
-          name: hua-published-${{ github.run_id }}
+          name: ${{ needs.publish.outputs.published_artifact_name }}
           path: ${{ runner.temp }}/hua-published
 
       - name: Check exact published-set npm provenance and close exact published plan

@@ -1,7 +1,7 @@
 {
   "packages": [
     {
-      "eligibility": "blocked",
+      "eligibility": "eligible",
       "expectedManifest": {
         "private": false,
         "publishConfig": {
@@ -11,7 +11,7 @@
       },
       "name": "@hua-labs/dot",
       "path": "packages/hua-dot",
-      "reason": "release-mode-no-publish",
+      "reason": "active-public",
       "release": {
         "authority": "hua-packages",
         "channel": "npm-public",
@@ -20,7 +20,7 @@
       }
     },
     {
-      "eligibility": "blocked",
+      "eligibility": "eligible",
       "expectedManifest": {
         "private": false,
         "publishConfig": {
@@ -30,7 +30,7 @@
       },
       "name": "@hua-labs/dot-aot",
       "path": "packages/hua-dot-aot",
-      "reason": "release-mode-no-publish",
+      "reason": "active-public",
       "release": {
         "authority": "hua-packages",
         "channel": "npm-public",

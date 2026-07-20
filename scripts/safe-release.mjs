@@ -16,6 +16,7 @@ import {
   realpathSync,
   renameSync,
   rmSync,
+  writeFileSync,
   writeSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -49,6 +50,11 @@ const GITHUB_OUTPUT_MAX_BYTES = 1024 * 1024;
 const ARTIFACT_MANIFEST_MAX_BYTES = 2 * 1024 * 1024;
 const ARTIFACT_MAX_BYTES = 128 * 1024 * 1024;
 const ARTIFACT_TOTAL_MAX_BYTES = 512 * 1024 * 1024;
+const REGISTRY_OUTPUT_MAX_BYTES = 64 * 1024;
+const CONSUMER_OUTPUT_MAX_BYTES = 2 * 1024 * 1024;
+const REGISTRY_OBSERVATION_ATTEMPTS = 12;
+const REGISTRY_OBSERVATION_DELAY_MS = 10000;
+const PROVENANCE_PREDICATE = "https://slsa.dev/provenance/v1";
 const MAX_JSON_DEPTH = 32;
 const MAX_JSON_NODES = 50000;
 const MAX_STRING_BYTES = 8 * 1024;
@@ -331,6 +337,10 @@ export function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
 
+function sha512Integrity(bytes) {
+  return `sha512-${createHash("sha512").update(bytes).digest("base64")}`;
+}
+
 function sameIdentity(left, right) {
   return (
     left.dev === right.dev &&
@@ -433,7 +443,7 @@ function normalizeReleaseAuthority(value) {
 }
 
 function derivedEligibility(release) {
-  return release.mode === "public-npm" &&
+  return (release.mode === "public-npm" || release.mode === "no-publish") &&
     release.intent === "active-public" &&
     release.authority === "hua-packages" &&
     release.channel === "npm-public"
@@ -442,16 +452,7 @@ function derivedEligibility(release) {
 }
 
 function allowsEmptyManifestRefresh(policyEntry) {
-  if (policyEntry.eligibility === "eligible") return true;
-  const { release, expectedManifest } = policyEntry;
-  return (
-    release.mode === "no-publish" &&
-    release.intent === "active-public" &&
-    release.authority === "hua-packages" &&
-    release.channel === "npm-public" &&
-    expectedManifest.private === false &&
-    expectedManifest.publishConfig !== null
-  );
+  return policyEntry.eligibility === "eligible";
 }
 
 function assertSortedUnique(records, property, code) {
@@ -586,7 +587,7 @@ function normalizeManifest(value, label) {
     value.publishConfig === undefined
       ? null
       : validatePublishConfig(value.publishConfig, `${label}-publish-config`);
-  const dependencyNames = new Set();
+  const dependencyRecords = [];
   for (const field of ["dependencies", "optionalDependencies"]) {
     const dependencies = value[field];
     if (dependencies === undefined) continue;
@@ -602,18 +603,18 @@ function normalizeManifest(value, label) {
         /^.{1,512}$/u,
         `${label}-${field}-spec`,
       );
-      if (dependencySpec.startsWith("workspace:")) {
-        dependencyNames.add(dependencyName);
-      }
+      dependencyRecords.push({
+        name: dependencyName,
+        workspaceSpecifier: dependencySpec.startsWith("workspace:"),
+      });
     }
   }
-  const workspaceDependencies = [...dependencyNames].sort(compareUtf8);
   return {
     name,
     version,
     private: isPrivate,
     publishConfig,
-    workspaceDependencies,
+    dependencyRecords,
   };
 }
 
@@ -641,7 +642,7 @@ export function discoverWorkspaceManifests(root) {
       version: manifest.version,
       private: manifest.private,
       publishConfig: manifest.publishConfig,
-      workspaceDependencies: manifest.workspaceDependencies,
+      dependencyRecords: manifest.dependencyRecords,
       sha256: sha256(bytes),
     });
   }
@@ -649,6 +650,21 @@ export function discoverWorkspaceManifests(root) {
   assertSortedUnique(records, "name", "workspace-name-order");
   assertNoNormalizedCollisions(records, "name", "workspace-name-collision");
   assertNoNormalizedCollisions(records, "path", "workspace-path-collision");
+  const workspaceNames = new Set(records.map((record) => record.name));
+  for (const record of records) {
+    record.workspaceDependencies = [
+      ...new Set(
+        record.dependencyRecords
+          .filter(
+            (dependency) =>
+              dependency.workspaceSpecifier ||
+              workspaceNames.has(dependency.name),
+          )
+          .map((dependency) => dependency.name),
+      ),
+    ].sort(compareUtf8);
+    delete record.dependencyRecords;
+  }
   return records;
 }
 
@@ -1558,6 +1574,29 @@ function readPackedPackageManifest(execFile, root, artifactPath) {
     label: "artifact-package-manifest",
   });
   assert(isRecord(value), "artifact-package-manifest-shape");
+  const dependencyFields = {};
+  for (const field of ["dependencies", "optionalDependencies"]) {
+    const dependencies = value[field];
+    if (dependencies === undefined) {
+      dependencyFields[field] = {};
+      continue;
+    }
+    assert(isRecord(dependencies), `artifact-package-${field}-shape`);
+    const normalized = {};
+    for (const dependencyName of Object.keys(dependencies).sort(compareUtf8)) {
+      stringValue(
+        dependencyName,
+        PACKAGE_NAME_PATTERN,
+        `artifact-package-${field}-name`,
+      );
+      normalized[dependencyName] = stringValue(
+        dependencies[dependencyName],
+        /^.{1,512}$/u,
+        `artifact-package-${field}-spec`,
+      );
+    }
+    dependencyFields[field] = normalized;
+  }
   return {
     name: stringValue(
       value.name,
@@ -1569,7 +1608,37 @@ function readPackedPackageManifest(execFile, root, artifactPath) {
       SEMVER_PATTERN,
       "artifact-package-version",
     ),
+    ...dependencyFields,
   };
+}
+
+function assertPackedWorkspaceDependencies(
+  packageManifest,
+  dependencies,
+  workspaceNames,
+) {
+  const declarations = new Map();
+  for (const field of ["dependencies", "optionalDependencies"]) {
+    for (const [name, specifier] of Object.entries(packageManifest[field])) {
+      if (!workspaceNames.has(name)) continue;
+      assert(
+        !declarations.has(name),
+        "artifact-package-dependency-declaration",
+      );
+      declarations.set(name, specifier);
+    }
+  }
+  assert(
+    declarations.size === dependencies.length &&
+      dependencies.every((dependency) => declarations.has(dependency.name)),
+    "artifact-package-dependency-set",
+  );
+  for (const dependency of dependencies) {
+    assert(
+      declarations.get(dependency.name) === dependency.version,
+      "artifact-package-dependency-version",
+    );
+  }
 }
 
 export function readArtifactBundle(options = {}) {
@@ -1664,13 +1733,22 @@ export function readArtifactBundle(options = {}) {
       packageManifest.version === artifact.version,
       "artifact-package-version-drift",
     );
+    assertPackedWorkspaceDependencies(
+      packageManifest,
+      artifactWorkspaceDependencies(options.releaseState, artifact),
+      new Set(options.releaseState.manifests.map((entry) => entry.name)),
+    );
     const after = readRegularFile(
       artifactPath,
       ARTIFACT_MAX_BYTES,
       "artifact-tarball-postcheck",
     );
     assert(before.equals(after), "artifact-tarball-drift");
-    return { ...artifact, artifactPath };
+    return {
+      ...artifact,
+      artifactPath,
+      integrity: sha512Integrity(before),
+    };
   });
   return { manifest, manifestBytes, artifactManifestSha256, artifacts };
 }
@@ -2540,6 +2618,271 @@ export function validatePublishedPackages(value, releaseState) {
   return { schemaVersion: 1, publishedPackages };
 }
 
+function normalizeRegistryObservation(value) {
+  exactKeys(value, ["status"], "publish-registry-observation-shape");
+  assert(
+    value.status === "absent" ||
+      value.status === "pending" ||
+      value.status === "verified" ||
+      value.status === "conflict",
+    "publish-registry-observation-status",
+  );
+  return { status: value.status };
+}
+
+function registryViewObservation({ artifact, execFile, root }) {
+  const specifier = `${artifact.name}@${artifact.version}`;
+  let output;
+  try {
+    output = execFile(
+      "npm",
+      [
+        "view",
+        specifier,
+        "name",
+        "version",
+        "dist.integrity",
+        "dist.attestations.provenance.predicateType",
+        "--json",
+        "--registry",
+        "https://registry.npmjs.org/",
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        maxBuffer: REGISTRY_OUTPUT_MAX_BYTES,
+        timeout: 10000,
+      },
+    );
+  } catch (error) {
+    const code = typeof error?.code === "string" ? error.code : "";
+    const stderr =
+      typeof error?.stderr === "string"
+        ? error.stderr.slice(0, REGISTRY_OUTPUT_MAX_BYTES)
+        : Buffer.isBuffer(error?.stderr)
+          ? error.stderr.subarray(0, REGISTRY_OUTPUT_MAX_BYTES).toString("utf8")
+          : "";
+    return {
+      status:
+        code === "E404" || /(?:^|\s)E404(?:\s|$)/u.test(stderr)
+          ? "absent"
+          : "pending",
+    };
+  }
+  if (typeof output !== "string") return { status: "pending" };
+  let value;
+  try {
+    value = parseStrictJsonBytes(Buffer.from(output), {
+      maxBytes: REGISTRY_OUTPUT_MAX_BYTES,
+      label: "publish-registry",
+    });
+  } catch {
+    return { status: "pending" };
+  }
+  if (!isRecord(value)) return { status: "pending" };
+  const allowedKeys = new Set([
+    "name",
+    "version",
+    "dist.integrity",
+    "dist.attestations.provenance.predicateType",
+  ]);
+  if (Object.keys(value).some((key) => !allowedKeys.has(key))) {
+    return { status: "pending" };
+  }
+  if (value.name !== artifact.name || value.version !== artifact.version) {
+    return { status: "conflict" };
+  }
+  const integrity = value["dist.integrity"];
+  if (integrity === undefined) return { status: "pending" };
+  if (integrity !== artifact.integrity) return { status: "conflict" };
+  const predicate = value["dist.attestations.provenance.predicateType"];
+  if (predicate === undefined) return { status: "pending" };
+  return {
+    status: predicate === PROVENANCE_PREDICATE ? "verified" : "conflict",
+  };
+}
+
+function sleepSync(milliseconds) {
+  assert(
+    Number.isSafeInteger(milliseconds) &&
+      milliseconds >= 0 &&
+      milliseconds <= 30000,
+    "publish-registry-delay",
+  );
+  if (milliseconds === 0) return;
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
+
+function observeArtifact(options) {
+  const { artifact, phase, registryObserver, registryAttempts, sleep } =
+    options;
+  assert(
+    Number.isSafeInteger(registryAttempts) &&
+      registryAttempts >= 1 &&
+      registryAttempts <= 20,
+    "publish-registry-attempts",
+  );
+  for (let attempt = 1; attempt <= registryAttempts; attempt += 1) {
+    const observation = normalizeRegistryObservation(
+      registryObserver({ artifact, phase, attempt }),
+    );
+    if (observation.status === "verified") return "verified";
+    if (observation.status === "conflict") {
+      fail("publish-registry-immutable-conflict");
+    }
+    if (phase === "before" && observation.status === "absent") {
+      return "absent";
+    }
+    if (attempt < registryAttempts) sleep(REGISTRY_OBSERVATION_DELAY_MS);
+  }
+  fail("publish-registry-unverified");
+}
+
+function selectedPublishOrder(releaseState, artifacts) {
+  const artifactByName = new Map(
+    artifacts.map((artifact) => [artifact.name, artifact]),
+  );
+  const manifestByName = new Map(
+    releaseState.manifests.map((manifest) => [manifest.name, manifest]),
+  );
+  const selected = new Set(artifactByName.keys());
+  const visited = new Set();
+  const visiting = new Set();
+  const ordered = [];
+  const visit = (name) => {
+    if (visited.has(name)) return;
+    assert(!visiting.has(name), "publish-dependency-cycle");
+    const manifest = manifestByName.get(name);
+    assert(manifest !== undefined, "publish-dependency-manifest");
+    visiting.add(name);
+    for (const dependencyName of manifest.workspaceDependencies) {
+      if (selected.has(dependencyName)) visit(dependencyName);
+    }
+    visiting.delete(name);
+    visited.add(name);
+    const artifact = artifactByName.get(name);
+    assert(artifact !== undefined, "publish-artifact-missing");
+    ordered.push(artifact);
+  };
+  for (const name of [...selected].sort(compareUtf8)) visit(name);
+  return ordered;
+}
+
+function artifactWorkspaceDependencies(releaseState, artifact) {
+  const releaseByName = new Map(
+    releaseState.plan.releases.map((release) => [release.name, release]),
+  );
+  const manifestByName = new Map(
+    releaseState.manifests.map((manifest) => [manifest.name, manifest]),
+  );
+  const manifest = releaseState.manifests.find(
+    (candidate) => candidate.name === artifact.name,
+  );
+  assert(manifest !== undefined, "publish-dependency-manifest");
+  return manifest.workspaceDependencies
+    .map((name) => {
+      const dependencyManifest = manifestByName.get(name);
+      assert(dependencyManifest !== undefined, "publish-dependency-manifest");
+      return {
+        name,
+        version:
+          releaseByName.get(name)?.toVersion ?? dependencyManifest.version,
+      };
+    })
+    .sort((left, right) => compareUtf8(left.name, right.name));
+}
+
+function installedPackageManifestPath(root, packageName) {
+  const segments = packageName.startsWith("@")
+    ? packageName.split("/")
+    : [packageName];
+  return join(root, "node_modules", ...segments, "package.json");
+}
+
+function verifyInstalledConsumer({ artifact, dependencies, execFile }) {
+  const consumerRoot = realpathSync(
+    mkdtempSync(join(tmpdir(), "hua-release-consumer-")),
+  );
+  try {
+    writeFileSync(
+      join(consumerRoot, "package.json"),
+      canonicalJson({
+        name: "hua-release-consumer",
+        private: true,
+        version: "0.0.0",
+      }),
+      { encoding: "utf8", flag: "wx", mode: 0o600 },
+    );
+    try {
+      execFile(
+        "npm",
+        [
+          "install",
+          `${artifact.name}@${artifact.version}`,
+          "--ignore-scripts",
+          "--no-save",
+          "--package-lock=false",
+          "--prefer-online",
+          "--no-audit",
+          "--no-fund",
+          "--registry",
+          "https://registry.npmjs.org/",
+        ],
+        {
+          cwd: consumerRoot,
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          maxBuffer: CONSUMER_OUTPUT_MAX_BYTES,
+          timeout: 120000,
+        },
+      );
+      const installed = parseStrictJsonBytes(
+        readRegularFile(
+          installedPackageManifestPath(consumerRoot, artifact.name),
+          MANIFEST_MAX_BYTES,
+          "publish-consumer-manifest",
+        ),
+        { maxBytes: MANIFEST_MAX_BYTES, label: "publish-consumer-manifest" },
+      );
+      assert(isRecord(installed), "publish-consumer-manifest-shape");
+      assert(
+        installed.name === artifact.name &&
+          installed.version === artifact.version,
+        "publish-consumer-package-drift",
+      );
+      for (const dependency of dependencies) {
+        execFile(
+          "npm",
+          [
+            "ls",
+            `${dependency.name}@${dependency.version}`,
+            "--json",
+            "--depth=Infinity",
+          ],
+          {
+            cwd: consumerRoot,
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "pipe"],
+            maxBuffer: CONSUMER_OUTPUT_MAX_BYTES,
+            timeout: 30000,
+          },
+        );
+      }
+    } catch (error) {
+      if (
+        typeof error?.code === "string" &&
+        error.code.startsWith("publish-consumer-")
+      ) {
+        throw error;
+      }
+      fail("publish-consumer-install");
+    }
+  } finally {
+    rmSync(consumerRoot, { recursive: true, force: true });
+  }
+}
+
 export function runPublish(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
@@ -2583,27 +2926,57 @@ export function runPublish(options = {}) {
     artifactManifestPath: options.artifactManifestPath,
     ...claim,
   });
+  const registryAttempts =
+    options.registryAttempts ?? REGISTRY_OBSERVATION_ATTEMPTS;
+  const registryObserver =
+    options.registryObserver ??
+    ((input) => registryViewObservation({ ...input, execFile, root }));
+  const installedConsumerVerifier =
+    options.installedConsumerVerifier ??
+    ((input) => verifyInstalledConsumer({ ...input, execFile }));
+  const sleep = options.sleep ?? sleepSync;
   const publishedPackages = [];
-  for (const artifact of bundle.artifacts) {
+  for (const artifact of selectedPublishOrder(releaseState, bundle.artifacts)) {
     const artifactPath = artifact.artifactPath;
-    execFile(
-      "npm",
-      [
-        "publish",
-        artifactPath,
-        "--ignore-scripts",
-        "--access",
-        "public",
-        "--provenance",
-      ],
-      {
-        cwd: root,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      },
-    );
+    const initial = observeArtifact({
+      artifact,
+      phase: "before",
+      registryObserver,
+      registryAttempts,
+      sleep,
+    });
+    if (initial === "absent") {
+      execFile(
+        "npm",
+        [
+          "publish",
+          artifactPath,
+          "--ignore-scripts",
+          "--access",
+          "public",
+          "--provenance",
+        ],
+        {
+          cwd: root,
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        },
+      );
+      observeArtifact({
+        artifact,
+        phase: "after",
+        registryObserver,
+        registryAttempts,
+        sleep,
+      });
+    }
+    installedConsumerVerifier({
+      artifact,
+      dependencies: artifactWorkspaceDependencies(releaseState, artifact),
+    });
     publishedPackages.push({ name: artifact.name, version: artifact.version });
   }
+  publishedPackages.sort((left, right) => compareUtf8(left.name, right.name));
   return validatePublishedPackages(
     { schemaVersion: 1, publishedPackages },
     releaseState,
