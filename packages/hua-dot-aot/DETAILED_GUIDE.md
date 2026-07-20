@@ -22,54 +22,54 @@ Build-time static extraction for @hua-labs/dot.
 
 The extraction engine is the central piece of `@hua-labs/dot-aot`. At its core it is a two-step pipeline:
 
-1. **Scan** — `extractStaticCalls` walks the source string and identifies all call sites that qualify for static replacement. It returns an array of `ExtractedCall` objects sorted last-to-first by source position so that downstream replacements never shift earlier offsets.
+1. **Authorize and extract** — `extractStaticCalls` parses the source module, identifies exact named `dot` imports from `@hua-labs/dot`, and admits only statically safe calls owned by those bindings. It returns `ExtractedCall` objects sorted last-to-first so later replacements never shift earlier offsets.
 2. **Replace** — `transformSource` iterates the extracted calls and splices each one out of the source, substituting the pre-computed object literal string produced by `styleToObjectLiteral`.
 
-Both the Vite plugin and the Babel plugin are thin adapters that route file source text through this pipeline. The core logic lives in a single, framework-agnostic extraction module.
+The Vite plugin uses the core parser-backed transform. The Babel plugin performs the same static-value checks through Babel's own AST and lexical binding authority before replacing a call with an object expression.
 
-### Regex-Based Scanning
+### Parser And Binding Authority
 
-`extractStaticCalls` uses regular expressions to locate candidate call sites rather than a full parser. The regex approach is intentional: it is significantly faster than parsing an AST for every file and it avoids a hard compile-time dependency on any specific JS parser version.
+`extractStaticCalls` parses JavaScript/TypeScript, including JSX, before it considers a call. Matching text is never sufficient authority. A candidate local name must resolve from a runtime named import of the exact `dot` export from `@hua-labs/dot`.
 
-The scanner applies the following heuristics to decide whether a call is extractable:
+Configured `functionNames` are an allowlist for local aliases, not a global function-name list. For example, `functionNames: ["s"]` can admit `import { dot as s } from "@hua-labs/dot"`; it cannot admit a local `s`, a foreign import, or `namespace.dot`.
 
-- The call must match one of the configured function names (default: `dot`).
-- The entire argument list must be statically resolvable: string literals only, no identifiers or expressions.
-- The call must not appear inside a comment (`//`, `/* */`), inside another string literal, inside a template literal `` ` `` expression, or as the target of a chained method call (e.g. `.map(dot)`).
+The core/Vite path deliberately fails closed for a configured local name when the module also declares or shadows that name. Babel uses its scope binding for each call. Both paths leave namespace imports, member calls, type-only imports, constructors, bare globals, and ambiguous bindings at runtime.
 
 ### Static Analysis Limitations
 
-Because the scanner does not build a full AST, there are categories of calls it deliberately skips rather than risk incorrect output:
+Only the following bounded call shape is eligible. Everything else remains at runtime:
 
 | Pattern                                           | Behaviour       |
 | ------------------------------------------------- | --------------- |
 | Template literal argument: ``dot(`p-${size}`)``   | Left as runtime |
+| No-substitution template: ``dot(`p-4`)``          | Left as runtime |
 | Identifier argument: `dot(className)`             | Left as runtime |
 | Dynamic options: `dot("p-4", { breakpoint: bp })` | Left as runtime |
-| Chained: `tokens.map(dot)`                        | Left as runtime |
+| Namespace/member call: `ns.dot("p-4")`            | Left as runtime |
+| Shadowed local binding: `function f(dot) { ... }` | Left as runtime |
 | Nested call: `dot(getClass())`                    | Left as runtime |
 
-All unresolvable calls are silently left intact. There is no error or warning — the call simply continues to run at runtime, so the output is always correct even when extraction is partial.
+Malformed modules, unresolvable calls, unsupported option objects, and invalid plugin-level default targets are left intact. Only an absent or explicit `undefined` plugin target defaults to Web; an explicit `null` does not. Strings, comments, regular-expression literals, JSX text, and `new dot(...)` are syntax nodes rather than textual candidates, so they are never partially rewritten.
 
 ### Vite Plugin Lifecycle
 
 `dotAotVite` returns a Vite plugin with `enforce: 'pre'` so it runs before other transform plugins (such as TypeScript or JSX compilers). The transform hook:
 
-1. Checks the file extension against the configured `include`/`exclude` lists. Files that do not match are returned unchanged immediately — this is the fast path that keeps cold-start build times low.
-2. Passes the raw source to `transformSource`.
+1. Removes a Vite query/hash suffix for extension matching, then checks the module pathname against the configured `include`/`exclude` lists. Files that do not match are returned unchanged immediately.
+2. Passes the raw source to the parser-backed `transformSource`.
 3. Returns the mutated code string if any extractions were made, or `null` to signal no change.
 
-Because the plugin runs before JSX compilation, it operates on the original source where `dot()` calls look exactly as the developer wrote them.
+There is no raw identifier prefilter before parsing. The parser remains authoritative, so escaped aliases and valid calls separated by whitespace, comments, or newlines are not skipped. Because the plugin runs before JSX compilation, the core parser must admit the original module before any replacement occurs.
 
 ### Babel Plugin AST Visitor
 
-`dotAotBabel` returns a Babel plugin whose visitor targets `CallExpression` nodes. Unlike the regex engine, the Babel visitor has access to the fully-parsed AST, so it can precisely identify:
+`dotAotBabel` returns a Babel plugin whose visitor targets `CallExpression` nodes. It uses Babel's lexical scope to verify that each callee resolves to the exact named `dot` import from `@hua-labs/dot`, then checks:
 
-- The function name (callee identifier or member expression).
-- Whether every argument is a `StringLiteral` node.
-- Whether option arguments are object expressions with literal values.
+- The callee is an allowed local identifier, not a member expression or constructor.
+- The first argument is exactly one `StringLiteral`.
+- The optional second argument is a flat object containing only literal `target` and/or `dark` values.
 
-When a qualifying node is found, the visitor replaces it with an `ObjectExpression` AST node built from the resolved style object. This makes the Babel plugin suitable for toolchains where source accuracy matters more than raw speed — Metro (React Native) and Next.js both fall into this category.
+When a qualifying node is found, the visitor replaces it with an `ObjectExpression` built from the resolved style object. This entry works in Metro and other pipelines that explicitly execute Babel plugins. It is not an SWC plugin.
 
 ---
 
@@ -128,7 +128,7 @@ module.exports = {
 
 ### Next.js
 
-Next.js uses Babel by default (Pages Router) and SWC by default (App Router). Use the Babel plugin for both setups.
+The Babel entry runs in Next.js only when the project explicitly opts into a Babel configuration. A project using the default SWC pipeline does not execute this plugin.
 
 ```js
 // .babelrc or babel.config.js
@@ -138,7 +138,7 @@ module.exports = {
 };
 ```
 
-> Note: Using a custom Babel config in Next.js disables the built-in SWC compiler. This is an accepted trade-off for projects that require Babel plugins.
+> Note: Opting into a custom Babel config changes the Next.js compiler path. Confirm that trade-off against the Next.js version used by the application; `@hua-labs/dot-aot` does not patch or emulate SWC.
 
 ---
 
@@ -148,10 +148,11 @@ module.exports = {
 
 A `dot()` call is extracted at build time when all of the following are true:
 
-1. The function name matches (default `dot`, configurable via `functionNames`).
+1. The callee is a runtime named `dot` import from exact package `@hua-labs/dot`; `functionNames` may additionally allow that import's local alias.
 2. The first argument is a plain string literal — no template literals, no concatenation.
-3. If a second argument (options object) is present, every value in it is a literal: string, boolean, or number.
-4. The `target` option — if present — is a string literal (`"web"`, `"native"`, or `"flutter"`).
+3. There are no more than two arguments.
+4. If a second argument is present, it is a flat object containing only exact `target` and/or `dark` keys, without duplicates, computed keys, shorthand, or spreads.
+5. `target` is one of `"web"`, `"native"`, or `"flutter"`, and `dark` is a boolean literal.
 
 ```ts
 // Extracted — static string, static options
@@ -174,6 +175,12 @@ const style = dot("p-4", { breakpoint: currentBreakpoint });
 
 // NOT extracted — chained method
 const styles = tokens.map(dot);
+
+// NOT extracted — matching name without exact import authority
+function dot(value: string) {
+  return value;
+}
+const local = dot("p-4");
 ```
 
 The `breakpoint` option is always left as runtime because it depends on the current viewport state, which is inherently dynamic and cannot be resolved at build time.
@@ -196,7 +203,7 @@ If `target` is not present in the call site options, the value from `ExtractOpti
 
 ### `extractStaticCalls`
 
-Scans a source string and returns all extractable `dot()` calls sorted last-to-first by source position.
+Parses a source module and returns binding-authorized, statically extractable `dot()` calls sorted last-to-first by source position. Parse failure or ambiguous ownership returns an empty array.
 
 ```ts
 import { extractStaticCalls } from "@hua-labs/dot-aot";
@@ -209,10 +216,10 @@ const extractions = extractStaticCalls(sourceCode, {
 
 **Options (`ExtractOptions`):**
 
-| Property        | Type                             | Default   | Description                |
-| --------------- | -------------------------------- | --------- | -------------------------- |
-| `functionNames` | `string[]`                       | `["dot"]` | Function names to scan for |
-| `target`        | `'web' \| 'native' \| 'flutter'` | `"web"`   | Default output target      |
+| Property        | Type                             | Default   | Description                                                      |
+| --------------- | -------------------------------- | --------- | ---------------------------------------------------------------- |
+| `functionNames` | `string[]`                       | `["dot"]` | Allowed local names that must alias the exact named `dot` import |
+| `target`        | `'web' \| 'native' \| 'flutter'` | `"web"`   | Default output target                                            |
 
 **Returns:** `ExtractedCall[]` sorted last-to-first (safe for sequential splice operations).
 
@@ -233,7 +240,7 @@ const result = transformSource(sourceCode, {
 if (result !== null) {
   const { code, extractions } = result;
   // code: transformed source string
-  // extractions: ExtractedCall[] that were applied
+  // extractions: number of calls that were applied
 }
 ```
 
@@ -248,10 +255,7 @@ Serializes a resolved style object to a JavaScript object literal string, with w
 ```ts
 import { styleToObjectLiteral } from "@hua-labs/dot-aot";
 
-const literal = styleToObjectLiteral(
-  { padding: "16px", display: "flex" },
-  "web",
-);
+const literal = styleToObjectLiteral({ padding: "16px", display: "flex" });
 // → '({ padding: "16px", display: "flex" })'
 ```
 
@@ -324,7 +328,7 @@ import type {
 type ExtractedCall = {
   start: number; // Start offset in source string
   end: number; // End offset in source string
-  input: string; // Original call site source text
+  input: string; // Static Dot utility string
   options?: DotOptions; // Resolved options from the call
   result: Record<string, unknown>; // Pre-computed style object
 };
@@ -342,17 +346,23 @@ type ExtractOptions = {
 
 ### Custom Function Names
 
-If your codebase aliases `dot` to a different name, configure `functionNames`:
+If your codebase aliases the exact named `dot` import, configure that local name in `functionNames`:
 
 ```ts
 // vite.config.ts
-dotAot({ functionNames: ["dot", "s", "style"] })[
-  // babel.config.js
-  ("@hua-labs/dot-aot/babel", { functionNames: ["dot", "css"] })
-];
+dotAot({ functionNames: ["dot", "s"] });
+
+// application source
+import { dot as s } from "@hua-labs/dot";
+const style = s("p-4");
+
+// babel.config.js
+module.exports = {
+  plugins: [["@hua-labs/dot-aot/babel", { functionNames: ["dot", "s"] }]],
+};
 ```
 
-Any call matching one of the names and satisfying static-resolvability will be extracted.
+A matching local helper, foreign import, namespace member, or shadowed alias is not extracted.
 
 ### Include / Exclude Patterns
 
@@ -493,7 +503,7 @@ export default function Page() {
 }
 ```
 
-> Because this extraction happens in the Babel transform step, it works with both Pages Router and App Router. Server Components are fully supported — there is no runtime import to tree-shake.
+> This example applies only when the Next.js build actually executes the custom Babel configuration. The package does not claim extraction in the default SWC path.
 
 ### React Native with Metro
 
@@ -543,17 +553,19 @@ const style = dot(cls);
 const style = dot("p-4 flex");
 ```
 
-**Check 2:** Confirm the function name matches `functionNames`. If you aliased `dot`:
+**Check 2:** Confirm both the exact import authority and configured local name. If you aliased `dot`:
 
 ```ts
 import { dot as s } from "@hua-labs/dot";
 
-// Not extracted with default config
+// Not extracted when "s" is not allowed
 const style = s("p-4");
 
 // Fix: add the alias to functionNames
 dotAot({ functionNames: ["dot", "s"] });
 ```
+
+Adding a name does not authorize arbitrary functions with that spelling. The local binding must still be the runtime named `dot` export from exact package `@hua-labs/dot`.
 
 **Check 3:** Ensure the file extension is in the `include` list for the Vite plugin.
 
@@ -598,14 +610,15 @@ const style = isMobile ? mobile : desktop;
 
 ---
 
-### Chained Methods
+### Non-Call And Member Uses
 
-The scanner explicitly skips `dot` when used as a callback or in a method chain:
+Only a direct authorized call is transformed. Callback references, member calls, constructors, and namespace imports remain intact:
 
 ```ts
 // Not extracted
 const styles = classNames.map(dot);
 const style = obj.dot("p-4");
+const instance = new dot("p-4");
 ```
 
 Extract calls explicitly instead:

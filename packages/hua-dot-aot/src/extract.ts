@@ -11,8 +11,9 @@
  * - dotMap() is not extracted (state variants need runtime)
  */
 
-import { dot } from '@hua-labs/dot';
-import type { DotOptions } from '@hua-labs/dot';
+import { parse } from "@babel/parser";
+import { dot } from "@hua-labs/dot";
+import type { DotOptions } from "@hua-labs/dot";
 
 /** A single extraction result */
 export interface ExtractedCall {
@@ -30,109 +31,271 @@ export interface ExtractedCall {
 
 /** Options for the extractor */
 export interface ExtractOptions {
-  /** Function names to extract. Default: ['dot'] */
+  /** Allowed local names for a named `dot` import. Default: ['dot'] */
   functionNames?: string[];
   /** Default target for extraction. Default: 'web' */
-  target?: 'web' | 'native' | 'flutter';
+  target?: "web" | "native" | "flutter";
 }
 
-/**
- * Regex to find dot('string literal') or dot("string literal") calls.
- *
- * Handles:
- *   dot('p-4 bg-red-500')
- *   dot("p-4 bg-red-500")
- *   dot('p-4 bg-red-500', { target: 'web' })
- *
- * Does NOT match:
- *   dot(variable)
- *   dot(`template ${literal}`)
- *   dot('...' + '...')
- *   obj.dot('...') — negative lookbehind blocks [.\w$]
- */
-function buildPattern(fnNames: string[]): RegExp {
-  const names = fnNames.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  return new RegExp(
-    `(?<![\\w$.])(?:${names})\\(\\s*(['"])([^'"]*)\\1\\s*(?:,\\s*(\\{[^}]*\\}))?\\s*\\)`,
-    'g',
-  );
+type AstNode = {
+  type: string;
+  start?: number | null;
+  end?: number | null;
+  [key: string]: unknown;
+};
+
+type ParsedStaticOptions =
+  | { admitted: true; opts: DotOptions }
+  | { admitted: false };
+
+const DOT_IMPORT_SOURCE = "@hua-labs/dot";
+const STATIC_TARGETS = new Set(["web", "native", "flutter"]);
+
+function admitConfiguredTarget(
+  value: unknown,
+): ExtractOptions["target"] | null {
+  if (value === undefined) return "web";
+  if (typeof value !== "string" || !STATIC_TARGETS.has(value)) return null;
+  return value as NonNullable<ExtractOptions["target"]>;
 }
 
-// ---------------------------------------------------------------------------
-// Context detection — skip matches inside strings or comments
-// ---------------------------------------------------------------------------
+const PARSER_PLUGIN_SETS = [
+  ["jsx", "typescript", "decorators"],
+  ["typescript", "decorators"],
+] as const;
 
-/**
- * Check if a match position is inside a string literal or comment.
- * Simple heuristic that works for typical source code.
- */
-function isInsideStringOrComment(source: string, matchIndex: number): boolean {
-  // Get the line containing the match
-  const lineStart = source.lastIndexOf('\n', matchIndex - 1) + 1;
-  const beforeMatch = source.slice(lineStart, matchIndex);
+function parseModule(source: string): AstNode | null {
+  for (const plugins of PARSER_PLUGIN_SETS) {
+    try {
+      return parse(source, {
+        sourceType: "unambiguous",
+        allowAwaitOutsideFunction: true,
+        allowReturnOutsideFunction: true,
+        plugins: [...plugins],
+      }) as unknown as AstNode;
+    } catch {
+      // Try the next bounded parser shape, then fail closed.
+    }
+  }
+  return null;
+}
 
-  // Single-line comment: // appears before match on the same line
-  const commentIdx = beforeMatch.indexOf('//');
-  if (commentIdx !== -1) {
-    // Make sure the // isn't inside a string on this line
-    // Simple check: count quotes before //
-    const beforeComment = beforeMatch.slice(0, commentIdx);
-    const singles = (beforeComment.match(/(?<!\\)'/g) || []).length;
-    const doubles = (beforeComment.match(/(?<!\\)"/g) || []).length;
-    if (singles % 2 === 0 && doubles % 2 === 0) return true;
+function walkAst(value: unknown, visit: (node: AstNode) => void): void {
+  if (!value || typeof value !== "object") return;
+  if (Array.isArray(value)) {
+    for (const item of value) walkAst(item, visit);
+    return;
   }
 
-  // Block comment: last /* before match has no matching */ after it
-  const beforeAll = source.slice(0, matchIndex);
-  const lastBlockOpen = beforeAll.lastIndexOf('/*');
-  const lastBlockClose = beforeAll.lastIndexOf('*/');
-  if (lastBlockOpen > lastBlockClose) return true;
+  const record = value as Record<string, unknown>;
+  if (typeof record.type === "string") visit(record as AstNode);
 
-  // String literal: odd number of unescaped quotes before match on same line
-  let singleQuotes = 0;
-  let doubleQuotes = 0;
-  let backticks = 0;
-  for (let i = 0; i < beforeMatch.length; i++) {
-    if (beforeMatch[i] === '\\') { i++; continue; }
-    if (beforeMatch[i] === "'") singleQuotes++;
-    if (beforeMatch[i] === '"') doubleQuotes++;
-    if (beforeMatch[i] === '`') backticks++;
+  for (const [key, child] of Object.entries(record)) {
+    if (
+      key === "loc" ||
+      key === "start" ||
+      key === "end" ||
+      key === "extra" ||
+      key === "comments" ||
+      key === "tokens" ||
+      key === "errors"
+    ) {
+      continue;
+    }
+    walkAst(child, visit);
   }
-  if (singleQuotes % 2 !== 0 || doubleQuotes % 2 !== 0 || backticks % 2 !== 0) return true;
-
-  return false;
 }
 
-// ---------------------------------------------------------------------------
-// Static options parsing
-// ---------------------------------------------------------------------------
-
-/** Parsed static options from source code */
-interface ParsedStaticOptions {
-  opts: DotOptions;
-  /** Whether extraction should be skipped (e.g., breakpoint present) */
-  skipExtraction: boolean;
+function identifierName(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const node = value as Record<string, unknown>;
+  return node.type === "Identifier" && typeof node.name === "string"
+    ? node.name
+    : null;
 }
 
-/**
- * Try to parse a static options object literal.
- * Only handles simple { key: 'value' } patterns — no expressions.
- *
- * If breakpoint is present, signals to skip extraction (runtime-dependent).
- */
-function parseStaticOptions(str: string): ParsedStaticOptions {
-  const targetMatch = str.match(/target\s*:\s*['"](\w+)['"]/);
-  const darkMatch = str.match(/dark\s*:\s*(true|false)/);
-  const breakpointMatch = str.match(/breakpoint\s*:/);
+function importedName(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const node = value as Record<string, unknown>;
+  if (node.type === "Identifier" && typeof node.name === "string") {
+    return node.name;
+  }
+  if (node.type === "StringLiteral" && typeof node.value === "string") {
+    return node.value;
+  }
+  return null;
+}
 
-  // Breakpoint is inherently dynamic — skip extraction
-  if (breakpointMatch) return { opts: {}, skipExtraction: true };
+function collectPatternNames(value: unknown, names: Set<string>): void {
+  if (!value || typeof value !== "object") return;
+  const node = value as Record<string, unknown>;
+
+  const name = identifierName(node);
+  if (name) {
+    names.add(name);
+    return;
+  }
+
+  switch (node.type) {
+    case "RestElement":
+      collectPatternNames(node.argument, names);
+      return;
+    case "AssignmentPattern":
+      collectPatternNames(node.left, names);
+      return;
+    case "ArrayPattern":
+      collectPatternNames(node.elements, names);
+      return;
+    case "ObjectPattern":
+      collectPatternNames(node.properties, names);
+      return;
+    case "ObjectProperty":
+      collectPatternNames(node.value, names);
+      return;
+    case "TSParameterProperty":
+      collectPatternNames(node.parameter, names);
+      return;
+    default:
+      if (Array.isArray(value)) {
+        for (const item of value) collectPatternNames(item, names);
+      }
+  }
+}
+
+function collectBindingAuthority(
+  ast: AstNode,
+  configuredNames: Set<string>,
+): Set<string> {
+  const authorized = new Set<string>();
+  const conflicting = new Set<string>();
+
+  walkAst(ast, (node) => {
+    const record = node as Record<string, unknown>;
+
+    if (node.type === "ImportDeclaration") {
+      const source = record.source as Record<string, unknown> | undefined;
+      const isDotImport = source?.value === DOT_IMPORT_SOURCE;
+      const declarationTypeOnly = record.importKind === "type";
+      const specifiers = Array.isArray(record.specifiers)
+        ? record.specifiers
+        : [];
+
+      for (const value of specifiers) {
+        if (!value || typeof value !== "object") continue;
+        const specifier = value as Record<string, unknown>;
+        const local = identifierName(specifier.local);
+        if (!local) continue;
+
+        const isAuthorized =
+          isDotImport &&
+          !declarationTypeOnly &&
+          specifier.type === "ImportSpecifier" &&
+          specifier.importKind !== "type" &&
+          importedName(specifier.imported) === "dot" &&
+          configuredNames.has(local);
+
+        if (isAuthorized) authorized.add(local);
+        else conflicting.add(local);
+      }
+      return;
+    }
+
+    const bindings = new Set<string>();
+    switch (node.type) {
+      case "VariableDeclarator":
+        collectPatternNames(record.id, bindings);
+        break;
+      case "FunctionDeclaration":
+      case "FunctionExpression":
+      case "ArrowFunctionExpression":
+      case "ObjectMethod":
+      case "ClassMethod":
+      case "ClassPrivateMethod":
+      case "TSDeclareFunction":
+        collectPatternNames(record.id, bindings);
+        collectPatternNames(record.params, bindings);
+        break;
+      case "ClassDeclaration":
+      case "ClassExpression":
+      case "TSEnumDeclaration":
+      case "TSModuleDeclaration":
+      case "TSImportEqualsDeclaration":
+        collectPatternNames(record.id, bindings);
+        break;
+      case "CatchClause":
+        collectPatternNames(record.param, bindings);
+        break;
+      default:
+        return;
+    }
+
+    for (const binding of bindings) conflicting.add(binding);
+  });
+
+  for (const name of conflicting) authorized.delete(name);
+  return authorized;
+}
+
+function staticPropertyKey(value: unknown): "target" | "dark" | null {
+  if (!value || typeof value !== "object") return null;
+  const node = value as Record<string, unknown>;
+  const key =
+    node.type === "Identifier" && typeof node.name === "string"
+      ? node.name
+      : node.type === "StringLiteral" && typeof node.value === "string"
+        ? node.value
+        : null;
+  return key === "target" || key === "dark" ? key : null;
+}
+
+function parseStaticOptionsNode(value: unknown): ParsedStaticOptions {
+  if (!value || typeof value !== "object") return { admitted: false };
+  const node = value as Record<string, unknown>;
+  if (node.type !== "ObjectExpression" || !Array.isArray(node.properties)) {
+    return { admitted: false };
+  }
 
   const opts: DotOptions = {};
-  if (targetMatch) opts.target = targetMatch[1] as DotOptions['target'];
-  if (darkMatch) opts.dark = darkMatch[1] === 'true';
+  const seen = new Set<"target" | "dark">();
 
-  return { opts: Object.keys(opts).length > 0 ? opts : {}, skipExtraction: false };
+  for (const value of node.properties) {
+    if (!value || typeof value !== "object") return { admitted: false };
+    const property = value as Record<string, unknown>;
+    if (
+      property.type !== "ObjectProperty" ||
+      property.computed === true ||
+      property.shorthand === true
+    ) {
+      return { admitted: false };
+    }
+
+    const key = staticPropertyKey(property.key);
+    if (!key || seen.has(key)) return { admitted: false };
+    seen.add(key);
+
+    const propertyValue = property.value as Record<string, unknown> | undefined;
+    if (key === "target") {
+      if (
+        propertyValue?.type !== "StringLiteral" ||
+        typeof propertyValue.value !== "string" ||
+        !STATIC_TARGETS.has(propertyValue.value)
+      ) {
+        return { admitted: false };
+      }
+      opts.target = propertyValue.value as DotOptions["target"];
+      continue;
+    }
+
+    if (
+      propertyValue?.type !== "BooleanLiteral" ||
+      typeof propertyValue.value !== "boolean"
+    ) {
+      return { admitted: false };
+    }
+    opts.dark = propertyValue.value;
+  }
+
+  return { admitted: true, opts };
 }
 
 // ---------------------------------------------------------------------------
@@ -144,24 +307,25 @@ function parseStaticOptions(str: string): ParsedStaticOptions {
  * Handles primitives, arrays, and nested objects (RN transforms, Flutter recipes).
  */
 function valueToLiteral(value: unknown): string {
-  if (value === null) return 'null';
-  if (value === undefined) return 'undefined';
-  if (typeof value === 'string') return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-  if (typeof value === 'number') return String(value);
-  if (typeof value === 'boolean') return String(value);
+  if (value === null) return "null";
+  if (value === undefined) return "undefined";
+  if (typeof value === "string")
+    return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return String(value);
 
   if (Array.isArray(value)) {
-    return `[${value.map(valueToLiteral).join(', ')}]`;
+    return `[${value.map(valueToLiteral).join(", ")}]`;
   }
 
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>);
-    if (entries.length === 0) return '{}';
+    if (entries.length === 0) return "{}";
     const parts = entries.map(([k, v]) => {
       const safeKey = /^[a-zA-Z_$][\w$]*$/.test(k) ? k : `"${k}"`;
       return `${safeKey}: ${valueToLiteral(v)}`;
     });
-    return `{${parts.join(', ')}}`;
+    return `{${parts.join(", ")}}`;
   }
 
   return String(value);
@@ -173,14 +337,14 @@ function valueToLiteral(value: unknown): string {
  */
 export function styleToObjectLiteral(style: Record<string, unknown>): string {
   const entries = Object.entries(style);
-  if (entries.length === 0) return '({})';
+  if (entries.length === 0) return "({})";
 
   const parts = entries.map(([key, value]) => {
     const safeKey = /^[a-zA-Z_$][\w$]*$/.test(key) ? key : `"${key}"`;
     return `${safeKey}: ${valueToLiteral(value)}`;
   });
 
-  return `({${parts.join(', ')}})`;
+  return `({${parts.join(", ")}})`;
 }
 
 // ---------------------------------------------------------------------------
@@ -197,25 +361,47 @@ export function extractStaticCalls(
   source: string,
   options?: ExtractOptions,
 ): ExtractedCall[] {
-  const fnNames = options?.functionNames ?? ['dot'];
-  const defaultTarget = options?.target ?? 'web';
-  const pattern = buildPattern(fnNames);
+  const ast = parseModule(source);
+  if (!ast) return [];
+
+  const fnNames = new Set(options?.functionNames ?? ["dot"]);
+  const authorizedBindings = collectBindingAuthority(ast, fnNames);
+  if (authorizedBindings.size === 0) return [];
+
+  const defaultTarget = admitConfiguredTarget(options?.target as unknown);
+  if (defaultTarget === null) return [];
 
   const results: ExtractedCall[] = [];
-  let match: RegExpExecArray | null;
+  walkAst(ast, (node) => {
+    if (node.type !== "CallExpression") return;
+    const record = node as Record<string, unknown>;
+    const calleeName = identifierName(record.callee);
+    if (!calleeName || !authorizedBindings.has(calleeName)) return;
 
-  while ((match = pattern.exec(source)) !== null) {
-    // Skip matches inside strings or comments
-    if (isInsideStringOrComment(source, match.index)) continue;
+    const args = Array.isArray(record.arguments) ? record.arguments : [];
+    if (args.length === 0 || args.length > 2) return;
 
-    const input = match[2];
-    const optionsStr = match[3];
+    const firstArg = args[0] as Record<string, unknown> | undefined;
+    if (
+      firstArg?.type !== "StringLiteral" ||
+      typeof firstArg.value !== "string"
+    ) {
+      return;
+    }
 
-    // Parse static options if present
-    const parsed = optionsStr ? parseStaticOptions(optionsStr) : null;
-    if (parsed?.skipExtraction) continue;
+    const parsed =
+      args.length === 2
+        ? parseStaticOptionsNode(args[1])
+        : { admitted: true as const, opts: {} };
+    if (!parsed.admitted) return;
 
-    const callOpts = parsed?.opts;
+    const start = node.start;
+    const end = node.end;
+    if (typeof start !== "number" || typeof end !== "number") return;
+
+    const input = firstArg.value;
+    const callOpts =
+      Object.keys(parsed.opts).length > 0 ? parsed.opts : undefined;
     const resolveOpts: DotOptions = {
       target: callOpts?.target ?? defaultTarget,
       ...(callOpts?.dark !== undefined ? { dark: callOpts.dark } : {}),
@@ -224,17 +410,17 @@ export function extractStaticCalls(
     try {
       const result = dot(input, resolveOpts) as Record<string, unknown>;
       results.push({
-        start: match.index,
-        end: match.index + match[0].length,
+        start,
+        end,
         input,
-        options: callOpts && Object.keys(callOpts).length > 0 ? callOpts : undefined,
+        options: callOpts,
         result,
       });
     } catch {
       // Skip calls that fail to resolve (malformed input)
-      continue;
+      return;
     }
-  }
+  });
 
   // Sort last-first for safe replacement
   return results.sort((a, b) => b.start - a.start);
@@ -255,7 +441,10 @@ export function transformSource(
   let code = source;
   for (const call of calls) {
     // calls are sorted last-first, so offsets remain valid
-    code = code.slice(0, call.start) + styleToObjectLiteral(call.result) + code.slice(call.end);
+    code =
+      code.slice(0, call.start) +
+      styleToObjectLiteral(call.result) +
+      code.slice(call.end);
   }
 
   return { code, extractions: calls.length };

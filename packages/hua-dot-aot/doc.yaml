@@ -1,11 +1,12 @@
-overview: "Build-time static extraction for @hua-labs/dot. Replaces static dot() calls with pre-computed style objects at build time, eliminating runtime parsing overhead. Provides a Vite plugin and a Babel plugin (Metro, Next.js compatible). AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
+overview: "Build-time static extraction for @hua-labs/dot. Replaces authorized static dot() calls with pre-computed style objects while leaving ambiguous or dynamic calls at runtime. Provides a parser-backed Vite transform and a Babel plugin for explicit Babel pipelines such as Metro. AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
 
 features:
   - "Zero-runtime CSS — static dot() calls replaced with inline object literals at build time"
-  - "Vite plugin — enforce: 'pre' transform hook, fast path skips files with no dot calls"
-  - "Babel plugin — AST-accurate CallExpression visitor, works with Metro and Next.js"
-  - "Regex-based extraction engine — skips calls in strings, comments, template literals, and chained methods"
-  - "Static options support — extracts target and dark when literal values; skips breakpoint (dynamic)"
+  - "Vite plugin — enforce: 'pre' transform hook with parser-backed call and import binding authority"
+  - "Babel plugin — scope-aware CallExpression visitor for Metro and other explicit Babel pipelines"
+  - "Exact import authority — transforms only named dot imports from @hua-labs/dot; foreign, local, namespace, type-only, and shadowed bindings stay runtime"
+  - "Static options support — accepts only exact literal target and dark values; unknown, duplicate, computed, spread, nested, and dynamic options stay runtime"
+  - "Lexical safety — strings, comments, templates, regex literals, JSX text, constructors, member calls, and malformed modules are never rewritten by text matching"
   - "Cross-platform output — correct serialization for web, native, and flutter targets"
   - "AX boundary — delegates capability truth to @hua-labs/dot/getDotAxCatalog() and preserves target output parity without creating an AOT-specific catalog"
   - "Graceful fallback — malformed or unresolvable calls silently left as runtime"
@@ -13,17 +14,25 @@ features:
 
 quickStart: |
   // Vite
-  import dotAot from '@hua-labs/dot-aot/vite';
+  import dotAot from "@hua-labs/dot-aot/vite";
   export default defineConfig({ plugins: [dotAot()] });
 
-  // Babel / Metro / Next.js
-  module.exports = { plugins: [['@hua-labs/dot-aot/babel', { target: 'native' }]] };
+  // Babel / Metro (or another explicit Babel pipeline)
+  module.exports = {
+    plugins: [["@hua-labs/dot-aot/babel", { target: "native" }]],
+  };
 
-  // Before build:
-  const style = dot('p-4 flex items-center bg-primary-500');
+  // Application source (the exact import owns extraction authority):
+  import { dot } from "@hua-labs/dot";
+  const style = dot("p-4 flex items-center bg-primary-500");
 
-  // After build (inlined by plugin):
-  const style = ({padding: "16px", display: "flex", alignItems: "center", backgroundColor: "var(--color-primary-500)"});
+  // Equivalent generated value:
+  const generatedStyle = {
+    padding: "16px",
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: "var(--color-primary-500)",
+  };
 
 readme:
   features:
@@ -45,25 +54,33 @@ readme:
 related:
   - "dot"
 
+apiFilter: notes-only
+
 apiNotes:
   extractStaticCalls:
-    description: "Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' | 'native' | 'flutter' }"
+    description: "Parse a source module and return authorized, statically extractable named dot-import calls sorted last-to-first. Options include functionNames and the web/native/flutter default target. Parse failures and ambiguous bindings fail closed."
   transformSource:
-    description: "Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline."
+    description: "Apply parser-authorized extractions in one pass. Returns { code, extractions } or null if no changes. The source must contain an exact named dot import from @hua-labs/dot."
   styleToObjectLiteral:
     description: "Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets."
   ExtractedCall:
     description: "Single extraction result: { start, end, input, options?, result }. start/end are character offsets in the source string."
+    kind: type
   ExtractOptions:
-    description: "Options for core extraction: functionNames (default: ['dot']), target (default: 'web')."
+    description: "Options for core extraction: functionNames is an allowlist of local names that must still alias the named @hua-labs/dot export; target supplies the default web/native/flutter output."
+    kind: type
   DotAotViteOptions:
     description: "Vite plugin options — extends ExtractOptions with include (file extensions) and exclude (path patterns)."
+    kind: type
   DotAotBabelOptions:
-    description: "Babel plugin options — functionNames and target. Passed as second argument to the plugin tuple."
+    description: "Babel plugin options — functionNames and target. The plugin verifies Babel's lexical binding resolves to the exact named @hua-labs/dot import."
+    kind: type
   "@hua-labs/dot-aot/vite":
     description: "Default export: dotAotVite(options?) — returns a Vite Plugin. Logs extraction count in buildEnd hook."
+    kind: function
   "@hua-labs/dot-aot/babel":
     description: "Default export: dotAotBabel(_babel, options?) — standard Babel plugin factory. Uses CallExpression AST visitor."
+    kind: function
 
 sections:
   - title: "AX Boundary"
@@ -79,3 +96,32 @@ sections:
       package-owned dot AX catalog remain the authority. AOT should preserve
       target output parity and leave dynamic or unsafe calls at runtime rather
       than inventing alternate capability semantics.
+
+  - title: "Binding And Parser Boundary"
+    content: |
+      AOT transformation is authorized by syntax and lexical ownership, not by
+      a matching identifier string. The core/Vite path parses the module and
+      the Babel path consults Babel bindings. Both require a runtime named
+      `dot` import from `@hua-labs/dot`; configured aliases are admitted only
+      when they are aliases of that exact export.
+
+      Bare globals, local helpers, foreign packages, namespace/member access,
+      type-only imports, constructors, and shadowed or ambiguous bindings stay
+      at runtime. Only a string literal plus an optional flat object containing
+      exact literal `target` and/or `dark` keys is extractable. Malformed source
+      and every unsupported option shape fail closed without a partial textual
+      rewrite. Only an absent or explicit `undefined` plugin target defaults to
+      Web. Explicit `null` and every other invalid plugin-level target leave
+      every call at runtime instead of silently falling back to Web output.
+
+  - title: "Toolchain Boundary"
+    content: |
+      The Vite entry owns Vite's pre-transform path. The Babel entry runs only
+      in toolchains configured to execute Babel plugins, including Metro. A
+      Next.js project that remains on its default SWC pipeline does not execute
+      this Babel plugin; using it requires an explicit Babel configuration and
+      accepts Next.js's documented compiler trade-off. Vite filters the module
+      pathname before query/hash suffixes, then sends every included module to
+      parser authority without a raw identifier prefilter. Parser-valid escaped
+      aliases and whitespace, comment, or newline-separated calls therefore
+      share the same admission path.

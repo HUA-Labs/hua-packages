@@ -42,6 +42,26 @@ if (dotAuthorityResult.status !== 0) {
   process.exit(1);
 }
 
+const dotAotAuthorityChecker = path.join(
+  __dirname,
+  "check-dot-aot-source-authority.mjs",
+);
+const dotAotAuthorityResult = spawnSync(
+  process.execPath,
+  [dotAotAuthorityChecker],
+  {
+    cwd: path.join(__dirname, ".."),
+    encoding: "utf8",
+  },
+);
+
+if (dotAotAuthorityResult.status !== 0) {
+  process.stdout.write(dotAotAuthorityResult.stdout || "");
+  process.stderr.write(dotAotAuthorityResult.stderr || "");
+  console.error("Pack artifact check blocked by Dot AOT source authority.");
+  process.exit(1);
+}
+
 const allowedSourcePayloads = new Map([
   ["create-hua", ["package/templates/"]],
   ["@hua-labs/hua", ["package/.hua-agent-docs/"]],
@@ -272,6 +292,22 @@ for (const tarball of tarballs) {
       process.stdout.write(artifactAuthority.stdout || "");
       process.stderr.write(artifactAuthority.stderr || "");
       console.error("Pack artifact check blocked by Dot tar authority.");
+      process.exit(1);
+    }
+  }
+  if (pkg.name === "@hua-labs/dot-aot") {
+    const artifactAuthority = spawnSync(
+      process.execPath,
+      [dotAotAuthorityChecker, "--tarball", path.resolve(tarball)],
+      {
+        cwd: path.join(__dirname, ".."),
+        encoding: "utf8",
+      },
+    );
+    if (artifactAuthority.status !== 0) {
+      process.stdout.write(artifactAuthority.stdout || "");
+      process.stderr.write(artifactAuthority.stderr || "");
+      console.error("Pack artifact check blocked by Dot AOT tar authority.");
       process.exit(1);
     }
   }

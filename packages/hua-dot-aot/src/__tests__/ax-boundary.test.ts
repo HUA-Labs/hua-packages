@@ -54,7 +54,7 @@ describe("dot-aot AX boundary", () => {
     ];
 
     for (const { input, target } of cases) {
-      const source = `const style = dot(${JSON.stringify(input)}, { target: ${JSON.stringify(target)} });`;
+      const source = `import { dot } from "@hua-labs/dot";\nconst style = dot(${JSON.stringify(input)}, { target: ${JSON.stringify(target)} });`;
       const calls = extractStaticCalls(source);
 
       expect(calls).toHaveLength(1);
@@ -104,7 +104,7 @@ describe("dot-aot AX boundary", () => {
     ];
 
     for (const { input, target } of cases) {
-      const source = `const style = dot(${JSON.stringify(input)}, { target: ${JSON.stringify(target)} });`;
+      const source = `import { dot } from "@hua-labs/dot";\nconst style = dot(${JSON.stringify(input)}, { target: ${JSON.stringify(target)} });`;
       const calls = extractStaticCalls(source);
 
       expect(calls).toHaveLength(1);
