@@ -45,9 +45,9 @@
   "mapDigest": "21f7a088b26b6b18bf7431834df55580878eee1b5d5577917086c79d47254fd2",
   "packagePath": "packages/hua-dot-lsp",
   "publicBase": {
-    "commit": "284172793106a79d47f78fcc016360b211971d73",
+    "commit": "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
     "packageTree": "9b2969174aa7c669176e9e9410a85347338a5e95",
-    "tree": "711a4b33b82bd5a9b36327a5e00febe64a53db97"
+    "tree": "2ee07f511e2fa96814801e8cbde45f0c45875aff"
   },
   "rows": [
     {

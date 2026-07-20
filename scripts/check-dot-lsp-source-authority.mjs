@@ -50,9 +50,9 @@ const REVIEWED_ARTIFACT_ROSTER_DIGEST =
 const REVIEWED_TARBALL_SHA256 =
   "2c5fe47aa4f4777bc7fc025e04d52eeb467e66e3783484cc8a42832613095b50";
 const REVIEWED_PUBLIC_BASE = Object.freeze({
-  commit: "284172793106a79d47f78fcc016360b211971d73",
+  commit: "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
   packageTree: "9b2969174aa7c669176e9e9410a85347338a5e95",
-  tree: "711a4b33b82bd5a9b36327a5e00febe64a53db97",
+  tree: "2ee07f511e2fa96814801e8cbde45f0c45875aff",
 });
 const REVIEWED_SOURCE_AUTHORITY = Object.freeze({
   commit: "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",

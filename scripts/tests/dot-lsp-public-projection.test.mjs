@@ -89,7 +89,7 @@ test("derived public manifest preserves release authority and projects exact pro
       "git",
       [
         "show",
-        "284172793106a79d47f78fcc016360b211971d73:packages/hua-dot-lsp/package.json",
+        "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4:packages/hua-dot-lsp/package.json",
       ],
       { cwd: root, encoding: "utf8" },
     ),
@@ -223,7 +223,7 @@ test("stale public-first provenance is not source or base authority", () => {
   const config = JSON.parse(readFileSync(configPath, "utf8"));
   assert.equal(
     config.publicBase.commit,
-    "284172793106a79d47f78fcc016360b211971d73",
+    "4b0aa16ce0870a56bbab8e525eac9e40dd4273d4",
   );
   assert.equal(
     config.sourceAuthority.commit,
