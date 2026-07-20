@@ -100,6 +100,11 @@ package. This lets a later reviewed source/manifest sync plus a new Changeset
 enter `version` without weakening the planned-plan check. A planned plan remains
 manifest-exact in `check` and cannot publish directly.
 
+Workspace manifest `private` authority is accepted only when the field is
+absent or Boolean. Absent and explicit `false` are public manifest truth;
+strings, numbers, null, arrays, objects, and other malformed present values fail
+before normalization, preflight, or refresh.
+
 The ordinary empty-plan main-push path does not require the external policy
 credential while it creates or updates a version PR. Its dedicated preflight
 classifies exact `empty`, `planned`, and `publishing` states and detects an

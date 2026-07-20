@@ -1589,6 +1589,59 @@ test("empty-plan refresh admits exact public no-publish manifest drift without c
   }
 });
 
+test("empty-plan refresh admits an explicit false private field as public manifest truth", () => {
+  const fixture = makeFixture();
+  try {
+    mutateJson(
+      join(fixture.root, "packages/hua-dot/package.json"),
+      (manifest) => {
+        manifest.private = false;
+        manifest.description = "Reviewed explicit-public projection drift";
+      },
+    );
+
+    const preflight = runPreflight({ root: fixture.root });
+    assert.equal(preflight.plan.status, "empty");
+    assert.deepEqual(preflight.plan.releases, []);
+    assert.equal(preflight.authorityRequired, false);
+    assert.equal(preflight.refreshRequired, true);
+
+    const refreshed = runRefresh({ root: fixture.root });
+    assert.equal(refreshed.status, "empty");
+    assert.deepEqual(refreshed.releases, []);
+    assert.equal(runPreflight({ root: fixture.root }).refreshRequired, false);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("empty-plan refresh rejects malformed present private values before normalization", async (t) => {
+  for (const privateValue of ["true", "false", null, 0, {}, []]) {
+    await t.test(JSON.stringify(privateValue), () => {
+      const fixture = makeFixture();
+      try {
+        mutateJson(
+          join(fixture.root, "packages/hua-dot/package.json"),
+          (manifest) => {
+            manifest.private = privateValue;
+            manifest.description = "Malformed private projection drift";
+          },
+        );
+        assertCode(
+          () => runPreflight({ root: fixture.root }),
+          "workspace-manifest-private",
+        );
+        assertCode(
+          () => runRefresh({ root: fixture.root }),
+          "workspace-manifest-private",
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
 test("no-publish manifest refresh rejects every non-public authority variant", async (t) => {
   const variants = [
     {

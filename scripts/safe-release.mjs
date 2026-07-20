@@ -577,6 +577,10 @@ function normalizeManifest(value, label) {
     `${label}-version`,
   );
   parseSemver(version);
+  assert(
+    value.private === undefined || typeof value.private === "boolean",
+    `${label}-private`,
+  );
   const isPrivate = value.private === true;
   const publishConfig =
     value.publishConfig === undefined
