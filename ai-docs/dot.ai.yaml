@@ -250,6 +250,9 @@ features:
   - "FlutterRecipe fields — decoration (BoxDecoration), padding/margin (EdgeInsets), constraints (SizedBox), layout (Row/Column), flexChild (Flexible/Expanded), positioning (Positioned), textStyle (TextStyle), transform (Matrix4), opacity, visible, aspectRatio, zIndex"
   - "FlutterGradient — bg-gradient-to-* + from/via/to stops → LinearGradient recipe"
   - "Flutter target: 'flutter' — dot('p-4', { target: 'flutter' }) → FlutterRecipe"
+  - "Flutter recipe subpath — import from '@hua-labs/dot/flutter' for pre-bound dot(), dotMap(), and dotExplain()"
+  - "Versioned Flutter wire envelope — deterministic JSON-safe recipe plus retained dropped/capability metadata for a future Dart consumer"
+  - "Flutter recipe wire helpers — createFlutterRecipeWire() and serializeFlutterRecipeWire() from @hua-labs/dot/flutter produce deterministic recipe data"
   - "dotExplain() — resolves styles + returns DotCapabilityReport (dropped, approximated, capabilities per property)"
   - "CAPABILITY_MATRIX — static map of utility family → target → support level (native/approximate/recipe-only/plugin-backed/unsupported)"
   - "PROPERTY_TO_FAMILY — static map of CSS property → utility family for capability lookup"
@@ -267,4 +270,12 @@ related_packages:
   - "@hua-labs/dot-aot"
 
 compatibility:
-  node: ">=20.0.0"
+  node: ">=20.16.0"
+
+documentation:
+  detailedGuide:
+    state: "shipped"
+    path: "./DETAILED_GUIDE.md"
+    distribution: "packed"
+    description: "Flutter entry, recipe wire, target boundaries, and advanced style-engine guidance"
+    link: "./DETAILED_GUIDE.md"

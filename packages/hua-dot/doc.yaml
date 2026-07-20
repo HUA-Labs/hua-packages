@@ -1,5 +1,10 @@
 overview: "Cross-platform utility style engine for Web, React Native, and Flutter. Parses Tailwind-inspired utility strings into flat style objects via a shared resolver pipeline and target-specific adapters. Zero dependencies, framework-agnostic, 2,400+ tests. Broad Tailwind-inspired utility coverage across common style families."
 
+detailedGuide:
+  path: "./DETAILED_GUIDE.md"
+  distribution: "packed"
+  description: "Flutter entry, recipe wire, target boundaries, and advanced style-engine guidance"
+
 features:
   # ── Core Styling ──
   - "dot() — utility string → CSSProperties (or RN StyleSheet / FlutterRecipe via adapter)"
@@ -34,6 +39,9 @@ features:
   - "FlutterRecipe fields — decoration (BoxDecoration), padding/margin (EdgeInsets), constraints (SizedBox), layout (Row/Column), flexChild (Flexible/Expanded), positioning (Positioned), textStyle (TextStyle), transform (Matrix4), opacity, visible, aspectRatio, zIndex"
   - "FlutterGradient — bg-gradient-to-* + from/via/to stops → LinearGradient recipe"
   - "Flutter target: 'flutter' — dot('p-4', { target: 'flutter' }) → FlutterRecipe"
+  - "Flutter recipe subpath — import from '@hua-labs/dot/flutter' for pre-bound dot(), dotMap(), and dotExplain()"
+  - "Versioned Flutter wire envelope — deterministic JSON-safe recipe plus retained dropped/capability metadata for a future Dart consumer"
+  - "Flutter recipe wire helpers — createFlutterRecipeWire() and serializeFlutterRecipeWire() from @hua-labs/dot/flutter produce deterministic recipe data"
   # ── Capability Reporting ──
   - "dotExplain() — resolves styles + returns DotCapabilityReport (dropped, approximated, capabilities per property)"
   - "CAPABILITY_MATRIX — static map of utility family → target → support level (native/approximate/recipe-only/plugin-backed/unsupported)"
@@ -73,6 +81,13 @@ quickStart: |
   // adaptFlutter() directly
   adaptFlutter({ padding: '16px', backgroundColor: '#3b82f6', borderRadius: '8px' });
   // → FlutterRecipe
+
+  // Flutter pre-bound entry + versioned JSON wire data
+  // import { dot, createFlutterRecipeWire, serializeFlutterRecipeWire }
+  //   from '@hua-labs/dot/flutter';
+  // dot('p-4 rounded-lg') → FlutterRecipe
+  // serializeFlutterRecipeWire(createFlutterRecipeWire('p-4 cursor-pointer'))
+  // → deterministic hua.dot.flutter.recipe v1 JSON (recipe data, not widgets)
 
   // Gradient
   dot('bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500');
@@ -142,24 +157,6 @@ quickStart: |
   dot('bg-brand-500 p-18');
   // { backgroundColor: '#6630E6', padding: '72px' }
 
-readme:
-  features:
-    - "dot() resolves Tailwind-inspired utility strings to Web CSSProperties, React Native style objects, or FlutterRecipe output"
-    - "dotExplain() reports target caveats for dropped, approximated, recipe-only, and unsupported properties"
-    - "Native subpath, AOT/codegen, and AX catalog exports support app and tooling integrations"
-  quickStart: |
-    import { dot, dotExplain } from '@hua-labs/dot';
-
-    const web = dot('p-4 flex items-center bg-primary-500 text-white rounded-lg');
-    const native = dot('p-4 rounded-lg shadow-lg', { target: 'native' });
-    const report = dotExplain('grid grid-cols-3 gap-4', { target: 'native' });
-
-    console.log(web, native, report.report._dropped);
-  codeBlockLang: "ts"
-  hideApi: true
-  hideSections: true
-  detailedGuide: "./DETAILED_GUIDE.md"
-
 related:
   - "hua"
   - "ui"
@@ -168,7 +165,7 @@ related:
 sections:
   - title: "AI / Operator Guide"
     content: |
-      `@hua-labs/dot` is intentionally not a full Tailwind runtime. AI agents and advanced operators should read the [Detailed Guide](./DETAILED_GUIDE.md) before claiming cross-platform support, adding new token families, or using dot for responsive/state/motion-heavy UI.
+      `@hua-labs/dot` is intentionally not a full Tailwind runtime. AI agents and advanced operators should read [`AI_GUIDE.md`](./AI_GUIDE.md) before claiming cross-platform support, adding new token families, or using dot for responsive/state/motion-heavy UI.
 
 apiNotes:
   dot:
@@ -201,6 +198,12 @@ apiNotes:
     description: "getDotAxCatalog() → DotAxCatalog. Read-only package AX catalog derived from CAPABILITY_MATRIX / PROPERTY_TO_FAMILY, with composition metadata for internal marker families such as ring and divide. Stable, JSON-serializable, and intended for AI/tooling guidance without executing dot() or dotExplain()."
   "@hua-labs/dot/native":
     description: "Native subpath entry — dot() and dotMap() pre-bound to target: 'native'. Also auto-resolved via 'react-native' package.json condition in Metro."
+  "@hua-labs/dot/flutter":
+    description: "Flutter recipe subpath — dot(), dotMap(), and dotExplain() are pre-bound to target: 'flutter'. Exposes the existing FlutterRecipe types and the versioned JSON-safe recipe wire helper, but not the web-only dotVariants API. Produces recipe data only; no Dart runtime or widgets are included."
+  createFlutterRecipeWire:
+    description: "Create the versioned FlutterRecipeWireEnvelope from the existing Flutter dotExplain pipeline. Each envelope owns a deep JSON-safe recipe snapshot rather than exposing the dot input-cache object. The executable TypeScript envelope type is the field-level SSOT and retains recipe drops plus normalized capability metadata."
+  serializeFlutterRecipeWire:
+    description: "Validate the Flutter recipe wire discriminator and serialize JSON-safe envelope data with deterministic recursively sorted object keys. Rejects wrong versions, non-finite/non-JSON-safe values, and array pseudo-index/non-index properties while preserving dangerous-name own keys as inert JSON data."
   _resetNativeWarnings:
     description: "Reset native adapter warning dedup set. For testing only."
   semanticVars:

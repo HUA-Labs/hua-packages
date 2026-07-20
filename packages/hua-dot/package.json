@@ -23,6 +23,11 @@
       "import": "./dist/native.mjs",
       "default": "./dist/native.mjs"
     },
+    "./flutter": {
+      "types": "./dist/flutter.d.mts",
+      "import": "./dist/flutter.mjs",
+      "default": "./dist/flutter.mjs"
+    },
     "./class": {
       "types": "./dist/class.d.mts",
       "import": "./dist/class.mjs",
@@ -36,6 +41,7 @@
   },
   "files": [
     "CHANGELOG.md",
+    "AI_GUIDE.md",
     "DETAILED_GUIDE.md",
     "dist"
   ],

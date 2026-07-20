@@ -26,6 +26,22 @@ if (authorityResult.status !== 0) {
   process.exit(1);
 }
 
+const dotAuthorityChecker = path.join(
+  __dirname,
+  "check-dot-core-source-authority.mjs",
+);
+const dotAuthorityResult = spawnSync(process.execPath, [dotAuthorityChecker], {
+  cwd: path.join(__dirname, ".."),
+  encoding: "utf8",
+});
+
+if (dotAuthorityResult.status !== 0) {
+  process.stdout.write(dotAuthorityResult.stdout || "");
+  process.stderr.write(dotAuthorityResult.stderr || "");
+  console.error("Pack artifact check blocked by Dot source authority.");
+  process.exit(1);
+}
+
 const allowedSourcePayloads = new Map([
   ["create-hua", ["package/templates/"]],
   ["@hua-labs/hua", ["package/.hua-agent-docs/"]],
@@ -243,6 +259,22 @@ for (const tarball of tarballs) {
   const files = listTarball(tarball);
   const fileSet = new Set(files);
   const pkg = getPackageJson(tarball);
+  if (pkg.name === "@hua-labs/dot") {
+    const artifactAuthority = spawnSync(
+      process.execPath,
+      [dotAuthorityChecker, "--tarball", path.resolve(tarball)],
+      {
+        cwd: path.join(__dirname, ".."),
+        encoding: "utf8",
+      },
+    );
+    if (artifactAuthority.status !== 0) {
+      process.stdout.write(artifactAuthority.stdout || "");
+      process.stderr.write(artifactAuthority.stderr || "");
+      console.error("Pack artifact check blocked by Dot tar authority.");
+      process.exit(1);
+    }
+  }
   const typeRefs = collectTypeRefs(pkg);
   const missingTypeRefs = typeRefs.filter((ref) => !fileSet.has(ref));
   const runtimeRefs = collectRuntimeRefs(pkg);

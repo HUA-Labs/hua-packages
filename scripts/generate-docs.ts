@@ -80,6 +80,7 @@ interface PackageData {
   fullName: string; // @hua-labs/xxx
   version: string;
   description: string;
+  nodeEngine: string;
   peerDeps: Record<string, string>;
   peerDepsList: string;
   reactMajor?: string;
@@ -405,6 +406,7 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     fullName,
     version: pkgJson.version,
     description: pkgJson.description ?? "",
+    nodeEngine: pkgJson.engines?.node ?? ">=20.0.0",
     peerDeps,
     peerDepsList,
     reactMajor,
