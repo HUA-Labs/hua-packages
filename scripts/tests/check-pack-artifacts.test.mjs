@@ -144,22 +144,23 @@ test("rejects TypeScript source used as an installed JavaScript runtime target",
       ".": {
         "react-native": {
           types: "./types/icons.d.ts",
-          default: "./types/icons.d.ts",
+          default: "./types/icons.ts",
         },
         default: "./dist/index.mjs",
       },
       "./icons": {
         types: "./types/icons.d.ts",
-        import: "./types/icons.d.ts",
-        default: "./types/icons.d.ts",
+        import: "./types/icons.ts",
+        default: "./types/icons.ts",
       },
       "./icons-require": {
         types: "./types/icons.d.ts",
-        require: "./types/icons.d.ts",
+        require: "./types/icons.ts",
       },
     },
     files: {
       ...sourceTypes,
+      "types/icons.ts": "export const Icon = {};\n",
       "dist/index.mjs": "export {};\n",
     },
   });
@@ -168,10 +169,10 @@ test("rejects TypeScript source used as an installed JavaScript runtime target",
 
   assert.equal(result.status, 1);
   assert.match(result.stdout, /unsupported runtime refs:/);
-  assert.match(result.stdout, /import: package\/types\/icons\.d\.ts/);
-  assert.match(result.stdout, /default: package\/types\/icons\.d\.ts/);
-  assert.match(result.stdout, /require: package\/types\/icons\.d\.ts/);
-  assert.match(result.stdout, /react-native: package\/types\/icons\.d\.ts/);
+  assert.match(result.stdout, /import: package\/types\/icons\.ts/);
+  assert.match(result.stdout, /default: package\/types\/icons\.ts/);
+  assert.match(result.stdout, /require: package\/types\/icons\.ts/);
+  assert.match(result.stdout, /react-native: package\/types\/icons\.ts/);
 });
 
 test("accepts compiled ESM runtime targets with source-backed types", () => {
