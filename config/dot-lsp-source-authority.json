@@ -1,0 +1,204 @@
+{
+  "artifact": {
+    "files": [
+      {
+        "path": "package/CHANGELOG.md",
+        "sha256": "879a233b5df4937df1da21b13cad1afadf5c6839647d93a9d23a2cdc74841157",
+        "size": 1221
+      },
+      {
+        "path": "package/DETAILED_GUIDE.md",
+        "sha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834",
+        "size": 17542
+      },
+      {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "e59449cbd2d4ee35129f82a851bfa51a2dc73dd465140b6c66d7c6d5a27f570e",
+        "size": 5355
+      },
+      {
+        "path": "package/dist/index.js",
+        "sha256": "385db2482e5c62d450795102d2bde951013d815cf45d304062c2536e8b9091ae",
+        "size": 63876
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "7871de75089ebebfde5ba05e98c82838128a4d42cee8dadeb5db1d9a4d21f93e",
+        "size": 1228
+      }
+    ],
+    "packageName": "@hua-labs/dot-lsp",
+    "packageVersion": "0.1.3",
+    "packedManifestSha256": "7871de75089ebebfde5ba05e98c82838128a4d42cee8dadeb5db1d9a4d21f93e",
+    "requiredTargets": ["package/dist/index.js"],
+    "rosterDigest": "42d1bfc732ddc320b31cc24160350d6e3626aa129e385ea9ab74a53d226973bb",
+    "sourceManifestSha256": "6e6af08a6641801bed3398661549a20c7318f392a3aca54c2763000896aea870",
+    "tarballBytes": 24397,
+    "tarballSha256": "d343f947f48fdba9b74cc87f6d2a668c9d7216c904f8ec8bc1e327d11177110b"
+  },
+  "authorityKind": "platform-dot-lsp-package-projection",
+  "mapDigest": "6fa078d9e8bc435d0cf499b83a24e38268aaff2a5b52087cf3fd8664a010a40c",
+  "packagePath": "packages/hua-dot-lsp",
+  "publicBase": {
+    "commit": "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3",
+    "packageTree": "9b2969174aa7c669176e9e9410a85347338a5e95",
+    "tree": "ccf9dfa29a2cd515c8acb014f17eae3bfc619a5d"
+  },
+  "rows": [
+    {
+      "disposition": "public-preserved",
+      "kind": "docs",
+      "outputSha256": "879a233b5df4937df1da21b13cad1afadf5c6839647d93a9d23a2cdc74841157",
+      "path": "packages/hua-dot-lsp/CHANGELOG.md",
+      "publicBaseSha256": "879a233b5df4937df1da21b13cad1afadf5c6839647d93a9d23a2cdc74841157",
+      "sourceSha256": "18d043accd794e39f60bdf269fee73bf8df1a607dc8bfd3bbf6eacc6be6681ba"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834",
+      "path": "packages/hua-dot-lsp/DETAILED_GUIDE.md",
+      "publicBaseSha256": "26913af2abe6ff937355182fb9bfa2cc7bc4fec042a3bd32853966585c8103e3",
+      "sourceSha256": "557f99956c155c5be33dc50f99281042e759106869944afaa14bf1428bb2c834"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "path": "packages/hua-dot-lsp/LICENSE",
+      "publicBaseSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "sourceSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "docs",
+      "outputSha256": "e59449cbd2d4ee35129f82a851bfa51a2dc73dd465140b6c66d7c6d5a27f570e",
+      "path": "packages/hua-dot-lsp/README.md",
+      "publicBaseSha256": "1c125bbe7517b48f4b0fd9a3c7cf935f95b14edafb0f0bd6defc1a5ed0f21f8a",
+      "sourceSha256": "e59449cbd2d4ee35129f82a851bfa51a2dc73dd465140b6c66d7c6d5a27f570e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "f3194657b930be26570c378d695a54c42b709f2b7aa4cf7b160db70ee01b9351",
+      "path": "packages/hua-dot-lsp/doc.yaml",
+      "publicBaseSha256": "91b3b1a055bc2102932c9546a480de17a8e95cbe5b7a30a19b2e9e07a63667b2",
+      "sourceSha256": "f3194657b930be26570c378d695a54c42b709f2b7aa4cf7b160db70ee01b9351"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "manifest",
+      "outputSha256": "6e6af08a6641801bed3398661549a20c7318f392a3aca54c2763000896aea870",
+      "path": "packages/hua-dot-lsp/package.json",
+      "publicBaseSha256": "ed67b1b14570fc1a37adf6b3b1725e0621282148bb1c72770a89839b52fe9860",
+      "sourceSha256": "6a3a1d56799efb6a74621bef2f24b7fa44550b19cafebc193982a8a54ffef10f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "db85c09b7b98322b77c969357868dcb707c5c1a5a1133e2cef3702ff7c13bc3e",
+      "path": "packages/hua-dot-lsp/src/__tests__/completions.test.ts",
+      "publicBaseSha256": "db85c09b7b98322b77c969357868dcb707c5c1a5a1133e2cef3702ff7c13bc3e",
+      "sourceSha256": "db85c09b7b98322b77c969357868dcb707c5c1a5a1133e2cef3702ff7c13bc3e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "7154582478cebbb0945d5619877a2a309341cbfbdbcc48f8a00c07725804a73e",
+      "path": "packages/hua-dot-lsp/src/__tests__/diagnostics.test.ts",
+      "publicBaseSha256": "7154582478cebbb0945d5619877a2a309341cbfbdbcc48f8a00c07725804a73e",
+      "sourceSha256": "7154582478cebbb0945d5619877a2a309341cbfbdbcc48f8a00c07725804a73e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "bf9771073c9f8c8410f77a577f7f156c0e99e704930bd8fa79a77e19a1cedcdf",
+      "path": "packages/hua-dot-lsp/src/__tests__/server-info.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "bf9771073c9f8c8410f77a577f7f156c0e99e704930bd8fa79a77e19a1cedcdf"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "ab6db4623f7baa9f52cec745e217deed3658d89c99bbf39ef2d142b6e61c01f7",
+      "path": "packages/hua-dot-lsp/src/__tests__/settings.test.ts",
+      "publicBaseSha256": "ab6db4623f7baa9f52cec745e217deed3658d89c99bbf39ef2d142b6e61c01f7",
+      "sourceSha256": "ab6db4623f7baa9f52cec745e217deed3658d89c99bbf39ef2d142b6e61c01f7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "da1feed807b4b0dc8f4613fe6696375286c57ca0da24c78645d08d8a8be5d40b",
+      "path": "packages/hua-dot-lsp/src/completions.ts",
+      "publicBaseSha256": "da1feed807b4b0dc8f4613fe6696375286c57ca0da24c78645d08d8a8be5d40b",
+      "sourceSha256": "da1feed807b4b0dc8f4613fe6696375286c57ca0da24c78645d08d8a8be5d40b"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "ff761c93ab4d25bb37a8879b2944038898e77143f7945453560453e128a0d85c",
+      "path": "packages/hua-dot-lsp/src/diagnostics.ts",
+      "publicBaseSha256": "ff761c93ab4d25bb37a8879b2944038898e77143f7945453560453e128a0d85c",
+      "sourceSha256": "ff761c93ab4d25bb37a8879b2944038898e77143f7945453560453e128a0d85c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "3508241f0a55c92c3c335f43e3488e8eec552e51472771eee3d574aa48c46ac5",
+      "path": "packages/hua-dot-lsp/src/dot-regions.ts",
+      "publicBaseSha256": "3508241f0a55c92c3c335f43e3488e8eec552e51472771eee3d574aa48c46ac5",
+      "sourceSha256": "3508241f0a55c92c3c335f43e3488e8eec552e51472771eee3d574aa48c46ac5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "523221b8896449d9cc9a5f02ff1d55f64a948d9952656c022220b0ddc00bb5f6",
+      "path": "packages/hua-dot-lsp/src/index.ts",
+      "publicBaseSha256": "e1c3e908cf27e95ff28805d73b0e0e44a7e42c1663a8265122d5756a66beb24d",
+      "sourceSha256": "523221b8896449d9cc9a5f02ff1d55f64a948d9952656c022220b0ddc00bb5f6"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "b52111332b9102e1310c1d6c307fb9adf2954ce32382f64385c1001cf9c05e4d",
+      "path": "packages/hua-dot-lsp/src/server-info.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "b52111332b9102e1310c1d6c307fb9adf2954ce32382f64385c1001cf9c05e4d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "25c21e9232a07ba94358d19fff374a3f4300f0ee9f4c15b611edd608ad0bdc3e",
+      "path": "packages/hua-dot-lsp/src/settings.ts",
+      "publicBaseSha256": "25c21e9232a07ba94358d19fff374a3f4300f0ee9f4c15b611edd608ad0bdc3e",
+      "sourceSha256": "25c21e9232a07ba94358d19fff374a3f4300f0ee9f4c15b611edd608ad0bdc3e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "c9dcbdf44f765bd541062e52008e81ad9b2e228eb7af325a6d123e0e48f7096f",
+      "path": "packages/hua-dot-lsp/tsconfig.json",
+      "publicBaseSha256": "c9dcbdf44f765bd541062e52008e81ad9b2e228eb7af325a6d123e0e48f7096f",
+      "sourceSha256": "c9dcbdf44f765bd541062e52008e81ad9b2e228eb7af325a6d123e0e48f7096f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "build",
+      "outputSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324",
+      "path": "packages/hua-dot-lsp/vitest.config.ts",
+      "publicBaseSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324",
+      "sourceSha256": "28f2177a73b80f89a41de0efa421f6397d6c4b7510fb4779b3995960dcc81324"
+    }
+  ],
+  "schema": "hua-dot-lsp-source-authority.v1",
+  "sourceAuthority": {
+    "commit": "19385e52e2f3694eb06fb15f2e13d5cce3270280",
+    "packageTree": "f173b259a9f4fc4834e2454fcf427e0c44251037",
+    "tree": "7ab93813e0e098c98379460be4acf3016e61a8d1"
+  }
+}

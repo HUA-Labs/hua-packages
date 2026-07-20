@@ -41,15 +41,19 @@ The server exposes three capabilities:
 | Hover       | `textDocument/hover`              | Cursor over a token       |
 | Diagnostics | `textDocument/publishDiagnostics` | File open, file change    |
 
-**Completion provider** — Scans the cursor position to determine whether it is inside a `dot(...)` call or `dot="..."` attribute. If so, it returns matching utility tokens from the built-in list. The response is capped at 500 items per request. `insertText` is set to only the suffix of the token that has not yet been typed, enabling incremental completion without duplicating already-typed characters. Every base token is also expanded with each supported variant prefix, so the list covers `hover:p-4`, `dark:bg-white`, etc.
+**Completion provider** — Scans the cursor position to determine whether it is inside a `dot(...)` call or `dot="..."` attribute. If so, it returns matching utility tokens from the package-local catalog. The response is capped at 500 items per request. `insertText` is set to only the suffix of the token that has not yet been typed, enabling incremental completion without duplicating already-typed characters. Every catalogued base token is also expanded with each supported variant prefix, so the list covers `hover:p-4`, `dark:bg-white`, etc.
 
-**Hover provider** — Resolves the token under the cursor and returns a Markdown popup showing the token name and its CSS output. If the token is not in the built-in list, resolution falls back to the dot engine directly. No popup is shown when the engine produces no output.
+**Hover provider** — Resolves the token under the cursor and returns a Markdown popup showing the token name and its CSS output. If the token is not in the package-local catalog, resolution falls back to the dot engine directly. No popup is shown when the engine produces no output.
 
-**Diagnostics provider** — Runs on every `textDocument/didOpen` and `textDocument/didChange` event. It scans all dot regions in the file and emits a `Warning` diagnostic for every token that is both absent from the built-in completion list and unresolvable by the dot engine. Variant prefixes and the `!` important prefix are stripped before the check to avoid false positives on valid qualified tokens.
+**Diagnostics provider** — Runs on every `textDocument/didOpen` and `textDocument/didChange` event. It scans all dot regions in the file and emits a `Warning` diagnostic for every token that is both absent from the package-local completion catalog and unresolvable by the dot engine. Variant prefixes and the `!` important prefix are stripped before the check to avoid false positives on valid qualified tokens.
 
-### Token Coverage Generation
+### Completion Catalog Ownership
 
-The completion and diagnostics providers share a single built-in token list that is generated at build time from the `@hua-labs/dot` engine. This list covers all 15 token categories (see [Core Concepts](#core-concepts)) and is bundled into the server binary so no runtime file I/O is required.
+The completion provider uses a package-local bounded hand-maintained completion catalog. Its constants and entry builders are maintained in the Dot LSP package and bundled into the server. They are not generated from the current `@hua-labs/dot` engine during build, do not represent complete engine coverage, and are not resolver or target-support authority. The direct Dot runtime dependency remains the fallback authority used by hover and diagnostics for tokens outside the catalog.
+
+### Initialize Identity
+
+The LSP initialize response includes a manifest-derived initialize server identity: name `dot-lsp` plus the exact package-manifest version bundled by the build. The value is validated and frozen by the package's internal server-info module. This protocol identity does not create a JavaScript import API; the supported public surface remains the `dot-lsp --stdio` binary and LSP protocol.
 
 ---
 
@@ -96,12 +100,9 @@ npx dot-lsp --stdio
 
 The executable is named **`dot-lsp`** regardless of install method. All editor configuration examples below use this name and assume it is on `PATH`. Substitute the full path if using a local install.
 
-### Engine Dependency
+### Direct Runtime Dependency
 
-`@hua-labs/dot` is installed as a package dependency of `@hua-labs/dot-lsp`.
-When `@hua-labs/dot-lsp` is installed from npm, the matching dot engine package
-is installed with it so hover fallback and diagnostic resolution can run without
-an extra peer install step.
+`@hua-labs/dot` is a direct runtime dependency of `@hua-labs/dot-lsp`. Package installation resolves it through the package dependency graph; consumers do not need to supply it separately. Hover fallback and diagnostic resolution call that installed dependency when a token is outside the package-local catalog.
 
 ---
 
@@ -124,9 +125,9 @@ The server identifies dot regions using the following patterns:
 
 Completion and diagnostics are active only inside these recognized regions. Tokens written outside of them are ignored.
 
-### Token Coverage Categories
+### Completion Catalog Categories
 
-The built-in token list covers the following categories:
+The package-local completion catalog covers the following categories:
 
 | Category          | Example tokens                                                                                 |
 | ----------------- | ---------------------------------------------------------------------------------------------- |
@@ -150,7 +151,7 @@ Semantic color tokens such as `bg-primary` and `text-muted-foreground` are inclu
 
 ### Variant Handling
 
-Every base token in the built-in list is also offered as a completion item prefixed with each of the supported variants:
+Every base token in the package-local catalog is also offered as a completion item prefixed with each of the supported variants:
 
 ```
 hover:   focus:   active:   focus-visible:   focus-within:
@@ -226,7 +227,7 @@ If you are already using a multi-LSP extension (such as `neovim.vscode-neovim` o
 - **initializationOptions.dot.target:** optional `"web"`, `"native"`, or
   `"flutter"` for target caveat diagnostics
 
-Note: A first-party VS Code extension (`hua-labs.dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
+The repository also contains first-party VSIX source (`dot-vscode`) that can bundle this LSP server. Its release classification is `channel-pending` with unresolved distribution authority. This package does not claim Marketplace availability or a prebuilt VSIX. Building or packaging that source locally is separate from installing a published editor extension.
 
 ### Neovim — nvim-lspconfig
 
@@ -294,7 +295,7 @@ The server starts and blocks, waiting for LSP messages on `stdin`. It will not p
 Any editor or tool that can spawn a subprocess and communicate over stdio using the LSP protocol can use `dot-lsp`. The minimum LSP handshake is:
 
 1. Client sends `initialize` request with `capabilities`.
-2. Server replies with `InitializeResult` advertising completion, hover, and diagnostics support.
+2. Server replies with `InitializeResult` advertising completion, hover, and diagnostics support plus its manifest-derived name/version identity.
 3. Client sends `initialized` notification.
 4. Client sends `textDocument/didOpen` to begin receiving diagnostics.
 
@@ -350,13 +351,13 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 
 **Checks:**
 
-1. Ensure the installed `@hua-labs/dot-lsp` package includes its `@hua-labs/dot` dependency. If the dependency install is incomplete or the package tree is corrupted, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
-2. If you are using a custom token defined only in a project-level dot config, the built-in list will not contain it. The server falls back to the dot engine for resolution — verify that your project's dot config is on the module resolution path used by the server process (i.e., the server is started from the project root).
+1. Confirm the installed package graph includes the direct `@hua-labs/dot` runtime dependency. A partial or manually copied Dot LSP installation can leave hover fallback and diagnostic resolution unavailable for tokens outside the package-local catalog.
+2. If you are using a custom token defined only in a project-level dot config, the package-local catalog will not contain it. The server falls back to the Dot engine for resolution — verify that your project's Dot config is on the module resolution path used by the server process (i.e., the server is started from the project root).
 3. Confirm the token is not a typo. Hover over it to see whether hover documentation appears — if it does, the token is known and should not produce a diagnostic.
 
 ### Node.js Version Requirements
 
-The server requires **Node.js 20 or later**. Running it on an older version will cause the process to exit immediately, which editors typically report as a server crash.
+The supported minimum is **Node.js 20.16.0**. Versions below that floor are unsupported. Package managers may warn or refuse installation when engine enforcement is enabled. Runtime behavior below the supported floor is not guaranteed.
 
 Check your version:
 
@@ -364,4 +365,4 @@ Check your version:
 node --version
 ```
 
-If you have multiple Node.js versions installed (e.g. via `nvm` or `fnm`), ensure the version active in the shell environment used by your editor is 20+. Editor processes do not always inherit the same shell environment as your terminal.
+If you have multiple Node.js versions installed (e.g. via `nvm` or `fnm`), ensure the version active in the shell environment used by your editor is 20.16.0 or later. Editor processes do not always inherit the same shell environment as your terminal.
