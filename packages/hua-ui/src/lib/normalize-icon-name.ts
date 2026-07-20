@@ -1,84 +1,78 @@
 /**
- * Icon Name Normalization System
- *
- * 아이콘 이름 정규화를 위한 통합 시스템입니다.
- *
- * Features:
- * - kebab-case → camelCase conversion
- * - snake_case → camelCase conversion
- * - PascalCase → camelCase conversion
- * - Alias resolution
- * - Provider-specific name mapping
+ * Icon name normalization backed by the semantic icon catalog.
  */
 
-import { ICON_ALIASES } from './icon-aliases'
-import { toCamelCase, toPascalCase } from './case-utils'
+import {
+  ICON_ALIAS_MAP,
+  ICON_CATALOG_BY_ID,
+  getIconProviderComponent,
+  type IconCatalogAlias,
+  type IconProviderName,
+} from "./icon-catalog";
+import { toCamelCase } from "./case-utils";
 
-// Re-export case utils for backward compatibility
-export { toCamelCase, toPascalCase } from './case-utils'
+export { toCamelCase, toPascalCase } from "./case-utils";
 
-// IconProvider type (avoid circular dependency with icon-providers.ts)
-export type IconProviderType = 'lucide' | 'phosphor' | 'iconsax'
+export type IconProviderType = IconProviderName;
 
-/**
- * 정규화 결과 인터페이스
- */
 export interface NormalizeResult {
-  /** 정규화된 아이콘 이름 (camelCase) */
-  normalized: string
-  /** 원본 이름이 alias였는지 여부 */
-  wasAlias: boolean
-  /** 원본 alias 이름 (alias였던 경우) */
-  originalAlias?: string
+  normalized: string;
+  wasAlias: boolean;
+  originalAlias?: string;
 }
 
-/**
- * 아이콘 이름을 정규화합니다.
- *
- * @example
- * normalizeIconName('arrow-left')  // { normalized: 'arrowLeft', wasAlias: false }
- * normalizeIconName('back')        // { normalized: 'arrowLeft', wasAlias: true, originalAlias: 'back' }
- * normalizeIconName('ArrowLeft')   // { normalized: 'arrowLeft', wasAlias: false }
- */
 export function normalizeIconName(iconName: string): NormalizeResult {
-  if (!iconName || typeof iconName !== 'string') {
-    return { normalized: iconName || '', wasAlias: false }
+  if (!iconName || typeof iconName !== "string") {
+    return { normalized: iconName || "", wasAlias: false };
   }
 
-  const camelCased = toCamelCase(iconName)
-  const aliasTarget = ICON_ALIASES[iconName] || ICON_ALIASES[camelCased]
-
-  if (aliasTarget) {
+  if (Object.prototype.hasOwnProperty.call(ICON_CATALOG_BY_ID, iconName)) {
+    return { normalized: iconName, wasAlias: false };
+  }
+  const exactAlias = Object.prototype.hasOwnProperty.call(
+    ICON_ALIAS_MAP,
+    iconName,
+  )
+    ? ICON_ALIAS_MAP[iconName as IconCatalogAlias]
+    : undefined;
+  if (exactAlias) {
     return {
-      normalized: aliasTarget,
+      normalized: exactAlias,
       wasAlias: true,
-      originalAlias: iconName
-    }
+      originalAlias: iconName,
+    };
   }
 
-  return {
-    normalized: camelCased,
-    wasAlias: false
+  const camelCased = toCamelCase(iconName);
+  if (Object.prototype.hasOwnProperty.call(ICON_CATALOG_BY_ID, camelCased)) {
+    return { normalized: camelCased, wasAlias: false };
   }
+  const camelAlias = Object.prototype.hasOwnProperty.call(
+    ICON_ALIAS_MAP,
+    camelCased,
+  )
+    ? ICON_ALIAS_MAP[camelCased as IconCatalogAlias]
+    : undefined;
+  if (camelAlias) {
+    return {
+      normalized: camelAlias,
+      wasAlias: true,
+      originalAlias: iconName,
+    };
+  }
+
+  return { normalized: camelCased, wasAlias: false };
 }
 
 /**
- * 프로바이더별 아이콘 이름을 반환합니다.
+ * Return an exact provider component from the catalog.
  *
- * @example
- * getProviderIconName('arrowLeft', 'lucide') // 'ArrowLeft'
- * getProviderIconName('heart', 'iconsax')    // 'Heart'
+ * Unknown or explicitly unsupported names return null. Provider component
+ * names are never inferred with PascalCase.
  */
 export function getProviderIconName(
-  normalizedName: string,
-  provider: IconProviderType
-): string {
-  switch (provider) {
-    case 'lucide':
-    case 'phosphor':
-    case 'iconsax':
-      return toPascalCase(normalizedName)
-    default:
-      return normalizedName
-  }
+  iconName: string,
+  provider: IconProviderType,
+): string | null {
+  return getIconProviderComponent(iconName, provider);
 }

@@ -1,5 +1,5 @@
 {
-  "mapDigest": "ad9f86fad0a8fa7180f959df39c014c7617e402e802b215f579e4951eab7f93a",
+  "mapDigest": "e9c9cf1b5fbf4dac9061e9bbf1209d5de9ae574b06c5119a2daa7b05d78bf367",
   "publicBase": {
     "commit": "742da1e7dd5d53d06b0614ee53cea70c514e29ff",
     "packageTree": "c9e9eda885dfbbde9956167dd4ab514122f0ad69",
@@ -64,17 +64,17 @@
       "sourceSha256": "d89ba903bbf64975c01f4363419dd7359fdbe105a7e06db5d15b3edc8b06dfe6"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "a3be957f0877aaa451ae7c138f596144447fb02a273b588f52a3cb7e88bb4005",
       "path": "packages/hua-ui/src/components/ActionToolbar.tsx",
       "publicBaseSha256": "6f43883bb0c657fdab9a42d32d0dbee0a360e69b5762a2211a90e17f41a7a001",
       "sourceSha256": "a3be957f0877aaa451ae7c138f596144447fb02a273b588f52a3cb7e88bb4005"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": "a7a58e04f418846cf1d33ea47ec960c065efab26c5dc42144f97e01adafbbe4c",
+      "outputSha256": "b9021c207c3d95c872b0776f0b3df4337342992d6f9abee048d2d6a66bb18bdf",
       "path": "packages/hua-ui/src/components/Bookmark.tsx",
       "publicBaseSha256": "a7a58e04f418846cf1d33ea47ec960c065efab26c5dc42144f97e01adafbbe4c",
       "sourceSha256": "b9021c207c3d95c872b0776f0b3df4337342992d6f9abee048d2d6a66bb18bdf"
@@ -104,17 +104,17 @@
       "sourceSha256": "11adf46e30fd0ba8e5f53cfa3877336e4db0baff9552c3e7ef45b3c4d1731856"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": "019425701962fec549e6d52f657c89f912f485116f177ca8b11eddd955e1d719",
+      "outputSha256": "6bc5bf467efe7b24f775007f76bb50215af5f563610d88d59e35ea047cd192a3",
       "path": "packages/hua-ui/src/components/Card.tsx",
       "publicBaseSha256": "019425701962fec549e6d52f657c89f912f485116f177ca8b11eddd955e1d719",
       "sourceSha256": "6bc5bf467efe7b24f775007f76bb50215af5f563610d88d59e35ea047cd192a3"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": "20654176b824b46da9c4a7db251516ffa57c22294817d3ce3e25edd155d2f0de",
+      "outputSha256": "90e92d86a5c1694e3529c64d1a7fb666eb9444618024f89c05bbb98e43bacf0d",
       "path": "packages/hua-ui/src/components/Divider.tsx",
       "publicBaseSha256": "20654176b824b46da9c4a7db251516ffa57c22294817d3ce3e25edd155d2f0de",
       "sourceSha256": "90e92d86a5c1694e3529c64d1a7fb666eb9444618024f89c05bbb98e43bacf0d"
@@ -136,12 +136,12 @@
       "sourceSha256": "654ab9acac22a43a86a25bb9c5a39d310a9e490d03d7d8e5279823ebb5f66f11"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": "f2e2bb562aa1958ab3c0749818f3ccaa18d71111225d173c67649bb48b59436c",
+      "outputSha256": "4404ce59943a5994fd42e6e9cb6cf25a03bc0a81a19455c01c8e008b2c4f782f",
       "path": "packages/hua-ui/src/components/Icon/Icon.tsx",
       "publicBaseSha256": "f2e2bb562aa1958ab3c0749818f3ccaa18d71111225d173c67649bb48b59436c",
-      "sourceSha256": "14ece378a0c8aeafc694f84ec2a686e2b7c6db79c87619690ddddf617923a6de"
+      "sourceSha256": "4404ce59943a5994fd42e6e9cb6cf25a03bc0a81a19455c01c8e008b2c4f782f"
     },
     {
       "disposition": "platform-exact",
@@ -176,9 +176,9 @@
       "sourceSha256": "f8fb87ef6b96ab478b626cd672e95b9f6014acfcbeb2f6d90649ad08f595b43b"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": "e4a492be9be24b4c35b7fab37bced999ee0c25150cba33896823d024ae5acd77",
+      "outputSha256": "4cc9ba3d170341edac1855342a8c951bbc93684154d7cac7ca86c4e5431be3d2",
       "path": "packages/hua-ui/src/components/ScrollProgress.tsx",
       "publicBaseSha256": "e4a492be9be24b4c35b7fab37bced999ee0c25150cba33896823d024ae5acd77",
       "sourceSha256": "4cc9ba3d170341edac1855342a8c951bbc93684154d7cac7ca86c4e5431be3d2"
@@ -264,9 +264,9 @@
       "sourceSha256": "f6040a978da13c6ec5a4997318b34a232fa8fbe810a167be5abc8bfcf4ca23ca"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": "1801c6792b6857af014b501428be3411c179ac4676f0de2deb6f8728e5d7ff87",
+      "outputSha256": "d8981581b9b51c30aa39e37156a7442342d4a3ab4b7435139a34cf0fbf2fb6e3",
       "path": "packages/hua-ui/src/components/__tests__/Bookmark.test.tsx",
       "publicBaseSha256": "1801c6792b6857af014b501428be3411c179ac4676f0de2deb6f8728e5d7ff87",
       "sourceSha256": "d8981581b9b51c30aa39e37156a7442342d4a3ab4b7435139a34cf0fbf2fb6e3"
@@ -376,12 +376,12 @@
       "sourceSha256": "42a02c3bd85913eb42a81c68a03dd4d6306a48f6e121c0f6342e41dfa7e98de8"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "126838c52a4ef479d939528cd41d6bd354ec5e603ff04aea4e8c98c8733ea433",
       "path": "packages/hua-ui/src/components/__tests__/Icon.test.tsx",
       "publicBaseSha256": null,
-      "sourceSha256": "990ef16c5181a479438c515260b60805abc540afe1f9a5c73e349edae34a048a"
+      "sourceSha256": "126838c52a4ef479d939528cd41d6bd354ec5e603ff04aea4e8c98c8733ea433"
     },
     {
       "disposition": "public-preserved",
@@ -880,9 +880,9 @@
       "sourceSha256": "b6147daf8263e31a1ca88d1cbd6bc0497d45373d628c432f017b5cea488f5e9b"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "3a14731442ca6d8cd3434f93783003275be8a920ff77beeb2d2fc4d59c47927f",
       "path": "packages/hua-ui/src/lib/__tests__/icon-aliases.test.ts",
       "publicBaseSha256": "02a74dc041ad1ae92f033974a618eb24a1443d0b6cbfad6b71241be2204822b9",
       "sourceSha256": "3a14731442ca6d8cd3434f93783003275be8a920ff77beeb2d2fc4d59c47927f"
@@ -896,17 +896,17 @@
       "sourceSha256": "046bcaa5080cbf1181f7851713dfa85530e183ef7e1d34290c0e0aed151ae44a"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "7203850595b0cbc454fe7490891a72322db4108f0e0c82b4aca5e5054b0462cf",
       "path": "packages/hua-ui/src/lib/__tests__/icon-providers.test.ts",
       "publicBaseSha256": null,
       "sourceSha256": "7203850595b0cbc454fe7490891a72322db4108f0e0c82b4aca5e5054b0462cf"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "cdc6228429a99d961c8d51c4f23add1ccf7804f0d63cb352937f0d5f350412ed",
       "path": "packages/hua-ui/src/lib/__tests__/normalize-icon-name.test.ts",
       "publicBaseSha256": "389d7edf29db5f036061320d5e21161d55a28a45f6ab457462d558b4b3586a13",
       "sourceSha256": "cdc6228429a99d961c8d51c4f23add1ccf7804f0d63cb352937f0d5f350412ed"
@@ -920,49 +920,49 @@
       "sourceSha256": "d1be858ddae6b869bc23effc658988d8bf57e5feeaac52ef3aa76fb6671847f5"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "1e090aacb8bc5bcda15f5bde0904f09ff728874488c506b89b19c5648823026d",
       "path": "packages/hua-ui/src/lib/icon-aliases.ts",
       "publicBaseSha256": "00f9c23196b1c8afdb44acac4ae140acae7b24aeed0c6bbab0fcb42ecc1d3507",
       "sourceSha256": "1e090aacb8bc5bcda15f5bde0904f09ff728874488c506b89b19c5648823026d"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "18f78a7c372993f4a11dd8a05e9b38c832aea3ea71554c788beb418b92a4457a",
       "path": "packages/hua-ui/src/lib/icon-catalog.ts",
       "publicBaseSha256": null,
       "sourceSha256": "18f78a7c372993f4a11dd8a05e9b38c832aea3ea71554c788beb418b92a4457a"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "c2a7fbd912280e2bf29bc52e27d6bbf54cfec41184eb0cee6e2c6e8f5764c902",
       "path": "packages/hua-ui/src/lib/icon-names.ts",
       "publicBaseSha256": "23eb713d00c172a082e3ab6ed788b7c64b9c86d942b6549a132cb62b6fb10ce3",
       "sourceSha256": "c2a7fbd912280e2bf29bc52e27d6bbf54cfec41184eb0cee6e2c6e8f5764c902"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "1c1e66d5e24ba27f9597506fce11a3139bdf2cfe0a073c90d4c93b99940800df",
       "path": "packages/hua-ui/src/lib/icon-providers.ts",
       "publicBaseSha256": "b0d70ff1281babf2b7dbbf5d349721784f25b0f86872800c90d7b2bd430daa1c",
       "sourceSha256": "1c1e66d5e24ba27f9597506fce11a3139bdf2cfe0a073c90d4c93b99940800df"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "e9f666ece970670ae48272638adfffcacda754fd3a0cbf6987935d8cef0c855a",
       "path": "packages/hua-ui/src/lib/icons.ts",
       "publicBaseSha256": "381ffaf413c747ef266a7e608eb7a3df7287c293d5b010ff2bc35c1d76cf8954",
       "sourceSha256": "e9f666ece970670ae48272638adfffcacda754fd3a0cbf6987935d8cef0c855a"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "e97a377659797c2a853ce424517f542c858254acb8d58c6ad693b0b4efa8c752",
       "path": "packages/hua-ui/src/lib/normalize-icon-name.ts",
       "publicBaseSha256": "48bf58fd598791206d515ab26518ae25494f9f762e8974693c9481e182bab136",
       "sourceSha256": "e97a377659797c2a853ce424517f542c858254acb8d58c6ad693b0b4efa8c752"
@@ -1210,9 +1210,9 @@
   ],
   "schema": "hua-ui-source-authority.v1",
   "sourceAuthority": {
-    "commit": "4a710400e2920073c29cb942e148f65bf3c44c6e",
-    "packageTree": "fe3ea9a3d65ade4d65d1d7bf66b032cfaa01db7f",
-    "sourceTree": "dd64665d9b8a11baf93aa554516304c3276a64b5",
-    "tree": "fb14af0491913f208f88f94972bea30a8193fdb4"
+    "commit": "72d311fa84c596397f338cd06b9bfc541448af61",
+    "packageTree": "e7097d610de019c22ffb2967c08d62b3eeec319f",
+    "sourceTree": "ac7b098559e9560b74ce24652b34f5c8561a70ea",
+    "tree": "516c1135a218413e7f7725f38379beca721594e9"
   }
 }

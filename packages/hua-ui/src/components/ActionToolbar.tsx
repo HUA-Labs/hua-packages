@@ -182,8 +182,8 @@ const ActionToolbarComponent = React.forwardRef<
               dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5"
             />
           )}
-          <span style={dot("hidden sm:inline")}>{action.label}</span>
-          <span style={dot("sm:hidden")}>
+          <span className="hidden sm:inline">{action.label}</span>
+          <span className="sm:hidden">
             {action.labelMobile || action.label}
           </span>
           {action.badge && action.badge.count > 0 && (
@@ -235,10 +235,10 @@ const ActionToolbarComponent = React.forwardRef<
                   name={selectedCount === totalCount ? "square" : "check"}
                   dot="h-4 w-4 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5"
                 />
-                <span style={dot("hidden sm:inline")}>
+                <span className="hidden sm:inline">
                   {selectedCount === totalCount ? "전체 해제" : "전체 선택"}
                 </span>
-                <span style={dot("sm:hidden")}>
+                <span className="sm:hidden">
                   {selectedCount === totalCount ? "해제" : "전체"}
                 </span>
               </Button>
@@ -283,7 +283,7 @@ const ActionToolbarComponent = React.forwardRef<
                 title={totalCount === 0 ? "항목이 없습니다" : "여러 항목 선택"}
               >
                 <Icon name="check" dot="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-                <span style={dot("hidden sm:inline ml-1.5 sm:ml-2")}>선택</span>
+                <span className="hidden sm:inline ml-1.5 sm:ml-2">선택</span>
               </Button>
             )}
 

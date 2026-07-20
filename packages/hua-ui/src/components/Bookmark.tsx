@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-import { Icon } from "./Icon"
+import React, { useState, useEffect } from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { Icon } from "./Icon";
 
 /**
  * Bookmark 컴포넌트의 props / Bookmark component props
@@ -15,15 +15,18 @@ import { Icon } from "./Icon"
  * @property {'default' | 'filled' | 'outline'} [variant='default'] - Bookmark 스타일 변형 / Bookmark style variant
  * @extends {Omit<React.HTMLAttributes<HTMLButtonElement>, 'className'>}
  */
-export interface BookmarkProps extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'className'> {
-  id: string
-  storageKey?: string
-  defaultBookmarked?: boolean
-  onBookmarkChange?: (bookmarked: boolean) => void
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'default' | 'filled' | 'outline'
-  dot?: string
-  style?: React.CSSProperties
+export interface BookmarkProps extends Omit<
+  React.HTMLAttributes<HTMLButtonElement>,
+  "className"
+> {
+  id: string;
+  storageKey?: string;
+  defaultBookmarked?: boolean;
+  onBookmarkChange?: (bookmarked: boolean) => void;
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "filled" | "outline";
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -53,87 +56,97 @@ export interface BookmarkProps extends Omit<React.HTMLAttributes<HTMLButtonEleme
  * @returns {JSX.Element} Bookmark 컴포넌트 / Bookmark component
  */
 const Bookmark = React.forwardRef<HTMLButtonElement, BookmarkProps>(
-  ({
-    id,
-    storageKey = 'bookmarks',
-    defaultBookmarked = false,
-    onBookmarkChange,
-    size = 'md',
-    variant = 'default',
-    dot: dotProp,
-    style,
-    ...props
-  }, ref) => {
-    const [isBookmarked, setIsBookmarked] = useState(defaultBookmarked)
+  (
+    {
+      id,
+      storageKey = "bookmarks",
+      defaultBookmarked = false,
+      onBookmarkChange,
+      size = "md",
+      variant = "default",
+      dot: dotProp,
+      style,
+      ...props
+    },
+    ref,
+  ) => {
+    const [isBookmarked, setIsBookmarked] = useState(defaultBookmarked);
 
     // 로컬 스토리지에서 북마크 상태 불러오기
     useEffect(() => {
-      const savedBookmarks = localStorage.getItem(storageKey)
+      const savedBookmarks = localStorage.getItem(storageKey);
       if (savedBookmarks) {
-        const bookmarks = JSON.parse(savedBookmarks)
-        setIsBookmarked(bookmarks.includes(id))
+        const bookmarks = JSON.parse(savedBookmarks);
+        setIsBookmarked(bookmarks.includes(id));
       }
-    }, [id, storageKey])
+    }, [id, storageKey]);
 
     // 북마크 토글
     const toggleBookmark = () => {
-      const newBookmarked = !isBookmarked
-      setIsBookmarked(newBookmarked)
+      const newBookmarked = !isBookmarked;
+      setIsBookmarked(newBookmarked);
 
       // 로컬 스토리지 업데이트
-      const savedBookmarks = localStorage.getItem(storageKey)
-      const bookmarks = savedBookmarks ? JSON.parse(savedBookmarks) : []
+      const savedBookmarks = localStorage.getItem(storageKey);
+      const bookmarks = savedBookmarks ? JSON.parse(savedBookmarks) : [];
 
       if (newBookmarked) {
         if (!bookmarks.includes(id)) {
-          bookmarks.push(id)
+          bookmarks.push(id);
         }
       } else {
-        const index = bookmarks.indexOf(id)
+        const index = bookmarks.indexOf(id);
         if (index > -1) {
-          bookmarks.splice(index, 1)
+          bookmarks.splice(index, 1);
         }
       }
 
-      localStorage.setItem(storageKey, JSON.stringify(bookmarks))
-      onBookmarkChange?.(newBookmarked)
-    }
+      localStorage.setItem(storageKey, JSON.stringify(bookmarks));
+      onBookmarkChange?.(newBookmarked);
+    };
 
     const sizeClasses = {
       sm: "w-6 h-6",
       md: "w-8 h-8",
-      lg: "w-10 h-10"
-    }
+      lg: "w-10 h-10",
+    };
 
     const variantClasses = {
       default: "text-muted-foreground hover:text-yellow-500 transition-colors",
       filled: "text-yellow-500 hover:text-yellow-600 transition-colors",
-      outline: "border border-border text-muted-foreground hover:text-yellow-500 hover:border-yellow-500 transition-colors rounded"
-    }
+      outline:
+        "border border-border text-muted-foreground hover:text-yellow-500 hover:border-yellow-500 transition-colors rounded",
+    };
 
     return (
       <button
         ref={ref}
         onClick={toggleBookmark}
         style={mergeStyles(
-          resolveDot("flex items-center justify-center transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-yellow-500 focus-visible:ring-offset-2"),
+          resolveDot(
+            "flex items-center justify-center transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-yellow-500 focus-visible:ring-offset-2",
+          ),
           resolveDot(sizeClasses[size]),
           resolveDot(variantClasses[variant]),
           resolveDot(dotProp),
-          style
+          style,
         )}
         {...props}
       >
         <Icon
           name="star"
-          dot="transition-all duration-200"
-          style={isBookmarked ? { fill: "currentColor" } : undefined}
+          weight={isBookmarked ? "fill" : "regular"}
+          dot={
+            isBookmarked
+              ? "transition-all duration-200 fill-current"
+              : "transition-all duration-200"
+          }
         />
       </button>
-    )
-  }
-)
+    );
+  },
+);
 
-Bookmark.displayName = "Bookmark"
+Bookmark.displayName = "Bookmark";
 
-export { Bookmark }
+export { Bookmark };

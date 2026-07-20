@@ -64,13 +64,38 @@ const m828PlatformExactPaths = [
   ...m814InteractionPaths,
   ...m821DomClassNamePaths,
 ].sort();
-const m828PlatformExactPathSet = new Set(m828PlatformExactPaths);
-const m828MapDigest =
-  "ad9f86fad0a8fa7180f959df39c014c7617e402e802b215f579e4951eab7f93a";
+const m835IconCorePaths = [
+  "packages/hua-ui/src/components/ActionToolbar.tsx",
+  "packages/hua-ui/src/components/Bookmark.tsx",
+  "packages/hua-ui/src/components/Card.tsx",
+  "packages/hua-ui/src/components/Divider.tsx",
+  "packages/hua-ui/src/components/Icon/Icon.tsx",
+  "packages/hua-ui/src/components/ScrollProgress.tsx",
+  "packages/hua-ui/src/components/__tests__/Bookmark.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Icon.test.tsx",
+  "packages/hua-ui/src/lib/__tests__/icon-aliases.test.ts",
+  "packages/hua-ui/src/lib/__tests__/icon-providers.test.ts",
+  "packages/hua-ui/src/lib/__tests__/normalize-icon-name.test.ts",
+  "packages/hua-ui/src/lib/icon-aliases.ts",
+  "packages/hua-ui/src/lib/icon-catalog.ts",
+  "packages/hua-ui/src/lib/icon-names.ts",
+  "packages/hua-ui/src/lib/icon-providers.ts",
+  "packages/hua-ui/src/lib/icons.ts",
+  "packages/hua-ui/src/lib/normalize-icon-name.ts",
+].sort();
+const m835PlatformExactPaths = [
+  ...m828PlatformExactPaths,
+  ...m835IconCorePaths,
+].sort();
+const m835IconCorePathSet = new Set(m835IconCorePaths);
+const m835MapDigest =
+  "e9c9cf1b5fbf4dac9061e9bbf1209d5de9ae574b06c5119a2daa7b05d78bf367";
+const m835SelectedDigest =
+  "7c8cb9b467ff56b323e7a9d286803c36409d724b14f7a38c3a11f02d234f7963";
 const m821SelectedDigest =
   "1b62279f3148d21bedee2311eb9ef58c256e1f01c56d67246f7e6b43f00a291f";
-const m828UnselectedDigest =
-  "8d4a5e912ee4b80158e71bfb4f78dbe5718ef54005e4f2647059dd5f61df9fb3";
+const m835RemainingDigest =
+  "4ef39338e6932fc540e3da9e55addec0a0295340662bcc15c92699ccf641b46e";
 const ownedRoots = [];
 
 afterEach(() => {
@@ -136,30 +161,27 @@ function authorityRowDigest(rows) {
   return sha256(`${lines.join("\n")}\n`);
 }
 
-function unselectedAuthorityRows(rows) {
-  return rows.filter((row) => !m828PlatformExactPathSet.has(row.path));
+function remainingAuthorityRows(rows) {
+  return rows.filter((row) => !m835IconCorePathSet.has(row.path));
 }
 
-function unselectedAuthorityDigest(rows) {
-  return authorityRowDigest(unselectedAuthorityRows(rows));
+function remainingAuthorityDigest(rows) {
+  return authorityRowDigest(remainingAuthorityRows(rows));
 }
 
-function assertM828AuthorityLock(
+function assertM835AuthorityLock(
   config,
   {
-    expectedMapDigest = m828MapDigest,
-    expectedUnselectedDigest = m828UnselectedDigest,
+    expectedMapDigest = m835MapDigest,
+    expectedRemainingDigest = m835RemainingDigest,
   } = {},
 ) {
   assert.equal(config.mapDigest, sha256(canonicalJson(config.rows)));
   assert.equal(config.mapDigest, expectedMapDigest);
 
-  const unselectedRows = unselectedAuthorityRows(config.rows);
-  assert.equal(unselectedRows.length, 116);
-  assert.equal(
-    unselectedAuthorityDigest(config.rows),
-    expectedUnselectedDigest,
-  );
+  const remainingRows = remainingAuthorityRows(config.rows);
+  assert.equal(remainingRows.length, 133);
+  assert.equal(remainingAuthorityDigest(config.rows), expectedRemainingDigest);
 }
 
 function authority(root, commit) {
@@ -289,22 +311,31 @@ function runChecker(fixture, ...extra) {
   );
 }
 
-test("locks the M828 DOM family and unselected remainder to platform authority", () => {
+test("locks the M835 icon core and remaining rows to platform authority", () => {
   const config = JSON.parse(readFileSync(realConfig, "utf8"));
   assert.deepEqual(config.sourceAuthority, {
-    commit: "4a710400e2920073c29cb942e148f65bf3c44c6e",
-    packageTree: "fe3ea9a3d65ade4d65d1d7bf66b032cfaa01db7f",
-    sourceTree: "dd64665d9b8a11baf93aa554516304c3276a64b5",
-    tree: "fb14af0491913f208f88f94972bea30a8193fdb4",
+    commit: "72d311fa84c596397f338cd06b9bfc541448af61",
+    packageTree: "e7097d610de019c22ffb2967c08d62b3eeec319f",
+    sourceTree: "ac7b098559e9560b74ce24652b34f5c8561a70ea",
+    tree: "516c1135a218413e7f7725f38379beca721594e9",
   });
-  assertM828AuthorityLock(config);
+  assertM835AuthorityLock(config);
 
   const platformExactRows = config.rows.filter(
     (row) => row.disposition === "platform-exact",
   );
+  assert.equal(platformExactRows.length, 51);
+  assert.equal(
+    config.rows.filter((row) => row.disposition === "deferred").length,
+    51,
+  );
+  assert.equal(
+    config.rows.filter((row) => row.disposition === "public-preserved").length,
+    48,
+  );
   assert.deepEqual(
     platformExactRows.map((row) => row.path),
-    m828PlatformExactPaths,
+    m835PlatformExactPaths,
   );
   for (const row of platformExactRows) {
     assert.equal(row.outputSha256, row.sourceSha256, row.path);
@@ -321,39 +352,68 @@ test("locks the M828 DOM family and unselected remainder to platform authority",
     assert.equal(row?.outputSha256, row?.sourceSha256, path);
   }
 
-  const tampered = structuredClone(config);
-  const card = tampered.rows.find(
-    (row) => row.path === "packages/hua-ui/src/components/Card.tsx",
+  const m835SelectedRows = config.rows.filter((row) =>
+    m835IconCorePaths.includes(row.path),
   );
-  assert.ok(card);
-  assert.equal(card.kind, "production");
-  assert.equal(card.disposition, "public-preserved");
-  assert.equal(card.outputSha256, card.publicBaseSha256);
-  card.disposition = "deferred";
-  card.outputSha256 = null;
+  assert.equal(m835SelectedRows.length, 17);
+  assert.equal(authorityRowDigest(m835SelectedRows), m835SelectedDigest);
+
+  for (const path of m835IconCorePaths) {
+    const row = config.rows.find((candidate) => candidate.path === path);
+    assert.equal(row?.disposition, "platform-exact", path);
+    assert.equal(row?.outputSha256, row?.sourceSha256, path);
+  }
+
+  const catalogEvidence = config.rows.find(
+    (row) =>
+      row.path === "packages/hua-ui/src/lib/__tests__/icon-catalog.test.ts",
+  );
+  assert.equal(catalogEvidence?.disposition, "deferred");
+  assert.equal(catalogEvidence?.outputSha256, null);
+
+  const productionContents = m835IconCorePaths
+    .filter((path) => path.endsWith(".ts") || path.endsWith(".tsx"))
+    .filter((path) => !path.includes("/__tests__/"))
+    .map((path) => readFileSync(join(root, path), "utf8"))
+    .join("\n");
+  assert.doesNotMatch(
+    productionContents,
+    /(?:from\s+|import\s*\(|require\s*\()\s*["']lucide-react["']/,
+  );
+
+  const tampered = structuredClone(config);
+  const logo = tampered.rows.find(
+    (row) => row.path === "packages/hua-ui/src/advanced/Logo.tsx",
+  );
+  assert.ok(logo);
+  assert.equal(logo.kind, "production");
+  assert.equal(logo.disposition, "deferred");
+  assert.equal(logo.outputSha256, null);
+  logo.disposition = "public-preserved";
+  logo.outputSha256 = logo.publicBaseSha256;
   tampered.mapDigest = sha256(canonicalJson(tampered.rows));
 
   assert.equal(
     tampered.mapDigest,
-    "4ac1ac2fba874867f8b4ed5633c86d7105d3bd08d675701402daf14075138aa2",
+    "c3097ff816a63afc3dee42fa3ba15248ff4a998471bbc10dd04cfd3c79256065",
   );
-  const tamperedUnselectedDigest = unselectedAuthorityDigest(tampered.rows);
+  const tamperedRemainingDigest = remainingAuthorityDigest(tampered.rows);
   assert.equal(
-    tamperedUnselectedDigest,
-    "5e1c95bd615f60b9a10ef67077b6ea63a88cc7333588b2591c071be159c1e636",
+    tamperedRemainingDigest,
+    "9304f16d0c175b3fa4c5c1b2c6c90989c86a9496c8b94fa45cd9de39b27e5025",
   );
 
   let failure;
   try {
-    assertM828AuthorityLock(tampered, {
+    assertM835AuthorityLock(tampered, {
       expectedMapDigest: tampered.mapDigest,
     });
   } catch (error) {
     failure = error;
   }
   assert.equal(failure?.name, "AssertionError");
-  assert.equal(failure?.actual, tamperedUnselectedDigest);
-  assert.equal(failure?.expected, m828UnselectedDigest);
+  assert.equal(failure?.actual, tamperedRemainingDigest);
+  assert.equal(failure?.expected, m835RemainingDigest);
 });
 
 function createOversizedSourceFixture() {
@@ -607,6 +667,10 @@ function installCheckerFixture(fixture) {
   mkdirSync(scripts, { recursive: true });
   copyFileSync(checker, join(scripts, "check-ui-source-authority.mjs"));
   copyFileSync(packChecker, join(scripts, "check-pack-artifacts.js"));
+  writeFileSync(
+    join(scripts, "check-dot-core-source-authority.mjs"),
+    "#!/usr/bin/env node\nprocess.exit(0);\n",
+  );
 }
 
 test("pack inspection is blocked when current UI authority drifts", () => {
