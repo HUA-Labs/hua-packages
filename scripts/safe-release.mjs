@@ -587,7 +587,7 @@ function normalizeManifest(value, label) {
     value.publishConfig === undefined
       ? null
       : validatePublishConfig(value.publishConfig, `${label}-publish-config`);
-  const dependencyNames = new Set();
+  const dependencyRecords = [];
   for (const field of ["dependencies", "optionalDependencies"]) {
     const dependencies = value[field];
     if (dependencies === undefined) continue;
@@ -603,18 +603,18 @@ function normalizeManifest(value, label) {
         /^.{1,512}$/u,
         `${label}-${field}-spec`,
       );
-      if (dependencySpec.startsWith("workspace:")) {
-        dependencyNames.add(dependencyName);
-      }
+      dependencyRecords.push({
+        name: dependencyName,
+        workspaceSpecifier: dependencySpec.startsWith("workspace:"),
+      });
     }
   }
-  const workspaceDependencies = [...dependencyNames].sort(compareUtf8);
   return {
     name,
     version,
     private: isPrivate,
     publishConfig,
-    workspaceDependencies,
+    dependencyRecords,
   };
 }
 
@@ -642,7 +642,7 @@ export function discoverWorkspaceManifests(root) {
       version: manifest.version,
       private: manifest.private,
       publishConfig: manifest.publishConfig,
-      workspaceDependencies: manifest.workspaceDependencies,
+      dependencyRecords: manifest.dependencyRecords,
       sha256: sha256(bytes),
     });
   }
@@ -650,6 +650,21 @@ export function discoverWorkspaceManifests(root) {
   assertSortedUnique(records, "name", "workspace-name-order");
   assertNoNormalizedCollisions(records, "name", "workspace-name-collision");
   assertNoNormalizedCollisions(records, "path", "workspace-path-collision");
+  const workspaceNames = new Set(records.map((record) => record.name));
+  for (const record of records) {
+    record.workspaceDependencies = [
+      ...new Set(
+        record.dependencyRecords
+          .filter(
+            (dependency) =>
+              dependency.workspaceSpecifier ||
+              workspaceNames.has(dependency.name),
+          )
+          .map((dependency) => dependency.name),
+      ),
+    ].sort(compareUtf8);
+    delete record.dependencyRecords;
+  }
   return records;
 }
 
@@ -1559,6 +1574,29 @@ function readPackedPackageManifest(execFile, root, artifactPath) {
     label: "artifact-package-manifest",
   });
   assert(isRecord(value), "artifact-package-manifest-shape");
+  const dependencyFields = {};
+  for (const field of ["dependencies", "optionalDependencies"]) {
+    const dependencies = value[field];
+    if (dependencies === undefined) {
+      dependencyFields[field] = {};
+      continue;
+    }
+    assert(isRecord(dependencies), `artifact-package-${field}-shape`);
+    const normalized = {};
+    for (const dependencyName of Object.keys(dependencies).sort(compareUtf8)) {
+      stringValue(
+        dependencyName,
+        PACKAGE_NAME_PATTERN,
+        `artifact-package-${field}-name`,
+      );
+      normalized[dependencyName] = stringValue(
+        dependencies[dependencyName],
+        /^.{1,512}$/u,
+        `artifact-package-${field}-spec`,
+      );
+    }
+    dependencyFields[field] = normalized;
+  }
   return {
     name: stringValue(
       value.name,
@@ -1570,7 +1608,37 @@ function readPackedPackageManifest(execFile, root, artifactPath) {
       SEMVER_PATTERN,
       "artifact-package-version",
     ),
+    ...dependencyFields,
   };
+}
+
+function assertPackedWorkspaceDependencies(
+  packageManifest,
+  dependencies,
+  workspaceNames,
+) {
+  const declarations = new Map();
+  for (const field of ["dependencies", "optionalDependencies"]) {
+    for (const [name, specifier] of Object.entries(packageManifest[field])) {
+      if (!workspaceNames.has(name)) continue;
+      assert(
+        !declarations.has(name),
+        "artifact-package-dependency-declaration",
+      );
+      declarations.set(name, specifier);
+    }
+  }
+  assert(
+    declarations.size === dependencies.length &&
+      dependencies.every((dependency) => declarations.has(dependency.name)),
+    "artifact-package-dependency-set",
+  );
+  for (const dependency of dependencies) {
+    assert(
+      declarations.get(dependency.name) === dependency.version,
+      "artifact-package-dependency-version",
+    );
+  }
 }
 
 export function readArtifactBundle(options = {}) {
@@ -1664,6 +1732,11 @@ export function readArtifactBundle(options = {}) {
     assert(
       packageManifest.version === artifact.version,
       "artifact-package-version-drift",
+    );
+    assertPackedWorkspaceDependencies(
+      packageManifest,
+      artifactWorkspaceDependencies(options.releaseState, artifact),
+      new Set(options.releaseState.manifests.map((entry) => entry.name)),
     );
     const after = readRegularFile(
       artifactPath,
@@ -2696,17 +2769,27 @@ function selectedPublishOrder(releaseState, artifacts) {
   return ordered;
 }
 
-function selectedArtifactDependencies(releaseState, artifact) {
+function artifactWorkspaceDependencies(releaseState, artifact) {
   const releaseByName = new Map(
     releaseState.plan.releases.map((release) => [release.name, release]),
+  );
+  const manifestByName = new Map(
+    releaseState.manifests.map((manifest) => [manifest.name, manifest]),
   );
   const manifest = releaseState.manifests.find(
     (candidate) => candidate.name === artifact.name,
   );
   assert(manifest !== undefined, "publish-dependency-manifest");
   return manifest.workspaceDependencies
-    .filter((name) => releaseByName.has(name))
-    .map((name) => ({ name, version: releaseByName.get(name).toVersion }))
+    .map((name) => {
+      const dependencyManifest = manifestByName.get(name);
+      assert(dependencyManifest !== undefined, "publish-dependency-manifest");
+      return {
+        name,
+        version:
+          releaseByName.get(name)?.toVersion ?? dependencyManifest.version,
+      };
+    })
     .sort((left, right) => compareUtf8(left.name, right.name));
 }
 
@@ -2889,7 +2972,7 @@ export function runPublish(options = {}) {
     }
     installedConsumerVerifier({
       artifact,
-      dependencies: selectedArtifactDependencies(releaseState, artifact),
+      dependencies: artifactWorkspaceDependencies(releaseState, artifact),
     });
     publishedPackages.push({ name: artifact.name, version: artifact.version });
   }

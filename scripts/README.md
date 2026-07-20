@@ -218,9 +218,12 @@ closed. A newly published artifact must reach the same exact registry and
 provenance state before progress continues.
 
 After registry verification, a fresh caller-owned temporary npm consumer
-installs the exact package version with lifecycle scripts disabled. It checks
-the installed package identity and uses `npm ls` to require every selected
-workspace dependency at its exact planned version. The temporary consumer is
+installs the exact package version with lifecycle scripts disabled. Before npm
+is reached, the guard also requires each packed workspace dependency to be
+declared exactly once at its exact planned or current version; mutable tags and
+ranges such as `latest` or `^1.2.3` fail closed. The consumer then checks the
+installed package identity and uses `npm ls` to require every workspace
+dependency at that exact version. The temporary consumer is
 removed on success or failure, and no dependent package is attempted until
 that install boundary passes. This permits safe reviewed resume after a
 partial run while preventing a dependency from publishing before the registry

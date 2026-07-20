@@ -14,7 +14,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import test from "node:test";
 import { parseDocument } from "yaml";
 import { checkPublishedProvenance } from "../check-npm-provenance.mjs";
@@ -348,8 +348,18 @@ function kindHead(kind) {
   return kind === "claim" ? "b".repeat(40) : "e".repeat(40);
 }
 
-function createTestArtifactBundle(fixture, claim = TEST_CLAIM) {
+function createTestArtifactBundle(
+  fixture,
+  claim = TEST_CLAIM,
+  artifactOptions = {},
+) {
   const state = loadReleaseState(fixture.root, { requireNonempty: true });
+  const releaseByName = new Map(
+    state.plan.releases.map((release) => [release.name, release]),
+  );
+  const manifestByName = new Map(
+    state.manifests.map((manifest) => [manifest.name, manifest]),
+  );
   const artifactRoot = realpathSync(
     mkdtempSync(join(tmpdir(), "hua-safe-artifacts-")),
   );
@@ -360,9 +370,41 @@ function createTestArtifactBundle(fixture, claim = TEST_CLAIM) {
       const file = `${release.name.replaceAll("@", "").replaceAll("/", "-")}-${release.toVersion}.tgz`;
       const packageRoot = join(stagingRoot, file, "package");
       mkdirSync(packageRoot, { recursive: true });
+      const definition = fixture.definitions.find(
+        (candidate) => candidate.name === release.name,
+      );
+      assert.notEqual(definition, undefined);
+      const dependencyFields = {};
+      for (const field of ["dependencies", "optionalDependencies"]) {
+        const dependencies = Object.fromEntries(
+          Object.entries(definition[field] ?? {})
+            .filter(([dependencyName]) => manifestByName.has(dependencyName))
+            .map(([dependencyName, specifier]) => {
+              const dependencyManifest = manifestByName.get(dependencyName);
+              assert.notEqual(dependencyManifest, undefined);
+              const exactVersion =
+                releaseByName.get(dependencyName)?.toVersion ??
+                dependencyManifest.version;
+              return [
+                dependencyName,
+                artifactOptions.dependencySpec ??
+                  (specifier.startsWith("workspace:")
+                    ? exactVersion
+                    : specifier),
+              ];
+            }),
+        );
+        if (Object.keys(dependencies).length > 0) {
+          dependencyFields[field] = dependencies;
+        }
+      }
       writeFileSync(
         join(packageRoot, "package.json"),
-        canonicalJson({ name: release.name, version: release.toVersion }),
+        canonicalJson({
+          name: release.name,
+          version: release.toVersion,
+          ...dependencyFields,
+        }),
       );
       const artifactPath = join(artifactRoot, file);
       execFileSync(
@@ -416,10 +458,14 @@ function createTestArtifactBundle(fixture, claim = TEST_CLAIM) {
   }
 }
 
-function claimFixturePlan(fixture, claim = TEST_CLAIM) {
+function claimFixturePlan(fixture, claim = TEST_CLAIM, artifactOptions = {}) {
   const state = loadReleaseState(fixture.root, { requireNonempty: true });
   assert.equal(state.plan.status, "planned");
-  const artifactClaim = createTestArtifactBundle(fixture, claim);
+  const artifactClaim = createTestArtifactBundle(
+    fixture,
+    claim,
+    artifactOptions,
+  );
   const plan = finalizeReleasePlan({
     ...state.plan,
     status: "publishing",
@@ -438,9 +484,10 @@ function claimFixturePlan(fixture, claim = TEST_CLAIM) {
 function createPublishingFixture(
   names = ["@hua-labs/ui"],
   definitions = packageDefinitions,
+  artifactOptions = {},
 ) {
   const fixture = createPlannedFixture(names, definitions);
-  claimFixturePlan(fixture);
+  claimFixturePlan(fixture, TEST_CLAIM, artifactOptions);
   fixture.claimHead = "c".repeat(40);
   return fixture;
 }
@@ -526,6 +573,27 @@ function packExecFixture(calls, options = {}) {
       const packageManifest = JSON.parse(
         readFileSync(join(commandOptions.cwd, "package.json"), "utf8"),
       );
+      let workspaceRoot = commandOptions.cwd;
+      while (!existsSync(join(workspaceRoot, "config/release-plan.json"))) {
+        const parent = dirname(workspaceRoot);
+        assert.notEqual(parent, workspaceRoot);
+        workspaceRoot = parent;
+      }
+      const workspaceVersions = new Map(
+        loadReleaseState(workspaceRoot, {
+          requireNonempty: true,
+        }).manifests.map((manifest) => [manifest.name, manifest.version]),
+      );
+      for (const field of ["dependencies", "optionalDependencies"]) {
+        for (const [dependencyName, specifier] of Object.entries(
+          packageManifest[field] ?? {},
+        )) {
+          if (!specifier.startsWith("workspace:")) continue;
+          assert.equal(workspaceVersions.has(dependencyName), true);
+          packageManifest[field][dependencyName] =
+            workspaceVersions.get(dependencyName);
+        }
+      }
       writePackedFixture(args[2], packageManifest);
       return "";
     }
@@ -2988,6 +3056,16 @@ test("default registry and disposable installed-consumer gates bind immutable by
       );
       return "";
     }
+    if (args[0] === "ls") {
+      assert.deepEqual(args, [
+        "ls",
+        "@hua-labs/dot@0.2.2",
+        "--json",
+        "--depth=Infinity",
+      ]);
+      events.push("ls:@hua-labs/dot@0.2.2");
+      return "{}";
+    }
     throw new Error("unexpected npm command");
   });
   delete options.registryObserver;
@@ -2996,7 +3074,13 @@ test("default registry and disposable installed-consumer gates bind immutable by
   assert.deepEqual(published.publishedPackages, [
     { name: "@hua-labs/ui", version: "2.3.1" },
   ]);
-  assert.deepEqual(events, ["view:1", "publish", "view:2", "install"]);
+  assert.deepEqual(events, [
+    "view:1",
+    "publish",
+    "view:2",
+    "install",
+    "ls:@hua-labs/dot@0.2.2",
+  ]);
   assert.equal(existsSync(consumerRoot), false);
 
   const conflict = createPublishingFixture();
@@ -3069,6 +3153,158 @@ test("explicit UI and Motion publish is exact while Dot is never inferred", (t) 
     directories.some((path) => path.endsWith("hua-dot")),
     false,
   );
+});
+
+test("packed artifacts reject mutable internal dependency specifiers before npm", async (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/base",
+      path: "packages/base",
+      version: "1.0.0",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/dependent",
+      path: "packages/dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/base": "workspace:1.0.0" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  for (const dependencySpec of ["latest", "^1.0.1"]) {
+    await t.test(dependencySpec, () => {
+      const fixture = createPublishingFixture(
+        ["@hua-labs/base", "@hua-labs/dependent"],
+        definitions,
+        { dependencySpec },
+      );
+      try {
+        let npmCalls = 0;
+        assertCode(
+          () =>
+            runPublish(
+              publishingOptions(fixture, () => {
+                npmCalls += 1;
+                return "";
+              }),
+            ),
+          "artifact-package-dependency-version",
+        );
+        assert.equal(npmCalls, 0);
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("an internal package name cannot evade exactness with a non-workspace source specifier", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/base",
+      path: "packages/base",
+      version: "1.0.0",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/dependent",
+      path: "packages/dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/base": "latest" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPublishingFixture(
+    ["@hua-labs/base", "@hua-labs/dependent"],
+    definitions,
+  );
+  t.after(() => fixture.cleanup());
+  let npmCalls = 0;
+
+  assertCode(
+    () =>
+      runPublish(
+        publishingOptions(fixture, () => {
+          npmCalls += 1;
+          return "";
+        }),
+      ),
+    "artifact-package-dependency-version",
+  );
+  assert.equal(npmCalls, 0);
+});
+
+test("unselected workspace dependencies stay exact at their current version", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/base",
+      path: "packages/base",
+      version: "1.0.0",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/dependent",
+      path: "packages/dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/base": "workspace:1.0.0" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPublishingFixture(["@hua-labs/dependent"], definitions);
+  t.after(() => fixture.cleanup());
+  const dependencies = [];
+  const options = publishingOptions(fixture, () => "");
+  options.installedConsumerVerifier = (input) => {
+    dependencies.push(input.dependencies);
+  };
+
+  runPublish(options);
+
+  assert.deepEqual(dependencies, [
+    [{ name: "@hua-labs/base", version: "1.0.0" }],
+  ]);
 });
 
 test("tarball byte or manifest SHA substitution fails before npm and lifecycle execution", async (t) => {
@@ -3478,7 +3714,7 @@ test("current Dot family and UI cohort publishes in the operator-approved depend
   ]);
 });
 
-test("default fresh consumer checks each selected dependency at its exact released version", (t) => {
+test("default fresh consumer checks each workspace dependency at its exact version", (t) => {
   const activePublic = {
     mode: "public-npm",
     intent: "active-public",
