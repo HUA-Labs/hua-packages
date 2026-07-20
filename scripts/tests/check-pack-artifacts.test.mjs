@@ -320,22 +320,6 @@ test("admits only the exact UI retained profile tar boundary", async (t) => {
     );
   });
 
-  await t.test("packed files omit the shipped guide authority", () => {
-    const fixture = createUiProfileFixture({
-      mutateManifest(manifest) {
-        manifest.files = manifest.files.filter(
-          (entry) => entry !== "DETAILED_GUIDE.md",
-        );
-      },
-    });
-    const result = runChecker(fixture.tarball);
-    assert.equal(result.status, 1);
-    assert.match(
-      result.stdout,
-      /package manifest does not match UI public-core authority/u,
-    );
-  });
-
   await t.test("guide omitted", () => {
     const fixture = createUiProfileFixture({ omit: ["DETAILED_GUIDE.md"] });
     rmSync(join(fixture.packageRoot, "DETAILED_GUIDE.md"), { force: true });
@@ -344,4 +328,61 @@ test("admits only the exact UI retained profile tar boundary", async (t) => {
     assert.equal(result.status, 1);
     assert.match(result.stdout, /missing public-core document/u);
   });
+});
+
+test("rejects packed UI files manifest drift while the guide payload remains", () => {
+  const cases = [
+    [
+      "omission",
+      (manifest) => {
+        manifest.files = manifest.files.filter(
+          (entry) => entry !== "DETAILED_GUIDE.md",
+        );
+      },
+    ],
+    [
+      "extra entry",
+      (manifest) => {
+        manifest.files.push("README.md");
+      },
+    ],
+    [
+      "reordered entries",
+      (manifest) => {
+        manifest.files = [...manifest.files].reverse();
+      },
+    ],
+    [
+      "duplicate entry",
+      (manifest) => {
+        manifest.files.push("DETAILED_GUIDE.md");
+      },
+    ],
+    [
+      "type drift",
+      (manifest) => {
+        manifest.files = "dist";
+      },
+    ],
+  ];
+
+  for (const [label, mutateManifest] of cases) {
+    const fixture = createUiProfileFixture({ mutateManifest });
+    assert.equal(
+      readFileSync(join(fixture.packageRoot, "DETAILED_GUIDE.md"), "utf8"),
+      "# UI guide\n",
+      `${label}: guide payload must remain present`,
+    );
+    const result = runChecker(fixture.tarball);
+    assert.equal(
+      result.status,
+      1,
+      `${label}: ${result.stdout}${result.stderr}`,
+    );
+    assert.match(
+      result.stdout,
+      /package manifest does not match UI public-core authority/u,
+      label,
+    );
+  }
 });
