@@ -23,7 +23,7 @@
     "safe-release:pack": "node scripts/safe-release.mjs pack",
     "safe-release:publish": "node scripts/safe-release.mjs publish",
     "generate:docs": "tsx scripts/generate-docs.ts",
-    "generate:docs:validate": "tsx scripts/generate-docs.ts --validate",
+    "generate:docs:validate": "tsx scripts/generate-docs.ts --validate && node --test scripts/tests/*docs-conformance.test.mjs",
     "check:npm-provenance": "node scripts/check-npm-provenance.mjs",
     "changeset": "changeset",
     "version-packages": "pnpm safe-release:version",

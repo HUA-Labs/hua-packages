@@ -8,7 +8,7 @@ package:
   description: "Build-time static extraction for @hua-labs/dot — Vite and Babel plugins"
   license: "MIT"
 
-overview: "Build-time static extraction for @hua-labs/dot. Replaces static dot() calls with pre-computed style objects at build time, eliminating runtime parsing overhead. Provides a Vite plugin and a Babel plugin (Metro, Next.js compatible). AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
+overview: "Build-time static extraction for @hua-labs/dot. Provides a heuristic Vite transform, an AST-based Babel plugin for explicit Babel pipelines, and core extraction helpers. AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth."
 
 exports:
   main:
@@ -19,10 +19,10 @@ exports:
         description: "Scan source string and return all extractable dot() calls sorted last-to-first. Options: { functionNames?: string[], target?: 'web' | 'native' | 'flutter' }"
       - name: "transformSource"
         type: "function"
-        description: "Apply all extractions in a single pass. Returns { code, extractions } or null if no changes. Safe for use in any transform pipeline."
+        description: "Apply all regex-extractor replacements in a single pass. Returns { code, extractions: number } or null if no changes."
       - name: "styleToObjectLiteral"
         type: "function"
-        description: "Serialize a resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects for RN/Flutter targets."
+        description: "Serialize one already-resolved style object to a JS object literal string (with wrapping parentheses). Handles nested arrays and objects; it does not accept a target parameter."
       - name: "type ExtractedCall"
         type: "function"
         description: ""
@@ -31,14 +31,14 @@ exports:
         description: ""
 
 features:
-  - "Zero-runtime CSS — static dot() calls replaced with inline object literals at build time"
+  - "Static-call projection — admitted dot() calls are replaced with inline object literals at build time"
   - "Vite plugin — enforce: 'pre' transform hook, fast path skips files with no dot calls"
-  - "Babel plugin — AST-accurate CallExpression visitor, works with Metro and Next.js"
-  - "Regex-based extraction engine — skips calls in strings, comments, template literals, and chained methods"
-  - "Static options support — extracts target and dark when literal values; skips breakpoint (dynamic)"
-  - "Cross-platform output — correct serialization for web, native, and flutter targets"
+  - "Babel plugin — AST CallExpression visitor for Metro and other explicit Babel pipelines"
+  - "Regex-based Vite extraction — heuristic scanner for bounded plain-string call sites"
+  - "Static options support — literal target and dark values are admitted; breakpoint remains at runtime"
+  - "Cross-platform output — serializes the @hua-labs/dot result for the admitted web, native, or flutter target"
   - "AX boundary — delegates capability truth to @hua-labs/dot/getDotAxCatalog() and preserves target output parity without creating an AOT-specific catalog"
-  - "Graceful fallback — malformed or unresolvable calls silently left as runtime"
+  - "Compiler boundary — the Babel plugin does not run inside Next.js SWC; a custom Babel configuration is required"
   - "styleToObjectLiteral — handles nested structures (RN transform arrays, Flutter recipe objects)"
 
 related_packages:

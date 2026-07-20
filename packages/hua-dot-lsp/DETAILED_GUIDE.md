@@ -45,11 +45,21 @@ The server exposes three capabilities:
 
 **Hover provider** — Resolves the token under the cursor and returns a Markdown popup showing the token name and its CSS output. If the token is not in the built-in list, resolution falls back to the dot engine directly. No popup is shown when the engine produces no output.
 
-**Diagnostics provider** — Runs on every `textDocument/didOpen` and `textDocument/didChange` event. It scans all dot regions in the file and emits a `Warning` diagnostic for every token that is both absent from the built-in completion list and unresolvable by the dot engine. Variant prefixes and the `!` important prefix are stripped before the check to avoid false positives on valid qualified tokens.
+**Diagnostics provider** — Runs on every `textDocument/didOpen` and
+`textDocument/didChange` event. It scans all dot regions in the file. A
+CSS-only responsive, state, dark-mode, or pseudo variant emits a `Warning`
+because inline `dot()` cannot apply it; the message directs the caller to
+`dotClass()` or `classDot`. Other prefixes and the `!` important prefix are
+stripped before the unknown-token check. Unknown tokens also emit a `Warning`.
 
-### Token Coverage Generation
+### Token Coverage Boundary
 
-The completion and diagnostics providers share a single built-in token list that is generated at build time from the `@hua-labs/dot` engine. This list covers all 15 token categories (see [Core Concepts](#core-concepts)) and is bundled into the server binary so no runtime file I/O is required.
+The completion and diagnostics providers share a package-local token list that
+is hand-maintained in `src/completions.ts` and inlined into the server bundle.
+It is organized through 15 builder groups and expanded with the supported
+variant prefixes, but it is not generated from or guaranteed to exhaust the
+current Dot registry. Tokens outside that list can still be resolved by the
+installed `@hua-labs/dot` fallback for hover and diagnostics.
 
 ---
 
@@ -86,10 +96,10 @@ When using a local install, reference the binary by its full path in your editor
 ./node_modules/.bin/dot-lsp
 ```
 
-or via `npx`:
+or via the package name with `npx`:
 
 ```bash
-npx dot-lsp --stdio
+npx @hua-labs/dot-lsp --stdio
 ```
 
 ### Binary Name
@@ -157,7 +167,10 @@ hover:   focus:   active:   focus-visible:   focus-within:
 disabled:   dark:   sm:   md:   lg:   xl:   2xl:
 ```
 
-During diagnostics, variant prefixes are stripped before the unknown-token check. This means `hover:p-4` is validated as `p-4` and does not produce a warning if `p-4` is a known token.
+Completion availability does not imply inline runtime support. During
+diagnostics, a CSS-only variant such as `hover:p-4` produces a `Warning` that
+variants require `dotClass()` or a `classDot` prop. Only prefixes outside the
+known CSS-only set are stripped before the base unknown-token check.
 
 The `!` important prefix is also stripped before validation, so `!p-4` is checked as `p-4`.
 
@@ -200,7 +213,9 @@ support.
 
 ### VS Code — Manual Configuration
 
-There is no dedicated VS Code extension required for basic LSP usage. Install a generic LSP client extension such as [vscode-lsp-client](https://marketplace.visualstudio.com/items?itemName=mattn.vscode-lsp-client), then add the following to your `settings.json`:
+There is no first-party VS Code extension in this package release. Use a
+generic VS Code LSP client and translate the following values into that
+client's own settings schema:
 
 ```json
 {
@@ -219,14 +234,17 @@ There is no dedicated VS Code extension required for basic LSP usage. Install a 
 }
 ```
 
-If you are already using a multi-LSP extension (such as `neovim.vscode-neovim` or a custom LSP bridge), adapt the server entry to match that extension's configuration schema. The key values that must be preserved are:
+Exact JSON keys differ by client. The package-owned values are:
 
 - **command:** `["dot-lsp", "--stdio"]`
-- **filetypes:** the four TS/JS file types listed above
+- **file types:** selected by the client; the server itself does not register or
+  enforce a file-type list
 - **initializationOptions.dot.target:** optional `"web"`, `"native"`, or
   `"flutter"` for target caveat diagnostics
 
-Note: A first-party VS Code extension (`hua-labs.dot-vscode`) exists and uses this LSP server internally. If you install that extension you do not need the manual configuration above.
+Treat any separately distributed editor extension as an independent
+availability, version, and support decision. Its existence must not be inferred
+from installation of `@hua-labs/dot-lsp`.
 
 ### Neovim — nvim-lspconfig
 
@@ -255,9 +273,10 @@ lspconfig.dot_lsp.setup({
 })
 ```
 
-Place this block in your Neovim config after `lspconfig` is loaded. The `root_dir` pattern anchors the server to the nearest `package.json` or `.git` directory, which is the standard convention for JavaScript/TypeScript projects.
-
-You can pass additional options to `setup({})` as you would for any other lspconfig server — for example, attaching keymaps via `on_attach` or overriding capabilities.
+This is an illustrative client configuration. Neovim/lspconfig APIs and
+file-type registration are client-owned and may differ by installed version;
+preserve the `dot-lsp --stdio` command and optional initialization target when
+adapting it.
 
 ### Helix — languages.toml
 
@@ -300,19 +319,16 @@ Any editor or tool that can spawn a subprocess and communicate over stdio using 
 
 The server advertises the following trigger characters for completion: `"` `'` `` ` `` ` ` (space) `:`
 
-No custom LSP extensions or non-standard methods are used. Any spec-compliant LSP client implementation should work without modification.
+The package registers standard LSP handlers only. Client configuration,
+process supervision, and document/file-type association still vary by editor
+and are not proven by the server source alone.
 
 ### Debugging LSP Communication
 
-To inspect the raw JSON-RPC messages exchanged between your editor and the server, use a logging proxy. One approach is to wrap the server with a script that tees stdin/stdout to a log file:
-
-```bash
-# log-lsp.sh
-#!/bin/bash
-dot-lsp --stdio 2>&1 | tee /tmp/dot-lsp.log
-```
-
-Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"lsp.trace.server": "verbose"` (exact key depends on the LSP client extension). In Neovim with nvim-lspconfig, set `vim.lsp.set_log_level("debug")` and check `~/.local/state/nvim/lsp.log`.
+Use the editor client's built-in LSP trace facility. Do not merge stderr into
+stdout or insert a generic `tee` pipeline in front of the server: stdout is the
+LSP protocol transport, and unrelated bytes can corrupt the session. Exact
+trace settings and log locations are client/version specific.
 
 ---
 
@@ -341,7 +357,8 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 
 1. Confirm the cursor is inside a recognized syntax pattern (see [Recognized Syntax Patterns](#recognized-syntax-patterns)). Completions are not offered outside these regions.
 2. Trigger completion manually using your editor's completion keybind (e.g. `Ctrl+Space` in VS Code) rather than relying solely on auto-trigger.
-3. Verify the file type is one of the four configured types: `typescript`, `typescriptreact`, `javascript`, `javascriptreact`.
+3. Verify that your client associates the document's file type with this
+   server. The server does not choose that list itself.
 4. The completion list is capped at 500 items per request. If you have already typed several characters and the list appears empty, try triggering again with fewer characters typed — the filter may be excluding all results at a high specificity.
 
 ### False Positive Diagnostics
@@ -351,7 +368,10 @@ Alternatively, many editors have a built-in LSP trace mode. In VS Code, set `"ls
 **Checks:**
 
 1. Ensure the installed `@hua-labs/dot-lsp` package includes its `@hua-labs/dot` dependency. If the dependency install is incomplete or the package tree is corrupted, the engine fallback used during diagnostics cannot resolve tokens and every token outside the built-in list will appear as unknown.
-2. If you are using a custom token defined only in a project-level dot config, the built-in list will not contain it. The server falls back to the dot engine for resolution — verify that your project's dot config is on the module resolution path used by the server process (i.e., the server is started from the project root).
+2. A custom token defined only in application configuration is not loaded by
+   this server. Its runtime settings accept only an optional `target`; starting
+   the process at a project root does not make it import a project Dot config.
+   Keep application-only tokens out of this diagnostic contract.
 3. Confirm the token is not a typo. Hover over it to see whether hover documentation appears — if it does, the token is known and should not produce a diagnostic.
 
 ### Node.js Version Requirements

@@ -22,7 +22,7 @@ exports:
         description: "Resolve + return capability report showing dropped/approximated properties for the target platform."
       - name: "dot_complete"
         type: "function"
-        description: "Get autocomplete suggestions for a partial token. Params: partial (string), limit? (number, default 20)."
+        description: "Get suggestions from this package's local completion catalog. Params: partial (string), limit? (number, default 20). The catalog is not an exhaustive Dot token authority."
       - name: "dot_capabilities"
         type: "function"
         description: "Query the package-owned dot AX capability catalog. Params: target?, category?, level?, family?, limit?, includeProperties?, includeExamples?, includeComposition?."
@@ -33,7 +33,7 @@ exports:
 features:
   - "dot_resolve — convert utility strings to style objects (web CSSProperties, RN StyleSheet, Flutter recipe)"
   - "dot_explain — resolve + capability report (dropped/approximated properties per target)"
-  - "dot_complete — autocomplete suggestions with category labels (prefix + substring matching)"
+  - "dot_complete — suggestions from a package-local completion catalog with category labels (prefix + substring matching)"
   - "dot_capabilities — query the package-owned AX capability catalog without resolving styles"
   - "dot_validate — check utility strings for unrecognized tokens"
   - "Cross-platform support — web, native (React Native), and flutter targets"
