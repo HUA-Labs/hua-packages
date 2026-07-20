@@ -10,6 +10,7 @@ import {
   linkSync,
   lstatSync,
   mkdtempSync,
+  mkdirSync,
   openSync,
   readSync,
   readdirSync,
@@ -22,6 +23,7 @@ import {
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { isAlias, parseDocument, visit } from "yaml";
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_ROOT = resolve(moduleDirectory, "..");
@@ -42,6 +44,7 @@ export const PLATFORM_AUTHORITY = Object.freeze({
 
 const POLICY_MAX_BYTES = 128 * 1024;
 const PLAN_MAX_BYTES = 2 * 1024 * 1024;
+const LOCKFILE_MAX_BYTES = 8 * 1024 * 1024;
 const MANIFEST_MAX_BYTES = 256 * 1024;
 const CHANGESET_MAX_BYTES = 256 * 1024;
 const STATUS_MAX_BYTES = 2 * 1024 * 1024;
@@ -88,6 +91,17 @@ const RELEASE_MODES = new Set([
 const RELEASE_AUTHORITIES = new Set(["hua-packages", "none", "unresolved"]);
 const RELEASE_CHANNELS = new Set(["npm-public", "none", "pending"]);
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+const LOCK_IMPORTER_FIELDS = Object.freeze([
+  "dependencies",
+  "devDependencies",
+  "optionalDependencies",
+]);
+const MANIFEST_DEPENDENCY_FIELDS = Object.freeze([
+  "dependencies",
+  "devDependencies",
+  "optionalDependencies",
+  "peerDependencies",
+]);
 const GITHUB_CLI = "/usr/bin/gh";
 
 export function compareUtf8(left, right) {
@@ -567,6 +581,195 @@ export function validatePolicy(value, expectedAuthority = PLATFORM_AUTHORITY) {
 function readStrictJsonFile(filePath, maxBytes, label) {
   const bytes = readRegularFile(filePath, maxBytes, label);
   return { bytes, value: parseStrictJsonBytes(bytes, { maxBytes, label }) };
+}
+
+function readLockfile(root, label) {
+  const bytes = readRegularFile(
+    join(root, "pnpm-lock.yaml"),
+    LOCKFILE_MAX_BYTES,
+    label,
+  );
+  let text;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    fail(`${label}-invalid-utf8`);
+  }
+  let document;
+  try {
+    document = parseDocument(text, {
+      strict: true,
+      uniqueKeys: true,
+      maxAliasCount: 0,
+      prettyErrors: false,
+    });
+  } catch {
+    fail(`${label}-invalid`);
+  }
+  assert(
+    document.errors.length === 0 && document.warnings.length === 0,
+    `${label}-invalid`,
+  );
+  let aliasFound = false;
+  visit(document, {
+    Node(_key, node) {
+      if (isAlias(node)) aliasFound = true;
+    },
+  });
+  assert(!aliasFound, `${label}-alias`);
+  let value;
+  try {
+    value = document.toJS({ maxAliasCount: 0, mapAsMap: false });
+  } catch {
+    fail(`${label}-invalid`);
+  }
+  assert(isRecord(value), `${label}-shape`);
+  assert(isRecord(value.importers), `${label}-importers`);
+  return { bytes, value };
+}
+
+function readWorkspaceManifestValues(root, manifests, label) {
+  return new Map(
+    manifests.map((manifest) => {
+      const { value } = readStrictJsonFile(
+        join(root, manifest.path, "package.json"),
+        MANIFEST_MAX_BYTES,
+        label,
+      );
+      assert(value.name === manifest.name, `${label}-identity`);
+      return [manifest.path, value];
+    }),
+  );
+}
+
+function workspaceManifestSpecifiers(manifest, workspaceNames, label) {
+  const specifiers = new Map();
+  for (const field of MANIFEST_DEPENDENCY_FIELDS) {
+    const dependencies = manifest[field];
+    if (dependencies === undefined) continue;
+    assert(isRecord(dependencies), `${label}-shape`);
+    for (const name of Object.keys(dependencies).sort(compareUtf8)) {
+      if (!workspaceNames.has(name)) continue;
+      const specifier = stringValue(
+        dependencies[name],
+        /^.{1,512}$/u,
+        `${label}-specifier`,
+      );
+      assert(
+        !specifiers.has(name) || specifiers.get(name) === specifier,
+        `${label}-duplicate`,
+      );
+      specifiers.set(name, specifier);
+    }
+  }
+  return specifiers;
+}
+
+function parseWorkspaceVersionSpecifier(specifier) {
+  assert(specifier.startsWith("workspace:"), "version-lock-workspace-protocol");
+  const version = specifier.slice("workspace:".length);
+  assert(
+    version !== "*" && !version.startsWith("^") && !version.startsWith("~"),
+    "version-lock-workspace-protocol",
+  );
+  parseSemver(version);
+  return version;
+}
+
+function validateVersionLockClosure({
+  sourceLock,
+  finalLock,
+  sourceManifestValues,
+  finalManifestValues,
+  plannedReleases,
+  workspaceNames,
+}) {
+  const normalizedFinalLock = structuredClone(finalLock);
+  const plannedNames = new Set(plannedReleases.map((release) => release.name));
+  const releaseByName = new Map(
+    plannedReleases.map((release) => [release.name, release]),
+  );
+  for (const release of plannedReleases) {
+    const sourceManifest = sourceManifestValues.get(release.path);
+    const finalManifest = finalManifestValues.get(release.path);
+    assert(
+      sourceManifest !== undefined && finalManifest !== undefined,
+      "version-lock-manifest-missing",
+    );
+    const sourceSpecifiers = workspaceManifestSpecifiers(
+      sourceManifest,
+      workspaceNames,
+      "version-lock-source-manifest",
+    );
+    const finalSpecifiers = workspaceManifestSpecifiers(
+      finalManifest,
+      workspaceNames,
+      "version-lock-final-manifest",
+    );
+    const names = [
+      ...new Set([...sourceSpecifiers.keys(), ...finalSpecifiers.keys()]),
+    ].sort(compareUtf8);
+    for (const name of names) {
+      const sourceSpecifier = sourceSpecifiers.get(name);
+      const finalSpecifier = finalSpecifiers.get(name);
+      if (sourceSpecifier === finalSpecifier) continue;
+      assert(
+        sourceSpecifier !== undefined && finalSpecifier !== undefined,
+        "version-lock-manifest-relation",
+      );
+      assert(plannedNames.has(name), "version-lock-unselected-relation");
+      const dependencyRelease = releaseByName.get(name);
+      assert(
+        dependencyRelease !== undefined,
+        "version-lock-unselected-relation",
+      );
+      const sourceWorkspaceVersion =
+        parseWorkspaceVersionSpecifier(sourceSpecifier);
+      const finalWorkspaceVersion =
+        parseWorkspaceVersionSpecifier(finalSpecifier);
+      assert(
+        sourceWorkspaceVersion === dependencyRelease.fromVersion &&
+          finalWorkspaceVersion === dependencyRelease.toVersion,
+        "version-lock-workspace-version",
+      );
+      const sourceImporter = sourceLock.importers[release.path];
+      const finalImporter = finalLock.importers[release.path];
+      const normalizedFinalImporter =
+        normalizedFinalLock.importers[release.path];
+      assert(
+        isRecord(sourceImporter) &&
+          isRecord(finalImporter) &&
+          isRecord(normalizedFinalImporter),
+        "version-lock-importer-missing",
+      );
+      const matchingFields = LOCK_IMPORTER_FIELDS.filter((field) => {
+        const dependencies = sourceImporter[field];
+        return (
+          isRecord(dependencies) &&
+          isRecord(dependencies[name]) &&
+          dependencies[name].specifier === sourceSpecifier
+        );
+      });
+      assert(matchingFields.length === 1, "version-lock-importer-relation");
+      const field = matchingFields[0];
+      assert(
+        isRecord(finalImporter[field]) &&
+          isRecord(finalImporter[field][name]) &&
+          finalImporter[field][name].specifier === finalSpecifier,
+        "version-lock-importer-relation",
+      );
+      assert(
+        isRecord(normalizedFinalImporter[field]) &&
+          isRecord(normalizedFinalImporter[field][name]),
+        "version-lock-importer-relation",
+      );
+      normalizedFinalImporter[field][name].specifier = sourceSpecifier;
+    }
+  }
+  assert(
+    canonicalJson(normalizedFinalLock) === canonicalJson(sourceLock),
+    "version-lock-churn",
+  );
 }
 
 function normalizeManifest(value, label) {
@@ -2262,7 +2465,7 @@ function normalizeArtifactClaim(options) {
   };
 }
 
-function lifecycleFreePackEnvironment(environment) {
+function lifecycleFreeEnvironment(environment) {
   const ignoreScriptKeys = new Set([
     "npm_config_ignore_scripts",
     "pnpm_config_ignore_scripts",
@@ -2273,6 +2476,41 @@ function lifecycleFreePackEnvironment(environment) {
         ([key]) => !ignoreScriptKeys.has(key.toLowerCase()),
       ),
     ),
+    npm_config_ignore_scripts: "true",
+    pnpm_config_ignore_scripts: "true",
+  };
+}
+
+function versionLockEnvironment(
+  environment,
+  lockHome,
+  userConfigPath,
+  globalConfigPath,
+) {
+  const inheritedKeys = [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "SSL_CERT_FILE",
+    "SSL_CERT_DIR",
+    "NODE_EXTRA_CA_CERTS",
+    "TMPDIR",
+    "TMP",
+    "TEMP",
+  ];
+  return {
+    ...Object.fromEntries(
+      inheritedKeys.flatMap((key) =>
+        typeof environment[key] === "string" ? [[key, environment[key]]] : [],
+      ),
+    ),
+    CI: "true",
+    HOME: lockHome,
+    USERPROFILE: lockHome,
+    XDG_CACHE_HOME: join(lockHome, "cache"),
+    NPM_CONFIG_USERCONFIG: userConfigPath,
+    NPM_CONFIG_GLOBALCONFIG: globalConfigPath,
+    npm_config_registry: "https://registry.npmjs.org/",
     npm_config_ignore_scripts: "true",
     pnpm_config_ignore_scripts: "true",
   };
@@ -2326,7 +2564,7 @@ export function runPack(options = {}) {
     execFile("pnpm", ["pack", "--pack-destination", artifactDirectory], {
       cwd: packageDirectory,
       encoding: "utf8",
-      env: lifecycleFreePackEnvironment(process.env),
+      env: lifecycleFreeEnvironment(process.env),
       stdio: ["ignore", "pipe", "pipe"],
     });
     assertPackReleaseStateUnchanged(root, releaseState);
@@ -2509,13 +2747,26 @@ export function persistProvenanceClosure(options = {}) {
 export function runVersion(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
+  const environment = options.environment ?? process.env;
   const startingState = loadReleaseState(root);
   assert(startingState.plan.status === "empty", "version-existing-plan");
   const policyState = startingState;
   const sourceManifests = policyState.manifests;
+  const sourceManifestValues = readWorkspaceManifestValues(
+    root,
+    sourceManifests,
+    "version-source-manifest",
+  );
+  const { value: sourceLock } = readLockfile(root, "version-source-lock");
   const temporaryRoot = mkdtempSync(join(tmpdir(), "hua-safe-release-status-"));
   const statusPath = join(temporaryRoot, "status.json");
+  const lockHome = join(temporaryRoot, "lock-home");
+  const userConfigPath = join(lockHome, "user.npmrc");
+  const globalConfigPath = join(lockHome, "global.npmrc");
   try {
+    mkdirSync(lockHome, { recursive: true, mode: 0o700 });
+    writeFileSync(userConfigPath, "", { mode: 0o600 });
+    writeFileSync(globalConfigPath, "", { mode: 0o600 });
     execFile("pnpm", ["exec", "changeset", "status", "--output", statusPath], {
       cwd: root,
       encoding: "utf8",
@@ -2541,14 +2792,14 @@ export function runVersion(options = {}) {
       stdio: ["ignore", "pipe", "pipe"],
     });
     validateConsumedChangesetSources(root, status);
-    const finalPolicyState = loadPolicy(root);
+    const versionedPolicyState = loadPolicy(root);
     const sourceByName = new Map(
       sourceManifests.map((entry) => [entry.name, entry]),
     );
     const releaseByName = new Map(
       plannedReleases.map((entry) => [entry.name, entry]),
     );
-    for (const manifest of finalPolicyState.manifests) {
+    for (const manifest of versionedPolicyState.manifests) {
       const source = sourceByName.get(manifest.name);
       const release = releaseByName.get(manifest.name);
       assert(source !== undefined, "version-workspace-extra");
@@ -2564,6 +2815,66 @@ export function runVersion(options = {}) {
         );
         release.manifestSha256 = manifest.sha256;
       }
+    }
+    execFile(
+      "pnpm",
+      [
+        "install",
+        "--lockfile-only",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        env: versionLockEnvironment(
+          environment,
+          lockHome,
+          userConfigPath,
+          globalConfigPath,
+        ),
+      },
+    );
+    const finalPolicyState = loadPolicy(root);
+    assert(
+      finalPolicyState.manifests.length ===
+        versionedPolicyState.manifests.length &&
+        finalPolicyState.manifests.every(
+          (manifest, index) =>
+            manifest.name === versionedPolicyState.manifests[index].name &&
+            manifest.path === versionedPolicyState.manifests[index].path &&
+            manifest.sha256 === versionedPolicyState.manifests[index].sha256,
+        ),
+      "version-lock-manifest-drift",
+    );
+    const finalManifestValues = readWorkspaceManifestValues(
+      root,
+      finalPolicyState.manifests,
+      "version-lock-final-manifest",
+    );
+    const { value: finalLock } = readLockfile(root, "version-final-lock");
+    validateVersionLockClosure({
+      sourceLock,
+      finalLock,
+      sourceManifestValues,
+      finalManifestValues,
+      plannedReleases,
+      workspaceNames: new Set(sourceManifests.map((manifest) => manifest.name)),
+    });
+    assert(
+      readRegularFile(
+        join(root, PLAN_RELATIVE_PATH),
+        PLAN_MAX_BYTES,
+        "version-plan-before-write",
+      ).equals(startingState.planBytes),
+      "version-plan-drift",
+    );
+    for (const release of plannedReleases) {
+      release.manifestSha256 = finalPolicyState.manifests.find(
+        (manifest) => manifest.name === release.name,
+      ).sha256;
     }
     const plan = finalizeReleasePlan({
       policy: {
