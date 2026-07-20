@@ -1,0 +1,1696 @@
+{
+  "artifact": {
+    "files": [
+      {
+        "path": "package/AI_GUIDE.md",
+        "sha256": "2fba56c5a00939873142e7f307fbc8a97c6860b63639492db3c778b298a1859a",
+        "size": 10713
+      },
+      {
+        "path": "package/CHANGELOG.md",
+        "sha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
+        "size": 1176
+      },
+      {
+        "path": "package/DETAILED_GUIDE.md",
+        "sha256": "b692b6a8861cc8086dacfda448104e678273451b820109429479a121966987db",
+        "size": 40109
+      },
+      {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "afa7d02e996d47b8dd1411216a7350101fa0a7797012dc95689b41caf01af781",
+        "size": 15146
+      },
+      {
+        "path": "package/dist/chunk-5A6VOG7N.mjs",
+        "sha256": "ff2bba1bd1d1b01c8642d5c827ff23864fabf5f06e6528a4296f5f5b0c7a2d7c",
+        "size": 71316
+      },
+      {
+        "path": "package/dist/chunk-5A6VOG7N.mjs.map",
+        "sha256": "8f4a5605cda9370fc4403ba91865ac6d36f62d37f5c672475356ce20312ceb31",
+        "size": 180656
+      },
+      {
+        "path": "package/dist/chunk-KXWBDWXO.mjs",
+        "sha256": "07d9c1e7dc25f6e2df2860b2ad4c28d2e48ce3f31c3ef5626747796cd3a8636c",
+        "size": 33675
+      },
+      {
+        "path": "package/dist/chunk-KXWBDWXO.mjs.map",
+        "sha256": "5965985153a8b0b2d0d4f1f3fc39770bcb8e781ad2b4fa0bf0fbcaf91e3b1e0d",
+        "size": 83085
+      },
+      {
+        "path": "package/dist/chunk-T3XD7U66.mjs",
+        "sha256": "87692c92a43384daa3af2564a33d8f50f7138f991c36e0b11bb119499cac65d1",
+        "size": 94402
+      },
+      {
+        "path": "package/dist/chunk-T3XD7U66.mjs.map",
+        "sha256": "3873a9ac54cbb2572663b5436a7d87f315b41ef3673d505c19eb6205815025a1",
+        "size": 246061
+      },
+      {
+        "path": "package/dist/class.d.mts",
+        "sha256": "435134f8ac24d814994ee79ef24be14b35a3857e7f2c20acb1537b0364ac49a4",
+        "size": 2513
+      },
+      {
+        "path": "package/dist/class.mjs",
+        "sha256": "eba574cb66b67fd1f78edf6293792b92da233af3233a1a1a45ba534e1dd90f87",
+        "size": 15890
+      },
+      {
+        "path": "package/dist/class.mjs.map",
+        "sha256": "18afbde1b055ef992e3bd4065d46d3df04a0a49162afa1ee75204240e6dd5151",
+        "size": 43394
+      },
+      {
+        "path": "package/dist/codegen/cli.d.mts",
+        "sha256": "ca7de2bf6ea28662a1597f4f8cbdd49e63fcfe9bde11e96155d9cabee46099d4",
+        "size": 500
+      },
+      {
+        "path": "package/dist/codegen/cli.mjs",
+        "sha256": "1e467384a6ec9f3248e7cfd05197814ed095dbd82e411e2355987beefbddc026",
+        "size": 4914
+      },
+      {
+        "path": "package/dist/codegen/cli.mjs.map",
+        "sha256": "3cd5c45e3059f066f108de99b19d6fd56358d265680946b37cd0f0b18a962748",
+        "size": 11270
+      },
+      {
+        "path": "package/dist/codegen/index.d.mts",
+        "sha256": "a2bc2f6a464b3f2487c4ab4724655e1c84d6b163a819888e02f4c152539d0b8f",
+        "size": 8814
+      },
+      {
+        "path": "package/dist/codegen/index.mjs",
+        "sha256": "ccf2a62d17090050a856615cfdef69c5433f8ad63ae1ef9a47e0bbfaba3bed31",
+        "size": 880
+      },
+      {
+        "path": "package/dist/codegen/index.mjs.map",
+        "sha256": "7eb9f12217293001e07ab5d140f77a45dd079c8d2be0878ae69adea0e30309e5",
+        "size": 1769
+      },
+      {
+        "path": "package/dist/flutter.d.mts",
+        "sha256": "7a7a23048b94beaab0a945260fd8414c1a751e5c7025fe912d4526d1d09238a6",
+        "size": 3484
+      },
+      {
+        "path": "package/dist/flutter.mjs",
+        "sha256": "dfacbc43c809b3ebacc57c6b9bf3d0aa5be136258cb81800c19c6abea85c7503",
+        "size": 7381
+      },
+      {
+        "path": "package/dist/flutter.mjs.map",
+        "sha256": "d2a26c986d0e27579d1746d70f825029b6bfc101560da907fd4cfe23a64e215e",
+        "size": 18556
+      },
+      {
+        "path": "package/dist/index.d.mts",
+        "sha256": "015341e604c104455466e1f403b4a4242de349a2ea6eaddfd3f2c8abf48fcab9",
+        "size": 13732
+      },
+      {
+        "path": "package/dist/index.mjs",
+        "sha256": "ff3a6290ee9026757ddf3bfd7455dc29f62321f8c26053fd1ff99e1a3fd22a03",
+        "size": 484
+      },
+      {
+        "path": "package/dist/index.mjs.map",
+        "sha256": "91a07f89ca9bd0abed1f757ba5bead46314472ba5008458065f0ffd225dcc30d",
+        "size": 70
+      },
+      {
+        "path": "package/dist/native.d.mts",
+        "sha256": "359b7e4aad1cef8ac514444ad28d50d9f52db26b5beff0c2359436f61f3d6aa1",
+        "size": 1565
+      },
+      {
+        "path": "package/dist/native.mjs",
+        "sha256": "1b8fe6e7b6a142f8087cc718c2d7c5892388b26dfb96c11b7ffb3df91423ad5b",
+        "size": 676
+      },
+      {
+        "path": "package/dist/native.mjs.map",
+        "sha256": "183399a0261d54f19030d314525c9623b38c04414a14efbda2174ad22c335b3c",
+        "size": 2358
+      },
+      {
+        "path": "package/dist/types-CsntW3D8.d.mts",
+        "sha256": "a81be6c2d203ee478363bb361caa193d1d17c23a256e255bedfd00e1ed8415e7",
+        "size": 13694
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "409be51f102f4af27a4b136000406bf507e0fc93b7b7db59e209959f1bf414aa",
+        "size": 2083
+      }
+    ],
+    "packageName": "@hua-labs/dot",
+    "packageVersion": "0.2.2",
+    "packedManifestSha256": "409be51f102f4af27a4b136000406bf507e0fc93b7b7db59e209959f1bf414aa",
+    "requiredTargets": [
+      "package/dist/flutter.d.mts",
+      "package/dist/flutter.mjs",
+      "package/dist/index.d.mts",
+      "package/dist/index.mjs",
+      "package/dist/native.d.mts",
+      "package/dist/native.mjs"
+    ],
+    "rosterDigest": "d42e072aea5b86b3f138945d23a83dc6e2be172bc85985e7a2940ac9d8596f68",
+    "sourceManifestSha256": "d67bb6a513eef1bf8dc0be189554b0d61ce6d9e754eb2982b42d00d28ee04cb0",
+    "tarballBytes": 201486,
+    "tarballSha256": "831d7b8ea2cd680ef175b02608b1bf0d611bee5f1ccf09efad3a8b731e6814de"
+  },
+  "authorityKind": "platform-dot-package-projection",
+  "mapDigest": "718429465a9094c36aac76ea3746fbb8081cc87b4f6c6c1a913b7728ec91175d",
+  "packagePath": "packages/hua-dot",
+  "publicBase": {
+    "commit": "92aa99a1957e8514f9ae7ca271f1765f8d6974fa",
+    "packageTree": "8a070f317818e6f0e861483452ae67e7736ab3b6",
+    "tree": "115f2981afefec54120cab8e0112870352e35986"
+  },
+  "rows": [
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "2fba56c5a00939873142e7f307fbc8a97c6860b63639492db3c778b298a1859a",
+      "path": "packages/hua-dot/AI_GUIDE.md",
+      "publicBaseSha256": null,
+      "sourceSha256": "2fba56c5a00939873142e7f307fbc8a97c6860b63639492db3c778b298a1859a"
+    },
+    {
+      "disposition": "public-preserved",
+      "kind": "docs",
+      "outputSha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
+      "path": "packages/hua-dot/CHANGELOG.md",
+      "publicBaseSha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
+      "sourceSha256": "f7c10519029d74f2325df35d95b222bfffbe540a7d761ea6489158470375fc77"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "b692b6a8861cc8086dacfda448104e678273451b820109429479a121966987db",
+      "path": "packages/hua-dot/DETAILED_GUIDE.md",
+      "publicBaseSha256": "bea9ad0f4ac2a5587e875c7155658b6fef80982626080d0602cc006f5d62bafa",
+      "sourceSha256": "b692b6a8861cc8086dacfda448104e678273451b820109429479a121966987db"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "path": "packages/hua-dot/LICENSE",
+      "publicBaseSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "sourceSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "docs",
+      "outputSha256": "afa7d02e996d47b8dd1411216a7350101fa0a7797012dc95689b41caf01af781",
+      "path": "packages/hua-dot/README.md",
+      "publicBaseSha256": "0e02e50005376d7fc2509c6e0f746f21c67ab99cc6899e56b20bde07c9416b41",
+      "sourceSha256": "afa7d02e996d47b8dd1411216a7350101fa0a7797012dc95689b41caf01af781"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "e45bb40153d169127f53705818a2058fdf404812c3ca2be5886a2ea28b48b1cd",
+      "path": "packages/hua-dot/doc.yaml",
+      "publicBaseSha256": "7fb086d941ad925c1e4a1a1406cd2fb08bfb45750e90b3bf1f5243669597bcf9",
+      "sourceSha256": "e45bb40153d169127f53705818a2058fdf404812c3ca2be5886a2ea28b48b1cd"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "manifest",
+      "outputSha256": "d67bb6a513eef1bf8dc0be189554b0d61ce6d9e754eb2982b42d00d28ee04cb0",
+      "path": "packages/hua-dot/package.json",
+      "publicBaseSha256": "bf024fa4bd2351557fa816694a05620e571b43c832753b73225983fcb47711ac",
+      "sourceSha256": "f81c8e3d9bb0a8377ac9182b78e03358fff36d3beb0e5e5656d55277d1fdccea"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6f6491d3c9ec3feac4a19f8a78bd4f3259270d7ff09d9db1eeca44e77f1bbfee",
+      "path": "packages/hua-dot/src/__tests__/adapters/class-divide.test.ts",
+      "publicBaseSha256": "6f6491d3c9ec3feac4a19f8a78bd4f3259270d7ff09d9db1eeca44e77f1bbfee",
+      "sourceSha256": "6f6491d3c9ec3feac4a19f8a78bd4f3259270d7ff09d9db1eeca44e77f1bbfee"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e4c731717c95c9e90db71a0e5be6a1229748a1faa3618142fd265aaca27b5cf9",
+      "path": "packages/hua-dot/src/__tests__/adapters/flutter-edge.test.ts",
+      "publicBaseSha256": "e4c731717c95c9e90db71a0e5be6a1229748a1faa3618142fd265aaca27b5cf9",
+      "sourceSha256": "e4c731717c95c9e90db71a0e5be6a1229748a1faa3618142fd265aaca27b5cf9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e1056d4254b7837b647dbdd16a836753791e87306b55d14fbf65fab9844bac94",
+      "path": "packages/hua-dot/src/__tests__/adapters/flutter.test.ts",
+      "publicBaseSha256": "e1056d4254b7837b647dbdd16a836753791e87306b55d14fbf65fab9844bac94",
+      "sourceSha256": "e1056d4254b7837b647dbdd16a836753791e87306b55d14fbf65fab9844bac94"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "b500d8eb2c21f73d8078439ddbfcd07df679ec5aca65d5fb1d53ed5c14a69f6e",
+      "path": "packages/hua-dot/src/__tests__/adapters/native-integration.test.ts",
+      "publicBaseSha256": "b500d8eb2c21f73d8078439ddbfcd07df679ec5aca65d5fb1d53ed5c14a69f6e",
+      "sourceSha256": "b500d8eb2c21f73d8078439ddbfcd07df679ec5aca65d5fb1d53ed5c14a69f6e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "9a833432e9772ee0692cf9856477cfaf0c854b370be795937bd663fff4c96792",
+      "path": "packages/hua-dot/src/__tests__/adapters/native-warnings.test.ts",
+      "publicBaseSha256": "9a833432e9772ee0692cf9856477cfaf0c854b370be795937bd663fff4c96792",
+      "sourceSha256": "9a833432e9772ee0692cf9856477cfaf0c854b370be795937bd663fff4c96792"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "16a74b09f4fc3db9078eaba23486766c12a3addeff0ffea7244ae95d460bc416",
+      "path": "packages/hua-dot/src/__tests__/adapters/native.test.ts",
+      "publicBaseSha256": "16a74b09f4fc3db9078eaba23486766c12a3addeff0ffea7244ae95d460bc416",
+      "sourceSha256": "16a74b09f4fc3db9078eaba23486766c12a3addeff0ffea7244ae95d460bc416"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "966cb1372beb6eae523dffa6f731eb405bf0eded4e28da88c4669420cdf6c0f8",
+      "path": "packages/hua-dot/src/__tests__/ax.test.ts",
+      "publicBaseSha256": "966cb1372beb6eae523dffa6f731eb405bf0eded4e28da88c4669420cdf6c0f8",
+      "sourceSha256": "966cb1372beb6eae523dffa6f731eb405bf0eded4e28da88c4669420cdf6c0f8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "b6aebc28e349efa24358c49eebf05e0208552ae6937151d0354f5602d10cba3f",
+      "path": "packages/hua-dot/src/__tests__/cache.test.ts",
+      "publicBaseSha256": "b6aebc28e349efa24358c49eebf05e0208552ae6937151d0354f5602d10cba3f",
+      "sourceSha256": "b6aebc28e349efa24358c49eebf05e0208552ae6937151d0354f5602d10cba3f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "5c8fb6830cf1d3d636f760a55c0d486fe64e537d89b1c678f9db2287f553ffc9",
+      "path": "packages/hua-dot/src/__tests__/capabilities.test.ts",
+      "publicBaseSha256": "5c8fb6830cf1d3d636f760a55c0d486fe64e537d89b1c678f9db2287f553ffc9",
+      "sourceSha256": "5c8fb6830cf1d3d636f760a55c0d486fe64e537d89b1c678f9db2287f553ffc9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "151466c225c4a45b0aeacddbea65336befc5f7dcab9fef2c51fce32241b9a243",
+      "path": "packages/hua-dot/src/__tests__/class-extended.test.ts",
+      "publicBaseSha256": "151466c225c4a45b0aeacddbea65336befc5f7dcab9fef2c51fce32241b9a243",
+      "sourceSha256": "151466c225c4a45b0aeacddbea65336befc5f7dcab9fef2c51fce32241b9a243"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "60a7acf148700b293ac1212a25026c4878316cdc1325e7f2bc9cf88c5abcfce3",
+      "path": "packages/hua-dot/src/__tests__/class-m61-regression.test.ts",
+      "publicBaseSha256": "60a7acf148700b293ac1212a25026c4878316cdc1325e7f2bc9cf88c5abcfce3",
+      "sourceSha256": "60a7acf148700b293ac1212a25026c4878316cdc1325e7f2bc9cf88c5abcfce3"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "8bcfa59975f9df7ab94ae495258745997fd86eab46583a348583c20cd038007a",
+      "path": "packages/hua-dot/src/__tests__/class.test.ts",
+      "publicBaseSha256": "8bcfa59975f9df7ab94ae495258745997fd86eab46583a348583c20cd038007a",
+      "sourceSha256": "8bcfa59975f9df7ab94ae495258745997fd86eab46583a348583c20cd038007a"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "451774b5584679671f7dcfd74d60ff17d1222b50a03afe3eb60d03830a9c63b3",
+      "path": "packages/hua-dot/src/__tests__/codegen/__snapshots__/compose-emitter.test.ts.snap",
+      "publicBaseSha256": "451774b5584679671f7dcfd74d60ff17d1222b50a03afe3eb60d03830a9c63b3",
+      "sourceSha256": "451774b5584679671f7dcfd74d60ff17d1222b50a03afe3eb60d03830a9c63b3"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "4b24ffe0aac7fd813425535d1d6a911357a12e5f6113fcf3844699704e4fc402",
+      "path": "packages/hua-dot/src/__tests__/codegen/__snapshots__/pipeline.test.ts.snap",
+      "publicBaseSha256": "4b24ffe0aac7fd813425535d1d6a911357a12e5f6113fcf3844699704e4fc402",
+      "sourceSha256": "4b24ffe0aac7fd813425535d1d6a911357a12e5f6113fcf3844699704e4fc402"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "51b356c8ef317783c6c3b5cec61001a5ffa9cd5fea1e3fccb172eab29ff57650",
+      "path": "packages/hua-dot/src/__tests__/codegen/__snapshots__/swift-emitter.test.ts.snap",
+      "publicBaseSha256": "51b356c8ef317783c6c3b5cec61001a5ffa9cd5fea1e3fccb172eab29ff57650",
+      "sourceSha256": "51b356c8ef317783c6c3b5cec61001a5ffa9cd5fea1e3fccb172eab29ff57650"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "68039580f6b22291899dd246c0ac8d0ffc9ac9dae16d129409510d045f2661e4",
+      "path": "packages/hua-dot/src/__tests__/codegen/__snapshots__/to-ir.test.ts.snap",
+      "publicBaseSha256": "68039580f6b22291899dd246c0ac8d0ffc9ac9dae16d129409510d045f2661e4",
+      "sourceSha256": "68039580f6b22291899dd246c0ac8d0ffc9ac9dae16d129409510d045f2661e4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "926c7fb86c7468ec4240f53b6acd30775a852c8bf53492591e2f05f17aff4be7",
+      "path": "packages/hua-dot/src/__tests__/codegen/compose-emitter.test.ts",
+      "publicBaseSha256": "926c7fb86c7468ec4240f53b6acd30775a852c8bf53492591e2f05f17aff4be7",
+      "sourceSha256": "926c7fb86c7468ec4240f53b6acd30775a852c8bf53492591e2f05f17aff4be7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "54633ab52e945fd6296a6ba7e6ede8ac0f75285344f35e57107d08e41ab1b7c1",
+      "path": "packages/hua-dot/src/__tests__/codegen/emitter.test.ts",
+      "publicBaseSha256": "54633ab52e945fd6296a6ba7e6ede8ac0f75285344f35e57107d08e41ab1b7c1",
+      "sourceSha256": "54633ab52e945fd6296a6ba7e6ede8ac0f75285344f35e57107d08e41ab1b7c1"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "55307699947b369d8c999694faf45c66c7cade73dbedd4b15d6cfc81f9223c9f",
+      "path": "packages/hua-dot/src/__tests__/codegen/pipeline.test.ts",
+      "publicBaseSha256": "55307699947b369d8c999694faf45c66c7cade73dbedd4b15d6cfc81f9223c9f",
+      "sourceSha256": "55307699947b369d8c999694faf45c66c7cade73dbedd4b15d6cfc81f9223c9f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "2b69e9ff890a5280926dc6dd05aa31d04496bcc99b5c52f20ab6a6f42df9279d",
+      "path": "packages/hua-dot/src/__tests__/codegen/swift-emitter.test.ts",
+      "publicBaseSha256": "2b69e9ff890a5280926dc6dd05aa31d04496bcc99b5c52f20ab6a6f42df9279d",
+      "sourceSha256": "2b69e9ff890a5280926dc6dd05aa31d04496bcc99b5c52f20ab6a6f42df9279d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "3a148c86260fde4e8fa25138aa5f719a949f92d752050bfbe701d504329677ca",
+      "path": "packages/hua-dot/src/__tests__/codegen/to-ir.test.ts",
+      "publicBaseSha256": "3a148c86260fde4e8fa25138aa5f719a949f92d752050bfbe701d504329677ca",
+      "sourceSha256": "3a148c86260fde4e8fa25138aa5f719a949f92d752050bfbe701d504329677ca"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "539c964be41f121191df7bba533d59f8c90737d80708bc6f6b1b318b1278474d",
+      "path": "packages/hua-dot/src/__tests__/composition-patterns.test.ts",
+      "publicBaseSha256": "539c964be41f121191df7bba533d59f8c90737d80708bc6f6b1b318b1278474d",
+      "sourceSha256": "539c964be41f121191df7bba533d59f8c90737d80708bc6f6b1b318b1278474d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "0f174099d1d87f65d4bfa95a5a0899fb37a21bb7b4f560561e692a02b3b36db5",
+      "path": "packages/hua-dot/src/__tests__/config-validation.test.ts",
+      "publicBaseSha256": "0f174099d1d87f65d4bfa95a5a0899fb37a21bb7b4f560561e692a02b3b36db5",
+      "sourceSha256": "0f174099d1d87f65d4bfa95a5a0899fb37a21bb7b4f560561e692a02b3b36db5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "25a7aa578b907c3815c9c52a68d9fe15444d02bfaafa0f3d7bfa8afa92c7aa43",
+      "path": "packages/hua-dot/src/__tests__/config.test.ts",
+      "publicBaseSha256": "25a7aa578b907c3815c9c52a68d9fe15444d02bfaafa0f3d7bfa8afa92c7aa43",
+      "sourceSha256": "25a7aa578b907c3815c9c52a68d9fe15444d02bfaafa0f3d7bfa8afa92c7aa43"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "0fbcc817a31d3181f96fc3c22203929110bd55145b6aa642ce3a68645604dea2",
+      "path": "packages/hua-dot/src/__tests__/cx-extended.test.ts",
+      "publicBaseSha256": "0fbcc817a31d3181f96fc3c22203929110bd55145b6aa642ce3a68645604dea2",
+      "sourceSha256": "0fbcc817a31d3181f96fc3c22203929110bd55145b6aa642ce3a68645604dea2"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "8449a6ec932a1b34133d7a3ea034ca55a95743ad9f7ff4f9fbd04c66c01a1e49",
+      "path": "packages/hua-dot/src/__tests__/cx.test.ts",
+      "publicBaseSha256": "8449a6ec932a1b34133d7a3ea034ca55a95743ad9f7ff4f9fbd04c66c01a1e49",
+      "sourceSha256": "8449a6ec932a1b34133d7a3ea034ca55a95743ad9f7ff4f9fbd04c66c01a1e49"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "2062681b6bb2dc1e0d3d5bec751b750b2c16dc651f5ffefb283409049e806645",
+      "path": "packages/hua-dot/src/__tests__/dotexplain-extended.test.ts",
+      "publicBaseSha256": "2062681b6bb2dc1e0d3d5bec751b750b2c16dc651f5ffefb283409049e806645",
+      "sourceSha256": "2062681b6bb2dc1e0d3d5bec751b750b2c16dc651f5ffefb283409049e806645"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "ce4384bae81a9ff791b78a46ed8bdf855293481f75fea3592d03f52209628b65",
+      "path": "packages/hua-dot/src/__tests__/dotmap-extended.test.ts",
+      "publicBaseSha256": "ce4384bae81a9ff791b78a46ed8bdf855293481f75fea3592d03f52209628b65",
+      "sourceSha256": "ce4384bae81a9ff791b78a46ed8bdf855293481f75fea3592d03f52209628b65"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "eaa8c71d66689aaf19be0be7b880aa38e2179c8ca0ce1d674bfc083ffa65ddf8",
+      "path": "packages/hua-dot/src/__tests__/dotvariants-extended.test.ts",
+      "publicBaseSha256": "eaa8c71d66689aaf19be0be7b880aa38e2179c8ca0ce1d674bfc083ffa65ddf8",
+      "sourceSha256": "eaa8c71d66689aaf19be0be7b880aa38e2179c8ca0ce1d674bfc083ffa65ddf8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "618a93bc081cb5a2c26db50e4a83a7016f9cfb7c90e9fe89d7b73d0d42df61ad",
+      "path": "packages/hua-dot/src/__tests__/edge-cases-new.test.ts",
+      "publicBaseSha256": "618a93bc081cb5a2c26db50e4a83a7016f9cfb7c90e9fe89d7b73d0d42df61ad",
+      "sourceSha256": "618a93bc081cb5a2c26db50e4a83a7016f9cfb7c90e9fe89d7b73d0d42df61ad"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "4180fff1c6884487f9789e3f05ef2bbcbed615948cf27e8b78f3c8de2a33f478",
+      "path": "packages/hua-dot/src/__tests__/flutter-entry.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "4180fff1c6884487f9789e3f05ef2bbcbed615948cf27e8b78f3c8de2a33f478"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e7d5ad2a229f8b943c4233671d94bbd9729e3e929f3eb4a08739be5a52eacd33",
+      "path": "packages/hua-dot/src/__tests__/flutter-wire.test.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "e7d5ad2a229f8b943c4233671d94bbd9729e3e929f3eb4a08739be5a52eacd33"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "b1acce60cbd5042deb0961a5992175ac843e6ddba1655ad3d1f59653370692e1",
+      "path": "packages/hua-dot/src/__tests__/fractional-values.test.ts",
+      "publicBaseSha256": "b1acce60cbd5042deb0961a5992175ac843e6ddba1655ad3d1f59653370692e1",
+      "sourceSha256": "b1acce60cbd5042deb0961a5992175ac843e6ddba1655ad3d1f59653370692e1"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "1161b4eb383164a526f45ec369835d37ac31f1bb8fcd6b5f881b32efd387d6cf",
+      "path": "packages/hua-dot/src/__tests__/integration.test.ts",
+      "publicBaseSha256": "1161b4eb383164a526f45ec369835d37ac31f1bb8fcd6b5f881b32efd387d6cf",
+      "sourceSha256": "1161b4eb383164a526f45ec369835d37ac31f1bb8fcd6b5f881b32efd387d6cf"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "889c64daa2a7bc610fe67624335eeca6f13042512a4717051a68ae6cf12ba9b8",
+      "path": "packages/hua-dot/src/__tests__/native-subpath.test.ts",
+      "publicBaseSha256": "889c64daa2a7bc610fe67624335eeca6f13042512a4717051a68ae6cf12ba9b8",
+      "sourceSha256": "889c64daa2a7bc610fe67624335eeca6f13042512a4717051a68ae6cf12ba9b8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "06f394718a4ff2a7f8004a27d508ea8dc033729849d0d295a09a4212eb7670eb",
+      "path": "packages/hua-dot/src/__tests__/overload-types.test.ts",
+      "publicBaseSha256": "06f394718a4ff2a7f8004a27d508ea8dc033729849d0d295a09a4212eb7670eb",
+      "sourceSha256": "06f394718a4ff2a7f8004a27d508ea8dc033729849d0d295a09a4212eb7670eb"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "373244f2734d1368ac6af72b076d61248246524d4e9b456eac5c21a35c2af34f",
+      "path": "packages/hua-dot/src/__tests__/parser-extended.test.ts",
+      "publicBaseSha256": "373244f2734d1368ac6af72b076d61248246524d4e9b456eac5c21a35c2af34f",
+      "sourceSha256": "373244f2734d1368ac6af72b076d61248246524d4e9b456eac5c21a35c2af34f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6d04638478ebaad54ee2b687f9de960892f72294eebd8452d776426b415d1bda",
+      "path": "packages/hua-dot/src/__tests__/parser.test.ts",
+      "publicBaseSha256": "6d04638478ebaad54ee2b687f9de960892f72294eebd8452d776426b415d1bda",
+      "sourceSha256": "6d04638478ebaad54ee2b687f9de960892f72294eebd8452d776426b415d1bda"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "62906788253b78b976c58bdf7fa978f17715d51212e15366f505660389e50b58",
+      "path": "packages/hua-dot/src/__tests__/phase1-variants.test.ts",
+      "publicBaseSha256": "62906788253b78b976c58bdf7fa978f17715d51212e15366f505660389e50b58",
+      "sourceSha256": "62906788253b78b976c58bdf7fa978f17715d51212e15366f505660389e50b58"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "fb01924b93cc5f3807357eee2b654c245046ca74bb8d3c6313a4d0fc1db46081",
+      "path": "packages/hua-dot/src/__tests__/prose-passthrough.test.ts",
+      "publicBaseSha256": "fb01924b93cc5f3807357eee2b654c245046ca74bb8d3c6313a4d0fc1db46081",
+      "sourceSha256": "fb01924b93cc5f3807357eee2b654c245046ca74bb8d3c6313a4d0fc1db46081"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "5d2663cd4bfc327ed7857c97a785d6d65aeb0226bd189889680fd7b384e404af",
+      "path": "packages/hua-dot/src/__tests__/resolvers/animate-enter.test.ts",
+      "publicBaseSha256": "5d2663cd4bfc327ed7857c97a785d6d65aeb0226bd189889680fd7b384e404af",
+      "sourceSha256": "5d2663cd4bfc327ed7857c97a785d6d65aeb0226bd189889680fd7b384e404af"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "047df9f84c225064cd213e60d75395a2cdb2828ceee5431bf56fc297fcacc81f",
+      "path": "packages/hua-dot/src/__tests__/resolvers/animation.test.ts",
+      "publicBaseSha256": "047df9f84c225064cd213e60d75395a2cdb2828ceee5431bf56fc297fcacc81f",
+      "sourceSha256": "047df9f84c225064cd213e60d75395a2cdb2828ceee5431bf56fc297fcacc81f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "62f6878dee9c4e2d7ceaa0590d69f641cf6a03e138d4cd12d3c82d6623e50006",
+      "path": "packages/hua-dot/src/__tests__/resolvers/arbitrary.test.ts",
+      "publicBaseSha256": "62f6878dee9c4e2d7ceaa0590d69f641cf6a03e138d4cd12d3c82d6623e50006",
+      "sourceSha256": "62f6878dee9c4e2d7ceaa0590d69f641cf6a03e138d4cd12d3c82d6623e50006"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e08733fc73c33bb7e1bd6604c448d3b630a666a0afe6781e8094d0451d0a7fc9",
+      "path": "packages/hua-dot/src/__tests__/resolvers/aspect-ratio.test.ts",
+      "publicBaseSha256": "e08733fc73c33bb7e1bd6604c448d3b630a666a0afe6781e8094d0451d0a7fc9",
+      "sourceSha256": "e08733fc73c33bb7e1bd6604c448d3b630a666a0afe6781e8094d0451d0a7fc9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "4493f85f72aabd579c90e193feedf37a4eee8c8bf7c27f138e6de793fcbd1c89",
+      "path": "packages/hua-dot/src/__tests__/resolvers/backdrop-extended.test.ts",
+      "publicBaseSha256": "4493f85f72aabd579c90e193feedf37a4eee8c8bf7c27f138e6de793fcbd1c89",
+      "sourceSha256": "4493f85f72aabd579c90e193feedf37a4eee8c8bf7c27f138e6de793fcbd1c89"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "89d05b44c5d42ef646ac1ec54bca41b46c5029ecfaafbd6b5ebfc786eee5961c",
+      "path": "packages/hua-dot/src/__tests__/resolvers/backdrop.test.ts",
+      "publicBaseSha256": "89d05b44c5d42ef646ac1ec54bca41b46c5029ecfaafbd6b5ebfc786eee5961c",
+      "sourceSha256": "89d05b44c5d42ef646ac1ec54bca41b46c5029ecfaafbd6b5ebfc786eee5961c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "256a8e7905e9b91e4984a45da366f8fbb3a8e85504f4196b35d1bec8f525aae5",
+      "path": "packages/hua-dot/src/__tests__/resolvers/border.test.ts",
+      "publicBaseSha256": "256a8e7905e9b91e4984a45da366f8fbb3a8e85504f4196b35d1bec8f525aae5",
+      "sourceSha256": "256a8e7905e9b91e4984a45da366f8fbb3a8e85504f4196b35d1bec8f525aae5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "8c8bcb41b3e0953a8510a69095a423cfb1bbb5ddde919e2933abaeb74f42ece4",
+      "path": "packages/hua-dot/src/__tests__/resolvers/color-mix.test.ts",
+      "publicBaseSha256": "8c8bcb41b3e0953a8510a69095a423cfb1bbb5ddde919e2933abaeb74f42ece4",
+      "sourceSha256": "8c8bcb41b3e0953a8510a69095a423cfb1bbb5ddde919e2933abaeb74f42ece4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "1bb040377c74683d3fbab710c09685e0c692ce3541a3221351118da99170703d",
+      "path": "packages/hua-dot/src/__tests__/resolvers/color-opacity.test.ts",
+      "publicBaseSha256": "1bb040377c74683d3fbab710c09685e0c692ce3541a3221351118da99170703d",
+      "sourceSha256": "1bb040377c74683d3fbab710c09685e0c692ce3541a3221351118da99170703d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "de8265da9d590142877e1cc9cd11d1aa499e8894caaea505c4ea55b55486bdb3",
+      "path": "packages/hua-dot/src/__tests__/resolvers/color.test.ts",
+      "publicBaseSha256": "de8265da9d590142877e1cc9cd11d1aa499e8894caaea505c4ea55b55486bdb3",
+      "sourceSha256": "de8265da9d590142877e1cc9cd11d1aa499e8894caaea505c4ea55b55486bdb3"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "26f1230cbf1868d49c28c14fdff6cd9b01f4e08e1091035a30cb7a0ffefca540",
+      "path": "packages/hua-dot/src/__tests__/resolvers/divide-extended.test.ts",
+      "publicBaseSha256": "26f1230cbf1868d49c28c14fdff6cd9b01f4e08e1091035a30cb7a0ffefca540",
+      "sourceSha256": "26f1230cbf1868d49c28c14fdff6cd9b01f4e08e1091035a30cb7a0ffefca540"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e5f108e9af68a9032f267f66ad6c96aa6c9ffac67ca70620241393c1bccc271c",
+      "path": "packages/hua-dot/src/__tests__/resolvers/divide.test.ts",
+      "publicBaseSha256": "e5f108e9af68a9032f267f66ad6c96aa6c9ffac67ca70620241393c1bccc271c",
+      "sourceSha256": "e5f108e9af68a9032f267f66ad6c96aa6c9ffac67ca70620241393c1bccc271c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "5bbe77589d2d8ce2a39b8e7418e4e425eac90eb6207f101b84de76fe254b805c",
+      "path": "packages/hua-dot/src/__tests__/resolvers/filter-animation.test.ts",
+      "publicBaseSha256": "5bbe77589d2d8ce2a39b8e7418e4e425eac90eb6207f101b84de76fe254b805c",
+      "sourceSha256": "5bbe77589d2d8ce2a39b8e7418e4e425eac90eb6207f101b84de76fe254b805c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "d824533d868e3b335596504ca3611379f37b8b6e180529144a3fc1afebdb1f52",
+      "path": "packages/hua-dot/src/__tests__/resolvers/filter.test.ts",
+      "publicBaseSha256": "d824533d868e3b335596504ca3611379f37b8b6e180529144a3fc1afebdb1f52",
+      "sourceSha256": "d824533d868e3b335596504ca3611379f37b8b6e180529144a3fc1afebdb1f52"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "44933c3d6da0d6df74ad6bcadb57db75e09febfb93c2021d22f224e0bb270602",
+      "path": "packages/hua-dot/src/__tests__/resolvers/flexbox.test.ts",
+      "publicBaseSha256": "44933c3d6da0d6df74ad6bcadb57db75e09febfb93c2021d22f224e0bb270602",
+      "sourceSha256": "44933c3d6da0d6df74ad6bcadb57db75e09febfb93c2021d22f224e0bb270602"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "3eadcf9d7881d898ca1b1f0e5bad5d116f9c3ca4919c1b444e9f4f45d7ce4a14",
+      "path": "packages/hua-dot/src/__tests__/resolvers/gradient-extended.test.ts",
+      "publicBaseSha256": "3eadcf9d7881d898ca1b1f0e5bad5d116f9c3ca4919c1b444e9f4f45d7ce4a14",
+      "sourceSha256": "3eadcf9d7881d898ca1b1f0e5bad5d116f9c3ca4919c1b444e9f4f45d7ce4a14"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e4fb97caf7cd6049b02bd0b31d8f4fccdc3291bda32734574069e5f864844c52",
+      "path": "packages/hua-dot/src/__tests__/resolvers/gradient.test.ts",
+      "publicBaseSha256": "e4fb97caf7cd6049b02bd0b31d8f4fccdc3291bda32734574069e5f864844c52",
+      "sourceSha256": "e4fb97caf7cd6049b02bd0b31d8f4fccdc3291bda32734574069e5f864844c52"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6d34ff115b2dcb4ca7e7d6cf807c3e208eece8b980846a15bb88d5814a998ac0",
+      "path": "packages/hua-dot/src/__tests__/resolvers/grid.test.ts",
+      "publicBaseSha256": "6d34ff115b2dcb4ca7e7d6cf807c3e208eece8b980846a15bb88d5814a998ac0",
+      "sourceSha256": "6d34ff115b2dcb4ca7e7d6cf807c3e208eece8b980846a15bb88d5814a998ac0"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6d6aaaa8725b8aa9f0a6919adf7e7d677780da3f18a6076ae36c8a19335d7f71",
+      "path": "packages/hua-dot/src/__tests__/resolvers/interactivity.test.ts",
+      "publicBaseSha256": "6d6aaaa8725b8aa9f0a6919adf7e7d677780da3f18a6076ae36c8a19335d7f71",
+      "sourceSha256": "6d6aaaa8725b8aa9f0a6919adf7e7d677780da3f18a6076ae36c8a19335d7f71"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "79a6f6769de2229aa2f205b3932f4f5df5540a9908acb099c0ec683c34b83cdf",
+      "path": "packages/hua-dot/src/__tests__/resolvers/layout.test.ts",
+      "publicBaseSha256": "79a6f6769de2229aa2f205b3932f4f5df5540a9908acb099c0ec683c34b83cdf",
+      "sourceSha256": "79a6f6769de2229aa2f205b3932f4f5df5540a9908acb099c0ec683c34b83cdf"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "2597d1d4fbb6741d14ab61cd9d35ad0d0addb3ec9ef40f8f82dea85b6edb7ac1",
+      "path": "packages/hua-dot/src/__tests__/resolvers/line-clamp.test.ts",
+      "publicBaseSha256": "2597d1d4fbb6741d14ab61cd9d35ad0d0addb3ec9ef40f8f82dea85b6edb7ac1",
+      "sourceSha256": "2597d1d4fbb6741d14ab61cd9d35ad0d0addb3ec9ef40f8f82dea85b6edb7ac1"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6368a5433f83c3411f60308e7d146d7ac3c6f5eec793ea54748556ef6859e987",
+      "path": "packages/hua-dot/src/__tests__/resolvers/list.test.ts",
+      "publicBaseSha256": "6368a5433f83c3411f60308e7d146d7ac3c6f5eec793ea54748556ef6859e987",
+      "sourceSha256": "6368a5433f83c3411f60308e7d146d7ac3c6f5eec793ea54748556ef6859e987"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6ae4b37edf14fcf8cfa53b9f65b4d552ea56d851d91c691d17881bd0e289b972",
+      "path": "packages/hua-dot/src/__tests__/resolvers/missing-tokens.test.ts",
+      "publicBaseSha256": "6ae4b37edf14fcf8cfa53b9f65b4d552ea56d851d91c691d17881bd0e289b972",
+      "sourceSha256": "6ae4b37edf14fcf8cfa53b9f65b4d552ea56d851d91c691d17881bd0e289b972"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "a01d2dbae7841578cfa457d688ce0b390b6e6de8ef7a0ad8d5608a9bbb41f31d",
+      "path": "packages/hua-dot/src/__tests__/resolvers/native-line-clamp.test.ts",
+      "publicBaseSha256": "a01d2dbae7841578cfa457d688ce0b390b6e6de8ef7a0ad8d5608a9bbb41f31d",
+      "sourceSha256": "a01d2dbae7841578cfa457d688ce0b390b6e6de8ef7a0ad8d5608a9bbb41f31d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "73836ef3c6a45e15ca8e0f99b008db391fb6d9fe617c79d17e63553b4a5511cd",
+      "path": "packages/hua-dot/src/__tests__/resolvers/object-fit.test.ts",
+      "publicBaseSha256": "73836ef3c6a45e15ca8e0f99b008db391fb6d9fe617c79d17e63553b4a5511cd",
+      "sourceSha256": "73836ef3c6a45e15ca8e0f99b008db391fb6d9fe617c79d17e63553b4a5511cd"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "f54ab83d3030561ff22aadc15bf97a5400e22d69845c3340f9c7c2ab79acab0b",
+      "path": "packages/hua-dot/src/__tests__/resolvers/opacity.test.ts",
+      "publicBaseSha256": "f54ab83d3030561ff22aadc15bf97a5400e22d69845c3340f9c7c2ab79acab0b",
+      "sourceSha256": "f54ab83d3030561ff22aadc15bf97a5400e22d69845c3340f9c7c2ab79acab0b"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "02c982b24bbb5235b6c9566cbb3f7feb815d67db3796b9c1ea44f0015b796c72",
+      "path": "packages/hua-dot/src/__tests__/resolvers/outline.test.ts",
+      "publicBaseSha256": "02c982b24bbb5235b6c9566cbb3f7feb815d67db3796b9c1ea44f0015b796c72",
+      "sourceSha256": "02c982b24bbb5235b6c9566cbb3f7feb815d67db3796b9c1ea44f0015b796c72"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "dced0e1a901f327d457d4a85ef0f940d10db4583dcd2abf2670d133fccc383c4",
+      "path": "packages/hua-dot/src/__tests__/resolvers/phase0-native.test.ts",
+      "publicBaseSha256": "dced0e1a901f327d457d4a85ef0f940d10db4583dcd2abf2670d133fccc383c4",
+      "sourceSha256": "dced0e1a901f327d457d4a85ef0f940d10db4583dcd2abf2670d133fccc383c4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "678178a83a7ee13fc6b09645d7e63308715e3ba9e1c7bd3f51aecf08e8ef74f9",
+      "path": "packages/hua-dot/src/__tests__/resolvers/phase1-coverage.test.ts",
+      "publicBaseSha256": "678178a83a7ee13fc6b09645d7e63308715e3ba9e1c7bd3f51aecf08e8ef74f9",
+      "sourceSha256": "678178a83a7ee13fc6b09645d7e63308715e3ba9e1c7bd3f51aecf08e8ef74f9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "da300a4b58631f6a89e5f657139165bd7d814127d3fa49682b3a7db1b0c648c7",
+      "path": "packages/hua-dot/src/__tests__/resolvers/positioning.test.ts",
+      "publicBaseSha256": "da300a4b58631f6a89e5f657139165bd7d814127d3fa49682b3a7db1b0c648c7",
+      "sourceSha256": "da300a4b58631f6a89e5f657139165bd7d814127d3fa49682b3a7db1b0c648c7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "b74fbca3264fe773635a178aeba6e989ed2f059441617b8ea956c7e9ee2ebfa4",
+      "path": "packages/hua-dot/src/__tests__/resolvers/ring.test.ts",
+      "publicBaseSha256": "b74fbca3264fe773635a178aeba6e989ed2f059441617b8ea956c7e9ee2ebfa4",
+      "sourceSha256": "b74fbca3264fe773635a178aeba6e989ed2f059441617b8ea956c7e9ee2ebfa4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "279413ecee14ab75ebfe1d6684c2949ae35956ca736a616927074249d58146c1",
+      "path": "packages/hua-dot/src/__tests__/resolvers/scroll.test.ts",
+      "publicBaseSha256": "279413ecee14ab75ebfe1d6684c2949ae35956ca736a616927074249d58146c1",
+      "sourceSha256": "279413ecee14ab75ebfe1d6684c2949ae35956ca736a616927074249d58146c1"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "52facae24e8e42aad6b3a5083e59432443916e479e231a315f936fd9b998eb64",
+      "path": "packages/hua-dot/src/__tests__/resolvers/semantic-colors.test.ts",
+      "publicBaseSha256": "52facae24e8e42aad6b3a5083e59432443916e479e231a315f936fd9b998eb64",
+      "sourceSha256": "52facae24e8e42aad6b3a5083e59432443916e479e231a315f936fd9b998eb64"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6450eaa82492ddae1395dfc703d30bba77e77acffc994d120179cdfa6b25ec3e",
+      "path": "packages/hua-dot/src/__tests__/resolvers/shadow.test.ts",
+      "publicBaseSha256": "6450eaa82492ddae1395dfc703d30bba77e77acffc994d120179cdfa6b25ec3e",
+      "sourceSha256": "6450eaa82492ddae1395dfc703d30bba77e77acffc994d120179cdfa6b25ec3e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "384eec44ff55d52335ed5724ac3b92523ecd6cb47996cc0e38b271d1ef0e70f6",
+      "path": "packages/hua-dot/src/__tests__/resolvers/space.test.ts",
+      "publicBaseSha256": "384eec44ff55d52335ed5724ac3b92523ecd6cb47996cc0e38b271d1ef0e70f6",
+      "sourceSha256": "384eec44ff55d52335ed5724ac3b92523ecd6cb47996cc0e38b271d1ef0e70f6"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "29e143d83d939f465bce34ac93848195b51e58fc083975e9dbea87ebbe3ef061",
+      "path": "packages/hua-dot/src/__tests__/resolvers/spacing.test.ts",
+      "publicBaseSha256": "29e143d83d939f465bce34ac93848195b51e58fc083975e9dbea87ebbe3ef061",
+      "sourceSha256": "29e143d83d939f465bce34ac93848195b51e58fc083975e9dbea87ebbe3ef061"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6fa8d0530e091f526833cd6c342f0eb7f43b2e92070a0f86285f3ea739789463",
+      "path": "packages/hua-dot/src/__tests__/resolvers/table.test.ts",
+      "publicBaseSha256": "6fa8d0530e091f526833cd6c342f0eb7f43b2e92070a0f86285f3ea739789463",
+      "sourceSha256": "6fa8d0530e091f526833cd6c342f0eb7f43b2e92070a0f86285f3ea739789463"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "de286feb428e9c566dab8a3a8cd298af90df7fd3be61bcdd3d1476197ba115f5",
+      "path": "packages/hua-dot/src/__tests__/resolvers/text-decoration.test.ts",
+      "publicBaseSha256": "de286feb428e9c566dab8a3a8cd298af90df7fd3be61bcdd3d1476197ba115f5",
+      "sourceSha256": "de286feb428e9c566dab8a3a8cd298af90df7fd3be61bcdd3d1476197ba115f5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "a4189b95f17d8df7ca6a1acef237f69247894ddd51f4c9f1f9773db1076ef076",
+      "path": "packages/hua-dot/src/__tests__/resolvers/timing.test.ts",
+      "publicBaseSha256": "a4189b95f17d8df7ca6a1acef237f69247894ddd51f4c9f1f9773db1076ef076",
+      "sourceSha256": "a4189b95f17d8df7ca6a1acef237f69247894ddd51f4c9f1f9773db1076ef076"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "53c4f9681c211a7a128ce9ba6473dc400d9f03ffd3533a70080659ded472c154",
+      "path": "packages/hua-dot/src/__tests__/resolvers/transform-origin.test.ts",
+      "publicBaseSha256": "53c4f9681c211a7a128ce9ba6473dc400d9f03ffd3533a70080659ded472c154",
+      "sourceSha256": "53c4f9681c211a7a128ce9ba6473dc400d9f03ffd3533a70080659ded472c154"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "a70929a939f04062f728768949d94f5976d5ac87a1424107c8fb927ad858837e",
+      "path": "packages/hua-dot/src/__tests__/resolvers/transform.test.ts",
+      "publicBaseSha256": "a70929a939f04062f728768949d94f5976d5ac87a1424107c8fb927ad858837e",
+      "sourceSha256": "a70929a939f04062f728768949d94f5976d5ac87a1424107c8fb927ad858837e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "a6c780d7f83545bb707f79132fabc5355cb82699b9c9ec622dff3f81a047e769",
+      "path": "packages/hua-dot/src/__tests__/resolvers/transition.test.ts",
+      "publicBaseSha256": "a6c780d7f83545bb707f79132fabc5355cb82699b9c9ec622dff3f81a047e769",
+      "sourceSha256": "a6c780d7f83545bb707f79132fabc5355cb82699b9c9ec622dff3f81a047e769"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "46ba3157df2e47e94955db76d56b6477d038f0637a821ec5eda298fea7688692",
+      "path": "packages/hua-dot/src/__tests__/resolvers/typography.test.ts",
+      "publicBaseSha256": "46ba3157df2e47e94955db76d56b6477d038f0637a821ec5eda298fea7688692",
+      "sourceSha256": "46ba3157df2e47e94955db76d56b6477d038f0637a821ec5eda298fea7688692"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "4877c2551251436a5a1746a53f472dfac364ad0b22de0c7004723e34ab6f8b46",
+      "path": "packages/hua-dot/src/__tests__/resolvers/visibility.test.ts",
+      "publicBaseSha256": "4877c2551251436a5a1746a53f472dfac364ad0b22de0c7004723e34ab6f8b46",
+      "sourceSha256": "4877c2551251436a5a1746a53f472dfac364ad0b22de0c7004723e34ab6f8b46"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "927f75de76a8e45783734e8fd3a28cfffb1294f416fef4ec1e63c842a4d9439f",
+      "path": "packages/hua-dot/src/__tests__/resolvers/warn-unknown.test.ts",
+      "publicBaseSha256": "927f75de76a8e45783734e8fd3a28cfffb1294f416fef4ec1e63c842a4d9439f",
+      "sourceSha256": "927f75de76a8e45783734e8fd3a28cfffb1294f416fef4ec1e63c842a4d9439f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "de807642f93fc6dd8ab70fe1d0cae51121a498602e2066349c0292c5e9ab53af",
+      "path": "packages/hua-dot/src/__tests__/resolvers/wave2-edge.test.ts",
+      "publicBaseSha256": "de807642f93fc6dd8ab70fe1d0cae51121a498602e2066349c0292c5e9ab53af",
+      "sourceSha256": "de807642f93fc6dd8ab70fe1d0cae51121a498602e2066349c0292c5e9ab53af"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "fa3e858acb5c7585b696d88c6dee9727275c004076d15fe6841bbfcf26c69aed",
+      "path": "packages/hua-dot/src/__tests__/resolvers/wave5-colors-fonts.test.ts",
+      "publicBaseSha256": "fa3e858acb5c7585b696d88c6dee9727275c004076d15fe6841bbfcf26c69aed",
+      "sourceSha256": "fa3e858acb5c7585b696d88c6dee9727275c004076d15fe6841bbfcf26c69aed"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "6d58b885a360624ee93fe02e454fe23b1b429332663d19b6cf70617e6239d060",
+      "path": "packages/hua-dot/src/__tests__/resolvers/whitespace-appearance.test.ts",
+      "publicBaseSha256": "6d58b885a360624ee93fe02e454fe23b1b429332663d19b6cf70617e6239d060",
+      "sourceSha256": "6d58b885a360624ee93fe02e454fe23b1b429332663d19b6cf70617e6239d060"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "30da79902dcb8e7e03c9a2f4ed0abb4494557e39e657723fbca435eb626ce177",
+      "path": "packages/hua-dot/src/__tests__/resolvers/word-break.test.ts",
+      "publicBaseSha256": "30da79902dcb8e7e03c9a2f4ed0abb4494557e39e657723fbca435eb626ce177",
+      "sourceSha256": "30da79902dcb8e7e03c9a2f4ed0abb4494557e39e657723fbca435eb626ce177"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "104d59726f95f8b081ae26c4c999c06b6b1509f6f65317373445bd296d7d1715",
+      "path": "packages/hua-dot/src/__tests__/semanticvars.test.ts",
+      "publicBaseSha256": "104d59726f95f8b081ae26c4c999c06b6b1509f6f65317373445bd296d7d1715",
+      "sourceSha256": "104d59726f95f8b081ae26c4c999c06b6b1509f6f65317373445bd296d7d1715"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "a50a11d6bc31e98835656cc5ad354811ed1198fd25f4854d3fa01b4e588590ee",
+      "path": "packages/hua-dot/src/__tests__/state-variants.test.ts",
+      "publicBaseSha256": "a50a11d6bc31e98835656cc5ad354811ed1198fd25f4854d3fa01b4e588590ee",
+      "sourceSha256": "a50a11d6bc31e98835656cc5ad354811ed1198fd25f4854d3fa01b4e588590ee"
+    },
+    {
+      "disposition": "platform-only-excluded",
+      "kind": "docs",
+      "outputSha256": null,
+      "path": "packages/hua-dot/src/__tests__/target-contracts-guide.md",
+      "publicBaseSha256": null,
+      "sourceSha256": "42542de1a507d4214246b9cac4479dec3e3a18e2b126a49b5bf98a777ddb5186"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "55f8cd7b2cd8c550a0ce902109b7553931545e344d0eaf48b1e0716ea2df74f2",
+      "path": "packages/hua-dot/src/__tests__/target-contracts.test.ts",
+      "publicBaseSha256": "55f8cd7b2cd8c550a0ce902109b7553931545e344d0eaf48b1e0716ea2df74f2",
+      "sourceSha256": "55f8cd7b2cd8c550a0ce902109b7553931545e344d0eaf48b1e0716ea2df74f2"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "e3a779e7e8a22e546a97851ca459ae0f69d3f8956b6494c355c8d0e00a6520fc",
+      "path": "packages/hua-dot/src/__tests__/variants.test.ts",
+      "publicBaseSha256": "e3a779e7e8a22e546a97851ca459ae0f69d3f8956b6494c355c8d0e00a6520fc",
+      "sourceSha256": "e3a779e7e8a22e546a97851ca459ae0f69d3f8956b6494c355c8d0e00a6520fc"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "b4d293158a656e8a11ce831521092f1a6f70ff9968113e1edd4683981e6fcc1f",
+      "path": "packages/hua-dot/src/__tests__/wave0-edge-cases.test.ts",
+      "publicBaseSha256": "b4d293158a656e8a11ce831521092f1a6f70ff9968113e1edd4683981e6fcc1f",
+      "sourceSha256": "b4d293158a656e8a11ce831521092f1a6f70ff9968113e1edd4683981e6fcc1f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "1b5ea6e2f666bdc53b468a7d01f302c1605466f8727e8c5ba1d8a56ebd82b077",
+      "path": "packages/hua-dot/src/__tests__/wave3-config.test.ts",
+      "publicBaseSha256": "1b5ea6e2f666bdc53b468a7d01f302c1605466f8727e8c5ba1d8a56ebd82b077",
+      "sourceSha256": "1b5ea6e2f666bdc53b468a7d01f302c1605466f8727e8c5ba1d8a56ebd82b077"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "c4ec5cde6c226549fbc25e93d659f23bf82cf22cc666c920eb8748f99fb9bf75",
+      "path": "packages/hua-dot/src/adapters/class.ts",
+      "publicBaseSha256": "c4ec5cde6c226549fbc25e93d659f23bf82cf22cc666c920eb8748f99fb9bf75",
+      "sourceSha256": "c4ec5cde6c226549fbc25e93d659f23bf82cf22cc666c920eb8748f99fb9bf75"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "2e4bfe9792d53e2212a8bb015659a1d2aab5ce29d181f53347aa7793ebf8b624",
+      "path": "packages/hua-dot/src/adapters/flutter-types.ts",
+      "publicBaseSha256": "2e4bfe9792d53e2212a8bb015659a1d2aab5ce29d181f53347aa7793ebf8b624",
+      "sourceSha256": "2e4bfe9792d53e2212a8bb015659a1d2aab5ce29d181f53347aa7793ebf8b624"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a6b6ea280fefa7f1a07d36f859fb9198e24adf5c402be35647350270a8129001",
+      "path": "packages/hua-dot/src/adapters/flutter.ts",
+      "publicBaseSha256": "a6b6ea280fefa7f1a07d36f859fb9198e24adf5c402be35647350270a8129001",
+      "sourceSha256": "a6b6ea280fefa7f1a07d36f859fb9198e24adf5c402be35647350270a8129001"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "82fd4f6d16b954e081d6d0a62aab913538ad75e2b3b3bb2ac18ab519e669a33e",
+      "path": "packages/hua-dot/src/adapters/index.ts",
+      "publicBaseSha256": "82fd4f6d16b954e081d6d0a62aab913538ad75e2b3b3bb2ac18ab519e669a33e",
+      "sourceSha256": "82fd4f6d16b954e081d6d0a62aab913538ad75e2b3b3bb2ac18ab519e669a33e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "fdb4369b262c61221b2a0b593baaceed3e5f0edc44fd8d001efee065bcc91ce9",
+      "path": "packages/hua-dot/src/adapters/native-types.ts",
+      "publicBaseSha256": "fdb4369b262c61221b2a0b593baaceed3e5f0edc44fd8d001efee065bcc91ce9",
+      "sourceSha256": "fdb4369b262c61221b2a0b593baaceed3e5f0edc44fd8d001efee065bcc91ce9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "d739b1549352591a53e2bbf4d0f1e8946268db97e78a19c16d63ae0b2e64e2a5",
+      "path": "packages/hua-dot/src/adapters/native.ts",
+      "publicBaseSha256": "d739b1549352591a53e2bbf4d0f1e8946268db97e78a19c16d63ae0b2e64e2a5",
+      "sourceSha256": "d739b1549352591a53e2bbf4d0f1e8946268db97e78a19c16d63ae0b2e64e2a5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "9e839cfaa26528e2b6f5299db4ef6a799ae257b07f7e5b11d2024e113b1bbd22",
+      "path": "packages/hua-dot/src/adapters/shared.ts",
+      "publicBaseSha256": "9e839cfaa26528e2b6f5299db4ef6a799ae257b07f7e5b11d2024e113b1bbd22",
+      "sourceSha256": "9e839cfaa26528e2b6f5299db4ef6a799ae257b07f7e5b11d2024e113b1bbd22"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "64672ade1629c43271c63386f03cf75bad9132497e080d090d66a580cb780dbf",
+      "path": "packages/hua-dot/src/adapters/web.ts",
+      "publicBaseSha256": "64672ade1629c43271c63386f03cf75bad9132497e080d090d66a580cb780dbf",
+      "sourceSha256": "64672ade1629c43271c63386f03cf75bad9132497e080d090d66a580cb780dbf"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a77a7a304639915cff077ed3a5e5cd8ad6b7cf36dfd757dd7fc34c7c6ddbef7d",
+      "path": "packages/hua-dot/src/ax.ts",
+      "publicBaseSha256": "a77a7a304639915cff077ed3a5e5cd8ad6b7cf36dfd757dd7fc34c7c6ddbef7d",
+      "sourceSha256": "a77a7a304639915cff077ed3a5e5cd8ad6b7cf36dfd757dd7fc34c7c6ddbef7d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "9e7dfec2c80cb9d81759aa9366899594f95c2c23768fa68ef3c2e715f2c15112",
+      "path": "packages/hua-dot/src/cache.ts",
+      "publicBaseSha256": "9e7dfec2c80cb9d81759aa9366899594f95c2c23768fa68ef3c2e715f2c15112",
+      "sourceSha256": "9e7dfec2c80cb9d81759aa9366899594f95c2c23768fa68ef3c2e715f2c15112"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "c7d3cb8ee6803a1e62c0d1b59f5f063204f3b4cc1878294fa8184b46bffef031",
+      "path": "packages/hua-dot/src/capabilities.ts",
+      "publicBaseSha256": "c7d3cb8ee6803a1e62c0d1b59f5f063204f3b4cc1878294fa8184b46bffef031",
+      "sourceSha256": "c7d3cb8ee6803a1e62c0d1b59f5f063204f3b4cc1878294fa8184b46bffef031"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "7c116db729ee068b56289a7b609dcc8f444a4472f080d157291094687f9e4fbc",
+      "path": "packages/hua-dot/src/class.ts",
+      "publicBaseSha256": "7c116db729ee068b56289a7b609dcc8f444a4472f080d157291094687f9e4fbc",
+      "sourceSha256": "7c116db729ee068b56289a7b609dcc8f444a4472f080d157291094687f9e4fbc"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "f2908d1a628009a858f83402a2af3756c145f0177243eeba672ace4c7b3c878b",
+      "path": "packages/hua-dot/src/codegen/cli.ts",
+      "publicBaseSha256": "f2908d1a628009a858f83402a2af3756c145f0177243eeba672ace4c7b3c878b",
+      "sourceSha256": "f2908d1a628009a858f83402a2af3756c145f0177243eeba672ace4c7b3c878b"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "94fab85bcbb786060baa4827e61166c17213b79fda2333a68bb60dfa9421b34d",
+      "path": "packages/hua-dot/src/codegen/compose-emitter.ts",
+      "publicBaseSha256": "94fab85bcbb786060baa4827e61166c17213b79fda2333a68bb60dfa9421b34d",
+      "sourceSha256": "94fab85bcbb786060baa4827e61166c17213b79fda2333a68bb60dfa9421b34d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "de96c35649fe03a4c5ba43dc5f5954a12178e4f0d97ea2807fa606ec081e8905",
+      "path": "packages/hua-dot/src/codegen/emitter.ts",
+      "publicBaseSha256": "de96c35649fe03a4c5ba43dc5f5954a12178e4f0d97ea2807fa606ec081e8905",
+      "sourceSha256": "de96c35649fe03a4c5ba43dc5f5954a12178e4f0d97ea2807fa606ec081e8905"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "3bdcb02ec8fefafb843d048b9d966b7f1771fa9a27b7c1a9cb017059cf71c9d4",
+      "path": "packages/hua-dot/src/codegen/index.ts",
+      "publicBaseSha256": "3bdcb02ec8fefafb843d048b9d966b7f1771fa9a27b7c1a9cb017059cf71c9d4",
+      "sourceSha256": "3bdcb02ec8fefafb843d048b9d966b7f1771fa9a27b7c1a9cb017059cf71c9d4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "d7f72a65d8de5dc2aed2d34618cdda7e19e1aaaaf91fd8dc6e3fcfbcac477dfa",
+      "path": "packages/hua-dot/src/codegen/ir.ts",
+      "publicBaseSha256": "d7f72a65d8de5dc2aed2d34618cdda7e19e1aaaaf91fd8dc6e3fcfbcac477dfa",
+      "sourceSha256": "d7f72a65d8de5dc2aed2d34618cdda7e19e1aaaaf91fd8dc6e3fcfbcac477dfa"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "8838015ec7887757f0c28332b46e92175c113f78d753e78367324adb3dd960d9",
+      "path": "packages/hua-dot/src/codegen/pipeline.ts",
+      "publicBaseSha256": "8838015ec7887757f0c28332b46e92175c113f78d753e78367324adb3dd960d9",
+      "sourceSha256": "8838015ec7887757f0c28332b46e92175c113f78d753e78367324adb3dd960d9"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "8bd1cda9f6e44b0cce074a7ac44ee77ed3c03d9760afb32616a517efe6e1fc0c",
+      "path": "packages/hua-dot/src/codegen/stub-emitter.ts",
+      "publicBaseSha256": "8bd1cda9f6e44b0cce074a7ac44ee77ed3c03d9760afb32616a517efe6e1fc0c",
+      "sourceSha256": "8bd1cda9f6e44b0cce074a7ac44ee77ed3c03d9760afb32616a517efe6e1fc0c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "3eb473fa42264208d5e99b5b342fb43d44e36b5a6143e2c87d1593cd1f2fc651",
+      "path": "packages/hua-dot/src/codegen/swift-emitter.ts",
+      "publicBaseSha256": "3eb473fa42264208d5e99b5b342fb43d44e36b5a6143e2c87d1593cd1f2fc651",
+      "sourceSha256": "3eb473fa42264208d5e99b5b342fb43d44e36b5a6143e2c87d1593cd1f2fc651"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "5752f6428294c51a229be8d497ef9f1bd69b31e657683a712a06a3fac1c2dde7",
+      "path": "packages/hua-dot/src/codegen/to-ir.ts",
+      "publicBaseSha256": "5752f6428294c51a229be8d497ef9f1bd69b31e657683a712a06a3fac1c2dde7",
+      "sourceSha256": "5752f6428294c51a229be8d497ef9f1bd69b31e657683a712a06a3fac1c2dde7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "dcbea8556b1c99897edc027e6ce19d3d3c774a219d708340754c05f4717cef17",
+      "path": "packages/hua-dot/src/config.ts",
+      "publicBaseSha256": "dcbea8556b1c99897edc027e6ce19d3d3c774a219d708340754c05f4717cef17",
+      "sourceSha256": "dcbea8556b1c99897edc027e6ce19d3d3c774a219d708340754c05f4717cef17"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "18c3566debc60d35ff0e0b00bd95e26cb8df9c99e20a05bd1633a72dbcf326ad",
+      "path": "packages/hua-dot/src/cx.ts",
+      "publicBaseSha256": "18c3566debc60d35ff0e0b00bd95e26cb8df9c99e20a05bd1633a72dbcf326ad",
+      "sourceSha256": "18c3566debc60d35ff0e0b00bd95e26cb8df9c99e20a05bd1633a72dbcf326ad"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "f37621f3828d1eb9325921c7ce3a5a24c29644f49a1f2c72bcddd7e29e632527",
+      "path": "packages/hua-dot/src/flutter-wire.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "f37621f3828d1eb9325921c7ce3a5a24c29644f49a1f2c72bcddd7e29e632527"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "41a42b78d5a85732a63e22e52036cbb47d3cfc24c1c550a9c0d8109af5fc9716",
+      "path": "packages/hua-dot/src/flutter.ts",
+      "publicBaseSha256": null,
+      "sourceSha256": "41a42b78d5a85732a63e22e52036cbb47d3cfc24c1c550a9c0d8109af5fc9716"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "f3197585a5a8d61c88defbaa6d2b0aca9f75d54a2e93b4da706eb3cd494f0a97",
+      "path": "packages/hua-dot/src/index.ts",
+      "publicBaseSha256": "f3197585a5a8d61c88defbaa6d2b0aca9f75d54a2e93b4da706eb3cd494f0a97",
+      "sourceSha256": "f3197585a5a8d61c88defbaa6d2b0aca9f75d54a2e93b4da706eb3cd494f0a97"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "cb09cd9bb1eb96bacdbbf6816363ae3165e3eb57ac425c8698bfcae682943e77",
+      "path": "packages/hua-dot/src/native.ts",
+      "publicBaseSha256": "cb09cd9bb1eb96bacdbbf6816363ae3165e3eb57ac425c8698bfcae682943e77",
+      "sourceSha256": "cb09cd9bb1eb96bacdbbf6816363ae3165e3eb57ac425c8698bfcae682943e77"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "5f2d73ee02ea2d6f4462eb7032f8967384a5107d7b5e765a8523ce6d22533f86",
+      "path": "packages/hua-dot/src/parser.ts",
+      "publicBaseSha256": "5f2d73ee02ea2d6f4462eb7032f8967384a5107d7b5e765a8523ce6d22533f86",
+      "sourceSha256": "5f2d73ee02ea2d6f4462eb7032f8967384a5107d7b5e765a8523ce6d22533f86"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "ac42273c48651602a3ad6e4b2298623498c387b0be8f67dc42bc2f6be32f9e77",
+      "path": "packages/hua-dot/src/resolver.ts",
+      "publicBaseSha256": "ac42273c48651602a3ad6e4b2298623498c387b0be8f67dc42bc2f6be32f9e77",
+      "sourceSha256": "ac42273c48651602a3ad6e4b2298623498c387b0be8f67dc42bc2f6be32f9e77"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "2780983c3dea4af16312c2c77181b248841892b5a9af44228684959b600215ae",
+      "path": "packages/hua-dot/src/resolvers/animation.ts",
+      "publicBaseSha256": "2780983c3dea4af16312c2c77181b248841892b5a9af44228684959b600215ae",
+      "sourceSha256": "2780983c3dea4af16312c2c77181b248841892b5a9af44228684959b600215ae"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "6426a0456078ffff9e1e25fd132b0a4874ed0ee50dfa59646b1410202eec91db",
+      "path": "packages/hua-dot/src/resolvers/backdrop.ts",
+      "publicBaseSha256": "6426a0456078ffff9e1e25fd132b0a4874ed0ee50dfa59646b1410202eec91db",
+      "sourceSha256": "6426a0456078ffff9e1e25fd132b0a4874ed0ee50dfa59646b1410202eec91db"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "30e9f1a65337521b92949291511d7251c13f87acfb7644e8509b3e4b5e51f6bd",
+      "path": "packages/hua-dot/src/resolvers/border.ts",
+      "publicBaseSha256": "30e9f1a65337521b92949291511d7251c13f87acfb7644e8509b3e4b5e51f6bd",
+      "sourceSha256": "30e9f1a65337521b92949291511d7251c13f87acfb7644e8509b3e4b5e51f6bd"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a6795d8f2c8f80edaec5625d4f76eeb607c5e4b48a674d3f3ca7ef2a505f50a8",
+      "path": "packages/hua-dot/src/resolvers/color.ts",
+      "publicBaseSha256": "a6795d8f2c8f80edaec5625d4f76eeb607c5e4b48a674d3f3ca7ef2a505f50a8",
+      "sourceSha256": "a6795d8f2c8f80edaec5625d4f76eeb607c5e4b48a674d3f3ca7ef2a505f50a8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "b79bf4fdd598b794dd24893267e1c26698c67c08436dd5b9ed621237ff06d0bb",
+      "path": "packages/hua-dot/src/resolvers/divide.ts",
+      "publicBaseSha256": "b79bf4fdd598b794dd24893267e1c26698c67c08436dd5b9ed621237ff06d0bb",
+      "sourceSha256": "b79bf4fdd598b794dd24893267e1c26698c67c08436dd5b9ed621237ff06d0bb"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "86d96d77175d8f2313e0a0e336010b1f1955606bac60efbe81c7aaec61b1835d",
+      "path": "packages/hua-dot/src/resolvers/filter.ts",
+      "publicBaseSha256": "86d96d77175d8f2313e0a0e336010b1f1955606bac60efbe81c7aaec61b1835d",
+      "sourceSha256": "86d96d77175d8f2313e0a0e336010b1f1955606bac60efbe81c7aaec61b1835d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "2c1c5f19f3ea970e8b463940f6d005459416065ca15a3a252addee3a0dbb4b40",
+      "path": "packages/hua-dot/src/resolvers/flexbox.ts",
+      "publicBaseSha256": "2c1c5f19f3ea970e8b463940f6d005459416065ca15a3a252addee3a0dbb4b40",
+      "sourceSha256": "2c1c5f19f3ea970e8b463940f6d005459416065ca15a3a252addee3a0dbb4b40"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "ece27d3a8297682708d8f42cc5ab863b5e81042e079ac1d96e2fb4a94323d10a",
+      "path": "packages/hua-dot/src/resolvers/gradient.ts",
+      "publicBaseSha256": "ece27d3a8297682708d8f42cc5ab863b5e81042e079ac1d96e2fb4a94323d10a",
+      "sourceSha256": "ece27d3a8297682708d8f42cc5ab863b5e81042e079ac1d96e2fb4a94323d10a"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "48e68bc7167c17b960a7d7839866efb4ce19663a65f73d5b28e28aa59b25b871",
+      "path": "packages/hua-dot/src/resolvers/grid.ts",
+      "publicBaseSha256": "48e68bc7167c17b960a7d7839866efb4ce19663a65f73d5b28e28aa59b25b871",
+      "sourceSha256": "48e68bc7167c17b960a7d7839866efb4ce19663a65f73d5b28e28aa59b25b871"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "9901e484f132e53be03de2677fabfafd0fae0fc05bce89ce08642cf8749bb881",
+      "path": "packages/hua-dot/src/resolvers/interactivity.ts",
+      "publicBaseSha256": "9901e484f132e53be03de2677fabfafd0fae0fc05bce89ce08642cf8749bb881",
+      "sourceSha256": "9901e484f132e53be03de2677fabfafd0fae0fc05bce89ce08642cf8749bb881"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e3c33e8c6f28408e82ae36954db3d91d73db51ed8b568da0cfa79ea0c212ea83",
+      "path": "packages/hua-dot/src/resolvers/layout.ts",
+      "publicBaseSha256": "e3c33e8c6f28408e82ae36954db3d91d73db51ed8b568da0cfa79ea0c212ea83",
+      "sourceSha256": "e3c33e8c6f28408e82ae36954db3d91d73db51ed8b568da0cfa79ea0c212ea83"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "cff5686569a79e7839515d0617a7f8f2d8fe20c1babe1dcb8866d72cafae3d34",
+      "path": "packages/hua-dot/src/resolvers/line-clamp.ts",
+      "publicBaseSha256": "cff5686569a79e7839515d0617a7f8f2d8fe20c1babe1dcb8866d72cafae3d34",
+      "sourceSha256": "cff5686569a79e7839515d0617a7f8f2d8fe20c1babe1dcb8866d72cafae3d34"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "01c7c77961bf918f7bb615f06b4f12798737d48b3a425e0f8e65bd4286a8b84f",
+      "path": "packages/hua-dot/src/resolvers/list.ts",
+      "publicBaseSha256": "01c7c77961bf918f7bb615f06b4f12798737d48b3a425e0f8e65bd4286a8b84f",
+      "sourceSha256": "01c7c77961bf918f7bb615f06b4f12798737d48b3a425e0f8e65bd4286a8b84f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a630d95d7c5f2c624a34835aada57f9d9e1de9a50f5cb4c56791cdbf7a854feb",
+      "path": "packages/hua-dot/src/resolvers/object-fit.ts",
+      "publicBaseSha256": "a630d95d7c5f2c624a34835aada57f9d9e1de9a50f5cb4c56791cdbf7a854feb",
+      "sourceSha256": "a630d95d7c5f2c624a34835aada57f9d9e1de9a50f5cb4c56791cdbf7a854feb"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "5ef7b4033fd1ecb2f4b3400066f33fc6043424d9a2a760b26d3832f4cc6dc684",
+      "path": "packages/hua-dot/src/resolvers/opacity.ts",
+      "publicBaseSha256": "5ef7b4033fd1ecb2f4b3400066f33fc6043424d9a2a760b26d3832f4cc6dc684",
+      "sourceSha256": "5ef7b4033fd1ecb2f4b3400066f33fc6043424d9a2a760b26d3832f4cc6dc684"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "7c762c77aec7adc075cbf51cc442d78ce73374abbadce7be6f26b84a8e1cd342",
+      "path": "packages/hua-dot/src/resolvers/outline.ts",
+      "publicBaseSha256": "7c762c77aec7adc075cbf51cc442d78ce73374abbadce7be6f26b84a8e1cd342",
+      "sourceSha256": "7c762c77aec7adc075cbf51cc442d78ce73374abbadce7be6f26b84a8e1cd342"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e02265bb072f555cb7dbec039c34a264c637e97cbd7db40c3ac44cefd6c53d17",
+      "path": "packages/hua-dot/src/resolvers/positioning.ts",
+      "publicBaseSha256": "e02265bb072f555cb7dbec039c34a264c637e97cbd7db40c3ac44cefd6c53d17",
+      "sourceSha256": "e02265bb072f555cb7dbec039c34a264c637e97cbd7db40c3ac44cefd6c53d17"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "05a721805411586279ff54f150f3ec05c571eea89a9c312d7097834fee5357a3",
+      "path": "packages/hua-dot/src/resolvers/ring.ts",
+      "publicBaseSha256": "05a721805411586279ff54f150f3ec05c571eea89a9c312d7097834fee5357a3",
+      "sourceSha256": "05a721805411586279ff54f150f3ec05c571eea89a9c312d7097834fee5357a3"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "633b0e1f32ad9fc3b54b5fff1195736134303ed9571fd5479ca397fe9fff2612",
+      "path": "packages/hua-dot/src/resolvers/scroll.ts",
+      "publicBaseSha256": "633b0e1f32ad9fc3b54b5fff1195736134303ed9571fd5479ca397fe9fff2612",
+      "sourceSha256": "633b0e1f32ad9fc3b54b5fff1195736134303ed9571fd5479ca397fe9fff2612"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "bb70af2ef0fd5f9e5a56e992ca10a9ea9430cd6c3c8e4821d11811d478d278da",
+      "path": "packages/hua-dot/src/resolvers/shadow.ts",
+      "publicBaseSha256": "bb70af2ef0fd5f9e5a56e992ca10a9ea9430cd6c3c8e4821d11811d478d278da",
+      "sourceSha256": "bb70af2ef0fd5f9e5a56e992ca10a9ea9430cd6c3c8e4821d11811d478d278da"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "d3a5aaf4f6e646c02f51bf6dc1bd3db57b799916883b694c8e43c7bbeabe8875",
+      "path": "packages/hua-dot/src/resolvers/spacing.ts",
+      "publicBaseSha256": "d3a5aaf4f6e646c02f51bf6dc1bd3db57b799916883b694c8e43c7bbeabe8875",
+      "sourceSha256": "d3a5aaf4f6e646c02f51bf6dc1bd3db57b799916883b694c8e43c7bbeabe8875"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "0b18b2e4068fc570231509d384103ff9c7b54dc40409ac7b60b347470fea6eb8",
+      "path": "packages/hua-dot/src/resolvers/table.ts",
+      "publicBaseSha256": "0b18b2e4068fc570231509d384103ff9c7b54dc40409ac7b60b347470fea6eb8",
+      "sourceSha256": "0b18b2e4068fc570231509d384103ff9c7b54dc40409ac7b60b347470fea6eb8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a3060002eac914b80390df0df3dc11a41704e02d472c63ec6f26d12c6a616206",
+      "path": "packages/hua-dot/src/resolvers/transform.ts",
+      "publicBaseSha256": "a3060002eac914b80390df0df3dc11a41704e02d472c63ec6f26d12c6a616206",
+      "sourceSha256": "a3060002eac914b80390df0df3dc11a41704e02d472c63ec6f26d12c6a616206"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "b7d3987751c5866614946580b4af4d20caf63553b233603a19826f6d2a0db309",
+      "path": "packages/hua-dot/src/resolvers/transition.ts",
+      "publicBaseSha256": "b7d3987751c5866614946580b4af4d20caf63553b233603a19826f6d2a0db309",
+      "sourceSha256": "b7d3987751c5866614946580b4af4d20caf63553b233603a19826f6d2a0db309"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "01570ed95e301a41d6608d5ee665b5ae89e9244f3edb91edc469ec75fe51f1c7",
+      "path": "packages/hua-dot/src/resolvers/typography.ts",
+      "publicBaseSha256": "01570ed95e301a41d6608d5ee665b5ae89e9244f3edb91edc469ec75fe51f1c7",
+      "sourceSha256": "01570ed95e301a41d6608d5ee665b5ae89e9244f3edb91edc469ec75fe51f1c7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "3ca5091fadf65a2f1d7182712ca4e994543fda2f276695659fa0f06ff0fd6e56",
+      "path": "packages/hua-dot/src/resolvers/utils.ts",
+      "publicBaseSha256": "3ca5091fadf65a2f1d7182712ca4e994543fda2f276695659fa0f06ff0fd6e56",
+      "sourceSha256": "3ca5091fadf65a2f1d7182712ca4e994543fda2f276695659fa0f06ff0fd6e56"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "4e605b776454060e2b6ee59fed7db71066573c5ffe5b39ca7b04e698447bf18b",
+      "path": "packages/hua-dot/src/resolvers/z-index.ts",
+      "publicBaseSha256": "4e605b776454060e2b6ee59fed7db71066573c5ffe5b39ca7b04e698447bf18b",
+      "sourceSha256": "4e605b776454060e2b6ee59fed7db71066573c5ffe5b39ca7b04e698447bf18b"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "25e69f5876e835c30013aca104c41505c390c4d630a4f92fa1b4baa128205dd8",
+      "path": "packages/hua-dot/src/tokens/animations.ts",
+      "publicBaseSha256": "25e69f5876e835c30013aca104c41505c390c4d630a4f92fa1b4baa128205dd8",
+      "sourceSha256": "25e69f5876e835c30013aca104c41505c390c4d630a4f92fa1b4baa128205dd8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e16d8021dd29a5a8480c1a57504a4985d9abe7f1eff304774e67c7a7cdb44c05",
+      "path": "packages/hua-dot/src/tokens/backdrop.ts",
+      "publicBaseSha256": "e16d8021dd29a5a8480c1a57504a4985d9abe7f1eff304774e67c7a7cdb44c05",
+      "sourceSha256": "e16d8021dd29a5a8480c1a57504a4985d9abe7f1eff304774e67c7a7cdb44c05"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "631317ed8c9b076f66135e04b3f720022abe5e8344971e3295a943f1a5de67f2",
+      "path": "packages/hua-dot/src/tokens/borders.ts",
+      "publicBaseSha256": "631317ed8c9b076f66135e04b3f720022abe5e8344971e3295a943f1a5de67f2",
+      "sourceSha256": "631317ed8c9b076f66135e04b3f720022abe5e8344971e3295a943f1a5de67f2"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "acaee302c8095c4fd862ab5ee0774d059c07831cc925b02415b3b2e008d055ec",
+      "path": "packages/hua-dot/src/tokens/breakpoints.ts",
+      "publicBaseSha256": "acaee302c8095c4fd862ab5ee0774d059c07831cc925b02415b3b2e008d055ec",
+      "sourceSha256": "acaee302c8095c4fd862ab5ee0774d059c07831cc925b02415b3b2e008d055ec"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "d058107e2b17fa3fa4d2401f65a4e7cb49efba455776af45ac3de050ba68dcc1",
+      "path": "packages/hua-dot/src/tokens/colors.ts",
+      "publicBaseSha256": "d058107e2b17fa3fa4d2401f65a4e7cb49efba455776af45ac3de050ba68dcc1",
+      "sourceSha256": "d058107e2b17fa3fa4d2401f65a4e7cb49efba455776af45ac3de050ba68dcc1"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "288b13e4ae0a14525ec9399aaf05c5fc122a2d1d54fcf666fae0970a776eaf8f",
+      "path": "packages/hua-dot/src/tokens/filter.ts",
+      "publicBaseSha256": "288b13e4ae0a14525ec9399aaf05c5fc122a2d1d54fcf666fae0970a776eaf8f",
+      "sourceSha256": "288b13e4ae0a14525ec9399aaf05c5fc122a2d1d54fcf666fae0970a776eaf8f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "372d34a2797cfc9acd8f8e748ae7d4dc2902849598aa2015b08a4a4507ab5aa2",
+      "path": "packages/hua-dot/src/tokens/flexbox.ts",
+      "publicBaseSha256": "372d34a2797cfc9acd8f8e748ae7d4dc2902849598aa2015b08a4a4507ab5aa2",
+      "sourceSha256": "372d34a2797cfc9acd8f8e748ae7d4dc2902849598aa2015b08a4a4507ab5aa2"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "5fc668c09766a5cb8fe73cc8c74d6f520e2baa69d2e145a9a0ea2b815808de91",
+      "path": "packages/hua-dot/src/tokens/gradients.ts",
+      "publicBaseSha256": "5fc668c09766a5cb8fe73cc8c74d6f520e2baa69d2e145a9a0ea2b815808de91",
+      "sourceSha256": "5fc668c09766a5cb8fe73cc8c74d6f520e2baa69d2e145a9a0ea2b815808de91"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "bdd4656def1747fb0ea22a50e1e48e71e5819ee6bbcbf4dd24d655f831add464",
+      "path": "packages/hua-dot/src/tokens/grid.ts",
+      "publicBaseSha256": "bdd4656def1747fb0ea22a50e1e48e71e5819ee6bbcbf4dd24d655f831add464",
+      "sourceSha256": "bdd4656def1747fb0ea22a50e1e48e71e5819ee6bbcbf4dd24d655f831add464"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a2d15bac6ad0b50422556a66830f5bfee2343af753d92ad540614afcca888fe4",
+      "path": "packages/hua-dot/src/tokens/index.ts",
+      "publicBaseSha256": "a2d15bac6ad0b50422556a66830f5bfee2343af753d92ad540614afcca888fe4",
+      "sourceSha256": "a2d15bac6ad0b50422556a66830f5bfee2343af753d92ad540614afcca888fe4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "4c332e5d64bb2b2fd3a951a78a9d2ae947ba842546f5f7f72e8c9a1f6203099f",
+      "path": "packages/hua-dot/src/tokens/interactivity.ts",
+      "publicBaseSha256": "4c332e5d64bb2b2fd3a951a78a9d2ae947ba842546f5f7f72e8c9a1f6203099f",
+      "sourceSha256": "4c332e5d64bb2b2fd3a951a78a9d2ae947ba842546f5f7f72e8c9a1f6203099f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "699ca24804179aa6e1e4ab45b3f9fc7d954273bcd55d747e775218cbe11c4b6f",
+      "path": "packages/hua-dot/src/tokens/layout.ts",
+      "publicBaseSha256": "699ca24804179aa6e1e4ab45b3f9fc7d954273bcd55d747e775218cbe11c4b6f",
+      "sourceSha256": "699ca24804179aa6e1e4ab45b3f9fc7d954273bcd55d747e775218cbe11c4b6f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "0f2565abd295f3c236a03b374732a8f354851fbf857dbe9c481d211ca2fa78d8",
+      "path": "packages/hua-dot/src/tokens/list.ts",
+      "publicBaseSha256": "0f2565abd295f3c236a03b374732a8f354851fbf857dbe9c481d211ca2fa78d8",
+      "sourceSha256": "0f2565abd295f3c236a03b374732a8f354851fbf857dbe9c481d211ca2fa78d8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "9d96223133a89f2350865099fb627267fbbc9a998f39d9f65ad48128d24aa788",
+      "path": "packages/hua-dot/src/tokens/object-fit.ts",
+      "publicBaseSha256": "9d96223133a89f2350865099fb627267fbbc9a998f39d9f65ad48128d24aa788",
+      "sourceSha256": "9d96223133a89f2350865099fb627267fbbc9a998f39d9f65ad48128d24aa788"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "a486248271c0dc952ca977dc8a4e4fbdd59b92eb679f097b323450dcd6f03f3c",
+      "path": "packages/hua-dot/src/tokens/opacity.ts",
+      "publicBaseSha256": "a486248271c0dc952ca977dc8a4e4fbdd59b92eb679f097b323450dcd6f03f3c",
+      "sourceSha256": "a486248271c0dc952ca977dc8a4e4fbdd59b92eb679f097b323450dcd6f03f3c"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "0a2cfa25fa6a4fd79c9df68de6157db134fc07a1d7c1242bcaefe4b338216582",
+      "path": "packages/hua-dot/src/tokens/rings.ts",
+      "publicBaseSha256": "0a2cfa25fa6a4fd79c9df68de6157db134fc07a1d7c1242bcaefe4b338216582",
+      "sourceSha256": "0a2cfa25fa6a4fd79c9df68de6157db134fc07a1d7c1242bcaefe4b338216582"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "fe6b71bdb572b544a4656a3f35e79a317419e2963d0220c36705db1927366588",
+      "path": "packages/hua-dot/src/tokens/scroll.ts",
+      "publicBaseSha256": "fe6b71bdb572b544a4656a3f35e79a317419e2963d0220c36705db1927366588",
+      "sourceSha256": "fe6b71bdb572b544a4656a3f35e79a317419e2963d0220c36705db1927366588"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "20700ce80e87352f2e2f56266d7de3d1470ec69a1c1e1cfbdb8764ac33790549",
+      "path": "packages/hua-dot/src/tokens/shadows.ts",
+      "publicBaseSha256": "20700ce80e87352f2e2f56266d7de3d1470ec69a1c1e1cfbdb8764ac33790549",
+      "sourceSha256": "20700ce80e87352f2e2f56266d7de3d1470ec69a1c1e1cfbdb8764ac33790549"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "021b9ad6c673d176133968aae6c817e533786d9544c82b699cb7b6d05ed7b9cd",
+      "path": "packages/hua-dot/src/tokens/spacing.ts",
+      "publicBaseSha256": "021b9ad6c673d176133968aae6c817e533786d9544c82b699cb7b6d05ed7b9cd",
+      "sourceSha256": "021b9ad6c673d176133968aae6c817e533786d9544c82b699cb7b6d05ed7b9cd"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "b7cab465f5c317e3fb910f44d01bd742e5fb9127a18906d454a92a952e888947",
+      "path": "packages/hua-dot/src/tokens/table.ts",
+      "publicBaseSha256": "b7cab465f5c317e3fb910f44d01bd742e5fb9127a18906d454a92a952e888947",
+      "sourceSha256": "b7cab465f5c317e3fb910f44d01bd742e5fb9127a18906d454a92a952e888947"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "325c349e42cddfa06816c230fe09230be894d19df6057c5aeab6ec8d004de82a",
+      "path": "packages/hua-dot/src/tokens/transforms.ts",
+      "publicBaseSha256": "325c349e42cddfa06816c230fe09230be894d19df6057c5aeab6ec8d004de82a",
+      "sourceSha256": "325c349e42cddfa06816c230fe09230be894d19df6057c5aeab6ec8d004de82a"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "ef6fd914ac470af0d5695d64013b5fd50af7bc1b4a8cb533146d7f53fb83537e",
+      "path": "packages/hua-dot/src/tokens/transitions.ts",
+      "publicBaseSha256": "ef6fd914ac470af0d5695d64013b5fd50af7bc1b4a8cb533146d7f53fb83537e",
+      "sourceSha256": "ef6fd914ac470af0d5695d64013b5fd50af7bc1b4a8cb533146d7f53fb83537e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "ce78e1157642cccb61f916b1b47498697f5103e7149ed5374fc9c771eda1f37d",
+      "path": "packages/hua-dot/src/tokens/typography.ts",
+      "publicBaseSha256": "ce78e1157642cccb61f916b1b47498697f5103e7149ed5374fc9c771eda1f37d",
+      "sourceSha256": "ce78e1157642cccb61f916b1b47498697f5103e7149ed5374fc9c771eda1f37d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "6abad85ea807062ba169cb07ae0d065b4cc26586dd316ed6cc033646df86df24",
+      "path": "packages/hua-dot/src/tokens/z-index.ts",
+      "publicBaseSha256": "6abad85ea807062ba169cb07ae0d065b4cc26586dd316ed6cc033646df86df24",
+      "sourceSha256": "6abad85ea807062ba169cb07ae0d065b4cc26586dd316ed6cc033646df86df24"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "1f73c98794253ec494d7388aa4ebfb12e0e0f59e1679f30311e769e363e7d3e8",
+      "path": "packages/hua-dot/src/types.ts",
+      "publicBaseSha256": "1f73c98794253ec494d7388aa4ebfb12e0e0f59e1679f30311e769e363e7d3e8",
+      "sourceSha256": "1f73c98794253ec494d7388aa4ebfb12e0e0f59e1679f30311e769e363e7d3e8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "4015ba4526cb5c3b40df8689fe784657c8649b65825281dd11f92501cbd2e0f8",
+      "path": "packages/hua-dot/src/variants.ts",
+      "publicBaseSha256": "4015ba4526cb5c3b40df8689fe784657c8649b65825281dd11f92501cbd2e0f8",
+      "sourceSha256": "4015ba4526cb5c3b40df8689fe784657c8649b65825281dd11f92501cbd2e0f8"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "55f515e279186545dc98795afcf12a76987346c5ad14af252b879c1e84aa18b4",
+      "path": "packages/hua-dot/tsconfig.json",
+      "publicBaseSha256": "55f515e279186545dc98795afcf12a76987346c5ad14af252b879c1e84aa18b4",
+      "sourceSha256": "55f515e279186545dc98795afcf12a76987346c5ad14af252b879c1e84aa18b4"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "build",
+      "outputSha256": "2e00b3bac990692f2d433443f5ebfec929a169d1d4f0c5e643f4f1552d2d81c5",
+      "path": "packages/hua-dot/tsup.config.ts",
+      "publicBaseSha256": "0f0add89af28d544e314023ab51b2eec1379979aa3c7531efce88af80dd655a0",
+      "sourceSha256": "2e00b3bac990692f2d433443f5ebfec929a169d1d4f0c5e643f4f1552d2d81c5"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "6f902f6077b6aa3171b53c14f11dc8c69873b9b080eb6d4845bdbd40d154a06e",
+      "path": "packages/hua-dot/vitest.config.ts",
+      "publicBaseSha256": "6f902f6077b6aa3171b53c14f11dc8c69873b9b080eb6d4845bdbd40d154a06e",
+      "sourceSha256": "6f902f6077b6aa3171b53c14f11dc8c69873b9b080eb6d4845bdbd40d154a06e"
+    }
+  ],
+  "schema": "hua-dot-core-source-authority.v1",
+  "sourceAuthority": {
+    "commit": "fec4da0c615e615e5973dc283f9d4b02ecafcfdb",
+    "packageTree": "5b294ed3d752861e99d6e9e7d233dccefeb7645a",
+    "tree": "7ffbe014fc5d084e7b0e4599f1542cf0f0f01c43"
+  }
+}

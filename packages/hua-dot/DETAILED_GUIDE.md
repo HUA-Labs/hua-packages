@@ -413,6 +413,40 @@ interface AdaptFlutterOptions {
 }
 ```
 
+### Flutter package entry and recipe wire
+
+Use the package subpath when the consumer wants a Flutter-prebound recipe
+surface instead of passing `target: "flutter"` on every call:
+
+```ts
+import {
+  createFlutterRecipeWire,
+  dot,
+  serializeFlutterRecipeWire,
+} from "@hua-labs/dot/flutter";
+import type { FlutterRecipeWireEnvelope } from "@hua-labs/dot/flutter";
+
+const recipe = dot("p-4 rounded-lg");
+const envelope: FlutterRecipeWireEnvelope = createFlutterRecipeWire(
+  "p-4 cursor-pointer",
+  { dark: false, breakpoint: "md" },
+);
+const canonicalJson = serializeFlutterRecipeWire(envelope);
+```
+
+`createFlutterRecipeWire` snapshots the current Flutter `dotExplain` recipe
+and capability evidence into the versioned `FlutterRecipeWireEnvelope`.
+`serializeFlutterRecipeWire` validates that envelope and emits deterministic
+JSON with recursively sorted object keys. These helpers produce recipe data;
+the package does not ship a Dart runtime, Flutter widgets, a renderer, or
+device-parity evidence.
+
+The `@hua-labs/dot/flutter` JavaScript and declaration entry is emitted under
+`dist/flutter.*`. This Detailed Guide is included in the package tarball with
+that executable entry. Package distribution is separate from runtime proof: a
+consumer still needs its own reviewed Dart/widget renderer if it converts the
+wire data into a Flutter UI.
+
 ---
 
 ## Variant System
