@@ -363,7 +363,6 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     detailedGuide: docYaml.detailedGuide,
     packageDir: pkgDir,
     packageDirName: dirName,
-    packageFiles: pkgJson.files,
   }) as PackageData["documentationAx"] &
     Partial<NonNullable<PackageData["detailedGuide"]>>;
   const readmeFeatureLimit =

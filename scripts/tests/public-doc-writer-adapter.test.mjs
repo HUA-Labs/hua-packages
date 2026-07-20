@@ -56,8 +56,11 @@ function writePackage(root, name, options = {}) {
   const packageDir = join(root, "packages", name);
   mkdirSync(join(packageDir, "src"), { recursive: true });
   const guide = options.guide;
-  const files = ["dist"];
-  if (guide?.distribution === "packed") files.unshift("GUIDE.md");
+  const guidePath = (guide?.path ?? "./GUIDE.md").replace(/^\.\//, "");
+  const files = options.files ?? ["dist"];
+  if (options.files === undefined && guide?.distribution === "packed") {
+    files.unshift(guidePath);
+  }
   writeFileSync(
     join(packageDir, "package.json"),
     `${JSON.stringify(
@@ -76,7 +79,9 @@ function writePackage(root, name, options = {}) {
     "export function example() { return true; }\n",
   );
   if (guide && options.writeGuide !== false) {
-    writeFileSync(join(packageDir, "GUIDE.md"), `# ${name} Guide\n`);
+    const guideFile = join(packageDir, guidePath);
+    mkdirSync(dirname(guideFile), { recursive: true });
+    writeFileSync(guideFile, `# ${name} Guide\n`);
   }
   const guideYaml = guide
     ? `\ndetailedGuide:\n  path: ${JSON.stringify(guide.path ?? "./GUIDE.md")}\n  distribution: ${JSON.stringify(guide.distribution)}\n  description: ${JSON.stringify(guide.description ?? "Usage details")}\n${options.guideExtra ?? ""}`
@@ -165,6 +170,93 @@ test("renders shipped, repository-only, and absent guide authority deterministic
   const stale = runWriter(root, ["--validate"]);
   assert.equal(stale.status, 1);
   assert.match(stale.stdout, /hua-shipped\/README\.md/);
+});
+
+test("writer derives both guide claims from the effective npm tarball roster", async (t) => {
+  const cases = [
+    {
+      name: "packed directory",
+      guide: { path: "./docs/GUIDE.md", distribution: "packed" },
+      files: ["docs"],
+      accepted: true,
+    },
+    {
+      name: "packed glob",
+      guide: { path: "./docs/GUIDE.md", distribution: "packed" },
+      files: ["docs/*.md"],
+      accepted: true,
+    },
+    {
+      name: "repository directory mismatch",
+      guide: { path: "./docs/GUIDE.md", distribution: "repository" },
+      files: ["docs"],
+      accepted: false,
+    },
+    {
+      name: "repository glob mismatch",
+      guide: { path: "./docs/GUIDE.md", distribution: "repository" },
+      files: ["docs/*.md"],
+      accepted: false,
+    },
+    {
+      name: "packed mandatory inclusion",
+      guide: { path: "./LICENSE", distribution: "packed" },
+      files: ["dist"],
+      accepted: true,
+    },
+    {
+      name: "repository mandatory-inclusion mismatch",
+      guide: { path: "./LICENSE", distribution: "repository" },
+      files: ["dist"],
+      accepted: false,
+    },
+    {
+      name: "repository excluded guide",
+      guide: { path: "./GUIDE.md", distribution: "repository" },
+      files: ["dist"],
+      accepted: true,
+    },
+    {
+      name: "packed excluded-guide mismatch",
+      guide: { path: "./GUIDE.md", distribution: "packed" },
+      files: ["dist"],
+      accepted: false,
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, () => {
+      const root = makeRoot();
+      writePackage(root, "hua-packlist", {
+        guide: {
+          ...fixture.guide,
+          description: fixture.name,
+        },
+        files: fixture.files,
+      });
+      const result = runWriter(root, ["--package", "hua-packlist"]);
+      if (!fixture.accepted) {
+        assert.notEqual(result.status, 0);
+        assert.match(
+          `${result.stdout}\n${result.stderr}`,
+          new RegExp(`${fixture.guide.distribution}.*tarball`),
+        );
+        return;
+      }
+
+      assert.equal(result.status, 0, result.stderr || result.stdout);
+      const generated = output(root, "hua-packlist");
+      assert.match(generated.readme, new RegExp(fixture.name));
+      assert.match(
+        generated.ai,
+        new RegExp(
+          fixture.guide.distribution === "packed"
+            ? 'state: "shipped"'
+            : 'state: "repository-only"',
+        ),
+      );
+    });
+  }
 });
 
 test("fails closed on malformed guide and package-root authority", async (t) => {
@@ -298,9 +390,9 @@ test("current public package outputs remain byte-identical under validate", () =
 test("writer, AX adapter, and README template bytes are review-locked", () => {
   const expected = {
     "scripts/generate-docs.ts":
-      "0403605d7249aa0d064c992547f1c98cbac6f41ec8bba22782af1ef51a115592",
+      "9489d6dc8830e398f1543f22b994d18299a487938174e24bc32ff5946d1498ee",
     "scripts/package-ax.mjs":
-      "124c508e53c165d283eb729094c7ee7eacd13675c343622eb9ce30f27a8a4f8a",
+      "c8b07a3291e4733eba9c9689932586749333dc33e5f0ee3bc1ecfa69f954bcd6",
     "scripts/templates/readme.hbs":
       "bcae04c0249c22f4d7dafa079347876be474dbb48bf95c6f8f33d9953fca3879",
   };

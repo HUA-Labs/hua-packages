@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import {
   mkdtempSync,
   mkdirSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -31,6 +33,39 @@ function tempRoot(prefix) {
   const root = mkdtempSync(join(tmpdir(), prefix));
   TEMP_ROOTS.add(root);
   return root;
+}
+
+function writePackageManifest(packageDir, files, extra = {}) {
+  writeFileSync(
+    join(packageDir, "package.json"),
+    `${JSON.stringify(
+      {
+        name: "@hua-labs/example",
+        version: "0.0.0-test",
+        files,
+        ...extra,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+}
+
+function npmPacklist(packageDir) {
+  const result = spawnSync(
+    "npm",
+    ["pack", "--dry-run", "--json", "--ignore-scripts", "--loglevel=silent"],
+    {
+      cwd: packageDir,
+      encoding: "utf8",
+      timeout: 30000,
+      maxBuffer: 8 * 1024 * 1024,
+    },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.length, 1);
+  return parsed[0].files.map((entry) => entry.path);
 }
 
 after(() => {
@@ -178,6 +213,7 @@ test("projects packed, repository-only, and absent guide authority exactly", () 
   const packageDir = tempRoot("hua-public-doc-ax-");
   mkdirSync(join(packageDir, "docs"));
   writeFileSync(join(packageDir, "docs", "GUIDE.md"), "# Guide\n");
+  writePackageManifest(packageDir, ["docs/GUIDE.md", "dist"]);
 
   const packed = buildDocumentationAxProjection({
     detailedGuide: {
@@ -187,7 +223,6 @@ test("projects packed, repository-only, and absent guide authority exactly", () 
     },
     packageDir,
     packageDirName: "hua-example",
-    packageFiles: ["docs/GUIDE.md", "dist"],
   });
   assert.deepEqual(packed, {
     description: "The packed usage guide",
@@ -198,6 +233,7 @@ test("projects packed, repository-only, and absent guide authority exactly", () 
     state: "shipped",
   });
 
+  writePackageManifest(packageDir, ["dist"]);
   const repository = buildDocumentationAxProjection({
     detailedGuide: {
       path: "./docs/GUIDE.md",
@@ -206,7 +242,6 @@ test("projects packed, repository-only, and absent guide authority exactly", () 
     },
     packageDir,
     packageDirName: "hua-example",
-    packageFiles: ["dist"],
   });
   assert.deepEqual(repository, {
     description: "The repository usage guide",
@@ -222,9 +257,98 @@ test("projects packed, repository-only, and absent guide authority exactly", () 
       detailedGuide: undefined,
       packageDir,
       packageDirName: "hua-example",
-      packageFiles: ["dist"],
     }),
     { state: "absent" },
+  );
+});
+
+test("binds both distribution claims to the effective npm tarball roster", () => {
+  const isolatedPacklistRoot = tempRoot("hua-public-packlist-test-");
+  const cases = [
+    {
+      name: "directory allowlist",
+      path: "docs/GUIDE.md",
+      files: ["docs"],
+      admitted: true,
+    },
+    {
+      name: "glob allowlist",
+      path: "docs/GUIDE.md",
+      files: ["docs/*.md"],
+      admitted: true,
+    },
+    {
+      name: "npm mandatory README inclusion",
+      path: "README.md",
+      files: ["dist"],
+      admitted: true,
+    },
+    {
+      name: "excluded ordinary guide",
+      path: "GUIDE.md",
+      files: ["dist"],
+      admitted: false,
+    },
+  ];
+
+  for (const fixture of cases) {
+    const packageDir = tempRoot("hua-public-doc-packlist-");
+    mkdirSync(join(packageDir, "docs"), { recursive: true });
+    writeFileSync(join(packageDir, fixture.path), `# ${fixture.name}\n`);
+    writePackageManifest(packageDir, fixture.files, {
+      scripts: {
+        prepack:
+          "node -e \"require('node:fs').writeFileSync('LIFECYCLE_RAN', 'true')\"",
+      },
+    });
+    assert.equal(
+      npmPacklist(packageDir).includes(fixture.path),
+      fixture.admitted,
+      fixture.name,
+    );
+
+    const project = (distribution) =>
+      buildDocumentationAxProjection({
+        detailedGuide: {
+          path: `./${fixture.path}`,
+          distribution,
+          description: fixture.name,
+        },
+        packageDir,
+        packageDirName: "hua-example",
+      });
+
+    const previousTmpdir = process.env.TMPDIR;
+    process.env.TMPDIR = isolatedPacklistRoot;
+    try {
+      if (fixture.admitted) {
+        assert.equal(project("packed").state, "shipped", fixture.name);
+        assert.throws(() => project("repository"), /repository.*tarball/);
+      } else {
+        assert.throws(() => project("packed"), /packed.*tarball/);
+        assert.equal(
+          project("repository").state,
+          "repository-only",
+          fixture.name,
+        );
+      }
+    } finally {
+      if (previousTmpdir === undefined) delete process.env.TMPDIR;
+      else process.env.TMPDIR = previousTmpdir;
+    }
+    assert.equal(
+      readdirSync(packageDir).some(
+        (name) => name === "LIFECYCLE_RAN" || name.endsWith(".tgz"),
+      ),
+      false,
+      fixture.name,
+    );
+  }
+  assert.deepEqual(
+    readdirSync(isolatedPacklistRoot).filter((name) =>
+      name.startsWith("hua-public-packlist-"),
+    ),
+    [],
   );
 });
 
@@ -236,13 +360,14 @@ test("rejects malformed guide authority and distribution drift", () => {
     distribution: "packed",
     description: "Guide",
   };
-  const project = (detailedGuide, packageFiles = ["GUIDE.md"]) =>
-    buildDocumentationAxProjection({
+  const project = (detailedGuide, packageFiles = ["GUIDE.md"]) => {
+    writePackageManifest(packageDir, packageFiles);
+    return buildDocumentationAxProjection({
       detailedGuide,
       packageDir,
       packageDirName: "hua-example",
-      packageFiles,
     });
+  };
 
   assert.throws(() => project({ ...valid, extra: true }), /unknown key/);
   assert.throws(() => project({ ...valid, path: "../GUIDE.md" }), /safe/);
@@ -255,10 +380,10 @@ test("rejects malformed guide authority and distribution drift", () => {
     () => project({ ...valid, path: "./MISSING.md" }),
     /regular file/,
   );
-  assert.throws(() => project(valid, ["dist"]), /packed.*files/);
+  assert.throws(() => project(valid, ["dist"]), /packed.*tarball/);
   assert.throws(
     () => project({ ...valid, distribution: "repository" }),
-    /repository.*files/,
+    /repository.*tarball/,
   );
 
   const outside = tempRoot("hua-public-doc-outside-");

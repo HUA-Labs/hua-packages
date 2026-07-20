@@ -1,5 +1,13 @@
-import { lstatSync, realpathSync } from "node:fs";
-import { resolve, sep } from "node:path";
+import { spawnSync } from "node:child_process";
+import {
+  lstatSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve, sep } from "node:path";
 
 export const HUA_PACKAGE_AX_SCHEMA_VERSION = "hua-package-ax.v1";
 
@@ -37,6 +45,8 @@ const SURFACE_LEVELS = new Set([
 
 const GUIDE_KEYS = new Set(["path", "distribution", "description"]);
 const PACKAGE_DIR_NAME = /^[a-z0-9][a-z0-9-]{0,127}$/;
+const MAX_PACKLIST_BYTES = 8 * 1024 * 1024;
+const MAX_PACKLIST_ENTRIES = 32768;
 
 function stableObject(value) {
   if (Array.isArray(value)) return value.map(stableObject);
@@ -81,6 +91,108 @@ function hasAsciiControl(value) {
     const code = character.codePointAt(0);
     return code !== undefined && (code <= 0x1f || code === 0x7f);
   });
+}
+
+function effectiveNpmTarballRoster(packageDir) {
+  const ownedRoot = mkdtempSync(join(tmpdir(), "hua-public-packlist-"));
+  const userConfig = join(ownedRoot, "npmrc");
+  try {
+    writeFileSync(userConfig, "", { mode: 0o600 });
+    const env = Object.fromEntries(
+      Object.entries(process.env).filter(
+        ([key]) => !key.toLowerCase().startsWith("npm_config_"),
+      ),
+    );
+    Object.assign(env, {
+      HOME: ownedRoot,
+      NO_COLOR: "1",
+      npm_config_audit: "false",
+      npm_config_cache: join(ownedRoot, "cache"),
+      npm_config_fund: "false",
+      npm_config_ignore_scripts: "true",
+      npm_config_loglevel: "silent",
+      npm_config_offline: "true",
+      npm_config_update_notifier: "false",
+      npm_config_userconfig: userConfig,
+      npm_config_workspaces: "false",
+    });
+    const result = spawnSync(
+      "npm",
+      [
+        "pack",
+        "--dry-run",
+        "--json",
+        "--ignore-scripts=true",
+        "--loglevel=silent",
+        "--audit=false",
+        "--fund=false",
+        "--offline=true",
+        "--update-notifier=false",
+        "--workspaces=false",
+        `--userconfig=${userConfig}`,
+        `--cache=${join(ownedRoot, "cache")}`,
+      ],
+      {
+        cwd: packageDir,
+        encoding: "utf8",
+        env,
+        maxBuffer: MAX_PACKLIST_BYTES,
+        timeout: 30000,
+      },
+    );
+    if (
+      result.error ||
+      result.signal !== null ||
+      result.status !== 0 ||
+      typeof result.stdout !== "string" ||
+      Buffer.byteLength(result.stdout, "utf8") > MAX_PACKLIST_BYTES
+    ) {
+      throw new Error("effective npm tarball roster is unavailable");
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(result.stdout);
+    } catch {
+      throw new Error("effective npm tarball roster is malformed");
+    }
+    if (
+      !Array.isArray(parsed) ||
+      parsed.length !== 1 ||
+      !parsed[0] ||
+      typeof parsed[0] !== "object" ||
+      !Array.isArray(parsed[0].files) ||
+      parsed[0].files.length === 0 ||
+      parsed[0].files.length > MAX_PACKLIST_ENTRIES
+    ) {
+      throw new Error("effective npm tarball roster is malformed");
+    }
+
+    const roster = new Set();
+    for (const entry of parsed[0].files) {
+      const path = entry?.path;
+      if (
+        typeof path !== "string" ||
+        path.length === 0 ||
+        path.length > 512 ||
+        path.startsWith("/") ||
+        path.includes("\\") ||
+        hasAsciiControl(path) ||
+        path
+          .split("/")
+          .some(
+            (segment) => segment === "" || segment === "." || segment === "..",
+          ) ||
+        roster.has(path)
+      ) {
+        throw new Error("effective npm tarball roster is malformed");
+      }
+      roster.add(path);
+    }
+    return roster;
+  } finally {
+    rmSync(ownedRoot, { recursive: true, force: true });
+  }
 }
 
 export function executionForSupportLevel(level) {
@@ -374,7 +486,6 @@ export function buildDocumentationAxProjection({
   detailedGuide,
   packageDir,
   packageDirName,
-  packageFiles,
 }) {
   if (detailedGuide === undefined) return freezeDeep({ state: "absent" });
   if (
@@ -441,16 +552,15 @@ export function buildDocumentationAxProjection({
   }
 
   const relativePath = path.slice(2);
-  const files = Array.isArray(packageFiles) ? packageFiles : [];
-  const admitted = files.includes(relativePath);
+  const admitted = effectiveNpmTarballRoster(exactPackageDir).has(relativePath);
   if (distribution === "packed" && !admitted) {
     throw new Error(
-      "packed detailedGuide.path must be named exactly in package files",
+      "packed detailedGuide.path must be present in the effective npm tarball roster",
     );
   }
   if (distribution === "repository" && admitted) {
     throw new Error(
-      "repository detailedGuide.path must not be named in package files",
+      "repository detailedGuide.path must be absent from the effective npm tarball roster",
     );
   }
 
