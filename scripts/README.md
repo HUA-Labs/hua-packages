@@ -72,8 +72,20 @@ class-name paths: `FormControl`, `Link`, `LoadingSpinner`, `PageTransition`, and
 the M828 10-row projection separately from the complete 34-path admitted roster
 and independently rejects a self-consistent reclassification in the remaining
 116-row authority set. Every other mapped source path keeps its prior
-fail-closed disposition; these projections do not copy package, export,
-dependency, version, Changeset, lock, workflow, or generated-document authority.
+fail-closed disposition. M835 advances the source authority to landed M838
+platform commit `72d311fa84c596397f338cd06b9bfc541448af61` and admits 17
+byte-exact icon/core rows: `ActionToolbar`, `Bookmark`, `Card`, `Divider`,
+`Icon`, `ScrollProgress`, the icon alias/catalog/name/provider/lookup/normalizer
+graph, and the Bookmark, Icon, alias, provider, and normalizer evidence tests.
+The vendor-catalog test remains deferred with the Lucide route while the
+platform-exact catalog production byte is retained. All 12 production rows remain reachable
+from the retained root or advanced entries in the non-shipped M834 public-core
+profile. The map now contains 51 `platform-exact`, 51 `deferred`, and 48
+`public-preserved` rows. The focused test locks the exact 17-row projection,
+the complete 51-path admitted roster, and the remaining 133-row digest; a
+self-consistent reclassification outside M835 still fails closed. These
+projections do not copy package, export, dependency, version, Changeset, lock,
+workflow, or generated-document authority.
 The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it

@@ -83,13 +83,11 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
   }, [])
 
   // 색상 옵션 (Teal 브랜드 기반)
-  const progressColors: Record<string, React.CSSProperties> = {
-    default: { backgroundColor: 'var(--color-foreground)' },
-    primary: { backgroundColor: 'var(--color-primary)' },
-    secondary: { backgroundColor: 'var(--color-muted-foreground)' },
-    gradient: {
-      backgroundImage: 'linear-gradient(to right, #0d9488, #06b6d4, #0d9488)',
-    },
+  const progressColors: Record<string, string> = {
+    default: 'bg-foreground',
+    primary: 'bg-primary',
+    secondary: 'bg-muted-foreground',
+    gradient: 'bg-gradient-to-r from-teal-600 via-cyan-500 to-teal-600'
   }
 
   const positionClasses = {
@@ -116,7 +114,7 @@ const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressProps>(({
       <div
         style={mergeStyles(
           resolveDot('absolute top-0 left-0 h-full origin-left transition-all duration-100 ease-out'),
-          progressColors[color] || progressColors.gradient,
+          resolveDot(progressColors[color] || progressColors.gradient),
           { width: `${progress}%`, transformOrigin: 'left' }
         )}
       />

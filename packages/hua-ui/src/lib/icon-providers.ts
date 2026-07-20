@@ -1,311 +1,586 @@
 /**
- * Icon Provider System
+ * Icon provider resolver lifecycle.
  *
- * 각 프로바이더별 로딩 전략 / Loading strategies per provider:
- *
- * 1. Phosphor Icons (https://phosphoricons.com) - default
- *    - Official package: @phosphor-icons/react (MIT License)
- *    - icons.ts에서 정적 subpath import (SSR-safe /dist/ssr)
- *    - PROJECT_ICONS 매핑으로 통합 이름 지원
- *    - 정적 맵에 없는 아이콘은 "?" fallback UI 표시
- *
- * 2. Iconsax Icons (https://iconsax.io) - separate entry
- *    - '@hua-labs/ui/iconsax'에서 import 시 자동 등록
- *    - 코어 번들에 포함되지 않음 / Not in core bundle
- *    - registerIconsaxResolver()로 lazy 연결
- *
- * 3. Lucide Icons (https://lucide.dev) - separate entry
- *    - '@hua-labs/ui/lucide'에서 import 시 자동 등록
- *    - 코어 번들에 포함되지 않음 / Not in core bundle
- *    - registerLucideResolver()로 lazy 연결
- * Note: 동적 barrel import (import('@phosphor-icons/react'))는 Turbopack에서
- *       전체 라이브러리(4.6MB)를 번들하므로 사용 금지.
+ * Semantic names and provider bindings live in icon-catalog.ts. This module
+ * keeps the existing global resolver lifecycle and exposes compatibility
+ * projections without guessing provider component names.
  */
 
-import { toPascalCase } from './case-utils'
+import type { ComponentType } from "react";
+import {
+  ICON_CATALOG,
+  LEGACY_PROJECT_ICON_NAMES,
+  getIconProviderComponent,
+  type IconProviderName,
+  type LegacyProjectIconName,
+} from "./icon-catalog";
 
 // ── Global Resolver Registry ────────────────────────────────────
-// globalThis 기반 레지스트리: 별도 번들(iconsax.mjs, index.mjs)간
-// 모듈 인스턴스가 분리되어도 동일한 resolver에 접근 가능.
-const REGISTRY_KEY = '__hua_icon_resolvers__'
+// globalThis registry preserves resolver sharing across split package entries.
+const REGISTRY_KEY = "__hua_icon_resolvers__";
+const REGISTRY_SCHEMA_VERSION = 2;
+const SERVER_SNAPSHOT = 0;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LucideResolver = ((name: string) => any) | null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type IconsaxResolver = ((name: string, variant?: string) => any) | null;
+type ProviderResolver = LucideResolver | IconsaxResolver;
+
+type ProviderListener = () => void;
+
+interface MutableIconProviderResolverState<Resolver extends ProviderResolver> {
+  resolver: Resolver;
+  version: number;
+  listeners: Set<ProviderListener>;
+}
+
+interface IconProviderResolverFacade<Resolver extends ProviderResolver> {
+  readonly resolver: Resolver;
+  readonly version: number;
+  readonly listeners: readonly ProviderListener[];
+}
 
 interface IconResolverRegistry {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  lucide: ((name: string) => any) | null
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  iconsax: ((name: string, variant?: string) => any) | null
+  schemaVersion: typeof REGISTRY_SCHEMA_VERSION;
+  lucide: IconProviderResolverFacade<LucideResolver>;
+  iconsax: IconProviderResolverFacade<IconsaxResolver>;
+  getResolver(
+    provider: Exclude<IconProviderName, "phosphor">,
+  ): ProviderResolver;
+  getVersion(provider: Exclude<IconProviderName, "phosphor">): number;
+  setResolver(
+    provider: Exclude<IconProviderName, "phosphor">,
+    resolver: ProviderResolver,
+  ): void;
+  addListener(
+    provider: Exclude<IconProviderName, "phosphor">,
+    listener: ProviderListener,
+  ): void;
+  deleteListener(
+    provider: Exclude<IconProviderName, "phosphor">,
+    listener: ProviderListener,
+  ): void;
+}
+
+function createProviderState<Resolver extends ProviderResolver>(
+  resolver: Resolver,
+  version = 0,
+  listeners: Set<ProviderListener> = new Set(),
+): MutableIconProviderResolverState<Resolver> {
+  return { resolver, version, listeners };
+}
+
+function createProviderFacade<Resolver extends ProviderResolver>(
+  state: MutableIconProviderResolverState<Resolver>,
+): IconProviderResolverFacade<Resolver> {
+  const facade = Object.defineProperties(
+    {},
+    {
+      resolver: {
+        get: () => state.resolver,
+        enumerable: true,
+      },
+      version: {
+        get: () => state.version,
+        enumerable: true,
+      },
+      listeners: {
+        get: () => Object.freeze([...state.listeners]),
+        enumerable: true,
+      },
+    },
+  );
+  return Object.freeze(facade) as IconProviderResolverFacade<Resolver>;
+}
+
+function selectProviderState(
+  provider: Exclude<IconProviderName, "phosphor">,
+  lucide: MutableIconProviderResolverState<LucideResolver>,
+  iconsax: MutableIconProviderResolverState<IconsaxResolver>,
+): MutableIconProviderResolverState<ProviderResolver> {
+  if (provider === "lucide") return lucide;
+  if (provider === "iconsax") return iconsax;
+  throw new TypeError("invalid-icon-provider");
+}
+
+function notifyProviderListeners(
+  state: MutableIconProviderResolverState<ProviderResolver>,
+): void {
+  for (const listener of [...state.listeners]) {
+    try {
+      listener();
+    } catch {
+      // A subscriber is observational. Its exception cannot roll back or
+      // invalidate a provider registration that already committed.
+    }
+  }
+}
+
+function createRegistryFromStates(
+  lucide: MutableIconProviderResolverState<LucideResolver>,
+  iconsax: MutableIconProviderResolverState<IconsaxResolver>,
+): IconResolverRegistry {
+  const getState = (provider: Exclude<IconProviderName, "phosphor">) =>
+    selectProviderState(provider, lucide, iconsax);
+  const registry = Object.freeze({
+    schemaVersion: REGISTRY_SCHEMA_VERSION,
+    lucide: createProviderFacade(lucide),
+    iconsax: createProviderFacade(iconsax),
+    getResolver: (provider: Exclude<IconProviderName, "phosphor">) =>
+      getState(provider).resolver,
+    getVersion: (provider: Exclude<IconProviderName, "phosphor">) =>
+      getState(provider).version,
+    setResolver: (
+      provider: Exclude<IconProviderName, "phosphor">,
+      resolver: ProviderResolver,
+    ) => {
+      if (resolver !== null && !isResolver(resolver)) {
+        throw new TypeError("invalid-icon-resolver");
+      }
+      const state = getState(provider);
+      if (Object.is(state.resolver, resolver)) return;
+      state.resolver = resolver;
+      state.version += 1;
+      notifyProviderListeners(state);
+    },
+    addListener: (
+      provider: Exclude<IconProviderName, "phosphor">,
+      listener: ProviderListener,
+    ) => {
+      if (typeof listener !== "function") {
+        throw new TypeError("invalid-icon-provider-listener");
+      }
+      Set.prototype.add.call(getState(provider).listeners, listener);
+    },
+    deleteListener: (
+      provider: Exclude<IconProviderName, "phosphor">,
+      listener: ProviderListener,
+    ) => {
+      Set.prototype.delete.call(getState(provider).listeners, listener);
+    },
+  });
+  return registry;
+}
+
+function createRegistry(
+  lucide: LucideResolver = null,
+  iconsax: IconsaxResolver = null,
+): IconResolverRegistry {
+  return createRegistryFromStates(
+    createProviderState(lucide),
+    createProviderState(iconsax),
+  );
+}
+
+function readExactPlainDataRecord(
+  value: unknown,
+  expectedKeys: readonly string[],
+): Readonly<Record<string, unknown>> | null {
+  if (typeof value !== "object" || value === null) return null;
+
+  try {
+    if (Object.getPrototypeOf(value) !== Object.prototype) return null;
+    const ownKeys = Reflect.ownKeys(value);
+    if (
+      ownKeys.length !== expectedKeys.length ||
+      ownKeys.some(
+        (key) =>
+          typeof key !== "string" ||
+          !(expectedKeys as readonly string[]).includes(key),
+      )
+    ) {
+      return null;
+    }
+
+    const record: Record<string, unknown> = Object.create(null);
+    for (const key of expectedKeys) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (!descriptor || !("value" in descriptor) || !descriptor.enumerable) {
+        return null;
+      }
+      record[key] = descriptor.value;
+    }
+    return record;
+  } catch {
+    return null;
+  }
+}
+
+function isResolver(value: unknown): value is Exclude<ProviderResolver, null> {
+  return typeof value === "function";
+}
+
+function isOptionalProvider(
+  value: unknown,
+): value is Exclude<IconProviderName, "phosphor"> {
+  return value === "lucide" || value === "iconsax";
+}
+
+function readExactListenerSet(value: unknown): Set<() => void> | null {
+  if (typeof value !== "object" || value === null) return null;
+
+  try {
+    if (
+      Object.getPrototypeOf(value) !== Set.prototype ||
+      Reflect.ownKeys(value).length !== 0
+    ) {
+      return null;
+    }
+
+    const listeners = new Set<() => void>();
+    let valid = true;
+    Set.prototype.forEach.call(value, (listener: unknown) => {
+      if (typeof listener !== "function") {
+        valid = false;
+        return;
+      }
+      Set.prototype.add.call(listeners, listener);
+    });
+    return valid ? listeners : null;
+  } catch {
+    return null;
+  }
+}
+
+function readCurrentProviderState(
+  value: unknown,
+): MutableIconProviderResolverState<ProviderResolver> | null {
+  const record = readExactPlainDataRecord(value, [
+    "resolver",
+    "version",
+    "listeners",
+  ]);
+  if (!record) return null;
+
+  const listeners = readExactListenerSet(record.listeners);
+  if (
+    (record.resolver !== null && !isResolver(record.resolver)) ||
+    !Number.isSafeInteger(record.version) ||
+    (record.version as number) < 0 ||
+    !listeners
+  ) {
+    return null;
+  }
+  return createProviderState(
+    record.resolver as ProviderResolver,
+    record.version as number,
+    listeners,
+  );
+}
+
+function readCurrentRegistry(value: unknown): IconResolverRegistry | null {
+  const record = readExactPlainDataRecord(value, [
+    "schemaVersion",
+    "lucide",
+    "iconsax",
+  ]);
+  if (!record || record.schemaVersion !== REGISTRY_SCHEMA_VERSION) return null;
+
+  const lucide = readCurrentProviderState(record.lucide);
+  const iconsax = readCurrentProviderState(record.iconsax);
+  if (!lucide || !iconsax) return null;
+
+  return createRegistryFromStates(
+    lucide as MutableIconProviderResolverState<LucideResolver>,
+    iconsax as MutableIconProviderResolverState<IconsaxResolver>,
+  );
+}
+
+function isFrozenProviderFacade(value: unknown): boolean {
+  if (typeof value !== "object" || value === null) return false;
+
+  try {
+    if (
+      Object.getPrototypeOf(value) !== Object.prototype ||
+      !Object.isFrozen(value)
+    ) {
+      return false;
+    }
+    const ownKeys = Reflect.ownKeys(value);
+    const expectedKeys = ["resolver", "version", "listeners"] as const;
+    if (
+      ownKeys.length !== expectedKeys.length ||
+      ownKeys.some(
+        (key) =>
+          typeof key !== "string" ||
+          !(expectedKeys as readonly string[]).includes(key),
+      )
+    ) {
+      return false;
+    }
+    return expectedKeys.every((key) => {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      return (
+        descriptor !== undefined &&
+        !("value" in descriptor) &&
+        typeof descriptor.get === "function" &&
+        descriptor.set === undefined &&
+        descriptor.enumerable === true &&
+        descriptor.configurable === false
+      );
+    });
+  } catch {
+    return false;
+  }
+}
+
+function isPublishedRegistry(value: unknown): value is IconResolverRegistry {
+  const record = readExactPlainDataRecord(value, [
+    "schemaVersion",
+    "lucide",
+    "iconsax",
+    "getResolver",
+    "getVersion",
+    "setResolver",
+    "addListener",
+    "deleteListener",
+  ]);
+  if (!record) return false;
+
+  try {
+    return (
+      Object.isFrozen(value) &&
+      record.schemaVersion === REGISTRY_SCHEMA_VERSION &&
+      isFrozenProviderFacade(record.lucide) &&
+      isFrozenProviderFacade(record.iconsax) &&
+      typeof record.getResolver === "function" &&
+      typeof record.getVersion === "function" &&
+      typeof record.setResolver === "function" &&
+      typeof record.addListener === "function" &&
+      typeof record.deleteListener === "function"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function readLegacyRegistry(
+  value: unknown,
+): { lucide: LucideResolver; iconsax: IconsaxResolver } | null {
+  const record = readExactPlainDataRecord(value, ["lucide", "iconsax"]);
+  if (
+    !record ||
+    (record.lucide !== null && !isResolver(record.lucide)) ||
+    (record.iconsax !== null && !isResolver(record.iconsax))
+  ) {
+    return null;
+  }
+  return {
+    lucide: record.lucide as LucideResolver,
+    iconsax: record.iconsax as IconsaxResolver,
+  };
+}
+
+function readGlobalRegistry(): unknown {
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      globalThis,
+      REGISTRY_KEY,
+    );
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function publishGlobalRegistry(registry: IconResolverRegistry): void {
+  try {
+    Object.defineProperty(globalThis, REGISTRY_KEY, {
+      value: registry,
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+  } catch {
+    // A malformed non-configurable foreign global remains isolated. The fresh
+    // registry returned by getRegistry still fails closed for this call.
+  }
 }
 
 function getRegistry(): IconResolverRegistry {
-  const g = globalThis as unknown as Record<string, IconResolverRegistry>
-  if (!g[REGISTRY_KEY]) {
-    g[REGISTRY_KEY] = { lucide: null, iconsax: null }
+  const current = readGlobalRegistry();
+  if (isPublishedRegistry(current)) return current;
+
+  const currentSnapshot = readCurrentRegistry(current);
+  if (currentSnapshot) {
+    publishGlobalRegistry(currentSnapshot);
+    return currentSnapshot;
   }
-  return g[REGISTRY_KEY]
+
+  const legacy = readLegacyRegistry(current);
+  const registry = legacy
+    ? createRegistry(legacy.lucide, legacy.iconsax)
+    : createRegistry();
+  publishGlobalRegistry(registry);
+  return registry;
 }
 
-/**
- * Register lucide resolver (called from app-level setup).
- */
-export function registerLucideResolver(resolver: IconResolverRegistry['lucide']) {
-  getRegistry().lucide = resolver
+function recoverRegistry(): IconResolverRegistry {
+  const registry = createRegistry();
+  publishGlobalRegistry(registry);
+  return registry;
 }
 
-/**
- * Get registered lucide resolver
- */
-export function getLucideResolver() {
-  return getRegistry().lucide
+function runRegistryOperation<Result>(
+  operation: (registry: IconResolverRegistry) => Result,
+  fallback: Result,
+): Result {
+  try {
+    return operation(getRegistry());
+  } catch {
+    try {
+      return operation(recoverRegistry());
+    } catch {
+      return fallback;
+    }
+  }
 }
 
-/**
- * Register iconsax resolver (called from iconsax entry point).
- * Allows the core Icon component to resolve iconsax icons
- * without statically importing the iconsax bundle.
- */
-export function registerIconsaxResolver(resolver: IconResolverRegistry['iconsax']) {
-  getRegistry().iconsax = resolver
+/** Register a Lucide resolver (called from app-level setup). */
+export function registerLucideResolver(resolver: LucideResolver): void {
+  if (resolver !== null && !isResolver(resolver)) return;
+  runRegistryOperation((registry) => {
+    registry.setResolver("lucide", resolver);
+  }, undefined);
 }
 
-/**
- * Get registered iconsax resolver
- */
-export function getIconsaxResolver() {
-  return getRegistry().iconsax
+/** Get the registered Lucide resolver. */
+export function getLucideResolver(): LucideResolver {
+  return runRegistryOperation((registry) => {
+    const resolver = registry.getResolver("lucide");
+    return resolver === null || isResolver(resolver) ? resolver : null;
+  }, null) as LucideResolver;
 }
 
-// Icon Provider Type
-export type IconProvider = 'lucide' | 'phosphor' | 'iconsax'
+/** Register the Iconsax resolver from the optional Iconsax entry. */
+export function registerIconsaxResolver(resolver: IconsaxResolver): void {
+  if (resolver !== null && !isResolver(resolver)) return;
+  runRegistryOperation((registry) => {
+    registry.setResolver("iconsax", resolver);
+  }, undefined);
+}
 
-// Icon Provider Configuration
+/** Get the registered Iconsax resolver. */
+export function getIconsaxResolver(): IconsaxResolver {
+  return runRegistryOperation((registry) => {
+    const resolver = registry.getResolver("iconsax");
+    return resolver === null || isResolver(resolver) ? resolver : null;
+  }, null) as IconsaxResolver;
+}
+
+/** Subscribe only to the selected optional provider resolver. */
+export function subscribeIconProvider(
+  provider: IconProviderName,
+  listener: () => void,
+): () => void {
+  if (!isOptionalProvider(provider) || typeof listener !== "function") {
+    return () => {};
+  }
+  runRegistryOperation((registry) => {
+    registry.addListener(provider, listener);
+  }, undefined);
+  let active = true;
+  return () => {
+    if (!active) return;
+    active = false;
+    runRegistryOperation((registry) => {
+      registry.deleteListener(provider, listener);
+    }, undefined);
+  };
+}
+
+/** Return the selected provider's monotonic client snapshot. */
+export function getIconProviderSnapshot(provider: IconProviderName): number {
+  if (!isOptionalProvider(provider)) return 0;
+  return runRegistryOperation((registry) => {
+    const version = registry.getVersion(provider);
+    return Number.isSafeInteger(version) && version >= 0 ? version : 0;
+  }, 0);
+}
+
+/** Stable server snapshot used by React hydration. */
+export function getIconProviderServerSnapshot(): number {
+  return SERVER_SNAPSHOT;
+}
+
+export type IconProvider = IconProviderName;
+
 export interface IconProviderConfig {
-  provider: IconProvider
-  prefix?: string
+  provider: IconProvider;
+  prefix?: string;
+}
+
+export interface ProjectIconProviderMapping {
+  readonly lucide: string;
+  readonly phosphor: string;
+  readonly iconsax?: string;
 }
 
 /**
- * Project-specific icon list
- * These are the icons actually used in SumUp project
- * Only these icons will be loaded for optimal bundle size
+ * Compatibility projection of the 125 historical PROJECT_ICONS spellings.
+ *
+ * The semantic catalog is the sole authored list. Unsupported optional
+ * providers are omitted rather than guessed.
  */
-export const PROJECT_ICONS = {
-  // Navigation & Layout
-  'home': { lucide: 'Home', phosphor: 'House', iconsax: 'Home2' },
-  'layout-dashboard': { lucide: 'LayoutDashboard', phosphor: 'SquaresFour' },
-  'folder': { lucide: 'Folder', phosphor: 'Folder', iconsax: 'Folder' },
-  'alert-circle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Danger' },
-  'alertCircle': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Danger' },
-  'columns': { lucide: 'Columns', phosphor: 'Columns' },
-  'users': { lucide: 'Users', phosphor: 'Users', iconsax: 'People' },
-  'settings': { lucide: 'Settings', phosphor: 'Gear' },
-  'menu': { lucide: 'Menu', phosphor: 'List', iconsax: 'Menu' },
-  'close': { lucide: 'X', phosphor: 'X', iconsax: 'CloseCircle' },
-  'chevronLeft': { lucide: 'ChevronLeft', phosphor: 'CaretLeft', iconsax: 'ArrowLeft2' },
-  'chevronRight': { lucide: 'ChevronRight', phosphor: 'CaretRight', iconsax: 'ArrowRight2' },
-  'chevronDown': { lucide: 'ChevronDown', phosphor: 'CaretDown', iconsax: 'ArrowDown2' },
-  'chevronUp': { lucide: 'ChevronUp', phosphor: 'CaretUp', iconsax: 'ArrowUp2' },
-  'arrowLeft': { lucide: 'ArrowLeft', phosphor: 'ArrowLeft', iconsax: 'ArrowLeft' },
-  'arrowRight': { lucide: 'ArrowRight', phosphor: 'ArrowRight', iconsax: 'ArrowRight' },
-  'arrowUp': { lucide: 'ArrowUp', phosphor: 'ArrowUp', iconsax: 'ArrowUp' },
-  'arrowDown': { lucide: 'ArrowDown', phosphor: 'ArrowDown', iconsax: 'ArrowDown' },
+export const PROJECT_ICONS = Object.freeze(
+  Object.fromEntries(
+    LEGACY_PROJECT_ICON_NAMES.map((name) => {
+      const record = ICON_CATALOG.find((candidate) =>
+        (candidate.projectSpellings as readonly string[]).includes(name),
+      );
+      if (!record) {
+        throw new Error(`Missing catalog record for legacy icon ${name}`);
+      }
 
-  // Actions
-  'add': { lucide: 'Plus', phosphor: 'Plus', iconsax: 'Add' },
-  'edit': { lucide: 'Edit', phosphor: 'Pencil' },
-  'pencil': { lucide: 'Pencil', phosphor: 'Pencil' },
-  'delete': { lucide: 'Trash2', phosphor: 'Trash', iconsax: 'Trash' },
-  'trash': { lucide: 'Trash2', phosphor: 'Trash', iconsax: 'Trash' },
-  'upload': { lucide: 'Upload', phosphor: 'Upload', iconsax: 'Upload' },
-  'download': { lucide: 'Download', phosphor: 'Download', iconsax: 'Download' },
-  'x': { lucide: 'X', phosphor: 'X' },
-  'check': { lucide: 'Check', phosphor: 'Check', iconsax: 'Check' },
-  'search': { lucide: 'Search', phosphor: 'MagnifyingGlass', iconsax: 'SearchNormal' },
-  'share': { lucide: 'Share', phosphor: 'Share' },
-  'copy': { lucide: 'Copy', phosphor: 'Copy' },
-  'save': { lucide: 'Save', phosphor: 'FloppyDisk' },
+      const lucideComponent = record.providers.lucide.component;
+      const phosphorComponent = record.providers.phosphor.component;
+      if (lucideComponent === null || phosphorComponent === null) {
+        throw new Error(`Legacy icon ${name} is missing a required provider`);
+      }
 
-  // Status & Feedback
-  'loader': { lucide: 'Loader2', phosphor: 'Spinner' },
-  'loader2': { lucide: 'Loader2', phosphor: 'Spinner' },
-  'check-circle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
-  'checkCircle': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
-  'success': { lucide: 'CheckCircle', phosphor: 'CheckCircle', iconsax: 'TickCircle' },
-  'error': { lucide: 'XCircle', phosphor: 'XCircle', iconsax: 'CloseCircle' },
-  'warning': { lucide: 'AlertCircle', phosphor: 'WarningCircle', iconsax: 'Warning2' },
-  'info': { lucide: 'Info', phosphor: 'Info', iconsax: 'InfoCircle' },
-  'refresh': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', iconsax: 'Refresh' },
-  'refreshCw': { lucide: 'RefreshCw', phosphor: 'ArrowClockwise', iconsax: 'Refresh' },
-  'bell': { lucide: 'Bell', phosphor: 'Bell', iconsax: 'Bell' },
-  'heart': { lucide: 'Heart', phosphor: 'Heart', iconsax: 'Heart' },
-  'star': { lucide: 'Star', phosphor: 'Star', iconsax: 'Star' },
-  'bookmark': { lucide: 'Bookmark', phosphor: 'Bookmark' },
-
-  // User & Auth
-  'user': { lucide: 'User', phosphor: 'User', iconsax: 'User' },
-  'userPlus': { lucide: 'UserPlus', phosphor: 'UserPlus', iconsax: 'UserAdd' },
-  'logIn': { lucide: 'LogIn', phosphor: 'SignIn', iconsax: 'Login' },
-  'logOut': { lucide: 'LogOut', phosphor: 'SignOut', iconsax: 'Logout' },
-  'chrome': { lucide: 'Chrome', phosphor: 'ChromeLogo', iconsax: 'Chrome' },
-  'github': { lucide: 'Github', phosphor: 'GithubLogo' },
-  'message': { lucide: 'MessageCircle', phosphor: 'ChatCircle' },
-
-  // Content
-  'messageSquare': { lucide: 'MessageSquare', phosphor: 'ChatSquare' },
-  'message-square': { lucide: 'MessageSquare', phosphor: 'ChatSquare' },
-  'inbox': { lucide: 'Inbox', phosphor: 'Inbox' },
-  'calendar': { lucide: 'Calendar', phosphor: 'Calendar' },
-  'calendarPlus': { lucide: 'CalendarPlus', phosphor: 'CalendarPlus' },
-  'checkSquare': { lucide: 'CheckSquare', phosphor: 'CheckSquare', iconsax: 'TickSquare' },
-  'clock': { lucide: 'Clock', phosphor: 'Clock' },
-  'book': { lucide: 'Book', phosphor: 'Book', iconsax: 'Book' },
-  'bookOpen': { lucide: 'BookOpen', phosphor: 'BookOpen', iconsax: 'Book' },
-
-  // Theme & UI
-  'monitor': { lucide: 'Monitor', phosphor: 'Monitor', iconsax: 'Monitor' },
-  'sun': { lucide: 'Sun', phosphor: 'Sun', iconsax: 'Sun' },
-  'moon': { lucide: 'Moon', phosphor: 'Moon', iconsax: 'Moon' },
-
-  // AI & Features
-  'sparkle': { lucide: 'Sparkle', phosphor: 'Sparkle' },
-  'sparkles': { lucide: 'Sparkles', phosphor: 'Sparkle' },
-  'lightbulb': { lucide: 'Lightbulb', phosphor: 'Lightbulb' },
-  'brain': { lucide: 'Brain', phosphor: 'Brain' },
-  'zap': { lucide: 'Zap', phosphor: 'Lightning' },
-
-  // Device & Platform
-  'globe': { lucide: 'Globe', phosphor: 'Globe', iconsax: 'Global' },
-  'deviceMobile': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
-  'smartphone': { lucide: 'Smartphone', phosphor: 'DeviceMobile' },
-  'floppyDisk': { lucide: 'Save', phosphor: 'FloppyDisk' },
-
-  // Data & Analytics
-  'chart': { lucide: 'BarChart3', phosphor: 'ChartBar' },
-  'barChart': { lucide: 'BarChart', phosphor: 'ChartBar' },
-  'trendingUp': { lucide: 'TrendingUp', phosphor: 'TrendUp' },
-  'trendingDown': { lucide: 'TrendingDown', phosphor: 'TrendDown' },
-  'activity': { lucide: 'Activity', phosphor: 'Pulse' },
-  'database': { lucide: 'Database', phosphor: 'Database' },
-  'dollarSign': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
-  'dollar': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
-  'currency': { lucide: 'DollarSign', phosphor: 'CurrencyDollar' },
-
-  'layers': { lucide: 'Layers', phosphor: 'Stack' },
-  'ban': { lucide: 'Ban', phosphor: 'Prohibit' },
-
-  // Security
-  'lock': { lucide: 'Lock', phosphor: 'Lock', iconsax: 'Lock' },
-  'unlock': { lucide: 'Unlock', phosphor: 'LockOpen', iconsax: 'Unlock' },
-  'shield': { lucide: 'Shield', phosphor: 'Shield', iconsax: 'Shield' },
-  'key': { lucide: 'Key', phosphor: 'Key' },
-
-  // Media
-  'play': { lucide: 'Play', phosphor: 'Play', iconsax: 'Play' },
-  'pause': { lucide: 'Pause', phosphor: 'Pause', iconsax: 'Pause' },
-  'image': { lucide: 'Image', phosphor: 'Image', iconsax: 'Image' },
-  'video': { lucide: 'Video', phosphor: 'Video', iconsax: 'Video' },
-  'camera': { lucide: 'Camera', phosphor: 'Camera', iconsax: 'Camera' },
-
-  // Files
-  'fileText': { lucide: 'FileText', phosphor: 'FileText' },
-  'file': { lucide: 'File', phosphor: 'File' },
-
-  // Navigation
-  'externalLink': { lucide: 'ExternalLink', phosphor: 'ArrowSquareOut' },
-  'link': { lucide: 'Link', phosphor: 'Link', iconsax: 'Link' },
-  'moreHorizontal': { lucide: 'MoreHorizontal', phosphor: 'DotsThreeOutline' },
-  'moreVertical': { lucide: 'MoreVertical', phosphor: 'DotsThreeVertical' },
-
-  // Priority
-  'remove': { lucide: 'Minus', phosphor: 'Minus', iconsax: 'Minus' },
-
-  // Eye (password)
-  'eye': { lucide: 'Eye', phosphor: 'Eye', iconsax: 'Eye' },
-  'eyeOff': { lucide: 'EyeOff', phosphor: 'EyeSlash', iconsax: 'EyeSlash' },
-
-  // Emotions
-  'smile': { lucide: 'Smile', phosphor: 'Smiley', iconsax: 'EmojiHappy' },
-  'frown': { lucide: 'Frown', phosphor: 'SmileySad', iconsax: 'EmojiSad' },
-  'meh': { lucide: 'Meh', phosphor: 'SmileyMeh', iconsax: 'EmojiNormal' },
-
-  // Social
-  'mail': { lucide: 'Mail', phosphor: 'Envelope' },
-  'phone': { lucide: 'Phone', phosphor: 'Phone' },
-
-  // Additional
-  'flag': { lucide: 'Flag', phosphor: 'Flag', iconsax: 'Flag' },
-  'rocket': { lucide: 'Rocket', phosphor: 'Rocket', iconsax: 'Rocket' },
-
-  // Connectivity & Misc
-  'ticket': { lucide: 'Ticket', phosphor: 'Ticket', iconsax: 'Ticket' },
-  'clipboard': { lucide: 'ClipboardList', phosphor: 'Clipboard', iconsax: 'Sticker' },
-  'wifi': { lucide: 'Wifi', phosphor: 'WifiHigh', iconsax: 'Wifi' },
-  'wifiOff': { lucide: 'WifiOff', phosphor: 'WifiSlash' },
-  'cpu': { lucide: 'Cpu', phosphor: 'Cpu', iconsax: 'Computing' },
-  'mask': { lucide: 'Drama', phosphor: 'MaskHappy', iconsax: 'EmojiHappy' },
-
-  // Text Formatting (Markdown Toolbar)
-  'bold': { lucide: 'Bold', phosphor: 'TextB' },
-  'italic': { lucide: 'Italic', phosphor: 'TextItalic' },
-  'strikethrough': { lucide: 'Strikethrough', phosphor: 'TextStrikethrough' },
-  'heading': { lucide: 'Heading', phosphor: 'TextHOne' },
-  'code': { lucide: 'Code', phosphor: 'Code', iconsax: 'Code' },
-  'fileCode': { lucide: 'FileCode', phosphor: 'FileCode' },
-  'quote': { lucide: 'Quote', phosphor: 'Quotes', iconsax: 'QuoteUp' },
-  'list': { lucide: 'List', phosphor: 'List' },
-  'listOrdered': { lucide: 'ListOrdered', phosphor: 'ListNumbers' },
-  'minus': { lucide: 'Minus', phosphor: 'Minus', iconsax: 'Minus' },
-} as const
+      const mapping: {
+        lucide: string;
+        phosphor: string;
+        iconsax?: string;
+      } = {
+        lucide: lucideComponent,
+        phosphor: phosphorComponent,
+      };
+      if (record.providers.iconsax.component !== null) {
+        mapping.iconsax = record.providers.iconsax.component;
+      }
+      return [name, Object.freeze(mapping)] as const;
+    }),
+  ),
+) as Readonly<Record<LegacyProjectIconName, ProjectIconProviderMapping>>;
 
 /**
- * Get icon from provider (iconsax only)
- *
- * Phosphor/Lucide는 정적 맵(icons.ts)으로 해결. 이 함수는 iconsax fallback용.
+ * Resolve an optional provider component through the existing resolver
+ * lifecycle. Unsupported and unknown catalog mappings return null.
  */
 export function getIconFromProvider(
   iconName: string,
-  provider: IconProvider = 'phosphor'
-): React.ComponentType<Record<string, unknown>> | null {
-  const registry = getRegistry()
+  provider: IconProvider = "phosphor",
+): ComponentType<Record<string, unknown>> | null {
+  const componentName = getIconProviderComponent(iconName, provider);
+  if (componentName === null || provider === "phosphor") return null;
 
-  if (provider === 'lucide') {
-    if (!registry.lucide) return null
-    const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
-    const lucideName = iconMapping
-      ? (iconMapping as Record<string, string | undefined>)['lucide'] || toPascalCase(iconName)
-      : toPascalCase(iconName)
-    return registry.lucide(lucideName) || null
+  if (provider === "lucide") {
+    return getLucideResolver()?.(componentName) ?? null;
   }
-
-  if (provider !== 'iconsax' || !registry.iconsax) return null
-
-  const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
-  const iconsaxName = iconMapping
-    ? (iconMapping as Record<string, string | undefined>)['iconsax'] || toPascalCase(iconName)
-    : toPascalCase(iconName)
-
-  return registry.iconsax(iconsaxName) || null
+  return getIconsaxResolver()?.(componentName) ?? null;
 }
 
-/**
- * Get icon name for provider
- */
+/** Return the exact catalog component name, or null when unsupported. */
 export function getIconNameForProvider(
   iconName: string,
-  provider: IconProvider
-): string {
-  const iconMapping = PROJECT_ICONS[iconName as keyof typeof PROJECT_ICONS]
-  if (iconMapping) {
-    const mappedName = (iconMapping as Record<string, string | undefined>)[provider]
-    if (mappedName) {
-      return mappedName
-    }
-  }
-  return iconName
+  provider: IconProvider,
+): string | null {
+  return getIconProviderComponent(iconName, provider);
 }
 
-/**
- * Get all project icon names
- */
+/** Return the exact historical PROJECT_ICONS spelling inventory. */
 export function getProjectIconNames(): string[] {
-  return Object.keys(PROJECT_ICONS)
+  return [...LEGACY_PROJECT_ICON_NAMES];
 }

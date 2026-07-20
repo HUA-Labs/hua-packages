@@ -78,17 +78,6 @@ function getColorClass(variant: string, color: "default" | "muted" | "primary" |
   }[color]
 }
 
-function getVariantStyle(orientation: "horizontal" | "vertical", variant: string): React.CSSProperties | undefined {
-  if (variant !== "gradient" && variant !== "glass") return undefined
-
-  const direction = orientation === "horizontal" ? "to right" : "to bottom"
-  const middle = variant === "glass" ? "rgba(255, 255, 255, 0.3)" : "var(--color-border)"
-
-  return {
-    backgroundImage: `linear-gradient(${direction}, transparent, ${middle}, transparent)`,
-  }
-}
-
 /**
  * Divider 컴포넌트 / Divider component
  *
@@ -123,7 +112,7 @@ const DividerComponent = React.forwardRef<HTMLDivElement, DividerProps>(
     return (
       <div
         ref={ref}
-        style={mergeStyles(resolveDot(classes), getVariantStyle(orientation, variant), resolveDot(dotProp), styleProp)}
+        style={mergeStyles(resolveDot(classes), resolveDot(dotProp), styleProp)}
         {...props}
       />
     )

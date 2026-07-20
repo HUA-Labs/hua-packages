@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { dotVariants, dot as dotFn } from "@hua-labs/dot";
+import { dotClass } from "@hua-labs/dot/class";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
 import { composeRefs } from "../lib/Slot";
 import { useAnimatedEntrance } from "../hooks/useAnimatedEntrance";
@@ -15,10 +16,10 @@ export const cardVariants = dotVariants({
   variants: {
     variant: {
       default:
-        "bg-[var(--color-card)] text-[var(--color-card-foreground)]",
-      outline: "bg-transparent",
+        "bg-[var(--color-card)] text-[var(--color-card-foreground)] border border-[var(--color-border)]",
+      outline: "bg-transparent border-2 border-[var(--color-border)]",
       elevated:
-        "bg-[var(--color-card)] text-[var(--color-card-foreground)] shadow-lg",
+        "bg-[var(--color-card)] text-[var(--color-card-foreground)] shadow-lg border border-[var(--color-border)]",
     },
     rounded: {
       none: "rounded-none",
@@ -69,27 +70,6 @@ const SPRING_TRANSITION: string = createSpringTransition(
   200,
 );
 
-const VARIANT_BORDER_STYLE: Record<
-  "default" | "outline" | "elevated",
-  React.CSSProperties
-> = {
-  default: {
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: "var(--color-border)",
-  },
-  outline: {
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderColor: "var(--color-border)",
-  },
-  elevated: {
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: "var(--color-border)",
-  },
-};
-
 /**
  * Card 컴포넌트의 props / Card component props
  */
@@ -106,6 +86,8 @@ export interface CardProps extends Omit<
   /** Enable preset entrance animation (reads from MotionConfigContext) */
   animated?: boolean;
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 /**
@@ -123,6 +105,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   (
     {
       dot: dotProp,
+      classDot,
       variant = "default",
       rounded = "lg",
       shadow,
@@ -140,6 +123,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     });
     const [isHovered, setIsHovered] = useState(false);
     const reducedMotion = useReducedMotion();
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
 
     const computedStyle = useMemo(() => {
       const base = cardVariants({
@@ -148,6 +135,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         shadow,
         padding,
       }) as React.CSSProperties;
+      const borderStyle: React.CSSProperties = {
+        borderWidth: variant === "outline" ? "2px" : "1px",
+        borderStyle: "solid",
+        borderColor: "var(--color-border)",
+      };
       const entranceWillChange = entrance.className
         ? ({ willChange: "opacity, transform" } as React.CSSProperties)
         : undefined;
@@ -166,7 +158,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           : undefined;
       return mergeStyles(
         base,
-        VARIANT_BORDER_STYLE[variant],
+        borderStyle,
         hoverTransition,
         hoverActive,
         entranceWillChange,
@@ -191,6 +183,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={composeRefs(ref, entrance.ref)}
+        className={classDotName}
         style={computedStyle}
         onMouseEnter={hoverable ? () => setIsHovered(true) : undefined}
         onMouseLeave={hoverable ? () => setIsHovered(false) : undefined}
@@ -207,15 +200,28 @@ export interface CardHeaderProps extends Omit<
   "className"
 > {
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ dot: dotProp, style, ...props }, ref) => {
+  ({ dot: dotProp, classDot, style, ...props }, ref) => {
     const computedStyle = useMemo(
       () => mergeStyles(s("flex flex-col gap-1"), resolveDot(dotProp), style),
       [dotProp, style],
     );
-    return <div ref={ref} style={computedStyle} {...props} />;
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
+    return (
+      <div
+        ref={ref}
+        className={classDotName}
+        style={computedStyle}
+        {...props}
+      />
+    );
   },
 );
 
@@ -226,10 +232,12 @@ export interface CardTitleProps extends Omit<
   "className"
 > {
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, CardTitleProps>(
-  ({ dot: dotProp, style, ...props }, ref) => {
+  ({ dot: dotProp, classDot, style, ...props }, ref) => {
     const computedStyle = useMemo(
       () =>
         mergeStyles(
@@ -239,7 +247,13 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, CardTitleProps>(
         ),
       [dotProp, style],
     );
-    return <h3 ref={ref} style={computedStyle} {...props} />;
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
+    return (
+      <h3 ref={ref} className={classDotName} style={computedStyle} {...props} />
+    );
   },
 );
 
@@ -250,12 +264,14 @@ export interface CardDescriptionProps extends Omit<
   "className"
 > {
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   CardDescriptionProps
->(({ dot: dotProp, style, ...props }, ref) => {
+>(({ dot: dotProp, classDot, style, ...props }, ref) => {
   const computedStyle = useMemo(
     () =>
       mergeStyles(
@@ -265,7 +281,13 @@ const CardDescription = React.forwardRef<
       ),
     [dotProp, style],
   );
-  return <p ref={ref} style={computedStyle} {...props} />;
+  const classDotName = useMemo(
+    () => (classDot ? dotClass(classDot) : undefined),
+    [classDot],
+  );
+  return (
+    <p ref={ref} className={classDotName} style={computedStyle} {...props} />
+  );
 });
 
 CardDescription.displayName = "CardDescription";
@@ -275,15 +297,28 @@ export interface CardContentProps extends Omit<
   "className"
 > {
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  ({ dot: dotProp, style, ...props }, ref) => {
+  ({ dot: dotProp, classDot, style, ...props }, ref) => {
     const computedStyle = useMemo(
       () => mergeStyles(s("p-4"), resolveDot(dotProp), style),
       [dotProp, style],
     );
-    return <div ref={ref} style={computedStyle} {...props} />;
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
+    return (
+      <div
+        ref={ref}
+        className={classDotName}
+        style={computedStyle}
+        {...props}
+      />
+    );
   },
 );
 
@@ -294,15 +329,28 @@ export interface CardFooterProps extends Omit<
   "className"
 > {
   dot?: string;
+  /** CSS-rule features: responsive (sm:, md:), state (hover:, focus:), pseudo-elements */
+  classDot?: string;
 }
 
 const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ dot: dotProp, style, ...props }, ref) => {
+  ({ dot: dotProp, classDot, style, ...props }, ref) => {
     const computedStyle = useMemo(
       () => mergeStyles(s("flex items-center"), resolveDot(dotProp), style),
       [dotProp, style],
     );
-    return <div ref={ref} style={computedStyle} {...props} />;
+    const classDotName = useMemo(
+      () => (classDot ? dotClass(classDot) : undefined),
+      [classDot],
+    );
+    return (
+      <div
+        ref={ref}
+        className={classDotName}
+        style={computedStyle}
+        {...props}
+      />
+    );
   },
 );
 
