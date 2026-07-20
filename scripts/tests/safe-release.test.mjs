@@ -14,13 +14,14 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import test from "node:test";
-import { parseDocument } from "yaml";
+import { parseDocument, stringify } from "yaml";
 import { checkPublishedProvenance } from "../check-npm-provenance.mjs";
 import {
   PLATFORM_AUTHORITY,
   canonicalJson,
+  compareUtf8,
   createEmptyReleasePlan,
   finalizeReleasePlan,
   loadPolicy,
@@ -164,6 +165,68 @@ function policyFor(definitions = packageDefinitions) {
   };
 }
 
+function fixtureLockfile(definitions) {
+  const definitionsByName = new Map(
+    definitions.map((definition) => [definition.name, definition]),
+  );
+  const importers = {};
+  for (const definition of definitions) {
+    const importer = {};
+    for (const [manifestField, lockField] of [
+      ["dependencies", "dependencies"],
+      ["optionalDependencies", "optionalDependencies"],
+      ["peerDependencies", "dependencies"],
+    ]) {
+      for (const [name, specifier] of Object.entries(
+        definition[manifestField] ?? {},
+      )) {
+        const dependency = definitionsByName.get(name);
+        if (dependency === undefined) continue;
+        if (importer[lockField] === undefined) importer[lockField] = {};
+        importer[lockField][name] = {
+          specifier,
+          version: `link:${relative(definition.path, dependency.path)}`,
+        };
+      }
+    }
+    importers[definition.path] = importer;
+  }
+  return {
+    lockfileVersion: "9.0",
+    settings: {
+      autoInstallPeers: true,
+      excludeLinksFromLockfile: false,
+    },
+    importers,
+    packages: {},
+    snapshots: {},
+  };
+}
+
+function rewriteFixtureLockfile(root, definitions) {
+  const lockPath = join(root, "pnpm-lock.yaml");
+  const lock = parseDocument(readFileSync(lockPath, "utf8")).toJS();
+  for (const definition of definitions) {
+    const manifest = JSON.parse(
+      readFileSync(join(root, definition.path, "package.json"), "utf8"),
+    );
+    const specifiers = {
+      ...(manifest.peerDependencies ?? {}),
+      ...(manifest.optionalDependencies ?? {}),
+      ...(manifest.dependencies ?? {}),
+      ...(manifest.devDependencies ?? {}),
+    };
+    for (const dependencies of Object.values(
+      lock.importers[definition.path] ?? {},
+    )) {
+      for (const [name, entry] of Object.entries(dependencies)) {
+        if (specifiers[name] !== undefined) entry.specifier = specifiers[name];
+      }
+    }
+  }
+  writeFileSync(lockPath, stringify(lock));
+}
+
 function makeFixture(options = {}) {
   const definitions = structuredClone(
     options.definitions ?? packageDefinitions,
@@ -188,6 +251,10 @@ function makeFixture(options = {}) {
   const policyState = loadPolicy(root);
   const plan = createEmptyReleasePlan(policyState);
   writeFileSync(join(root, "config/release-plan.json"), canonicalJson(plan));
+  writeFileSync(
+    join(root, "pnpm-lock.yaml"),
+    stringify(fixtureLockfile(definitions)),
+  );
   return {
     root,
     definitions,
@@ -4154,14 +4221,121 @@ function versionStatus(name = "@hua-labs/ui", overrides = {}) {
   };
 }
 
-function runVersionFixture(fixture, status) {
+function fivePackageVersionDefinitions() {
+  const byName = new Map(
+    packageDefinitions.map((definition) => [
+      definition.name,
+      structuredClone(definition),
+    ]),
+  );
+  const publicPackage = (name, path, version) => ({
+    name,
+    path,
+    version,
+    dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+    release: {
+      mode: "public-npm",
+      intent: "active-public",
+      authority: "hua-packages",
+      channel: "npm-public",
+    },
+    eligibility: "eligible",
+    reason: "active-public",
+    private: false,
+    publishConfig: { access: "public", provenance: true },
+  });
+  return [
+    byName.get("@hua-labs/dot"),
+    {
+      ...publicPackage("@hua-labs/dot-aot", "packages/hua-dot-aot", "0.1.3"),
+      release: {
+        mode: "no-publish",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+    },
+    publicPackage("@hua-labs/dot-lsp", "packages/hua-dot-lsp", "0.1.3"),
+    publicPackage("@hua-labs/dot-mcp", "packages/hua-dot-mcp", "0.1.3"),
+    byName.get("@hua-labs/hua"),
+    byName.get("@hua-labs/security"),
+    byName.get("@hua-labs/ui"),
+  ];
+}
+
+function fivePackageVersionStatus() {
+  const id = "five-package-release-cohort";
+  const rows = [
+    ["@hua-labs/dot", "minor", "0.2.2", "0.3.0"],
+    ["@hua-labs/dot-aot", "minor", "0.1.3", "0.2.0"],
+    ["@hua-labs/dot-lsp", "patch", "0.1.3", "0.1.4"],
+    ["@hua-labs/dot-mcp", "minor", "0.1.3", "0.2.0"],
+    ["@hua-labs/ui", "minor", "2.3.0", "2.4.0"],
+  ];
+  return {
+    changesets: [
+      {
+        id,
+        summary: "Dependency-ordered release cohort",
+        releases: rows.map(([name, type]) => ({ name, type })),
+      },
+    ],
+    releases: [
+      ...rows.map(([name, type, oldVersion, newVersion]) => ({
+        name,
+        type,
+        oldVersion,
+        changesets: [id],
+        newVersion,
+      })),
+      {
+        name: "@hua-labs/hua",
+        type: "none",
+        oldVersion: "1.2.2",
+        changesets: [],
+        newVersion: "1.2.2",
+      },
+    ],
+  };
+}
+
+function createFivePackageVersionFixture() {
+  const fixture = makeFixture({ definitions: fivePackageVersionDefinitions() });
+  writeFileSync(
+    join(fixture.root, ".changeset/five-package-release-cohort.md"),
+    '---\n"@hua-labs/dot": minor\n"@hua-labs/dot-aot": minor\n"@hua-labs/dot-lsp": patch\n"@hua-labs/dot-mcp": minor\n"@hua-labs/ui": minor\n---\n\nDependency-ordered release cohort.\n',
+  );
+  return fixture;
+}
+
+function applyFivePackageDependencyVersions(root) {
+  for (const path of [
+    "packages/hua-dot-aot/package.json",
+    "packages/hua-dot-lsp/package.json",
+    "packages/hua-dot-mcp/package.json",
+  ]) {
+    mutateJson(join(root, path), (manifest) => {
+      manifest.dependencies["@hua-labs/dot"] = "workspace:0.3.0";
+    });
+  }
+}
+
+function runVersionFixture(fixture, status, options = {}) {
   const calls = [];
   const result = runVersion({
     root: fixture.root,
-    execFile(file, args) {
-      calls.push({ file, args });
+    execFile(file, args, commandOptions) {
+      calls.push({ file, args, options: commandOptions });
       if (args.includes("status")) {
         writeFileSync(args.at(-1), canonicalJson(status));
+        return "";
+      }
+      if (args[0] === "install") {
+        if (options.lockError !== undefined) throw options.lockError;
+        if (!options.skipLockWrite) {
+          rewriteFixtureLockfile(fixture.root, fixture.definitions);
+        }
+        options.afterLock?.(fixture.root);
         return "";
       }
       for (const release of status.releases) {
@@ -4179,6 +4353,7 @@ function runVersionFixture(fixture, status) {
       for (const changeset of status.changesets) {
         unlinkSync(join(fixture.root, ".changeset", `${changeset.id}.md`));
       }
+      options.afterVersion?.(fixture.root);
       return "";
     },
   });
@@ -4211,6 +4386,7 @@ test("version mode captures source bytes then writes a deterministic UI-only dur
     [
       ["exec", "changeset", "status"],
       ["exec", "changeset", "version"],
+      ["install", "--lockfile-only", "--ignore-scripts"],
     ],
   );
   assert.deepEqual(
@@ -4228,6 +4404,165 @@ test("version mode captures source bytes then writes a deterministic UI-only dur
     readFileSync(join(first.root, "config/release-plan.json"), "utf8"),
     readFileSync(join(second.root, "config/release-plan.json"), "utf8"),
   );
+});
+
+test("version mode closes only selected workspace importer relations before planning", (t) => {
+  const first = createFivePackageVersionFixture();
+  const second = createFivePackageVersionFixture();
+  t.after(() => first.cleanup());
+  t.after(() => second.cleanup());
+  const status = fivePackageVersionStatus();
+  const sourceLock = readFileSync(join(first.root, "pnpm-lock.yaml"), "utf8");
+  const firstRun = runVersionFixture(first, status, {
+    afterVersion: applyFivePackageDependencyVersions,
+  });
+  const secondRun = runVersionFixture(second, status, {
+    afterVersion: applyFivePackageDependencyVersions,
+  });
+
+  assert.deepEqual(
+    firstRun.result.releases.map(({ name, fromVersion, toVersion, type }) => ({
+      name,
+      fromVersion,
+      toVersion,
+      type,
+    })),
+    [
+      {
+        name: "@hua-labs/dot",
+        fromVersion: "0.2.2",
+        toVersion: "0.3.0",
+        type: "minor",
+      },
+      {
+        name: "@hua-labs/dot-aot",
+        fromVersion: "0.1.3",
+        toVersion: "0.2.0",
+        type: "minor",
+      },
+      {
+        name: "@hua-labs/dot-lsp",
+        fromVersion: "0.1.3",
+        toVersion: "0.1.4",
+        type: "patch",
+      },
+      {
+        name: "@hua-labs/dot-mcp",
+        fromVersion: "0.1.3",
+        toVersion: "0.2.0",
+        type: "minor",
+      },
+      {
+        name: "@hua-labs/ui",
+        fromVersion: "2.3.0",
+        toVersion: "2.4.0",
+        type: "minor",
+      },
+    ],
+  );
+  assert.equal(firstRun.result.planDigest, secondRun.result.planDigest);
+  assert.equal(
+    readFileSync(join(first.root, "pnpm-lock.yaml"), "utf8"),
+    readFileSync(join(second.root, "pnpm-lock.yaml"), "utf8"),
+  );
+  assert.notEqual(
+    readFileSync(join(first.root, "pnpm-lock.yaml"), "utf8"),
+    sourceLock,
+  );
+  const lock = parseDocument(
+    readFileSync(join(first.root, "pnpm-lock.yaml"), "utf8"),
+  ).toJS();
+  for (const path of [
+    "packages/hua-dot-aot",
+    "packages/hua-dot-lsp",
+    "packages/hua-dot-mcp",
+  ]) {
+    assert.equal(
+      lock.importers[path].dependencies["@hua-labs/dot"].specifier,
+      "workspace:0.3.0",
+    );
+  }
+  assert.equal(
+    lock.importers["packages/hua-ui"].dependencies["@hua-labs/dot"].specifier,
+    "workspace:*",
+  );
+  const lockCall = firstRun.calls.find(
+    ({ file, args }) => file === "pnpm" && args[0] === "install",
+  );
+  assert.deepEqual(lockCall.args, [
+    "install",
+    "--lockfile-only",
+    "--ignore-scripts",
+  ]);
+  assert.equal(lockCall.options.env.CI, "true");
+  assert.deepEqual(
+    Object.entries(lockCall.options.env)
+      .filter(([key]) => key.toLowerCase().endsWith("_ignore_scripts"))
+      .sort(([left], [right]) => compareUtf8(left, right)),
+    [
+      ["npm_config_ignore_scripts", "true"],
+      ["pnpm_config_ignore_scripts", "true"],
+    ],
+  );
+  assert.equal(
+    firstRun.calls.some(
+      ({ file, args }) => file === "npm" || args.includes("publish"),
+    ),
+    false,
+  );
+});
+
+test("version mode writes no planned authority for stale, failed, or churned lock closure", async (t) => {
+  const cases = [
+    ["stale", { skipLockWrite: true }, "version-lock-importer-relation"],
+    [
+      "command failure",
+      {
+        lockError: Object.assign(new Error("fixture-lock-failed"), {
+          code: "fixture-lock-failed",
+        }),
+      },
+      "fixture-lock-failed",
+    ],
+    [
+      "unrelated graph churn",
+      {
+        afterLock(root) {
+          const path = join(root, "pnpm-lock.yaml");
+          const lock = parseDocument(readFileSync(path, "utf8")).toJS();
+          lock.settings.autoInstallPeers = false;
+          writeFileSync(path, stringify(lock));
+        },
+      },
+      "version-lock-churn",
+    ],
+  ];
+  for (const [name, options, code] of cases) {
+    await t.test(name, () => {
+      const fixture = createFivePackageVersionFixture();
+      try {
+        assertCode(
+          () =>
+            runVersionFixture(fixture, fivePackageVersionStatus(), {
+              ...options,
+              afterVersion: applyFivePackageDependencyVersions,
+            }),
+          code,
+        );
+        assert.equal(
+          JSON.parse(
+            readFileSync(
+              join(fixture.root, "config/release-plan.json"),
+              "utf8",
+            ),
+          ).status,
+          "empty",
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
 });
 
 test("version mode admits the exact aggregate Changeset type and complete ID relation", (t) => {
