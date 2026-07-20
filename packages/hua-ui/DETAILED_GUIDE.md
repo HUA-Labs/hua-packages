@@ -1,7 +1,9 @@
 # @hua-labs/ui Detailed Guide
 
-Complete technical reference for the modern React UI component library.
-모던 React UI 컴포넌트 라이브러리에 대한 완전한 기술 레퍼런스입니다.
+Practical technical guide for the modern React UI component library. The
+published manifest and TypeScript declarations remain the exact API authority.
+모던 React UI 컴포넌트 라이브러리의 실용 기술 가이드입니다. 정확한 API
+권위는 배포된 manifest와 TypeScript 선언입니다.
 
 ---
 
@@ -28,26 +30,31 @@ Complete technical reference for the modern React UI component library.
 
 `@hua-labs/ui` is built on four core principles:
 
-1. **Atomic-First** - Root export contains only atomic components; composite components are organized into subpath exports for optimal tree-shaking
-2. **Zero-Config Design System** - Works out of the box with the dot style engine, optional theme customization
-3. **Accessibility First** - Full ARIA support, keyboard navigation, WCAG 2.1 AA compliant
+1. **Layered public surface** - The compatibility root and focused subpath exports provide explicit import boundaries
+2. **Runtime-first styling** - The dot style engine works without Tailwind; theme CSS is an optional integration
+3. **Evidence-backed accessibility** - ARIA, keyboard, and naming contracts are documented per component without package-wide certification
 4. **Developer Experience** - TypeScript-first with full type safety and IntelliSense support
 
 ### Package Structure
 
 ```
 @hua-labs/ui
-├── Core (atomic)       → Button, Input, Card, Badge, Alert, Avatar...
+├── Root compatibility  → Button, Input, Card, Badge, Alert, Avatar...
 ├── /form               → Form, Select, DatePicker, Autocomplete, Upload...
 ├── /overlay            → Modal, Popover, Dropdown, Drawer, BottomSheet...
 ├── /data               → Table, CodeBlock...
 ├── /interactive        → Accordion, Tabs, Menu, Command...
+├── /interactive/kanban → Optional-peer Kanban drag-and-drop components
 ├── /navigation         → Navigation, Breadcrumb, Pagination...
 ├── /feedback           → Toast, LoadingSpinner...
-├── /advanced           → Dashboard, Motion, Emotion components...
+├── /advanced/*         → Advanced, motion, emotion, dashboard compatibility
 ├── /sdui               → Server-Driven UI components
-├── /iconsax            → Iconsax icon set
-├── /icons              → Custom icon components
+├── /landing            → Landing-page components
+├── /native             → Explicit React Native primitives
+├── /theme              → Theme contract
+├── /icons, /icons-bold → Raw Iconsax line and bold component barrels
+├── /iconsax            → Essential project Iconsax registration
+├── /iconsax-extended   → Extended Iconsax registration and gallery
 └── /styles/*           → CSS files
 ```
 
@@ -72,9 +79,9 @@ Complete technical reference for the modern React UI component library.
 ### Basic Installation
 
 ```bash
-pnpm add @hua-labs/ui
+pnpm add @hua-labs/ui react react-dom
 # or
-npm install @hua-labs/ui
+npm install @hua-labs/ui react react-dom
 ```
 
 ### Peer Dependencies
@@ -83,24 +90,33 @@ Required:
 
 ```json
 {
-  "react": ">=19.0.0",
-  "react-dom": ">=19.0.0"
+  "react": ">=19.0.0"
 }
 ```
 
-Optional (for drag-and-drop components):
+The compatibility root `@hua-labs/ui` currently requires `react-dom` at runtime
+because it exports portal-backed components. Install `react-dom` whenever you
+import the compatibility root. Package metadata keeps it optional so focused
+subpaths proven not to load portal code, such as `@hua-labs/ui/theme`, can be
+used without it.
+
+Optional peers are installed only for the features that use them:
 
 ```json
 {
   "@dnd-kit/core": "^6.3.1",
   "@dnd-kit/sortable": "^10.0.0",
-  "@dnd-kit/utilities": "^3.2.2"
+  "@dnd-kit/utilities": "^3.2.2",
+  "@hua-labs/motion-core": ">=2.4.0",
+  "react-native": ">=0.73.0"
 }
 ```
 
 ### Tailwind CSS Setup
 
-HUA UI requires Tailwind CSS v4. Configure your project:
+The component runtime does not require Tailwind CSS. The optional
+`recommended-theme.css` and `base.css` entries use Tailwind v4 directives, so
+run those files through a Tailwind v4 pipeline when you opt into them:
 
 ```css
 /* globals.css */
@@ -108,12 +124,8 @@ HUA UI requires Tailwind CSS v4. Configure your project:
 @import "@hua-labs/ui/styles/recommended-theme.css";
 ```
 
-**Minimal setup (no theme):**
-
-```css
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/base.css";
-```
+Without Tailwind, define the documented CSS custom properties in ordinary CSS
+instead of importing the Tailwind-specific theme entries.
 
 ### TypeScript Configuration
 
@@ -268,7 +280,7 @@ import { Toolbar } from "@hua-labs/ui/interactive";
 import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
 // deprecated barrel (backwards compat):
 // import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { GlowCard } from "@hua-labs/ui/advanced/motion";
 import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
@@ -339,7 +351,7 @@ import {
 - Compound component pattern for flexible composition
 - Supports all base HTML div attributes
 - Dark mode ready
-- Customizable via className
+- Customizable through `dot` and `style`; raw `className` support is component-specific
 
 ### Icon
 
@@ -375,9 +387,9 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 
 **Icon Sets:**
 
-- **Phosphor** (default) - 6 weights, 1200+ icons
-- **Lucide** - Minimalist, 1000+ icons
-- **Iconsax** - 4 variants (line/bold/bulk/broken), 1000+ icons (requires `@hua-labs/ui/iconsax` import)
+- **Phosphor** (default) - six supported weights
+- **Lucide** - consumer-registered resolver with consistent stroke icons
+- **Iconsax** - exactly `line` and `bold`; import `@hua-labs/ui/iconsax` for the essential project mapping or `@hua-labs/ui/iconsax-extended` for the extended catalog
 
 **Icon Aliases:**
 
@@ -398,7 +410,7 @@ import { Modal } from "@hua-labs/ui";
 const [open, setOpen] = useState(false);
 
 <Modal
-  open={open}
+  isOpen={open}
   onClose={() => setOpen(false)}
   title="Modal Title"
   description="Modal description"
@@ -410,21 +422,22 @@ const [open, setOpen] = useState(false);
 
 **Props:**
 
-- `open` - Controlled open state
+- `isOpen` - Controlled open state
 - `onClose` - Close handler
 - `title` - Modal title
 - `description` - Modal description (optional)
 - `children` - Modal content
-- `size` - "sm" | "md" | "lg" | "xl" | "full"
+- `size` - "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
 - `closeOnOverlayClick` - Close on overlay click (default: true)
-- `showCloseButton` - Show close button (default: true)
+- `closable` - Show the close button (default: true)
+- `showBackdrop` - Show the backdrop (default: true)
 
 **Accessibility:**
 
-- Traps focus within modal
 - Closes on Escape key
-- ARIA attributes for screen readers
-- Restores focus on close
+- Applies `role="dialog"`, `aria-modal`, and title/description linkage
+- Locks body scrolling while open
+- Does not trap or restore focus; provide a `title` so the dialog has an accessible name
 
 ### Input
 
@@ -739,16 +752,22 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // Hook-based
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>Click me</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      Click me
+    </button>
+  );
 }
 
-// Style-based
-const motionStyle = getMicroMotionClasses("hover-lift");
-<div style={motionStyle}>Hover me</div>;
+// Class-based
+const classes = getMicroMotionClasses("soft");
+<div className={classes}>Hover me</div>;
 
 // Available presets:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
 
 ---
@@ -792,7 +811,9 @@ import "@hua-labs/ui/iconsax";
 </IconProvider>;
 ```
 
-Variants: `line`, `bold`, `bulk`, `broken`
+Iconsax supports exactly `line` and `bold` variants. The essential entry keeps
+the project mapping small; use `iconsax-extended` only when the extended catalog
+or gallery is required.
 
 ### Icon Configuration
 
@@ -833,10 +854,10 @@ import { EmotionIcon, StatusIcon } from '@hua-labs/ui';
 ### Custom Icon Components
 
 ```tsx
-import { HeartIcon, UserIcon, SettingsIcon } from '@hua-labs/ui/icons';
-import { HeartBold, UserBold, SettingsBold } from '@hua-labs/ui/icons-bold';
+import { Heart, User } from '@hua-labs/ui/icons';
+import { Heart as HeartBold, User as UserBold } from '@hua-labs/ui/icons-bold';
 
-<HeartIcon size={24} />
+<Heart size={24} />
 <UserBold size={32} />
 ```
 
@@ -1111,7 +1132,8 @@ export default function ClientComponent() {
 ### Form Validation
 
 ```tsx
-import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
+import { Button } from "@hua-labs/ui";
+import { Form, FormControl, Input, Label } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -1299,12 +1321,10 @@ function Component() {
 **Solution:** Use subpath imports to import only needed components:
 
 ```tsx
-// Bad: Imports entire package
-import { Form, Select, DatePicker } from "@hua-labs/ui";
-
-// Good: Tree-shakeable
+// Keep compatibility-root components on the root entry.
 import { Button, Card } from "@hua-labs/ui";
-import { Form, Select } from "@hua-labs/ui/form";
+// Import form-only components from their focused entry.
+import { Form, Select, DatePicker } from "@hua-labs/ui/form";
 ```
 
 Analyze bundle:
@@ -1357,26 +1377,31 @@ export default {
 
 `@hua-labs/ui`는 네 가지 핵심 원칙을 기반으로 합니다:
 
-1. **원자 우선** - 루트 export는 원자 컴포넌트만 포함하며, 복합 컴포넌트는 서브경로 export로 구성하여 최적의 트리쉐이킹 제공
-2. **무설정 디자인 시스템** - Tailwind CSS v4와 즉시 사용 가능, 선택적 테마 커스터마이징
-3. **접근성 우선** - 완전한 ARIA 지원, 키보드 내비게이션, WCAG 2.1 AA 준수
+1. **계층화된 공개 표면** - 호환성 루트와 목적별 subpath export가 명시적인 import 경계를 제공
+2. **런타임 우선 스타일링** - dot 스타일 엔진은 Tailwind 없이 동작하며 테마 CSS는 선택적 통합
+3. **증거 기반 접근성** - 패키지 전체 인증 대신 컴포넌트별 ARIA, 키보드, 이름 계약을 명시
 4. **개발자 경험** - 완전한 타입 안전성과 IntelliSense 지원을 제공하는 TypeScript 우선
 
 ### 패키지 구조
 
 ```
 @hua-labs/ui
-├── Core (원자)          → Button, Input, Card, Badge, Alert, Avatar...
+├── Root 호환성          → Button, Input, Card, Badge, Alert, Avatar...
 ├── /form               → Form, Select, DatePicker, Autocomplete, Upload...
 ├── /overlay            → Modal, Popover, Dropdown, Drawer, BottomSheet...
 ├── /data               → Table, CodeBlock...
 ├── /interactive        → Accordion, Tabs, Menu, Command...
+├── /interactive/kanban → 선택 peer 기반 Kanban 드래그 앤 드롭
 ├── /navigation         → Navigation, Breadcrumb, Pagination...
 ├── /feedback           → Toast, LoadingSpinner...
-├── /advanced           → Dashboard, Motion, Emotion 컴포넌트...
+├── /advanced/*         → Advanced, motion, emotion, dashboard 호환 경로
 ├── /sdui               → Server-Driven UI 컴포넌트
-├── /iconsax            → Iconsax 아이콘 세트
-├── /icons              → 커스텀 아이콘 컴포넌트
+├── /landing            → 랜딩 페이지 컴포넌트
+├── /native             → 명시적 React Native primitive
+├── /theme              → 테마 계약
+├── /icons, /icons-bold → raw Iconsax line/bold 컴포넌트 barrel
+├── /iconsax            → 프로젝트 필수 Iconsax 등록
+├── /iconsax-extended   → 확장 Iconsax 등록과 갤러리
 └── /styles/*           → CSS 파일
 ```
 
@@ -1401,9 +1426,9 @@ export default {
 ### 기본 설치
 
 ```bash
-pnpm add @hua-labs/ui
+pnpm add @hua-labs/ui react react-dom
 # 또는
-npm install @hua-labs/ui
+npm install @hua-labs/ui react react-dom
 ```
 
 ### Peer Dependencies
@@ -1412,24 +1437,33 @@ npm install @hua-labs/ui
 
 ```json
 {
-  "react": ">=19.0.0",
-  "react-dom": ">=19.0.0"
+  "react": ">=19.0.0"
 }
 ```
 
-선택 (드래그 앤 드롭 컴포넌트용):
+호환성 root `@hua-labs/ui`는 현재 런타임에 `react-dom`이 필요합니다. root가
+portal 기반 컴포넌트를 내보내므로, 호환성 root를 import할 때는 `react-dom`을
+설치하세요. 패키지 메타데이터는 `@hua-labs/ui/theme`처럼 portal 코드를
+불러오지 않는다고 검증된 세부 경로를 `react-dom` 없이 사용할 수 있도록 이
+peer를 선택 사항으로 유지합니다.
+
+선택 peer는 해당 기능을 사용할 때만 설치합니다:
 
 ```json
 {
   "@dnd-kit/core": "^6.3.1",
   "@dnd-kit/sortable": "^10.0.0",
-  "@dnd-kit/utilities": "^3.2.2"
+  "@dnd-kit/utilities": "^3.2.2",
+  "@hua-labs/motion-core": ">=2.4.0",
+  "react-native": ">=0.73.0"
 }
 ```
 
 ### Tailwind CSS 설정
 
-HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
+컴포넌트 런타임에는 Tailwind CSS가 필수가 아닙니다. 선택 항목인
+`recommended-theme.css`와 `base.css`는 Tailwind v4 지시어를 사용하므로,
+이 파일을 사용할 때는 Tailwind v4 파이프라인으로 처리하세요:
 
 ```css
 /* globals.css */
@@ -1437,12 +1471,8 @@ HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
 @import "@hua-labs/ui/styles/recommended-theme.css";
 ```
 
-**최소 설정 (테마 없이):**
-
-```css
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/base.css";
-```
+Tailwind를 쓰지 않는다면 Tailwind 전용 테마 entry를 import하지 말고 이
+가이드의 CSS custom property를 일반 CSS에 직접 정의하세요.
 
 ### TypeScript 설정
 
@@ -1597,7 +1627,7 @@ import { Toolbar } from "@hua-labs/ui/interactive";
 import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
 // deprecated barrel (backwards compat):
 // import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { GlowCard } from "@hua-labs/ui/advanced/motion";
 import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
@@ -1668,7 +1698,7 @@ import {
 - 유연한 구성을 위한 복합 컴포넌트 패턴
 - 모든 기본 HTML div 속성 지원
 - 다크 모드 지원
-- className으로 커스터마이징 가능
+- `dot`과 `style`로 커스터마이징 가능하며 raw `className` 지원은 컴포넌트별로 다름
 
 ### Icon
 
@@ -1704,9 +1734,9 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 
 **아이콘 세트:**
 
-- **Phosphor** (기본) - 6가지 굵기, 1200개 이상 아이콘
-- **Lucide** - 미니멀리스트, 1000개 이상 아이콘
-- **Iconsax** - 4가지 변형 (line/bold/bulk/broken), 1000개 이상 아이콘 (`@hua-labs/ui/iconsax` import 필요)
+- **Phosphor** (기본) - 지원되는 여섯 가지 굵기
+- **Lucide** - 소비자가 등록하는 일관된 stroke 아이콘 resolver
+- **Iconsax** - 정확히 `line`과 `bold`; 필수 프로젝트 매핑은 `@hua-labs/ui/iconsax`, 확장 카탈로그는 `@hua-labs/ui/iconsax-extended`를 import
 
 **아이콘 별칭:**
 
@@ -1727,7 +1757,7 @@ import { Modal } from "@hua-labs/ui";
 const [open, setOpen] = useState(false);
 
 <Modal
-  open={open}
+  isOpen={open}
   onClose={() => setOpen(false)}
   title="모달 제목"
   description="모달 설명"
@@ -1739,21 +1769,22 @@ const [open, setOpen] = useState(false);
 
 **Props:**
 
-- `open` - 제어된 열림 상태
+- `isOpen` - 제어된 열림 상태
 - `onClose` - 닫기 핸들러
 - `title` - 모달 제목
 - `description` - 모달 설명 (선택)
 - `children` - 모달 콘텐츠
-- `size` - "sm" | "md" | "lg" | "xl" | "full"
+- `size` - "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
 - `closeOnOverlayClick` - 오버레이 클릭 시 닫기 (기본값: true)
-- `showCloseButton` - 닫기 버튼 표시 (기본값: true)
+- `closable` - 닫기 버튼 표시 (기본값: true)
+- `showBackdrop` - 배경 표시 (기본값: true)
 
 **접근성:**
 
-- 모달 내에서 포커스 트랩
 - Escape 키로 닫기
-- 스크린 리더를 위한 ARIA 속성
-- 닫을 때 포커스 복원
+- `role="dialog"`, `aria-modal`, 제목/설명 연결 적용
+- 열린 동안 body 스크롤 잠금
+- 포커스 트랩과 복원은 제공하지 않으며 접근 가능한 이름을 위해 `title`을 제공해야 함
 
 ### Input
 
@@ -2084,16 +2115,22 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // 훅 기반
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>클릭하세요</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      클릭하세요
+    </button>
+  );
 }
 
 // 클래스 기반
-const classes = getMicroMotionClasses("hover-lift");
+const classes = getMicroMotionClasses("soft");
 <div className={classes}>호버하세요</div>;
 
 // 사용 가능한 프리셋:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
 
 ---
@@ -2137,7 +2174,9 @@ import "@hua-labs/ui/iconsax";
 </IconProvider>;
 ```
 
-변형: `line`, `bold`, `bulk`, `broken`
+Iconsax는 정확히 `line`과 `bold` 변형을 지원합니다. 필수 entry는 프로젝트
+매핑을 작게 유지하며 확장 카탈로그나 갤러리가 필요할 때만
+`iconsax-extended`를 사용하세요.
 
 ### 아이콘 설정
 
@@ -2178,10 +2217,10 @@ import { EmotionIcon, StatusIcon } from '@hua-labs/ui';
 ### 커스텀 아이콘 컴포넌트
 
 ```tsx
-import { HeartIcon, UserIcon, SettingsIcon } from '@hua-labs/ui/icons';
-import { HeartBold, UserBold, SettingsBold } from '@hua-labs/ui/icons-bold';
+import { Heart, User } from '@hua-labs/ui/icons';
+import { Heart as HeartBold, User as UserBold } from '@hua-labs/ui/icons-bold';
 
-<HeartIcon size={24} />
+<Heart size={24} />
 <UserBold size={32} />
 ```
 
@@ -2456,7 +2495,8 @@ export default function ClientComponent() {
 ### 폼 유효성 검증
 
 ```tsx
-import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
+import { Button } from "@hua-labs/ui";
+import { Form, FormControl, Input, Label } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -2644,12 +2684,10 @@ function Component() {
 **해결:** 서브경로 import를 사용하여 필요한 컴포넌트만 import:
 
 ```tsx
-// 나쁨: 전체 패키지를 import
-import { Form, Select, DatePicker } from "@hua-labs/ui";
-
-// 좋음: 트리쉐이킹 가능
+// 호환성 루트 컴포넌트는 루트 entry에서 가져옵니다.
 import { Button, Card } from "@hua-labs/ui";
-import { Form, Select } from "@hua-labs/ui/form";
+// 폼 전용 컴포넌트는 목적별 entry에서 가져옵니다.
+import { Form, Select, DatePicker } from "@hua-labs/ui/form";
 ```
 
 번들 분석:

@@ -3,10 +3,10 @@ overview: "Accessible, TypeScript-first component library for React applications
 features:
   - "70+ components — Buttons, forms, tables, modals, overlays, and more"
   - "Modular entry points — Import only what you need for optimal bundle size"
-  - "Accessible — ARIA attributes, keyboard navigation, WCAG compliant"
+  - "Accessible contracts — Component-specific ARIA, keyboard, and naming behavior with explicit evidence limits"
   - "Dark mode — Built-in dark mode support"
   - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
-  - "Tree-shakeable — Side-effect free (except CSS)"
+  - "Tree-shakeable ESM — CSS and provider-registration entries retain their declared side effects"
 
 quickStart: |
   import { Button, Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
@@ -26,22 +26,52 @@ quickStart: |
     );
   }
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
-  - "hua"
+  - "dot"
+  - "motion-core"
 
 subpathExports:
+  - path: "advanced"
+    description: "Advanced components and composition utilities"
+  - path: "advanced/dashboard"
+    description: "Deprecated dashboard compatibility barrel; prefer replacement domain entry points"
+  - path: "advanced/emotion"
+    description: "Emotion analysis and selection components"
+  - path: "advanced/motion"
+    description: "Motion-oriented advanced components and transitions"
+  - path: "data"
+    description: "Data display components such as Table and CodeBlock"
+  - path: "feedback"
+    description: "Feedback components such as Toast, Alert, and loading states"
   - path: "form"
     description: "Form components (Input, Select, DatePicker, Upload, etc.)"
   - path: "icons"
-    description: "Icon components"
-  - path: "chart"
-    description: "Chart components"
-  - path: "data-display"
-    description: "Data display components (Table, Timeline, etc.)"
+    description: "Compiled raw Iconsax line component barrel"
+  - path: "icons-bold"
+    description: "Compiled raw Iconsax bold component barrel"
+  - path: "iconsax"
+    description: "Essential Iconsax provider registration and project mappings"
+  - path: "iconsax-extended"
+    description: "Extended Iconsax provider registration, raw catalogs, and gallery"
+  - path: "interactive"
+    description: "Interactive components such as Accordion, Tabs, Menu, and Command"
+  - path: "interactive/kanban"
+    description: "Optional-peer Kanban drag-and-drop components"
+  - path: "landing"
+    description: "Landing-page components"
+  - path: "native"
+    description: "Explicit React Native primitives entry point"
+  - path: "navigation"
+    description: "Navigation, breadcrumb, and pagination components"
   - path: "overlay"
     description: "Overlay components (Modal, Drawer, Popover, etc.)"
-  - path: "feedback"
-    description: "Feedback components (Toast, Alert, etc.)"
+  - path: "sdui"
+    description: "Server-driven UI schema and renderer components"
+  - path: "theme"
+    description: "Theme contract and theme utilities"
 
 apiFilter: notes-only
 
@@ -106,7 +136,7 @@ apiNotes:
 
   # Overlay
   Modal:
-    description: "Dialog overlay with backdrop and focus trap"
+    description: "Portal dialog with backdrop, Escape and overlay close, scroll lock, and title/description ARIA linkage; focus trapping and restoration are not provided"
     kind: "component"
   Tooltip:
     description: "Hover tooltip with positioning"
@@ -165,7 +195,7 @@ apiNotes:
     description: "Base text primitive (renders as <span> on web, Text on native via .native.tsx)"
     kind: "component"
   Pressable:
-    description: "Interactive primitive with hover/active feedback and WCAG 2.1 AA touch targets (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of touch targets."
+    description: "Interactive primitive with hover/active feedback and a default 44px minimum touch target (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of the minimum target."
     kind: "component"
 
   # Utilities
