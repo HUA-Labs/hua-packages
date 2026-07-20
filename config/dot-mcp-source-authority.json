@@ -38,8 +38,8 @@
     "requiredTargets": ["package/dist/index.js"],
     "rosterDigest": "a964b63ab9077d04aa27ef0fad9aafe2ebd536d2626a9311c0556f84297a5e33",
     "sourceManifestSha256": "f102cae6a77c00ed552db38a2bbd7710992914b8e1aaf9069957ec3d52f4d984",
-    "tarballBytes": 16783,
-    "tarballSha256": "12c779c847ad5764a75d1a6d7ee49e70ea08c27d361280ec1e099b2bdc656b9a"
+    "tarStreamBytes": 68096,
+    "tarStreamSha256": "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073"
   },
   "authorityKind": "platform-dot-mcp-package-projection",
   "mapDigest": "6ac70499d787987ec91ea7e8ff2cd867e7f23183a949d18cdaa32dfca74056eb",

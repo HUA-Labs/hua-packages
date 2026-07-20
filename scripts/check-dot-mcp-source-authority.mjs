@@ -47,8 +47,8 @@ const REVIEWED_MAP_DIGEST =
   "6ac70499d787987ec91ea7e8ff2cd867e7f23183a949d18cdaa32dfca74056eb";
 const REVIEWED_ARTIFACT_ROSTER_DIGEST =
   "a964b63ab9077d04aa27ef0fad9aafe2ebd536d2626a9311c0556f84297a5e33";
-const REVIEWED_TARBALL_SHA256 =
-  "12c779c847ad5764a75d1a6d7ee49e70ea08c27d361280ec1e099b2bdc656b9a";
+const REVIEWED_TAR_STREAM_SHA256 =
+  "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073";
 const REVIEWED_PUBLIC_BASE = Object.freeze({
   commit: "5f0fa9feb54de4cfc343c5c7c4fe73a54c4e14a9",
   packageTree: "70942905900e26e8c14e8d6bd4bf0ace8759f867",
@@ -267,8 +267,8 @@ function validateArtifact(artifact, rows) {
       "requiredTargets",
       "rosterDigest",
       "sourceManifestSha256",
-      "tarballBytes",
-      "tarballSha256",
+      "tarStreamBytes",
+      "tarStreamSha256",
     ],
     "invalid-artifact-keys",
   );
@@ -282,13 +282,15 @@ function validateArtifact(artifact, rows) {
     fail("invalid-packed-manifest-sha");
   }
   if (!SHA256.test(artifact.rosterDigest)) fail("invalid-roster-digest");
-  if (!SHA256.test(artifact.tarballSha256)) fail("invalid-tarball-sha");
+  if (!SHA256.test(artifact.tarStreamSha256)) {
+    fail("invalid-tar-stream-sha");
+  }
   if (
-    !Number.isSafeInteger(artifact.tarballBytes) ||
-    artifact.tarballBytes <= 0 ||
-    artifact.tarballBytes > MAX_TARBALL_BYTES
+    !Number.isSafeInteger(artifact.tarStreamBytes) ||
+    artifact.tarStreamBytes <= 0 ||
+    artifact.tarStreamBytes > MAX_TAR_BYTES
   ) {
-    fail("invalid-tarball-bytes");
+    fail("invalid-tar-stream-bytes");
   }
   if (
     !Array.isArray(artifact.requiredTargets) ||
@@ -453,8 +455,8 @@ function validateConfig(config) {
   if (config.artifact.rosterDigest !== REVIEWED_ARTIFACT_ROSTER_DIGEST) {
     fail("reviewed-artifact-roster-mismatch");
   }
-  if (config.artifact.tarballSha256 !== REVIEWED_TARBALL_SHA256) {
-    fail("reviewed-tarball-sha-mismatch");
+  if (config.artifact.tarStreamSha256 !== REVIEWED_TAR_STREAM_SHA256) {
+    fail("reviewed-tar-stream-sha-mismatch");
   }
   return paths;
 }
@@ -757,14 +759,14 @@ function parseTarArchive(tar, expectedPrefix) {
   return files;
 }
 
-function parseTarball(bytes) {
+function decompressTarball(bytes) {
   let tar;
   try {
     tar = gunzipSync(bytes, { maxOutputLength: MAX_TAR_BYTES });
   } catch {
     fail("tarball-gzip-invalid");
   }
-  return parseTarArchive(tar, "package/");
+  return tar;
 }
 
 function collectExportTargets(value, targets = new Set()) {
@@ -786,13 +788,14 @@ function collectExportTargets(value, targets = new Set()) {
 
 function verifyTarball(path, config) {
   const compressed = readRegularFile(path, MAX_TARBALL_BYTES, "tarball");
+  const tarStream = decompressTarball(compressed);
   if (
-    compressed.length !== config.artifact.tarballBytes ||
-    sha256(compressed) !== config.artifact.tarballSha256
+    tarStream.length !== config.artifact.tarStreamBytes ||
+    sha256(tarStream) !== config.artifact.tarStreamSha256
   ) {
-    fail("tarball-bytes-mismatch");
+    fail("tar-stream-bytes-mismatch");
   }
-  const files = parseTarball(compressed);
+  const files = parseTarArchive(tarStream, "package/");
   const actualRows = [...files.entries()]
     .map(([filePath, bytes]) => ({
       path: filePath,

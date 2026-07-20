@@ -12,6 +12,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 import { test } from "node:test";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -345,6 +346,13 @@ test("the complete package union and artifact authority are canonical", () => {
   assert.equal(config.artifact.files.length, 6);
   assert.equal(config.artifact.packageName, "@hua-labs/dot-mcp");
   assert.equal(config.artifact.packageVersion, "0.1.3");
+  assert.equal(config.artifact.tarStreamBytes, 68096);
+  assert.equal(
+    config.artifact.tarStreamSha256,
+    "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+  );
+  assert.equal(Object.hasOwn(config.artifact, "tarballBytes"), false);
+  assert.equal(Object.hasOwn(config.artifact, "tarballSha256"), false);
 });
 
 test("every projected package path agrees with its reviewed output digest", () => {
@@ -354,6 +362,14 @@ test("every projected package path agrees with its reviewed output digest", () =
     assert.equal(existsSync(absolute), true, row.path);
     assert.equal(sha256(row.path), row.outputSha256, row.path);
   }
+});
+
+test("tar authority binds the decompressed stream instead of the host gzip envelope", () => {
+  const source = text("scripts/check-dot-mcp-source-authority.mjs");
+  assert.match(source, /const tarStream = decompressTarball\(compressed\);/u);
+  assert.match(source, /sha256\(tarStream\)/u);
+  assert.doesNotMatch(source, /sha256\(compressed\)/u);
+  assert.doesNotMatch(source, /artifact\.tarball(?:Bytes|Sha256)/u);
 });
 
 test("self-consistent row reclassification and semantic drift reject", () => {
@@ -501,10 +517,10 @@ test("a substituted tarball is rejected before artifact admission", () => {
   const parent = mkdtempSync(join(tmpdir(), "dot-mcp-tar-"));
   try {
     const tarball = join(parent, "substituted.tgz");
-    writeFileSync(tarball, Buffer.from("not the reviewed artifact"));
+    writeFileSync(tarball, gzipSync(Buffer.alloc(1024)));
     const result = runChecker(["--tarball", tarball]);
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /tarball-bytes-mismatch/u);
+    assert.match(result.stderr, /tar-stream-bytes-mismatch/u);
   } finally {
     rmSync(parent, { force: true, recursive: true });
   }
