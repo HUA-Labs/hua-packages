@@ -194,7 +194,15 @@ the reviewed claim merge, never on the planned run that created the PR. A
 reviewed workflow retry is allowed because publication is reconciled against
 immutable registry evidence rather than assumed to be a fresh first attempt.
 The publishing run reads the original artifact run ID and source head from the
-durable claim and downloads that exact cross-run bundle. Before that
+durable claim and downloads the content-addressed cross-run bundle named from
+the exact claimed artifact-manifest SHA-256. Repacking the same bytes may
+replace only that same content identity; different bytes produce a different
+artifact name and cannot overwrite the claimed bundle. The sanitized published
+set uses a run-attempt-specific artifact name exported by the publish job and
+consumed through the exact `needs.publish` output. A full rerun therefore writes
+a fresh handoff, while a failed-job rerun keeps the successful publish attempt's
+exact output instead of colliding with upload-artifact v4's immutable namespace.
+Before that
 OIDC-capable job is admitted, the no-OIDC prepare check requires local `HEAD`
 and remote `main` to match and requires a single-parent plan-only claim
 transition. The publish job repeats those checks and revalidates the plan,

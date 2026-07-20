@@ -848,6 +848,52 @@ test("workflow withholds OIDC and npm credentials until an immutable artifact cl
   );
 });
 
+test("workflow artifact handoffs remain exact across supported GitHub reruns", () => {
+  const workflow = parseDocument(
+    readFileSync(join(CURRENT_ROOT, ".github/workflows/release.yml"), "utf8"),
+    { uniqueKeys: true },
+  ).toJS();
+
+  const releaseUpload = workflow.jobs.prepare.steps.find(
+    (step) => step.name === "Upload exact verified artifacts",
+  );
+  assert.equal(
+    workflow.jobs.prepare.outputs.artifact_name,
+    "hua-release-${{ steps.release-plan.outputs.artifact_manifest_sha256 }}",
+  );
+  assert.equal(
+    releaseUpload.with.name,
+    "hua-release-${{ steps.artifact-pack.outputs.artifact_manifest_sha256 }}",
+  );
+  assert.equal(releaseUpload.with.overwrite, true);
+
+  const publishStep = workflow.jobs.publish.steps.find(
+    (step) => step.name === "Publish immutable verified tarballs",
+  );
+  const publishedUpload = workflow.jobs.publish.steps.find(
+    (step) => step.name === "Upload sanitized exact published set",
+  );
+  const publishedDownload = workflow.jobs.close.steps.find(
+    (step) => step.name === "Download sanitized exact published set",
+  );
+  assert.match(
+    publishStep.run,
+    /artifact_name=hua-published-\$\{GITHUB_RUN_ID\}-\$\{GITHUB_RUN_ATTEMPT\}/,
+  );
+  assert.equal(
+    workflow.jobs.publish.outputs.published_artifact_name,
+    "${{ steps.safe-publish.outputs.artifact_name }}",
+  );
+  assert.equal(
+    publishedUpload.with.name,
+    "${{ steps.safe-publish.outputs.artifact_name }}",
+  );
+  assert.equal(
+    publishedDownload.with.name,
+    "${{ needs.publish.outputs.published_artifact_name }}",
+  );
+});
+
 test("release source binds checked tarballs and never publishes mutable package directories", () => {
   const source = readFileSync(
     join(CURRENT_ROOT, "scripts/safe-release.mjs"),
