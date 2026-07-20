@@ -19,12 +19,14 @@ exports:
         description: "CLI binary — starts the LSP server via stdio transport. Provides completion, hover, and diagnostic capabilities for dot utility strings."
 
 features:
-  - "Autocomplete — real-time suggestions for all dot utility tokens + variant prefixes (hover:, dark:, md:, etc.)"
+  - "Autocomplete — package-local bounded hand-maintained completion catalog with fixed utility entries and variant prefixes; each response is capped at 500 items and is not complete engine coverage or resolver/support authority"
   - "Hover Preview — shows resolved CSS property values (e.g., p-4 → padding: 16px)"
   - "Diagnostics — flags unrecognized utility tokens as warnings on file open and change"
   - "Target Caveats — optional web/native/flutter diagnostics for dropped, approximated, and recipe-only output, annotated with package-owned AX family/category metadata"
   - "Pattern Detection — works inside dot(), dot='', dot={''}, and template literal forms"
-  - "500+ built-in token suggestions across 15 categories (spacing, color, sizing, typography, layout, flexbox, grid, border, shadow, background, transition, animation, transform, filter, interactivity)"
+  - "Dependency Boundary — @hua-labs/dot is a direct runtime dependency used for hover fallback and diagnostics; consumers do not supply it as a peer"
+  - "Initialize Identity — manifest-derived initialize server identity reports dot-lsp with the exact build-manifest version and does not create a JavaScript import API"
+  - "Editor Distribution — the repository contains first-party VSIX source, but its release channel is channel-pending and this package does not claim Marketplace availability or a prebuilt VSIX"
 
 related_packages:
   - "@hua-labs/dot"
@@ -32,3 +34,11 @@ related_packages:
 
 compatibility:
   node: ">=20.0.0"
+
+documentation:
+  detailedGuide:
+    state: "shipped"
+    path: "./DETAILED_GUIDE.md"
+    distribution: "packed"
+    description: "CLI protocol, completion-catalog boundaries, editor distribution, and initialize identity"
+    link: "./DETAILED_GUIDE.md"

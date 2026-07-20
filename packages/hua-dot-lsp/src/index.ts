@@ -22,7 +22,6 @@ import {
   TextDocumentPositionParams,
   Hover,
   MarkupKind,
-  Position,
   DidChangeConfigurationParams,
 } from "vscode-languageserver/node.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -30,11 +29,11 @@ import { dot } from "@hua-labs/dot";
 import { findDotRegions, type DotRegion } from "./dot-regions.js";
 import { buildDotDiagnostics } from "./diagnostics.js";
 import { readDotLspSettings, type DotLspSettings } from "./settings.js";
+import { DOT_LSP_SERVER_INFO } from "./server-info.js";
 import {
   getAllCompletions,
   getCompletionsForPrefix,
   getCompletionByLabel,
-  type CompletionEntry,
 } from "./completions.js";
 
 // ---------------------------------------------------------------------------
@@ -57,10 +56,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
       },
       hoverProvider: true,
     },
-    serverInfo: {
-      name: "dot-lsp",
-      version: "0.1.0",
-    },
+    serverInfo: DOT_LSP_SERVER_INFO,
   };
 });
 

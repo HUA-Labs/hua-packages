@@ -62,6 +62,26 @@ if (dotAotAuthorityResult.status !== 0) {
   process.exit(1);
 }
 
+const dotLspAuthorityChecker = path.join(
+  __dirname,
+  "check-dot-lsp-source-authority.mjs",
+);
+const dotLspAuthorityResult = spawnSync(
+  process.execPath,
+  [dotLspAuthorityChecker],
+  {
+    cwd: path.join(__dirname, ".."),
+    encoding: "utf8",
+  },
+);
+
+if (dotLspAuthorityResult.status !== 0) {
+  process.stdout.write(dotLspAuthorityResult.stdout || "");
+  process.stderr.write(dotLspAuthorityResult.stderr || "");
+  console.error("Pack artifact check blocked by Dot LSP source authority.");
+  process.exit(1);
+}
+
 const allowedSourcePayloads = new Map([
   ["create-hua", ["package/templates/"]],
   ["@hua-labs/hua", ["package/.hua-agent-docs/"]],
@@ -308,6 +328,22 @@ for (const tarball of tarballs) {
       process.stdout.write(artifactAuthority.stdout || "");
       process.stderr.write(artifactAuthority.stderr || "");
       console.error("Pack artifact check blocked by Dot AOT tar authority.");
+      process.exit(1);
+    }
+  }
+  if (pkg.name === "@hua-labs/dot-lsp") {
+    const artifactAuthority = spawnSync(
+      process.execPath,
+      [dotLspAuthorityChecker, "--tarball", path.resolve(tarball)],
+      {
+        cwd: path.join(__dirname, ".."),
+        encoding: "utf8",
+      },
+    );
+    if (artifactAuthority.status !== 0) {
+      process.stdout.write(artifactAuthority.stdout || "");
+      process.stderr.write(artifactAuthority.stderr || "");
+      console.error("Pack artifact check blocked by Dot LSP tar authority.");
       process.exit(1);
     }
   }

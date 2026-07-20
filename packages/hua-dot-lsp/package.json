@@ -14,7 +14,7 @@
     "dist/index.js"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --shims && rm -f dist/index.d.ts",
+    "build": "tsup src/index.ts --format esm --shims && node -e \"require('node:fs').rmSync('dist/index.d.ts',{force:true})\"",
     "dev": "tsx src/index.ts --stdio",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
