@@ -1,5 +1,5 @@
 {
-  "mapDigest": "e9c9cf1b5fbf4dac9061e9bbf1209d5de9ae574b06c5119a2daa7b05d78bf367",
+  "mapDigest": "30ba90316b04ee2c8e898caaa5de1c700090dedc716ac7b597129ae070566f31",
   "publicBase": {
     "commit": "742da1e7dd5d53d06b0614ee53cea70c514e29ff",
     "packageTree": "c9e9eda885dfbbde9956167dd4ab514122f0ad69",
@@ -400,9 +400,9 @@
       "sourceSha256": "807df4129ff6b030a229da80be73683adec1500edfabeb0f8a60b4fe79360204"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "test",
-      "outputSha256": null,
+      "outputSha256": "514a071224e8b64fd541f2397e44a33cd3c20fc81de16251175811f56cf6d13b",
       "path": "packages/hua-ui/src/components/__tests__/KanbanBoard.test.tsx",
       "publicBaseSha256": null,
       "sourceSha256": "514a071224e8b64fd541f2397e44a33cd3c20fc81de16251175811f56cf6d13b"
@@ -624,25 +624,25 @@
       "sourceSha256": "66bf40882a4c0c30f106b55720be2f7edcc699e30fad63de04e05edba7b30169"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "96f6579614f38592ff344f8fc207f9e545262bcf398e6d20442f373b43bda2c7",
       "path": "packages/hua-ui/src/components/dashboard/kanban/KanbanBoard.tsx",
       "publicBaseSha256": "032754d16a41c47dc3c38627c7dcad52b097ed363facc5d2ff94bd4e6bbeeb4f",
       "sourceSha256": "96f6579614f38592ff344f8fc207f9e545262bcf398e6d20442f373b43bda2c7"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "production",
-      "outputSha256": null,
+      "outputSha256": "fa25b544ce58285d68386b0f75b81aca070b8c4907ff89edf99038c39305368e",
       "path": "packages/hua-ui/src/components/dashboard/kanban/KanbanCard.tsx",
       "publicBaseSha256": "c568e0d7a33db2f4819b8bad1f9b789e5d38809e09fd4585c0ce41e5e721bc13",
       "sourceSha256": "fa25b544ce58285d68386b0f75b81aca070b8c4907ff89edf99038c39305368e"
     },
     {
-      "disposition": "deferred",
+      "disposition": "platform-exact",
       "kind": "docs",
-      "outputSha256": null,
+      "outputSha256": "a02fda4cb93d216bb5d602f963a2c563f6d2bea0de53f74be8a104b32691ac2c",
       "path": "packages/hua-ui/src/components/dashboard/kanban/README.md",
       "publicBaseSha256": "da0b4a19f6da8ad13e500fd6818fa57f33e2f9c12e41eabb8c76342be7e89afa",
       "sourceSha256": "a02fda4cb93d216bb5d602f963a2c563f6d2bea0de53f74be8a104b32691ac2c"
@@ -1210,9 +1210,9 @@
   ],
   "schema": "hua-ui-source-authority.v1",
   "sourceAuthority": {
-    "commit": "72d311fa84c596397f338cd06b9bfc541448af61",
+    "commit": "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",
     "packageTree": "e7097d610de019c22ffb2967c08d62b3eeec319f",
     "sourceTree": "ac7b098559e9560b74ce24652b34f5c8561a70ea",
-    "tree": "516c1135a218413e7f7725f38379beca721594e9"
+    "tree": "a9f2436c625d56b4447885b70f6cd48257369199"
   }
 }

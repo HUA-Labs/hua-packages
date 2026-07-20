@@ -87,15 +87,27 @@ const m835PlatformExactPaths = [
   ...m828PlatformExactPaths,
   ...m835IconCorePaths,
 ].sort();
-const m835IconCorePathSet = new Set(m835IconCorePaths);
-const m835MapDigest =
-  "e9c9cf1b5fbf4dac9061e9bbf1209d5de9ae574b06c5119a2daa7b05d78bf367";
+const m840KanbanPaths = [
+  "packages/hua-ui/src/components/__tests__/KanbanBoard.test.tsx",
+  "packages/hua-ui/src/components/dashboard/kanban/KanbanBoard.tsx",
+  "packages/hua-ui/src/components/dashboard/kanban/KanbanCard.tsx",
+  "packages/hua-ui/src/components/dashboard/kanban/README.md",
+].sort();
+const m840PlatformExactPaths = [
+  ...m835PlatformExactPaths,
+  ...m840KanbanPaths,
+].sort();
+const m840KanbanPathSet = new Set(m840KanbanPaths);
+const m840MapDigest =
+  "30ba90316b04ee2c8e898caaa5de1c700090dedc716ac7b597129ae070566f31";
 const m835SelectedDigest =
   "7c8cb9b467ff56b323e7a9d286803c36409d724b14f7a38c3a11f02d234f7963";
+const m840SelectedDigest =
+  "1434d5eaed260c93fa20d0460e60d493fb9415512655742a93249b47d716cf64";
 const m821SelectedDigest =
   "1b62279f3148d21bedee2311eb9ef58c256e1f01c56d67246f7e6b43f00a291f";
-const m835RemainingDigest =
-  "4ef39338e6932fc540e3da9e55addec0a0295340662bcc15c92699ccf641b46e";
+const m840RemainingDigest =
+  "dcdbf954655a040b3730d004b64c4213ca0bb1be05855feeabf1451232ad466a";
 const ownedRoots = [];
 
 afterEach(() => {
@@ -162,25 +174,25 @@ function authorityRowDigest(rows) {
 }
 
 function remainingAuthorityRows(rows) {
-  return rows.filter((row) => !m835IconCorePathSet.has(row.path));
+  return rows.filter((row) => !m840KanbanPathSet.has(row.path));
 }
 
 function remainingAuthorityDigest(rows) {
   return authorityRowDigest(remainingAuthorityRows(rows));
 }
 
-function assertM835AuthorityLock(
+function assertM840AuthorityLock(
   config,
   {
-    expectedMapDigest = m835MapDigest,
-    expectedRemainingDigest = m835RemainingDigest,
+    expectedMapDigest = m840MapDigest,
+    expectedRemainingDigest = m840RemainingDigest,
   } = {},
 ) {
   assert.equal(config.mapDigest, sha256(canonicalJson(config.rows)));
   assert.equal(config.mapDigest, expectedMapDigest);
 
   const remainingRows = remainingAuthorityRows(config.rows);
-  assert.equal(remainingRows.length, 133);
+  assert.equal(remainingRows.length, 146);
   assert.equal(remainingAuthorityDigest(config.rows), expectedRemainingDigest);
 }
 
@@ -311,23 +323,23 @@ function runChecker(fixture, ...extra) {
   );
 }
 
-test("locks the M835 icon core and remaining rows to platform authority", () => {
+test("locks the M840 Kanban projection and remaining rows to platform authority", () => {
   const config = JSON.parse(readFileSync(realConfig, "utf8"));
   assert.deepEqual(config.sourceAuthority, {
-    commit: "72d311fa84c596397f338cd06b9bfc541448af61",
+    commit: "6be90ccac2f83f8c0fb7befb7310bbcbc590cce6",
     packageTree: "e7097d610de019c22ffb2967c08d62b3eeec319f",
     sourceTree: "ac7b098559e9560b74ce24652b34f5c8561a70ea",
-    tree: "516c1135a218413e7f7725f38379beca721594e9",
+    tree: "a9f2436c625d56b4447885b70f6cd48257369199",
   });
-  assertM835AuthorityLock(config);
+  assertM840AuthorityLock(config);
 
   const platformExactRows = config.rows.filter(
     (row) => row.disposition === "platform-exact",
   );
-  assert.equal(platformExactRows.length, 51);
+  assert.equal(platformExactRows.length, 55);
   assert.equal(
     config.rows.filter((row) => row.disposition === "deferred").length,
-    51,
+    47,
   );
   assert.equal(
     config.rows.filter((row) => row.disposition === "public-preserved").length,
@@ -335,7 +347,7 @@ test("locks the M835 icon core and remaining rows to platform authority", () => 
   );
   assert.deepEqual(
     platformExactRows.map((row) => row.path),
-    m835PlatformExactPaths,
+    m840PlatformExactPaths,
   );
   for (const row of platformExactRows) {
     assert.equal(row.outputSha256, row.sourceSha256, row.path);
@@ -359,6 +371,18 @@ test("locks the M835 icon core and remaining rows to platform authority", () => 
   assert.equal(authorityRowDigest(m835SelectedRows), m835SelectedDigest);
 
   for (const path of m835IconCorePaths) {
+    const row = config.rows.find((candidate) => candidate.path === path);
+    assert.equal(row?.disposition, "platform-exact", path);
+    assert.equal(row?.outputSha256, row?.sourceSha256, path);
+  }
+
+  const m840SelectedRows = config.rows.filter((row) =>
+    m840KanbanPaths.includes(row.path),
+  );
+  assert.equal(m840SelectedRows.length, 4);
+  assert.equal(authorityRowDigest(m840SelectedRows), m840SelectedDigest);
+
+  for (const path of m840KanbanPaths) {
     const row = config.rows.find((candidate) => candidate.path === path);
     assert.equal(row?.disposition, "platform-exact", path);
     assert.equal(row?.outputSha256, row?.sourceSha256, path);
@@ -395,17 +419,17 @@ test("locks the M835 icon core and remaining rows to platform authority", () => 
 
   assert.equal(
     tampered.mapDigest,
-    "c3097ff816a63afc3dee42fa3ba15248ff4a998471bbc10dd04cfd3c79256065",
+    "3669248f9b61bc37dfd19e608e0de43db3836e713e70f4b1fcbdccd5c8fcda6f",
   );
   const tamperedRemainingDigest = remainingAuthorityDigest(tampered.rows);
   assert.equal(
     tamperedRemainingDigest,
-    "9304f16d0c175b3fa4c5c1b2c6c90989c86a9496c8b94fa45cd9de39b27e5025",
+    "f0ea9c9ef857243db58a2975ee322fb21a4c7b1b75554dc329168a4f5449980a",
   );
 
   let failure;
   try {
-    assertM835AuthorityLock(tampered, {
+    assertM840AuthorityLock(tampered, {
       expectedMapDigest: tampered.mapDigest,
     });
   } catch (error) {
@@ -413,7 +437,7 @@ test("locks the M835 icon core and remaining rows to platform authority", () => 
   }
   assert.equal(failure?.name, "AssertionError");
   assert.equal(failure?.actual, tamperedRemainingDigest);
-  assert.equal(failure?.expected, m835RemainingDigest);
+  assert.equal(failure?.expected, m840RemainingDigest);
 });
 
 function createOversizedSourceFixture() {
@@ -669,6 +693,10 @@ function installCheckerFixture(fixture) {
   copyFileSync(packChecker, join(scripts, "check-pack-artifacts.js"));
   writeFileSync(
     join(scripts, "check-dot-core-source-authority.mjs"),
+    "#!/usr/bin/env node\nprocess.exit(0);\n",
+  );
+  writeFileSync(
+    join(scripts, "check-dot-aot-source-authority.mjs"),
     "#!/usr/bin/env node\nprocess.exit(0);\n",
   );
 }

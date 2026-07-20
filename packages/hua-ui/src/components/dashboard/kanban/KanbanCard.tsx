@@ -1,15 +1,26 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
+import { composeRefs } from "../../../lib/Slot";
 import { Icon } from "../../Icon";
 import { useKanban } from "./KanbanContext";
 import type { KanbanCardProps, KanbanPriority } from "./types";
 
 // Keyframes ID for animation
 const KEYFRAMES_ID = "kanban-card-keyframes";
+
+function mergeAriaTokens(
+  ...values: Array<string | undefined>
+): string | undefined {
+  const tokens = values.flatMap(
+    (value) => value?.split(/\s+/u).filter(Boolean) ?? [],
+  );
+  const unique = [...new Set(tokens)];
+  return unique.length > 0 ? unique.join(" ") : undefined;
+}
 
 /**
  * Hook to inject keyframes once
@@ -95,6 +106,12 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
       isOver = false,
       dot,
       style,
+      onClick: consumerOnClick,
+      onKeyDown: consumerOnKeyDown,
+      onMouseDown: consumerOnMouseDown,
+      onPointerDown: consumerOnPointerDown,
+      onTouchStart: consumerOnTouchStart,
+      "aria-describedby": consumerAriaDescribedBy,
       ...props
     },
     ref,
@@ -122,6 +139,23 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
         columnId: card.columnId,
       },
     });
+    const composedRef = useMemo(
+      () => composeRefs<HTMLDivElement>(setNodeRef, ref),
+      [ref, setNodeRef],
+    );
+    const sortableListeners = listeners as
+      | {
+          onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+          onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
+          onPointerDown?: React.PointerEventHandler<HTMLDivElement>;
+          onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
+        }
+      | undefined;
+    const sortableAriaDescribedBy = attributes["aria-describedby"];
+    const ariaDescribedBy = mergeAriaTokens(
+      sortableAriaDescribedBy,
+      consumerAriaDescribedBy,
+    );
 
     // Sortable styles
     const sortableStyle: React.CSSProperties = {
@@ -130,10 +164,71 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
     };
 
     const handleClick = useCallback(() => {
-      if (!isDragging) {
+      if (!isDragging && !isDraggingProp) {
         onCardClick?.(card);
       }
-    }, [card, onCardClick, isDragging]);
+    }, [card, isDragging, isDraggingProp, onCardClick]);
+
+    const handleRootClick = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        if (isDragging || isDraggingProp) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        consumerOnClick?.(event);
+        if (!event.defaultPrevented) handleClick();
+      },
+      [consumerOnClick, handleClick, isDragging, isDraggingProp],
+    );
+
+    const handleRootKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        sortableListeners?.onKeyDown?.(event);
+        const dndOwnedEvent = event.defaultPrevented;
+        consumerOnKeyDown?.(event);
+        if (dndOwnedEvent) return;
+        if (
+          !event.defaultPrevented &&
+          (!allowCardDrag || readOnly) &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          handleClick();
+        }
+      },
+      [
+        allowCardDrag,
+        consumerOnKeyDown,
+        handleClick,
+        readOnly,
+        sortableListeners,
+      ],
+    );
+
+    const handleRootMouseDown = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        sortableListeners?.onMouseDown?.(event);
+        consumerOnMouseDown?.(event);
+      },
+      [consumerOnMouseDown, sortableListeners],
+    );
+
+    const handleRootPointerDown = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        sortableListeners?.onPointerDown?.(event);
+        consumerOnPointerDown?.(event);
+      },
+      [consumerOnPointerDown, sortableListeners],
+    );
+
+    const handleRootTouchStart = useCallback(
+      (event: React.TouchEvent<HTMLDivElement>) => {
+        sortableListeners?.onTouchStart?.(event);
+        consumerOnTouchStart?.(event);
+      },
+      [consumerOnTouchStart, sortableListeners],
+    );
 
     // Delete animation state
     const [isDeleting, setIsDeleting] = useState(false);
@@ -186,7 +281,6 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
         ...resolveDot("rounded-lg p-3 mb-2"),
         cursor: allowCardDrag ? "grab" : "default",
         transition: "all 200ms",
-        touchAction: "none",
         outline: isOver ? "1px solid #6366f1" : undefined,
       },
       variantStyle,
@@ -208,21 +302,19 @@ export const KanbanCard = React.forwardRef<HTMLDivElement, KanbanCardProps>(
     return (
       <div
         {...attributes}
-        {...listeners}
-        ref={setNodeRef}
+        ref={composedRef}
         data-card-id={card.id}
         role="listitem"
         aria-label={card.title}
+        aria-describedby={ariaDescribedBy}
         tabIndex={0}
         style={cardStyle}
-        onClick={handleClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleClick();
-          }
-        }}
         {...props}
+        onClick={handleRootClick}
+        onKeyDown={handleRootKeyDown}
+        onMouseDown={handleRootMouseDown}
+        onPointerDown={handleRootPointerDown}
+        onTouchStart={handleRootTouchStart}
       >
         {/* Delete button (shown on hover) */}
         {!readOnly && (

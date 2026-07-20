@@ -86,6 +86,19 @@ the complete 51-path admitted roster, and the remaining 133-row digest; a
 self-consistent reclassification outside M835 still fails closed. These
 projections do not copy package, export, dependency, version, Changeset, lock,
 workflow, or generated-document authority.
+M840 advances the source authority to platform commit
+`6be90ccac2f83f8c0fb7befb7310bbcbc590cce6` and admits the byte-exact Kanban
+board, card, family README, and 40-case transaction/interaction evidence test.
+The platform-exact installed-boundary test separately proves the retained
+`./interactive/kanban` package route with and without the optional React DOM
+peer; it is public release evidence and is not a UI source-map row. The map now
+contains 55 `platform-exact`, 47 `deferred`, and 48 `public-preserved` rows.
+The focused authority test retains the M835 icon/core lock, locks the exact
+four-row M840 projection and complete 55-path admitted roster, and independently
+rejects a self-consistent reclassification in the remaining 146-row authority
+set. M840 does not change the generic checker, public package profile,
+manifest/export/dependency/version, lock, workflow, Changeset, release plan, or
+generated-document authority.
 The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it

@@ -1,22 +1,31 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import {
   DndContext,
   DragOverlay,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
+  type DragCancelEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   horizontalListSortingStrategy,
   arrayMove,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { mergeStyles, resolveDot } from "../../../hooks/useDotMap";
 import { KanbanProvider } from "./KanbanContext";
@@ -29,6 +38,505 @@ import type {
   KanbanColumn as KanbanColumnType,
   KanbanCard as KanbanCardType,
 } from "./types";
+
+const ANNOUNCEMENT_LIMIT = 180;
+const ANNOUNCEMENT_LABEL_LIMIT = 80;
+const AUTHORITY_METADATA_MAX_DEPTH = 12;
+const AUTHORITY_METADATA_MAX_NODES = 1024;
+const AUTHORITY_METADATA_MAX_ARRAY_LENGTH = 256;
+const AUTHORITY_METADATA_MAX_OBJECT_KEYS = 128;
+const AUTHORITY_METADATA_MAX_STRING_SCALARS = 4096;
+const AUTHORITY_METADATA_MAX_BYTES = 32768;
+const SCREEN_READER_INSTRUCTIONS =
+  "Press Space or Enter to pick up an item. Use the arrow keys to move it, press Space or Enter to drop it, or press Escape to cancel.";
+
+type DragType = "card" | "column";
+type DragBlockReason = "drift" | "invalid-target" | "wip-limit" | null;
+
+interface CardDropTarget {
+  columnId: string;
+  index: number;
+  overId: string;
+}
+
+interface DragTransaction {
+  type: DragType;
+  activeId: string;
+  sourceColumnId: string | null;
+  columns: KanbanColumnType[];
+  cards: KanbanCardType[];
+  authority: string;
+  previewCards: KanbanCardType[];
+  overId: string | null;
+  blockReason: DragBlockReason;
+  stableExternalTarget: CardDropTarget | null;
+  lastAnnouncedTarget: string | null;
+}
+
+interface AuthorityMetadataState {
+  nodes: number;
+  active: WeakSet<object>;
+}
+
+interface AuthorityMetadataSnapshot {
+  canonical: string;
+  value: unknown;
+}
+
+interface DragAuthoritySnapshot {
+  authority: string;
+  cards: KanbanCardType[];
+}
+
+function cloneColumns(columns: KanbanColumnType[]): KanbanColumnType[] {
+  return columns.map((column) => ({ ...column }));
+}
+
+function cloneCards(cards: KanbanCardType[]): KanbanCardType[] {
+  return cards.map((card) => ({
+    ...card,
+    tags: card.tags ? [...card.tags] : undefined,
+    assignee: card.assignee ? { ...card.assignee } : undefined,
+  }));
+}
+
+function snapshotAuthorityMetadataValue(
+  value: unknown,
+  state: AuthorityMetadataState,
+  depth: number,
+): AuthorityMetadataSnapshot | null {
+  state.nodes += 1;
+  if (
+    state.nodes > AUTHORITY_METADATA_MAX_NODES ||
+    depth > AUTHORITY_METADATA_MAX_DEPTH
+  ) {
+    return null;
+  }
+
+  if (value === null) return { canonical: "n", value: null };
+  if (typeof value === "boolean") {
+    return { canonical: value ? "b1" : "b0", value };
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    return {
+      canonical: Object.is(value, -0) ? "d-0" : `d${String(value)}`,
+      value,
+    };
+  }
+  if (typeof value === "string") {
+    if (
+      value.length > AUTHORITY_METADATA_MAX_STRING_SCALARS * 2 ||
+      Array.from(value).length > AUTHORITY_METADATA_MAX_STRING_SCALARS
+    ) {
+      return null;
+    }
+    return { canonical: `s${JSON.stringify(value)}`, value };
+  }
+  if (typeof value !== "object") return null;
+  if (state.active.has(value)) return null;
+
+  try {
+    state.active.add(value);
+    const isArray = Array.isArray(value);
+    const prototype = Object.getPrototypeOf(value);
+    if (isArray) {
+      if (prototype !== Array.prototype) return null;
+      const ownKeys = Reflect.ownKeys(value);
+      if (ownKeys.some((key) => typeof key !== "string")) return null;
+      const lengthDescriptor = Object.getOwnPropertyDescriptor(value, "length");
+      if (
+        !lengthDescriptor ||
+        !("value" in lengthDescriptor) ||
+        !Number.isSafeInteger(lengthDescriptor.value) ||
+        lengthDescriptor.value < 0 ||
+        lengthDescriptor.value > AUTHORITY_METADATA_MAX_ARRAY_LENGTH
+      ) {
+        return null;
+      }
+      const length = lengthDescriptor.value as number;
+      if (ownKeys.length !== length + 1 || !ownKeys.includes("length")) {
+        return null;
+      }
+
+      const items: string[] = [];
+      const snapshot: unknown[] = new Array(length);
+      for (let index = 0; index < length; index += 1) {
+        const key = String(index);
+        if (!ownKeys.includes(key)) return null;
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (
+          !descriptor ||
+          !("value" in descriptor) ||
+          descriptor.enumerable !== true
+        ) {
+          return null;
+        }
+        const item = snapshotAuthorityMetadataValue(
+          descriptor.value,
+          state,
+          depth + 1,
+        );
+        if (item === null) return null;
+        Object.defineProperty(snapshot, key, {
+          configurable: true,
+          enumerable: true,
+          value: item.value,
+          writable: true,
+        });
+        items.push(item.canonical);
+      }
+      return { canonical: `a[${items.join(",")}]`, value: snapshot };
+    }
+
+    if (prototype !== Object.prototype && prototype !== null) return null;
+    const ownKeys = Reflect.ownKeys(value);
+    if (
+      ownKeys.length > AUTHORITY_METADATA_MAX_OBJECT_KEYS ||
+      ownKeys.some((key) => typeof key !== "string")
+    ) {
+      return null;
+    }
+    const keys = (ownKeys as string[]).sort();
+    const entries: string[] = [];
+    const snapshot: Record<string, unknown> =
+      prototype === null ? Object.create(null) : {};
+    for (const key of keys) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (
+        !descriptor ||
+        !("value" in descriptor) ||
+        descriptor.enumerable !== true
+      ) {
+        return null;
+      }
+      const nested = snapshotAuthorityMetadataValue(
+        descriptor.value,
+        state,
+        depth + 1,
+      );
+      if (nested === null) return null;
+      Object.defineProperty(snapshot, key, {
+        configurable: true,
+        enumerable: true,
+        value: nested.value,
+        writable: true,
+      });
+      entries.push(`${JSON.stringify(key)}:${nested.canonical}`);
+    }
+    return { canonical: `o{${entries.join(",")}}`, value: snapshot };
+  } catch {
+    return null;
+  } finally {
+    state.active.delete(value);
+  }
+}
+
+function snapshotAuthorityMetadata(
+  metadata: unknown,
+  state: AuthorityMetadataState,
+): AuthorityMetadataSnapshot | null {
+  if (
+    metadata === null ||
+    typeof metadata !== "object" ||
+    Array.isArray(metadata)
+  ) {
+    return null;
+  }
+  return snapshotAuthorityMetadataValue(metadata, state, 0);
+}
+
+function createDragAuthority(
+  columns: KanbanColumnType[],
+  cards: KanbanCardType[],
+): DragAuthoritySnapshot | null {
+  const columnIds = new Set<string>();
+  for (const column of columns) {
+    if (typeof column.id !== "string" || columnIds.has(column.id)) return null;
+    columnIds.add(column.id);
+  }
+  try {
+    const cardAuthorityRows: unknown[] = [];
+    const cardSnapshots: KanbanCardType[] = [];
+    const cardIds = new Set<string>();
+    const metadataState: AuthorityMetadataState = {
+      nodes: 0,
+      active: new WeakSet<object>(),
+    };
+    let metadataBytes = 0;
+    for (const sourceCard of cards) {
+      const ownKeys = Reflect.ownKeys(sourceCard);
+      if (ownKeys.some((key) => typeof key !== "string")) return null;
+      const metadataDescriptor = Object.getOwnPropertyDescriptor(
+        sourceCard,
+        "metadata",
+      );
+      if (!metadataDescriptor && Reflect.has(sourceCard, "metadata")) {
+        return null;
+      }
+      if (
+        metadataDescriptor &&
+        (!("value" in metadataDescriptor) ||
+          metadataDescriptor.enumerable !== true)
+      ) {
+        return null;
+      }
+
+      const hasDefinedMetadata =
+        metadataDescriptor !== undefined &&
+        metadataDescriptor.value !== undefined;
+      const metadataSnapshot = hasDefinedMetadata
+        ? snapshotAuthorityMetadata(metadataDescriptor.value, metadataState)
+        : null;
+      if (hasDefinedMetadata && metadataSnapshot === null) return null;
+      if (metadataSnapshot !== null) {
+        metadataBytes += new TextEncoder().encode(
+          metadataSnapshot.canonical,
+        ).byteLength;
+        if (metadataBytes > AUTHORITY_METADATA_MAX_BYTES) return null;
+      }
+
+      const card: KanbanCardType = {
+        ...sourceCard,
+        tags: sourceCard.tags ? [...sourceCard.tags] : undefined,
+        assignee: sourceCard.assignee ? { ...sourceCard.assignee } : undefined,
+        dueDate:
+          sourceCard.dueDate instanceof Date
+            ? new Date(sourceCard.dueDate.getTime())
+            : sourceCard.dueDate,
+      };
+      if (metadataSnapshot) {
+        Object.defineProperty(card, "metadata", {
+          configurable: true,
+          enumerable: true,
+          value: metadataSnapshot.value,
+          writable: true,
+        });
+      } else {
+        delete card.metadata;
+      }
+
+      if (
+        typeof card.id !== "string" ||
+        cardIds.has(card.id) ||
+        !columnIds.has(card.columnId)
+      ) {
+        return null;
+      }
+      cardIds.add(card.id);
+      cardSnapshots.push(card);
+      cardAuthorityRows.push([
+        card.id,
+        card.columnId,
+        card.order ?? null,
+        card.title,
+        card.description ?? null,
+        card.priority ?? null,
+        card.tags ?? null,
+        card.assignee?.name ?? null,
+        card.assignee?.avatar ?? null,
+        card.dueDate instanceof Date
+          ? Number.isNaN(card.dueDate.getTime())
+            ? "invalid-date"
+            : card.dueDate.toISOString()
+          : (card.dueDate ?? null),
+        metadataSnapshot?.canonical ?? null,
+      ]);
+    }
+    return {
+      authority: JSON.stringify({
+        columns: columns.map((column) => [
+          column.id,
+          column.title,
+          column.color ?? null,
+          column.limit ?? null,
+          column.collapsed ?? null,
+        ]),
+        cards: cardAuthorityRows,
+      }),
+      cards: cardSnapshots,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function getSortedColumnCards(
+  cards: KanbanCardType[],
+  columnId: string,
+): KanbanCardType[] {
+  return cards
+    .map((card, sourceIndex) => ({ card, sourceIndex }))
+    .filter(({ card }) => card.columnId === columnId)
+    .sort(
+      (a, b) =>
+        (a.card.order ?? 0) - (b.card.order ?? 0) ||
+        a.sourceIndex - b.sourceIndex,
+    )
+    .map(({ card }) => card);
+}
+
+function resolveCardDropTarget(
+  transaction: DragTransaction,
+  overId: string,
+): CardDropTarget | null {
+  const overColumn = transaction.columns.find((column) => column.id === overId);
+  if (overColumn) {
+    const targetCards = getSortedColumnCards(
+      transaction.previewCards,
+      overColumn.id,
+    ).filter((card) => card.id !== transaction.activeId);
+    const sameColumn = transaction.sourceColumnId === overColumn.id;
+    return {
+      columnId: overColumn.id,
+      index: sameColumn ? Math.max(targetCards.length, 0) : targetCards.length,
+      overId,
+    };
+  }
+
+  const overCard = transaction.previewCards.find((card) => card.id === overId);
+  if (!overCard) return null;
+
+  const sameColumn = transaction.sourceColumnId === overCard.columnId;
+  const targetCards = getSortedColumnCards(
+    transaction.previewCards,
+    overCard.columnId,
+  ).filter((card) => sameColumn || card.id !== transaction.activeId);
+  const index = targetCards.findIndex((card) => card.id === overId);
+  if (index === -1) return null;
+
+  return { columnId: overCard.columnId, index, overId };
+}
+
+function sameCardDropTarget(
+  left: CardDropTarget | null,
+  right: CardDropTarget,
+): boolean {
+  return (
+    left?.columnId === right.columnId &&
+    left.index === right.index &&
+    left.overId === right.overId
+  );
+}
+
+function clearCardPreviewAuthority(transaction: DragTransaction): void {
+  transaction.previewCards = transaction.cards;
+  transaction.stableExternalTarget = null;
+}
+
+function isWipBlocked(
+  transaction: DragTransaction,
+  target: CardDropTarget,
+): boolean {
+  if (transaction.sourceColumnId === target.columnId) return false;
+  const column = transaction.columns.find(({ id }) => id === target.columnId);
+  if (!column || column.limit === undefined) return false;
+  const foreignCount = transaction.previewCards.filter(
+    (card) =>
+      card.columnId === target.columnId && card.id !== transaction.activeId,
+  ).length;
+  return foreignCount >= column.limit;
+}
+
+function moveCardInSnapshot(
+  transaction: DragTransaction,
+  target: CardDropTarget,
+): KanbanCardType[] | null {
+  const activeCard = transaction.cards.find(
+    (card) => card.id === transaction.activeId,
+  );
+  if (!activeCard || !transaction.sourceColumnId) return null;
+
+  const sourceColumnId = transaction.sourceColumnId;
+  if (sourceColumnId === target.columnId) {
+    const columnCards = getSortedColumnCards(transaction.cards, sourceColumnId);
+    const oldIndex = columnCards.findIndex(
+      (card) => card.id === transaction.activeId,
+    );
+    if (oldIndex === -1) return null;
+    const newIndex = Math.max(
+      0,
+      Math.min(target.index, columnCards.length - 1),
+    );
+    if (oldIndex === newIndex) return cloneCards(transaction.cards);
+    const reordered = arrayMove(columnCards, oldIndex, newIndex);
+    const orders = new Map(reordered.map((card, index) => [card.id, index]));
+    return transaction.cards.map((card) =>
+      card.columnId === sourceColumnId
+        ? { ...card, order: orders.get(card.id) }
+        : { ...card },
+    );
+  }
+
+  const sourceCards = getSortedColumnCards(transaction.cards, sourceColumnId)
+    .filter((card) => card.id !== transaction.activeId)
+    .map((card) => ({ ...card }));
+  const targetCards = getSortedColumnCards(transaction.cards, target.columnId)
+    .filter((card) => card.id !== transaction.activeId)
+    .map((card) => ({ ...card }));
+  const targetIndex = Math.max(0, Math.min(target.index, targetCards.length));
+  targetCards.splice(targetIndex, 0, {
+    ...activeCard,
+    columnId: target.columnId,
+  });
+  const sourceOrders = new Map(
+    sourceCards.map((card, index) => [card.id, index]),
+  );
+  const targetOrders = new Map(
+    targetCards.map((card, index) => [card.id, index]),
+  );
+
+  return transaction.cards.map((card) => {
+    if (card.id === transaction.activeId) {
+      return {
+        ...card,
+        columnId: target.columnId,
+        order: targetOrders.get(card.id),
+      };
+    }
+    if (card.columnId === sourceColumnId) {
+      return { ...card, order: sourceOrders.get(card.id) };
+    }
+    if (card.columnId === target.columnId) {
+      return { ...card, order: targetOrders.get(card.id) };
+    }
+    return { ...card };
+  });
+}
+
+function sanitizeAnnouncementText(
+  value: unknown,
+  fallback: string,
+  scalarLimit: number,
+): string {
+  if (typeof value !== "string") return fallback;
+  const sanitized = Array.from(value, (character) => {
+    const point = character.codePointAt(0) ?? 0;
+    return point <= 0x1f ||
+      (point >= 0x7f && point <= 0x9f) ||
+      (point >= 0xd800 && point <= 0xdfff) ||
+      point === 0x2028 ||
+      point === 0x2029
+      ? " "
+      : character;
+  })
+    .join("")
+    .replace(/\s+/gu, " ")
+    .trim();
+  return Array.from(sanitized).slice(0, scalarLimit).join("") || fallback;
+}
+
+function sanitizeAnnouncementLabel(value: unknown, fallback: string): string {
+  return sanitizeAnnouncementText(value, fallback, ANNOUNCEMENT_LABEL_LIMIT);
+}
+
+function boundedAnnouncement(value: string): string {
+  return sanitizeAnnouncementText(
+    value,
+    "Drag status unavailable.",
+    ANNOUNCEMENT_LIMIT,
+  );
+}
 
 /**
  * KanbanBoard 컴포넌트
@@ -100,11 +608,43 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     const [activeType, setActiveType] = useState<"card" | "column" | null>(
       null,
     );
+    const [previewCards, setPreviewCards] = useState<KanbanCardType[] | null>(
+      null,
+    );
+    const dragTransactionRef = useRef<DragTransaction | null>(null);
+    const announcementOutcomeRef = useRef<string | null>(null);
+    const onKanbanDragEndRef = useRef(onKanbanDragEnd);
+
+    useEffect(() => {
+      onKanbanDragEndRef.current = onKanbanDragEnd;
+    }, [onKanbanDragEnd]);
+
+    const takeDragTransaction = useCallback((): DragTransaction | null => {
+      const transaction = dragTransactionRef.current;
+      if (!transaction) return null;
+      dragTransactionRef.current = null;
+      return transaction;
+    }, []);
+
+    useEffect(
+      () => () => {
+        const transaction = takeDragTransaction();
+        announcementOutcomeRef.current = null;
+        if (transaction) {
+          onKanbanDragEndRef.current?.(transaction.type, transaction.activeId);
+        }
+      },
+      [takeDragTransaction],
+    );
 
     // Determine controlled vs uncontrolled
     const isControlled = controlledColumns !== undefined;
     const columns = isControlled ? controlledColumns : internalColumns;
-    const cards = isControlled ? (controlledCards ?? []) : internalCards;
+    const cards = useMemo(
+      () => (isControlled ? (controlledCards ?? []) : internalCards),
+      [controlledCards, internalCards, isControlled],
+    );
+    const displayedCards = previewCards ?? cards;
 
     // Is dragging?
     const isDragging = activeId !== null;
@@ -112,30 +652,40 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
 
     // Sensors
     const sensors = useSensors(
-      useSensor(PointerSensor, {
+      useSensor(MouseSensor, {
         activationConstraint: { distance: 8 },
       }),
-      useSensor(KeyboardSensor),
+      useSensor(TouchSensor, {
+        activationConstraint: { delay: 250, tolerance: 5 },
+      }),
+      useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+      }),
     );
 
     // Handle column changes
     const handleColumnsChange = useCallback(
       (newColumns: KanbanColumnType[]) => {
+        const internalColumnsSnapshot = cloneColumns(newColumns);
+        const externalColumnsSnapshot = cloneColumns(newColumns);
         if (!isControlled) {
-          setInternalColumns(newColumns);
+          setInternalColumns(internalColumnsSnapshot);
         }
-        onColumnsChange?.(newColumns);
+        onColumnsChange?.(externalColumnsSnapshot);
       },
       [isControlled, onColumnsChange],
     );
 
     // Handle card changes
     const handleCardsChange = useCallback(
-      (newCards: KanbanCardType[]) => {
+      (
+        newCards: KanbanCardType[],
+        externalCards: KanbanCardType[] = newCards,
+      ) => {
         if (!isControlled) {
           setInternalCards(newCards);
         }
-        onCardsChange?.(newCards);
+        onCardsChange?.(externalCards);
       },
       [isControlled, onCardsChange],
     );
@@ -143,217 +693,355 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     // Get cards for a specific column (sorted by order)
     const getColumnCards = useCallback(
       (columnId: string) => {
-        return cards
-          .filter((card) => card.columnId === columnId)
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        return getSortedColumnCards(displayedCards, columnId);
       },
-      [cards],
+      [displayedCards],
     );
 
-    // Find which column a card belongs to
-    const findColumnByCardId = useCallback(
-      (cardId: string): string | null => {
-        const card = cards.find((c) => c.id === cardId);
-        return card?.columnId ?? null;
-      },
-      [cards],
-    );
+    const finishDragLifecycle = useCallback(
+      (
+        announcement: string,
+        commit?: (transaction: DragTransaction) => void,
+      ): boolean => {
+        const transaction = takeDragTransaction();
+        if (!transaction) return false;
 
-    // Check if item is a column
-    const isColumn = useCallback(
-      (id: string): boolean => {
-        return columns.some((col) => col.id === id);
+        announcementOutcomeRef.current = boundedAnnouncement(announcement);
+        setPreviewCards(null);
+        setActiveId(null);
+        setActiveType(null);
+
+        try {
+          commit?.(transaction);
+        } finally {
+          onKanbanDragEndRef.current?.(transaction.type, transaction.activeId);
+        }
+        return true;
       },
-      [columns],
+      [takeDragTransaction],
     );
 
     // Drag start handler
     const handleDragStart = useCallback(
       (event: DragStartEvent) => {
-        const { active } = event;
-        const id = active.id as string;
-        const type = isColumn(id) ? "column" : "card";
+        if (dragTransactionRef.current) return;
+        const id = event.active.id;
+        if (typeof id !== "string") return;
+
+        const columnsSnapshot = cloneColumns(columns);
+        const authoritySnapshot = createDragAuthority(columnsSnapshot, cards);
+        if (!authoritySnapshot) return;
+        const cardsSnapshot = authoritySnapshot.cards;
+        const columnMatch = columnsSnapshot.some((column) => column.id === id);
+        const card = cardsSnapshot.find((candidate) => candidate.id === id);
+        if (Number(columnMatch) + Number(Boolean(card)) !== 1) return;
+
+        const type: DragType = columnMatch ? "column" : "card";
+
+        dragTransactionRef.current = {
+          type,
+          activeId: id,
+          sourceColumnId: card?.columnId ?? null,
+          columns: columnsSnapshot,
+          cards: cardsSnapshot,
+          authority: authoritySnapshot.authority,
+          previewCards: cardsSnapshot,
+          overId: null,
+          blockReason: null,
+          stableExternalTarget: null,
+          lastAnnouncedTarget: null,
+        };
+        announcementOutcomeRef.current = null;
+        setPreviewCards(null);
 
         setActiveId(id);
         setActiveType(type);
         onKanbanDragStart?.(type, id);
       },
-      [isColumn, onKanbanDragStart],
+      [cards, columns, onKanbanDragStart],
     );
 
-    // Drag over handler (for moving cards between columns)
+    // Drag over is preview-only. External state and callbacks commit at drop.
     const handleDragOver = useCallback(
       (event: DragOverEvent) => {
-        const { active, over } = event;
-        if (!over) return;
-
-        const activeId = active.id as string;
-        const overId = over.id as string;
-
-        // Skip if dragging column (handled by dnd-kit sortable)
-        if (isColumn(activeId)) return;
-
-        const activeColumnId = findColumnByCardId(activeId);
-        const overColumnId = isColumn(overId)
-          ? overId
-          : findColumnByCardId(overId);
-
-        if (!activeColumnId || !overColumnId) return;
-
-        // Moving to different column
-        if (activeColumnId !== overColumnId) {
-          const activeCards = getColumnCards(activeColumnId);
-          const overCards = getColumnCards(overColumnId);
-
-          const activeIndex = activeCards.findIndex((c) => c.id === activeId);
-          const overIndex = isColumn(overId)
-            ? overCards.length
-            : overCards.findIndex((c) => c.id === overId);
-
-          // Check WIP limit
-          const overColumn = columns.find((c) => c.id === overColumnId);
-          if (overColumn?.limit && overCards.length >= overColumn.limit) {
-            return;
-          }
-
-          // Update cards
-          const newCards = cards.map((card) => {
-            if (card.id === activeId) {
-              return { ...card, columnId: overColumnId, order: overIndex };
-            }
-            return card;
-          });
-
-          // Reorder cards in target column
-          const reorderedCards = newCards.map((card) => {
-            if (card.columnId === overColumnId && card.id !== activeId) {
-              const currentOrder = card.order ?? 0;
-              if (currentOrder >= overIndex) {
-                return { ...card, order: currentOrder + 1 };
-              }
-            }
-            return card;
-          });
-
-          handleCardsChange(reorderedCards);
+        const transaction = dragTransactionRef.current;
+        const activeId = event.active.id;
+        const overId = event.over?.id;
+        if (
+          !transaction ||
+          transaction.type !== "card" ||
+          typeof activeId !== "string" ||
+          activeId !== transaction.activeId
+        ) {
+          return;
         }
+
+        if (typeof overId !== "string") {
+          transaction.blockReason = "invalid-target";
+          transaction.overId = null;
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+
+        if (
+          createDragAuthority(columns, cards)?.authority !==
+          transaction.authority
+        ) {
+          transaction.blockReason = "drift";
+          transaction.overId = overId;
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+
+        if (
+          overId === transaction.activeId &&
+          transaction.stableExternalTarget
+        ) {
+          transaction.blockReason = null;
+          transaction.overId = overId;
+          return;
+        }
+
+        const target = resolveCardDropTarget(transaction, overId);
+        if (!target) {
+          transaction.blockReason = "invalid-target";
+          transaction.overId = overId;
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+        transaction.overId = overId;
+
+        if (isWipBlocked(transaction, target)) {
+          transaction.blockReason = "wip-limit";
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+
+        transaction.blockReason = null;
+        if (target.columnId === transaction.sourceColumnId) {
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+
+        if (sameCardDropTarget(transaction.stableExternalTarget, target)) {
+          return;
+        }
+
+        const nextPreview = moveCardInSnapshot(transaction, target);
+        if (!nextPreview) {
+          transaction.blockReason = "invalid-target";
+          clearCardPreviewAuthority(transaction);
+          setPreviewCards(null);
+          return;
+        }
+        transaction.stableExternalTarget = target;
+        transaction.previewCards = nextPreview;
+        setPreviewCards(nextPreview);
       },
-      [
-        cards,
-        columns,
-        findColumnByCardId,
-        getColumnCards,
-        handleCardsChange,
-        isColumn,
-      ],
+      [cards, columns],
     );
 
     // Drag end handler
     const handleDragEnd = useCallback(
       (event: DragEndEvent) => {
-        const { active, over } = event;
-        const draggedId = activeId;
-        const draggedType = activeType;
-
-        setActiveId(null);
-        setActiveType(null);
-
-        if (draggedId && draggedType) {
-          onKanbanDragEnd?.(draggedType, draggedId);
+        const transaction = dragTransactionRef.current;
+        const activeId = event.active.id;
+        const overId = event.over?.id;
+        if (
+          !transaction ||
+          typeof activeId !== "string" ||
+          activeId !== transaction.activeId
+        ) {
+          finishDragLifecycle("Drag cancelled.");
+          return;
         }
-
-        if (!over) return;
-
-        const activeIdStr = active.id as string;
-        const overId = over.id as string;
-
-        if (activeIdStr === overId) return;
-
-        // Column drag
-        if (isColumn(activeIdStr) && isColumn(overId)) {
-          const oldIndex = columns.findIndex((c) => c.id === activeIdStr);
-          const newIndex = columns.findIndex((c) => c.id === overId);
-
-          if (oldIndex !== newIndex) {
-            const newColumns = arrayMove(columns, oldIndex, newIndex);
-            handleColumnsChange(newColumns);
-            onColumnMove?.({ columnId: activeIdStr, toIndex: newIndex });
-          }
+        if (
+          createDragAuthority(columns, cards)?.authority !==
+          transaction.authority
+        ) {
+          finishDragLifecycle("Drag cancelled because the board changed.");
+          return;
+        }
+        if (typeof overId !== "string") {
+          finishDragLifecycle("Drag cancelled without a drop target.");
           return;
         }
 
-        // Card drag within same column
-        const activeColumnId = findColumnByCardId(activeIdStr);
-        const overColumnId = isColumn(overId)
-          ? overId
-          : findColumnByCardId(overId);
-
-        if (!activeColumnId || !overColumnId) return;
-
-        if (activeColumnId === overColumnId) {
-          const columnCards = getColumnCards(activeColumnId);
-          const oldIndex = columnCards.findIndex((c) => c.id === activeIdStr);
-          const newIndex = isColumn(overId)
-            ? columnCards.length - 1
-            : columnCards.findIndex((c) => c.id === overId);
-
-          if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
-            const reorderedColumnCards = arrayMove(
-              columnCards,
-              oldIndex,
-              newIndex,
-            );
-
-            // Update order for all cards in this column
-            const newCards = cards.map((card) => {
-              if (card.columnId === activeColumnId) {
-                const newOrder = reorderedColumnCards.findIndex(
-                  (c) => c.id === card.id,
-                );
-                return { ...card, order: newOrder };
-              }
-              return card;
-            });
-
-            handleCardsChange(newCards);
-            onCardMove?.({
-              cardId: activeIdStr,
-              fromColumnId: activeColumnId,
-              toColumnId: overColumnId,
-              toIndex: newIndex,
-            });
+        if (transaction.type === "column") {
+          const oldIndex = transaction.columns.findIndex(
+            (column) => column.id === transaction.activeId,
+          );
+          const newIndex = transaction.columns.findIndex(
+            (column) => column.id === overId,
+          );
+          if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
+            finishDragLifecycle("Column drag cancelled.");
+            return;
           }
-        } else {
-          // Card moved to different column (already handled in dragOver)
-          onCardMove?.({
-            cardId: activeIdStr,
-            fromColumnId: activeColumnId,
-            toColumnId: overColumnId,
-            toIndex: 0,
+          const newColumns = arrayMove(
+            cloneColumns(transaction.columns),
+            oldIndex,
+            newIndex,
+          );
+          const columnMove = {
+            columnId: transaction.activeId,
+            toIndex: newIndex,
+          };
+          finishDragLifecycle("Column dropped.", () => {
+            handleColumnsChange(newColumns);
+            onColumnMove?.(columnMove);
           });
+          return;
         }
+
+        const target =
+          overId === transaction.activeId &&
+          transaction.stableExternalTarget !== null
+            ? transaction.stableExternalTarget
+            : resolveCardDropTarget(transaction, overId);
+        if (!target || isWipBlocked(transaction, target)) {
+          finishDragLifecycle(
+            target
+              ? "Move blocked by the target WIP limit."
+              : "Drag cancelled.",
+          );
+          return;
+        }
+        const newCards = moveCardInSnapshot(transaction, target);
+        const committedSnapshot = newCards
+          ? createDragAuthority(transaction.columns, newCards)
+          : null;
+        if (
+          !committedSnapshot ||
+          committedSnapshot.authority === transaction.authority
+        ) {
+          finishDragLifecycle("Card drag cancelled without a move.");
+          return;
+        }
+        const externalSnapshot = createDragAuthority(
+          transaction.columns,
+          committedSnapshot.cards,
+        );
+        if (
+          !externalSnapshot ||
+          externalSnapshot.authority !== committedSnapshot.authority
+        ) {
+          finishDragLifecycle("Card drag cancelled.");
+          return;
+        }
+        const movedCard = committedSnapshot.cards.find(
+          (card) => card.id === transaction.activeId,
+        );
+        const sourceColumnId = transaction.sourceColumnId;
+        if (!movedCard || sourceColumnId === null) {
+          finishDragLifecycle("Card drag cancelled.");
+          return;
+        }
+        const moveEvent = {
+          cardId: transaction.activeId,
+          fromColumnId: sourceColumnId,
+          toColumnId: movedCard.columnId,
+          toIndex: movedCard.order ?? 0,
+        };
+
+        finishDragLifecycle("Card dropped.", () => {
+          handleCardsChange(committedSnapshot.cards, externalSnapshot.cards);
+          onCardMove?.(moveEvent);
+        });
       },
       [
-        activeId,
-        activeType,
-        columns,
         cards,
-        findColumnByCardId,
-        getColumnCards,
+        columns,
+        finishDragLifecycle,
         handleColumnsChange,
         handleCardsChange,
-        isColumn,
         onCardMove,
         onColumnMove,
-        onKanbanDragEnd,
       ],
+    );
+
+    const handleDragCancel = useCallback(
+      (_event: DragCancelEvent) => {
+        finishDragLifecycle("Drag cancelled.");
+      },
+      [finishDragLifecycle],
+    );
+
+    const accessibility = useMemo(
+      () => ({
+        screenReaderInstructions: {
+          draggable: SCREEN_READER_INSTRUCTIONS,
+        },
+        announcements: {
+          onDragStart: ({ active }: Pick<DragStartEvent, "active">) => {
+            const transaction = dragTransactionRef.current;
+            const currentId = typeof active.id === "string" ? active.id : null;
+            const card = transaction?.cards.find(({ id }) => id === currentId);
+            const column = transaction?.columns.find(
+              ({ id }) => id === currentId,
+            );
+            const label = sanitizeAnnouncementLabel(
+              card?.title ?? column?.title,
+              transaction?.type === "column" ? "Column" : "Card",
+            );
+            return boundedAnnouncement(`Picked up ${label}.`);
+          },
+          onDragOver: ({ over }: Pick<DragOverEvent, "over">) => {
+            const transaction = dragTransactionRef.current;
+            const overId = over?.id;
+            if (!transaction || typeof overId !== "string") return undefined;
+            if (
+              overId === transaction.activeId &&
+              transaction.stableExternalTarget
+            ) {
+              return undefined;
+            }
+            if (transaction.lastAnnouncedTarget === overId) return undefined;
+            transaction.lastAnnouncedTarget = overId;
+            if (
+              transaction.blockReason === "wip-limit" &&
+              transaction.overId === overId
+            ) {
+              return boundedAnnouncement(
+                "Move blocked. The target column is at its WIP limit.",
+              );
+            }
+            const card = transaction.previewCards.find(
+              ({ id }) => id === overId,
+            );
+            const column = transaction.columns.find(({ id }) => id === overId);
+            const label = sanitizeAnnouncementLabel(
+              card?.title ?? column?.title,
+              "drop target",
+            );
+            return boundedAnnouncement(`Moving over ${label}.`);
+          },
+          onDragEnd: () => {
+            const outcome =
+              announcementOutcomeRef.current ?? "Drag finished without a move.";
+            announcementOutcomeRef.current = null;
+            return boundedAnnouncement(outcome);
+          },
+          onDragCancel: () => {
+            const outcome = announcementOutcomeRef.current ?? "Drag cancelled.";
+            announcementOutcomeRef.current = null;
+            return boundedAnnouncement(outcome);
+          },
+        },
+      }),
+      [],
     );
 
     // Active item for overlay
     const activeCard = useMemo(() => {
       if (!activeId || activeType !== "card") return null;
-      return cards.find((c) => c.id === activeId);
-    }, [activeId, activeType, cards]);
+      return displayedCards.find((c) => c.id === activeId);
+    }, [activeId, activeType, displayedCards]);
 
     const activeColumnData = useMemo(() => {
       if (!activeId || activeType !== "column") return null;
@@ -448,7 +1136,7 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
     return (
       <KanbanProvider
         columns={columns}
-        cards={cards}
+        cards={displayedCards}
         onColumnsChange={handleColumnsChange}
         onCardsChange={handleCardsChange}
         onCardMove={onCardMove}
@@ -471,9 +1159,11 @@ export const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          accessibility={accessibility}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           {/* Dimmed overlay when dragging column */}
           {showDragOverlay && isDragging && isDraggingColumn && (
