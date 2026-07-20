@@ -4,7 +4,7 @@ import dotAotVite from "../vite";
 // ---------------------------------------------------------------------------
 // Helper — call the transform hook on a fake file
 // ---------------------------------------------------------------------------
-function runTransform(
+function runTransformRaw(
   plugin: ReturnType<typeof dotAotVite>,
   code: string,
   id: string,
@@ -14,6 +14,18 @@ function runTransform(
     id: string,
   ) => { code: string; map: null } | null;
   return hook(code, id);
+}
+
+function runTransform(
+  plugin: ReturnType<typeof dotAotVite>,
+  code: string,
+  id: string,
+) {
+  return runTransformRaw(
+    plugin,
+    `import { dot } from "@hua-labs/dot";\n${code}`,
+    id,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -54,6 +66,17 @@ describe("dotAotVite — file extension filtering", () => {
       "/src/foo.tsx",
     );
     expect(result).not.toBeNull();
+  });
+
+  it("processes query-suffixed module ids by their pathname extension", () => {
+    const plugin = dotAotVite();
+    const result = runTransform(
+      plugin,
+      `const s = dot("p-4");`,
+      "/src/foo.ts?direct",
+    );
+
+    expect(result?.code).toContain('padding: "16px"');
   });
 
   it("processes .js files", () => {
@@ -126,6 +149,16 @@ describe("dotAotVite — exclude filtering", () => {
     );
     expect(result).not.toBeNull();
   });
+
+  it.each([
+    "/project/src/app.ts?source=node_modules",
+    "/project/src/app.ts#node_modules",
+  ])("does not treat query/hash metadata as an excluded pathname: %s", (id) => {
+    const plugin = dotAotVite();
+    const result = runTransform(plugin, `const s = dot('p-4');`, id);
+
+    expect(result?.code).toContain('padding: "16px"');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -169,7 +202,7 @@ describe("dotAotVite — custom options", () => {
     const plugin = dotAotVite({ functionNames: ["css"] });
     const resultCss = runTransform(
       plugin,
-      `const s = css('p-4');`,
+      `import { dot as css } from "@hua-labs/dot";\nconst s = css('p-4');`,
       "/src/foo.ts",
     );
     const resultDot = runTransform(
@@ -178,7 +211,7 @@ describe("dotAotVite — custom options", () => {
       "/src/foo.ts",
     );
     expect(resultCss).not.toBeNull();
-    // dot() not in functionNames → fast-path skips, returns null
+    // dot() is not an authorized configured binding, so extraction stays off.
     expect(resultDot).toBeNull();
   });
 
@@ -231,15 +264,138 @@ describe("dotAotVite — transform output", () => {
     expect(result!.code).toContain('margin: "8px"');
   });
 
-  it("skips files without the function name (fast path)", () => {
+  it("returns null for files without an authorized call", () => {
     const plugin = dotAotVite();
-    // No 'dot(' substring — should skip without calling transformSource
     const result = runTransform(
       plugin,
       `const x = style('p-4');`,
       "/src/foo.ts",
     );
     expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Binding and lexical authority
+// ---------------------------------------------------------------------------
+describe("dotAotVite — binding and lexical authority", () => {
+  it.each([
+    ["whitespace", `const s = dot ("p-4");`],
+    ["comment", `const s = dot /* keep */ ("p-4");`],
+    ["newline", `const s = dot\n("p-4");`],
+  ])("extracts parser-valid %s-separated calls", (_name, source) => {
+    const plugin = dotAotVite();
+    const result = runTransform(plugin, source, "/src/foo.ts");
+
+    expect(result?.code).toContain('padding: "16px"');
+  });
+
+  it("fails closed for an invalid configured default target", () => {
+    const plugin = dotAotVite({ target: "naitve" } as never);
+
+    expect(
+      runTransform(plugin, `const s = dot("p-4");`, "/src/foo.ts"),
+    ).toBeNull();
+  });
+
+  it("fails closed for an explicit null configured default target", () => {
+    const plugin = dotAotVite({ target: null } as never);
+
+    expect(
+      runTransform(plugin, `const s = dot("p-4");`, "/src/foo.ts"),
+    ).toBeNull();
+  });
+
+  it("extracts a direct HUA Dot binding", () => {
+    const plugin = dotAotVite();
+    const result = runTransformRaw(
+      plugin,
+      `import { dot } from "@hua-labs/dot";\nconst s = dot("p-4");`,
+      "/src/foo.ts",
+    );
+
+    expect(result?.code).toContain('padding: "16px"');
+  });
+
+  it("extracts a configured HUA Dot alias", () => {
+    const plugin = dotAotVite({ functionNames: ["css"] });
+    const result = runTransformRaw(
+      plugin,
+      `import { dot as css } from "@hua-labs/dot";\nconst s = css("p-4");`,
+      "/src/foo.ts",
+    );
+
+    expect(result?.code).toContain('padding: "16px"');
+  });
+
+  it("extracts a configured alias spelled with identifier escapes", () => {
+    const plugin = dotAotVite({ functionNames: ["css"] });
+    const result = runTransformRaw(
+      plugin,
+      String.raw`import { dot as c\u0073s } from "@hua-labs/dot";
+const s = c\u0073s("p-4");`,
+      "/src/foo.ts",
+    );
+
+    expect(result?.code).toContain('padding: "16px"');
+  });
+
+  it.each([
+    ["bare global", `const s = dot("p-4");`],
+    [
+      "foreign import",
+      `import { dot } from "other-lib";\nconst s = dot("p-4");`,
+    ],
+    [
+      "local function",
+      `function dot(value: string) { return value; }\nconst s = dot("p-4");`,
+    ],
+    [
+      "shadowed import",
+      `import { dot } from "@hua-labs/dot";\nfunction render(dot: (value: string) => unknown) { return dot("p-4"); }`,
+    ],
+  ])("leaves %s calls at runtime", (_name, source) => {
+    const plugin = dotAotVite();
+
+    expect(runTransformRaw(plugin, source, "/src/foo.ts")).toBeNull();
+  });
+
+  it.each([
+    ["multiline template content", 'const text = `\\ndot("p-4")\\n`;'],
+    ["regular expression content", `const matcher = /dot\\("p-4"\\)/;`],
+    ["JSX text content", `const view = <p>dot("p-4")</p>;`],
+    ["constructor call", `const value = new dot("p-4");`],
+  ])("does not rewrite %s", (_name, body) => {
+    const plugin = dotAotVite();
+    const source = `import { dot } from "@hua-labs/dot";\n${body}`;
+
+    expect(runTransformRaw(plugin, source, "/src/foo.tsx")).toBeNull();
+  });
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown option", `{ cache: true }`],
+    ["spread options", `{ ...options }`],
+  ])("leaves %s options for the runtime resolver", (_name, options) => {
+    const plugin = dotAotVite();
+    const result = runTransform(
+      plugin,
+      `const s = dot("p-4", ${options});`,
+      "/src/foo.ts",
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it.each([
+    `const s = dot("p-4",);`,
+    `const s = dot("p-4", { target: "native" },);`,
+  ])("extracts a safe trailing-comma call: %s", (source) => {
+    const plugin = dotAotVite();
+    const result = runTransform(plugin, source, "/src/foo.ts");
+
+    expect(result?.code).toContain("padding");
   });
 });
 

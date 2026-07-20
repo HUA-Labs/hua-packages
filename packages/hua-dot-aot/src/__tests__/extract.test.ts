@@ -2,10 +2,27 @@ import { describe, it, expect } from "vitest";
 import { dot } from "@hua-labs/dot";
 import type { DotTarget } from "@hua-labs/dot";
 import {
-  extractStaticCalls,
-  transformSource,
+  extractStaticCalls as extractStaticCallsRaw,
+  transformSource as transformSourceRaw,
   styleToObjectLiteral,
+  type ExtractOptions,
 } from "../extract";
+
+function authorizeSource(source: string, options?: ExtractOptions): string {
+  const names = options?.functionNames ?? ["dot"];
+  const specifiers = names
+    .map((name) => (name === "dot" ? "dot" : `dot as ${name}`))
+    .join(", ");
+  return `import { ${specifiers} } from "@hua-labs/dot";\n${source}`;
+}
+
+function extractStaticCalls(source: string, options?: ExtractOptions) {
+  return extractStaticCallsRaw(authorizeSource(source, options), options);
+}
+
+function transformSource(source: string, options?: ExtractOptions) {
+  return transformSourceRaw(authorizeSource(source, options), options);
+}
 
 type AotContractCase = {
   name: string;
@@ -144,6 +161,83 @@ describe("string/comment context detection", () => {
     const source = `// dot('p-4')\nconst x = 1;`;
     const result = transformSource(source);
     expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Binding and lexical authority — only the HUA Dot import may be compiled
+// ---------------------------------------------------------------------------
+describe("binding and lexical authority", () => {
+  it("extracts a direct named import from @hua-labs/dot", () => {
+    const source = `import { dot } from "@hua-labs/dot";\nconst style = dot("p-4");`;
+
+    expect(extractStaticCallsRaw(source)).toHaveLength(1);
+  });
+
+  it("extracts a configured alias only when it aliases the HUA Dot export", () => {
+    const source = `import { dot as css } from "@hua-labs/dot";\nconst style = css("p-4");`;
+
+    expect(
+      extractStaticCallsRaw(source, { functionNames: ["css"] }),
+    ).toHaveLength(1);
+  });
+
+  it.each([
+    ["bare global", `const style = dot("p-4");`],
+    [
+      "foreign named import",
+      `import { dot } from "other-lib";\nconst style = dot("p-4");`,
+    ],
+    [
+      "local function",
+      `function dot(value: string) { return value; }\nconst style = dot("p-4");`,
+    ],
+    [
+      "CommonJS lookalike",
+      `const { dot } = require("@hua-labs/dot");\nconst style = dot("p-4");`,
+    ],
+  ])("leaves %s calls byte-preserved", (_name, source) => {
+    expect(extractStaticCallsRaw(source)).toHaveLength(0);
+    expect(transformSourceRaw(source)).toBeNull();
+  });
+
+  it("fails closed for an imported name shadowed anywhere in the module", () => {
+    const source = [
+      `import { dot } from "@hua-labs/dot";`,
+      `const outer = dot("p-4");`,
+      `function nested(dot: (value: string) => unknown) {`,
+      `  return dot("m-2");`,
+      `}`,
+    ].join("\n");
+
+    expect(extractStaticCallsRaw(source)).toHaveLength(0);
+    expect(transformSourceRaw(source)).toBeNull();
+  });
+
+  it("keeps namespace access at runtime instead of guessing member authority", () => {
+    const source = `import * as Dot from "@hua-labs/dot";\nconst style = Dot.dot("p-4");`;
+
+    expect(extractStaticCallsRaw(source)).toHaveLength(0);
+    expect(transformSourceRaw(source)).toBeNull();
+  });
+
+  it.each([
+    ["multiline template content", 'const text = `\\ndot("p-4")\\n`;'],
+    ["regular expression content", `const matcher = /dot\\("p-4"\\)/;`],
+    ["JSX text content", `const view = <p>dot("p-4")</p>;`],
+    ["constructor call", `const value = new dot("p-4");`],
+  ])("does not rewrite %s", (_name, body) => {
+    const source = `import { dot } from "@hua-labs/dot";\n${body}`;
+
+    expect(extractStaticCallsRaw(source)).toHaveLength(0);
+    expect(transformSourceRaw(source)).toBeNull();
+  });
+
+  it("fails closed when the source cannot be parsed as a module", () => {
+    const source = `import { dot } from "@hua-labs/dot";\nconst = dot("p-4");`;
+
+    expect(extractStaticCallsRaw(source)).toHaveLength(0);
+    expect(transformSourceRaw(source)).toBeNull();
   });
 });
 
@@ -954,6 +1048,81 @@ describe("breakpoint option handling", () => {
     const source = `const style = dot('p-4', { target: 'web' });`;
     const calls = extractStaticCalls(source);
     expect(calls).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Static option admission — fail closed on shapes the compiler cannot prove
+// ---------------------------------------------------------------------------
+describe("static option admission", () => {
+  it("fails closed for an invalid configured default target", () => {
+    const options = { target: "naitve" } as never;
+    const source = `const style = dot("p-4");`;
+
+    expect(extractStaticCalls(source, options)).toHaveLength(0);
+    expect(transformSource(source, options)).toBeNull();
+  });
+
+  it("fails closed for an explicit null configured default target", () => {
+    const options = { target: null } as never;
+    const source = `const style = dot("p-4");`;
+
+    expect(extractStaticCalls(source, options)).toHaveLength(0);
+    expect(transformSource(source, options)).toBeNull();
+  });
+
+  it.each([
+    [`{}`, undefined],
+    [`{ target: "native" }`, { target: "native" }],
+    [`{ dark: true }`, { dark: true }],
+    [
+      `{ "target": "flutter", 'dark': false, }`,
+      { target: "flutter", dark: false },
+    ],
+  ])("extracts the bounded literal shape %s", (options, expected) => {
+    const calls = extractStaticCalls(`const style = dot("p-4", ${options});`);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].options).toEqual(expected);
+  });
+
+  it.each([
+    [`const style = dot("p-4",);`, undefined],
+    [`const style = dot("p-4", { target: "native" },);`, { target: "native" }],
+  ])(
+    "keeps a trailing call comma aligned with Babel: %s",
+    (source, expected) => {
+      const calls = extractStaticCalls(source);
+
+      expect(calls).toHaveLength(1);
+      expect(calls[0].options).toEqual(expected);
+    },
+  );
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown key", `{ target: "web", cache: true }`],
+    ["spread", `{ ...options }`],
+    ["computed key", `{ [key]: "native" }`],
+    ["nested value", `{ target: { value: "native" } }`],
+    ["duplicate key", `{ target: "web", target: "native" }`],
+    ["unsupported target", `{ target: "desktop" }`],
+    ["malformed supported value", `{ dark: }`],
+    ["breakpoint", `{ breakpoint: "md" }`],
+  ])("leaves %s at runtime", (_name, options) => {
+    const source = `const style = dot("p-4", ${options});`;
+
+    expect(extractStaticCalls(source)).toHaveLength(0);
+    expect(transformSource(source)).toBeNull();
+  });
+
+  it.each([
+    ["identifier options", `const style = dot("p-4", options);`],
+    ["extra argument", `const style = dot("p-4", { dark: true }, extra);`],
+  ])("leaves %s at runtime", (_name, source) => {
+    expect(extractStaticCalls(source)).toHaveLength(0);
+    expect(transformSource(source)).toBeNull();
   });
 });
 

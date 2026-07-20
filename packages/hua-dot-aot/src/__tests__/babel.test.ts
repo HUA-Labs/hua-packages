@@ -5,7 +5,7 @@ import dotAotBabel from "../babel";
 // ---------------------------------------------------------------------------
 // Helper — run babel transform with the dot-aot plugin
 // ---------------------------------------------------------------------------
-function transform(
+function transformRaw(
   code: string,
   pluginOptions?: Parameters<typeof dotAotBabel>[1],
 ): string | null | undefined {
@@ -16,6 +16,20 @@ function transform(
     babelrc: false,
   });
   return result?.code;
+}
+
+function transform(
+  code: string,
+  pluginOptions?: Parameters<typeof dotAotBabel>[1],
+): string | null | undefined {
+  const names = pluginOptions?.functionNames ?? ["dot"];
+  const specifiers = names
+    .map((name) => (name === "dot" ? "dot" : `dot as ${name}`))
+    .join(", ");
+  return transformRaw(
+    `import { ${specifiers} } from "@hua-labs/dot";\n${code}`,
+    pluginOptions,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -36,6 +50,24 @@ describe("dotAotBabel — plugin shape", () => {
 // Basic extraction
 // ---------------------------------------------------------------------------
 describe("dotAotBabel — basic extraction", () => {
+  it("fails closed for an invalid configured default target", () => {
+    const code = transform(`const s = dot("p-4");`, {
+      target: "naitve",
+    } as never);
+
+    expect(code).toContain('dot("p-4")');
+    expect(code).not.toContain("padding");
+  });
+
+  it("fails closed for an explicit null configured default target", () => {
+    const code = transform(`const s = dot("p-4");`, {
+      target: null,
+    } as never);
+
+    expect(code).toContain('dot("p-4")');
+    expect(code).not.toContain("padding");
+  });
+
   it("replaces dot() with static style object", () => {
     const code = transform(`const s = dot('p-4');`);
     expect(code).toBeDefined();
@@ -66,6 +98,61 @@ describe("dotAotBabel — basic extraction", () => {
     const code = transform(`const s = dot('p-4 m-2');`);
     expect(code).toContain("padding");
     expect(code).toContain("margin");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Binding authority
+// ---------------------------------------------------------------------------
+describe("dotAotBabel — binding authority", () => {
+  it("extracts the direct HUA Dot binding", () => {
+    const code = transformRaw(
+      `import { dot } from "@hua-labs/dot";\nconst style = dot("p-4");`,
+    );
+
+    expect(code).not.toContain('dot("p-4")');
+    expect(code).toContain("padding");
+  });
+
+  it("extracts a configured alias bound to the HUA Dot export", () => {
+    const code = transformRaw(
+      `import { dot as css } from "@hua-labs/dot";\nconst style = css("p-4");`,
+      { functionNames: ["css"] },
+    );
+
+    expect(code).not.toContain('css("p-4")');
+    expect(code).toContain("padding");
+  });
+
+  it.each([
+    ["bare global", `const style = dot("p-4");`],
+    [
+      "foreign import",
+      `import { dot } from "other-lib";\nconst style = dot("p-4");`,
+    ],
+    [
+      "local function",
+      `function dot(value) { return value; }\nconst style = dot("p-4");`,
+    ],
+    [
+      "lexically shadowed import",
+      [
+        `import { dot } from "@hua-labs/dot";`,
+        `function render(dot) { return dot("p-4"); }`,
+      ].join("\n"),
+    ],
+  ])("leaves the %s call at runtime", (_name, source) => {
+    const code = transformRaw(source);
+
+    expect(code).toContain('dot("p-4")');
+  });
+
+  it("keeps namespace member calls at runtime", () => {
+    const code = transformRaw(
+      `import * as Dot from "@hua-labs/dot";\nconst style = Dot.dot("p-4");`,
+    );
+
+    expect(code).toContain('Dot.dot("p-4")');
   });
 });
 
@@ -106,6 +193,53 @@ describe("dotAotBabel — options object argument", () => {
     );
     expect(code).toContain("dot(");
     expect(code).toContain("breakpoint");
+  });
+
+  it.each([
+    [`{}`, undefined],
+    [`{ target: "native" }`, "padding: 16"],
+    [`{ dark: true }`, 'padding: "16px"'],
+    [`{ "target": "flutter", 'dark': false }`, "padding"],
+  ])("extracts the bounded literal shape %s", (options, expected) => {
+    const code = transform(`const s = dot("p-4", ${options});`);
+
+    expect(code).not.toContain("dot(");
+    if (expected) expect(code).toContain(expected);
+  });
+
+  it.each([
+    `const s = dot("p-4",);`,
+    `const s = dot("p-4", { target: "native" },);`,
+  ])("extracts a safe call with a trailing comma: %s", (source) => {
+    const code = transform(source);
+
+    expect(code).not.toContain("dot(");
+    expect(code).toContain("padding");
+  });
+
+  it.each([
+    ["dynamic target", `{ target }`],
+    ["dynamic dark", `{ dark: enabled }`],
+    ["unknown key", `{ target: "web", cache: true }`],
+    ["spread", `{ ...options }`],
+    ["computed key", `{ [key]: "native" }`],
+    ["nested value", `{ target: { value: "native" } }`],
+    ["duplicate key", `{ target: "web", target: "native" }`],
+    ["unsupported target", `{ target: "desktop" }`],
+    ["object method", `{ target() { return "native"; } }`],
+  ])("leaves %s at runtime", (_name, options) => {
+    const code = transform(`const s = dot("p-4", ${options});`);
+
+    expect(code).toContain("dot(");
+  });
+
+  it.each([
+    ["identifier options", `const s = dot("p-4", options);`],
+    ["extra argument", `const s = dot("p-4", { dark: true }, extra);`],
+  ])("leaves %s at runtime", (_name, source) => {
+    const code = transform(source);
+
+    expect(code).toContain("dot(");
   });
 });
 

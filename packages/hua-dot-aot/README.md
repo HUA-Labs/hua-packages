@@ -1,6 +1,6 @@
 # @hua-labs/dot-aot
 
-Build-time static extraction for @hua-labs/dot. Replaces static dot() calls with pre-computed style objects at build time, eliminating runtime parsing overhead. Provides a Vite plugin and a Babel plugin (Metro, Next.js compatible). AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth.
+Build-time static extraction for @hua-labs/dot. Replaces authorized static dot() calls with pre-computed style objects while leaving ambiguous or dynamic calls at runtime. Provides a parser-backed Vite transform and a Babel plugin for explicit Babel pipelines such as Metro. AOT output follows the @hua-labs/dot resolver and AX catalog; this package does not define independent capability truth.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/dot-aot.svg)](https://www.npmjs.com/package/@hua-labs/dot-aot)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/dot-aot.svg)](https://www.npmjs.com/package/@hua-labs/dot-aot)

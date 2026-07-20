@@ -1,0 +1,245 @@
+{
+  "artifact": {
+    "files": [
+      {
+        "path": "package/CHANGELOG.md",
+        "sha256": "445c9b34b4db96f9e41ff6679b963c6a931c85075036b87dd3f8ab3cd236edd5",
+        "size": 1134
+      },
+      {
+        "path": "package/DETAILED_GUIDE.md",
+        "sha256": "ae013e6d0853d12a2fb9794a80b693b13d66c683b8491d81e2d99cd56adb0e49",
+        "size": 20954
+      },
+      {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "5c68cca189d065a81bf4319e38b86660ce772b706cbd21a53038bb6b38067be8",
+        "size": 1509
+      },
+      {
+        "path": "package/dist/babel.d.mts",
+        "sha256": "f270c4650044e6f1fd39c2b414cec0b30a2a617ca4a072f5ecc170ebb079dffe",
+        "size": 2235
+      },
+      {
+        "path": "package/dist/babel.mjs",
+        "sha256": "6171d1f437177306d97570847ef6613c093bc8817a6b48202c794007ae76d17e",
+        "size": 4303
+      },
+      {
+        "path": "package/dist/babel.mjs.map",
+        "sha256": "bec4b106dbd9df84f0f5cac077772fed790eb9e6b72dc5874885434b9e994a4e",
+        "size": 12346
+      },
+      {
+        "path": "package/dist/chunk-2WWALCKF.mjs",
+        "sha256": "0968ca7f515ac1533153d7ad024fa6efd6f42dee77950dcac1cde7f79648633d",
+        "size": 9697
+      },
+      {
+        "path": "package/dist/chunk-2WWALCKF.mjs.map",
+        "sha256": "c54b1b33c4b88867b5ef1bc968d56347064263c6d2ed7efcc7b13264e7ca77bf",
+        "size": 24844
+      },
+      {
+        "path": "package/dist/index.d.mts",
+        "sha256": "79408f6bb9582258edfcd28d042b88a640919b206fc52bbe1de6d56ee7c2dfc3",
+        "size": 2263
+      },
+      {
+        "path": "package/dist/index.mjs",
+        "sha256": "1840a988f34f99456774ce96004251ea4be1ee1048017354d4ae6decf31c4aba",
+        "size": 167
+      },
+      {
+        "path": "package/dist/index.mjs.map",
+        "sha256": "91a07f89ca9bd0abed1f757ba5bead46314472ba5008458065f0ffd225dcc30d",
+        "size": 70
+      },
+      {
+        "path": "package/dist/vite.d.mts",
+        "sha256": "58abaac59c8ac71125174333454c4414f6c003be82f49638b695637237dfda6f",
+        "size": 787
+      },
+      {
+        "path": "package/dist/vite.mjs",
+        "sha256": "b9352f608b86263d64e53f0eb843dc087b51a9a5853bacb58d34750bb02fa5a5",
+        "size": 1137
+      },
+      {
+        "path": "package/dist/vite.mjs.map",
+        "sha256": "6b0654aee0dcc91581487a6a5c6d6acaf31afe802ee93e2dba1bb947094dd2d1",
+        "size": 2998
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "2f71f73b449cc0909fc7cdec814f383ba546ea81a8a24d3fb74300e7c4ccd090",
+        "size": 1684
+      }
+    ],
+    "packageName": "@hua-labs/dot-aot",
+    "packageVersion": "0.1.3",
+    "packedManifestSha256": "2f71f73b449cc0909fc7cdec814f383ba546ea81a8a24d3fb74300e7c4ccd090",
+    "requiredTargets": [
+      "package/dist/babel.d.mts",
+      "package/dist/babel.mjs",
+      "package/dist/index.d.mts",
+      "package/dist/index.mjs",
+      "package/dist/vite.d.mts",
+      "package/dist/vite.mjs"
+    ],
+    "rosterDigest": "c106d2ae9c415706a734d4f78e22f36a90deafa799275440bcfa5638bb341579",
+    "sourceManifestSha256": "72df2974627dc7cc47bd8d250f553eed28728e1c4041ebc1d2a8d4dfc96610ab",
+    "tarballBytes": 23325,
+    "tarballSha256": "841e2b5c2c1a090a10c88ceaf3f0860a14eb236daef181552bfc468a970fb9a6"
+  },
+  "authorityKind": "platform-dot-aot-package-projection",
+  "mapDigest": "c5380b95eb184a80cac43eaa3f37b1cf555924e2efe1fe7ebe2ad263ea006523",
+  "packagePath": "packages/hua-dot-aot",
+  "publicBase": {
+    "commit": "fedf3ee4acd687be0fb85c16f8cd4e4a25eae4ea",
+    "packageTree": "ac3505b26893d82170e772243513df0b6e2ecfe3",
+    "tree": "c4f7f34b23c4d40561ef182d3d38de4bf3657093"
+  },
+  "rows": [
+    {
+      "disposition": "public-preserved",
+      "kind": "docs",
+      "outputSha256": "445c9b34b4db96f9e41ff6679b963c6a931c85075036b87dd3f8ab3cd236edd5",
+      "path": "packages/hua-dot-aot/CHANGELOG.md",
+      "publicBaseSha256": "445c9b34b4db96f9e41ff6679b963c6a931c85075036b87dd3f8ab3cd236edd5",
+      "sourceSha256": "0e36c77b15d0f6e8395bd2ace4141c2041bfbccf28df44915c86fc563e8f845f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "docs",
+      "outputSha256": "ae013e6d0853d12a2fb9794a80b693b13d66c683b8491d81e2d99cd56adb0e49",
+      "path": "packages/hua-dot-aot/DETAILED_GUIDE.md",
+      "publicBaseSha256": "fee6bf96c7b7a8f1381dc60c2a55924901aa233e19244001b757a3228a6b9bf7",
+      "sourceSha256": "ae013e6d0853d12a2fb9794a80b693b13d66c683b8491d81e2d99cd56adb0e49"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "path": "packages/hua-dot-aot/LICENSE",
+      "publicBaseSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+      "sourceSha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "docs",
+      "outputSha256": "5c68cca189d065a81bf4319e38b86660ce772b706cbd21a53038bb6b38067be8",
+      "path": "packages/hua-dot-aot/README.md",
+      "publicBaseSha256": "715797049271404ac6ed445ec569c9e97c615547621b5ad747485d0a916e9992",
+      "sourceSha256": "24f6ab8159d9d71f6e5fa50baebc491f7c6c2f79457642b0f6bdc9de2656beea"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "docs",
+      "outputSha256": "c3e953a702bbde5efe9de3146acc1697928448fdaaa15e41202336cb99f60df2",
+      "path": "packages/hua-dot-aot/doc.yaml",
+      "publicBaseSha256": "553ebf1dce9e11a0988ced1dce11826b8a89e616e9d552a502a87a369958b573",
+      "sourceSha256": "57f3e75e86c20faf16fd4c13ff80f5d90c30677b1e730e13a5e5e3a5853090ee"
+    },
+    {
+      "disposition": "derived-reviewed",
+      "kind": "manifest",
+      "outputSha256": "72df2974627dc7cc47bd8d250f553eed28728e1c4041ebc1d2a8d4dfc96610ab",
+      "path": "packages/hua-dot-aot/package.json",
+      "publicBaseSha256": "56911510cb40126ae9f37a95c0a69e455ee213d6b1a8784c22378834da1fa038",
+      "sourceSha256": "b531e1127cef95226c8920e8d96380555156f37140831f0e657b001e535a2099"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "d114eb80885338a25434ee69a677413c49ef862b92ea16d4d95cdc215add78dd",
+      "path": "packages/hua-dot-aot/src/__tests__/ax-boundary.test.ts",
+      "publicBaseSha256": "24220d49ca7cf1d9e32082f0fc2f8fb6e8dbcbe444107e11de6493202e2f4f05",
+      "sourceSha256": "d114eb80885338a25434ee69a677413c49ef862b92ea16d4d95cdc215add78dd"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "718eb3e30dc6d8770e688e968aff0229eda8537809cea4c4181d94db7101ed74",
+      "path": "packages/hua-dot-aot/src/__tests__/babel.test.ts",
+      "publicBaseSha256": "e8695950aa38f3d68c9e616a298bbfab4496a2dd38586807d768ec71420be434",
+      "sourceSha256": "718eb3e30dc6d8770e688e968aff0229eda8537809cea4c4181d94db7101ed74"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "060caadf555ab9176e522815c0891997711cdbf421ea19048c436faa0fd16db6",
+      "path": "packages/hua-dot-aot/src/__tests__/extract.test.ts",
+      "publicBaseSha256": "6934370b6fc1bbf5d1beedc7b9b5b7e0b93069999125bbfe31c147819c4e217f",
+      "sourceSha256": "060caadf555ab9176e522815c0891997711cdbf421ea19048c436faa0fd16db6"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "test",
+      "outputSha256": "2fee112f02091380cb817b5211e524c877a757583864b5877fe21af607e1e4cd",
+      "path": "packages/hua-dot-aot/src/__tests__/vite.test.ts",
+      "publicBaseSha256": "9726a7d314e7e6750964aed6941a8c26de8021d0259d00cedd6155440fca31d1",
+      "sourceSha256": "2fee112f02091380cb817b5211e524c877a757583864b5877fe21af607e1e4cd"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "90af8e89350b3c8250863aeb23f71c946714f72662a1326e698d1eca712ca76e",
+      "path": "packages/hua-dot-aot/src/babel.ts",
+      "publicBaseSha256": "1bd34433f49be887bd1a0729fdf7159f5ee0f1cc16c4a24d4dc02eea6f144070",
+      "sourceSha256": "90af8e89350b3c8250863aeb23f71c946714f72662a1326e698d1eca712ca76e"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "42e74dea86b31ee8c9df6583b543ab432898edaae1ceed8c21b53c169c1efb07",
+      "path": "packages/hua-dot-aot/src/extract.ts",
+      "publicBaseSha256": "f2410530fa0a908eeb5232951c5193a09050fe701fadd2f0742d2eaeb5b195f9",
+      "sourceSha256": "42e74dea86b31ee8c9df6583b543ab432898edaae1ceed8c21b53c169c1efb07"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "3de8cc5b2aeb3fa2d96b2f6a1feaf06f39f0e1f8e7d62d5b3d399d271fefb26f",
+      "path": "packages/hua-dot-aot/src/index.ts",
+      "publicBaseSha256": "3de8cc5b2aeb3fa2d96b2f6a1feaf06f39f0e1f8e7d62d5b3d399d271fefb26f",
+      "sourceSha256": "3de8cc5b2aeb3fa2d96b2f6a1feaf06f39f0e1f8e7d62d5b3d399d271fefb26f"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "88a70ec9387a3c4a8aad5faa40143f78577573c6eda5c0aeef79f5c5d2fb186d",
+      "path": "packages/hua-dot-aot/src/vite.ts",
+      "publicBaseSha256": "d0f8b4a20ffb99c8d0212df0debfb346d77f6338ae20a01b9a8523b612ee19f7",
+      "sourceSha256": "88a70ec9387a3c4a8aad5faa40143f78577573c6eda5c0aeef79f5c5d2fb186d"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "production",
+      "outputSha256": "9950991f5f0556a7377215a73e079e24ddca854d3bff78f8c3ad22fbbf25b9f7",
+      "path": "packages/hua-dot-aot/tsconfig.json",
+      "publicBaseSha256": "9950991f5f0556a7377215a73e079e24ddca854d3bff78f8c3ad22fbbf25b9f7",
+      "sourceSha256": "9950991f5f0556a7377215a73e079e24ddca854d3bff78f8c3ad22fbbf25b9f7"
+    },
+    {
+      "disposition": "platform-exact",
+      "kind": "build",
+      "outputSha256": "a71804ffca8189b2bf149a8b91acbee8bcee7ac75d0b5a0d6ae8bb1b9722bfb4",
+      "path": "packages/hua-dot-aot/tsup.config.ts",
+      "publicBaseSha256": "a71804ffca8189b2bf149a8b91acbee8bcee7ac75d0b5a0d6ae8bb1b9722bfb4",
+      "sourceSha256": "a71804ffca8189b2bf149a8b91acbee8bcee7ac75d0b5a0d6ae8bb1b9722bfb4"
+    }
+  ],
+  "schema": "hua-dot-aot-source-authority.v1",
+  "sourceAuthority": {
+    "commit": "72d311fa84c596397f338cd06b9bfc541448af61",
+    "packageTree": "f66caa572cdaa1c9d7bb2d1e56154c30b28798e4",
+    "tree": "516c1135a218413e7f7725f38379beca721594e9"
+  }
+}
