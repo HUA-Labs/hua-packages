@@ -65,10 +65,11 @@ function writePackage(root, name, options = {}) {
     join(packageDir, "package.json"),
     `${JSON.stringify(
       {
-        name: `@hua-labs/${name.replace(/^hua-/, "")}`,
+        name: options.fullName ?? `@hua-labs/${name.replace(/^hua-/, "")}`,
         version: "1.2.3",
         description: `${name} package`,
         files,
+        ...(options.exports === undefined ? {} : { exports: options.exports }),
         ...(options.nodeEngine === undefined
           ? {}
           : { engines: { node: options.nodeEngine } }),
@@ -91,8 +92,15 @@ function writePackage(root, name, options = {}) {
     : "";
   writeFileSync(
     join(packageDir, "doc.yaml"),
-    `overview: ${JSON.stringify(`${name} overview`)}\nfeatures:\n  - ${JSON.stringify("Feature")}\nquickStart: ${JSON.stringify("example();")}\n${guideYaml}${options.docExtra ?? ""}`,
+    options.docContent ??
+      `overview: ${JSON.stringify(`${name} overview`)}\nfeatures:\n  - ${JSON.stringify("Feature")}\nquickStart: ${JSON.stringify("example();")}\n${guideYaml}${options.docExtra ?? ""}`,
   );
+  if (options.publicProfile !== undefined) {
+    writeFileSync(
+      join(packageDir, "public-core-profile.json"),
+      `${JSON.stringify(options.publicProfile, null, 2)}\n`,
+    );
+  }
 }
 
 function runWriter(root, args = []) {
@@ -186,6 +194,142 @@ test("projects the exact package Node engine with the platform fallback", () => 
   assert.match(output(root, "hua-node-20").ai, /node: ">=20\.16\.0"/);
   assert.match(output(root, "hua-node-22").ai, /node: ">=22\.0\.0"/);
   assert.match(output(root, "hua-node-fallback").ai, /node: ">=20\.0\.0"/);
+});
+
+test("projects the exact UI public-core profile and filters deferred API authority", async (t) => {
+  const sourceProfile = JSON.parse(
+    readFileSync(
+      join(REPO_ROOT, "packages", "hua-ui", "public-core-profile.json"),
+      "utf8",
+    ),
+  );
+  const retainedEntries = sourceProfile.entries.filter(
+    (entry) => entry.disposition === "retained",
+  );
+  const deferredEntries = sourceProfile.entries.filter(
+    (entry) => entry.disposition === "deferred",
+  );
+  const canonicalImport = (subpath) =>
+    subpath === "."
+      ? sourceProfile.package
+      : `${sourceProfile.package}${subpath.slice(1)}`;
+  const utf8Sorted = (values) =>
+    [...values].sort((left, right) =>
+      Buffer.from(left).compare(Buffer.from(right)),
+    );
+  const retained = utf8Sorted(
+    retainedEntries.map((entry) => canonicalImport(entry.subpath)),
+  );
+  const deferred = utf8Sorted(
+    deferredEntries.map((entry) => canonicalImport(entry.subpath)),
+  );
+  const features = [
+    `Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ${retained.join(", ")}.`,
+    `Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ${deferred.join(", ")}.`,
+    "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven.",
+  ];
+  const docContent = `overview: "Profile projection"\nfeatures:\n${features
+    .map((feature) => `  - ${JSON.stringify(feature)}`)
+    .join(
+      "\n",
+    )}\nquickStart: "example();"\ndetailedGuide:\n  path: "./DETAILED_GUIDE.md"\n  distribution: "packed"\n  description: "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"\napiFilter: notes-only\napiNotes:\n  retainedRoot:\n    description: "Retained root API"\n    kind: "function"\n  deferredAx:\n    description: "Deferred AX API"\n    kind: "function"\n    importFrom: "@hua-labs/ui/ax"\n`;
+  const exports = Object.fromEntries(
+    retainedEntries.map((entry) => [entry.subpath, entry.manifestTarget]),
+  );
+
+  function writeFixture(root, profile = sourceProfile) {
+    writePackage(root, "hua-profile", {
+      fullName: "@hua-labs/ui",
+      nodeEngine: ">=20.16.0",
+      files: ["dist", "DETAILED_GUIDE.md"],
+      guide: {
+        path: "./DETAILED_GUIDE.md",
+        distribution: "packed",
+        description:
+          "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary",
+      },
+      exports,
+      publicProfile: profile,
+      docContent,
+    });
+    for (const entry of profile.entries) {
+      if (entry.kind !== "javascript") continue;
+      const sourcePath = join(
+        root,
+        "packages",
+        "hua-profile",
+        entry.tsup.source,
+      );
+      mkdirSync(dirname(sourcePath), { recursive: true });
+      writeFileSync(sourcePath, "export {};\n");
+    }
+  }
+
+  const root = makeRoot();
+  writeFixture(root);
+  const result = runWriter(root, ["--package", "hua-profile"]);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const generated = output(root, "hua-profile");
+  assert.match(generated.readme, /Retained root API/u);
+  assert.doesNotMatch(generated.readme, /Deferred AX API/u);
+  assert.doesNotMatch(generated.ai, /name: "deferredAx"/u);
+  assert.match(generated.ai, /public_core_profile:/u);
+  assert.match(generated.ai, /candidate_status: "source-ready"/u);
+  assert.match(generated.ai, /release_selection: null/u);
+  assert.match(generated.ai, /entry_count: 37/u);
+  assert.match(generated.ai, /retained_count: 27/u);
+  assert.match(generated.ai, /deferred_count: 10/u);
+  assert.match(generated.ai, /javascript_count: 30/u);
+  assert.match(generated.ai, /asset_count: 7/u);
+
+  await t.test("missing profile", () => {
+    const missingRoot = makeRoot();
+    writePackage(missingRoot, "hua-profile", {
+      fullName: "@hua-labs/ui",
+      nodeEngine: ">=20.16.0",
+      files: ["dist", "DETAILED_GUIDE.md"],
+      guide: { distribution: "packed" },
+      exports,
+      docContent,
+    });
+    const missing = runWriter(missingRoot, ["--package", "hua-profile"]);
+    assert.notEqual(missing.status, 0);
+    assert.match(
+      `${missing.stdout}\n${missing.stderr}`,
+      /requires public-core-profile/u,
+    );
+  });
+
+  const invalidCases = [
+    ["release selection", (profile) => (profile.releaseSelection = {})],
+    [
+      "padded engine",
+      (profile) => (profile.installedEngineRange = " >=20.16.0"),
+    ],
+    [
+      "duplicate subpath",
+      (profile) => (profile.entries[1].subpath = profile.entries[0].subpath),
+    ],
+    ["path escape", (profile) => (profile.entries[1].subpath = "./../escape")],
+    [
+      "reclassified entry",
+      (profile) => (profile.entries[0].disposition = "deferred"),
+    ],
+    [
+      "stale tsup output",
+      (profile) => (profile.entries[0].tsup.output = "dist/foreign.mjs"),
+    ],
+  ];
+  for (const [name, mutate] of invalidCases) {
+    await t.test(name, () => {
+      const invalidRoot = makeRoot();
+      const profile = structuredClone(sourceProfile);
+      mutate(profile);
+      writeFixture(invalidRoot, profile);
+      const invalid = runWriter(invalidRoot, ["--package", "hua-profile"]);
+      assert.notEqual(invalid.status, 0, name);
+    });
+  }
 });
 
 test("writer derives both guide claims from the effective npm tarball roster", async (t) => {
@@ -393,6 +537,90 @@ test("fails closed on malformed guide and package-root authority", async (t) => 
   );
 });
 
+test("current UI docs derive the exact retained profile without copyable deferred routes", () => {
+  const packageRoot = join(REPO_ROOT, "packages", "hua-ui");
+  const manifest = JSON.parse(
+    readFileSync(join(packageRoot, "package.json"), "utf8"),
+  );
+  const profileBytes = readFileSync(
+    join(packageRoot, "public-core-profile.json"),
+  );
+  const profile = JSON.parse(profileBytes.toString("utf8"));
+  const doc = readFileSync(join(packageRoot, "doc.yaml"), "utf8");
+  const guide = readFileSync(join(packageRoot, "DETAILED_GUIDE.md"), "utf8");
+  const readme = readFileSync(join(packageRoot, "README.md"), "utf8");
+  const ai = readFileSync(join(REPO_ROOT, "ai-docs", "ui.ai.yaml"), "utf8");
+  const canonicalImport = (subpath) =>
+    subpath === "." ? manifest.name : `${manifest.name}${subpath.slice(1)}`;
+  const classified = { retained: [], deferred: [] };
+  for (const entry of profile.entries) {
+    classified[entry.disposition].push(canonicalImport(entry.subpath));
+  }
+  for (const values of Object.values(classified)) {
+    values.sort((left, right) => Buffer.from(left).compare(Buffer.from(right)));
+  }
+  const retainedFeature = `Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ${classified.retained.join(", ")}.`;
+  const deferredFeature = `Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ${classified.deferred.join(", ")}.`;
+
+  assert.equal(profile.schema, "hua-ui-public-core-profile.v1");
+  assert.equal(profile.package, manifest.name);
+  assert.equal(profile.releaseSelection, null);
+  assert.equal(profile.entries.length, 37);
+  assert.equal(classified.retained.length, 27);
+  assert.equal(classified.deferred.length, 10);
+  assert.equal(
+    profile.entries.filter((entry) => entry.kind === "javascript").length,
+    30,
+  );
+  assert.equal(
+    profile.entries.filter((entry) => entry.kind === "asset").length,
+    7,
+  );
+  assert.equal(manifest.engines.node, ">=20.16.0");
+  assert.equal(manifest.version, "2.3.0");
+  assert.ok(manifest.files.includes("DETAILED_GUIDE.md"));
+  assert.ok(!manifest.files.includes("public-core-profile.json"));
+  assert.deepEqual(
+    Object.keys(manifest.exports).sort(),
+    profile.entries
+      .filter((entry) => entry.disposition === "retained")
+      .map((entry) => entry.subpath)
+      .sort(),
+  );
+  for (const generated of [doc, readme, ai]) {
+    assert.ok(generated.includes(retainedFeature));
+    assert.ok(generated.includes(deferredFeature));
+    assert.match(generated, /Source-ready is not release-ready/u);
+  }
+  assert.match(
+    ai,
+    new RegExp(
+      `digest: "${createHash("sha256").update(profileBytes).digest("hex")}"`,
+      "u",
+    ),
+  );
+  for (const deferredImport of classified.deferred) {
+    for (const match of guide.matchAll(
+      /```(?:tsx?|jsx?|bash|sh)\n([\s\S]*?)```/gu,
+    )) {
+      assert.ok(
+        !match[1].includes(deferredImport),
+        `copyable guide exposes ${deferredImport}`,
+      );
+    }
+  }
+  for (const deferredApi of [
+    "getUiAxCatalog",
+    "getDefaultThemeFoundationPreview",
+    "validateSDUIPageSchemaV1",
+    "getDefaultSDUIManifest",
+  ]) {
+    assert.doesNotMatch(readme, new RegExp("\\| `" + deferredApi + "`", "u"));
+    assert.doesNotMatch(ai, new RegExp(`name: "${deferredApi}"`, "u"));
+  }
+  assert.doesNotMatch(guide, /<IconProvider set="lucide">/u);
+});
+
 test("current public package outputs remain byte-identical under validate", () => {
   assert.ok(lstatSync(join(REPO_ROOT, "ai-docs")).isDirectory());
   const result = spawnSync(TSX, ["scripts/generate-docs.ts", "--validate"], {
@@ -406,7 +634,7 @@ test("current public package outputs remain byte-identical under validate", () =
 test("writer, AX adapter, and README template bytes are review-locked", () => {
   const expected = {
     "scripts/generate-docs.ts":
-      "c4a5e24268a69aec4727460861f0697e88d2544900cfc210c59901a7c40c961a",
+      "914f6624aebdf3e8bb6d31aac6b55b535f2f2f4b2b58398132e4ddda77db4b01",
     "scripts/package-ax.mjs":
       "c8b07a3291e4733eba9c9689932586749333dc33e5f0ee3bc1ecfa69f954bcd6",
     "scripts/templates/ai-yaml.hbs":

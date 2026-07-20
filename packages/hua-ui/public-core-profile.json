@@ -1,0 +1,513 @@
+{
+  "schema": "hua-ui-public-core-profile.v1",
+  "package": "@hua-labs/ui",
+  "installedEngineRange": ">=20.16.0",
+  "futureMajorEngineStop": ">=22.3.0",
+  "releaseSelection": null,
+  "entries": [
+    {
+      "subpath": ".",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "react-native": {
+          "types": "./dist/native/index.d.ts",
+          "import": "./dist/native.mjs",
+          "default": "./dist/native.mjs"
+        },
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.mjs",
+        "default": "./dist/index.mjs"
+      },
+      "tsup": {
+        "entry": "index",
+        "source": "src/index.ts",
+        "output": "dist/index.mjs"
+      }
+    },
+    {
+      "subpath": "./native",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/native/index.d.ts",
+        "import": "./dist/native.mjs",
+        "default": "./dist/native.mjs"
+      },
+      "tsup": {
+        "entry": "native",
+        "source": "src/native/index.ts",
+        "output": "dist/native.mjs"
+      }
+    },
+    {
+      "subpath": "./theme",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/theme.d.ts",
+        "import": "./dist/theme.mjs",
+        "default": "./dist/theme.mjs"
+      },
+      "tsup": {
+        "entry": "theme",
+        "source": "src/theme.ts",
+        "output": "dist/theme.mjs"
+      }
+    },
+    {
+      "subpath": "./advanced",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/advanced.d.ts",
+        "import": "./dist/advanced.mjs",
+        "default": "./dist/advanced.mjs"
+      },
+      "tsup": {
+        "entry": "advanced",
+        "source": "src/advanced.ts",
+        "output": "dist/advanced.mjs"
+      }
+    },
+    {
+      "subpath": "./advanced/dashboard",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/advanced/dashboard.d.ts",
+        "import": "./dist/advanced-dashboard.mjs",
+        "default": "./dist/advanced-dashboard.mjs"
+      },
+      "tsup": {
+        "entry": "advanced-dashboard",
+        "source": "src/advanced/dashboard.ts",
+        "output": "dist/advanced-dashboard.mjs"
+      }
+    },
+    {
+      "subpath": "./advanced/motion",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/advanced/motion.d.ts",
+        "import": "./dist/advanced-motion.mjs",
+        "default": "./dist/advanced-motion.mjs"
+      },
+      "tsup": {
+        "entry": "advanced-motion",
+        "source": "src/advanced/motion.ts",
+        "output": "dist/advanced-motion.mjs"
+      }
+    },
+    {
+      "subpath": "./advanced/emotion",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/components/advanced/emotion/index.d.ts",
+        "import": "./dist/advanced-emotion.mjs",
+        "default": "./dist/advanced-emotion.mjs"
+      },
+      "tsup": {
+        "entry": "advanced-emotion",
+        "source": "src/components/advanced/emotion/index.ts",
+        "output": "dist/advanced-emotion.mjs"
+      }
+    },
+    {
+      "subpath": "./form",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/form.d.ts",
+        "import": "./dist/form.mjs",
+        "default": "./dist/form.mjs"
+      },
+      "tsup": {
+        "entry": "form",
+        "source": "src/form.ts",
+        "output": "dist/form.mjs"
+      }
+    },
+    {
+      "subpath": "./navigation",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/navigation.d.ts",
+        "import": "./dist/navigation.mjs",
+        "default": "./dist/navigation.mjs"
+      },
+      "tsup": {
+        "entry": "navigation",
+        "source": "src/navigation.ts",
+        "output": "dist/navigation.mjs"
+      }
+    },
+    {
+      "subpath": "./feedback",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/feedback.d.ts",
+        "import": "./dist/feedback.mjs",
+        "default": "./dist/feedback.mjs"
+      },
+      "tsup": {
+        "entry": "feedback",
+        "source": "src/feedback.ts",
+        "output": "dist/feedback.mjs"
+      }
+    },
+    {
+      "subpath": "./overlay",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/overlay.d.ts",
+        "import": "./dist/overlay.mjs",
+        "default": "./dist/overlay.mjs"
+      },
+      "tsup": {
+        "entry": "overlay",
+        "source": "src/overlay.ts",
+        "output": "dist/overlay.mjs"
+      }
+    },
+    {
+      "subpath": "./data",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/data.d.ts",
+        "import": "./dist/data.mjs",
+        "default": "./dist/data.mjs"
+      },
+      "tsup": {
+        "entry": "data",
+        "source": "src/data.ts",
+        "output": "dist/data.mjs"
+      }
+    },
+    {
+      "subpath": "./interactive",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/interactive.d.ts",
+        "import": "./dist/interactive.mjs",
+        "default": "./dist/interactive.mjs"
+      },
+      "tsup": {
+        "entry": "interactive",
+        "source": "src/interactive.ts",
+        "output": "dist/interactive.mjs"
+      }
+    },
+    {
+      "subpath": "./interactive/kanban",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/interactive/kanban.d.ts",
+        "import": "./dist/interactive-kanban.mjs",
+        "default": "./dist/interactive-kanban.mjs"
+      },
+      "tsup": {
+        "entry": "interactive-kanban",
+        "source": "src/interactive/kanban.ts",
+        "output": "dist/interactive-kanban.mjs"
+      }
+    },
+    {
+      "subpath": "./sdui",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/sdui/index.d.ts",
+        "import": "./dist/sdui.mjs",
+        "default": "./dist/sdui.mjs"
+      },
+      "tsup": {
+        "entry": "sdui",
+        "source": "src/sdui/index.ts",
+        "output": "dist/sdui.mjs"
+      }
+    },
+    {
+      "subpath": "./landing",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/landing/index.d.ts",
+        "import": "./dist/landing.mjs",
+        "default": "./dist/landing.mjs"
+      },
+      "tsup": {
+        "entry": "landing",
+        "source": "src/landing/index.ts",
+        "output": "dist/landing.mjs"
+      }
+    },
+    {
+      "subpath": "./icons",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./src/components/icons/index.ts",
+        "import": "./dist/icons.mjs",
+        "default": "./dist/icons.mjs"
+      },
+      "tsup": {
+        "entry": "icons",
+        "source": "src/components/icons/index.ts",
+        "output": "dist/icons.mjs"
+      }
+    },
+    {
+      "subpath": "./icons-bold",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./src/components/icons-bold/index.ts",
+        "import": "./dist/icons-bold.mjs",
+        "default": "./dist/icons-bold.mjs"
+      },
+      "tsup": {
+        "entry": "icons-bold",
+        "source": "src/components/icons-bold/index.ts",
+        "output": "dist/icons-bold.mjs"
+      }
+    },
+    {
+      "subpath": "./iconsax",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/iconsax.d.ts",
+        "import": "./dist/iconsax.mjs",
+        "default": "./dist/iconsax.mjs"
+      },
+      "tsup": {
+        "entry": "iconsax",
+        "source": "src/iconsax.ts",
+        "output": "dist/iconsax.mjs"
+      }
+    },
+    {
+      "subpath": "./iconsax-extended",
+      "disposition": "retained",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/iconsax-extended.d.ts",
+        "import": "./dist/iconsax-extended.mjs",
+        "default": "./dist/iconsax-extended.mjs"
+      },
+      "tsup": {
+        "entry": "iconsax-extended",
+        "source": "src/iconsax-extended.ts",
+        "output": "dist/iconsax-extended.mjs"
+      }
+    },
+    {
+      "subpath": "./styles/base.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/base.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/toast.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/toast.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/codeblock.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/codeblock.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/recommended-theme.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/recommended-theme.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/utilities.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/utilities.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/landing.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/landing.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./styles/prose.css",
+      "disposition": "retained",
+      "kind": "asset",
+      "manifestTarget": "./src/styles/prose.css",
+      "tsup": null
+    },
+    {
+      "subpath": "./ax",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/ax.d.ts",
+        "import": "./dist/ax.mjs",
+        "default": "./dist/ax.mjs"
+      },
+      "tsup": {
+        "entry": "ax",
+        "source": "src/ax.ts",
+        "output": "dist/ax.mjs"
+      }
+    },
+    {
+      "subpath": "./theme/foundation",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/theme/foundation.d.ts",
+        "import": "./dist/theme-foundation.mjs",
+        "default": "./dist/theme-foundation.mjs"
+      },
+      "tsup": {
+        "entry": "theme-foundation",
+        "source": "src/theme/foundation.ts",
+        "output": "dist/theme-foundation.mjs"
+      }
+    },
+    {
+      "subpath": "./primitives",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/primitives.d.ts",
+        "import": "./dist/primitives.mjs",
+        "default": "./dist/primitives.mjs"
+      },
+      "tsup": {
+        "entry": "primitives",
+        "source": "src/primitives.ts",
+        "output": "dist/primitives.mjs"
+      }
+    },
+    {
+      "subpath": "./layout",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/layout.d.ts",
+        "import": "./dist/layout.mjs",
+        "default": "./dist/layout.mjs"
+      },
+      "tsup": {
+        "entry": "layout",
+        "source": "src/layout.ts",
+        "output": "dist/layout.mjs"
+      }
+    },
+    {
+      "subpath": "./utils",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/utils.d.ts",
+        "import": "./dist/utils.mjs",
+        "default": "./dist/utils.mjs"
+      },
+      "tsup": {
+        "entry": "utils",
+        "source": "src/utils.ts",
+        "output": "dist/utils.mjs"
+      }
+    },
+    {
+      "subpath": "./motion",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/motion.d.ts",
+        "import": "./dist/motion.mjs",
+        "default": "./dist/motion.mjs"
+      },
+      "tsup": {
+        "entry": "motion",
+        "source": "src/motion.ts",
+        "output": "dist/motion.mjs"
+      }
+    },
+    {
+      "subpath": "./sdui/validation",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/sdui/validation.d.ts",
+        "import": "./dist/sdui-validation.mjs",
+        "default": "./dist/sdui-validation.mjs"
+      },
+      "tsup": {
+        "entry": "sdui-validation",
+        "source": "src/sdui/validation.ts",
+        "output": "dist/sdui-validation.mjs"
+      }
+    },
+    {
+      "subpath": "./sdui/motion-core-validation",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/sdui/motion-core-validation.d.ts",
+        "import": "./dist/sdui-motion-core-validation.mjs",
+        "default": "./dist/sdui-motion-core-validation.mjs"
+      },
+      "tsup": {
+        "entry": "sdui-motion-core-validation",
+        "source": "src/sdui/motion-core-validation.ts",
+        "output": "dist/sdui-motion-core-validation.mjs"
+      }
+    },
+    {
+      "subpath": "./sdui/manifest",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/sdui/manifest.d.ts",
+        "import": "./dist/sdui-manifest.mjs",
+        "default": "./dist/sdui-manifest.mjs"
+      },
+      "tsup": {
+        "entry": "sdui-manifest",
+        "source": "src/sdui/manifest.ts",
+        "output": "dist/sdui-manifest.mjs"
+      }
+    },
+    {
+      "subpath": "./lucide",
+      "disposition": "deferred",
+      "kind": "javascript",
+      "manifestTarget": {
+        "types": "./dist/lucide.d.ts",
+        "import": "./dist/lucide.mjs",
+        "default": "./dist/lucide.mjs"
+      },
+      "tsup": {
+        "entry": "lucide",
+        "source": "src/lucide.ts",
+        "output": "dist/lucide.mjs"
+      }
+    }
+  ]
+}

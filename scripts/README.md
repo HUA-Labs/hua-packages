@@ -6,10 +6,10 @@ monorepo state.
 
 ## Documentation
 
-| Script                        | Command                       | Purpose                                                                           |
-| ----------------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
-| `generate-docs.ts`            | `pnpm generate:docs`          | Generate package `README.md` files and `ai-docs/*.ai.yaml` files from `doc.yaml`. |
-| `generate-docs.ts --validate` | `pnpm generate:docs:validate` | Check generated package docs for drift.                                           |
+| Script                        | Command                       | Purpose                                                                                                                                              |
+| ----------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `generate-docs.ts`            | `pnpm generate:docs`          | Generate package `README.md` files and `ai-docs/*.ai.yaml` files from `doc.yaml`; UI output is filtered through its non-shipped public-core profile. |
+| `generate-docs.ts --validate` | `pnpm generate:docs:validate` | Check generated package docs and profile-derived UI output for drift.                                                                                |
 
 ## Package Checks
 
@@ -22,22 +22,22 @@ monorepo state.
 
 ## Release Helpers
 
-| Script                          | Purpose                                                                                                               |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `check-ui-source-authority.mjs` | Validate the opaque platform/public HUA UI path map and fail closed on unmapped or disposition-breaking source drift. |
-| `check-pack-artifacts.js`       | Inspect packed `.tgz` artifacts for missing type entries, `workspace:` specs, and unintended source/test payload.     |
-| `check-publish-allowlist.js`    | Validate the versioned platform-policy projection against every workspace manifest.                                   |
-| `safe-release.mjs preflight`    | Classify plan state while admitting only bounded same-version reviewed-public drift for an empty snapshot.            |
-| `safe-release.mjs authority`    | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.       |
-| `safe-release.mjs refresh`      | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                    |
-| `safe-release.mjs version`      | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                       |
-| `safe-release.mjs check`        | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.         |
-| `safe-release.mjs pack`         | Build the deterministic workspace-prerequisite closure, then pack, inspect, and hash only the exact planned packages. |
-| `safe-release.mjs claim`        | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.         |
-| `safe-release.mjs publish`      | Reverify, resume, publish, and install-check claimed tarballs in dependency-first order.                              |
-| `check-npm-provenance.mjs`      | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                     |
-| `prepare-publish.js`            | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.             |
-| `restore-workspace.js`          | Restore `workspace:` dependencies after manual publish preparation.                                                   |
+| Script                          | Purpose                                                                                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check-ui-source-authority.mjs` | Validate the opaque platform/public HUA UI path map and fail closed on unmapped or disposition-breaking source drift.                                    |
+| `check-pack-artifacts.js`       | Inspect packed `.tgz` artifacts for missing type/runtime entries, `workspace:` specs, unintended source/test payload, and exact package authority gates. |
+| `check-publish-allowlist.js`    | Validate the versioned platform-policy projection against every workspace manifest.                                                                      |
+| `safe-release.mjs preflight`    | Classify plan state while admitting only bounded same-version reviewed-public drift for an empty snapshot.                                               |
+| `safe-release.mjs authority`    | Fail closed unless current GitHub policy and any claim/closure transition match the reviewed-boundary contract.                                          |
+| `safe-release.mjs refresh`      | Rebind a verified empty snapshot to reviewed current manifests without creating release authority.                                                       |
+| `safe-release.mjs version`      | Validate a nonempty Changesets selection, version it, and write the durable exact release plan.                                                          |
+| `safe-release.mjs check`        | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.                                            |
+| `safe-release.mjs pack`         | Build the deterministic workspace-prerequisite closure, then pack, inspect, and hash only the exact planned packages.                                    |
+| `safe-release.mjs claim`        | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.                                            |
+| `safe-release.mjs publish`      | Reverify, resume, publish, and install-check claimed tarballs in dependency-first order.                                                                 |
+| `check-npm-provenance.mjs`      | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                                                        |
+| `prepare-publish.js`            | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.                                                |
+| `restore-workspace.js`          | Restore `workspace:` dependencies after manual publish preparation.                                                                                      |
 
 ## Safe release boundary
 
@@ -103,6 +103,24 @@ The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it
 does not select a version, Changeset, npm package, credential, or publication.
+
+`packages/hua-ui/public-core-profile.json` is the non-shipped compiler/source
+authority for the public UI core candidate. It partitions all 37 platform
+package entries into exactly 27 retained and 10 deferred entries (30 JavaScript
+and 7 assets), requires `releaseSelection: null`, and binds the installed Node
+floor to `>=20.16.0`. The documentation writer requires this profile for UI,
+derives the README and AI retained/deferred rosters from it, and removes API
+notes whose import route is deferred. The generated output describes only
+source readiness; it cannot establish final tarball, DTS, installed-consumer,
+version, release-plan, npm, publication, or deployment authority.
+
+For an `@hua-labs/ui` tarball, `check-pack-artifacts.js` composes the existing
+Dot, AOT, LSP, MCP, and UI source gates, then revalidates the packed manifest
+against the workspace/profile contract. Every retained runtime, CSS, and DTS
+target must exist; every deferred target, the profile itself, tests, and other
+unreviewed payload must be absent; and the shipped detailed guide must be
+present. The checker validates evidence only and never creates release
+selection or publication authority.
 
 `config/publish-allowlist.json` is a checked projection of the exact HUA
 platform release-intent authority. It records policy, not npm visibility.

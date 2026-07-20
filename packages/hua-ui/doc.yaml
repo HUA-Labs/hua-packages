@@ -1,12 +1,15 @@
-overview: "Accessible, TypeScript-first component library for React applications. Provides 70+ production-ready components with modular entry points for optimal bundle size, dark mode support, and cross-platform styling via the dot style engine."
+overview: "Platform workspace authority for all 37 package entries in the accessible, TypeScript-first React component library. The public 2.4 core candidate is a separate source-ready projection with exactly 27 retained entries and 10 explicitly deferred entries."
 
 features:
   - "70+ components — Buttons, forms, tables, modals, overlays, and more"
   - "Modular entry points — Import only what you need for optimal bundle size"
-  - "Accessible — ARIA attributes, keyboard navigation, WCAG compliant"
+  - "Accessibility foundations — component-specific ARIA and keyboard contracts; browser and physical assistive-technology evidence remain separate"
   - "Dark mode — Built-in dark mode support"
   - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
-  - "Tree-shakeable — Side-effect free (except CSS)"
+  - "Modular ESM entries — CSS assets and provider-registration entries declare their side effects explicitly"
+  - "Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: @hua-labs/ui, @hua-labs/ui/advanced, @hua-labs/ui/advanced/dashboard, @hua-labs/ui/advanced/emotion, @hua-labs/ui/advanced/motion, @hua-labs/ui/data, @hua-labs/ui/feedback, @hua-labs/ui/form, @hua-labs/ui/icons, @hua-labs/ui/icons-bold, @hua-labs/ui/iconsax, @hua-labs/ui/iconsax-extended, @hua-labs/ui/interactive, @hua-labs/ui/interactive/kanban, @hua-labs/ui/landing, @hua-labs/ui/native, @hua-labs/ui/navigation, @hua-labs/ui/overlay, @hua-labs/ui/sdui, @hua-labs/ui/styles/base.css, @hua-labs/ui/styles/codeblock.css, @hua-labs/ui/styles/landing.css, @hua-labs/ui/styles/prose.css, @hua-labs/ui/styles/recommended-theme.css, @hua-labs/ui/styles/toast.css, @hua-labs/ui/styles/utilities.css, @hua-labs/ui/theme."
+  - "Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: @hua-labs/ui/ax, @hua-labs/ui/layout, @hua-labs/ui/lucide, @hua-labs/ui/motion, @hua-labs/ui/primitives, @hua-labs/ui/sdui/manifest, @hua-labs/ui/sdui/motion-core-validation, @hua-labs/ui/sdui/validation, @hua-labs/ui/theme/foundation, @hua-labs/ui/utils."
+  - "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven."
 
 quickStart: |
   import { Button, Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
@@ -26,22 +29,14 @@ quickStart: |
     );
   }
 
-related:
-  - "hua"
+detailedGuide:
+  path: "./DETAILED_GUIDE.md"
+  distribution: "packed"
+  description: "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"
 
-subpathExports:
-  - path: "form"
-    description: "Form components (Input, Select, DatePicker, Upload, etc.)"
-  - path: "icons"
-    description: "Icon components"
-  - path: "chart"
-    description: "Chart components"
-  - path: "data-display"
-    description: "Data display components (Table, Timeline, etc.)"
-  - path: "overlay"
-    description: "Overlay components (Modal, Drawer, Popover, etc.)"
-  - path: "feedback"
-    description: "Feedback components (Toast, Alert, etc.)"
+related:
+  - "dot"
+  - "motion-core"
 
 apiFilter: notes-only
 
@@ -72,7 +67,7 @@ apiNotes:
     description: "Styled anchor with router integration"
     kind: "component"
   Icon:
-    description: "Universal icon component (Lucide, Phosphor, custom)"
+    description: "Semantic icon component backed by the executable catalog; Phosphor is the default complete fallback, Lucide is a first-class optional alternative, and Iconsax is an opt-in product-style alternative"
     kind: "component"
   Avatar:
     description: "User avatar with image fallback"
@@ -106,10 +101,16 @@ apiNotes:
 
   # Overlay
   Modal:
-    description: "Dialog overlay with backdrop and focus trap"
+    description: "Dialog overlay with backdrop; package docs do not claim browser focus containment or assistive-technology conformance without separate evidence"
+    kind: "component"
+  BottomSheet:
+    description: "Bottom overlay with role=dialog and consumer-owned accessible naming; does not claim aria-modal, focus containment/restoration, or background isolation"
+    kind: "component"
+  Drawer:
+    description: "Directional overlay with role=dialog and consumer-owned accessible naming; does not claim aria-modal, focus containment/restoration, or background isolation"
     kind: "component"
   Tooltip:
-    description: "Hover tooltip with positioning"
+    description: "ReactNode-compatible tooltip: one renderable element owns direct hover/focus/ref and visible-lifetime aria-describedby, while legacy text or grouped children use the existing wrapper and require consumer-provided focusability for keyboard exposure; SDUI still admits one non-empty string and owns one button trigger; browser and physical assistive-technology behavior remains unproven"
     kind: "component"
 
   # Feedback
@@ -117,13 +118,16 @@ apiNotes:
     description: "Inline alert with success/warning/error/info variants"
     kind: "component"
   ToastProvider:
-    description: "Toast notification provider"
+    description: "Toast provider with status/polite semantics for info and success, and alert/assertive semantics for warning and error; physical announcement behavior remains unproven"
     kind: "component"
   useToast:
     description: "Imperative toast API — toast.success(), toast.error()"
     kind: "hook"
   LoadingSpinner:
     description: "Animated loading indicator"
+    kind: "component"
+  Textarea:
+    description: "Multiline input with Booleanish aria-invalid preservation; error state forces aria-invalid=true and invalid styling"
     kind: "component"
   Progress:
     description: "Progress bar with percentage"
@@ -142,6 +146,32 @@ apiNotes:
   useTheme:
     description: "Theme context hook — { theme, setTheme }"
     kind: "hook"
+  getDefaultThemeFoundationPreview:
+    description: "Return the server-safe preview theme foundation metadata without importing ThemeProvider or renderer code"
+    kind: "function"
+    importFrom: "@hua-labs/ui/theme/foundation"
+  getThemeFoundationCssVars:
+    description: "Return light or dark preview CSS variable maps for current semantic theme tokens"
+    kind: "function"
+    importFrom: "@hua-labs/ui/theme/foundation"
+  stringifyThemeFoundationCssVars:
+    description: "Serialize a preview theme foundation CSS variable map under a selector"
+    kind: "function"
+    importFrom: "@hua-labs/ui/theme/foundation"
+  getThemeFoundationDotConfigSeed:
+    description: "Return a preview @hua-labs/dot config seed for semantic CSS variable color tokens"
+    kind: "function"
+    importFrom: "@hua-labs/ui/theme/foundation"
+  UIThemeFoundationPreview:
+    description: "Server-safe preview type for theme foundation metadata, presets, CSS vars, and dot config seed"
+    kind: "type"
+    importFrom: "@hua-labs/ui/theme/foundation"
+
+  # Package AX
+  getUiAxCatalog:
+    description: "Return the frozen server-safe catalog derived from the UI package export map and semantic public-subpath manifest"
+    kind: "function"
+    importFrom: "@hua-labs/ui/ax"
 
   # Layout (additional)
   Section:
@@ -159,14 +189,18 @@ apiNotes:
 
   # Primitives (cross-platform)
   Box:
-    description: "Base block primitive (renders as <div> on web, View on native via .native.tsx)"
+    description: "Base block primitive: div on web and View on React Native; native dot styles compose before the full consumer StyleProp"
     kind: "component"
   Text:
-    description: "Base text primitive (renders as <span> on web, Text on native via .native.tsx)"
+    description: "Base text primitive: span on web and Text on React Native; native dot line clamps map to numberOfLines and explicit props win"
     kind: "component"
   Pressable:
-    description: "Interactive primitive with hover/active feedback and WCAG 2.1 AA touch targets (renders as <button> on web). Defaults: hover opacity 0.85, active scale 0.98, minHeight/minWidth 44px. Pass `disableMinTouch` to opt out of touch targets."
+    description: "Interactive primitive for Web and React Native; Web keeps a removable 44px minimum below sm and natural sizing at sm and above while composing consumer events, refs, styles, and accessibility state"
     kind: "component"
+  KanbanBoard:
+    description: "Web Kanban route with optional dnd-kit peers, mouse/touch/keyboard sensors, detached canonical metadata snapshots, preview-only hover, one-drop transaction commits, WIP fail-closed behavior, terminal-safe click activation, and bounded sanitized announcements; browser, touch-device, live-region speech, and physical assistive-technology evidence remain separate"
+    kind: "component"
+    importFrom: "@hua-labs/ui/interactive/kanban"
 
   # Utilities
   cn:
@@ -235,6 +269,38 @@ apiNotes:
   useComponentMotion:
     description: "Resolve the merged motion config for a specific component name"
     kind: "hook"
+  validateSDUIPageSchemaV1:
+    description: "Validate a published SDUI V1 page envelope, including the additive schema 1.1.0 motion slot when supplied with the motion-core projection catalog"
+    kind: "function"
+    importFrom: "@hua-labs/ui/sdui/validation"
+  validateSDUIPageSchemaV1WithMotionCore:
+    description: "Validate a published SDUI V1 page envelope using the package-owned @hua-labs/motion-core projection catalog without executing renderer or animation runtime code"
+    kind: "function"
+    importFrom: "@hua-labs/ui/sdui/motion-core-validation"
+  getDefaultSDUIManifest:
+    description: "Return the current default SDUI component/event/style manifest without importing or executing the renderer"
+    kind: "function"
+    importFrom: "@hua-labs/ui/sdui/manifest"
+  explainSDUITree:
+    description: "Explain a canonical SDUI V1 tree against the default manifest and dotExplain target diagnostics without changing renderer behavior"
+    kind: "function"
+    importFrom: "@hua-labs/ui/sdui/manifest"
+  SDUIManifestPreview:
+    description: "Server-safe preview manifest for default SDUI component allowlist, style slots, and renderer-mapped event boundaries"
+    kind: "type"
+    importFrom: "@hua-labs/ui/sdui/manifest"
+  SDUITreeExplainResult:
+    description: "Tree-level SDUI authoring diagnostics result with component, event, style token, and dotExplain target caveat evidence"
+    kind: "type"
+    importFrom: "@hua-labs/ui/sdui/manifest"
+  SDUIMotionIntent:
+    description: "Declarative SDUI motion slot payload backed by @hua-labs/motion-core intent metadata; not a renderer hook or executable animation"
+    kind: "type"
+    importFrom: "@hua-labs/ui/sdui"
+  SDUI_MOTION_SCHEMA_VERSION:
+    description: "Minimum SDUI schema version that may publish the additive motion slot"
+    kind: "variable"
+    importFrom: "@hua-labs/ui/sdui/validation"
   HUA_SPRING_EASING:
     description: "CSS cubic-bezier string for the HUA brand spring easing"
     kind: "variable"
@@ -266,16 +332,16 @@ apiNotes:
 
   # Micro motion system
   useMicroMotion:
-    description: "Hook that returns CSS class strings for micro-interaction motion states"
+    description: "Hook returning motion state, inline style, event handlers, and a Tailwind-compatible GPU class"
     kind: "hook"
   getMicroMotionClasses:
-    description: "Pure function that resolves micro-motion class strings from a config without a hook"
+    description: "Generate Tailwind utility classes from a MicroMotionPreset and hover, active, and focus options"
     kind: "function"
   EASING_FUNCTIONS:
     description: "Map of named CSS cubic-bezier easing strings used by micro motion"
     kind: "variable"
   DURATIONS:
-    description: "Map of semantic duration tokens (fast, normal, slow, etc.) in milliseconds"
+    description: "Map of subtle, soft, springy, bouncy, and snappy duration tokens in milliseconds"
     kind: "variable"
   COMPONENT_MOTION_DEFAULTS:
     description: "Default micro-motion configs keyed by component name"
@@ -283,16 +349,16 @@ apiNotes:
 
   # Icon utilities
   iconNames:
-    description: "Complete list of all icon name strings available in the project"
+    description: "Frozen exact-name inventory derived from the executable icon catalog"
     kind: "variable"
   iconProviderMapping:
-    description: "Map from icon name to its provider (lucide, phosphor, custom, etc.)"
+    description: "Catalog-derived provider bindings for Phosphor, Lucide, and Iconsax in the full platform workspace; public-candidate availability follows the retained profile"
     kind: "variable"
   isValidIconName:
-    description: "Type-guard that checks whether a string is a valid icon name"
+    description: "Exact-membership type guard for canonical icon IDs and aliases; it does not normalize arbitrary strings"
     kind: "function"
   getIconNameForProvider:
-    description: "Resolve the provider-specific icon identifier for a given icon name"
+    description: "Resolve a verified semantic icon name to its explicit provider binding"
     kind: "function"
   ICON_ALIASES:
     description: "Map of alias strings to canonical icon names"
@@ -304,7 +370,7 @@ apiNotes:
     description: "Return the list of all registered icon alias strings"
     kind: "function"
   registerLucideResolver:
-    description: "Register the Lucide icon resolver so the Icon component can render Lucide icons"
+    description: "Low-level resolver hook used by the platform @hua-labs/ui/lucide side-effect entry, which is deferred from the public core candidate"
     kind: "function"
 
   # Advanced hooks
@@ -326,3 +392,24 @@ apiNotes:
   resolveDot:
     description: "Resolve a dot-style string to a CSSProperties object at runtime"
     kind: "function"
+
+sections:
+  - title: "Kanban drag transaction evidence"
+    content: |
+      `@hua-labs/ui/interactive/kanban` is a Web route backed by the existing optional
+      `@dnd-kit/core`, `@dnd-kit/sortable`, and `@dnd-kit/utilities` peers. Mouse,
+      delayed-touch, and sortable-keyboard sensors feed a one-snapshot transaction:
+      hover is preview-only, one valid drop commits, and cancel, missing targets,
+      controlled drift, or WIP rejection remain callback-free.
+
+      Card metadata is admitted through bounded own-data descriptor traversal. A
+      transparent Proxy may run bounded reflection traps, but only a detached ordinary
+      plain-data snapshot and its canonical bytes can become transaction authority or
+      output. Throwing/revoked views fail closed and time-varying views cancel as drift;
+      this is transaction integrity, not a same-realm hostile-code sandbox. Every drag
+      terminal preserves the next independent click-only card activation.
+
+      Keyboard instructions and drag announcements are bounded and sanitized. Unit,
+      type/build, deterministic SSR placeholder, and packed peer-isolation evidence do
+      not prove physical touch behavior, browser live-region speech, or assistive-
+      technology output.
