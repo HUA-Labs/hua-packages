@@ -8,7 +8,7 @@ package:
   description: "MCP server for the dot style engine"
   license: "MIT"
 
-overview: "MCP (Model Context Protocol) server for the dot style engine — enables AI assistants to resolve, explain, complete, and validate dot utility strings."
+overview: "MCP (Model Context Protocol) server for the dot style engine — enables AI assistants to resolve, explain, complete, validate, and produce canonical Flutter recipe wire data from dot utility strings."
 
 exports:
   main:
@@ -20,6 +20,9 @@ exports:
       - name: "dot_explain"
         type: "function"
         description: "Resolve + return capability report showing dropped/approximated properties for the target platform."
+      - name: "dot_flutter_wire"
+        type: "function"
+        description: "Produce the canonical Flutter recipe wire string. Params: input, dark?, breakpoint?. Flutter is fixed; target selectors and other unknown members are rejected."
       - name: "dot_complete"
         type: "function"
         description: "Get autocomplete suggestions for a partial token. Params: partial (string), limit? (number, default 20)."
@@ -33,14 +36,25 @@ exports:
 features:
   - "dot_resolve — convert utility strings to style objects (web CSSProperties, RN StyleSheet, Flutter recipe)"
   - "dot_explain — resolve + capability report (dropped/approximated properties per target)"
+  - "dot_flutter_wire — produce the canonical versioned Flutter recipe wire bytes owned by @hua-labs/dot/flutter"
   - "dot_complete — autocomplete suggestions with category labels (prefix + substring matching)"
+  - "dot_complete authority — package-local bounded completion catalog, not the resolver or token SSOT"
   - "dot_capabilities — query the package-owned AX capability catalog without resolving styles"
   - "dot_validate — check utility strings for unrecognized tokens"
   - "Cross-platform support — web, native (React Native), and flutter targets"
+  - "MCP error boundary — SDK or schema validation can fail before a registered handler; handler error text is not universal"
 
 related_packages:
   - "@hua-labs/dot"
   - "@hua-labs/dot-lsp"
 
 compatibility:
-  node: ">=20.0.0"
+  node: ">=20.16.0"
+
+documentation:
+  detailedGuide:
+    state: "shipped"
+    path: "./DETAILED_GUIDE.md"
+    distribution: "packed"
+    description: "Tool contracts, Flutter wire delegation, completion boundaries, and MCP error handling"
+    link: "./DETAILED_GUIDE.md"

@@ -12,6 +12,7 @@ MCP server for the [@hua-labs/dot](https://www.npmjs.com/package/@hua-labs/dot) 
 4. [Tool Reference](#tool-reference)
    - [dot_resolve](#dot_resolve)
    - [dot_explain](#dot_explain)
+   - [dot_flutter_wire](#dot_flutter_wire)
    - [dot_complete](#dot_complete)
    - [dot_capabilities](#dot_capabilities)
    - [dot_validate](#dot_validate)
@@ -35,12 +36,13 @@ The server communicates exclusively over **stdio transport**. It reads newline-d
 - The host process (Claude Desktop, VS Code, etc.) spawns the server as a child process.
 - Lifecycle is tied to the host: the server exits when the host closes the pipe.
 
-### 5 Tools Overview
+### 6 Tools Overview
 
 | Tool               | Purpose                                                                     |
 | ------------------ | --------------------------------------------------------------------------- |
 | `dot_resolve`      | Resolve utility strings into style objects for a target platform            |
 | `dot_explain`      | Capability report showing what works, what is dropped, what is approximated |
+| `dot_flutter_wire` | Produce the canonical versioned Flutter recipe wire JSON                    |
 | `dot_complete`     | Completion suggestions for partial utility tokens                           |
 | `dot_capabilities` | Read-only query over the package-owned AX capability catalog                |
 | `dot_validate`     | Validate tokens — check that each resolves to at least one CSS property     |
@@ -67,7 +69,10 @@ dot-mcp process
 AI Assistant
 ```
 
-The `content[0].text` field of every response is a JSON string. Clients must parse it to access the result data.
+Successful registered handlers in this package return result data through a
+text content item, normally as JSON. SDK or schema validation can fail before a
+registered handler runs, so clients must also handle the MCP SDK's protocol
+error envelope instead of assuming every response reached package code.
 
 ---
 
@@ -93,7 +98,7 @@ Use this in MCP client config when you prefer not to install globally or want to
 
 The installed binary is `dot-mcp` (set by the `bin` field in `package.json`). When referencing the command in MCP client configuration, use `dot-mcp` for a global install or use `npx` with `args: ["@hua-labs/dot-mcp"]` for the npx variant.
 
-**Requirements:** Node.js >= 20.0.0
+**Requirements:** Node.js >= 20.16.0
 
 ---
 
@@ -108,10 +113,13 @@ Each tool is a named operation with a JSON Schema-defined parameter set. The MCP
 `@hua-labs/dot-mcp` is a thin protocol adapter over `@hua-labs/dot`. It:
 
 1. Receives a tool call with parameters (e.g., `input`, `target`, `dark`, `breakpoint`).
-2. Calls the appropriate dot engine function (`dot()`, `dotExplain()`, completion index, validation logic).
+2. Calls the appropriate dot engine function (`dot()`, `dotExplain()`, or validation logic), delegates Flutter wire bytes to `@hua-labs/dot/flutter`, or reads the package-local completion catalog.
 3. Serializes the result to a JSON string and returns it inside the MCP `content` array.
 
-No configuration of the dot engine is required. The engine's built-in token registry and platform adapters are used directly.
+No configuration of the dot engine is required. Resolution and capability tools
+use the engine's source authorities directly. `dot_complete` is different: it
+uses a package-local bounded completion catalog for suggestions, not the
+resolver or token SSOT.
 
 ### Target Platforms
 
@@ -249,9 +257,62 @@ Input:
 
 ---
 
+### dot_flutter_wire
+
+Produce the exact versioned Flutter recipe wire string owned by
+`@hua-labs/dot/flutter`. The tool is pre-bound to Flutter and does not accept a
+target selector. The input object is strict: `target` and every other unknown
+member fail MCP input validation rather than being stripped or ignored.
+
+**Parameters:**
+
+| Name         | Type                                    | Required | Description                                                     |
+| ------------ | --------------------------------------- | -------- | --------------------------------------------------------------- |
+| `input`      | `string`                                | Yes      | Space-separated dot utility string, e.g. `"p-4 cursor-pointer"` |
+| `dark`       | `boolean`                               | No       | Apply dark mode styles                                          |
+| `breakpoint` | `"sm" \| "md" \| "lg" \| "xl" \| "2xl"` | No       | Active breakpoint for responsive styles                         |
+
+**Response Contract:**
+
+On success, `content[0].text` is byte-for-byte equal to:
+
+```ts
+serializeFlutterRecipeWire(
+  createFlutterRecipeWire(input, { dark, breakpoint }),
+);
+```
+
+The executable schema, version, recipe, and metadata contract remains owned by
+the public `@hua-labs/dot/flutter` helpers. This MCP guide intentionally does
+not maintain a second field inventory.
+
+Input:
+
+```json
+{
+  "input": "p-4 cursor-pointer",
+  "dark": false,
+  "breakpoint": "md"
+}
+```
+
+The response text is canonical compact JSON recipe data. It preserves the
+core producer's supported recipe output and dropped/capability evidence, but
+it is not a Dart runtime, Flutter widget, renderer, device-parity test, or
+proof that a Dart consumer used the recipe.
+
+Failures return `isError: true` with a bounded error message.
+
+---
+
 ### dot_complete
 
 Get completion suggestions for a partial dot utility token.
+
+The suggestions come from a package-local bounded completion catalog. That
+catalog is intentionally not the resolver or token SSOT, so completion output
+must not be used as proof that every resolvable token is listed or that every
+listed example is supported on every target.
 
 **Parameters:**
 
@@ -540,7 +601,7 @@ Any MCP client that supports stdio transport can run `dot-mcp`. Configure the cl
 
 ### Chaining Tools
 
-The five tools are designed to be used together in workflows. Parse `content[0].text` as JSON after each call to access the result before passing it to the next tool.
+The six tools are designed to be used together in workflows. Parse `content[0].text` as JSON after each call to access the result before passing it to the next tool.
 
 ### Cross-Platform Workflow: capabilities → validate → resolve → explain
 
@@ -603,17 +664,23 @@ Discover available tokens in a category to replace dropped properties.
 
 - Verify `dot-mcp` is on your PATH: run `dot-mcp` in a terminal. If the command is not found, either install globally (`npm install -g @hua-labs/dot-mcp`) or switch to the `npx` config variant.
 - Check the MCP client logs. stdio transport errors (broken pipe, spawn failure) appear there, not in the terminal.
-- Ensure Node.js >= 20.0.0 is installed: `node --version`.
+- Ensure Node.js >= 20.16.0 is installed: `node --version`.
 
 ### Empty Responses or `{}`
 
-- Confirm `content[0].text` is being parsed as JSON. The response wrapper is always `{ content: [{ type: "text", text: "<JSON string>" }] }` — the actual data is the string value of `text`, not the outer object.
+- For a successful registered handler, parse the tool's documented text content shape. SDK/schema failures can use a protocol-level error envelope before package code runs.
 - For `dot_resolve` with a `native` or `flutter` target, properties that are not supported on that platform are silently dropped. Use `dot_explain` to see what was omitted.
 - For `dot_complete` with an empty `partial`, the response is limited to one representative token per category (up to `limit`). Provide a non-empty prefix to get targeted suggestions.
 
 ### Error Handling
 
-When a tool call fails, the response has `isError: true` and `content[0].text` starts with `"Error: "`:
+SDK or schema validation can fail before a registered handler runs. Those
+protocol-level failures are owned by the MCP SDK. Handler-owned failures use
+the bounded error shape implemented by that tool; some currently return
+`isError: true` with an `Error: ` text item, but that prefix is not a universal
+SDK or package guarantee.
+
+One current handler-owned shape is:
 
 ```json
 {
