@@ -1557,6 +1557,128 @@ test("credential-free preflight admits only bounded empty manifest drift before 
   }
 });
 
+test("empty-plan refresh admits exact public no-publish manifest drift without creating release authority", () => {
+  const fixture = makeFixture();
+  try {
+    mutateJson(
+      join(fixture.root, "packages/hua-dot/package.json"),
+      (manifest) => {
+        manifest.description = "Reviewed public projection drift";
+      },
+    );
+
+    assertCode(() => loadReleaseState(fixture.root), "plan-workspace-drift");
+    const preflight = runPreflight({ root: fixture.root });
+    assert.equal(preflight.plan.status, "empty");
+    assert.deepEqual(preflight.plan.releases, []);
+    assert.equal(preflight.authorityRequired, false);
+    assert.equal(preflight.refreshRequired, true);
+    assert.equal(
+      preflight.policy.packages.find((entry) => entry.name === "@hua-labs/dot")
+        .eligibility,
+      "blocked",
+    );
+
+    const refreshed = runRefresh({ root: fixture.root });
+    assert.equal(refreshed.status, "empty");
+    assert.deepEqual(refreshed.releases, []);
+    assert.equal(runPreflight({ root: fixture.root }).refreshRequired, false);
+    assert.equal(loadReleaseState(fixture.root).plan.status, "empty");
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("no-publish manifest refresh rejects every non-public authority variant", async (t) => {
+  const variants = [
+    {
+      name: "held intent",
+      mutate(definition) {
+        definition.release.intent = "held";
+        definition.reason = "held";
+      },
+    },
+    {
+      name: "wrong release mode",
+      mutate(definition) {
+        definition.release.mode = "private-workspace";
+        definition.reason = "wrong-release-mode";
+      },
+    },
+    {
+      name: "pending authority and channel",
+      mutate(definition) {
+        definition.release.intent = "channel-pending";
+        definition.release.authority = "unresolved";
+        definition.release.channel = "pending";
+        definition.reason = "channel-pending";
+      },
+    },
+    {
+      name: "missing authority and channel",
+      mutate(definition) {
+        definition.release.authority = "none";
+        definition.release.channel = "none";
+        definition.reason = "release-authority-none";
+      },
+    },
+    {
+      name: "wrong authority",
+      mutate(definition) {
+        definition.release.authority = "none";
+        definition.reason = "wrong-authority";
+      },
+    },
+    {
+      name: "wrong channel",
+      mutate(definition) {
+        definition.release.channel = "none";
+        definition.reason = "wrong-channel";
+      },
+    },
+    {
+      name: "private public manifest",
+      mutate(definition) {
+        definition.private = true;
+      },
+    },
+    {
+      name: "missing public publish config",
+      mutate(definition) {
+        definition.publishConfig = null;
+      },
+    },
+  ];
+
+  for (const variant of variants) {
+    await t.test(variant.name, () => {
+      const definitions = structuredClone(packageDefinitions);
+      variant.mutate(
+        definitions.find((entry) => entry.name === "@hua-labs/dot"),
+      );
+      const fixture = makeFixture({ definitions });
+      try {
+        mutateJson(
+          join(fixture.root, "packages/hua-dot/package.json"),
+          (manifest) => {
+            manifest.description = "Rejected projection drift";
+          },
+        );
+        assertCode(
+          () => runPreflight({ root: fixture.root }),
+          "refresh-ineligible-workspace",
+        );
+        assertCode(
+          () => runRefresh({ root: fixture.root }),
+          "refresh-ineligible-workspace",
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
 test("preflight requires external policy only for release-bearing and closure states", (t) => {
   const emptyFixture = makeFixture();
   t.after(() => emptyFixture.cleanup());
