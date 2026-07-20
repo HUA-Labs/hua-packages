@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import React, { useState, useMemo } from "react"
-import { dotVariants, dot as dotFn } from "@hua-labs/dot"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
-
-const s = (input: string) => dotFn(input) as React.CSSProperties
+import React, { useState, useMemo } from "react";
+import { dotVariants } from "@hua-labs/dot";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 
 export const linkVariants = dotVariants({
   base: "",
@@ -26,30 +25,33 @@ export const linkVariants = dotVariants({
     variant: "default",
     size: "md",
   },
-})
+});
 
 /** Hover color overrides per variant */
 const VARIANT_HOVER: Record<string, React.CSSProperties> = {
-  default: { color: 'var(--color-muted-foreground)' },
+  default: { color: "var(--color-muted-foreground)" },
   primary: { opacity: 0.8 },
-  secondary: { color: 'var(--color-foreground)' },
-  ghost: { color: 'var(--color-foreground)' },
-  underline: { opacity: 0.8, textDecoration: 'none' },
-}
+  secondary: { color: "var(--color-foreground)" },
+  ghost: { color: "var(--color-foreground)" },
+  underline: { opacity: 0.8, textDecoration: "none" },
+};
 
 /**
  * Link 컴포넌트의 props / Link component props
  */
 export interface LinkProps {
-  href: string
-  children: React.ReactNode
-  variant?: "default" | "primary" | "secondary" | "ghost" | "underline"
-  size?: "sm" | "md" | "lg"
-  external?: boolean
-  className?: string
-  dot?: string
-  style?: React.CSSProperties
-  onClick?: () => void
+  href: string;
+  children: React.ReactNode;
+  variant?: "default" | "primary" | "secondary" | "ghost" | "underline";
+  size?: "sm" | "md" | "lg";
+  external?: boolean;
+  /** Opaque Web class bytes applied to the anchor root. */
+  className?: string;
+  /** Remove Link-owned variant, size, transition, and hover visuals. */
+  unstyled?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
 /**
@@ -71,24 +73,37 @@ export function Link({
   size = "md",
   external = false,
   className,
+  unstyled = false,
   style,
   onClick,
 }: LinkProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
   const computedStyle = useMemo(() => {
-    const base = linkVariants({ variant, size }) as React.CSSProperties
-    const transitionStyle: React.CSSProperties = {
-      transition: 'color 200ms ease-out, opacity 200ms ease-out, text-decoration 200ms ease-out',
-    }
-    const hoverStyle = isHovered ? VARIANT_HOVER[variant] : undefined
-    return mergeStyles(base, transitionStyle, hoverStyle, resolveDot(dotProp), style)
-  }, [variant, size, isHovered, dotProp, style])
+    const base = unstyled
+      ? undefined
+      : (linkVariants({ variant, size }) as React.CSSProperties);
+    const transitionStyle: React.CSSProperties | undefined = unstyled
+      ? undefined
+      : {
+          transition:
+            "color 200ms ease-out, opacity 200ms ease-out, text-decoration 200ms ease-out",
+        };
+    const hoverStyle =
+      !unstyled && isHovered ? VARIANT_HOVER[variant] : undefined;
+    return mergeStyles(
+      base,
+      transitionStyle,
+      hoverStyle,
+      resolveDot(dotProp),
+      style,
+    );
+  }, [variant, size, isHovered, dotProp, style, unstyled]);
 
   return (
     <a
       href={href}
-      className={className}
+      className={joinWebClassNames(className)}
       style={computedStyle}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
@@ -98,5 +113,5 @@ export function Link({
     >
       {children}
     </a>
-  )
+  );
 }
