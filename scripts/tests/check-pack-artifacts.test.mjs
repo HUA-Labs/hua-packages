@@ -320,6 +320,22 @@ test("admits only the exact UI retained profile tar boundary", async (t) => {
     );
   });
 
+  await t.test("packed files omit the shipped guide authority", () => {
+    const fixture = createUiProfileFixture({
+      mutateManifest(manifest) {
+        manifest.files = manifest.files.filter(
+          (entry) => entry !== "DETAILED_GUIDE.md",
+        );
+      },
+    });
+    const result = runChecker(fixture.tarball);
+    assert.equal(result.status, 1);
+    assert.match(
+      result.stdout,
+      /package manifest does not match UI public-core authority/u,
+    );
+  });
+
   await t.test("guide omitted", () => {
     const fixture = createUiProfileFixture({ omit: ["DETAILED_GUIDE.md"] });
     rmSync(join(fixture.packageRoot, "DETAILED_GUIDE.md"), { force: true });

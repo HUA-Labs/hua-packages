@@ -350,7 +350,8 @@ function verifyUiPublicProfileTarball(pkg, fileSet) {
   if (
     pkg.version !== uiWorkspaceManifest.version ||
     pkg.engines?.node !== uiPublicProfile.installedEngineRange ||
-    canonicalJson(pkg.exports) !== canonicalJson(uiWorkspaceManifest.exports)
+    canonicalJson(pkg.exports) !== canonicalJson(uiWorkspaceManifest.exports) ||
+    canonicalJson(pkg.files) !== canonicalJson(uiWorkspaceManifest.files)
   ) {
     return ["package manifest does not match UI public-core authority"];
   }
