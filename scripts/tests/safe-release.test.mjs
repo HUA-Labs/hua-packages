@@ -4339,6 +4339,7 @@ function runVersionFixture(fixture, status, options = {}) {
         return "";
       }
       if (args[0] === "install") {
+        options.onLockCall?.(commandOptions);
         if (options.lockError !== undefined) throw options.lockError;
         if (!options.skipLockWrite) {
           rewriteFixtureLockfile(fixture.root, fixture.definitions);
@@ -4647,6 +4648,7 @@ test("version mode writes no planned authority for stale, failed, or churned loc
     await t.test(name, () => {
       const fixture = createFivePackageVersionFixture();
       try {
+        let capturedLockHome;
         const planBytes = readFileSync(
           join(fixture.root, "config/release-plan.json"),
         );
@@ -4655,9 +4657,13 @@ test("version mode writes no planned authority for stale, failed, or churned loc
             runVersionFixture(fixture, fivePackageVersionStatus(), {
               ...options,
               afterVersion: applyFivePackageDependencyVersions,
+              onLockCall(commandOptions) {
+                capturedLockHome = commandOptions.env.HOME;
+              },
             }),
           code,
         );
+        assert.equal(existsSync(capturedLockHome), false);
         assert.deepEqual(
           readFileSync(join(fixture.root, "config/release-plan.json")),
           planBytes,

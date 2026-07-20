@@ -2764,10 +2764,10 @@ export function runVersion(options = {}) {
   const lockHome = join(temporaryRoot, "lock-home");
   const userConfigPath = join(lockHome, "user.npmrc");
   const globalConfigPath = join(lockHome, "global.npmrc");
-  mkdirSync(lockHome, { recursive: true, mode: 0o700 });
-  writeFileSync(userConfigPath, "", { mode: 0o600 });
-  writeFileSync(globalConfigPath, "", { mode: 0o600 });
   try {
+    mkdirSync(lockHome, { recursive: true, mode: 0o700 });
+    writeFileSync(userConfigPath, "", { mode: 0o600 });
+    writeFileSync(globalConfigPath, "", { mode: 0o600 });
     execFile("pnpm", ["exec", "changeset", "status", "--output", statusPath], {
       cwd: root,
       encoding: "utf8",
