@@ -15,13 +15,20 @@ import {
   readFileSync,
   writeFileSync,
   existsSync,
+  lstatSync,
   readdirSync,
   mkdirSync,
+  realpathSync,
 } from "fs";
-import { join, resolve, dirname } from "path";
+import { join, resolve, dirname, sep } from "path";
 import { fileURLToPath } from "url";
 import Handlebars from "handlebars";
 import { parse as parseYaml } from "yaml";
+import {
+  buildDocumentationAxProjection,
+  buildPackageAxCatalog,
+  summarizeHuaPackageAxCatalog,
+} from "./package-ax.mjs";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -41,7 +48,15 @@ interface DocYaml {
     aiGuide?: string;
   };
   docsUrl?: string;
-  apiNotes?: Record<string, { description: string; kind?: string }>;
+  detailedGuide?: {
+    path: string;
+    distribution: "packed" | "repository";
+    description: string;
+  };
+  apiNotes?: Record<
+    string,
+    { description: string; kind?: string; importFrom?: string }
+  >;
   apiFilter?: "all" | "notes-only"; // 'notes-only' = only show exports in apiNotes
   related?: string[];
   sections?: Array<{ title: string; content: string }>;
@@ -72,7 +87,17 @@ interface PackageData {
   readmeFeatures: string[];
   showReadmeApi: boolean;
   showReadmeSections: boolean;
-  detailedGuide?: string;
+  legacyDetailedGuide?: string;
+  detailedGuide?: {
+    state: "shipped" | "repository-only";
+    path: string;
+    distribution: "packed" | "repository";
+    description: string;
+    packed: boolean;
+    link: string;
+  };
+  documentationAx: { state: "absent" | "shipped" | "repository-only" };
+  axSummary?: ReturnType<typeof summarizeHuaPackageAxCatalog> | null;
   aiGuide?: string;
   // from doc.yaml
   overview: string;
@@ -93,6 +118,109 @@ const ROOT = resolve(__dirname, "..");
 const PACKAGES_DIR = join(ROOT, "packages");
 const AI_DOCS_DIR = join(ROOT, "ai-docs");
 const TEMPLATES_DIR = join(ROOT, "scripts", "templates");
+const SAFE_PACKAGE_DIR = /^[a-z0-9][a-z0-9-]{0,127}$/;
+const DOC_YAML_KEYS = new Set([
+  "overview",
+  "features",
+  "quickStart",
+  "codeBlockLang",
+  "readme",
+  "docsUrl",
+  "detailedGuide",
+  "apiNotes",
+  "apiFilter",
+  "related",
+  "sections",
+  "subpathExports",
+  "registry",
+]);
+const README_KEYS = new Set([
+  "features",
+  "featureLimit",
+  "quickStart",
+  "codeBlockLang",
+  "hideApi",
+  "hideSections",
+  "detailedGuide",
+  "aiGuide",
+]);
+
+function assertExactKeys(
+  value: unknown,
+  allowed: ReadonlySet<string>,
+  label: string,
+): asserts value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  const unknown = Object.keys(value)
+    .filter((key) => !allowed.has(key))
+    .sort();
+  if (unknown.length > 0) {
+    throw new Error(`${label} has unknown doc.yaml key: ${unknown[0]}`);
+  }
+}
+
+function assertSafePackageDirName(dirName: string): void {
+  if (!SAFE_PACKAGE_DIR.test(dirName)) {
+    throw new Error("invalid package directory: expected a safe package name");
+  }
+}
+
+function assertContainedDirectory(
+  parent: string,
+  candidate: string,
+  label: string,
+): void {
+  let parentStats;
+  let candidateStats;
+  try {
+    parentStats = lstatSync(parent);
+    candidateStats = lstatSync(candidate);
+  } catch {
+    throw new Error(`${label} must be an existing regular directory`);
+  }
+  if (
+    !parentStats.isDirectory() ||
+    parentStats.isSymbolicLink() ||
+    !candidateStats.isDirectory() ||
+    candidateStats.isSymbolicLink()
+  ) {
+    throw new Error(`${label} must be a regular directory`);
+  }
+  let realParent;
+  let realCandidate;
+  try {
+    realParent = realpathSync(parent);
+    realCandidate = realpathSync(candidate);
+  } catch {
+    throw new Error(`${label} could not be resolved safely`);
+  }
+  if (
+    realCandidate !== realParent &&
+    !realCandidate.startsWith(`${realParent}${sep}`)
+  ) {
+    throw new Error(`${label} must stay inside the public repository root`);
+  }
+}
+
+function assertRegularFile(path: string, label: string): void {
+  let stats;
+  try {
+    stats = lstatSync(path);
+  } catch {
+    throw new Error(`${label} must be an existing regular file`);
+  }
+  if (!stats.isFile() || stats.isSymbolicLink()) {
+    throw new Error(`${label} must be a regular file`);
+  }
+}
+
+function assertWriterRoots(): void {
+  assertContainedDirectory(ROOT, PACKAGES_DIR, "packages output root");
+  assertContainedDirectory(ROOT, AI_DOCS_DIR, "AI output root");
+  assertContainedDirectory(ROOT, TEMPLATES_DIR, "template root");
+}
 
 // ─── Export Parser ───────────────────────────────────────────────────
 
@@ -173,11 +301,18 @@ function classifyExport(name: string, isFuncDecl: boolean): string {
 
 // ─── Package Data Loader ─────────────────────────────────────────────
 
-function loadPackageData(dirName: string): PackageData | null {
+async function loadPackageData(dirName: string): Promise<PackageData | null> {
+  assertSafePackageDirName(dirName);
   const pkgDir = join(PACKAGES_DIR, dirName);
   const pkgJsonPath = join(pkgDir, "package.json");
   const docYamlPath = join(pkgDir, "doc.yaml");
   const indexPath = join(pkgDir, "src", "index.ts");
+
+  if (!existsSync(pkgDir)) {
+    console.warn(`  ⚠ ${dirName}: package directory not found, skipping`);
+    return null;
+  }
+  assertContainedDirectory(PACKAGES_DIR, pkgDir, `${dirName}: package root`);
 
   if (!existsSync(pkgJsonPath)) {
     console.warn(`  ⚠ ${dirName}: package.json not found, skipping`);
@@ -212,6 +347,25 @@ function loadPackageData(dirName: string): PackageData | null {
 
   // Parse doc.yaml
   const docYaml: DocYaml = parseYaml(readFileSync(docYamlPath, "utf-8"));
+  assertExactKeys(docYaml, DOC_YAML_KEYS, `${dirName}: doc.yaml`);
+  if (docYaml.readme !== undefined) {
+    assertExactKeys(docYaml.readme, README_KEYS, `${dirName}: readme`);
+  }
+  if (
+    docYaml.detailedGuide !== undefined &&
+    docYaml.readme?.detailedGuide !== undefined
+  ) {
+    throw new Error(
+      `${dirName}: detailedGuide authority cannot be declared twice`,
+    );
+  }
+  const documentationAx = buildDocumentationAxProjection({
+    detailedGuide: docYaml.detailedGuide,
+    packageDir: pkgDir,
+    packageDirName: dirName,
+    packageFiles: pkgJson.files,
+  }) as PackageData["documentationAx"] &
+    Partial<NonNullable<PackageData["detailedGuide"]>>;
   const readmeFeatureLimit =
     typeof docYaml.readme?.featureLimit === "number"
       ? docYaml.readme.featureLimit
@@ -240,6 +394,12 @@ function loadPackageData(dirName: string): PackageData | null {
     }
   }
 
+  const axCatalog = await buildPackageAxCatalog({
+    packageDirName: dirName,
+    packageFullName: fullName,
+    packageVersion: pkgJson.version,
+  });
+
   return {
     dirName,
     shortName,
@@ -253,7 +413,13 @@ function loadPackageData(dirName: string): PackageData | null {
     readmeFeatures,
     showReadmeApi: docYaml.readme?.hideApi !== true,
     showReadmeSections: docYaml.readme?.hideSections !== true,
-    detailedGuide: docYaml.readme?.detailedGuide,
+    legacyDetailedGuide: docYaml.readme?.detailedGuide,
+    detailedGuide:
+      documentationAx.state === "absent"
+        ? undefined
+        : (documentationAx as NonNullable<PackageData["detailedGuide"]>),
+    documentationAx,
+    axSummary: axCatalog ? summarizeHuaPackageAxCatalog(axCatalog) : null,
     aiGuide: docYaml.readme?.aiGuide,
     overview: docYaml.overview,
     features: docYaml.features ?? [],
@@ -271,6 +437,7 @@ function loadPackageData(dirName: string): PackageData | null {
 
 function compileTemplate(name: string): HandlebarsTemplateDelegate {
   const tplPath = join(TEMPLATES_DIR, name);
+  assertRegularFile(tplPath, `${name} template`);
   // Normalize to LF for consistent Handlebars output across platforms (Windows CRLF breaks standalone block removal)
   const tplSource = readFileSync(tplPath, "utf-8").replace(/\r\n/g, "\n");
   return Handlebars.compile(tplSource, { noEscape: true });
@@ -289,12 +456,16 @@ function generateReadme(data: PackageData): string {
 
 function generateAiYaml(data: PackageData): string {
   const template = compileTemplate("ai-yaml.hbs");
-  return (
+  const generated =
     template(data)
       .replace(/\r\n/g, "\n")
       .replace(/\n{3,}/g, "\n\n")
-      .trim() + "\n"
-  );
+      .trim() + "\n";
+  if (!data.detailedGuide) return generated;
+
+  const guide = data.detailedGuide;
+  const yamlString = (value: string) => JSON.stringify(value);
+  return `${generated.trimEnd()}\n\ndocumentation:\n  detailedGuide:\n    state: ${yamlString(guide.state)}\n    path: ${yamlString(guide.path)}\n    distribution: ${yamlString(guide.distribution)}\n    description: ${yamlString(guide.description)}\n    link: ${yamlString(guide.link)}\n`;
 }
 
 // ─── AI-docs filename mapping ────────────────────────────────────────
@@ -318,34 +489,44 @@ function discoverPackages(): string[] {
       const docYaml = join(PACKAGES_DIR, name, "doc.yaml");
       return existsSync(pkgJson) && existsSync(docYaml);
     })
-    .sort();
+    .sort()
+    .map((name) => {
+      assertSafePackageDirName(name);
+      return name;
+    });
 }
 
-function generate(packageFilter?: string): {
+async function generate(packageFilter?: string): Promise<{
   generated: number;
   errors: string[];
-} {
+}> {
   const errors: string[] = [];
   let generated = 0;
   mkdirSync(AI_DOCS_DIR, { recursive: true });
+  assertWriterRoots();
 
   const dirs = packageFilter ? [packageFilter] : discoverPackages();
 
   for (const dirName of dirs) {
-    const data = loadPackageData(dirName);
-    if (!data) {
-      errors.push(`${dirName}: failed to load package data`);
-      continue;
-    }
-
     try {
+      const data = await loadPackageData(dirName);
+      if (!data) {
+        errors.push(`${dirName}: failed to load package data`);
+        continue;
+      }
       // Generate README.md
       const readmePath = join(PACKAGES_DIR, dirName, "README.md");
+      if (existsSync(readmePath)) {
+        assertRegularFile(readmePath, `${dirName}/README.md`);
+      }
       const readmeContent = generateReadme(data);
       writeFileSync(readmePath, readmeContent, "utf-8");
 
       // Generate ai.yaml
       const aiYamlPath = join(AI_DOCS_DIR, aiYamlFilename(dirName));
+      if (existsSync(aiYamlPath)) {
+        assertRegularFile(aiYamlPath, aiYamlFilename(dirName));
+      }
       const aiYamlContent = generateAiYaml(data);
       writeFileSync(aiYamlPath, aiYamlContent, "utf-8");
 
@@ -363,60 +544,65 @@ function generate(packageFilter?: string): {
   return { generated, errors };
 }
 
-function validate(packageFilter?: string): {
+async function validate(packageFilter?: string): Promise<{
   valid: number;
   drifted: string[];
-} {
+}> {
   const drifted: string[] = [];
   let valid = 0;
+  assertWriterRoots();
 
   const dirs = packageFilter ? [packageFilter] : discoverPackages();
 
   for (const dirName of dirs) {
-    const data = loadPackageData(dirName);
-    if (!data) {
-      drifted.push(`${dirName}: failed to load`);
-      continue;
-    }
+    try {
+      const data = await loadPackageData(dirName);
+      if (!data) {
+        drifted.push(`${dirName}: failed to load`);
+        continue;
+      }
 
-    let hasDrift = false;
+      let hasDrift = false;
+      const norm = (s: string) => s.replace(/\r\n/g, "\n");
 
-    // Normalize line endings for cross-platform comparison
-    const norm = (s: string) => s.replace(/\r\n/g, "\n");
-
-    // Check README
-    const readmePath = join(PACKAGES_DIR, dirName, "README.md");
-    if (existsSync(readmePath)) {
-      const current = norm(readFileSync(readmePath, "utf-8"));
-      const expected = norm(generateReadme(data));
-      if (current !== expected) {
-        drifted.push(`${dirName}/README.md`);
+      const readmePath = join(PACKAGES_DIR, dirName, "README.md");
+      if (existsSync(readmePath)) {
+        assertRegularFile(readmePath, `${dirName}/README.md`);
+        const current = norm(readFileSync(readmePath, "utf-8"));
+        const expected = norm(generateReadme(data));
+        if (current !== expected) {
+          drifted.push(`${dirName}/README.md`);
+          hasDrift = true;
+        }
+      } else {
+        drifted.push(`${dirName}/README.md (missing)`);
         hasDrift = true;
       }
-    } else {
-      drifted.push(`${dirName}/README.md (missing)`);
-      hasDrift = true;
-    }
 
-    // Check ai.yaml
-    const aiYamlPath = join(AI_DOCS_DIR, aiYamlFilename(dirName));
-    if (existsSync(aiYamlPath)) {
-      const current = norm(readFileSync(aiYamlPath, "utf-8"));
-      const expected = norm(generateAiYaml(data));
-      if (current !== expected) {
-        drifted.push(`${aiYamlFilename(dirName)}`);
+      const aiYamlPath = join(AI_DOCS_DIR, aiYamlFilename(dirName));
+      if (existsSync(aiYamlPath)) {
+        assertRegularFile(aiYamlPath, aiYamlFilename(dirName));
+        const current = norm(readFileSync(aiYamlPath, "utf-8"));
+        const expected = norm(generateAiYaml(data));
+        if (current !== expected) {
+          drifted.push(`${aiYamlFilename(dirName)}`);
+          hasDrift = true;
+        }
+      } else {
+        drifted.push(`${aiYamlFilename(dirName)} (missing)`);
         hasDrift = true;
       }
-    } else {
-      drifted.push(`${aiYamlFilename(dirName)} (missing)`);
-      hasDrift = true;
-    }
 
-    if (!hasDrift) {
-      valid++;
-      console.log(`  ✓ ${data.fullName}`);
-    } else {
-      console.log(`  ✗ ${data.fullName} — drift detected`);
+      if (!hasDrift) {
+        valid++;
+        console.log(`  ✓ ${data.fullName}`);
+      } else {
+        console.log(`  ✗ ${data.fullName} — drift detected`);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      drifted.push(`${dirName}: ${message}`);
+      console.error(`  ✗ ${dirName}: ${message}`);
     }
   }
 
@@ -425,7 +611,7 @@ function validate(packageFilter?: string): {
 
 // ─── Main ────────────────────────────────────────────────────────────
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const isValidate = args.includes("--validate");
   const pkgFlag = args.find((a) => a.startsWith("--package"));
@@ -445,7 +631,7 @@ function main() {
 
   if (isValidate) {
     console.log("Mode: validate (checking drift)\n");
-    const { valid, drifted } = validate(packageFilter);
+    const { valid, drifted } = await validate(packageFilter);
     console.log(`\nResult: ${valid} valid, ${drifted.length} drifted`);
     if (drifted.length > 0) {
       console.log("\nDrifted files:");
@@ -456,14 +642,19 @@ function main() {
     console.log("");
   } else {
     console.log("Mode: generate\n");
-    const { generated, errors } = generate(packageFilter);
+    const { generated, errors } = await generate(packageFilter);
     console.log(`\nResult: ${generated} generated, ${errors.length} errors`);
     if (errors.length > 0) {
       console.log("\nErrors:");
       errors.forEach((e) => console.log(`  - ${e}`));
+      process.exitCode = 1;
     }
     console.log("");
   }
 }
 
-main();
+main().catch((error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Documentation writer failed: ${message}`);
+  process.exitCode = 1;
+});

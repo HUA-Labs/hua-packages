@@ -43,9 +43,25 @@ pnpm add @hua-labs/{{shortName}}
 {{/if}}
 
 {{#if detailedGuide}}
+## Detailed Guide
+
+[Detailed Guide]({{{detailedGuide.link}}}) — {{detailedGuide.description}}.
+{{#if detailedGuide.packed}}
+
+The Detailed Guide is included in the package tarball.
+{{else}}
+
+The Detailed Guide is hosted in the public source repository and is not included in the package tarball.
+{{/if}}
+{{#if docsUrl}}
+
+- [Full Documentation]({{{docsUrl}}})
+{{/if}}
+{{else}}
+{{#if legacyDetailedGuide}}
 ## Documentation
 
-- [Detailed Guide]({{{detailedGuide}}})
+- [Detailed Guide]({{{legacyDetailedGuide}}})
 {{#if docsUrl}}
 - [Full Documentation]({{{docsUrl}}})
 {{/if}}
@@ -54,6 +70,7 @@ pnpm add @hua-labs/{{shortName}}
 ## Documentation
 
 [Full Documentation]({{{docsUrl}}})
+{{/if}}
 {{/if}}
 {{/if}}
 
