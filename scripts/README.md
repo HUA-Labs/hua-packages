@@ -34,7 +34,7 @@ monorepo state.
 | `safe-release.mjs check`        | Revalidate policy, plan digest, and every current manifest without executing registry or credential commands.         |
 | `safe-release.mjs pack`         | Build the deterministic workspace-prerequisite closure, then pack, inspect, and hash only the exact planned packages. |
 | `safe-release.mjs claim`        | Commit one exact artifact-bound planned-to-publishing transition on a reviewed PR branch without moving main.         |
-| `safe-release.mjs publish`      | Reverify and publish only the claimed immutable tarballs with package lifecycle scripts disabled.                     |
+| `safe-release.mjs publish`      | Reverify, resume, publish, and install-check claimed tarballs in dependency-first order.                              |
 | `check-npm-provenance.mjs`      | Check exact provenance and prepare a reviewed empty-plan PR branch only after every check passes.                     |
 | `prepare-publish.js`            | Convert local `workspace:` dependencies to publishable package versions before manual package inspection.             |
 | `restore-workspace.js`          | Restore `workspace:` dependencies after manual publish preparation.                                                   |
@@ -97,15 +97,16 @@ source was consumed and that no unexpected source remains.
 An empty plan is deliberately not release authority. `refresh` first verifies
 the old empty plan's policy tuple, schema, roster, and digest, then captures the
 current reviewed manifest bytes only when changed manifests remain at the same
-version and either belong to policy-eligible packages or match the exact
-`no-publish / active-public / hua-packages / npm-public` tuple with a public
-manifest. The latter admits a reviewed public projection such as Dot without
-changing its `blocked` eligibility or creating a release row. Refresh still
-rejects held, never-publish, pending, private, wrong-authority, and
-wrong-channel drift, never overwrites a planned set, and cannot add or select a
-package. This lets a later reviewed source/manifest sync plus a new Changeset
-enter `version` without weakening the planned-plan check. A planned plan remains
-manifest-exact in `check` and cannot publish directly.
+version and belong to policy-eligible packages. Eligibility accepts the exact
+public authority tuple `active-public / hua-packages / npm-public` with either
+`public-npm` or `no-publish` mode. The latter is an alternate-authority case:
+Dot and Dot AOT remain non-publishable from the platform repository while their
+reviewed public projections may be selected only here. Refresh still rejects
+held, never-publish, pending, private, wrong-authority, and wrong-channel drift,
+never overwrites a planned set, and cannot add or select a package. This lets a
+later reviewed source/manifest sync plus a new Changeset enter `version`
+without weakening the planned-plan check. A planned plan remains manifest-exact
+in `check` and cannot publish directly.
 
 Workspace manifest `private` authority is accepted only when the field is
 absent or Boolean. Absent and explicit `false` are public manifest truth;
@@ -117,11 +118,10 @@ credential while it creates or updates a version PR. Its dedicated preflight
 classifies exact `empty`, `planned`, and `publishing` states and detects an
 exact publishing-to-empty closure transition before refresh. Only an ordinary
 exact empty plan may admit same-version manifest-byte drift, and only for
-policy-eligible packages or the exact blocked public `no-publish` tuple above;
-policy, roster, identity, version, plan digest, and canonical-byte authority
-remain exact. The following credential-free refresh binds those reviewed
-manifest bytes before Changesets status/version executes without changing
-release eligibility.
+policy-eligible packages; policy, roster, identity, version, plan digest, and
+canonical-byte authority remain exact. The following credential-free refresh
+binds those reviewed manifest bytes before Changesets status/version executes
+without changing release eligibility.
 A merged version PR is already `planned`, and a reviewed closure merge is an
 external-policy-bearing transition, so both require the policy gate before any
 artifact, claim, OIDC, publish, or closure admission. A planned plan remains
@@ -151,8 +151,8 @@ malformed, partial, or inconsistent API authority to exact
 No API error or incomplete response becomes an empty allowlist. For an exact
 planned set it resolves each selected package's `workspace:` dependencies and
 optional dependencies, builds that complete dependency-first closure once,
-then packs only the selected release rows. A blocked package such as Dot may be
-built as a prerequisite without becoming selected, eligible, packed, or
+then packs only the selected release rows. An eligible but unselected package
+may be built as a prerequisite without becoming selected, packed, or
 publishable. An unscoped package such as `create-hua` is built and packed only
 when explicitly selected. Pack runs with package lifecycle scripts disabled;
 before starting each pack child it removes every inherited case variant of the
@@ -189,21 +189,42 @@ Zero, self-only, stale, wrong-head, wrong-branch, duplicate, or head-drifting
 associations fail closed. Any claim or PR failure happens before an
 OIDC-capable job, npm credentials, or publish.
 
-A separate publish job is the only job with `id-token: write`. It starts only
-on the first workflow attempt for the reviewed claim merge, never on the
-planned run that created the PR. The publishing run reads the original
-artifact run ID and source head from the durable claim, downloads that exact
-cross-run bundle. Before that OIDC-capable job is admitted, the no-OIDC prepare
-check requires local `HEAD` and remote `main` to match and requires a
-single-parent plan-only claim transition. The publish job repeats those checks
-and revalidates the plan, claim,
-canonical manifest, complete directory population, tarball bytes, hashes, and
-internal package name/version before any npm command. It publishes the exact
-tarball paths with `npm publish --ignore-scripts`, never mutable package
-directories, so package lifecycle hooks cannot rerun after credential
-exposure. The npm token is present only on that publish step. Its temporary
-`RUNNER_TEMP` npmrc is removed before the step completes; neither the sanitized
-result upload nor the later closure job receives the npm token.
+A separate publish job is the only job with `id-token: write`. It runs only for
+the reviewed claim merge, never on the planned run that created the PR. A
+reviewed workflow retry is allowed because publication is reconciled against
+immutable registry evidence rather than assumed to be a fresh first attempt.
+The publishing run reads the original artifact run ID and source head from the
+durable claim and downloads that exact cross-run bundle. Before that
+OIDC-capable job is admitted, the no-OIDC prepare check requires local `HEAD`
+and remote `main` to match and requires a single-parent plan-only claim
+transition. The publish job repeats those checks and revalidates the plan,
+claim, canonical manifest, complete directory population, tarball bytes,
+hashes, and internal package name/version before any npm command. It computes
+the tarball's SHA-512 SRI from those re-read bytes and publishes exact tarball
+paths with `npm publish --ignore-scripts`, never mutable package directories,
+so package lifecycle hooks cannot rerun after credential exposure. The npm
+token is present only on that publish step. Its temporary `RUNNER_TEMP` npmrc
+is removed before the step completes; neither the sanitized result upload nor
+the later closure job receives the npm token.
+
+Selected packages are processed in deterministic dependency-topological order.
+Before each package, the guard observes the exact npm name/version, integrity,
+and SLSA provenance predicate. Exact E404 absence permits publish; an existing
+artifact with byte-identical SHA-512 integrity and SLSA v1 provenance is a
+verified resume and skips the immutable publish call; any differing immutable
+artifact is a conflict. Timeout, malformed, incomplete, or not-yet-consistent
+responses are retried within the bounded observation window and then fail
+closed. A newly published artifact must reach the same exact registry and
+provenance state before progress continues.
+
+After registry verification, a fresh caller-owned temporary npm consumer
+installs the exact package version with lifecycle scripts disabled. It checks
+the installed package identity and uses `npm ls` to require every selected
+workspace dependency at its exact planned version. The temporary consumer is
+removed on success or failure, and no dependent package is attempted until
+that install boundary passes. This permits safe reviewed resume after a
+partial run while preventing a dependency from publishing before the registry
+can actually install its prerequisite.
 
 Empty, stale, held, never-publish,
 pending, private, wrong-authority, unknown, missing, extra, or tampered sets
@@ -230,12 +251,15 @@ commands. Operator
 reconciliation is required before another release if either reviewed
 transition is not merged.
 
-The current committed plan is empty. Choosing a version, selecting UI alone or
-an explicit cohort, approving npm publication, and choosing token versus OIDC
-remain operator release decisions. UI's workspace dependency makes Dot a build
-prerequisite only; Dot remains blocked by its current `no-publish` mode and is
-never added to the release or artifact set. Motion is a peer and remains
-eligible only when an explicit reviewed Changeset selects it.
+The current committed plan is empty. Choosing versions, selecting an explicit
+cohort, approving npm publication, and choosing token versus OIDC remain
+operator release decisions. Dot and Dot AOT are policy-eligible here only
+through their exact alternate public authority; their platform `no-publish`
+mode is not platform publication authority. UI and every selected internal
+dependency require explicit reviewed Changeset rows and exact planned versions;
+the release guard never substitutes an npm dist-tag such as `latest` for an
+internal dependency relation. Motion is a peer and remains eligible only when
+an explicit reviewed Changeset selects it.
 
 After a successful version run, review the version diff, packed artifacts,
 policy SHA, plan digest, exact `fromVersion`/`toVersion` set, and the complete

@@ -111,7 +111,7 @@ jobs:
 
   publish:
     needs: prepare
-    if: needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1
+    if: needs.prepare.outputs.claimed == 'true'
     runs-on: ubuntu-latest
     permissions:
       actions: read

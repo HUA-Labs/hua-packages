@@ -1,9 +1,9 @@
 {
   "claim": null,
-  "planDigest": "6cbe39e6b1f0c39f71aec64f35be0635ce52262b1bdf33cb7700df016a85a126",
+  "planDigest": "1d2dd4588032571d360878f66229b400f1c2510e0f95a210645ca6599ca20864",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
-    "policySha256": "9be7d2474035c21c930af8c6dcfd364336c91afe490096761cb5369ce2bf64e3",
+    "policySha256": "5437a8de81b1f31bfc7dfc7a974314a22e5e8181ebcea24e6d67fc5cdb5a6a00",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac"
   },
   "releases": [],

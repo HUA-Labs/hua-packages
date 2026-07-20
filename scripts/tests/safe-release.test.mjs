@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdtempSync,
@@ -52,8 +53,8 @@ const packageDefinitions = [
       authority: "hua-packages",
       channel: "npm-public",
     },
-    eligibility: "blocked",
-    reason: "release-mode-no-publish",
+    eligibility: "eligible",
+    reason: "active-public",
     private: false,
     publishConfig: { access: "public", provenance: true },
   },
@@ -477,6 +478,12 @@ function publishingOptions(fixture, execFile) {
     githubAuthority: githubAuthorityFixture(transition),
     artifactManifestPath: fixture.artifactManifestPath,
     claimHead: fixture.claimHead,
+    registryAttempts: 2,
+    registryObserver({ phase }) {
+      return { status: phase === "before" ? "absent" : "verified" };
+    },
+    installedConsumerVerifier() {},
+    sleep() {},
     ...fixture.claim,
   };
 }
@@ -587,26 +594,30 @@ function assertCode(callback, code) {
   assert.throws(callback, (error) => error?.code === code);
 }
 
-test("current policy blocks HUA, Security, Dot, and Dot AOT while the empty plan is exact", () => {
+test("current policy admits the alternate-authority Dot family while held and never packages stay blocked", () => {
   const state = loadReleaseState(CURRENT_ROOT);
   assert.equal(state.policy.packages.length, 17);
   assert.equal(
     state.policy.packages.filter((entry) => entry.eligibility === "eligible")
       .length,
-    13,
+    15,
   );
   assert.equal(state.plan.status, "empty");
   assert.deepEqual(state.plan.releases, []);
-  for (const name of [
-    "@hua-labs/hua",
-    "@hua-labs/security",
-    "@hua-labs/dot",
-    "@hua-labs/dot-aot",
-  ]) {
+  for (const name of ["@hua-labs/hua", "@hua-labs/security"]) {
     assert.equal(
       state.policy.packages.find((entry) => entry.name === name).eligibility,
       "blocked",
     );
+  }
+  for (const name of ["@hua-labs/dot", "@hua-labs/dot-aot"]) {
+    const entry = state.policy.packages.find(
+      (candidate) => candidate.name === name,
+    );
+    assert.equal(entry.eligibility, "eligible");
+    assert.equal(entry.reason, "active-public");
+    assert.equal(entry.release.mode, "no-publish");
+    assert.equal(entry.release.authority, "hua-packages");
   }
 });
 
@@ -1576,7 +1587,7 @@ test("empty-plan refresh admits exact public no-publish manifest drift without c
     assert.equal(
       preflight.policy.packages.find((entry) => entry.name === "@hua-labs/dot")
         .eligibility,
-      "blocked",
+      "eligible",
     );
 
     const refreshed = runRefresh({ root: fixture.root });
@@ -1689,26 +1700,16 @@ test("no-publish manifest refresh rejects every non-public authority variant", a
         definition.reason = "wrong-channel";
       },
     },
-    {
-      name: "private public manifest",
-      mutate(definition) {
-        definition.private = true;
-      },
-    },
-    {
-      name: "missing public publish config",
-      mutate(definition) {
-        definition.publishConfig = null;
-      },
-    },
   ];
 
   for (const variant of variants) {
     await t.test(variant.name, () => {
       const definitions = structuredClone(packageDefinitions);
-      variant.mutate(
-        definitions.find((entry) => entry.name === "@hua-labs/dot"),
+      const definition = definitions.find(
+        (entry) => entry.name === "@hua-labs/dot",
       );
+      variant.mutate(definition);
+      definition.eligibility = "blocked";
       const fixture = makeFixture({ definitions });
       try {
         mutateJson(
@@ -1893,7 +1894,7 @@ test("workflow routes claim and closure through reviewed protected-main transiti
   );
   assert.equal(
     authority.jobs.publish.if,
-    "needs.prepare.outputs.claimed == 'true' && github.run_attempt == 1",
+    "needs.prepare.outputs.claimed == 'true'",
   );
   assert.match(
     workflow,
@@ -2659,6 +2660,12 @@ test("parsed workflow executes reviewed version, claim, publish, closure, and em
     artifactManifestPath: packed.artifactManifestPath,
     claimHead: claimed.claimHead,
     githubAuthority: githubAuthorityFixture(publishTransition),
+    registryAttempts: 2,
+    registryObserver({ phase }) {
+      return { status: phase === "before" ? "absent" : "verified" };
+    },
+    installedConsumerVerifier() {},
+    sleep() {},
     ...fixture.claim,
     execFile(file, args, options) {
       if (file === "tar") return execFileSync(file, args, options);
@@ -2833,7 +2840,7 @@ test("policy rejects old, future, unknown, malformed, and normalized-collision a
       {
         ...base,
         packages: base.packages.map((entry, index) =>
-          index === 0 ? { ...entry, eligibility: "eligible" } : entry,
+          index === 0 ? { ...entry, eligibility: "blocked" } : entry,
         ),
       },
       "policy-package-eligibility",
@@ -2931,6 +2938,114 @@ test("UI-only publish uses one exact immutable tarball and fixed execFile argv",
       cwd: fixture.root,
     },
   ]);
+});
+
+test("default registry and disposable installed-consumer gates bind immutable bytes without leaking raw errors", (t) => {
+  const fixture = createPublishingFixture();
+  t.after(() => fixture.cleanup());
+  const artifactPath = join(
+    fixture.artifactManifestPath,
+    "..",
+    "hua-labs-ui-2.3.1.tgz",
+  );
+  const integrity = `sha512-${createHash("sha512")
+    .update(readFileSync(artifactPath))
+    .digest("base64")}`;
+  const events = [];
+  let viewCalls = 0;
+  let consumerRoot;
+  const options = publishingOptions(fixture, (file, args, commandOptions) => {
+    assert.equal(file, "npm");
+    if (args[0] === "view") {
+      viewCalls += 1;
+      events.push(`view:${viewCalls}`);
+      if (viewCalls === 1) {
+        const error = new Error("private registry details");
+        error.code = "E404";
+        error.stderr = "secret-registry-body";
+        throw error;
+      }
+      return JSON.stringify({
+        name: "@hua-labs/ui",
+        version: "2.3.1",
+        "dist.integrity": integrity,
+        "dist.attestations.provenance.predicateType":
+          "https://slsa.dev/provenance/v1",
+      });
+    }
+    if (args[0] === "publish") {
+      events.push("publish");
+      return "";
+    }
+    if (args[0] === "install") {
+      consumerRoot = commandOptions.cwd;
+      events.push("install");
+      const installedRoot = join(consumerRoot, "node_modules/@hua-labs/ui");
+      mkdirSync(installedRoot, { recursive: true });
+      writeFileSync(
+        join(installedRoot, "package.json"),
+        canonicalJson({ name: "@hua-labs/ui", version: "2.3.1" }),
+      );
+      return "";
+    }
+    throw new Error("unexpected npm command");
+  });
+  delete options.registryObserver;
+  delete options.installedConsumerVerifier;
+  const published = runPublish(options);
+  assert.deepEqual(published.publishedPackages, [
+    { name: "@hua-labs/ui", version: "2.3.1" },
+  ]);
+  assert.deepEqual(events, ["view:1", "publish", "view:2", "install"]);
+  assert.equal(existsSync(consumerRoot), false);
+
+  const conflict = createPublishingFixture();
+  try {
+    const conflictOptions = publishingOptions(conflict, (file, args) => {
+      assert.equal(file, "npm");
+      assert.equal(args[0], "view");
+      return JSON.stringify({
+        name: "@hua-labs/ui",
+        version: "2.3.1",
+        "dist.integrity": "sha512-conflicting-immutable-bytes",
+        "dist.attestations.provenance.predicateType":
+          "https://slsa.dev/provenance/v1",
+      });
+    });
+    delete conflictOptions.registryObserver;
+    delete conflictOptions.installedConsumerVerifier;
+    assertCode(
+      () => runPublish(conflictOptions),
+      "publish-registry-immutable-conflict",
+    );
+  } finally {
+    conflict.cleanup();
+  }
+
+  const unavailable = createPublishingFixture();
+  try {
+    const unavailableOptions = publishingOptions(unavailable, (file, args) => {
+      assert.equal(file, "npm");
+      assert.equal(args[0], "view");
+      const error = new Error("private registry hostname and response body");
+      error.stderr = "ETIMEDOUT https://private.example.invalid/token=secret";
+      throw error;
+    });
+    delete unavailableOptions.registryObserver;
+    delete unavailableOptions.installedConsumerVerifier;
+    unavailableOptions.registryAttempts = 1;
+    assert.throws(
+      () => runPublish(unavailableOptions),
+      (error) => {
+        assert.equal(error?.code, "publish-registry-unverified");
+        assert.equal(error?.message, "publish-registry-unverified");
+        assert.doesNotMatch(error?.message ?? "", /private|secret|token/u);
+        return true;
+      },
+    );
+  } finally {
+    unavailable.cleanup();
+  }
 });
 
 test("explicit UI and Motion publish is exact while Dot is never inferred", (t) => {
@@ -3089,8 +3204,8 @@ test("publish rejects non-reviewed claim topology or non-plan scope before npm",
   }
 });
 
-test("held, never-publish, and no-publish packages fail before publish", async (t) => {
-  for (const name of ["@hua-labs/hua", "@hua-labs/security", "@hua-labs/dot"]) {
+test("held and never-publish packages fail before publish", async (t) => {
+  for (const name of ["@hua-labs/hua", "@hua-labs/security"]) {
     await t.test(name, () => {
       const fixture = createPlannedFixture([name]);
       try {
@@ -3153,6 +3268,380 @@ test("held, never-publish, and no-publish packages fail before publish", async (
           "plan-release-ineligible",
         );
         assert.equal(calls, 0);
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("alternate-authority no-publish package is selected and published only from hua-packages", (t) => {
+  const fixture = createPublishingFixture(["@hua-labs/dot"]);
+  t.after(() => fixture.cleanup());
+  const calls = [];
+  const published = runPublish(
+    publishingOptions(fixture, (file, args) => {
+      calls.push({ file, args });
+      return "";
+    }),
+  );
+  assert.deepEqual(published.publishedPackages, [
+    { name: "@hua-labs/dot", version: "0.2.3" },
+  ]);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].file, "npm");
+  assert.equal(calls[0].args[0], "publish");
+});
+
+test("publish resumes exact registry bytes and releases selected dependencies before dependents", (t) => {
+  const definitions = [
+    {
+      name: "@hua-labs/aaa-dependent",
+      path: "packages/aaa-dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/z-base": "workspace:1.0.0" },
+      release: {
+        mode: "public-npm",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/z-base",
+      path: "packages/z-base",
+      version: "1.0.0",
+      release: {
+        mode: "no-publish",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPublishingFixture(
+    ["@hua-labs/aaa-dependent", "@hua-labs/z-base"],
+    definitions,
+  );
+  t.after(() => fixture.cleanup());
+  const events = [];
+  let dependentAfterChecks = 0;
+  const options = publishingOptions(fixture, (_file, args) => {
+    events.push(
+      `publish:${args[1].includes("aaa-dependent") ? "dependent" : "base"}`,
+    );
+    return "";
+  });
+  options.registryAttempts = 3;
+  options.registryObserver = ({ artifact, phase }) => {
+    const role = artifact.name.endsWith("z-base") ? "base" : "dependent";
+    events.push(`registry:${role}:${phase}`);
+    if (role === "base") return { status: "verified" };
+    if (phase === "before") return { status: "absent" };
+    dependentAfterChecks += 1;
+    return { status: dependentAfterChecks === 1 ? "pending" : "verified" };
+  };
+  options.installedConsumerVerifier = ({ artifact, dependencies }) => {
+    const role = artifact.name.endsWith("z-base") ? "base" : "dependent";
+    events.push(
+      `install:${role}:${dependencies.map((entry) => entry.name).join(",")}`,
+    );
+  };
+  const published = runPublish(options);
+  assert.deepEqual(published.publishedPackages, [
+    { name: "@hua-labs/aaa-dependent", version: "1.0.1" },
+    { name: "@hua-labs/z-base", version: "1.0.1" },
+  ]);
+  assert.deepEqual(events, [
+    "registry:base:before",
+    "install:base:",
+    "registry:dependent:before",
+    "publish:dependent",
+    "registry:dependent:after",
+    "registry:dependent:after",
+    "install:dependent:@hua-labs/z-base",
+  ]);
+});
+
+test("current Dot family and UI cohort publishes in the operator-approved dependency sequence", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const publicManifest = { access: "public", provenance: true };
+  const definitions = [
+    {
+      name: "@hua-labs/dot",
+      path: "packages/hua-dot",
+      version: "0.2.2",
+      release: { ...activePublic, mode: "no-publish" },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/dot-aot",
+      path: "packages/hua-dot-aot",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: { ...activePublic, mode: "no-publish" },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/dot-lsp",
+      path: "packages/hua-dot-lsp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/dot-mcp",
+      path: "packages/hua-dot-mcp",
+      version: "0.1.3",
+      dependencies: { "@hua-labs/dot": "workspace:0.2.2" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+    {
+      name: "@hua-labs/ui",
+      path: "packages/hua-ui",
+      version: "2.3.0",
+      dependencies: { "@hua-labs/dot": "workspace:*" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: publicManifest,
+    },
+  ];
+  const cohort = definitions.map(({ name }) => name);
+  const fixture = createPublishingFixture(cohort, definitions);
+  t.after(() => fixture.cleanup());
+  const sequence = [];
+  const options = publishingOptions(fixture, (_file, args) => {
+    const artifact = args[1];
+    const definition = [...definitions]
+      .sort((left, right) => right.name.length - left.name.length)
+      .find(({ name }) => artifact.includes(name.slice(1).replace("/", "-")));
+    assert.notEqual(definition, undefined);
+    sequence.push(`publish:${definition.name}`);
+    return "";
+  });
+  options.registryObserver = ({ phase }) => {
+    if (phase === "before") return { status: "absent" };
+    return { status: "verified" };
+  };
+  options.installedConsumerVerifier = ({ artifact, dependencies }) => {
+    sequence.push(`install:${artifact.name}`);
+    const expectedDependencies =
+      artifact.name === "@hua-labs/dot" ? [] : ["@hua-labs/dot"];
+    assert.deepEqual(
+      dependencies.map(({ name }) => name),
+      expectedDependencies,
+    );
+  };
+
+  runPublish(options);
+
+  assert.deepEqual(sequence, [
+    "publish:@hua-labs/dot",
+    "install:@hua-labs/dot",
+    "publish:@hua-labs/dot-aot",
+    "install:@hua-labs/dot-aot",
+    "publish:@hua-labs/dot-lsp",
+    "install:@hua-labs/dot-lsp",
+    "publish:@hua-labs/dot-mcp",
+    "install:@hua-labs/dot-mcp",
+    "publish:@hua-labs/ui",
+    "install:@hua-labs/ui",
+  ]);
+});
+
+test("default fresh consumer checks each selected dependency at its exact released version", (t) => {
+  const activePublic = {
+    mode: "public-npm",
+    intent: "active-public",
+    authority: "hua-packages",
+    channel: "npm-public",
+  };
+  const definitions = [
+    {
+      name: "@hua-labs/base",
+      path: "packages/base",
+      version: "1.0.0",
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/dependent",
+      path: "packages/dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/base": "workspace:1.0.0" },
+      release: activePublic,
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  const fixture = createPublishingFixture(
+    ["@hua-labs/base", "@hua-labs/dependent"],
+    definitions,
+  );
+  t.after(() => fixture.cleanup());
+  const events = [];
+  const consumerRoots = [];
+  const options = publishingOptions(fixture, (file, args, commandOptions) => {
+    assert.equal(file, "npm");
+    if (args[0] === "publish") {
+      events.push(
+        `publish:${args[1].includes("dependent") ? "dependent" : "base"}`,
+      );
+      return "";
+    }
+    if (args[0] === "install") {
+      const name = args[1].startsWith("@hua-labs/dependent@")
+        ? "@hua-labs/dependent"
+        : "@hua-labs/base";
+      events.push(`install:${name}`);
+      consumerRoots.push(commandOptions.cwd);
+      assert.equal(args.includes("--package-lock=false"), true);
+      const installedRoot = join(
+        commandOptions.cwd,
+        "node_modules",
+        ...name.split("/"),
+      );
+      mkdirSync(installedRoot, { recursive: true });
+      writeFileSync(
+        join(installedRoot, "package.json"),
+        canonicalJson({ name, version: "1.0.1" }),
+      );
+      return "";
+    }
+    assert.deepEqual(args, [
+      "ls",
+      "@hua-labs/base@1.0.1",
+      "--json",
+      "--depth=Infinity",
+    ]);
+    events.push("ls:@hua-labs/base@1.0.1");
+    return "{}";
+  });
+  options.registryObserver = ({ phase }) => ({
+    status: phase === "before" ? "absent" : "verified",
+  });
+  delete options.installedConsumerVerifier;
+
+  runPublish(options);
+
+  assert.deepEqual(events, [
+    "publish:base",
+    "install:@hua-labs/base",
+    "publish:dependent",
+    "install:@hua-labs/dependent",
+    "ls:@hua-labs/base@1.0.1",
+  ]);
+  assert.equal(consumerRoots.length, 2);
+  for (const consumerRoot of consumerRoots) {
+    assert.equal(existsSync(consumerRoot), false);
+  }
+});
+
+test("publish stops before a dependent when registry or fresh-install verification fails", async (t) => {
+  const definitions = [
+    {
+      name: "@hua-labs/base",
+      path: "packages/base",
+      version: "1.0.0",
+      release: {
+        mode: "public-npm",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+    {
+      name: "@hua-labs/dependent",
+      path: "packages/dependent",
+      version: "1.0.0",
+      dependencies: { "@hua-labs/base": "workspace:1.0.0" },
+      release: {
+        mode: "public-npm",
+        intent: "active-public",
+        authority: "hua-packages",
+        channel: "npm-public",
+      },
+      eligibility: "eligible",
+      reason: "active-public",
+      private: false,
+      publishConfig: { access: "public", provenance: true },
+    },
+  ];
+  for (const [label, failureCode, configure] of [
+    [
+      "registry",
+      "publish-registry-unverified",
+      (options) => {
+        options.registryObserver = ({ phase }) => ({
+          status: phase === "before" ? "absent" : "pending",
+        });
+      },
+    ],
+    [
+      "install",
+      "publish-consumer-install",
+      (options) => {
+        options.installedConsumerVerifier = () => {
+          const error = new Error("private raw install output");
+          error.code = "publish-consumer-install";
+          throw error;
+        };
+      },
+    ],
+  ]) {
+    await t.test(label, () => {
+      const fixture = createPublishingFixture(
+        ["@hua-labs/base", "@hua-labs/dependent"],
+        definitions,
+      );
+      try {
+        const published = [];
+        const options = publishingOptions(fixture, (_file, args) => {
+          published.push(args[1]);
+          return "";
+        });
+        configure(options);
+        assertCode(() => runPublish(options), failureCode);
+        assert.equal(published.length, 1);
+        assert.match(published[0], /base-1\.0\.1\.tgz$/);
       } finally {
         fixture.cleanup();
       }
@@ -3812,7 +4301,7 @@ test("refresh and close reject planned, tampered, unknown, and ineligible author
   });
 });
 
-test("version mode rejects empty, implicit, held, never, Dot, unknown, and source-set drift before version", async (t) => {
+test("version mode rejects empty, implicit, held, never, unknown, and source-set drift before version", async (t) => {
   const cases = [
     ["empty", { changesets: [], releases: [] }, "version-empty", []],
     [
@@ -3942,12 +4431,6 @@ test("version mode rejects empty, implicit, held, never, Dot, unknown, and sourc
       versionStatus("@hua-labs/security", { id: "security-release" }),
       "version-release-ineligible",
       ["security-release"],
-    ],
-    [
-      "no-publish",
-      versionStatus("@hua-labs/dot", { id: "dot-release" }),
-      "version-release-ineligible",
-      ["dot-release"],
     ],
     [
       "unknown",
