@@ -270,7 +270,7 @@ related_packages:
   - "@hua-labs/dot-aot"
 
 compatibility:
-  node: ">=20.0.0"
+  node: ">=20.16.0"
 
 documentation:
   detailedGuide:

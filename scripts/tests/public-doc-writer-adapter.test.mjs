@@ -69,6 +69,9 @@ function writePackage(root, name, options = {}) {
         version: "1.2.3",
         description: `${name} package`,
         files,
+        ...(options.nodeEngine === undefined
+          ? {}
+          : { engines: { node: options.nodeEngine } }),
       },
       null,
       2,
@@ -170,6 +173,19 @@ test("renders shipped, repository-only, and absent guide authority deterministic
   const stale = runWriter(root, ["--validate"]);
   assert.equal(stale.status, 1);
   assert.match(stale.stdout, /hua-shipped\/README\.md/);
+});
+
+test("projects the exact package Node engine with the platform fallback", () => {
+  const root = makeRoot();
+  writePackage(root, "hua-node-20", { nodeEngine: ">=20.16.0" });
+  writePackage(root, "hua-node-22", { nodeEngine: ">=22.0.0" });
+  writePackage(root, "hua-node-fallback");
+
+  const result = runWriter(root);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(output(root, "hua-node-20").ai, /node: ">=20\.16\.0"/);
+  assert.match(output(root, "hua-node-22").ai, /node: ">=22\.0\.0"/);
+  assert.match(output(root, "hua-node-fallback").ai, /node: ">=20\.0\.0"/);
 });
 
 test("writer derives both guide claims from the effective npm tarball roster", async (t) => {
@@ -390,9 +406,11 @@ test("current public package outputs remain byte-identical under validate", () =
 test("writer, AX adapter, and README template bytes are review-locked", () => {
   const expected = {
     "scripts/generate-docs.ts":
-      "9489d6dc8830e398f1543f22b994d18299a487938174e24bc32ff5946d1498ee",
+      "c4a5e24268a69aec4727460861f0697e88d2544900cfc210c59901a7c40c961a",
     "scripts/package-ax.mjs":
       "c8b07a3291e4733eba9c9689932586749333dc33e5f0ee3bc1ecfa69f954bcd6",
+    "scripts/templates/ai-yaml.hbs":
+      "7c195e7f33acd1c432083c103e5ccf287e8b7d2cd4e5e2975097b296fe25989b",
     "scripts/templates/readme.hbs":
       "bcae04c0249c22f4d7dafa079347876be474dbb48bf95c6f8f33d9953fca3879",
   };
