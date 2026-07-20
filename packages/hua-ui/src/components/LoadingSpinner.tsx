@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
-import React from "react"
-import { mergeStyles, resolveDot } from "../hooks/useDotMap"
+import React from "react";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 
 /**
  * LoadingSpinner 컴포넌트의 props / LoadingSpinner component props
@@ -14,14 +15,24 @@ import { mergeStyles, resolveDot } from "../hooks/useDotMap"
  * @property {React.CSSProperties} [style] - 추가 인라인 스타일 / Additional inline style
  */
 export interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg" | "xl"
-  variant?: "default" | "dots" | "bars" | "ring" | "ripple"
-  text?: string
-  color?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "glass"
-  className?: string
+  size?: "sm" | "md" | "lg" | "xl";
+  variant?: "default" | "dots" | "bars" | "ring" | "ripple";
+  text?: string;
+  color?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error"
+    | "glass";
+  /** Opaque Web class bytes applied to the outer wrapper. */
+  className?: string;
+  /** Remove only the outer wrapper flex and centering defaults. */
+  unstyled?: boolean;
   /** dot 유틸리티 스트링 (인라인 스타일로 변환) / dot utility string (converted to inline style) */
-  dot?: string
-  style?: React.CSSProperties
+  dot?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -61,6 +72,7 @@ export function LoadingSpinner({
   text,
   color = "default",
   className,
+  unstyled = false,
   dot: dotProp,
   style,
 }: LoadingSpinnerProps) {
@@ -68,22 +80,34 @@ export function LoadingSpinner({
     sm: "w-6 h-6", // 24px - 더 넉넉한 크기
     md: "w-8 h-8", // 32px - 더 넉넉한 크기
     lg: "w-12 h-12", // 48px - 더 넉넉한 크기
-    xl: "w-16 h-16" // 64px - 더 넉넉한 크기
-  }
+    xl: "w-16 h-16", // 64px - 더 넉넉한 크기
+  };
 
   // LoadingSpinner는 border 색상을 사용하므로 특화 색상 시스템 사용
   // 다크모드: track(배경)은 밝게, spinner(회전부)는 더 밝게 → 대비 확보
   const spinnerColors: Record<string, string> = {
-    default: "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
-    primary: "border-primary/30 border-t-primary dark:border-primary/20 dark:border-t-primary/80",
-    secondary: "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
-    success: "border-green-300 border-t-green-600 dark:border-green-500/50 dark:border-t-green-300",
-    warning: "border-yellow-300 border-t-yellow-600 dark:border-yellow-500/50 dark:border-t-yellow-300",
-    error: "border-red-300 border-t-red-600 dark:border-red-500/50 dark:border-t-red-300",
-    glass: "border-white/50 border-t-white/90 dark:border-slate-400/60 dark:border-t-slate-100"
-  }
+    default:
+      "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
+    primary:
+      "border-primary/30 border-t-primary dark:border-primary/20 dark:border-t-primary/80",
+    secondary:
+      "border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground/80",
+    success:
+      "border-green-300 border-t-green-600 dark:border-green-500/50 dark:border-t-green-300",
+    warning:
+      "border-yellow-300 border-t-yellow-600 dark:border-yellow-500/50 dark:border-t-yellow-300",
+    error:
+      "border-red-300 border-t-red-600 dark:border-red-500/50 dark:border-t-red-300",
+    glass:
+      "border-white/50 border-t-white/90 dark:border-slate-400/60 dark:border-t-slate-100",
+  };
 
-  const borderSizeClass = size === "xl" ? "border-[3px]" : size === "lg" ? "border-[2.5px]" : "border-2"
+  const borderSizeClass =
+    size === "xl"
+      ? "border-[3px]"
+      : size === "lg"
+        ? "border-[2.5px]"
+        : "border-2";
 
   const renderSpinner = () => {
     switch (variant) {
@@ -98,12 +122,30 @@ export function LoadingSpinner({
               }
             `}</style>
             <div style={resolveDot("flex space-x-1 items-center")}>
-              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '0ms' }} />
-              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '200ms' }} />
-              <div style={{ ...resolveDot("w-2 h-2 bg-current rounded-full"), animation: 'dotPulse 1.4s ease-in-out infinite', animationDelay: '400ms' }} />
+              <div
+                style={{
+                  ...resolveDot("w-2 h-2 bg-current rounded-full"),
+                  animation: "dotPulse 1.4s ease-in-out infinite",
+                  animationDelay: "0ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot("w-2 h-2 bg-current rounded-full"),
+                  animation: "dotPulse 1.4s ease-in-out infinite",
+                  animationDelay: "200ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot("w-2 h-2 bg-current rounded-full"),
+                  animation: "dotPulse 1.4s ease-in-out infinite",
+                  animationDelay: "400ms",
+                }}
+              />
             </div>
           </>
-        )
+        );
       case "bars":
         return (
           <>
@@ -114,49 +156,113 @@ export function LoadingSpinner({
               }
             `}</style>
             <div style={resolveDot("flex space-x-0.5 h-full items-center")}>
-              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '0ms' }} />
-              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '100ms' }} />
-              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '200ms' }} />
-              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '300ms' }} />
-              <div style={{ ...resolveDot("w-1 h-full bg-current rounded-sm origin-bottom"), animation: 'barWave 1.2s ease-in-out infinite', animationDelay: '400ms' }} />
+              <div
+                style={{
+                  ...resolveDot(
+                    "w-1 h-full bg-current rounded-sm origin-bottom",
+                  ),
+                  animation: "barWave 1.2s ease-in-out infinite",
+                  animationDelay: "0ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot(
+                    "w-1 h-full bg-current rounded-sm origin-bottom",
+                  ),
+                  animation: "barWave 1.2s ease-in-out infinite",
+                  animationDelay: "100ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot(
+                    "w-1 h-full bg-current rounded-sm origin-bottom",
+                  ),
+                  animation: "barWave 1.2s ease-in-out infinite",
+                  animationDelay: "200ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot(
+                    "w-1 h-full bg-current rounded-sm origin-bottom",
+                  ),
+                  animation: "barWave 1.2s ease-in-out infinite",
+                  animationDelay: "300ms",
+                }}
+              />
+              <div
+                style={{
+                  ...resolveDot(
+                    "w-1 h-full bg-current rounded-sm origin-bottom",
+                  ),
+                  animation: "barWave 1.2s ease-in-out infinite",
+                  animationDelay: "400ms",
+                }}
+              />
             </div>
           </>
-        )
+        );
       case "ring":
         return (
-          <div style={mergeStyles(
-            resolveDot("w-full h-full animate-spin rounded-full"),
-            resolveDot(borderSizeClass),
-            resolveDot(spinnerColors[color] || spinnerColors.default)
-          )} />
-        )
+          <div
+            style={mergeStyles(
+              resolveDot("w-full h-full animate-spin rounded-full"),
+              resolveDot(borderSizeClass),
+              resolveDot(spinnerColors[color] || spinnerColors.default),
+            )}
+          />
+        );
       case "ripple":
         return (
           <div style={resolveDot("relative w-full h-full")}>
-            <div style={mergeStyles(
-              resolveDot("absolute inset-0 rounded-full border-2 animate-ping"),
-              resolveDot(spinnerColors[color] || spinnerColors.default)
-            )} />
-            <div style={mergeStyles(
-              resolveDot("w-full h-full rounded-full border-2"),
-              resolveDot(spinnerColors[color] || spinnerColors.default)
-            )} />
+            <div
+              style={mergeStyles(
+                resolveDot(
+                  "absolute inset-0 rounded-full border-2 animate-ping",
+                ),
+                resolveDot(spinnerColors[color] || spinnerColors.default),
+              )}
+            />
+            <div
+              style={mergeStyles(
+                resolveDot("w-full h-full rounded-full border-2"),
+                resolveDot(spinnerColors[color] || spinnerColors.default),
+              )}
+            />
           </div>
-        )
+        );
       default:
         return (
-          <div style={mergeStyles(
-            resolveDot("w-full h-full animate-spin rounded-full"),
-            resolveDot(borderSizeClass),
-            resolveDot(spinnerColors[color] || spinnerColors.default)
-          )} />
-        )
+          <div
+            style={mergeStyles(
+              resolveDot("w-full h-full animate-spin rounded-full"),
+              resolveDot(borderSizeClass),
+              resolveDot(spinnerColors[color] || spinnerColors.default),
+            )}
+          />
+        );
     }
-  }
+  };
 
   return (
-    <div className={className} style={mergeStyles(resolveDot("flex flex-col items-center justify-center"), resolveDot(dotProp), style)}>
-      <div style={mergeStyles(resolveDot(sizeClasses[size]), resolveDot("text-muted-foreground"))}>
+    <div
+      className={joinWebClassNames(className)}
+      style={mergeStyles(
+        unstyled
+          ? undefined
+          : resolveDot("flex flex-col items-center justify-center"),
+        resolveDot(dotProp),
+        style,
+      )}
+    >
+      <div
+        style={mergeStyles(
+          resolveDot(sizeClasses[size]),
+          resolveDot("text-muted-foreground"),
+        )}
+      >
         {renderSpinner()}
       </div>
       {text && (
@@ -165,5 +271,5 @@ export function LoadingSpinner({
         </p>
       )}
     </div>
-  )
+  );
 }

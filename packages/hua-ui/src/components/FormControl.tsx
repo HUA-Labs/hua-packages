@@ -2,6 +2,7 @@
 
 import React from "react";
 import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 
 /**
  * FormControl 컴포넌트의 props / FormControl component props
@@ -23,7 +24,10 @@ export interface FormControlProps {
   htmlFor?: string;
   showErrorIcon?: boolean;
   suppressBrowserValidation?: boolean;
+  /** Opaque Web class bytes applied to the outer control wrapper. */
   className?: string;
+  /** Remove only the outer wrapper layout defaults. */
+  unstyled?: boolean;
   dot?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -64,6 +68,7 @@ function FormControl({
   showErrorIcon = true,
   suppressBrowserValidation = true,
   className,
+  unstyled = false,
   dot: dotProp,
   style,
   children,
@@ -83,7 +88,8 @@ function FormControl({
         childProps.onInvalid = (e: React.FormEvent) => {
           e.preventDefault();
           // Call original onInvalid if exists
-          const originalOnInvalid = (child.props as Record<string, unknown>).onInvalid;
+          const originalOnInvalid = (child.props as Record<string, unknown>)
+            .onInvalid;
           if (typeof originalOnInvalid === "function") {
             originalOnInvalid(e);
           }
@@ -97,21 +103,30 @@ function FormControl({
 
   return (
     <div
-      className={className}
-      style={mergeStyles(resolveDot("space-y-2"), resolveDot(dotProp), style)}
+      className={joinWebClassNames(className)}
+      style={mergeStyles(
+        unstyled ? undefined : resolveDot("space-y-2"),
+        resolveDot(dotProp),
+        style,
+      )}
     >
       {/* Label */}
       {label && (
         <label
           htmlFor={htmlFor}
           style={mergeStyles(
-            resolveDot("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"),
-            hasError ? resolveDot("text-destructive") : undefined
+            resolveDot(
+              "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+            ),
+            hasError ? resolveDot("text-destructive") : undefined,
           )}
         >
           {label}
           {required && (
-            <span style={resolveDot("text-destructive ml-1")} aria-hidden="true">
+            <span
+              style={resolveDot("text-destructive ml-1")}
+              aria-hidden="true"
+            >
               *
             </span>
           )}
@@ -124,7 +139,11 @@ function FormControl({
       )}
 
       {/* Input - with :invalid styling support */}
-      <div style={resolveDot("relative [&_input:invalid]:border-destructive/50 [&_select:invalid]:border-destructive/50 [&_textarea:invalid]:border-destructive/50")}>
+      <div
+        style={resolveDot(
+          "relative [&_input:invalid]:border-destructive/50 [&_select:invalid]:border-destructive/50 [&_textarea:invalid]:border-destructive/50",
+        )}
+      >
         {enhancedChildren}
       </div>
 
@@ -136,7 +155,9 @@ function FormControl({
           role="alert"
           aria-live="polite"
         >
-          {showErrorIcon && <ErrorIcon style={resolveDot("w-4 h-4 mt-0.5 flex-shrink-0")} />}
+          {showErrorIcon && (
+            <ErrorIcon style={resolveDot("w-4 h-4 mt-0.5 flex-shrink-0")} />
+          )}
           <span>{error}</span>
         </div>
       )}
@@ -173,7 +194,10 @@ type ValidationPreset = "email" | "phone" | "url" | "alphanumeric" | "password";
 /**
  * Preset validation patterns and error messages
  */
-const VALIDATION_PRESETS: Record<ValidationPreset, { pattern: RegExp; message: string }> = {
+const VALIDATION_PRESETS: Record<
+  ValidationPreset,
+  { pattern: RegExp; message: string }
+> = {
   email: {
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     message: "Invalid email format",
@@ -192,7 +216,8 @@ const VALIDATION_PRESETS: Record<ValidationPreset, { pattern: RegExp; message: s
   },
   password: {
     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-    message: "Must contain at least 8 characters with uppercase, lowercase, and number",
+    message:
+      "Must contain at least 8 characters with uppercase, lowercase, and number",
   },
 };
 
@@ -227,7 +252,18 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
     const newErrors: ValidationErrors = {};
 
     for (const [field, rule] of Object.entries(rules)) {
-      const { value, type, required, minLength, maxLength, min, max, pattern, custom, messages = {} } = rule;
+      const {
+        value,
+        type,
+        required,
+        minLength,
+        maxLength,
+        min,
+        max,
+        pattern,
+        custom,
+        messages = {},
+      } = rule;
       const stringValue = String(value);
 
       // Required check
@@ -250,13 +286,15 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
 
       // MinLength check
       if (minLength !== undefined && stringValue.length < minLength) {
-        newErrors[field] = messages.minLength || `Must be at least ${minLength} characters`;
+        newErrors[field] =
+          messages.minLength || `Must be at least ${minLength} characters`;
         continue;
       }
 
       // MaxLength check
       if (maxLength !== undefined && stringValue.length > maxLength) {
-        newErrors[field] = messages.maxLength || `Must be at most ${maxLength} characters`;
+        newErrors[field] =
+          messages.maxLength || `Must be at most ${maxLength} characters`;
         continue;
       }
 
@@ -309,12 +347,7 @@ function useFormValidation(initialErrors: ValidationErrors = {}) {
 // Error icon component
 function ErrorIcon({ style }: { style?: React.CSSProperties }) {
   return (
-    <svg
-      style={style}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -326,4 +359,9 @@ function ErrorIcon({ style }: { style?: React.CSSProperties }) {
 }
 
 export { FormControl, useFormValidation, VALIDATION_PRESETS };
-export type { ValidationRule, ValidationRules, ValidationErrors, ValidationPreset };
+export type {
+  ValidationRule,
+  ValidationRules,
+  ValidationErrors,
+  ValidationPreset,
+};

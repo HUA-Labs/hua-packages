@@ -64,9 +64,16 @@ their focused tests. M814 admits 10 more byte-exact interaction and accessibilit
 paths from that same authority: `BottomSheet`, `Drawer`, `Textarea`, `Toast`, and
 `Tooltip`, paired with their focused tests. The test locks all 24 admitted paths
 and independently rejects a self-consistent reclassification in the remaining
-126-row authority set. Every other mapped source path keeps its prior fail-closed
-disposition; these projections do not copy package, export, dependency, version,
-Changeset, lock, workflow, or generated-document authority.
+126-row authority set. M828 advances the source authority to platform commit
+`4a710400e2920073c29cb942e148f65bf3c44c6e` and admits 10 more byte-exact DOM
+class-name paths: `FormControl`, `Link`, `LoadingSpinner`, `PageTransition`, and
+`Section`, paired with their focused tests. The map now contains 34
+`platform-exact`, 62 `deferred`, and 54 `public-preserved` rows. The test locks
+the M828 10-row projection separately from the complete 34-path admitted roster
+and independently rejects a self-consistent reclassification in the remaining
+116-row authority set. Every other mapped source path keeps its prior
+fail-closed disposition; these projections do not copy package, export,
+dependency, version, Changeset, lock, workflow, or generated-document authority.
 The pack-artifact checker always runs the current public-side gate first, so a
 source sync cannot reach immutable tarball evidence with an unreviewed byte or
 an unupdated disposition. This authority map is verification evidence only: it

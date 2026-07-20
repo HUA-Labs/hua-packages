@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { LoadingSpinner } from './LoadingSpinner'
-import { mergeStyles, resolveDot } from '../hooks/useDotMap'
+import React, { useState, useEffect } from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
+import { mergeStyles, resolveDot } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 
 /**
  * PageTransition 컴포넌트의 props / PageTransition component props
@@ -17,17 +18,20 @@ import { mergeStyles, resolveDot } from '../hooks/useDotMap'
  * @property {() => void} [onTransitionEnd] - 전환 종료 콜백 / Transition end callback
  */
 export interface PageTransitionProps {
-  children: React.ReactNode
-  className?: string
-  dot?: string
-  style?: React.CSSProperties
-  duration?: number
-  variant?: 'fade' | 'slide' | 'scale' | 'flip'
-  loadingVariant?: 'default' | 'dots' | 'bars' | 'ring' | 'ripple'
-  loadingText?: string
-  showLoading?: boolean
-  onTransitionStart?: () => void
-  onTransitionEnd?: () => void
+  children: React.ReactNode;
+  /** Opaque Web class bytes applied to the current loading or content root. */
+  className?: string;
+  /** Remove shell defaults while preserving transition and spinner behavior. */
+  unstyled?: boolean;
+  dot?: string;
+  style?: React.CSSProperties;
+  duration?: number;
+  variant?: "fade" | "slide" | "scale" | "flip";
+  loadingVariant?: "default" | "dots" | "bars" | "ring" | "ripple";
+  loadingText?: string;
+  showLoading?: boolean;
+  onTransitionStart?: () => void;
+  onTransitionEnd?: () => void;
 }
 
 /**
@@ -60,99 +64,121 @@ export interface PageTransitionProps {
  * @param {React.Ref<HTMLDivElement>} ref - div 요소 ref / div element ref
  * @returns {JSX.Element} PageTransition 컴포넌트 / PageTransition component
  */
-export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(({
-  children,
-  className,
-  dot: dotProp,
-  style,
-  duration = 300,
-  variant = 'fade',
-  loadingVariant = 'ripple',
-  loadingText = '페이지 로딩 중...',
-  showLoading = true,
-  onTransitionStart,
-  onTransitionEnd
-}, ref) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isVisible, setIsVisible] = useState(false)
+export const PageTransition = React.forwardRef<
+  HTMLDivElement,
+  PageTransitionProps
+>(
+  (
+    {
+      children,
+      className,
+      unstyled = false,
+      dot: dotProp,
+      style,
+      duration = 300,
+      variant = "fade",
+      loadingVariant = "ripple",
+      loadingText = "페이지 로딩 중...",
+      showLoading = true,
+      onTransitionStart,
+      onTransitionEnd,
+    },
+    ref,
+  ) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-      setIsVisible(true)
-      onTransitionEnd?.()
-    }, duration)
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setIsVisible(true);
+        onTransitionEnd?.();
+      }, duration);
 
-    onTransitionStart?.()
+      onTransitionStart?.();
 
-    return () => clearTimeout(timer)
-  }, [duration, onTransitionStart, onTransitionEnd])
+      return () => clearTimeout(timer);
+    }, [duration, onTransitionStart, onTransitionEnd]);
 
-  const transitionClasses = {
-    fade: isVisible
-      ? 'transition-opacity duration-300 ease-in-out opacity-100'
-      : 'transition-opacity duration-300 ease-in-out opacity-0',
-    slide: isVisible
-      ? 'transition-transform duration-300 ease-in-out translate-x-0'
-      : 'transition-transform duration-300 ease-in-out translate-x-full',
-    scale: isVisible
-      ? 'transition-all duration-300 ease-in-out scale-100 opacity-100'
-      : 'transition-all duration-300 ease-in-out scale-95 opacity-0',
-    flip: isVisible
-      ? 'transition-all duration-500 ease-in-out rotate-y-0 opacity-100'
-      : 'transition-all duration-500 ease-in-out rotate-y-90 opacity-0',
-  }
+    const transitionClasses = {
+      fade: isVisible
+        ? "transition-opacity duration-300 ease-in-out opacity-100"
+        : "transition-opacity duration-300 ease-in-out opacity-0",
+      slide: isVisible
+        ? "transition-transform duration-300 ease-in-out translate-x-0"
+        : "transition-transform duration-300 ease-in-out translate-x-full",
+      scale: isVisible
+        ? "transition-all duration-300 ease-in-out scale-100 opacity-100"
+        : "transition-all duration-300 ease-in-out scale-95 opacity-0",
+      flip: isVisible
+        ? "transition-all duration-500 ease-in-out rotate-y-0 opacity-100"
+        : "transition-all duration-500 ease-in-out rotate-y-90 opacity-0",
+    };
 
-  if (isLoading && showLoading) {
+    if (isLoading && showLoading) {
+      return (
+        <div
+          className={joinWebClassNames(className)}
+          style={
+            unstyled
+              ? undefined
+              : resolveDot(
+                  "flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800",
+                )
+          }
+        >
+          <LoadingSpinner
+            size="lg"
+            variant={loadingVariant}
+            text={loadingText}
+          />
+        </div>
+      );
+    }
+
     return (
-      <div style={resolveDot('flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800')}>
-        <LoadingSpinner
-          size="lg"
-          variant={loadingVariant}
-          text={loadingText}
-        />
+      <div
+        ref={ref}
+        className={joinWebClassNames(className)}
+        style={mergeStyles(
+          unstyled ? undefined : resolveDot("w-full"),
+          resolveDot(transitionClasses[variant]),
+          { transitionDuration: `${duration}ms` },
+          resolveDot(dotProp),
+          style,
+        )}
+      >
+        {children}
       </div>
-    )
-  }
+    );
+  },
+);
 
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={mergeStyles(
-        resolveDot('w-full'),
-        resolveDot(transitionClasses[variant]),
-        { transitionDuration: `${duration}ms` },
-        resolveDot(dotProp),
-        style
-      )}
-    >
-      {children}
-    </div>
-  )
-})
-
-PageTransition.displayName = 'PageTransition'
+PageTransition.displayName = "PageTransition";
 
 // Convenience components for different transition types
-export const FadeTransition = React.forwardRef<HTMLDivElement, Omit<PageTransitionProps, 'variant'>>((props, ref) => (
-  <PageTransition ref={ref} variant="fade" {...props} />
-))
+export const FadeTransition = React.forwardRef<
+  HTMLDivElement,
+  Omit<PageTransitionProps, "variant">
+>((props, ref) => <PageTransition ref={ref} variant="fade" {...props} />);
 
-export const SlideTransition = React.forwardRef<HTMLDivElement, Omit<PageTransitionProps, 'variant'>>((props, ref) => (
-  <PageTransition ref={ref} variant="slide" {...props} />
-))
+export const SlideTransition = React.forwardRef<
+  HTMLDivElement,
+  Omit<PageTransitionProps, "variant">
+>((props, ref) => <PageTransition ref={ref} variant="slide" {...props} />);
 
-export const ScaleTransition = React.forwardRef<HTMLDivElement, Omit<PageTransitionProps, 'variant'>>((props, ref) => (
-  <PageTransition ref={ref} variant="scale" {...props} />
-))
+export const ScaleTransition = React.forwardRef<
+  HTMLDivElement,
+  Omit<PageTransitionProps, "variant">
+>((props, ref) => <PageTransition ref={ref} variant="scale" {...props} />);
 
-export const FlipTransition = React.forwardRef<HTMLDivElement, Omit<PageTransitionProps, 'variant'>>((props, ref) => (
-  <PageTransition ref={ref} variant="flip" {...props} />
-))
+export const FlipTransition = React.forwardRef<
+  HTMLDivElement,
+  Omit<PageTransitionProps, "variant">
+>((props, ref) => <PageTransition ref={ref} variant="flip" {...props} />);
 
 // Add displayName for convenience components
-FadeTransition.displayName = 'FadeTransition'
-SlideTransition.displayName = 'SlideTransition'
-ScaleTransition.displayName = 'ScaleTransition'
-FlipTransition.displayName = 'FlipTransition'
+FadeTransition.displayName = "FadeTransition";
+SlideTransition.displayName = "SlideTransition";
+ScaleTransition.displayName = "ScaleTransition";
+FlipTransition.displayName = "FlipTransition";

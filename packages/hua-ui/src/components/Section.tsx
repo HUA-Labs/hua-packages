@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { dotVariants, dot as dotFn } from "@hua-labs/dot";
 import { dotCSS } from "@hua-labs/dot/class";
 import { mergeStyles } from "../hooks/useDotMap";
+import { joinWebClassNames } from "../lib/web-classname";
 import { Container, type ContainerProps } from "./Container";
 
 const s = (input: string) => dotFn(input) as React.CSSProperties;
@@ -46,7 +47,10 @@ export interface SectionProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
   "className"
 > {
+  /** Opaque Web class bytes joined after the generated Dot class. */
   className?: string;
+  /** Remove Section-owned root base, spacing, and background defaults. */
+  unstyled?: boolean;
   /** Container 사이즈 @default 'lg' */
   container?: ContainerProps["size"];
   /** Container 패딩 @default 'none' */
@@ -139,6 +143,7 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
       header,
       fullWidth = false,
       className,
+      unstyled = false,
       style,
       children,
       ...props
@@ -147,20 +152,21 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
   ) => {
     const sectionCls = useMemo(() => {
       const tokens = [
-        "relative w-full px-6",
-        spacingTokens[spacing ?? "lg"],
+        unstyled ? undefined : "relative w-full px-6",
+        unstyled ? undefined : spacingTokens[spacing ?? "lg"],
         dotProp,
       ]
         .filter(Boolean)
         .join(" ");
-      return dotCSS(tokens);
-    }, [spacing, dotProp]);
+      return tokens ? dotCSS(tokens) : { className: "", css: "" };
+    }, [spacing, dotProp, unstyled]);
 
     const bgStyle = useMemo<React.CSSProperties | undefined>(() => {
+      if (unstyled) return undefined;
       const key = background ?? "none";
       if (key === "none") return undefined;
       return dotFn(bgTokens[key]) as React.CSSProperties;
-    }, [background]);
+    }, [background, unstyled]);
 
     const content = (
       <>
@@ -173,7 +179,10 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(
       <section
         ref={ref}
         {...props}
-        className={[sectionCls.className, className].filter(Boolean).join(" ")}
+        className={joinWebClassNames(
+          sectionCls.className || undefined,
+          className,
+        )}
         style={mergeStyles(bgStyle, style)}
       >
         {fullWidth ? (

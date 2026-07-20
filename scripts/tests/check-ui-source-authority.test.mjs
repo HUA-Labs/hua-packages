@@ -47,15 +47,30 @@ const m814InteractionPaths = [
   "packages/hua-ui/src/components/__tests__/Toast.test.tsx",
   "packages/hua-ui/src/components/__tests__/Tooltip.test.tsx",
 ];
-const m814PlatformExactPaths = [
+const m821DomClassNamePaths = [
+  "packages/hua-ui/src/components/FormControl.tsx",
+  "packages/hua-ui/src/components/Link.tsx",
+  "packages/hua-ui/src/components/LoadingSpinner.tsx",
+  "packages/hua-ui/src/components/PageTransition.tsx",
+  "packages/hua-ui/src/components/Section.tsx",
+  "packages/hua-ui/src/components/__tests__/FormControl.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Link.test.tsx",
+  "packages/hua-ui/src/components/__tests__/LoadingSpinner.test.tsx",
+  "packages/hua-ui/src/components/__tests__/PageTransition.test.tsx",
+  "packages/hua-ui/src/components/__tests__/Section.test.tsx",
+];
+const m828PlatformExactPaths = [
   ...m810PlatformExactPaths,
   ...m814InteractionPaths,
+  ...m821DomClassNamePaths,
 ].sort();
-const m814PlatformExactPathSet = new Set(m814PlatformExactPaths);
-const m814MapDigest =
-  "e5a0f87759e918195c7ade04b60d62bad83b900b1c5fe7ce5adace54998e58a7";
-const m814UnselectedDigest =
-  "e335ae56c5a7aaee8be939f12bc4bd2af3146884f55310dc12285f1b58879ff8";
+const m828PlatformExactPathSet = new Set(m828PlatformExactPaths);
+const m828MapDigest =
+  "ad9f86fad0a8fa7180f959df39c014c7617e402e802b215f579e4951eab7f93a";
+const m821SelectedDigest =
+  "1b62279f3148d21bedee2311eb9ef58c256e1f01c56d67246f7e6b43f00a291f";
+const m828UnselectedDigest =
+  "8d4a5e912ee4b80158e71bfb4f78dbe5718ef54005e4f2647059dd5f61df9fb3";
 const ownedRoots = [];
 
 afterEach(() => {
@@ -103,26 +118,44 @@ function canonicalJson(value) {
   return `${JSON.stringify(canonicalValue(value), null, 2)}\n`;
 }
 
+function authorityRowDigest(rows) {
+  const lines = rows
+    .map((row) =>
+      [
+        row.disposition,
+        row.kind,
+        row.path,
+        row.sourceSha256,
+        row.publicBaseSha256 ?? "null",
+        row.outputSha256 ?? "null",
+      ].join("\t"),
+    )
+    .sort((left, right) =>
+      Buffer.from(left, "utf8").compare(Buffer.from(right, "utf8")),
+    );
+  return sha256(`${lines.join("\n")}\n`);
+}
+
 function unselectedAuthorityRows(rows) {
-  return rows.filter((row) => !m814PlatformExactPathSet.has(row.path));
+  return rows.filter((row) => !m828PlatformExactPathSet.has(row.path));
 }
 
 function unselectedAuthorityDigest(rows) {
-  return sha256(canonicalJson(unselectedAuthorityRows(rows)));
+  return authorityRowDigest(unselectedAuthorityRows(rows));
 }
 
-function assertM814AuthorityLock(
+function assertM828AuthorityLock(
   config,
   {
-    expectedMapDigest = m814MapDigest,
-    expectedUnselectedDigest = m814UnselectedDigest,
+    expectedMapDigest = m828MapDigest,
+    expectedUnselectedDigest = m828UnselectedDigest,
   } = {},
 ) {
   assert.equal(config.mapDigest, sha256(canonicalJson(config.rows)));
   assert.equal(config.mapDigest, expectedMapDigest);
 
   const unselectedRows = unselectedAuthorityRows(config.rows);
-  assert.equal(unselectedRows.length, 126);
+  assert.equal(unselectedRows.length, 116);
   assert.equal(
     unselectedAuthorityDigest(config.rows),
     expectedUnselectedDigest,
@@ -256,28 +289,33 @@ function runChecker(fixture, ...extra) {
   );
 }
 
-test("locks the M814 interaction family and unselected remainder to platform authority", () => {
+test("locks the M828 DOM family and unselected remainder to platform authority", () => {
   const config = JSON.parse(readFileSync(realConfig, "utf8"));
   assert.deepEqual(config.sourceAuthority, {
-    commit: "f9ceddaa02c4b544b108d5ab68766a965e36b58d",
-    packageTree: "b729f3205637d4cd5a83ad7950df5b4faca7c56f",
-    sourceTree: "a74dd5618d5535c5968092cc5db9dc6c4b4d5558",
-    tree: "a425145fa9c63a35b61e44885f37c962aa86d593",
+    commit: "4a710400e2920073c29cb942e148f65bf3c44c6e",
+    packageTree: "fe3ea9a3d65ade4d65d1d7bf66b032cfaa01db7f",
+    sourceTree: "dd64665d9b8a11baf93aa554516304c3276a64b5",
+    tree: "fb14af0491913f208f88f94972bea30a8193fdb4",
   });
-  assertM814AuthorityLock(config);
+  assertM828AuthorityLock(config);
 
   const platformExactRows = config.rows.filter(
     (row) => row.disposition === "platform-exact",
   );
   assert.deepEqual(
     platformExactRows.map((row) => row.path),
-    m814PlatformExactPaths,
+    m828PlatformExactPaths,
   );
   for (const row of platformExactRows) {
     assert.equal(row.outputSha256, row.sourceSha256, row.path);
   }
 
-  for (const path of m814InteractionPaths) {
+  const m821SelectedRows = config.rows.filter((row) =>
+    m821DomClassNamePaths.includes(row.path),
+  );
+  assert.equal(authorityRowDigest(m821SelectedRows), m821SelectedDigest);
+
+  for (const path of m821DomClassNamePaths) {
     const row = config.rows.find((candidate) => candidate.path === path);
     assert.equal(row?.disposition, "platform-exact", path);
     assert.equal(row?.outputSha256, row?.sourceSha256, path);
@@ -297,17 +335,17 @@ test("locks the M814 interaction family and unselected remainder to platform aut
 
   assert.equal(
     tampered.mapDigest,
-    "462998b3bec23927f9d7c5be88979125b3d852cab49315b5eba651fecd31b084",
+    "4ac1ac2fba874867f8b4ed5633c86d7105d3bd08d675701402daf14075138aa2",
   );
   const tamperedUnselectedDigest = unselectedAuthorityDigest(tampered.rows);
   assert.equal(
     tamperedUnselectedDigest,
-    "dc1db5bff2f05635f95422fcb8989dff57969057a9600e57212b73f6380b8f39",
+    "5e1c95bd615f60b9a10ef67077b6ea63a88cc7333588b2591c071be159c1e636",
   );
 
   let failure;
   try {
-    assertM814AuthorityLock(tampered, {
+    assertM828AuthorityLock(tampered, {
       expectedMapDigest: tampered.mapDigest,
     });
   } catch (error) {
@@ -315,7 +353,7 @@ test("locks the M814 interaction family and unselected remainder to platform aut
   }
   assert.equal(failure?.name, "AssertionError");
   assert.equal(failure?.actual, tamperedUnselectedDigest);
-  assert.equal(failure?.expected, m814UnselectedDigest);
+  assert.equal(failure?.expected, m828UnselectedDigest);
 });
 
 function createOversizedSourceFixture() {
