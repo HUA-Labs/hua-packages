@@ -667,15 +667,13 @@ function workspaceManifestSpecifiers(manifest, workspaceNames, label) {
 
 function parseWorkspaceVersionSpecifier(specifier) {
   assert(specifier.startsWith("workspace:"), "version-lock-workspace-protocol");
-  let version = specifier.slice("workspace:".length);
-  let operator = "";
-  if (version.startsWith("^") || version.startsWith("~")) {
-    operator = version[0];
-    version = version.slice(1);
-  }
-  assert(version !== "*", "version-lock-workspace-protocol");
+  const version = specifier.slice("workspace:".length);
+  assert(
+    version !== "*" && !version.startsWith("^") && !version.startsWith("~"),
+    "version-lock-workspace-protocol",
+  );
   parseSemver(version);
-  return { operator, version };
+  return version;
 }
 
 function validateVersionLockClosure({
@@ -725,12 +723,13 @@ function validateVersionLockClosure({
         dependencyRelease !== undefined,
         "version-lock-unselected-relation",
       );
-      const sourceWorkspace = parseWorkspaceVersionSpecifier(sourceSpecifier);
-      const finalWorkspace = parseWorkspaceVersionSpecifier(finalSpecifier);
+      const sourceWorkspaceVersion =
+        parseWorkspaceVersionSpecifier(sourceSpecifier);
+      const finalWorkspaceVersion =
+        parseWorkspaceVersionSpecifier(finalSpecifier);
       assert(
-        sourceWorkspace.operator === finalWorkspace.operator &&
-          sourceWorkspace.version === dependencyRelease.fromVersion &&
-          finalWorkspace.version === dependencyRelease.toVersion,
+        sourceWorkspaceVersion === dependencyRelease.fromVersion &&
+          finalWorkspaceVersion === dependencyRelease.toVersion,
         "version-lock-workspace-version",
       );
       const sourceImporter = sourceLock.importers[release.path];

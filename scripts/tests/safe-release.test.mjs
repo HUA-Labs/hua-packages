@@ -4306,8 +4306,16 @@ function fivePackageVersionStatus() {
   };
 }
 
-function createFivePackageVersionFixture() {
-  const fixture = makeFixture({ definitions: fivePackageVersionDefinitions() });
+function createFivePackageVersionFixture(options = {}) {
+  const definitions = fivePackageVersionDefinitions();
+  if (options.dotSpecifier !== undefined) {
+    for (const definition of definitions) {
+      if (definition.dependencies?.["@hua-labs/dot"] !== undefined) {
+        definition.dependencies["@hua-labs/dot"] = options.dotSpecifier;
+      }
+    }
+  }
+  const fixture = makeFixture({ definitions });
   writeFileSync(
     join(fixture.root, ".changeset/five-package-release-cohort.md"),
     '---\n"@hua-labs/dot": minor\n"@hua-labs/dot-aot": minor\n"@hua-labs/dot-lsp": patch\n"@hua-labs/dot-mcp": minor\n"@hua-labs/ui": minor\n---\n\nDependency-ordered release cohort.\n',
@@ -4315,16 +4323,20 @@ function createFivePackageVersionFixture() {
   return fixture;
 }
 
-function applyFivePackageDependencyVersions(root) {
+function setFivePackageDotDependency(root, specifier) {
   for (const path of [
     "packages/hua-dot-aot/package.json",
     "packages/hua-dot-lsp/package.json",
     "packages/hua-dot-mcp/package.json",
   ]) {
     mutateJson(join(root, path), (manifest) => {
-      manifest.dependencies["@hua-labs/dot"] = "workspace:0.3.0";
+      manifest.dependencies["@hua-labs/dot"] = specifier;
     });
   }
+}
+
+function applyFivePackageDependencyVersions(root) {
+  setFivePackageDotDependency(root, "workspace:0.3.0");
 }
 
 function runVersionFixture(fixture, status, options = {}) {
@@ -4668,6 +4680,38 @@ test("version mode writes no planned authority for stale, failed, or churned loc
           readFileSync(join(fixture.root, "config/release-plan.json")),
           planBytes,
         );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("version mode rejects mutable workspace operators before planning", async (t) => {
+  for (const [name, operator] of [
+    ["caret", "^"],
+    ["tilde", "~"],
+  ]) {
+    await t.test(name, () => {
+      const sourceSpecifier = `workspace:${operator}0.2.2`;
+      const finalSpecifier = `workspace:${operator}0.3.0`;
+      const fixture = createFivePackageVersionFixture({
+        dotSpecifier: sourceSpecifier,
+      });
+      try {
+        const planPath = join(fixture.root, "config/release-plan.json");
+        const planBytes = readFileSync(planPath);
+
+        assertCode(
+          () =>
+            runVersionFixture(fixture, fivePackageVersionStatus(), {
+              afterVersion(root) {
+                setFivePackageDotDependency(root, finalSpecifier);
+              },
+            }),
+          "version-lock-workspace-protocol",
+        );
+        assert.deepEqual(readFileSync(planPath), planBytes);
       } finally {
         fixture.cleanup();
       }
