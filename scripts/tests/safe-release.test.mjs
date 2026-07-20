@@ -227,6 +227,13 @@ function rewriteFixtureLockfile(root, definitions) {
   writeFileSync(lockPath, stringify(lock));
 }
 
+function mutateFixtureLockfile(root, mutate) {
+  const lockPath = join(root, "pnpm-lock.yaml");
+  const lock = parseDocument(readFileSync(lockPath, "utf8")).toJS();
+  mutate(lock);
+  writeFileSync(lockPath, stringify(lock));
+}
+
 function makeFixture(options = {}) {
   const definitions = structuredClone(
     options.definitions ?? packageDefinitions,
@@ -4324,6 +4331,7 @@ function runVersionFixture(fixture, status, options = {}) {
   const calls = [];
   const result = runVersion({
     root: fixture.root,
+    environment: options.environment,
     execFile(file, args, commandOptions) {
       calls.push({ file, args, options: commandOptions });
       if (args.includes("status")) {
@@ -4335,7 +4343,7 @@ function runVersionFixture(fixture, status, options = {}) {
         if (!options.skipLockWrite) {
           rewriteFixtureLockfile(fixture.root, fixture.definitions);
         }
-        options.afterLock?.(fixture.root);
+        options.afterLock?.(fixture.root, commandOptions);
         return "";
       }
       for (const release of status.releases) {
@@ -4381,12 +4389,24 @@ test("version mode captures source bytes then writes a deterministic UI-only dur
   }
   const firstRun = runVersionFixture(first, status);
   const secondRun = runVersionFixture(second, status);
+  assert.deepEqual(firstRun.calls[0].args.slice(0, 4), [
+    "exec",
+    "changeset",
+    "status",
+    "--output",
+  ]);
+  assert.match(firstRun.calls[0].args[4], /\/status\.json$/);
   assert.deepEqual(
-    firstRun.calls.map((entry) => entry.args.slice(0, 3)),
+    firstRun.calls.slice(1).map((entry) => entry.args),
     [
-      ["exec", "changeset", "status"],
       ["exec", "changeset", "version"],
-      ["install", "--lockfile-only", "--ignore-scripts"],
+      [
+        "install",
+        "--lockfile-only",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+      ],
     ],
   );
   assert.deepEqual(
@@ -4413,8 +4433,48 @@ test("version mode closes only selected workspace importer relations before plan
   t.after(() => second.cleanup());
   const status = fivePackageVersionStatus();
   const sourceLock = readFileSync(join(first.root, "pnpm-lock.yaml"), "utf8");
+  const parsedSourceLock = parseDocument(sourceLock).toJS();
+  let observedLockEnvironment;
   const firstRun = runVersionFixture(first, status, {
     afterVersion: applyFivePackageDependencyVersions,
+    environment: {
+      PATH: process.env.PATH,
+      CI: "true",
+      LANG: "C.UTF-8",
+      HOME: "/foreign/home",
+      NPM_CONFIG_USERCONFIG: "/foreign/user.npmrc",
+      NPM_CONFIG_GLOBALCONFIG: "/foreign/global.npmrc",
+      NPM_TOKEN: "private-token",
+      NODE_AUTH_TOKEN: "private-node-token",
+      GITHUB_TOKEN: "private-github-token",
+      npm_config_registry: "https://foreign.invalid/",
+      npm_config_ignore_scripts: "false",
+      PNPM_CONFIG_IGNORE_SCRIPTS: "false",
+    },
+    afterLock(_root, commandOptions) {
+      observedLockEnvironment = commandOptions.env;
+      assert.match(
+        commandOptions.env.HOME,
+        /hua-safe-release-status-[^/]+\/lock-home$/,
+      );
+      assert.equal(commandOptions.env.USERPROFILE, commandOptions.env.HOME);
+      assert.equal(
+        commandOptions.env.NPM_CONFIG_USERCONFIG,
+        join(commandOptions.env.HOME, "user.npmrc"),
+      );
+      assert.equal(
+        commandOptions.env.NPM_CONFIG_GLOBALCONFIG,
+        join(commandOptions.env.HOME, "global.npmrc"),
+      );
+      assert.equal(
+        readFileSync(commandOptions.env.NPM_CONFIG_USERCONFIG, "utf8"),
+        "",
+      );
+      assert.equal(
+        readFileSync(commandOptions.env.NPM_CONFIG_GLOBALCONFIG, "utf8"),
+        "",
+      );
+    },
   });
   const secondRun = runVersionFixture(second, status, {
     afterVersion: applyFivePackageDependencyVersions,
@@ -4478,8 +4538,16 @@ test("version mode closes only selected workspace importer relations before plan
     "packages/hua-dot-mcp",
   ]) {
     assert.equal(
+      parsedSourceLock.importers[path].dependencies["@hua-labs/dot"].specifier,
+      "workspace:0.2.2",
+    );
+    assert.equal(
       lock.importers[path].dependencies["@hua-labs/dot"].specifier,
       "workspace:0.3.0",
+    );
+    assert.equal(
+      lock.importers[path].dependencies["@hua-labs/dot"].version,
+      "link:../hua-dot",
     );
   }
   assert.equal(
@@ -4492,9 +4560,47 @@ test("version mode closes only selected workspace importer relations before plan
   assert.deepEqual(lockCall.args, [
     "install",
     "--lockfile-only",
+    "--no-frozen-lockfile",
     "--ignore-scripts",
+    "--registry=https://registry.npmjs.org/",
   ]);
   assert.equal(lockCall.options.env.CI, "true");
+  assert.equal(
+    lockCall.options.env.npm_config_registry,
+    "https://registry.npmjs.org/",
+  );
+  assert.equal(lockCall.options.env.PATH, process.env.PATH);
+  assert.equal(lockCall.options.env.LANG, "C.UTF-8");
+  assert.equal(observedLockEnvironment, lockCall.options.env);
+  assert.deepEqual(Object.keys(lockCall.options.env).sort(compareUtf8), [
+    "CI",
+    "HOME",
+    "LANG",
+    "NPM_CONFIG_GLOBALCONFIG",
+    "NPM_CONFIG_USERCONFIG",
+    "PATH",
+    "USERPROFILE",
+    "XDG_CACHE_HOME",
+    "npm_config_ignore_scripts",
+    "npm_config_registry",
+    "pnpm_config_ignore_scripts",
+  ]);
+  assert.equal(existsSync(observedLockEnvironment.HOME), false);
+  for (const key of [
+    "NPM_TOKEN",
+    "NODE_AUTH_TOKEN",
+    "GITHUB_TOKEN",
+    "npm_config_auth",
+    "npm_config__authToken",
+  ]) {
+    assert.equal(Object.hasOwn(lockCall.options.env, key), false);
+  }
+  assert.equal(
+    Object.values(lockCall.options.env).some((value) =>
+      String(value).includes("private-"),
+    ),
+    false,
+  );
   assert.deepEqual(
     Object.entries(lockCall.options.env)
       .filter(([key]) => key.toLowerCase().endsWith("_ignore_scripts"))
@@ -4541,6 +4647,9 @@ test("version mode writes no planned authority for stale, failed, or churned loc
     await t.test(name, () => {
       const fixture = createFivePackageVersionFixture();
       try {
+        const planBytes = readFileSync(
+          join(fixture.root, "config/release-plan.json"),
+        );
         assertCode(
           () =>
             runVersionFixture(fixture, fivePackageVersionStatus(), {
@@ -4549,14 +4658,275 @@ test("version mode writes no planned authority for stale, failed, or churned loc
             }),
           code,
         );
-        assert.equal(
-          JSON.parse(
-            readFileSync(
-              join(fixture.root, "config/release-plan.json"),
-              "utf8",
-            ),
-          ).status,
-          "empty",
+        assert.deepEqual(
+          readFileSync(join(fixture.root, "config/release-plan.json")),
+          planBytes,
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("version mode rejects every non-derived lock mutation and unsafe lock input", async (t) => {
+  const graphCases = [
+    [
+      "missing importer edge",
+      (lock) => {
+        delete lock.importers["packages/hua-dot-aot"].dependencies[
+          "@hua-labs/dot"
+        ];
+      },
+      "version-lock-importer-relation",
+    ],
+    [
+      "extra importer edge",
+      (lock) => {
+        lock.importers["packages/hua-dot-aot"].devDependencies = {
+          "@hua-labs/dot": {
+            specifier: "workspace:0.3.0",
+            version: "link:../hua-dot",
+          },
+        };
+      },
+      "version-lock-churn",
+    ],
+    [
+      "changed workspace link",
+      (lock) => {
+        lock.importers["packages/hua-dot-aot"].dependencies[
+          "@hua-labs/dot"
+        ].version = "link:../foreign-dot";
+      },
+      "version-lock-churn",
+    ],
+    [
+      "settings churn",
+      (lock) => {
+        lock.settings.autoInstallPeers = false;
+      },
+      "version-lock-churn",
+    ],
+    [
+      "patched dependency churn",
+      (lock) => {
+        lock.patchedDependencies = {
+          "foreign@1.0.0": { path: "patches/x.patch" },
+        };
+      },
+      "version-lock-churn",
+    ],
+    [
+      "package resolution churn",
+      (lock) => {
+        lock.packages["foreign@1.0.0"] = {
+          resolution: { integrity: "sha512-foreign" },
+          peerDependencies: { react: ">=18" },
+        };
+      },
+      "version-lock-churn",
+    ],
+    [
+      "snapshot churn",
+      (lock) => {
+        lock.snapshots["foreign@1.0.0"] = {
+          dependencies: { react: "19.0.0" },
+        };
+      },
+      "version-lock-churn",
+    ],
+  ];
+  for (const [name, mutate, code] of graphCases) {
+    await t.test(name, () => {
+      const fixture = createFivePackageVersionFixture();
+      try {
+        const planBytes = readFileSync(
+          join(fixture.root, "config/release-plan.json"),
+        );
+        assertCode(
+          () =>
+            runVersionFixture(fixture, fivePackageVersionStatus(), {
+              afterVersion: applyFivePackageDependencyVersions,
+              afterLock(root) {
+                mutateFixtureLockfile(root, mutate);
+              },
+            }),
+          code,
+        );
+        assert.deepEqual(
+          readFileSync(join(fixture.root, "config/release-plan.json")),
+          planBytes,
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+
+  await t.test("non-workspace manifest output", () => {
+    const fixture = createFivePackageVersionFixture();
+    try {
+      const planBytes = readFileSync(
+        join(fixture.root, "config/release-plan.json"),
+      );
+      assertCode(
+        () =>
+          runVersionFixture(fixture, fivePackageVersionStatus(), {
+            afterVersion(root) {
+              applyFivePackageDependencyVersions(root);
+              mutateJson(
+                join(root, "packages/hua-dot-aot/package.json"),
+                (manifest) => {
+                  manifest.dependencies["@hua-labs/dot"] = "0.3.0";
+                },
+              );
+            },
+          }),
+        "version-lock-workspace-protocol",
+      );
+      assert.deepEqual(
+        readFileSync(join(fixture.root, "config/release-plan.json")),
+        planBytes,
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  const unsafeCases = [
+    [
+      "alias",
+      (root) => {
+        writeFileSync(
+          join(root, "pnpm-lock.yaml"),
+          "lockfileVersion: '9.0'\nimporters: &importers {}\ncopy: *importers\n",
+        );
+      },
+      "version-final-lock-alias",
+    ],
+    [
+      "malformed",
+      (root) => {
+        writeFileSync(join(root, "pnpm-lock.yaml"), "importers: [\n");
+      },
+      "version-final-lock-invalid",
+    ],
+    [
+      "oversize",
+      (root) => {
+        writeFileSync(
+          join(root, "pnpm-lock.yaml"),
+          Buffer.alloc(8 * 1024 * 1024 + 1),
+        );
+      },
+      "version-final-lock-oversize",
+    ],
+    [
+      "symlink",
+      (root) => {
+        const lockPath = join(root, "pnpm-lock.yaml");
+        const targetPath = join(root, "lock-target.yaml");
+        writeFileSync(targetPath, readFileSync(lockPath));
+        unlinkSync(lockPath);
+        symlinkSync(targetPath, lockPath);
+      },
+      "version-final-lock-non-regular",
+    ],
+    [
+      "directory",
+      (root) => {
+        const lockPath = join(root, "pnpm-lock.yaml");
+        unlinkSync(lockPath);
+        mkdirSync(lockPath);
+      },
+      "version-final-lock-non-regular",
+    ],
+  ];
+  for (const [name, mutate, code] of unsafeCases) {
+    await t.test(name, () => {
+      const fixture = createFivePackageVersionFixture();
+      try {
+        const planBytes = readFileSync(
+          join(fixture.root, "config/release-plan.json"),
+        );
+        assertCode(
+          () =>
+            runVersionFixture(fixture, fivePackageVersionStatus(), {
+              afterVersion: applyFivePackageDependencyVersions,
+              afterLock: mutate,
+            }),
+          code,
+        );
+        assert.deepEqual(
+          readFileSync(join(fixture.root, "config/release-plan.json")),
+          planBytes,
+        );
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  }
+});
+
+test("version mode rejects unsafe source locks before executing Changesets", async (t) => {
+  const cases = [
+    [
+      "alias",
+      (root) => {
+        writeFileSync(
+          join(root, "pnpm-lock.yaml"),
+          "lockfileVersion: '9.0'\nimporters: &importers {}\ncopy: *importers\n",
+        );
+      },
+      "version-source-lock-alias",
+    ],
+    [
+      "oversize",
+      (root) => {
+        writeFileSync(
+          join(root, "pnpm-lock.yaml"),
+          Buffer.alloc(8 * 1024 * 1024 + 1),
+        );
+      },
+      "version-source-lock-oversize",
+    ],
+    [
+      "symlink",
+      (root) => {
+        const lockPath = join(root, "pnpm-lock.yaml");
+        const targetPath = join(root, "lock-target.yaml");
+        writeFileSync(targetPath, readFileSync(lockPath));
+        unlinkSync(lockPath);
+        symlinkSync(targetPath, lockPath);
+      },
+      "version-source-lock-non-regular",
+    ],
+  ];
+  for (const [name, mutate, code] of cases) {
+    await t.test(name, () => {
+      const fixture = createFivePackageVersionFixture();
+      try {
+        const planBytes = readFileSync(
+          join(fixture.root, "config/release-plan.json"),
+        );
+        let calls = 0;
+        mutate(fixture.root);
+        assertCode(
+          () =>
+            runVersion({
+              root: fixture.root,
+              execFile() {
+                calls += 1;
+                return "";
+              },
+            }),
+          code,
+        );
+        assert.equal(calls, 0);
+        assert.deepEqual(
+          readFileSync(join(fixture.root, "config/release-plan.json")),
+          planBytes,
         );
       } finally {
         fixture.cleanup();

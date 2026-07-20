@@ -10,6 +10,7 @@ import {
   linkSync,
   lstatSync,
   mkdtempSync,
+  mkdirSync,
   openSync,
   readSync,
   readdirSync,
@@ -22,7 +23,7 @@ import {
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { parseDocument } from "yaml";
+import { isAlias, parseDocument, visit } from "yaml";
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_ROOT = resolve(moduleDirectory, "..");
@@ -609,6 +610,13 @@ function readLockfile(root, label) {
     document.errors.length === 0 && document.warnings.length === 0,
     `${label}-invalid`,
   );
+  let aliasFound = false;
+  visit(document, {
+    Node(_key, node) {
+      if (isAlias(node)) aliasFound = true;
+    },
+  });
+  assert(!aliasFound, `${label}-alias`);
   let value;
   try {
     value = document.toJS({ maxAliasCount: 0, mapAsMap: false });
@@ -657,28 +665,17 @@ function workspaceManifestSpecifiers(manifest, workspaceNames, label) {
   return specifiers;
 }
 
-function collectValueDifferences(left, right, path = [], differences = []) {
-  if (Object.is(left, right)) return differences;
-  if (isRecord(left) && isRecord(right)) {
-    const keys = [
-      ...new Set([...Object.keys(left), ...Object.keys(right)]),
-    ].sort(compareUtf8);
-    for (const key of keys) {
-      collectValueDifferences(
-        left[key],
-        right[key],
-        [...path, key],
-        differences,
-      );
-      assert(differences.length <= 4096, "version-lock-difference-count");
-    }
-    return differences;
+function parseWorkspaceVersionSpecifier(specifier) {
+  assert(specifier.startsWith("workspace:"), "version-lock-workspace-protocol");
+  let version = specifier.slice("workspace:".length);
+  let operator = "";
+  if (version.startsWith("^") || version.startsWith("~")) {
+    operator = version[0];
+    version = version.slice(1);
   }
-  if (Array.isArray(left) && Array.isArray(right)) {
-    if (JSON.stringify(left) === JSON.stringify(right)) return differences;
-  }
-  differences.push({ path, left, right });
-  return differences;
+  assert(version !== "*", "version-lock-workspace-protocol");
+  parseSemver(version);
+  return { operator, version };
 }
 
 function validateVersionLockClosure({
@@ -689,8 +686,11 @@ function validateVersionLockClosure({
   plannedReleases,
   workspaceNames,
 }) {
-  const expected = new Map();
+  const normalizedFinalLock = structuredClone(finalLock);
   const plannedNames = new Set(plannedReleases.map((release) => release.name));
+  const releaseByName = new Map(
+    plannedReleases.map((release) => [release.name, release]),
+  );
   for (const release of plannedReleases) {
     const sourceManifest = sourceManifestValues.get(release.path);
     const finalManifest = finalManifestValues.get(release.path);
@@ -720,10 +720,27 @@ function validateVersionLockClosure({
         "version-lock-manifest-relation",
       );
       assert(plannedNames.has(name), "version-lock-unselected-relation");
+      const dependencyRelease = releaseByName.get(name);
+      assert(
+        dependencyRelease !== undefined,
+        "version-lock-unselected-relation",
+      );
+      const sourceWorkspace = parseWorkspaceVersionSpecifier(sourceSpecifier);
+      const finalWorkspace = parseWorkspaceVersionSpecifier(finalSpecifier);
+      assert(
+        sourceWorkspace.operator === finalWorkspace.operator &&
+          sourceWorkspace.version === dependencyRelease.fromVersion &&
+          finalWorkspace.version === dependencyRelease.toVersion,
+        "version-lock-workspace-version",
+      );
       const sourceImporter = sourceLock.importers[release.path];
       const finalImporter = finalLock.importers[release.path];
+      const normalizedFinalImporter =
+        normalizedFinalLock.importers[release.path];
       assert(
-        isRecord(sourceImporter) && isRecord(finalImporter),
+        isRecord(sourceImporter) &&
+          isRecord(finalImporter) &&
+          isRecord(normalizedFinalImporter),
         "version-lock-importer-missing",
       );
       const matchingFields = LOCK_IMPORTER_FIELDS.filter((field) => {
@@ -742,24 +759,18 @@ function validateVersionLockClosure({
           finalImporter[field][name].specifier === finalSpecifier,
         "version-lock-importer-relation",
       );
-      expected.set(
-        JSON.stringify(["importers", release.path, field, name, "specifier"]),
-        { sourceSpecifier, finalSpecifier },
+      assert(
+        isRecord(normalizedFinalImporter[field]) &&
+          isRecord(normalizedFinalImporter[field][name]),
+        "version-lock-importer-relation",
       );
+      normalizedFinalImporter[field][name].specifier = sourceSpecifier;
     }
   }
-
-  const differences = collectValueDifferences(sourceLock, finalLock);
-  assert(differences.length === expected.size, "version-lock-churn");
-  for (const difference of differences) {
-    const relation = expected.get(JSON.stringify(difference.path));
-    assert(relation !== undefined, "version-lock-churn");
-    assert(
-      difference.left === relation.sourceSpecifier &&
-        difference.right === relation.finalSpecifier,
-      "version-lock-churn",
-    );
-  }
+  assert(
+    canonicalJson(normalizedFinalLock) === canonicalJson(sourceLock),
+    "version-lock-churn",
+  );
 }
 
 function normalizeManifest(value, label) {
@@ -2471,10 +2482,38 @@ function lifecycleFreeEnvironment(environment) {
   };
 }
 
-function versionLockEnvironment(environment) {
+function versionLockEnvironment(
+  environment,
+  lockHome,
+  userConfigPath,
+  globalConfigPath,
+) {
+  const inheritedKeys = [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "SSL_CERT_FILE",
+    "SSL_CERT_DIR",
+    "NODE_EXTRA_CA_CERTS",
+    "TMPDIR",
+    "TMP",
+    "TEMP",
+  ];
   return {
-    ...lifecycleFreeEnvironment(environment),
+    ...Object.fromEntries(
+      inheritedKeys.flatMap((key) =>
+        typeof environment[key] === "string" ? [[key, environment[key]]] : [],
+      ),
+    ),
     CI: "true",
+    HOME: lockHome,
+    USERPROFILE: lockHome,
+    XDG_CACHE_HOME: join(lockHome, "cache"),
+    NPM_CONFIG_USERCONFIG: userConfigPath,
+    NPM_CONFIG_GLOBALCONFIG: globalConfigPath,
+    npm_config_registry: "https://registry.npmjs.org/",
+    npm_config_ignore_scripts: "true",
+    pnpm_config_ignore_scripts: "true",
   };
 }
 
@@ -2709,6 +2748,7 @@ export function persistProvenanceClosure(options = {}) {
 export function runVersion(options = {}) {
   const root = options.root ?? DEFAULT_ROOT;
   const execFile = options.execFile ?? execFileSync;
+  const environment = options.environment ?? process.env;
   const startingState = loadReleaseState(root);
   assert(startingState.plan.status === "empty", "version-existing-plan");
   const policyState = startingState;
@@ -2721,6 +2761,12 @@ export function runVersion(options = {}) {
   const { value: sourceLock } = readLockfile(root, "version-source-lock");
   const temporaryRoot = mkdtempSync(join(tmpdir(), "hua-safe-release-status-"));
   const statusPath = join(temporaryRoot, "status.json");
+  const lockHome = join(temporaryRoot, "lock-home");
+  const userConfigPath = join(lockHome, "user.npmrc");
+  const globalConfigPath = join(lockHome, "global.npmrc");
+  mkdirSync(lockHome, { recursive: true, mode: 0o700 });
+  writeFileSync(userConfigPath, "", { mode: 0o600 });
+  writeFileSync(globalConfigPath, "", { mode: 0o600 });
   try {
     execFile("pnpm", ["exec", "changeset", "status", "--output", statusPath], {
       cwd: root,
@@ -2771,12 +2817,27 @@ export function runVersion(options = {}) {
         release.manifestSha256 = manifest.sha256;
       }
     }
-    execFile("pnpm", ["install", "--lockfile-only", "--ignore-scripts"], {
-      cwd: root,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-      env: versionLockEnvironment(process.env),
-    });
+    execFile(
+      "pnpm",
+      [
+        "install",
+        "--lockfile-only",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        env: versionLockEnvironment(
+          environment,
+          lockHome,
+          userConfigPath,
+          globalConfigPath,
+        ),
+      },
+    );
     const finalPolicyState = loadPolicy(root);
     assert(
       finalPolicyState.manifests.length ===
