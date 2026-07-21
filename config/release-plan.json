@@ -1,14 +1,30 @@
 {
   "claim": null,
-  "planDigest": "99744f3c0d04e3dc82530f3033e6e8b8b5022281b8c2006759eb4ae35921c2e5",
+  "planDigest": "7cadbab1dab745d50db9c9cc1d99c110192826251a972caccaa0bf971e635f38",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "policySha256": "5437a8de81b1f31bfc7dfc7a974314a22e5e8181ebcea24e6d67fc5cdb5a6a00",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac"
   },
-  "releases": [],
+  "releases": [
+    {
+      "changesets": [
+        {
+          "id": "m849-ui-public-metadata",
+          "sha256": "02ee7a85be01683b2c00de68553b576ed90eb4c4823f9cd57d3f7c948733c137"
+        }
+      ],
+      "fromVersion": "2.4.0",
+      "manifestSha256": "8dba094da22942b4834fd62fee7ad96bb583da5a8a52cdc01d0d3d5b9542d482",
+      "name": "@hua-labs/ui",
+      "path": "packages/hua-ui",
+      "sourceManifestSha256": "fd74a93c336852dbacea62ecdd1995fbaef6baedaecfcd4302fe39773f9de9a4",
+      "toVersion": "2.4.1",
+      "type": "patch"
+    }
+  ],
   "schemaVersion": 1,
-  "status": "empty",
+  "status": "planned",
   "workspaceManifests": [
     {
       "name": "@hua-labs/dot",
@@ -97,8 +113,8 @@
     {
       "name": "@hua-labs/ui",
       "path": "packages/hua-ui",
-      "sha256": "fd74a93c336852dbacea62ecdd1995fbaef6baedaecfcd4302fe39773f9de9a4",
-      "version": "2.4.0"
+      "sha256": "8dba094da22942b4834fd62fee7ad96bb583da5a8a52cdc01d0d3d5b9542d482",
+      "version": "2.4.1"
     },
     {
       "name": "@hua-labs/utils",

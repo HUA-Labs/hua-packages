@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/ui",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "TypeScript-first React UI components with modular Web and React Native entry points",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
