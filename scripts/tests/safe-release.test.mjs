@@ -872,12 +872,14 @@ test("workflow withholds OIDC and npm credentials until an immutable artifact cl
       .map(([name]) => name),
     ["publish"],
   );
+  const publishCheckout = workflowAuthority.jobs.publish.steps.find(
+    (step) => step.name === "Checkout exact pushed claim",
+  );
   assert.equal(
-    workflowAuthority.jobs.publish.steps.find(
-      (step) => step.name === "Checkout exact pushed claim",
-    ).with.ref,
+    publishCheckout.with.ref,
     "${{ needs.prepare.outputs.claim_head }}",
   );
+  assert.equal(publishCheckout.with["fetch-depth"], 2);
   assert.equal(
     workflowAuthority.jobs.publish.steps.find(
       (step) => step.name === "Publish immutable verified tarballs",
@@ -2007,6 +2009,24 @@ test("workflow routes claim and closure through reviewed protected-main transiti
     (step) =>
       step.name === "Recheck exact reviewed claim authority for closure",
   );
+  for (const [steps, authorityStep] of [
+    [publishSteps, publishAuthority],
+    [closeSteps, closureAuthority],
+  ]) {
+    const setupPnpm = steps.find((step) => step.name === "Setup pnpm");
+    const installDependencies = steps.find(
+      (step) => step.name === "Install dependencies",
+    );
+    assert.equal(setupPnpm.uses, "pnpm/action-setup@v6");
+    assert.equal(
+      installDependencies.run,
+      "pnpm install --frozen-lockfile --ignore-scripts",
+    );
+    assert.ok(steps.indexOf(setupPnpm) < steps.indexOf(installDependencies));
+    assert.ok(
+      steps.indexOf(installDependencies) < steps.indexOf(authorityStep),
+    );
+  }
   assert.equal(
     prepareAuthority.run,
     "node scripts/safe-release.mjs authority --format=github",
