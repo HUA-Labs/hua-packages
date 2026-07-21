@@ -21,7 +21,7 @@ const defaultConfig = resolve(
 );
 const PACKAGE_PATH = "packages/hua-dot-lsp";
 const PACKAGE_PREFIX = `${PACKAGE_PATH}/`;
-const SCHEMA = "hua-dot-lsp-source-authority.v1";
+const SCHEMA = "hua-dot-lsp-source-authority.v2";
 const AUTHORITY_KIND = "platform-dot-lsp-package-projection";
 const MAX_CONFIG_BYTES = 1024 * 1024;
 const MAX_FILE_BYTES = 4 * 1024 * 1024;
@@ -44,11 +44,11 @@ const GIT_ENV = Object.freeze({
 const GIT_HASH = /^[0-9a-f]{40}$/u;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const REVIEWED_MAP_DIGEST =
-  "6fa078d9e8bc435d0cf499b83a24e38268aaff2a5b52087cf3fd8664a010a40c";
+  "0da189ae5a9f0ff22ca75802a0c10774db1cae69307ed369325f4e0a6bda776d";
 const REVIEWED_ARTIFACT_ROSTER_DIGEST =
-  "42d1bfc732ddc320b31cc24160350d6e3626aa129e385ea9ab74a53d226973bb";
-const REVIEWED_TARBALL_SHA256 =
-  "d343f947f48fdba9b74cc87f6d2a668c9d7216c904f8ec8bc1e327d11177110b";
+  "6247a4adb824a32f319d01fd6669e51f5d0a2e5559e635f0a181f038cfded306";
+const REVIEWED_TAR_STREAM_SHA256 =
+  "41b370f78505a5f87cdf655e79fdbfb863094b740ad1a66cf213b638c424a119";
 const REVIEWED_PUBLIC_BASE = Object.freeze({
   commit: "8a6bc52ceb46a716b2bedf9418fc59a29869bfb3",
   packageTree: "9b2969174aa7c669176e9e9410a85347338a5e95",
@@ -267,14 +267,14 @@ function validateArtifact(artifact, rows) {
       "requiredTargets",
       "rosterDigest",
       "sourceManifestSha256",
-      "tarballBytes",
-      "tarballSha256",
+      "tarStreamBytes",
+      "tarStreamSha256",
     ],
     "invalid-artifact-keys",
   );
   if (artifact.packageName !== "@hua-labs/dot-lsp")
     fail("invalid-package-name");
-  if (artifact.packageVersion !== "0.1.3") fail("invalid-package-version");
+  if (artifact.packageVersion !== "0.1.4") fail("invalid-package-version");
   if (!SHA256.test(artifact.sourceManifestSha256)) {
     fail("invalid-source-manifest-sha");
   }
@@ -282,13 +282,15 @@ function validateArtifact(artifact, rows) {
     fail("invalid-packed-manifest-sha");
   }
   if (!SHA256.test(artifact.rosterDigest)) fail("invalid-roster-digest");
-  if (!SHA256.test(artifact.tarballSha256)) fail("invalid-tarball-sha");
+  if (!SHA256.test(artifact.tarStreamSha256)) {
+    fail("invalid-tar-stream-sha");
+  }
   if (
-    !Number.isSafeInteger(artifact.tarballBytes) ||
-    artifact.tarballBytes <= 0 ||
-    artifact.tarballBytes > MAX_TARBALL_BYTES
+    !Number.isSafeInteger(artifact.tarStreamBytes) ||
+    artifact.tarStreamBytes <= 0 ||
+    artifact.tarStreamBytes > MAX_TAR_BYTES
   ) {
-    fail("invalid-tarball-bytes");
+    fail("invalid-tar-stream-bytes");
   }
   if (
     !Array.isArray(artifact.requiredTargets) ||
@@ -453,8 +455,8 @@ function validateConfig(config) {
   if (config.artifact.rosterDigest !== REVIEWED_ARTIFACT_ROSTER_DIGEST) {
     fail("reviewed-artifact-roster-mismatch");
   }
-  if (config.artifact.tarballSha256 !== REVIEWED_TARBALL_SHA256) {
-    fail("reviewed-tarball-sha-mismatch");
+  if (config.artifact.tarStreamSha256 !== REVIEWED_TAR_STREAM_SHA256) {
+    fail("reviewed-tar-stream-sha-mismatch");
   }
   return paths;
 }
@@ -757,14 +759,14 @@ function parseTarArchive(tar, expectedPrefix) {
   return files;
 }
 
-function parseTarball(bytes) {
+function decompressTarball(bytes) {
   let tar;
   try {
     tar = gunzipSync(bytes, { maxOutputLength: MAX_TAR_BYTES });
   } catch {
     fail("tarball-gzip-invalid");
   }
-  return parseTarArchive(tar, "package/");
+  return tar;
 }
 
 function collectExportTargets(value, targets = new Set()) {
@@ -786,13 +788,14 @@ function collectExportTargets(value, targets = new Set()) {
 
 function verifyTarball(path, config) {
   const compressed = readRegularFile(path, MAX_TARBALL_BYTES, "tarball");
+  const tarStream = decompressTarball(compressed);
   if (
-    compressed.length !== config.artifact.tarballBytes ||
-    sha256(compressed) !== config.artifact.tarballSha256
+    tarStream.length !== config.artifact.tarStreamBytes ||
+    sha256(tarStream) !== config.artifact.tarStreamSha256
   ) {
-    fail("tarball-bytes-mismatch");
+    fail("tar-stream-bytes-mismatch");
   }
-  const files = parseTarball(compressed);
+  const files = parseTarArchive(tarStream, "package/");
   const actualRows = [...files.entries()]
     .map(([filePath, bytes]) => ({
       path: filePath,

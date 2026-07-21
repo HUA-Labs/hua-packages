@@ -44,11 +44,11 @@ const GIT_ENV = Object.freeze({
 const GIT_HASH = /^[0-9a-f]{40}$/u;
 const SHA256 = /^[0-9a-f]{64}$/u;
 const REVIEWED_MAP_DIGEST =
-  "6ac70499d787987ec91ea7e8ff2cd867e7f23183a949d18cdaa32dfca74056eb";
+  "d87b5b0f9816ed5e5e70d325f1dab118f968ad451ab09b788fb34e0733f59a83";
 const REVIEWED_ARTIFACT_ROSTER_DIGEST =
-  "a964b63ab9077d04aa27ef0fad9aafe2ebd536d2626a9311c0556f84297a5e33";
+  "9aaeba565cb965a1acd0bfa8472306dd10c4bfb33ef96694af4b65e52bf33a95";
 const REVIEWED_TAR_STREAM_SHA256 =
-  "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073";
+  "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e";
 const REVIEWED_PUBLIC_BASE = Object.freeze({
   commit: "5f0fa9feb54de4cfc343c5c7c4fe73a54c4e14a9",
   packageTree: "70942905900e26e8c14e8d6bd4bf0ace8759f867",
@@ -274,7 +274,7 @@ function validateArtifact(artifact, rows) {
   );
   if (artifact.packageName !== "@hua-labs/dot-mcp")
     fail("invalid-package-name");
-  if (artifact.packageVersion !== "0.1.3") fail("invalid-package-version");
+  if (artifact.packageVersion !== "0.2.0") fail("invalid-package-version");
   if (!SHA256.test(artifact.sourceManifestSha256)) {
     fail("invalid-source-manifest-sha");
   }

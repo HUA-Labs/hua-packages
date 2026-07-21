@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/dot-lsp",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "LSP server for the dot style engine — autocomplete, hover, diagnostics",
   "license": "MIT",
   "type": "module",
@@ -21,7 +21,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hua-labs/dot": "workspace:0.2.2",
+    "@hua-labs/dot": "workspace:0.3.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },

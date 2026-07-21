@@ -1,6 +1,6 @@
 {
   "name": "@hua-labs/dot",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Cross-platform style engine — utility strings to Web CSSProperties / RN StyleSheet / Swift / Compose",
   "bin": {
     "dot-codegen": "./dist/codegen/cli.mjs"

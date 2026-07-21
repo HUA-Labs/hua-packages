@@ -102,8 +102,8 @@ test("the public MCP manifest preserves release fields and projects the effectiv
   const mcp = manifest("packages/hua-dot-mcp/package.json");
   const dot = manifest("packages/hua-dot/package.json");
 
-  assert.equal(mcp.version, "0.1.3");
-  assert.equal(mcp.dependencies["@hua-labs/dot"], "workspace:0.2.2");
+  assert.equal(mcp.version, "0.2.0");
+  assert.equal(mcp.dependencies["@hua-labs/dot"], "workspace:0.3.0");
   assert.equal(mcp.engines.node, ">=20.16.0");
   assert.equal(dot.engines.node, ">=20.16.0");
 });
@@ -197,7 +197,7 @@ test("the derived manifest preserves the public release boundary exactly", () =>
   assert.deepEqual(current.files, publicBase.files);
   assert.deepEqual(current.bin, publicBase.bin);
   assert.deepEqual(current.dependencies, publicBase.dependencies);
-  assert.equal(current.dependencies["@hua-labs/dot"], "workspace:0.2.2");
+  assert.equal(current.dependencies["@hua-labs/dot"], "workspace:0.3.0");
   assert.equal(current.engines.node, ">=20.16.0");
   assert.equal(
     current.scripts.build,
@@ -336,8 +336,8 @@ test("the complete package union and artifact authority are canonical", () => {
     ),
     {
       "platform-exact": 12,
-      "public-preserved": 1,
-      "derived-reviewed": 2,
+      "public-preserved": 0,
+      "derived-reviewed": 3,
       "platform-only-excluded": 0,
     },
   );
@@ -347,11 +347,11 @@ test("the complete package union and artifact authority are canonical", () => {
   );
   assert.equal(config.artifact.files.length, 6);
   assert.equal(config.artifact.packageName, "@hua-labs/dot-mcp");
-  assert.equal(config.artifact.packageVersion, "0.1.3");
-  assert.equal(config.artifact.tarStreamBytes, 68096);
+  assert.equal(config.artifact.packageVersion, "0.2.0");
+  assert.equal(config.artifact.tarStreamBytes, 68608);
   assert.equal(
     config.artifact.tarStreamSha256,
-    "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+    "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e",
   );
   assert.equal(Object.hasOwn(config.artifact, "tarballBytes"), false);
   assert.equal(Object.hasOwn(config.artifact, "tarballSha256"), false);
@@ -424,7 +424,7 @@ test("two gzip envelopes of the canonical tar pass while one tar byte rejects", 
     );
     assert.equal(
       createHash("sha256").update(tarStream).digest("hex"),
-      "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+      "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e",
     );
     for (const tarball of [originalPath, alternatePath]) {
       const result = runChecker(["--tarball", tarball], clone);
