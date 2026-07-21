@@ -196,7 +196,9 @@ test("the derived manifest preserves the public release boundary exactly", () =>
   assert.deepEqual(current.publishConfig, publicBase.publishConfig);
   assert.deepEqual(current.files, publicBase.files);
   assert.deepEqual(current.bin, publicBase.bin);
-  assert.equal(current.dependencies["@hua-labs/dot"], "workspace:0.3.0");
+  const expectedDependencies = structuredClone(publicBase.dependencies);
+  expectedDependencies["@hua-labs/dot"] = "workspace:0.3.0";
+  assert.deepEqual(current.dependencies, expectedDependencies);
   assert.equal(current.engines.node, ">=20.16.0");
   assert.equal(
     current.scripts.build,
