@@ -1,6 +1,6 @@
 {
   "claim": null,
-  "planDigest": "f8bfe37d087984a8224756cca2d544e14cbacaf6a7c75bc0c3639042f0a10180",
+  "planDigest": "99744f3c0d04e3dc82530f3033e6e8b8b5022281b8c2006759eb4ae35921c2e5",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "policySha256": "5437a8de81b1f31bfc7dfc7a974314a22e5e8181ebcea24e6d67fc5cdb5a6a00",
@@ -97,7 +97,7 @@
     {
       "name": "@hua-labs/ui",
       "path": "packages/hua-ui",
-      "sha256": "62adb4dc19ee93053d66f5c58b05142c14ccc44bffc01e4bee7afb1c19840c7b",
+      "sha256": "fd74a93c336852dbacea62ecdd1995fbaef6baedaecfcd4302fe39773f9de9a4",
       "version": "2.4.0"
     },
     {
