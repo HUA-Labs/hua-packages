@@ -40,7 +40,7 @@ exports:
         description: "Styled anchor with router integration"
       - name: "Icon"
         type: "component"
-        description: "Semantic icon component backed by the executable catalog; Phosphor is the default complete fallback, Lucide is a first-class optional alternative, and Iconsax is an opt-in product-style alternative"
+        description: "Semantic icon component backed by the executable catalog; Phosphor is the default fallback, Iconsax is opt-in, and the public package does not ship the Lucide registrar"
       - name: "Avatar"
         type: "component"
         description: "User avatar with image fallback"
@@ -130,7 +130,7 @@ exports:
         description: "Frozen exact-name inventory derived from the executable icon catalog"
       - name: "iconProviderMapping"
         type: "variable"
-        description: "Catalog-derived provider bindings for Phosphor, Lucide, and Iconsax in the full platform workspace; public availability follows the current public package boundary"
+        description: "Catalog-derived bindings for Phosphor, Lucide, and Iconsax; only provider registrations shipped by the public package are usable by package consumers"
       - name: "isValidIconName"
         type: "function"
         description: "Exact-membership type guard for canonical icon IDs and aliases; it does not normalize arbitrary strings"
@@ -334,11 +334,11 @@ exports:
       description: "Retained public core asset entry."
 
 features:
-  - "70+ components — Buttons, forms, tables, modals, overlays, and more"
+  - "Broad component coverage — Buttons, forms, tables, modals, overlays, and more"
   - "Modular entry points — Import only what you need for optimal bundle size"
   - "Accessibility foundations — component-specific ARIA and keyboard contracts; browser and physical assistive-technology evidence remain separate"
-  - "Dark mode — Built-in dark mode support"
-  - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
+  - "Theme state — Light, dark, and system root-class management with consumer-owned semantic variables"
+  - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop; no Tailwind CSS required"
   - "Modular ESM entries — CSS assets and provider-registration entries declare their side effects explicitly"
 
 related_packages:
@@ -351,11 +351,11 @@ compatibility:
 
 documentation:
   detailedGuide:
-    state: "shipped"
+    state: "repository-only"
     path: "./DETAILED_GUIDE.md"
-    distribution: "packed"
-    description: "Complete usage, API, styling, accessibility, and public-surface guidance"
-    link: "./DETAILED_GUIDE.md"
+    distribution: "repository"
+    description: "Usage, API, styling, accessibility, and public-surface guidance"
+    link: "https://github.com/HUA-Labs/hua-packages/blob/main/packages/hua-ui/DETAILED_GUIDE.md"
 
 public_core_profile:
   schema: "hua-ui-public-core-profile.v1"

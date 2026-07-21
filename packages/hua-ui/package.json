@@ -121,7 +121,6 @@
   },
   "files": [
     "dist",
-    "DETAILED_GUIDE.md",
     "src/styles",
     "src/components/icons",
     "src/components/icons-bold"

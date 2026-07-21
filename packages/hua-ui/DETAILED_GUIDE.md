@@ -1,13 +1,12 @@
 # @hua-labs/ui Detailed Guide
 
-Complete technical reference for the modern React UI component library.
-모던 React UI 컴포넌트 라이브러리에 대한 완전한 기술 레퍼런스입니다.
+Usage and public-surface reference for the modern React UI component library.
 
-## Published 2.4 Family Public Package Boundary
+## Public Package Boundary
 
-This guide documents the full platform workspace authority across all 37
-package entries. The published `@hua-labs/ui` 2.4 family ships the following
-exact 27 package entries. This is the copyable public-package roster:
+This guide documents the current public `@hua-labs/ui` package. Its reviewed
+profile tracks 37 candidate entries: 27 are shipped and 10 are explicitly
+deferred. Only the following shipped roster is copyable public-package guidance:
 
 ```text
 @hua-labs/ui
@@ -40,7 +39,7 @@ exact 27 package entries. This is the copyable public-package roster:
 ```
 
 The following 10 entries remain platform-workspace-only and are not shipped by
-the published 2.4 family. Do not copy them into public-package consumer code:
+the current public package. Do not copy them into public-package consumer code:
 
 - `@hua-labs/ui/ax` — not shipped; platform-workspace-only.
 - `@hua-labs/ui/layout` — not shipped; platform-workspace-only.
@@ -59,18 +58,9 @@ exact shipped/unshipped roster comes from `public-core-profile.json`; that
 profile is platform source authority and is not included in the package
 tarball.
 
-이 가이드는 37개 패키지 엔트리를 모두 가진 플랫폼 워크스페이스 권위를
-설명합니다. 공개 `@hua-labs/ui` 2.4 계열은 위의 27개 엔트리를 정확히
-배포합니다. 아래 10개 엔트리는 플랫폼 워크스페이스 전용이며 공개 2.4
-계열에서 사용할 수 없으므로 소비자 코드에 복사하면 안 됩니다. 현재 공개
-패키지는 `@hua-labs/ui/lucide` registrar를 배포하지 않으므로 Lucide
-provider 선택은 현재 공개 패키지 사용 지침이 아닙니다.
-
 ---
 
-## English
-
-### Table of Contents
+## Table of Contents
 
 - [Architecture](#architecture)
 - [Installation & Setup](#installation--setup)
@@ -92,7 +82,7 @@ provider 선택은 현재 공개 패키지 사용 지침이 아닙니다.
 `@hua-labs/ui` is built on four core principles:
 
 1. **Layered public surface** - The compatibility root and focused subpath exports provide explicit import boundaries
-2. **Runtime-first styling** - The dot style engine works without Tailwind; theme CSS is an optional integration
+2. **Runtime-first styling** - The dot style engine works without Tailwind; Tailwind-specific theme CSS is an optional integration
 3. **Evidence-backed accessibility** - ARIA, keyboard, and naming contracts are documented per component without package-wide certification
 4. **Developer Experience** - TypeScript-first with full type safety and IntelliSense support
 
@@ -133,6 +123,19 @@ provider 선택은 현재 공개 패키지 사용 지침이 아닙니다.
 | Feedback    | `@hua-labs/ui/feedback`    | Toast notifications, spinners           |
 | Advanced    | `@hua-labs/ui/advanced`    | Complex domain components               |
 
+### Runtime and Styling Support
+
+| Surface           | Public import                                                                | Runtime                                                | Styling and CSS contract                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web components    | `@hua-labs/ui` and focused Web subpaths                                      | React DOM; component-specific SSR or client boundaries | `dot` resolves component styles at runtime. Define semantic `--color-*` variables; import feature CSS only when its documentation requires it. |
+| Native primitives | `@hua-labs/ui/native`, or the root export under the `react-native` condition | React Native                                           | Only `Box`, `Text`, `Pressable`, and native dot helpers are exported. dot resolves React Native style objects; Web CSS is not used.            |
+| SDUI renderer     | `@hua-labs/ui/sdui`                                                          | Web React renderer                                     | Uses the Web component and dot contracts. Optional motion behavior requires `@hua-labs/motion-core`.                                           |
+| Theme state       | `@hua-labs/ui/theme`                                                         | Web client context                                     | Toggles the root `light`/`dark` class and persists state. The consumer owns semantic CSS variable values.                                      |
+| Stylesheets       | `@hua-labs/ui/styles/*`                                                      | Browser CSS pipeline                                   | Feature assets are opt-in. `base.css` and `recommended-theme.css` contain Tailwind v4 directives and are only for Tailwind consumers.          |
+
+The Web component roster is not a claim that every component works in React
+Native. Use the explicit native entry for its bounded primitive surface.
+
 ---
 
 ## Installation & Setup
@@ -145,49 +148,57 @@ pnpm add @hua-labs/ui
 npm install @hua-labs/ui
 ```
 
+The component package uses `@hua-labs/dot` internally. Add it as a direct
+dependency only when application code imports `dot`, `dotMap`, or
+`dotVariants` itself:
+
+```bash
+pnpm add @hua-labs/dot
+```
+
 ### Peer Dependencies
 
 Required:
 
 ```json
 {
-  "react": ">=19.0.0",
-  "react-dom": ">=19.0.0"
+  "react": ">=19.0.0"
 }
 ```
 
-The root `@hua-labs/ui` entry requires both `react` and `react-dom`. Focused
-subpaths that do not import portal-backed components can omit `react-dom`, but
-the root quick start cannot.
-
-Optional (for drag-and-drop components):
+Optional peers are required only by the entries or features that use them:
 
 ```json
 {
+  "react-dom": ">=19.0.0",
+  "react-native": ">=0.73.0",
+  "@hua-labs/motion-core": ">=2.4.0",
   "@dnd-kit/core": "^6.3.1",
   "@dnd-kit/sortable": "^10.0.0",
   "@dnd-kit/utilities": "^3.2.2"
 }
 ```
 
-### Tailwind CSS Setup
+- Install `react-dom` for the Web root entry and portal-backed components such
+  as `Modal`.
+- Install `react-native` when using the React Native condition or the
+  `@hua-labs/ui/native` entry.
+- `@hua-labs/motion-core` enables the optional landing-page motion hooks; the
+  landing components retain a non-motion fallback when it is absent.
+- The three `@dnd-kit/*` packages are required by
+  `@hua-labs/ui/interactive/kanban`.
 
-The component runtime does not require Tailwind CSS. The optional
-`recommended-theme.css` and `base.css` entries use Tailwind v4 directives, so
-run those files through a Tailwind v4 pipeline when you opt into them:
+### dot-first Styling Setup
 
-```css
-/* globals.css */
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/recommended-theme.css";
-```
+HUA UI resolves its component styles with `dot` at runtime. It does not need
+Tailwind, a utility-class scanner, or a CSS build step. Palette tokens such as
+`bg-primary-500` resolve directly to inline values. Semantic tokens such as
+`bg-primary` resolve to CSS variables, so define the `--color-*` variables used
+by your theme. A complete plain-CSS example appears in [CSS Variables](#css-variables).
 
-**Minimal setup (no theme):**
-
-```css
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/base.css";
-```
+The `styles/recommended-theme.css` and `styles/base.css` exports are optional
+Tailwind v4 integration files. They contain Tailwind directives and should be
+imported only by consumers that already run a Tailwind v4 pipeline.
 
 ### TypeScript Configuration
 
@@ -340,8 +351,6 @@ import { EmptyState } from "@hua-labs/ui/feedback";
 import { Sidebar } from "@hua-labs/ui/navigation";
 import { Toolbar } from "@hua-labs/ui/interactive";
 import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
-// deprecated barrel (backwards compat):
-// import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
 import { GlowCard } from "@hua-labs/ui/advanced/motion";
 import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
@@ -357,14 +366,26 @@ Domain-specific advanced components.
 Multi-variant button with loading states, icons, and advanced styling.
 
 ```tsx
-import { Button } from '@hua-labs/ui';
+import { Button, Icon } from "@hua-labs/ui";
 
-<Button variant="default" size="md">Click Me</Button>
-<Button variant="destructive" loading>Deleting...</Button>
-<Button variant="gradient" gradient="purple">Gradient</Button>
-<Button href="/about" variant="link">Learn More</Button>
-<Button icon={<Icon name="plus" />} iconPosition="left">Add</Button>
-<Button hover="springy" shadow="lg" rounded="full">Springy</Button>
+<Button variant="default" size="md">
+  Click Me
+</Button>;
+<Button variant="destructive" loading>
+  Deleting...
+</Button>;
+<Button variant="gradient" gradient="purple">
+  Gradient
+</Button>;
+<Button href="/about" variant="link">
+  Learn More
+</Button>;
+<Button icon={<Icon name="plus" />} iconPosition="left">
+  Add
+</Button>;
+<Button hover="springy" shadow="lg" rounded="full">
+  Springy
+</Button>;
 ```
 
 **Props:**
@@ -375,7 +396,7 @@ import { Button } from '@hua-labs/ui';
 - `icon` - Icon element
 - `iconPosition` - "left" | "right"
 - `gradient` - "blue" | "purple" | "green" | "orange" | "pink" | "custom"
-- `customGradient` - Custom Tailwind gradient classes
+- `customGradient` - Custom CSS `background-image` value, such as `linear-gradient(...)`
 - `rounded` - "sm" | "md" | "lg" | "full"
 - `shadow` - "none" | "sm" | "md" | "lg" | "xl"
 - `hover` - "springy" | "scale" | "glow" | "slide" | "none"
@@ -394,6 +415,7 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
+  Button,
 } from "@hua-labs/ui";
 
 <Card>
@@ -411,30 +433,30 @@ import {
 **Features:**
 
 - Compound component pattern for flexible composition
-- Supports all base HTML div attributes
-- Dark mode ready
-- Customizable via className
+- Supports standard div attributes through its typed public contract
+- Theme-aware through semantic CSS variables
+- Customizable through `dot`, `classDot`, and `style`
 
 ### Icon
 
-The full platform workspace Icon component supports Phosphor, Lucide, and
-Iconsax. The current public package ships Phosphor and Iconsax registration
-routes but does not ship the Lucide registrar described above.
+The public Icon component ships Phosphor and Iconsax registration routes. Its
+provider type still names Lucide, but the current public package does not ship
+the Lucide registrar, so Lucide is not a usable public-package provider today.
 
 ```tsx
-import { Icon, IconProvider } from '@hua-labs/ui';
+import { Icon, IconProvider } from "@hua-labs/ui";
 
 // Global configuration
 <IconProvider set="phosphor" size={24} weight="regular">
   <App />
-</IconProvider>
+</IconProvider>;
 
 // Usage
-<Icon name="heart" />
-<Icon name="user" size={32} variant="primary" />
-<Icon name="loader" spin />
-<Icon name="check" variant="success" />
-<Icon name="star" pulse animated />
+<Icon name="heart" />;
+<Icon name="user" size={32} variant="primary" />;
+<Icon name="loader" spin />;
+<Icon name="check" variant="success" />;
+<Icon name="star" pulse animated />;
 ```
 
 **Props:**
@@ -451,26 +473,28 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 
 **Icon catalog:**
 
-The platform source SSOT is `docs/resources/packages/ui/icon-system.md`; its
-public projection and exact provider bindings are published in the
+Exact provider bindings are published in the
 [HUA Docs Icon guide](https://docs.hua-labs.com/docs/components/icon). Counts
 and provider support are generated from source instead of duplicated here.
 
 **Icon Aliases:**
 
 ```tsx
+import { Icon } from "@hua-labs/ui";
+
 // Normalized across providers
-<Icon name="trash" />     // → phosphor: Trash, lucide: Trash2, iconsax: trash
-<Icon name="settings" />  // → phosphor: Gear, lucide: Settings, iconsax: setting
-<Icon name="user" />      // → phosphor: User, lucide: User, iconsax: profile
+<Icon name="trash" />; // → phosphor: Trash, lucide: Trash2, iconsax: trash
+<Icon name="settings" />; // → phosphor: Gear, lucide: Settings, iconsax: setting
+<Icon name="user" />; // → phosphor: User, lucide: User, iconsax: profile
 ```
 
 ### Modal
 
-Accessible modal dialog with overlay and keyboard handling.
+Modal dialog with overlay and keyboard handling.
 
 ```tsx
-import { Modal } from "@hua-labs/ui";
+import { useState } from "react";
+import { Button, Modal } from "@hua-labs/ui";
 
 const [open, setOpen] = useState(false);
 
@@ -517,33 +541,41 @@ import { Input, Label } from "@hua-labs/ui";
     id="email"
     type="email"
     placeholder="Enter your email"
-    error="Invalid email"
+    aria-invalid="true"
+    aria-describedby="email-error"
+    error
   />
+  <p id="email-error">Invalid email</p>
 </div>;
 ```
 
 **Props:**
 
 - All standard input attributes
-- `error` - Error message (shows red border)
+- `error` - Error state (shows a red border)
 - `success` - Success state (shows green border)
-- `icon` - Left icon element
-- `iconRight` - Right icon element
+- `leftIcon` - Left icon element
 
 ### Alert
 
 Alert component with semantic variants.
 
 ```tsx
-import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-labs/ui';
+import {
+  Alert,
+  AlertSuccess,
+  AlertWarning,
+  AlertError,
+  AlertInfo,
+} from "@hua-labs/ui";
 
-<AlertSuccess>Operation successful</AlertSuccess>
-<AlertWarning>Warning message</AlertWarning>
-<AlertError>Error occurred</AlertError>
-<AlertInfo>Information message</AlertInfo>
+<AlertSuccess>Operation successful</AlertSuccess>;
+<AlertWarning>Warning message</AlertWarning>;
+<AlertError>Error occurred</AlertError>;
+<AlertInfo>Information message</AlertInfo>;
 
 // Generic
-<Alert variant="success">Custom alert</Alert>
+<Alert variant="success">Custom alert</Alert>;
 ```
 
 **Props:**
@@ -558,7 +590,7 @@ import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-l
 Toast notification system with context provider.
 
 ```tsx
-import { ToastProvider, useToast } from "@hua-labs/ui";
+import { Button, ToastProvider, useToast } from "@hua-labs/ui";
 import "@hua-labs/ui/styles/toast.css";
 
 // Wrap your app
@@ -568,13 +600,13 @@ import "@hua-labs/ui/styles/toast.css";
 
 // In component
 function Component() {
-  const { toast } = useToast();
+  const { addToast } = useToast();
 
   const showToast = () => {
-    toast({
+    addToast({
+      type: "success",
       title: "Success",
-      description: "Operation completed",
-      variant: "success",
+      message: "Operation completed",
       duration: 3000,
     });
   };
@@ -585,17 +617,18 @@ function Component() {
 
 **Toast Options:**
 
-- `title` - Toast title
-- `description` - Toast description
-- `variant` - "default" | "success" | "warning" | "error" | "info"
-- `duration` - Duration in ms (default: 3000)
+- `type` - "success" | "warning" | "error" | "info"
+- `title` - Optional toast title
+- `message` - Toast message
+- `duration` - Duration in ms (default: 5000; use 0 to disable automatic dismissal)
 - `action` - Action button config
 
 **Safe Hook:**
 
 ```tsx
 // Use in components that might not have ToastProvider
-const toast = useToastSafe();
+const { addToast } = useToastSafe();
+addToast({ type: "info", message: "Saved locally" });
 ```
 
 ### Badge
@@ -603,19 +636,20 @@ const toast = useToastSafe();
 Status indicator badge.
 
 ```tsx
-import { Badge } from '@hua-labs/ui';
+import { Badge } from "@hua-labs/ui";
 
-<Badge>Default</Badge>
-<Badge variant="success">Active</Badge>
-<Badge variant="warning">Pending</Badge>
-<Badge variant="error">Failed</Badge>
-<Badge variant="outline">Outline</Badge>
+<Badge>Default</Badge>;
+<Badge variant="secondary">Active</Badge>;
+<Badge variant="destructive">Blocked</Badge>;
+<Badge variant="error">Failed</Badge>;
+<Badge variant="outline">Outline</Badge>;
+<Badge variant="glass">Glass</Badge>;
 ```
 
 **Props:**
 
-- `variant` - "default" | "success" | "warning" | "error" | "outline" | "secondary"
-- `size` - "sm" | "md" | "lg"
+- `variant` - "default" | "secondary" | "destructive" | "error" | "outline" | "glass"
+- `rounded` - "none" | "sm" | "md" | "lg" | "xl" | "full"
 - `children` - Badge content
 
 ### Progress
@@ -623,41 +657,58 @@ import { Badge } from '@hua-labs/ui';
 Progress bar with compound variants.
 
 ```tsx
-import { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressGroup } from '@hua-labs/ui';
+import {
+  Progress,
+  ProgressSuccess,
+  ProgressWarning,
+  ProgressError,
+  ProgressInfo,
+  ProgressGroup,
+} from "@hua-labs/ui";
 
-<Progress value={60} max={100} />
-<ProgressSuccess value={100} />
-<ProgressWarning value={50} />
+<Progress value={60} max={100} />;
+<ProgressSuccess value={100} />;
+<ProgressWarning value={50} />;
 
 // Group multiple progress bars
 <ProgressGroup>
   <ProgressSuccess value={30} />
   <ProgressWarning value={40} />
   <ProgressError value={20} />
-</ProgressGroup>
+</ProgressGroup>;
 ```
 
 **Props:**
 
 - `value` - Current value
 - `max` - Maximum value (default: 100)
-- `variant` - "default" | "success" | "warning" | "error" | "info"
-- `showLabel` - Show percentage label
+- `size` - "sm" | "md" | "lg"
+- `variant` - "default" | "success" | "warning" | "error" | "info" | "glass"
+- `showValue` - Show the current value
 
 ### Skeleton
 
 Loading skeleton components.
 
 ```tsx
-import { Skeleton, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonAvatar, SkeletonUserProfile, SkeletonList, SkeletonTable } from '@hua-labs/ui';
+import {
+  Skeleton,
+  SkeletonText,
+  SkeletonCircle,
+  SkeletonCard,
+  SkeletonAvatar,
+  SkeletonUserProfile,
+  SkeletonList,
+  SkeletonTable,
+} from "@hua-labs/ui";
 
-<SkeletonText lines={3} />
-<SkeletonCircle size={64} />
-<SkeletonCard />
-<SkeletonAvatar />
-<SkeletonUserProfile />
-<SkeletonList items={5} />
-<SkeletonTable rows={5} columns={4} />
+<SkeletonText lines={3} />;
+<SkeletonCircle size={64} />;
+<SkeletonCard />;
+<SkeletonAvatar />;
+<SkeletonUserProfile />;
+<SkeletonList items={5} />;
+<SkeletonTable rows={5} columns={4} />;
 ```
 
 **Variants:**
@@ -679,21 +730,30 @@ import { Skeleton, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonAvatar, S
 Theme context provider for dark/light mode.
 
 ```tsx
-import { ThemeProvider, ThemeToggle, useTheme } from '@hua-labs/ui';
+import { ThemeProvider, ThemeToggle, useTheme } from "@hua-labs/ui";
 
-<ThemeProvider defaultTheme="system" storageKey="ui-theme">
+<ThemeProvider
+  defaultTheme="system"
+  storageKey="ui-theme"
+  enableTransition={false}
+>
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 
 // Theme toggle button
-<ThemeToggle />
+<ThemeToggle />;
 
 // Custom theme control
 function CustomThemeControl() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+    <select
+      value={theme}
+      onChange={(event) =>
+        setTheme(event.target.value as "light" | "dark" | "system")
+      }
+    >
       <option value="light">Light</option>
       <option value="dark">Dark</option>
       <option value="system">System</option>
@@ -704,8 +764,10 @@ function CustomThemeControl() {
 
 **Props:**
 
-- `defaultTheme` - "light" | "dark" | "system" (default: "system")
-- `storageKey` - localStorage key (default: "ui-theme")
+- `defaultTheme` - "light" | "dark" | "system" (default: "light")
+- `storageKey` - localStorage key (default: "hua-ui-theme")
+- `enableSystem` - Listen for system theme changes (default: true)
+- `enableTransition` - Add `transition-colors duration-300` class names to the root (default: true; matching CSS is consumer-owned)
 - `children` - App content
 
 ---
@@ -715,20 +777,20 @@ function CustomThemeControl() {
 ### dot() Function and dot Prop
 
 ```tsx
-import { dot } from '@hua-labs/dot';
+import { dot } from "@hua-labs/dot";
+import { Button, Card } from "@hua-labs/ui";
 
 // Convert tokens to CSSProperties
-dot('p-4 rounded-lg bg-primary-500')
-// → { padding: '1rem', borderRadius: '0.5rem', backgroundColor: '#6366f1' }
+dot("p-4 rounded-lg bg-primary-500");
+// → { padding: '1rem', borderRadius: '0.5rem', backgroundColor: '#2b6cd6' }
 
 // Component dot prop (use only on components whose public contract documents it)
-<Button dot="px-4 py-2 text-lg">Submit</Button>
-<Card dot="p-6 rounded-xl shadow-lg">Content</Card>
+<Button dot="px-4 py-2 text-lg">Submit</Button>;
+<Card dot="p-6 rounded-xl shadow-lg">Content</Card>;
 ```
 
-The generated package README is the public contract index. Its `native`
-subpath entry documents React Native style, event, ref, and accessibility
-composition; this broad guide does not maintain a second platform matrix.
+The public package boundary and runtime matrix above define where the Web and
+React Native style contracts apply.
 
 ### dotVariants and dotMap
 
@@ -752,97 +814,132 @@ const buttonStyles = dotVariants({
 });
 
 // State-based styles (hover, focus, active)
-const interactiveStyles = dotMap({
-  default: "bg-gray-100",
-  hover: "bg-gray-200",
-  focus: "ring-2 ring-primary-500",
-  active: "bg-gray-300",
-});
+const interactiveStyles = dotMap(
+  "bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-primary-500 active:bg-gray-300",
+);
+// → { base, hover, focus, active }
 ```
 
 ### CSS Variables
 
-HUA UI uses CSS variables for theming:
+HUA UI and bare semantic dot tokens use `--color-*` CSS variables. Define them
+in plain CSS; no Tailwind processing is required:
 
 ```css
-/* Light mode */
 :root {
-  --background: 210 20% 98%;
-  --foreground: 210 10% 10%;
-  --primary: 166 78% 30%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 15% 94%;
-  --secondary-foreground: 210 10% 20%;
-  --muted: 210 15% 94%;
-  --muted-foreground: 210 10% 40%;
-  --accent: 226 100% 97%;
-  --accent-foreground: 234 89% 74%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 210 15% 88%;
-  --input: 210 15% 88%;
-  --ring: 166 78% 30%;
-  --card: 0 0% 100%;
-  --card-foreground: 210 10% 10%;
+  --color-primary: #2b6cd6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #dae2e5;
+  --color-secondary-foreground: #0a161a;
+  --color-destructive: #ca2c22;
+  --color-destructive-foreground: #ffffff;
+  --color-muted: #dae2e5;
+  --color-muted-foreground: #62757b;
+  --color-accent: #e7f0ff;
+  --color-accent-foreground: #1e54a8;
+  --color-card: #ffffff;
+  --color-card-foreground: #0a161a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a161a;
+  --color-background: #eaf1f3;
+  --color-foreground: #0a161a;
+  --color-border: #bac6ca;
+  --color-input: #bac6ca;
+  --color-ring: #2b6cd6;
+  --color-success: #00874c;
+  --color-success-foreground: #ffffff;
+  --color-warning: #be7b00;
+  --color-warning-foreground: #ffffff;
+  --color-info: #0079b1;
+  --color-info-foreground: #ffffff;
 }
 
-/* Dark mode */
-[data-theme="dark"] {
-  --background: 210 10% 8%;
-  --foreground: 210 10% 98%;
-  /* ... other dark mode colors */
+.dark {
+  --color-primary: #4988f4;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1e2b30;
+  --color-secondary-foreground: #eaf1f3;
+  --color-destructive: #ea4e3e;
+  --color-destructive-foreground: #ffffff;
+  --color-muted: #1e2b30;
+  --color-muted-foreground: #7c9096;
+  --color-accent: #010a1c;
+  --color-accent-foreground: #d1e1ff;
+  --color-card: #121418;
+  --color-card-foreground: #eaf1f3;
+  --color-popover: #121418;
+  --color-popover-foreground: #eaf1f3;
+  --color-background: #080a0e;
+  --color-foreground: #eaf1f3;
+  --color-border: #334247;
+  --color-input: #334247;
+  --color-ring: #4988f4;
+  --color-success: #0fa65f;
+  --color-success-foreground: #ffffff;
+  --color-warning: #da9838;
+  --color-warning-foreground: #0a161a;
+  --color-info: #0095d9;
+  --color-info-foreground: #ffffff;
 }
 ```
+
+`ThemeProvider` toggles `light` or `dark` on the document root and persists the
+selection. It does not inject these variables. If `enableTransition` remains
+enabled without Tailwind, define the matching transition classes yourself or
+set `enableTransition={false}`.
 
 ### Styling with dot
 
 ```tsx
+import { dot } from "@hua-labs/dot";
+import { Box } from "@hua-labs/ui";
+
 // Background and text colors
-<Box dot="bg-background text-foreground" />
-<Box dot="bg-primary text-primary-foreground" />
+<Box dot="bg-background text-foreground" />;
+<Box dot="bg-primary text-primary-foreground" />;
 
 // Borders
-<Box dot="border border-border" />
+<Box dot="border border-border" />;
 
-// Dark mode (dot supports dark: prefix)
-<Box dot="bg-white dark:bg-slate-900" />
-<Box dot="text-gray-900 dark:text-gray-100" />
+// Box observes the root .dark class for dark: tokens
+<Box dot="bg-white dark:bg-slate-900" />;
+<Box dot="text-gray-900 dark:text-gray-100" />;
 
 // Using style prop directly
-<div style={dot('p-4 bg-card rounded-lg')}>Content</div>
+<div style={dot("p-4 bg-card rounded-lg")}>Content</div>;
 ```
+
+When calling `dot()` directly, pass `{ dark: true }` or the resolved application
+theme to activate `dark:` tokens. Semantic CSS variables usually avoid that
+branch because the `.dark` variable values change automatically.
 
 ### Micro Motion
 
 Built-in micro-interactions:
 
 ```tsx
-import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
+import { useMicroMotion } from "@hua-labs/ui";
 
 // Hook-based
 function Component() {
-  const { handlers, style, className } = useMicroMotion({
+  const { handlers, style } = useMicroMotion({
     preset: "springy",
   });
   return (
-    <button {...handlers} style={style} className={className}>
+    <button {...handlers} style={style}>
       Click me
     </button>
   );
 }
 
-// Class-based
-const motionClassName = getMicroMotionClasses("springy");
-<div className={motionClassName}>Hover me</div>;
-
 // Available presets:
 // 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
 
-The hook's inline `style` carries the motion without Tailwind; its returned
-`className` is an optional `transform-gpu` utility. `getMicroMotionClasses`
-returns Tailwind utility tokens and injects no CSS. Compile the consuming source
-with Tailwind before using the class-only path.
+The hook's inline `style` and event handlers are the dot-first path and require
+no utility CSS. The hook also returns an optional `className`, and
+`getMicroMotionClasses()` returns Tailwind utility tokens; those class-based
+outputs inject no CSS and are only for Tailwind consumers.
 
 ---
 
@@ -862,10 +959,19 @@ broad guide does not duplicate that catalog.
 ```tsx
 import { ThemeProvider } from "@hua-labs/ui";
 
-<ThemeProvider defaultTheme="system" storageKey="app-theme">
+<ThemeProvider
+  defaultTheme="system"
+  storageKey="app-theme"
+  enableTransition={false}
+>
   <App />
 </ThemeProvider>;
 ```
+
+The provider owns theme state and the root `light`/`dark` class. The plain CSS
+variables in the Style System section own the visual theme. Set
+`enableTransition={false}` when no stylesheet defines the provider's optional
+transition utility class names.
 
 ### useTheme Hook
 
@@ -873,12 +979,11 @@ import { ThemeProvider } from "@hua-labs/ui";
 import { useTheme } from "@hua-labs/ui";
 
 function CustomThemeControl() {
-  const { theme, setTheme, systemTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   return (
     <div>
       <p>Current theme: {theme}</p>
-      <p>System theme: {systemTheme}</p>
       <p>Resolved theme: {resolvedTheme}</p>
 
       <button onClick={() => setTheme("light")}>Light</button>
@@ -892,7 +997,7 @@ function CustomThemeControl() {
 ### Theme Toggle
 
 ```tsx
-import { ThemeToggle } from "@hua-labs/ui";
+import { ThemeToggle, useTheme } from "@hua-labs/ui";
 
 // Preset toggle button
 <ThemeToggle />;
@@ -910,17 +1015,20 @@ function CustomToggle() {
 }
 ```
 
-### Dark Mode Classes
+### Theme-aware dot Styles
 
 ```tsx
-// Conditional dark mode styles
-className = "bg-white dark:bg-slate-900";
-className = "text-gray-900 dark:text-gray-100";
-className = "border-gray-200 dark:border-gray-700";
+import { Box } from "@hua-labs/ui";
 
-// Using CSS variables (theme-aware)
-className = "bg-background text-foreground";
-className = "border-border";
+// Preferred: semantic variables change under the root .dark class.
+<Box dot="bg-background text-foreground border border-border">
+  Theme-aware content
+</Box>;
+
+// Box also observes the root theme for explicit dark: branches.
+<Box dot="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+  Palette-based content
+</Box>;
 ```
 
 ---
@@ -946,7 +1054,7 @@ function Component() {
 
 ### useScrollProgress
 
-Track scroll progress as percentage.
+Track scroll progress as a value from 0 to 1.
 
 ```tsx
 import { useScrollProgress } from "@hua-labs/ui";
@@ -957,7 +1065,7 @@ function ScrollIndicator() {
   return (
     <div
       style={{
-        width: `${progress}%`,
+        width: `${progress * 100}%`,
         height: 4,
         background: "blue",
       }}
@@ -974,11 +1082,14 @@ Track mouse position.
 import { useMouse } from "@hua-labs/ui";
 
 function Component() {
-  const { x, y, elementX, elementY, elementW, elementH } = useMouse();
+  const { ref, x, y, elementX, elementY, isInside } = useMouse({
+    type: "element",
+  });
 
   return (
-    <div>
-      Mouse: {x}, {y}
+    <div ref={ref}>
+      Page: {x}, {y}; element: {elementX}, {elementY}; inside:{" "}
+      {String(isInside)}
     </div>
   );
 }
@@ -989,12 +1100,19 @@ function Component() {
 Detect reduced motion preference.
 
 ```tsx
-import { useReducedMotion } from "@hua-labs/ui";
+import { Box, useReducedMotion } from "@hua-labs/ui";
 
 function Component() {
   const reducedMotion = useReducedMotion();
 
-  return <div className={reducedMotion ? "" : "animate-bounce"}>Content</div>;
+  return (
+    <Box
+      dot="p-4 rounded-lg bg-card"
+      style={{ transition: reducedMotion ? "none" : "transform 200ms ease" }}
+    >
+      Content
+    </Box>
+  );
 }
 ```
 
@@ -1030,6 +1148,7 @@ import {
   CardTitle,
   CardContent,
   CardFooter,
+  Button,
 } from "@hua-labs/ui";
 
 <Card>
@@ -1048,37 +1167,38 @@ import {
 ### Slot Pattern (Polymorphic Components)
 
 ```tsx
-import { Button } from '@hua-labs/ui';
-import NextLink from 'next/link';
+import { Button } from "@hua-labs/ui";
+import NextLink from "next/link";
 
 // Render as Next.js Link
 <Button asChild>
   <NextLink href="/about">About</NextLink>
-</Button>
+</Button>;
 
 // Render as custom element
 <Button asChild>
-  <a href="/external" target="_blank">External Link</a>
-</Button>
+  <a href="/external" target="_blank">
+    External Link
+  </a>
+</Button>;
 ```
 
 ### Custom Styling
 
 ```tsx
-import { Button, merge } from '@hua-labs/ui';
+import { Button } from "@hua-labs/ui";
 
-// Extend component styles
-<Button className={merge("custom-class", "hover:custom-hover")}>
-  Custom Button
-</Button>
+// Extend supported components through the dot prop.
+<Button dot="w-full mt-4">Custom Button</Button>;
 
-// Override variant styles
+// Supply a CSS background-image value for a custom gradient.
 <Button
-  className="bg-gradient-to-r from-purple-500 to-pink-500"
-  variant="ghost"
+  variant="gradient"
+  gradient="custom"
+  customGradient="linear-gradient(to right, #8650c5, #c32f5c)"
 >
   Custom Gradient
-</Button>
+</Button>;
 ```
 
 ### Server Components (Next.js App Router)
@@ -1111,14 +1231,18 @@ export default function ClientComponent() {
 ### Form Validation
 
 ```tsx
-import { Button } from "@hua-labs/ui";
+import { useState, type FormEvent } from "react";
+import { Button, Label } from "@hua-labs/ui";
 import { Form, FormControl, Input } from "@hua-labs/ui/form";
 
 function LoginForm() {
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     // Validation logic
   };
 
@@ -1126,12 +1250,26 @@ function LoginForm() {
     <Form onSubmit={handleSubmit}>
       <FormControl>
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" error={errors.email} />
+        <Input
+          id="email"
+          type="email"
+          error={Boolean(errors.email)}
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
+        />
+        {errors.email && <p id="email-error">{errors.email}</p>}
       </FormControl>
 
       <FormControl>
         <Label htmlFor="password">Password</Label>
-        <Input id="password" type="password" error={errors.password} />
+        <Input
+          id="password"
+          type="password"
+          error={Boolean(errors.password)}
+          aria-invalid={Boolean(errors.password)}
+          aria-describedby={errors.password ? "password-error" : undefined}
+        />
+        {errors.password && <p id="password-error">{errors.password}</p>}
       </FormControl>
 
       <Button type="submit">Login</Button>
@@ -1144,23 +1282,29 @@ function LoginForm() {
 
 ## Troubleshooting
 
-### "bg-primary not working"
+### `bg-primary` has no visible color
 
-**Issue:** Tailwind utility classes like `bg-primary` not working.
+**Issue:** `dot("bg-primary")` resolves, but the browser has no visible color.
 
-**Solution:** Import the recommended theme CSS:
+**Solution:** Bare semantic tokens resolve to CSS variables. Define the
+variable in plain CSS and use the `dot` prop or `dot()` output:
 
 ```css
-/* globals.css */
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/recommended-theme.css";
+:root {
+  --color-primary: #2b6cd6;
+  --color-primary-foreground: #ffffff;
+}
 ```
-
-Without the theme, use standard Tailwind colors:
 
 ```tsx
-<Button className="bg-blue-500">Button</Button>
+import { Box } from "@hua-labs/ui";
+
+<Box dot="bg-primary text-primary-foreground">Semantic color</Box>;
+<Box dot="bg-primary-500 text-white">Built-in palette color</Box>;
 ```
+
+The shaded palette token resolves to an inline color and does not require a CSS
+variable. A `className="bg-primary"` string is not parsed by dot.
 
 ---
 
@@ -1168,20 +1312,32 @@ Without the theme, use standard Tailwind colors:
 
 **Issue:** Dark mode styles not applied.
 
-**Solution:** Wrap your app with `ThemeProvider`:
+**Solution:** Wrap the app with `ThemeProvider` and define matching `.dark`
+semantic variables:
 
 ```tsx
 import { ThemeProvider } from "@hua-labs/ui";
 
-<ThemeProvider>
+<ThemeProvider enableTransition={false}>
   <App />
 </ThemeProvider>;
 ```
 
-Ensure dark mode classes are used:
+```css
+.dark {
+  --color-background: #080a0e;
+  --color-foreground: #eaf1f3;
+}
+```
+
+Use semantic tokens for variable-driven themes. `Box` observes the root class
+when an explicit dot dark variant is needed:
 
 ```tsx
-className = "bg-white dark:bg-slate-900";
+import { Box } from "@hua-labs/ui";
+
+<Box dot="bg-background text-foreground" />;
+<Box dot="bg-white dark:bg-gray-900" />;
 ```
 
 ---
@@ -1249,6 +1405,9 @@ console.log(iconNames);
 **Solution:** Components forward refs correctly. Ensure ref type matches element:
 
 ```tsx
+import { useRef } from "react";
+import { Button, Card } from "@hua-labs/ui";
+
 const buttonRef = useRef<HTMLButtonElement>(null);
 <Button ref={buttonRef}>Button</Button>;
 
@@ -1286,8 +1445,8 @@ import { ToastProvider } from "@hua-labs/ui";
 import { useToast } from "@hua-labs/ui";
 
 function Component() {
-  const { toast } = useToast();
-  toast({ title: "Success" });
+  const { addToast } = useToast();
+  addToast({ type: "success", message: "Saved" });
 }
 ```
 
@@ -1313,1307 +1472,21 @@ pnpm run build:analyze
 
 ---
 
-### Tailwind classes not working
+### Optional Tailwind classes not working
 
-**Issue:** Custom Tailwind classes not applied.
+**Issue:** A consumer intentionally uses Tailwind through `className` or the
+class-based micro-motion helper, but those classes are not emitted.
 
-**Solution:** Ensure Tailwind config includes HUA UI paths:
-
-```js
-// tailwind.config.js
-export default {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@hua-labs/ui/dist/**/*.{js,mjs}",
-  ],
-  // ...
-};
-```
-
----
-
-## Korean
-
-### 목차
-
-- [아키텍처](#아키텍처-1)
-- [설치 및 설정](#설치-및-설정-1)
-- [진입점](#진입점-1)
-- [핵심 컴포넌트](#핵심-컴포넌트-1)
-- [스타일 시스템](#스타일-시스템-1)
-- [아이콘 시스템](#아이콘-시스템-1)
-- [테마 시스템](#테마-시스템-1)
-- [훅](#훅-1)
-- [고급 사용법](#고급-사용법-1)
-- [문제 해결](#문제-해결-1)
-
----
-
-## 아키텍처
-
-### 설계 철학
-
-`@hua-labs/ui`는 네 가지 핵심 원칙을 기반으로 합니다:
-
-1. **계층형 공개 표면** - 호환성 루트와 목적별 서브경로가 명시적인 import 경계를 제공
-2. **런타임 우선 스타일링** - dot 스타일 엔진은 Tailwind 없이 동작하며 테마 CSS는 선택적 통합
-3. **증거 기반 접근성** - 패키지 전체 인증 대신 컴포넌트별 ARIA, 키보드, 이름 계약을 문서화
-4. **개발자 경험** - 완전한 타입 안전성과 IntelliSense 지원을 제공하는 TypeScript 우선
-
-### 패키지 구조
-
-```
-@hua-labs/ui
-├── Root 호환성          → Button, Input, Card, Badge, Alert, Avatar...
-├── /form               → Form, Select, DatePicker, Autocomplete, Upload...
-├── /overlay            → Modal, Popover, Dropdown, Drawer, BottomSheet...
-├── /data               → Table, CodeBlock...
-├── /interactive        → Accordion, Tabs, Menu, Command...
-├── /interactive/kanban → 선택적 peer 기반 Kanban 드래그 앤 드롭
-├── /navigation         → Navigation, Breadcrumb, Pagination...
-├── /feedback           → Toast, LoadingSpinner...
-├── /advanced/*         → 고급, 모션, 감정, 대시보드 호환 엔트리
-├── /sdui               → Server-Driven UI 컴포넌트
-├── /landing            → 랜딩 페이지 컴포넌트
-├── /native             → 명시적 React Native 프리미티브
-├── /theme              → 테마 계약
-├── /icons, /icons-bold → raw Iconsax line/bold 컴포넌트 배럴
-├── /iconsax            → essential 프로젝트 Iconsax 등록
-├── /iconsax-extended   → extended Iconsax 등록과 갤러리
-└── /styles/*           → CSS 파일
-```
-
-### 컴포넌트 카테고리
-
-| 카테고리   | 진입점                     | 목적                                 |
-| ---------- | -------------------------- | ------------------------------------ |
-| 원자 UI    | `@hua-labs/ui`             | 버튼, 인풋, 카드, 뱃지, 아바타       |
-| 레이아웃   | `@hua-labs/ui`             | Container, Grid, Stack, Card, Panel  |
-| 폼         | `@hua-labs/ui/form`        | 완전한 폼 컴포넌트                   |
-| 오버레이   | `@hua-labs/ui/overlay`     | 모달, 팝오버, 드롭다운, 드로어       |
-| 데이터     | `@hua-labs/ui/data`        | 테이블, 코드 블록                    |
-| 인터랙티브 | `@hua-labs/ui/interactive` | 아코디언, 탭, 메뉴                   |
-| 내비게이션 | `@hua-labs/ui/navigation`  | 내비게이션, 브레드크럼, 페이지네이션 |
-| 피드백     | `@hua-labs/ui/feedback`    | 토스트 알림, 스피너                  |
-| 고급       | `@hua-labs/ui/advanced`    | 복잡한 도메인 컴포넌트               |
-
----
-
-## 설치 및 설정
-
-### 기본 설치
-
-```bash
-pnpm add @hua-labs/ui
-# 또는
-npm install @hua-labs/ui
-```
-
-### Peer Dependencies
-
-필수:
-
-```json
-{
-  "react": ">=19.0.0",
-  "react-dom": ">=19.0.0"
-}
-```
-
-루트 `@hua-labs/ui` 엔트리는 `react`와 `react-dom`을 모두 요구합니다. 포털
-컴포넌트를 import하지 않는 목적별 서브경로는 `react-dom`을 생략할 수 있지만,
-루트 빠른 시작에서는 생략할 수 없습니다.
-
-선택 (드래그 앤 드롭 컴포넌트용):
-
-```json
-{
-  "@dnd-kit/core": "^6.3.1",
-  "@dnd-kit/sortable": "^10.0.0",
-  "@dnd-kit/utilities": "^3.2.2"
-}
-```
-
-### Tailwind CSS 설정
-
-컴포넌트 런타임에는 Tailwind CSS가 필수가 아닙니다. 선택 사항인
-`recommended-theme.css`와 `base.css`는 Tailwind v4 지시문을 사용하므로, 이
-파일을 사용할 때만 Tailwind v4 파이프라인으로 처리하세요:
+**Solution:** HUA UI does not compile Tailwind for the application. In a
+Tailwind v4 application, register package output that contains utility strings
+with `@source` in the stylesheet that imports Tailwind:
 
 ```css
-/* globals.css */
+/* globals.css; adjust the relative path from this stylesheet */
 @import "tailwindcss";
-@import "@hua-labs/ui/styles/recommended-theme.css";
+@source "../node_modules/@hua-labs/ui/dist";
 ```
 
-**최소 설정 (테마 없이):**
-
-```css
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/base.css";
-```
-
-### TypeScript 설정
-
-추가 설정 불필요. 라이브러리에 완전한 타입 정의가 포함되어 있습니다.
+This is optional Tailwind interoperability, not part of the dot runtime setup.
 
 ---
-
-## 진입점
-
-### 코어 Export (`@hua-labs/ui`)
-
-**기본 UI:**
-
-- `Button` - 로딩 상태를 지원하는 다중 변형 버튼
-- `Action` - 경량 버튼 대안
-- `Input` - 유효성 검증을 지원하는 텍스트 입력
-- `NumberInput` - 스텝 컨트롤이 있는 숫자 입력
-- `Link` - 스타일이 적용된 앵커 요소
-- `Icon` - 범용 아이콘 컴포넌트
-- `Avatar` - 폴백이 있는 사용자 아바타
-- `Badge` - 상태/라벨 표시기
-
-**레이아웃:**
-
-- `Container` - 반응형 컨테이너
-- `Grid` - CSS grid 래퍼
-- `Stack` - Flexbox 스택 (수직/수평)
-- `Card` - 복합 컴포넌트가 있는 카드 (CardHeader, CardTitle, CardDescription, CardContent, CardFooter)
-- `Panel` - 콘텐츠 패널
-- `Divider` - 시각적 구분선
-- `ActionToolbar` - 액션 버튼 툴바
-
-**피드백:**
-
-- `Alert` - 변형이 있는 알림 (Success, Warning, Error, Info)
-- `Toast` - 토스트 알림 시스템 (ToastProvider, useToast)
-- `LoadingSpinner` - 로딩 표시기
-- `Tooltip` - 라이트/다크 변형이 있는 툴팁
-
-**폼 요소:**
-
-- `Label` - 폼 라벨
-- `Switch` - 토글 스위치
-- `Toggle` - 토글 버튼
-
-**데이터 디스플레이:**
-
-- `Progress` - 변형이 있는 프로그레스 바
-- `Skeleton` - 로딩 스켈레톤 (Text, Circle, Rectangle, Card, Avatar, Image, UserProfile, List, Table)
-
-**테마 & 스크롤:**
-
-- `ThemeProvider` - 테마 컨텍스트 프로바이더
-- `ThemeToggle` - 테마 전환기
-- `ScrollArea` - 커스텀 스크롤바
-- `ScrollToTop` - 맨 위로 스크롤 버튼
-
-### Form Export (`@hua-labs/ui/form`)
-
-```tsx
-import {
-  Form,
-  FormControl,
-  Select,
-  DatePicker,
-  Upload,
-  Autocomplete,
-} from "@hua-labs/ui/form";
-```
-
-컴포넌트:
-
-- `Form` - 유효성 검증이 있는 폼 래퍼
-- `FormControl` - 폼 필드 래퍼
-- `Select` - 드롭다운 선택
-- `Checkbox` - 체크박스 입력
-- `Radio` - 라디오 입력
-- `Textarea` - 멀티라인 텍스트 입력
-- `Slider` - 범위 슬라이더
-- `DatePicker` - 날짜 선택기
-- `Upload` - 파일 업로드
-- `Autocomplete` - 자동완성 입력
-- `ColorPicker` - 색상 선택기
-
-### Overlay Export (`@hua-labs/ui/overlay`)
-
-```tsx
-import {
-  Modal,
-  Drawer,
-  Popover,
-  Dropdown,
-  BottomSheet,
-} from "@hua-labs/ui/overlay";
-```
-
-컴포넌트:
-
-- `Modal` - 모달 다이얼로그
-- `Drawer` - 사이드 드로어
-- `Popover` - 팝오버 오버레이
-- `Dropdown` - 드롭다운 메뉴
-- `BottomSheet` - 바텀 시트 (모바일 우선)
-- `ConfirmModal` - 확인 다이얼로그
-
-### Data Export (`@hua-labs/ui/data`)
-
-```tsx
-import { Table, CodeBlock } from "@hua-labs/ui/data";
-```
-
-컴포넌트:
-
-- `Table` - 데이터 테이블
-- `CodeBlock` - 구문 강조 코드 블록
-
-### Interactive Export (`@hua-labs/ui/interactive`)
-
-```tsx
-import { Accordion, Tabs, Menu, Command } from "@hua-labs/ui/interactive";
-```
-
-컴포넌트:
-
-- `Accordion` - 접을 수 있는 아코디언
-- `Tabs` - 탭 내비게이션
-- `Menu` - 메뉴 컴포넌트
-- `ContextMenu` - 컨텍스트 메뉴
-- `Command` - 커맨드 팔레트
-
-### Navigation Export (`@hua-labs/ui/navigation`)
-
-```tsx
-import { Navigation, Breadcrumb, Pagination } from "@hua-labs/ui/navigation";
-```
-
-컴포넌트:
-
-- `Navigation` - 내비게이션 컴포넌트
-- `Breadcrumb` - 브레드크럼 트레일
-- `Pagination` - 페이지 페이지네이션
-- `PageNavigation` - 페이지 레벨 내비게이션
-- `PageTransition` - 페이지 전환 애니메이션
-
-### Advanced Export (`@hua-labs/ui/advanced`)
-
-```tsx
-import { StatsPanel, BarChart, DataTable } from "@hua-labs/ui/data";
-import { EmptyState } from "@hua-labs/ui/feedback";
-import { Sidebar } from "@hua-labs/ui/navigation";
-import { Toolbar } from "@hua-labs/ui/interactive";
-import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
-// deprecated barrel (backwards compat):
-// import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { GlowCard } from "@hua-labs/ui/advanced/motion";
-import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
-```
-
-도메인별 고급 컴포넌트.
-
----
-
-## 핵심 컴포넌트
-
-### Button
-
-로딩 상태, 아이콘, 고급 스타일링을 지원하는 다중 변형 버튼.
-
-```tsx
-import { Button } from '@hua-labs/ui';
-
-<Button variant="default" size="md">클릭하세요</Button>
-<Button variant="destructive" loading>삭제 중...</Button>
-<Button variant="gradient" gradient="purple">그라디언트</Button>
-<Button href="/about" variant="link">자세히 보기</Button>
-<Button icon={<Icon name="plus" />} iconPosition="left">추가</Button>
-<Button hover="springy" shadow="lg" rounded="full">스프링</Button>
-```
-
-**Props:**
-
-- `variant` - "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "gradient" | "neon" | "glass"
-- `size` - "sm" | "md" | "lg" | "xl" | "icon"
-- `loading` - 로딩 스피너 표시
-- `icon` - 아이콘 요소
-- `iconPosition` - "left" | "right"
-- `gradient` - "blue" | "purple" | "green" | "orange" | "pink" | "custom"
-- `customGradient` - 커스텀 Tailwind 그라디언트 클래스
-- `rounded` - "sm" | "md" | "lg" | "full"
-- `shadow` - "none" | "sm" | "md" | "lg" | "xl"
-- `hover` - "springy" | "scale" | "glow" | "slide" | "none"
-- `fullWidth` - 전체 너비로 확장
-- `asChild` - 자식 요소로 렌더링 (Slot 패턴)
-
-### Card
-
-콘텐츠 카드를 위한 복합 컴포넌트.
-
-```tsx
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@hua-labs/ui";
-
-<Card>
-  <CardHeader>
-    <CardTitle>카드 제목</CardTitle>
-    <CardDescription>카드 설명이 여기에 들어갑니다</CardDescription>
-  </CardHeader>
-  <CardContent>메인 콘텐츠 영역</CardContent>
-  <CardFooter>
-    <Button>액션</Button>
-  </CardFooter>
-</Card>;
-```
-
-**특징:**
-
-- 유연한 구성을 위한 복합 컴포넌트 패턴
-- 모든 기본 HTML div 속성 지원
-- 다크 모드 지원
-- className으로 커스터마이징 가능
-
-### Icon
-
-플랫폼 전체 워크스페이스의 Icon 컴포넌트는 Phosphor, Lucide, Iconsax를
-지원합니다. 공개 core 후보는 Phosphor와 Iconsax 등록 경로만 유지하며 위에서
-설명한 Lucide registrar는 deferred 상태입니다.
-
-```tsx
-import { Icon, IconProvider } from '@hua-labs/ui';
-
-// 전역 설정
-<IconProvider set="phosphor" size={24} weight="regular">
-  <App />
-</IconProvider>
-
-// 사용
-<Icon name="heart" />
-<Icon name="user" size={32} variant="primary" />
-<Icon name="loader" spin />
-<Icon name="check" variant="success" />
-<Icon name="star" pulse animated />
-```
-
-**Props:**
-
-- `name` - 아이콘 이름 (프로바이더 간 자동 정규화)
-- `size` - 아이콘 크기 (숫자 또는 문자열)
-- `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
-- `provider` - 아이콘 프로바이더 오버라이드 ("phosphor" | "lucide" | "iconsax"); `lucide`는 deferred registrar가 필요하며 공개 후보에서는 사용할 수 없음
-- `weight` - Phosphor 굵기 ("thin" | "light" | "regular" | "bold" | "fill" | "duotone")
-- `animated` - 부드러운 애니메이션 효과
-- `pulse` - 펄스 애니메이션
-- `spin` - 회전 애니메이션
-- `bounce` - 바운스 애니메이션
-
-**아이콘 카탈로그:**
-
-exact 이름, 프로바이더별 지원 범위, essential/extended Iconsax 경계는
-[HUA Docs Icon 가이드](https://docs.hua-labs.com/docs/components/icon)에 공개된
-소스 기반 생성 계약을 따릅니다. 이 상세 가이드에는 변동 가능한 개수나 변형 수를
-중복해서 적지 않습니다.
-
-**아이콘 별칭:**
-
-```tsx
-// 프로바이더 간 정규화
-<Icon name="trash" />     // → phosphor: Trash, lucide: Trash2, iconsax: trash
-<Icon name="settings" />  // → phosphor: Gear, lucide: Settings, iconsax: setting
-<Icon name="user" />      // → phosphor: User, lucide: User, iconsax: profile
-```
-
-### Modal
-
-오버레이와 키보드 처리가 있는 접근 가능한 모달 다이얼로그.
-
-```tsx
-import { Modal } from "@hua-labs/ui";
-
-const [open, setOpen] = useState(false);
-
-<Modal
-  isOpen={open}
-  onClose={() => setOpen(false)}
-  title="모달 제목"
-  description="모달 설명"
->
-  <p>모달 콘텐츠</p>
-  <Button onClick={() => setOpen(false)}>닫기</Button>
-</Modal>;
-```
-
-**Props:**
-
-- `isOpen` - 제어된 열림 상태
-- `onClose` - 닫기 핸들러
-- `title` - 모달 제목
-- `description` - 모달 설명 (선택)
-- `children` - 모달 콘텐츠
-- `size` - "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
-- `closeOnOverlayClick` - 오버레이 클릭 시 닫기 (기본값: true)
-- `closable` - 닫기 버튼 표시 (기본값: true)
-- `showBackdrop` - 배경 오버레이 표시 (기본값: true)
-
-**접근성:**
-
-- Escape 키로 닫기
-- `role="dialog"`, `aria-modal`, 제목/설명 연결 적용
-- 열려 있는 동안 body 스크롤 잠금
-- 포커스를 가두거나 복원하지 않으므로 접근 가능한 이름을 위해 `title`을 제공
-
-### Input
-
-유효성 검증 상태와 커스텀 스타일링을 지원하는 텍스트 입력.
-
-```tsx
-import { Input, Label } from "@hua-labs/ui";
-
-<div>
-  <Label htmlFor="email">이메일</Label>
-  <Input
-    id="email"
-    type="email"
-    placeholder="이메일을 입력하세요"
-    error="잘못된 이메일"
-  />
-</div>;
-```
-
-**Props:**
-
-- 모든 표준 입력 속성
-- `error` - 에러 메시지 (빨간 테두리 표시)
-- `success` - 성공 상태 (초록 테두리 표시)
-- `icon` - 왼쪽 아이콘 요소
-- `iconRight` - 오른쪽 아이콘 요소
-
-### Alert
-
-의미론적 변형이 있는 알림 컴포넌트.
-
-```tsx
-import { Alert, AlertSuccess, AlertWarning, AlertError, AlertInfo } from '@hua-labs/ui';
-
-<AlertSuccess>작업 성공</AlertSuccess>
-<AlertWarning>경고 메시지</AlertWarning>
-<AlertError>에러 발생</AlertError>
-<AlertInfo>정보 메시지</AlertInfo>
-
-// 일반
-<Alert variant="success">커스텀 알림</Alert>
-```
-
-**Props:**
-
-- `variant` - "success" | "warning" | "error" | "info"
-- `title` - 알림 제목 (선택)
-- `children` - 알림 콘텐츠
-- `icon` - 커스텀 아이콘 (선택)
-
-### Toast
-
-컨텍스트 프로바이더가 있는 토스트 알림 시스템.
-
-```tsx
-import { ToastProvider, useToast } from "@hua-labs/ui";
-import "@hua-labs/ui/styles/toast.css";
-
-// 앱 래핑
-<ToastProvider>
-  <App />
-</ToastProvider>;
-
-// 컴포넌트 내에서
-function Component() {
-  const { toast } = useToast();
-
-  const showToast = () => {
-    toast({
-      title: "성공",
-      description: "작업 완료",
-      variant: "success",
-      duration: 3000,
-    });
-  };
-
-  return <Button onClick={showToast}>토스트 표시</Button>;
-}
-```
-
-**토스트 옵션:**
-
-- `title` - 토스트 제목
-- `description` - 토스트 설명
-- `variant` - "default" | "success" | "warning" | "error" | "info"
-- `duration` - 지속 시간(ms) (기본값: 3000)
-- `action` - 액션 버튼 설정
-
-**안전 훅:**
-
-```tsx
-// ToastProvider가 없을 수 있는 컴포넌트에서 사용
-const toast = useToastSafe();
-```
-
-### Badge
-
-상태 표시 뱃지.
-
-```tsx
-import { Badge } from '@hua-labs/ui';
-
-<Badge>기본</Badge>
-<Badge variant="success">활성</Badge>
-<Badge variant="warning">대기</Badge>
-<Badge variant="error">실패</Badge>
-<Badge variant="outline">아웃라인</Badge>
-```
-
-**Props:**
-
-- `variant` - "default" | "success" | "warning" | "error" | "outline" | "secondary"
-- `size` - "sm" | "md" | "lg"
-- `children` - 뱃지 콘텐츠
-
-### Progress
-
-복합 변형이 있는 프로그레스 바.
-
-```tsx
-import { Progress, ProgressSuccess, ProgressWarning, ProgressError, ProgressInfo, ProgressGroup } from '@hua-labs/ui';
-
-<Progress value={60} max={100} />
-<ProgressSuccess value={100} />
-<ProgressWarning value={50} />
-
-// 여러 프로그레스 바 그룹화
-<ProgressGroup>
-  <ProgressSuccess value={30} />
-  <ProgressWarning value={40} />
-  <ProgressError value={20} />
-</ProgressGroup>
-```
-
-**Props:**
-
-- `value` - 현재 값
-- `max` - 최대 값 (기본값: 100)
-- `variant` - "default" | "success" | "warning" | "error" | "info"
-- `showLabel` - 백분율 라벨 표시
-
-### Skeleton
-
-로딩 스켈레톤 컴포넌트.
-
-```tsx
-import { Skeleton, SkeletonText, SkeletonCircle, SkeletonCard, SkeletonAvatar, SkeletonUserProfile, SkeletonList, SkeletonTable } from '@hua-labs/ui';
-
-<SkeletonText lines={3} />
-<SkeletonCircle size={64} />
-<SkeletonCard />
-<SkeletonAvatar />
-<SkeletonUserProfile />
-<SkeletonList items={5} />
-<SkeletonTable rows={5} columns={4} />
-```
-
-**변형:**
-
-- `Skeleton` - 기본 스켈레톤
-- `SkeletonText` - 텍스트 라인 스켈레톤
-- `SkeletonCircle` - 원형 스켈레톤
-- `SkeletonRectangle` - 직사각형 스켈레톤
-- `SkeletonRounded` - 둥근 직사각형 스켈레톤
-- `SkeletonCard` - 카드 스켈레톤
-- `SkeletonAvatar` - 아바타 스켈레톤
-- `SkeletonImage` - 이미지 스켈레톤
-- `SkeletonUserProfile` - 사용자 프로필 스켈레톤
-- `SkeletonList` - 리스트 스켈레톤
-- `SkeletonTable` - 테이블 스켈레톤
-
-### ThemeProvider
-
-다크/라이트 모드를 위한 테마 컨텍스트 프로바이더.
-
-```tsx
-import { ThemeProvider, ThemeToggle, useTheme } from '@hua-labs/ui';
-
-<ThemeProvider defaultTheme="system" storageKey="ui-theme">
-  <App />
-</ThemeProvider>
-
-// 테마 토글 버튼
-<ThemeToggle />
-
-// 커스텀 테마 컨트롤
-function CustomThemeControl() {
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
-      <option value="light">라이트</option>
-      <option value="dark">다크</option>
-      <option value="system">시스템</option>
-    </select>
-  );
-}
-```
-
-**Props:**
-
-- `defaultTheme` - "light" | "dark" | "system" (기본값: "system")
-- `storageKey` - localStorage 키 (기본값: "ui-theme")
-- `children` - 앱 콘텐츠
-
----
-
-## 스타일 시스템
-
-### 유틸리티 함수
-
-```tsx
-import { merge, mergeIf, mergeMap, cn } from "@hua-labs/ui";
-
-// 스마트 클래스 병합 (clsx + tailwind-merge)
-merge("px-2 py-1", "px-4"); // → "py-1 px-4"
-
-// 조건부 병합
-mergeIf(isActive, "bg-blue-500", "bg-gray-200");
-
-// 객체 기반 병합
-mergeMap({
-  "bg-blue-500": isPrimary,
-  "bg-gray-500": !isPrimary,
-  "text-white": true,
-  "opacity-50": isDisabled,
-});
-
-// merge 별칭 (하위 호환성)
-cn("text-lg", "font-bold");
-```
-
-### 스타일 생성기
-
-```tsx
-import {
-  createColorStyles,
-  createVariantStyles,
-  createSizeStyles,
-  createRoundedStyles,
-  createShadowStyles,
-  createHoverStyles,
-} from "@hua-labs/ui";
-
-// 색상 스타일
-const colorStyles = createColorStyles({
-  primary: "bg-blue-500 text-white",
-  secondary: "bg-gray-200 text-gray-800",
-});
-
-// CVA를 사용한 변형 스타일
-const buttonVariants = createVariantStyles({
-  base: "inline-flex items-center justify-center",
-  variants: {
-    variant: {
-      default: "bg-primary text-primary-foreground",
-      destructive: "bg-destructive text-destructive-foreground",
-    },
-    size: {
-      sm: "text-sm px-3 py-1.5",
-      md: "text-base px-4 py-2",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-    size: "md",
-  },
-});
-```
-
-### CSS 변수
-
-HUA UI는 테마를 위해 CSS 변수를 사용합니다:
-
-```css
-/* 라이트 모드 */
-:root {
-  --background: 210 20% 98%;
-  --foreground: 210 10% 10%;
-  --primary: 166 78% 30%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 15% 94%;
-  --secondary-foreground: 210 10% 20%;
-  --muted: 210 15% 94%;
-  --muted-foreground: 210 10% 40%;
-  --accent: 226 100% 97%;
-  --accent-foreground: 234 89% 74%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 210 15% 88%;
-  --input: 210 15% 88%;
-  --ring: 166 78% 30%;
-  --card: 0 0% 100%;
-  --card-foreground: 210 10% 10%;
-}
-
-/* 다크 모드 */
-[data-theme="dark"] {
-  --background: 210 10% 8%;
-  --foreground: 210 10% 98%;
-  /* ... 기타 다크 모드 색상 */
-}
-```
-
-### Tailwind 유틸리티
-
-```tsx
-// 배경 색상
-className = "bg-background text-foreground";
-className = "bg-primary text-primary-foreground";
-className = "bg-card text-card-foreground";
-
-// 테두리
-className = "border border-border";
-className = "ring-2 ring-ring";
-
-// 다크 모드
-className = "bg-white dark:bg-slate-900";
-className = "text-gray-900 dark:text-gray-100";
-```
-
-### 마이크로 모션
-
-내장 마이크로 인터랙션:
-
-```tsx
-import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
-
-// 훅 기반
-function Component() {
-  const { handlers, style, className } = useMicroMotion({
-    preset: "springy",
-  });
-  return (
-    <button {...handlers} style={style} className={className}>
-      클릭하세요
-    </button>
-  );
-}
-
-// 클래스 기반
-const classes = getMicroMotionClasses("springy");
-<div className={classes}>호버하세요</div>;
-
-// 사용 가능한 프리셋:
-// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
-```
-
-훅의 인라인 `style`은 Tailwind 없이도 모션을 적용하고, 반환되는 `className`은
-선택적인 `transform-gpu` 유틸리티입니다. `getMicroMotionClasses`는 Tailwind
-유틸리티 토큰만 반환하며 CSS를 주입하지 않습니다. 클래스 전용 경로를 사용할
-때는 소비자 소스를 Tailwind로 컴파일하세요.
-
----
-
-## 아이콘 시스템
-
-canonical 카탈로그는 실행 가능한 소스에서 생성됩니다. 허용되는 exact 이름,
-프로바이더 역할, 활성화 경로, 증거 한계는
-[HUA Docs Icon 가이드](https://docs.hua-labs.com/docs/components/icon)에 공개하며,
-이 상세 가이드에는 같은 카탈로그를 중복하지 않습니다.
-
----
-
-## 테마 시스템
-
-### ThemeProvider 설정
-
-```tsx
-import { ThemeProvider } from "@hua-labs/ui";
-
-<ThemeProvider defaultTheme="system" storageKey="app-theme">
-  <App />
-</ThemeProvider>;
-```
-
-### useTheme 훅
-
-```tsx
-import { useTheme } from "@hua-labs/ui";
-
-function CustomThemeControl() {
-  const { theme, setTheme, systemTheme, resolvedTheme } = useTheme();
-
-  return (
-    <div>
-      <p>현재 테마: {theme}</p>
-      <p>시스템 테마: {systemTheme}</p>
-      <p>해석된 테마: {resolvedTheme}</p>
-
-      <button onClick={() => setTheme("light")}>라이트</button>
-      <button onClick={() => setTheme("dark")}>다크</button>
-      <button onClick={() => setTheme("system")}>시스템</button>
-    </div>
-  );
-}
-```
-
-### 테마 토글
-
-```tsx
-import { ThemeToggle } from "@hua-labs/ui";
-
-// 프리셋 토글 버튼
-<ThemeToggle />;
-
-// 커스텀 구현
-function CustomToggle() {
-  const { theme, setTheme } = useTheme();
-  const nextTheme = theme === "light" ? "dark" : "light";
-
-  return (
-    <button onClick={() => setTheme(nextTheme)}>
-      {theme === "light" ? "🌙" : "☀️"}
-    </button>
-  );
-}
-```
-
-### 다크 모드 클래스
-
-```tsx
-// 조건부 다크 모드 스타일
-className = "bg-white dark:bg-slate-900";
-className = "text-gray-900 dark:text-gray-100";
-className = "border-gray-200 dark:border-gray-700";
-
-// CSS 변수 사용 (테마 인식)
-className = "bg-background text-foreground";
-className = "border-border";
-```
-
----
-
-## 훅
-
-### useInView
-
-요소가 뷰포트에 진입할 때 감지.
-
-```tsx
-import { useInView } from "@hua-labs/ui";
-
-function Component() {
-  const { ref, inView } = useInView({
-    threshold: 0.5,
-    triggerOnce: true,
-  });
-
-  return <div ref={ref}>{inView ? "보임" : "숨김"}</div>;
-}
-```
-
-### useScrollProgress
-
-스크롤 진행률을 백분율로 추적.
-
-```tsx
-import { useScrollProgress } from "@hua-labs/ui";
-
-function ScrollIndicator() {
-  const { progress } = useScrollProgress();
-
-  return (
-    <div
-      style={{
-        width: `${progress}%`,
-        height: 4,
-        background: "blue",
-      }}
-    />
-  );
-}
-```
-
-### useMouse
-
-마우스 위치 추적.
-
-```tsx
-import { useMouse } from "@hua-labs/ui";
-
-function Component() {
-  const { x, y, elementX, elementY, elementW, elementH } = useMouse();
-
-  return (
-    <div>
-      마우스: {x}, {y}
-    </div>
-  );
-}
-```
-
-### useReducedMotion
-
-모션 감소 선호도 감지.
-
-```tsx
-import { useReducedMotion } from "@hua-labs/ui";
-
-function Component() {
-  const reducedMotion = useReducedMotion();
-
-  return <div className={reducedMotion ? "" : "animate-bounce"}>콘텐츠</div>;
-}
-```
-
-### useWindowSize
-
-윈도우 크기 추적.
-
-```tsx
-import { useWindowSize } from "@hua-labs/ui";
-
-function Component() {
-  const { width, height, isMobile, isTablet, isDesktop } = useWindowSize();
-
-  return (
-    <div>
-      윈도우: {width}x{height}
-      {isMobile && <p>모바일 뷰</p>}
-    </div>
-  );
-}
-```
-
----
-
-## 고급 사용법
-
-### 복합 컴포넌트
-
-```tsx
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@hua-labs/ui";
-
-<Card>
-  <CardHeader>
-    <CardTitle>프로필</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <p>사용자 정보</p>
-  </CardContent>
-  <CardFooter>
-    <Button>수정</Button>
-  </CardFooter>
-</Card>;
-```
-
-### Slot 패턴 (다형적 컴포넌트)
-
-```tsx
-import { Button } from '@hua-labs/ui';
-import NextLink from 'next/link';
-
-// Next.js Link로 렌더링
-<Button asChild>
-  <NextLink href="/about">소개</NextLink>
-</Button>
-
-// 커스텀 요소로 렌더링
-<Button asChild>
-  <a href="/external" target="_blank">외부 링크</a>
-</Button>
-```
-
-### 커스텀 스타일링
-
-```tsx
-import { Button, merge } from '@hua-labs/ui';
-
-// 컴포넌트 스타일 확장
-<Button className={merge("custom-class", "hover:custom-hover")}>
-  커스텀 버튼
-</Button>
-
-// 변형 스타일 오버라이드
-<Button
-  className="bg-gradient-to-r from-purple-500 to-pink-500"
-  variant="ghost"
->
-  커스텀 그라디언트
-</Button>
-```
-
-### 서버 컴포넌트 (Next.js App Router)
-
-```tsx
-// 서버 컴포넌트 ('use client' 없음)
-import { Card, CardHeader, CardTitle, CardContent } from "@hua-labs/ui";
-
-export default function ServerComponent() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>서버 렌더링 카드</CardTitle>
-      </CardHeader>
-      <CardContent>서버에서 렌더링됩니다</CardContent>
-    </Card>
-  );
-}
-
-// 클라이언트 컴포넌트 (인터랙티브)
-("use client");
-
-import { Button } from "@hua-labs/ui";
-
-export default function ClientComponent() {
-  return <Button onClick={() => console.log("클릭됨")}>클릭하세요</Button>;
-}
-```
-
-### 폼 유효성 검증
-
-```tsx
-import { Button } from "@hua-labs/ui";
-import { Form, FormControl, Input } from "@hua-labs/ui/form";
-
-function LoginForm() {
-  const [errors, setErrors] = useState({});
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // 유효성 검증 로직
-  };
-
-  return (
-    <Form onSubmit={handleSubmit}>
-      <FormControl>
-        <Label htmlFor="email">이메일</Label>
-        <Input id="email" type="email" error={errors.email} />
-      </FormControl>
-
-      <FormControl>
-        <Label htmlFor="password">비밀번호</Label>
-        <Input id="password" type="password" error={errors.password} />
-      </FormControl>
-
-      <Button type="submit">로그인</Button>
-    </Form>
-  );
-}
-```
-
----
-
-## 문제 해결
-
-### "bg-primary가 작동하지 않음"
-
-**문제:** `bg-primary` 같은 Tailwind 유틸리티 클래스가 작동하지 않습니다.
-
-**해결:** 추천 테마 CSS를 import하세요:
-
-```css
-/* globals.css */
-@import "tailwindcss";
-@import "@hua-labs/ui/styles/recommended-theme.css";
-```
-
-테마 없이는 표준 Tailwind 색상을 사용하세요:
-
-```tsx
-<Button className="bg-blue-500">버튼</Button>
-```
-
----
-
-### 다크 모드가 작동하지 않음
-
-**문제:** 다크 모드 스타일이 적용되지 않습니다.
-
-**해결:** 앱을 `ThemeProvider`로 래핑하세요:
-
-```tsx
-import { ThemeProvider } from "@hua-labs/ui";
-
-<ThemeProvider>
-  <App />
-</ThemeProvider>;
-```
-
-다크 모드 클래스가 사용되는지 확인하세요:
-
-```tsx
-className = "bg-white dark:bg-slate-900";
-```
-
----
-
-### SSR 하이드레이션 불일치
-
-**문제:** 서버/클라이언트 불일치 경고.
-
-**해결:** 인터랙티브 컴포넌트에 `'use client'` 지시어를 추가하세요:
-
-```tsx
-"use client";
-
-import { Button } from "@hua-labs/ui";
-
-export default function Component() {
-  return <Button onClick={() => {}}>클릭</Button>;
-}
-```
-
-비인터랙티브 컴포넌트(Card, Badge 등)는 서버 컴포넌트로 유지할 수 있습니다.
-
----
-
-### 아이콘을 찾을 수 없음
-
-**문제:** Icon 컴포넌트가 "?" 플레이스홀더를 표시합니다.
-
-**해결:**
-
-1. 아이콘 프로바이더 설정 확인:
-
-```tsx
-import { IconProvider } from "@hua-labs/ui";
-
-<IconProvider set="phosphor">
-  <App />
-</IconProvider>;
-```
-
-2. Iconsax의 경우 진입점을 import:
-
-```tsx
-import "@hua-labs/ui/iconsax";
-import { IconProvider } from "@hua-labs/ui";
-
-<IconProvider set="iconsax">
-  <App />
-</IconProvider>;
-```
-
-3. 아이콘 이름이 유효한지 확인. 사용 가능한 아이콘 확인:
-
-```tsx
-import { iconNames } from "@hua-labs/ui";
-console.log(iconNames);
-```
-
----
-
-### ref 관련 타입 에러
-
-**문제:** ref prop에서 TypeScript 에러.
-
-**해결:** 컴포넌트가 ref를 올바르게 전달합니다. ref 타입이 요소와 일치하는지 확인하세요:
-
-```tsx
-const buttonRef = useRef<HTMLButtonElement>(null);
-<Button ref={buttonRef}>버튼</Button>;
-
-const divRef = useRef<HTMLDivElement>(null);
-<Card ref={divRef}>카드</Card>;
-```
-
----
-
-### 토스트가 표시되지 않음
-
-**문제:** 토스트 알림이 나타나지 않습니다.
-
-**해결:**
-
-1. 토스트 CSS를 import:
-
-```css
-@import "@hua-labs/ui/styles/toast.css";
-```
-
-2. 앱을 ToastProvider로 래핑:
-
-```tsx
-import { ToastProvider } from "@hua-labs/ui";
-
-<ToastProvider>
-  <App />
-</ToastProvider>;
-```
-
-3. 훅 사용:
-
-```tsx
-import { useToast } from "@hua-labs/ui";
-
-function Component() {
-  const { toast } = useToast();
-  toast({ title: "성공" });
-}
-```
-
----
-
-### 번들 크기 문제
-
-**문제:** 번들 크기가 큽니다.
-
-**해결:** 서브경로 import를 사용하여 필요한 컴포넌트만 import:
-
-```tsx
-// 루트 컴포넌트와 폼 컴포넌트는 선언된 public entry를 사용합니다.
-import { Button, Card } from "@hua-labs/ui";
-import { Form, Select, DatePicker } from "@hua-labs/ui/form";
-```
-
-번들 분석:
-
-```bash
-pnpm run build:analyze
-```
-
----
-
-### Tailwind 클래스가 작동하지 않음
-
-**문제:** 커스텀 Tailwind 클래스가 적용되지 않습니다.
-
-**해결:** Tailwind 설정에 HUA UI 경로가 포함되어 있는지 확인:
-
-```js
-// tailwind.config.js
-export default {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@hua-labs/ui/dist/**/*.{js,mjs}",
-  ],
-  // ...
-};
-```
-
----
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](https://github.com/HUA-Labs/hua-packages/blob/main/CONTRIBUTING.md).
-
-기여를 환영합니다! [기여 가이드](https://github.com/HUA-Labs/hua-packages/blob/main/CONTRIBUTING.md)를 읽어주세요.
-
-## License
-
-MIT © HUA Labs

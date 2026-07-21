@@ -22,7 +22,11 @@
 pnpm add @hua-labs/{{shortName}}
 ```
 
-{{#if peerDepsList}}
+{{#if splitPeerDeps}}
+> Required peer dependencies: {{requiredPeerDepsList}}
+>
+> Optional peers (feature-specific): {{optionalPeerDepsList}}
+{{else if peerDepsList}}
 > Peer dependencies: {{peerDepsList}}
 {{/if}}
 

@@ -1,26 +1,35 @@
 overview: "TypeScript-first React UI components with modular Web and React Native entry points."
 
 features:
-  - "70+ components — Buttons, forms, tables, modals, overlays, and more"
+  - "Broad component coverage — Buttons, forms, tables, modals, overlays, and more"
   - "Modular entry points — Import only what you need for optimal bundle size"
   - "Accessibility foundations — component-specific ARIA and keyboard contracts; browser and physical assistive-technology evidence remain separate"
-  - "Dark mode — Built-in dark mode support"
-  - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
+  - "Theme state — Light, dark, and system root-class management with consumer-owned semantic variables"
+  - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop; no Tailwind CSS required"
   - "Modular ESM entries — CSS assets and provider-registration entries declare their side effects explicitly"
 
 quickStart: |
-  import { Button, Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
-  import { Input, Select } from '@hua-labs/ui/form';
+  import { Button, Card, CardHeader, CardTitle, CardContent, Label } from '@hua-labs/ui';
+  import { Input } from '@hua-labs/ui/form';
 
   function App() {
     return (
-      <Card>
+      <Card dot="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
         </CardHeader>
         <CardContent>
-          <Input placeholder="Email" />
-          <Button>Submit</Button>
+          <form onSubmit={(event) => event.preventDefault()}>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+            />
+            <Button type="submit" dot="mt-4 w-full">Sign Up</Button>
+          </form>
         </CardContent>
       </Card>
     );
@@ -28,8 +37,8 @@ quickStart: |
 
 detailedGuide:
   path: "./DETAILED_GUIDE.md"
-  distribution: "packed"
-  description: "Complete usage, API, styling, accessibility, and public-surface guidance"
+  distribution: "repository"
+  description: "Usage, API, styling, accessibility, and public-surface guidance"
 
 related:
   - "dot"
@@ -65,7 +74,7 @@ apiNotes:
     description: "Styled anchor with router integration"
     kind: "component"
   Icon:
-    description: "Semantic icon component backed by the executable catalog; Phosphor is the default complete fallback, Lucide is a first-class optional alternative, and Iconsax is an opt-in product-style alternative"
+    description: "Semantic icon component backed by the executable catalog; Phosphor is the default fallback, Iconsax is opt-in, and the public package does not ship the Lucide registrar"
     kind: "component"
   Avatar:
     description: "User avatar with image fallback"
@@ -350,7 +359,7 @@ apiNotes:
     description: "Frozen exact-name inventory derived from the executable icon catalog"
     kind: "variable"
   iconProviderMapping:
-    description: "Catalog-derived provider bindings for Phosphor, Lucide, and Iconsax in the full platform workspace; public availability follows the current public package boundary"
+    description: "Catalog-derived bindings for Phosphor, Lucide, and Iconsax; only provider registrations shipped by the public package are usable by package consumers"
     kind: "variable"
   isValidIconName:
     description: "Exact-membership type guard for canonical icon IDs and aliases; it does not normalize arbitrary strings"

@@ -241,7 +241,7 @@ test("projects the exact UI public-core profile and filters deferred API authori
   const retainedEntries = sourceProfile.entries.filter(
     (entry) => entry.disposition === "retained",
   );
-  const docContent = `overview: "Profile projection"\nfeatures:\n  - "Profile-aware exports"\nquickStart: "example();"\ndetailedGuide:\n  path: "./DETAILED_GUIDE.md"\n  distribution: "packed"\n  description: "Complete usage, API, styling, accessibility, and public-surface guidance"\napiFilter: notes-only\napiNotes:\n  retainedRoot:\n    description: "Retained root API"\n    kind: "function"\n  deferredAx:\n    description: "Deferred AX API"\n    kind: "function"\n    importFrom: "@hua-labs/ui/ax"\n`;
+  const docContent = `overview: "Profile projection"\nfeatures:\n  - "Profile-aware exports"\nquickStart: "example();"\ndetailedGuide:\n  path: "./DETAILED_GUIDE.md"\n  distribution: "repository"\n  description: "Usage, API, styling, accessibility, and public-surface guidance"\napiFilter: notes-only\napiNotes:\n  retainedRoot:\n    description: "Retained root API"\n    kind: "function"\n  deferredAx:\n    description: "Deferred AX API"\n    kind: "function"\n    importFrom: "@hua-labs/ui/ax"\n`;
   const exports = Object.fromEntries(
     retainedEntries.map((entry) => [entry.subpath, entry.manifestTarget]),
   );
@@ -250,12 +250,12 @@ test("projects the exact UI public-core profile and filters deferred API authori
     writePackage(root, "hua-profile", {
       fullName: "@hua-labs/ui",
       nodeEngine: ">=20.16.0",
-      files: ["dist", "DETAILED_GUIDE.md"],
+      files: ["dist"],
       guide: {
         path: "./DETAILED_GUIDE.md",
-        distribution: "packed",
+        distribution: "repository",
         description:
-          "Complete usage, API, styling, accessibility, and public-surface guidance",
+          "Usage, API, styling, accessibility, and public-surface guidance",
       },
       exports,
       publicProfile: profile,
@@ -296,8 +296,8 @@ test("projects the exact UI public-core profile and filters deferred API authori
     writePackage(missingRoot, "hua-profile", {
       fullName: "@hua-labs/ui",
       nodeEngine: ">=20.16.0",
-      files: ["dist", "DETAILED_GUIDE.md"],
-      guide: { distribution: "packed" },
+      files: ["dist"],
+      guide: { distribution: "repository" },
       exports,
       docContent,
     });
@@ -599,7 +599,7 @@ test("current UI docs derive the exact retained profile without copyable deferre
     "react-native",
     "cross-platform",
   ]);
-  assert.ok(manifest.files.includes("DETAILED_GUIDE.md"));
+  assert.ok(!manifest.files.includes("DETAILED_GUIDE.md"));
   assert.ok(!manifest.files.includes("public-core-profile.json"));
   assert.deepEqual(
     Object.keys(manifest.exports).sort(),
@@ -617,6 +617,13 @@ test("current UI docs derive the exact retained profile without copyable deferre
   assert.match(doc, /^readmeApiProjection: omit$/mu);
   assert.ok(Buffer.byteLength(readme, "utf8") < 8 * 1024);
   assert.ok(readme.trimEnd().split("\n").length < 80);
+  assert.match(readme, /not included in the package tarball/u);
+  assert.match(
+    readme,
+    /https:\/\/github\.com\/HUA-Labs\/hua-packages\/blob\/main\/packages\/hua-ui\/DETAILED_GUIDE\.md/u,
+  );
+  assert.match(ai, /state: "repository-only"/u);
+  assert.match(ai, /distribution: "repository"/u);
   assert.doesNotMatch(readme, /^## API$/mu);
   assert.doesNotMatch(readme, /^## Public Imports$/mu);
   assert.doesNotMatch(readme, /^## Kanban drag transaction evidence$/mu);
@@ -678,13 +685,13 @@ test("current public package outputs remain byte-identical under validate", () =
 test("writer, AX adapter, and README template bytes are review-locked", () => {
   const expected = {
     "scripts/generate-docs.ts":
-      "22f53ae813b8c530df0ed353c2e186ca4fc1b1e2ca45611546efca6078a8fb95",
+      "3202fcd235f180debc21adf57166a9abcbab839968d4652f0b8ce49e684287e1",
     "scripts/package-ax.mjs":
       "c8b07a3291e4733eba9c9689932586749333dc33e5f0ee3bc1ecfa69f954bcd6",
     "scripts/templates/ai-yaml.hbs":
       "7c195e7f33acd1c432083c103e5ccf287e8b7d2cd4e5e2975097b296fe25989b",
     "scripts/templates/readme.hbs":
-      "bcae04c0249c22f4d7dafa079347876be474dbb48bf95c6f8f33d9953fca3879",
+      "f9ee757cb24bb177f593e393a5f203858db3347f7cccca912aae1247efbcf0b5",
   };
   for (const [path, digest] of Object.entries(expected)) {
     const bytes = readFileSync(join(REPO_ROOT, path));

@@ -105,6 +105,9 @@ interface PackageData {
   nodeEngine: string;
   peerDeps: Record<string, string>;
   peerDepsList: string;
+  requiredPeerDepsList: string;
+  optionalPeerDepsList: string;
+  splitPeerDeps: boolean;
   reactMajor?: string;
   exports: ExportInfo[];
   readmeFeatures: string[];
@@ -525,19 +528,19 @@ function buildProfileDocumentationProjection(options: {
   if (
     !guide ||
     guide.path !== "./DETAILED_GUIDE.md" ||
-    guide.distribution !== "packed" ||
+    guide.distribution !== "repository" ||
     guide.description !==
-      "Complete usage, API, styling, accessibility, and public-surface guidance"
+      "Usage, API, styling, accessibility, and public-surface guidance"
   ) {
     throw new Error("profile-aware detailed guide authority must stay exact");
   }
   if (
     !Array.isArray(options.packageFiles) ||
-    !options.packageFiles.includes("DETAILED_GUIDE.md") ||
+    options.packageFiles.includes("DETAILED_GUIDE.md") ||
     options.packageFiles.includes("public-core-profile.json")
   ) {
     throw new Error(
-      "profile-aware package files must ship only the guide authority",
+      "profile-aware package files must exclude repository-only authorities",
     );
   }
   const guidePath = join(options.packageDir, "DETAILED_GUIDE.md");
@@ -550,12 +553,12 @@ function buildProfileDocumentationProjection(options: {
     );
   }
   return {
-    state: "shipped",
+    state: "repository-only",
     path: guide.path,
     distribution: guide.distribution,
     description: guide.description,
-    packed: true,
-    link: guide.path,
+    packed: false,
+    link: "https://github.com/HUA-Labs/hua-packages/blob/main/packages/hua-ui/DETAILED_GUIDE.md",
   };
 }
 
@@ -684,6 +687,15 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
   const peerDepsList = Object.entries(rawPeerDeps)
     .map(([k, v]) => `${k} ${v}`)
     .join(", ");
+  const peerDepsMeta = pkgJson.peerDependenciesMeta ?? {};
+  const requiredPeerDepsList = Object.entries(rawPeerDeps)
+    .filter(([name]) => peerDepsMeta[name]?.optional !== true)
+    .map(([name, range]) => `${name} ${range}`)
+    .join(", ");
+  const optionalPeerDepsList = Object.entries(rawPeerDeps)
+    .filter(([name]) => peerDepsMeta[name]?.optional === true)
+    .map(([name, range]) => `${name} ${range}`)
+    .join(", ");
 
   // Extract clean major version for badge (>=19.0.0 → 19)
   const reactMajor = rawPeerDeps.react?.match(/(\d+)/)?.[1];
@@ -799,6 +811,9 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     nodeEngine: pkgJson.engines?.node ?? ">=20.0.0",
     peerDeps,
     peerDepsList,
+    requiredPeerDepsList,
+    optionalPeerDepsList,
+    splitPeerDeps: fullName === "@hua-labs/ui",
     reactMajor,
     exports,
     readmeFeatures,

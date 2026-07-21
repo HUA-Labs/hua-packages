@@ -127,7 +127,6 @@ function createUiProfileFixture({
       .filter((target) => !omitted.has(target))
       .map((target) => [target, contentsForTarget(target)]),
   );
-  files["DETAILED_GUIDE.md"] = "# UI guide\n";
   Object.assign(files, extraFiles);
   return createFixture({
     exports: packedManifest.exports,
@@ -320,17 +319,17 @@ test("admits only the exact UI retained profile tar boundary", async (t) => {
     );
   });
 
-  await t.test("guide omitted", () => {
-    const fixture = createUiProfileFixture({ omit: ["DETAILED_GUIDE.md"] });
-    rmSync(join(fixture.packageRoot, "DETAILED_GUIDE.md"), { force: true });
-    packFixture(fixture.fixtureRoot, fixture.tarball);
+  await t.test("repository-only guide leaked", () => {
+    const fixture = createUiProfileFixture({
+      extraFiles: { "DETAILED_GUIDE.md": "# UI guide\n" },
+    });
     const result = runChecker(fixture.tarball);
     assert.equal(result.status, 1);
-    assert.match(result.stdout, /missing public-core document/u);
+    assert.match(result.stdout, /repository-only document present/u);
   });
 });
 
-test("binds packed UI description and ordered keywords to workspace authority", async (t) => {
+test("binds UI description and ordered keywords to workspace authority", async (t) => {
   const cases = [
     {
       name: "missing description",
@@ -391,13 +390,13 @@ test("binds packed UI description and ordered keywords to workspace authority", 
   }
 });
 
-test("rejects packed UI files manifest drift while the guide payload remains", () => {
+test("rejects packed UI files manifest drift while the guide stays repository-only", () => {
   const cases = [
     [
       "omission",
       (manifest) => {
         manifest.files = manifest.files.filter(
-          (entry) => entry !== "DETAILED_GUIDE.md",
+          (entry) => entry !== "src/styles",
         );
       },
     ],
@@ -416,7 +415,7 @@ test("rejects packed UI files manifest drift while the guide payload remains", (
     [
       "duplicate entry",
       (manifest) => {
-        manifest.files.push("DETAILED_GUIDE.md");
+        manifest.files.push("dist");
       },
     ],
     [
@@ -429,11 +428,6 @@ test("rejects packed UI files manifest drift while the guide payload remains", (
 
   for (const [label, mutateManifest] of cases) {
     const fixture = createUiProfileFixture({ mutateManifest });
-    assert.equal(
-      readFileSync(join(fixture.packageRoot, "DETAILED_GUIDE.md"), "utf8"),
-      "# UI guide\n",
-      `${label}: guide payload must remain present`,
-    );
     const result = runChecker(fixture.tarball);
     assert.equal(
       result.status,

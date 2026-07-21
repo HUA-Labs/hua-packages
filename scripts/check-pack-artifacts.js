@@ -241,7 +241,7 @@ function loadUiPublicProfile(profilePath, workspaceManifest) {
   }
   if (
     !Array.isArray(workspaceManifest.files) ||
-    !workspaceManifest.files.includes("DETAILED_GUIDE.md") ||
+    workspaceManifest.files.includes("DETAILED_GUIDE.md") ||
     workspaceManifest.files.includes("public-core-profile.json")
   ) {
     throw new Error("UI package files do not match public-core distribution");
@@ -397,9 +397,9 @@ function verifyUiPublicProfileTarball(pkg, fileSet) {
   for (const target of uiPublicProfile.deferredTargets) {
     if (fileSet.has(target)) issues.push(`deferred target present: ${target}`);
   }
-  for (const required of ["package/DETAILED_GUIDE.md"]) {
-    if (!fileSet.has(required))
-      issues.push(`missing public-core document: ${required}`);
+  for (const repositoryOnly of ["package/DETAILED_GUIDE.md"]) {
+    if (fileSet.has(repositoryOnly))
+      issues.push(`repository-only document present: ${repositoryOnly}`);
   }
   if (fileSet.has("package/public-core-profile.json")) {
     issues.push("non-shipped public-core profile is present");
