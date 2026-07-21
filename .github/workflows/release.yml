@@ -146,7 +146,7 @@ jobs:
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download exact claimed artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.prepare.outputs.artifact_name }}
           path: ${{ runner.temp }}/hua-release-artifacts
@@ -221,7 +221,7 @@ jobs:
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download sanitized exact published set
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ${{ needs.publish.outputs.published_artifact_name }}
           path: ${{ runner.temp }}/hua-published
