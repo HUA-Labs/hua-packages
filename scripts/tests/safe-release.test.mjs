@@ -2156,6 +2156,18 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
         ),
     ],
     [
+      "malformed classic bypass allowance",
+      (value) =>
+        (value.protection.required_pull_request_reviews.bypass_pull_request_allowances =
+          null),
+    ],
+    [
+      "partial classic bypass allowance",
+      (value) =>
+        delete value.protection.required_pull_request_reviews
+          .bypass_pull_request_allowances.apps,
+    ],
+    [
       "administrator bypass",
       (value) => (value.protection.enforce_admins.enabled = false),
     ],
@@ -2355,6 +2367,18 @@ test("synthetic protected claim and closure authorities prove contract shape onl
     assert.equal(result.transition, kind);
     assert.equal(result.status, "protected");
   }
+});
+
+test("GitHub REST omission of an empty classic bypass allowance is accepted", () => {
+  const transition = githubTransition("claim");
+  const authority = githubAuthorityFixture(transition);
+  delete authority.protection.required_pull_request_reviews
+    .bypass_pull_request_allowances;
+
+  const result = validateGitHubReleaseAuthority(authority, transition);
+  assert.equal(result.repository, TEST_RELEASE_REPOSITORY);
+  assert.equal(result.transition, "claim");
+  assert.equal(result.status, "protected");
 });
 
 test("credential-free resume authority binds the exact claim merge and remote head", (t) => {
