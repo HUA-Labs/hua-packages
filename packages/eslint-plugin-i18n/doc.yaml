@@ -7,7 +7,7 @@ features:
   - "no-unlocalized-field — Detect description/label/value fields with literal strings instead of i18n keys"
   - "prefer-common-key — Suggest common namespace keys when same value exists there"
   - "no-unused-key — Placeholder rule for unused translation key detection (CLI recommended)"
-  - "i18n-lint CLI — unused-keys, common-report, missing-translations commands"
+  - "i18n-lint CLI — Commands: unused-keys, common-report, and missing"
 
 quickStart: |
   // eslint.config.mjs (flat config)
@@ -43,6 +43,22 @@ quickStart: |
   ];
 
 codeBlockLang: js
+
+readme:
+  detailedGuide: "https://github.com/HUA-Labs/hua-packages/blob/main/packages/eslint-plugin-i18n/DETAILED_GUIDE.md"
+
+apiFilter: notes-only
+
+apiNotes:
+  default:
+    description: "Default ESLint plugin object containing the package rules and configs"
+    kind: "plugin"
+  rules:
+    description: "Six i18n rule modules keyed by their public rule names"
+    kind: "object"
+  configs:
+    description: "Shareable ESLint configurations, including the recommended config"
+    kind: "object"
 
 related:
   - "i18n-core"

@@ -15,7 +15,7 @@ ESLint plugin for i18n type safety — catch missing keys (with did-you-mean), h
 - **no-unlocalized-field — Detect description/label/value fields with literal strings instead of i18n keys**
 - **prefer-common-key — Suggest common namespace keys when same value exists there**
 - **no-unused-key — Placeholder rule for unused translation key detection (CLI recommended)**
-- **i18n-lint CLI — unused-keys, common-report, missing-translations commands**
+- **i18n-lint CLI — Commands: unused-keys, common-report, and missing**
 
 ## Installation
 
@@ -66,6 +66,13 @@ export default [
 
 | Export | Type | Description |
 |--------|------|-------------|
+| `default` | plugin | Default ESLint plugin object containing the package rules and configs |
+| `rules` | object | Six i18n rule modules keyed by their public rule names |
+| `configs` | object | Shareable ESLint configurations, including the recommended config |
+
+## Documentation
+
+- [Detailed Guide](https://github.com/HUA-Labs/hua-packages/blob/main/packages/eslint-plugin-i18n/DETAILED_GUIDE.md)
 
 ## Related Packages
 
