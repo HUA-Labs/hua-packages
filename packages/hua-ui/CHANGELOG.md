@@ -1,5 +1,11 @@
 # @hua-labs/ui
 
+## 2.4.1
+
+### Patch Changes
+
+- 832447e: Refresh the public UI package description, keywords, README, Detailed Guide, and AI documentation.
+
 ## 2.4.0
 
 ### Minor Changes

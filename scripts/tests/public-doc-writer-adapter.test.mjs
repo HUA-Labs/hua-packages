@@ -583,7 +583,7 @@ test("current UI docs derive the exact retained profile without copyable deferre
     7,
   );
   assert.equal(manifest.engines.node, ">=20.16.0");
-  assert.equal(manifest.version, "2.4.0");
+  assert.equal(manifest.version, "2.4.1");
   assert.equal(
     manifest.description,
     "TypeScript-first React UI components with modular Web and React Native entry points",
@@ -625,6 +625,8 @@ test("current UI docs derive the exact retained profile without copyable deferre
     ai,
     /description: "TypeScript-first React UI components with modular Web and React Native entry points"/u,
   );
+  assert.match(ai, /^# Version: 2\.4\.1$/mu);
+  assert.match(ai, /^  version: "2\.4\.1"$/mu);
   assert.match(ai, /public_core_profile:/u);
   assert.doesNotMatch(ai, /candidate_status:/u);
   for (const retainedImport of classified.retained) {
