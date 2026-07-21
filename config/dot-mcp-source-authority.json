@@ -12,31 +12,31 @@
         "size": 23697
       },
       {
-        "path": "package/dist/index.js",
-        "sha256": "849a0d97a2eefe90eb3b32375deb1b50c0bfe00dc27e9ffb1a5c4e6c0fa60603",
-        "size": 29016
-      },
-      {
         "path": "package/LICENSE",
         "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
         "size": 1073
       },
       {
-        "path": "package/package.json",
-        "sha256": "3d27ca6f9a93c65731a1e66334cdf13cbc4be8f5a2dce4a0481af08b1e5dd35c",
-        "size": 1155
-      },
-      {
         "path": "package/README.md",
         "sha256": "788830a6848d5fef5897f13f0c5bc30c81bd5ca967bdde0e0342f1e8c054591e",
         "size": 5769
+      },
+      {
+        "path": "package/dist/index.js",
+        "sha256": "849a0d97a2eefe90eb3b32375deb1b50c0bfe00dc27e9ffb1a5c4e6c0fa60603",
+        "size": 29016
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "3d27ca6f9a93c65731a1e66334cdf13cbc4be8f5a2dce4a0481af08b1e5dd35c",
+        "size": 1155
       }
     ],
     "packageName": "@hua-labs/dot-mcp",
     "packageVersion": "0.2.0",
     "packedManifestSha256": "3d27ca6f9a93c65731a1e66334cdf13cbc4be8f5a2dce4a0481af08b1e5dd35c",
     "requiredTargets": ["package/dist/index.js"],
-    "rosterDigest": "9aaeba565cb965a1acd0bfa8472306dd10c4bfb33ef96694af4b65e52bf33a95",
+    "rosterDigest": "8860fcd2670ea1cebbcdff05d29ab83457322ef62a1009d392898ae2fc0d5a4f",
     "sourceManifestSha256": "3c63c59e0cefd8910c3c37a4152bad8b40dd9cf21ae6a97275782dbf6017aa18",
     "tarStreamBytes": 68608,
     "tarStreamSha256": "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e"

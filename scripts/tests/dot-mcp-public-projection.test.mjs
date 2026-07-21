@@ -191,12 +191,11 @@ test("the derived manifest preserves the public release boundary exactly", () =>
     ),
   );
 
-  assert.equal(current.version, publicBase.version);
+  assert.equal(current.version, "0.2.0");
   assert.deepEqual(current.repository, publicBase.repository);
   assert.deepEqual(current.publishConfig, publicBase.publishConfig);
   assert.deepEqual(current.files, publicBase.files);
   assert.deepEqual(current.bin, publicBase.bin);
-  assert.deepEqual(current.dependencies, publicBase.dependencies);
   assert.equal(current.dependencies["@hua-labs/dot"], "workspace:0.3.0");
   assert.equal(current.engines.node, ">=20.16.0");
   assert.equal(
@@ -205,6 +204,9 @@ test("the derived manifest preserves the public release boundary exactly", () =>
   );
 
   const normalized = structuredClone(current);
+  normalized.version = publicBase.version;
+  normalized.dependencies["@hua-labs/dot"] =
+    publicBase.dependencies["@hua-labs/dot"];
   normalized.scripts.build = publicBase.scripts.build;
   normalized.engines = publicBase.engines;
   assert.deepEqual(normalized, publicBase);
@@ -243,9 +245,9 @@ test("generated MCP AI truth binds the reviewed public identity and support floo
   const ai = text("ai-docs/dot-mcp.ai.yaml");
   assert.equal(
     sha256("ai-docs/dot-mcp.ai.yaml"),
-    "561218733d104f13e8c9b461d675903d8b3a2631591798f25bd99320a340c109",
+    "0ecfde86d199176e1a77f573cf0bb1a0bfe87de7f48d9be117734b18cfd3ea37",
   );
-  assert.match(ai, /version: "0\.1\.3"/u);
+  assert.match(ai, /version: "0\.2\.0"/u);
   assert.match(ai, /node: ">=20\.16\.0"/u);
   assert.match(ai, /dot_flutter_wire/u);
   assert.match(ai, /package-local bounded completion catalog/u);

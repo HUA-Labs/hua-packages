@@ -12,31 +12,31 @@
         "size": 17542
       },
       {
-        "path": "package/dist/index.js",
-        "sha256": "5336213c98a121593f681c5fbb1641b173ec7ecc4f72d221f48862d332fd104b",
-        "size": 63876
-      },
-      {
         "path": "package/LICENSE",
         "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
         "size": 1073
       },
       {
-        "path": "package/package.json",
-        "sha256": "46426eba747c00882144dbb257f1da62acdbe082c1ba9b8233809fda1a0726ef",
-        "size": 1228
-      },
-      {
         "path": "package/README.md",
         "sha256": "e59449cbd2d4ee35129f82a851bfa51a2dc73dd465140b6c66d7c6d5a27f570e",
         "size": 5355
+      },
+      {
+        "path": "package/dist/index.js",
+        "sha256": "5336213c98a121593f681c5fbb1641b173ec7ecc4f72d221f48862d332fd104b",
+        "size": 63876
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "46426eba747c00882144dbb257f1da62acdbe082c1ba9b8233809fda1a0726ef",
+        "size": 1228
       }
     ],
     "packageName": "@hua-labs/dot-lsp",
     "packageVersion": "0.1.4",
     "packedManifestSha256": "46426eba747c00882144dbb257f1da62acdbe082c1ba9b8233809fda1a0726ef",
     "requiredTargets": ["package/dist/index.js"],
-    "rosterDigest": "6247a4adb824a32f319d01fd6669e51f5d0a2e5559e635f0a181f038cfded306",
+    "rosterDigest": "bc3e4ad92c4922fd5b6677bfd5cf74c4768c0b2abf45a44ea21423bb4595ce62",
     "sourceManifestSha256": "9536366abd89dc98814d4f2bc7826c97c46b0d5d8359fbeac222f97f49ba07cc",
     "tarStreamBytes": 96768,
     "tarStreamSha256": "41b370f78505a5f87cdf655e79fdbfb863094b740ad1a66cf213b638c424a119"

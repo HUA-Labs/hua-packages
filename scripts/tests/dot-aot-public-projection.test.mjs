@@ -104,6 +104,9 @@ test("derived public manifest preserves release authority and projects exact pro
   assert.deepEqual(manifest.files, publicBase.files);
 
   const normalized = structuredClone(manifest);
+  normalized.version = publicBase.version;
+  normalized.dependencies["@hua-labs/dot"] =
+    publicBase.dependencies["@hua-labs/dot"];
   delete normalized.dependencies["@babel/parser"];
   normalized.engines.node = ">=20.0.0";
   assert.deepEqual(normalized, publicBase);

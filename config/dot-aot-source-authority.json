@@ -12,6 +12,16 @@
         "size": 20954
       },
       {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "5c68cca189d065a81bf4319e38b86660ce772b706cbd21a53038bb6b38067be8",
+        "size": 1509
+      },
+      {
         "path": "package/dist/babel.d.mts",
         "sha256": "f270c4650044e6f1fd39c2b414cec0b30a2a617ca4a072f5ecc170ebb079dffe",
         "size": 2235
@@ -67,19 +77,9 @@
         "size": 2998
       },
       {
-        "path": "package/LICENSE",
-        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
-        "size": 1073
-      },
-      {
         "path": "package/package.json",
         "sha256": "9d5437339e5b88143437cb8e7274c3947347a92be5278abc7a4aa345008f4882",
         "size": 1684
-      },
-      {
-        "path": "package/README.md",
-        "sha256": "5c68cca189d065a81bf4319e38b86660ce772b706cbd21a53038bb6b38067be8",
-        "size": 1509
       }
     ],
     "packageName": "@hua-labs/dot-aot",
@@ -93,7 +93,7 @@
       "package/dist/vite.d.mts",
       "package/dist/vite.mjs"
     ],
-    "rosterDigest": "a73273ff305e83c7e061b47f5678964d2da25091265c11cf90b968c2c391d7b2",
+    "rosterDigest": "19bbd28b97d18df0e005066ea92af0ba38bd5558fedc4275e396635705060e26",
     "sourceManifestSha256": "304c50e847e8c33e7ccb392c6f764b722050bdc8a5da21238fb0416a9ef012af",
     "tarStreamBytes": 101376,
     "tarStreamSha256": "68f60a1d59496507de57945d8cedb667dd1b1e656fe254bad610a0b1cd938fe8"

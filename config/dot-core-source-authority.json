@@ -17,6 +17,16 @@
         "size": 40109
       },
       {
+        "path": "package/LICENSE",
+        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
+        "size": 1073
+      },
+      {
+        "path": "package/README.md",
+        "sha256": "afa7d02e996d47b8dd1411216a7350101fa0a7797012dc95689b41caf01af781",
+        "size": 15146
+      },
+      {
         "path": "package/dist/chunk-5A6VOG7N.mjs",
         "sha256": "ff2bba1bd1d1b01c8642d5c827ff23864fabf5f06e6528a4296f5f5b0c7a2d7c",
         "size": 71316
@@ -142,19 +152,9 @@
         "size": 13694
       },
       {
-        "path": "package/LICENSE",
-        "sha256": "e62d1a6c3c6ca2c0edbae7c1892accb72aed1312a818aa038720262e74bfc17e",
-        "size": 1073
-      },
-      {
         "path": "package/package.json",
         "sha256": "22b0f8e7d371d0d47c38a559777daabac59dec6dd8d0941e9bb86f11c2645c16",
         "size": 2083
-      },
-      {
-        "path": "package/README.md",
-        "sha256": "afa7d02e996d47b8dd1411216a7350101fa0a7797012dc95689b41caf01af781",
-        "size": 15146
       }
     ],
     "packageName": "@hua-labs/dot",
@@ -168,7 +168,7 @@
       "package/dist/native.d.mts",
       "package/dist/native.mjs"
     ],
-    "rosterDigest": "fcef222898f77d6b0e4170d62998e5b55bc8094a0c9f208e89cd7b4a1eab808c",
+    "rosterDigest": "cf03588b666c723a542ae49e0247b13102f97375b2ccbdca4cd783e84df5251c",
     "sourceManifestSha256": "5a0ef9af1f0353c813ed5ae77de97f275015bf86ca8d04f39852a1b55e4047a6",
     "tarStreamBytes": 956416,
     "tarStreamSha256": "265af3212f228f82aa036c164d0f641aa6841e73c38268de277ea3d80db1d29d"

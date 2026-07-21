@@ -115,6 +115,7 @@ test("public manifest preserves release fields and exposes the landed Flutter en
   assert.equal(manifest.engines.node, ">=20.16.0");
 
   const normalized = structuredClone(manifest);
+  normalized.version = publicBase.version;
   delete normalized.exports["./flutter"];
   normalized.files = normalized.files.filter(
     (entry) => entry !== "AI_GUIDE.md",

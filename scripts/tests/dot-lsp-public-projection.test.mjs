@@ -122,13 +122,16 @@ test("derived public manifest preserves release authority and projects exact pro
   assert.deepEqual(manifest.files, publicBase.files);
 
   const normalized = structuredClone(manifest);
+  normalized.version = publicBase.version;
+  normalized.dependencies["@hua-labs/dot"] =
+    publicBase.dependencies["@hua-labs/dot"];
   normalized.scripts.build = publicBase.scripts.build;
   normalized.engines = publicBase.engines;
   assert.deepEqual(normalized, publicBase);
 
   assert.equal(
     sha256("pnpm-lock.yaml"),
-    "b007cddf769b5e15a1715a108956aee83eb01039a782da58f6ccade0b21cb831",
+    "54fa28132c255d0cf70427534ad5ce6775ba63e7e4f306a065af2a0c40a82a06",
   );
 });
 
@@ -211,7 +214,7 @@ test("the generated public README and AI projection bind the exact doc semantics
     assert.ok(readme.includes(marker), marker);
     assert.ok(ai.includes(marker), marker);
   }
-  assert.match(ai, /# Version: 0\.1\.3/u);
+  assert.match(ai, /# Version: 0\.1\.4/u);
   assert.match(ai, /node: ">=20\.16\.0"/u);
 });
 
