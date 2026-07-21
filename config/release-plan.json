@@ -1,95 +1,14 @@
 {
-  "claim": {
-    "artifactManifestSha256": "42a59dbb3d0a9bd684e76e9318814aed25d1e3cc9cbc7f113c2c5c70edc9a86f",
-    "branch": "main",
-    "runId": "29805670119",
-    "sourceHead": "a106b1932d75807a27e9233a373dfebebcd6e449"
-  },
-  "planDigest": "47c4fc4c380b0c73913f49b1f445c877f02a7b3179cdc620aacbbefb7bef5bf2",
+  "claim": null,
+  "planDigest": "f8bfe37d087984a8224756cca2d544e14cbacaf6a7c75bc0c3639042f0a10180",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "policySha256": "5437a8de81b1f31bfc7dfc7a974314a22e5e8181ebcea24e6d67fc5cdb5a6a00",
     "registryBlob": "7127872f2f042cdaa2c2497500ae71e31d25ddac"
   },
-  "releases": [
-    {
-      "changesets": [
-        {
-          "id": "m844-dot-ui-release-train",
-          "sha256": "ee7cdf9d52c207249624c7246923111779c44ab1a439532d53fe181dc54cd0e4"
-        }
-      ],
-      "fromVersion": "0.2.2",
-      "manifestSha256": "5a0ef9af1f0353c813ed5ae77de97f275015bf86ca8d04f39852a1b55e4047a6",
-      "name": "@hua-labs/dot",
-      "path": "packages/hua-dot",
-      "sourceManifestSha256": "d67bb6a513eef1bf8dc0be189554b0d61ce6d9e754eb2982b42d00d28ee04cb0",
-      "toVersion": "0.3.0",
-      "type": "minor"
-    },
-    {
-      "changesets": [
-        {
-          "id": "m844-dot-ui-release-train",
-          "sha256": "ee7cdf9d52c207249624c7246923111779c44ab1a439532d53fe181dc54cd0e4"
-        }
-      ],
-      "fromVersion": "0.1.3",
-      "manifestSha256": "304c50e847e8c33e7ccb392c6f764b722050bdc8a5da21238fb0416a9ef012af",
-      "name": "@hua-labs/dot-aot",
-      "path": "packages/hua-dot-aot",
-      "sourceManifestSha256": "72df2974627dc7cc47bd8d250f553eed28728e1c4041ebc1d2a8d4dfc96610ab",
-      "toVersion": "0.2.0",
-      "type": "minor"
-    },
-    {
-      "changesets": [
-        {
-          "id": "m844-dot-ui-release-train",
-          "sha256": "ee7cdf9d52c207249624c7246923111779c44ab1a439532d53fe181dc54cd0e4"
-        }
-      ],
-      "fromVersion": "0.1.3",
-      "manifestSha256": "9536366abd89dc98814d4f2bc7826c97c46b0d5d8359fbeac222f97f49ba07cc",
-      "name": "@hua-labs/dot-lsp",
-      "path": "packages/hua-dot-lsp",
-      "sourceManifestSha256": "6e6af08a6641801bed3398661549a20c7318f392a3aca54c2763000896aea870",
-      "toVersion": "0.1.4",
-      "type": "patch"
-    },
-    {
-      "changesets": [
-        {
-          "id": "m844-dot-ui-release-train",
-          "sha256": "ee7cdf9d52c207249624c7246923111779c44ab1a439532d53fe181dc54cd0e4"
-        }
-      ],
-      "fromVersion": "0.1.3",
-      "manifestSha256": "3c63c59e0cefd8910c3c37a4152bad8b40dd9cf21ae6a97275782dbf6017aa18",
-      "name": "@hua-labs/dot-mcp",
-      "path": "packages/hua-dot-mcp",
-      "sourceManifestSha256": "f102cae6a77c00ed552db38a2bbd7710992914b8e1aaf9069957ec3d52f4d984",
-      "toVersion": "0.2.0",
-      "type": "minor"
-    },
-    {
-      "changesets": [
-        {
-          "id": "m844-dot-ui-release-train",
-          "sha256": "ee7cdf9d52c207249624c7246923111779c44ab1a439532d53fe181dc54cd0e4"
-        }
-      ],
-      "fromVersion": "2.3.0",
-      "manifestSha256": "62adb4dc19ee93053d66f5c58b05142c14ccc44bffc01e4bee7afb1c19840c7b",
-      "name": "@hua-labs/ui",
-      "path": "packages/hua-ui",
-      "sourceManifestSha256": "6ab7b582db5fef96cf04a3cd382cbc82624831d70e613132abe8e8244f706c2b",
-      "toVersion": "2.4.0",
-      "type": "minor"
-    }
-  ],
+  "releases": [],
   "schemaVersion": 1,
-  "status": "publishing",
+  "status": "empty",
   "workspaceManifests": [
     {
       "name": "@hua-labs/dot",
