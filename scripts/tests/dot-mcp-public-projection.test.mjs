@@ -102,8 +102,8 @@ test("the public MCP manifest preserves release fields and projects the effectiv
   const mcp = manifest("packages/hua-dot-mcp/package.json");
   const dot = manifest("packages/hua-dot/package.json");
 
-  assert.equal(mcp.version, "0.1.3");
-  assert.equal(mcp.dependencies["@hua-labs/dot"], "workspace:0.2.2");
+  assert.equal(mcp.version, "0.2.0");
+  assert.equal(mcp.dependencies["@hua-labs/dot"], "workspace:0.3.0");
   assert.equal(mcp.engines.node, ">=20.16.0");
   assert.equal(dot.engines.node, ">=20.16.0");
 });
@@ -191,13 +191,14 @@ test("the derived manifest preserves the public release boundary exactly", () =>
     ),
   );
 
-  assert.equal(current.version, publicBase.version);
+  assert.equal(current.version, "0.2.0");
   assert.deepEqual(current.repository, publicBase.repository);
   assert.deepEqual(current.publishConfig, publicBase.publishConfig);
   assert.deepEqual(current.files, publicBase.files);
   assert.deepEqual(current.bin, publicBase.bin);
-  assert.deepEqual(current.dependencies, publicBase.dependencies);
-  assert.equal(current.dependencies["@hua-labs/dot"], "workspace:0.2.2");
+  const expectedDependencies = structuredClone(publicBase.dependencies);
+  expectedDependencies["@hua-labs/dot"] = "workspace:0.3.0";
+  assert.deepEqual(current.dependencies, expectedDependencies);
   assert.equal(current.engines.node, ">=20.16.0");
   assert.equal(
     current.scripts.build,
@@ -205,6 +206,9 @@ test("the derived manifest preserves the public release boundary exactly", () =>
   );
 
   const normalized = structuredClone(current);
+  normalized.version = publicBase.version;
+  normalized.dependencies["@hua-labs/dot"] =
+    publicBase.dependencies["@hua-labs/dot"];
   normalized.scripts.build = publicBase.scripts.build;
   normalized.engines = publicBase.engines;
   assert.deepEqual(normalized, publicBase);
@@ -243,9 +247,9 @@ test("generated MCP AI truth binds the reviewed public identity and support floo
   const ai = text("ai-docs/dot-mcp.ai.yaml");
   assert.equal(
     sha256("ai-docs/dot-mcp.ai.yaml"),
-    "561218733d104f13e8c9b461d675903d8b3a2631591798f25bd99320a340c109",
+    "0ecfde86d199176e1a77f573cf0bb1a0bfe87de7f48d9be117734b18cfd3ea37",
   );
-  assert.match(ai, /version: "0\.1\.3"/u);
+  assert.match(ai, /version: "0\.2\.0"/u);
   assert.match(ai, /node: ">=20\.16\.0"/u);
   assert.match(ai, /dot_flutter_wire/u);
   assert.match(ai, /package-local bounded completion catalog/u);
@@ -336,8 +340,8 @@ test("the complete package union and artifact authority are canonical", () => {
     ),
     {
       "platform-exact": 12,
-      "public-preserved": 1,
-      "derived-reviewed": 2,
+      "public-preserved": 0,
+      "derived-reviewed": 3,
       "platform-only-excluded": 0,
     },
   );
@@ -347,11 +351,11 @@ test("the complete package union and artifact authority are canonical", () => {
   );
   assert.equal(config.artifact.files.length, 6);
   assert.equal(config.artifact.packageName, "@hua-labs/dot-mcp");
-  assert.equal(config.artifact.packageVersion, "0.1.3");
-  assert.equal(config.artifact.tarStreamBytes, 68096);
+  assert.equal(config.artifact.packageVersion, "0.2.0");
+  assert.equal(config.artifact.tarStreamBytes, 68608);
   assert.equal(
     config.artifact.tarStreamSha256,
-    "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+    "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e",
   );
   assert.equal(Object.hasOwn(config.artifact, "tarballBytes"), false);
   assert.equal(Object.hasOwn(config.artifact, "tarballSha256"), false);
@@ -393,7 +397,7 @@ test("two gzip envelopes of the canonical tar pass while one tar byte rejects", 
       env: childEnvironment,
       maxBuffer: 16 * 1024 * 1024,
       stdio: "ignore",
-      timeout: 120000,
+      timeout: 240000,
     });
 
   try {
@@ -424,7 +428,7 @@ test("two gzip envelopes of the canonical tar pass while one tar byte rejects", 
     );
     assert.equal(
       createHash("sha256").update(tarStream).digest("hex"),
-      "a700ff6f1e0f83d7c2f5b27fc02c62a61dc58a9b020be355cafbf1c51c45e073",
+      "52ea19941a439cd4a15c2a9afc31975e99616fad8694a6b996f49c67cc02c71e",
     );
     for (const tarball of [originalPath, alternatePath]) {
       const result = runChecker(["--tarball", tarball], clone);

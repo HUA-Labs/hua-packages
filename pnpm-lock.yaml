@@ -269,7 +269,7 @@ importers:
         specifier: ^7.29.0
         version: 7.29.7
       '@hua-labs/dot':
-        specifier: workspace:0.2.2
+        specifier: workspace:0.3.0
         version: link:../hua-dot
     devDependencies:
       '@babel/core':
@@ -294,7 +294,7 @@ importers:
   packages/hua-dot-lsp:
     dependencies:
       '@hua-labs/dot':
-        specifier: workspace:0.2.2
+        specifier: workspace:0.3.0
         version: link:../hua-dot
       vscode-languageserver:
         specifier: ^9.0.1
@@ -319,7 +319,7 @@ importers:
   packages/hua-dot-mcp:
     dependencies:
       '@hua-labs/dot':
-        specifier: workspace:0.2.2
+        specifier: workspace:0.3.0
         version: link:../hua-dot
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0

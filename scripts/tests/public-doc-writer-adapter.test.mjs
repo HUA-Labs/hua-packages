@@ -577,7 +577,7 @@ test("current UI docs derive the exact retained profile without copyable deferre
     7,
   );
   assert.equal(manifest.engines.node, ">=20.16.0");
-  assert.equal(manifest.version, "2.3.0");
+  assert.equal(manifest.version, "2.4.0");
   assert.ok(manifest.files.includes("DETAILED_GUIDE.md"));
   assert.ok(!manifest.files.includes("public-core-profile.json"));
   assert.deepEqual(

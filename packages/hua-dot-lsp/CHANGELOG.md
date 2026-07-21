@@ -1,5 +1,13 @@
 # @hua-labs/dot-lsp
 
+## 0.1.4
+
+### Patch Changes
+
+- 1671abf: Release the reviewed Dot-to-UI source train: Dot adds the Flutter wire entry, Dot AOT adds fail-closed static option extraction, Dot LSP aligns installed server identity and Node support, Dot MCP adds Flutter wire tooling with manifest-derived identity, and UI projects the reviewed public component profile.
+- Updated dependencies [1671abf]
+  - @hua-labs/dot@0.3.0
+
 ## 0.1.3
 
 ### Patch Changes

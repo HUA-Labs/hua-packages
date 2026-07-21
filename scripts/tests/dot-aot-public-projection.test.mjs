@@ -4,7 +4,9 @@ import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdtempSync,
+  mkdirSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -12,6 +14,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { gunzipSync, gzipSync } from "node:zlib";
 import { test } from "node:test";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -92,15 +95,18 @@ test("derived public manifest preserves release authority and projects exact pro
     ),
   );
 
-  assert.equal(manifest.version, "0.1.3");
+  assert.equal(manifest.version, "0.2.0");
   assert.equal(manifest.engines.node, ">=20.16.0");
   assert.equal(manifest.dependencies["@babel/parser"], "^7.29.0");
-  assert.equal(manifest.dependencies["@hua-labs/dot"], "workspace:0.2.2");
+  assert.equal(manifest.dependencies["@hua-labs/dot"], "workspace:0.3.0");
   assert.deepEqual(manifest.repository, publicBase.repository);
   assert.deepEqual(manifest.publishConfig, publicBase.publishConfig);
   assert.deepEqual(manifest.files, publicBase.files);
 
   const normalized = structuredClone(manifest);
+  normalized.version = publicBase.version;
+  normalized.dependencies["@hua-labs/dot"] =
+    publicBase.dependencies["@hua-labs/dot"];
   delete normalized.dependencies["@babel/parser"];
   normalized.engines.node = ">=20.0.0";
   assert.deepEqual(normalized, publicBase);
@@ -229,7 +235,7 @@ test("the complete package union and artifact authority are canonical", () => {
   const raw = readFileSync(configPath, "utf8");
   const config = JSON.parse(raw);
   assert.equal(raw, canonicalJson(config));
-  assert.equal(config.schema, "hua-dot-aot-source-authority.v1");
+  assert.equal(config.schema, "hua-dot-aot-source-authority.v2");
   assert.equal(config.authorityKind, "platform-dot-aot-package-projection");
   assert.equal(config.packagePath, "packages/hua-dot-aot");
   assert.equal(config.rows.length, 16);
@@ -248,8 +254,8 @@ test("the complete package union and artifact authority are canonical", () => {
     ),
     {
       "platform-exact": 12,
-      "public-preserved": 1,
-      "derived-reviewed": 3,
+      "public-preserved": 0,
+      "derived-reviewed": 4,
       "platform-only-excluded": 0,
     },
   );
@@ -259,9 +265,88 @@ test("the complete package union and artifact authority are canonical", () => {
   );
   assert.equal(config.artifact.files.length, 16);
   assert.equal(config.artifact.packageName, "@hua-labs/dot-aot");
-  assert.equal(config.artifact.packageVersion, "0.1.3");
+  assert.equal(config.artifact.packageVersion, "0.2.0");
+  assert.equal(config.artifact.tarStreamBytes, 101376);
+  assert.equal(
+    config.artifact.tarStreamSha256,
+    "68f60a1d59496507de57945d8cedb667dd1b1e656fe254bad610a0b1cd938fe8",
+  );
+  assert.equal(Object.hasOwn(config.artifact, "tarballBytes"), false);
+  assert.equal(Object.hasOwn(config.artifact, "tarballSha256"), false);
   assert.equal(Object.hasOwn(config.sourceAuthority, "repository"), false);
   assert.equal(Object.hasOwn(config.sourceAuthority, "url"), false);
+});
+
+test("portable tar authority admits two gzip envelopes and rejects stream tamper", () => {
+  const source = text("scripts/check-dot-aot-source-authority.mjs");
+  assert.match(source, /const tarStream = decompressTarball\(compressed\);/u);
+  assert.match(source, /sha256\(tarStream\)/u);
+  assert.doesNotMatch(source, /sha256\(compressed\)/u);
+  assert.doesNotMatch(source, /artifact\.tarball(?:Bytes|Sha256)/u);
+
+  const { clone, parent } = cloneFixture();
+  const packDirectory = join(parent, "pack");
+  mkdirSync(packDirectory);
+  const childEnvironment = Object.fromEntries(
+    Object.entries(process.env).filter(
+      ([key]) => !/(?:token|auth|credential)/iu.test(key),
+    ),
+  );
+  Object.assign(childEnvironment, {
+    CI: "true",
+    npm_config_ignore_scripts: "true",
+  });
+  const run = (args) =>
+    execFileSync("pnpm", args, {
+      cwd: clone,
+      env: childEnvironment,
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: "ignore",
+      timeout: 240000,
+    });
+
+  try {
+    run(["install", "--offline", "--frozen-lockfile", "--ignore-scripts"]);
+    run(["--filter", "@hua-labs/dot", "build"]);
+    run(["--filter", "@hua-labs/dot-aot", "build"]);
+    run([
+      "--dir",
+      "packages/hua-dot-aot",
+      "pack",
+      "--pack-destination",
+      packDirectory,
+    ]);
+    const originalPath = join(
+      packDirectory,
+      readdirSync(packDirectory).find((entry) => entry.endsWith(".tgz")),
+    );
+    const originalEnvelope = readFileSync(originalPath);
+    const tarStream = gunzipSync(originalEnvelope);
+    const alternateEnvelope = gzipSync(tarStream, { level: 1 });
+    const alternatePath = join(packDirectory, "alternate-envelope.tgz");
+    writeFileSync(alternatePath, alternateEnvelope);
+    assert.notEqual(
+      createHash("sha256").update(originalEnvelope).digest("hex"),
+      createHash("sha256").update(alternateEnvelope).digest("hex"),
+    );
+    assert.equal(
+      createHash("sha256").update(tarStream).digest("hex"),
+      "68f60a1d59496507de57945d8cedb667dd1b1e656fe254bad610a0b1cd938fe8",
+    );
+    for (const tarball of [originalPath, alternatePath]) {
+      const result = runChecker(["--tarball", tarball], clone);
+      assert.equal(result.status, 0, result.stderr);
+    }
+    const tampered = Buffer.from(tarStream);
+    tampered[600] ^= 1;
+    const tamperedPath = join(packDirectory, "tampered-stream.tgz");
+    writeFileSync(tamperedPath, gzipSync(tampered));
+    const rejected = runChecker(["--tarball", tamperedPath], clone);
+    assert.notEqual(rejected.status, 0);
+    assert.match(rejected.stderr, /tar-stream-bytes-mismatch/u);
+  } finally {
+    rmSync(parent, { force: true, recursive: true });
+  }
 });
 
 test("every projected package path agrees with its reviewed output digest", () => {
@@ -449,10 +534,10 @@ test("a substituted tarball is rejected before artifact admission", () => {
   const parent = mkdtempSync(join(tmpdir(), "dot-core-tar-"));
   try {
     const tarball = join(parent, "substituted.tgz");
-    writeFileSync(tarball, Buffer.from("not the reviewed artifact"));
+    writeFileSync(tarball, gzipSync(Buffer.alloc(1024)));
     const result = runChecker(["--tarball", tarball]);
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /tarball-bytes-mismatch/u);
+    assert.match(result.stderr, /tar-stream-bytes-mismatch/u);
   } finally {
     rmSync(parent, { force: true, recursive: true });
   }

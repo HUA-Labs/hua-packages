@@ -8,8 +8,8 @@
       },
       {
         "path": "package/CHANGELOG.md",
-        "sha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
-        "size": 1176
+        "sha256": "d518835d3a619e32bc44d28f0885516d8bf139c3a588a6b7d5e69d146c67aec3",
+        "size": 1526
       },
       {
         "path": "package/DETAILED_GUIDE.md",
@@ -153,13 +153,13 @@
       },
       {
         "path": "package/package.json",
-        "sha256": "409be51f102f4af27a4b136000406bf507e0fc93b7b7db59e209959f1bf414aa",
+        "sha256": "22b0f8e7d371d0d47c38a559777daabac59dec6dd8d0941e9bb86f11c2645c16",
         "size": 2083
       }
     ],
     "packageName": "@hua-labs/dot",
-    "packageVersion": "0.2.2",
-    "packedManifestSha256": "409be51f102f4af27a4b136000406bf507e0fc93b7b7db59e209959f1bf414aa",
+    "packageVersion": "0.3.0",
+    "packedManifestSha256": "22b0f8e7d371d0d47c38a559777daabac59dec6dd8d0941e9bb86f11c2645c16",
     "requiredTargets": [
       "package/dist/flutter.d.mts",
       "package/dist/flutter.mjs",
@@ -168,13 +168,13 @@
       "package/dist/native.d.mts",
       "package/dist/native.mjs"
     ],
-    "rosterDigest": "d42e072aea5b86b3f138945d23a83dc6e2be172bc85985e7a2940ac9d8596f68",
-    "sourceManifestSha256": "d67bb6a513eef1bf8dc0be189554b0d61ce6d9e754eb2982b42d00d28ee04cb0",
-    "tarballBytes": 201486,
-    "tarballSha256": "831d7b8ea2cd680ef175b02608b1bf0d611bee5f1ccf09efad3a8b731e6814de"
+    "rosterDigest": "cf03588b666c723a542ae49e0247b13102f97375b2ccbdca4cd783e84df5251c",
+    "sourceManifestSha256": "5a0ef9af1f0353c813ed5ae77de97f275015bf86ca8d04f39852a1b55e4047a6",
+    "tarStreamBytes": 956416,
+    "tarStreamSha256": "265af3212f228f82aa036c164d0f641aa6841e73c38268de277ea3d80db1d29d"
   },
   "authorityKind": "platform-dot-package-projection",
-  "mapDigest": "718429465a9094c36aac76ea3746fbb8081cc87b4f6c6c1a913b7728ec91175d",
+  "mapDigest": "833ad92fec2606ae5bb1046b271f1b7405dc08f5a3ea0dd69da8d098283b3632",
   "packagePath": "packages/hua-dot",
   "publicBase": {
     "commit": "92aa99a1957e8514f9ae7ca271f1765f8d6974fa",
@@ -191,9 +191,9 @@
       "sourceSha256": "2fba56c5a00939873142e7f307fbc8a97c6860b63639492db3c778b298a1859a"
     },
     {
-      "disposition": "public-preserved",
+      "disposition": "derived-reviewed",
       "kind": "docs",
-      "outputSha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
+      "outputSha256": "d518835d3a619e32bc44d28f0885516d8bf139c3a588a6b7d5e69d146c67aec3",
       "path": "packages/hua-dot/CHANGELOG.md",
       "publicBaseSha256": "d5ff2416ae4c75ff2e943957246c2ff8c14543363e3ad8f670384a2dd1153bc5",
       "sourceSha256": "f7c10519029d74f2325df35d95b222bfffbe540a7d761ea6489158470375fc77"
@@ -233,7 +233,7 @@
     {
       "disposition": "derived-reviewed",
       "kind": "manifest",
-      "outputSha256": "d67bb6a513eef1bf8dc0be189554b0d61ce6d9e754eb2982b42d00d28ee04cb0",
+      "outputSha256": "5a0ef9af1f0353c813ed5ae77de97f275015bf86ca8d04f39852a1b55e4047a6",
       "path": "packages/hua-dot/package.json",
       "publicBaseSha256": "bf024fa4bd2351557fa816694a05620e571b43c832753b73225983fcb47711ac",
       "sourceSha256": "f81c8e3d9bb0a8377ac9182b78e03358fff36d3beb0e5e5656d55277d1fdccea"
@@ -1687,7 +1687,7 @@
       "sourceSha256": "6f902f6077b6aa3171b53c14f11dc8c69873b9b080eb6d4845bdbd40d154a06e"
     }
   ],
-  "schema": "hua-dot-core-source-authority.v1",
+  "schema": "hua-dot-core-source-authority.v2",
   "sourceAuthority": {
     "commit": "fec4da0c615e615e5973dc283f9d4b02ecafcfdb",
     "packageTree": "5b294ed3d752861e99d6e9e7d233dccefeb7645a",
