@@ -394,7 +394,7 @@ function githubAuthorityFixture(transition = githubTransition()) {
       merged: true,
       merged_at: "2026-07-19T00:00:00Z",
       merge_commit_sha: transition.currentHead,
-      user: { login: "release-author" },
+      user: { login: "release-author", type: "User" },
       base: {
         ref: "main",
         sha: transition.baseHead,
@@ -411,7 +411,7 @@ function githubAuthorityFixture(transition = githubTransition()) {
         id: 1,
         state: "APPROVED",
         commit_id: pullRequestHead,
-        user: { login: "independent-reviewer" },
+        user: { login: "independent-reviewer", type: "User" },
       },
     ],
     headCommit: { tree: { sha: transition.currentTree } },
@@ -2211,6 +2211,17 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
       "Actions review approval",
       (value) => (value.actions.can_approve_pull_request_reviews = true),
     ],
+    [
+      "spoofed bot-suffix user reviewer",
+      (value) => {
+        value.reviews[0].user.login = "reviewer[bot]";
+        value.reviews[0].user.type = "User";
+      },
+    ],
+    [
+      "unknown pull request author type",
+      (value) => (value.pullRequest.user.type = "Mannequin"),
+    ],
     ["zero approval", (value) => (value.reviews = [])],
     [
       "self-only approval",
@@ -2373,6 +2384,27 @@ test("synthetic protected claim and closure authorities prove contract shape onl
     assert.equal(result.transition, kind);
     assert.equal(result.status, "protected");
   }
+});
+
+test("GitHub Actions bot claim authors require an exact human approval", () => {
+  const transition = githubTransition("claim");
+  const authority = githubAuthorityFixture(transition);
+  authority.pullRequest.user = {
+    login: "github-actions[bot]",
+    type: "Bot",
+  };
+
+  const result = validateGitHubReleaseAuthority(authority, transition);
+  assert.equal(result.status, "protected");
+
+  authority.reviews[0].user = {
+    login: "review-bot[bot]",
+    type: "Bot",
+  };
+  assertCode(
+    () => validateGitHubReleaseAuthority(authority, transition),
+    "external-policy-blocked",
+  );
 });
 
 test("GitHub REST omission of an empty classic bypass allowance is accepted", () => {

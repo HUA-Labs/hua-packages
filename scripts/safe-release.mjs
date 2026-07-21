@@ -64,7 +64,8 @@ const MAX_STRING_BYTES = 8 * 1024;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 const GIT_SHA_PATTERN = /^[a-f0-9]{40}$/;
 const RUN_ID_PATTERN = /^[1-9][0-9]{0,19}$/;
-const GITHUB_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/;
+const GITHUB_USER_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/;
+const GITHUB_BOT_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\[bot\]$/;
 const PACKAGE_NAME_PATTERN = /^(?:@[a-z0-9-]+\/[a-z0-9-]+|[a-z0-9-]+)$/;
 const PACKAGE_PATH_PATTERN = /^packages\/[a-z0-9-]+$/;
 const CHANGESET_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,79}$/;
@@ -2026,6 +2027,16 @@ function externalString(value, pattern, maxBytes = 512) {
   return value;
 }
 
+function externalGitHubActor(value, { allowBot = false } = {}) {
+  const actor = externalRecord(value);
+  const type = externalString(actor.type, /^(?:User|Bot)$/u, 16);
+  if (type === "User") {
+    return externalString(actor.login, GITHUB_USER_LOGIN_PATTERN);
+  }
+  externalPolicyAssert(allowBot);
+  return externalString(actor.login, GITHUB_BOT_LOGIN_PATTERN);
+}
+
 function externalArray(value, maximum = 99) {
   externalPolicyAssert(Array.isArray(value));
   externalPolicyAssert(value.length <= maximum);
@@ -2105,10 +2116,9 @@ function validateTransitionAuthority(authority, transition) {
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
   );
   externalPolicyAssert(pullRequest.merge_commit_sha === currentHead);
-  const pullRequestAuthor = externalString(
-    externalRecord(pullRequest.user).login,
-    GITHUB_LOGIN_PATTERN,
-  );
+  const pullRequestAuthor = externalGitHubActor(pullRequest.user, {
+    allowBot: true,
+  });
   const base = externalRecord(pullRequest.base);
   externalPolicyAssert(base.ref === "main");
   externalPolicyAssert(base.sha === baseHead);
@@ -2130,10 +2140,7 @@ function validateTransitionAuthority(authority, transition) {
   for (const reviewValue of externalArray(authority.reviews)) {
     const review = externalRecord(reviewValue);
     externalPolicyAssert(Number.isSafeInteger(review.id) && review.id > 0);
-    const actor = externalString(
-      externalRecord(review.user).login,
-      GITHUB_LOGIN_PATTERN,
-    );
+    const actor = externalGitHubActor(review.user);
     externalPolicyAssert(
       review.state === "APPROVED" ||
         review.state === "CHANGES_REQUESTED" ||

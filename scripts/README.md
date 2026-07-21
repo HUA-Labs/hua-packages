@@ -231,7 +231,9 @@ its single parent and changes only `config/release-plan.json`. Before the
 OIDC-capable job can be admitted, the authority gate additionally requires one
 unique merged PR association, exact `main` base/source, exact deterministic
 `release/claim-<source>` branch, exact PR-head tree and current merge commit,
-and a latest exact-head approval from a reviewer distinct from the PR author.
+and a latest exact-head approval from a human GitHub user distinct from the PR
+author. The transition PR author may be the exact `github-actions[bot]` actor,
+but bot reviewers and user/bot type mismatches fail closed.
 Zero, self-only, stale, wrong-head, wrong-branch, duplicate, or head-drifting
 associations fail closed. Any claim or PR failure happens before an
 OIDC-capable job, npm credentials, or publish.

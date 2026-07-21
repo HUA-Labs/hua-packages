@@ -1,11 +1,6 @@
 {
-  "claim": {
-    "artifactManifestSha256": "d3fe1a0c4d2dd7f0d6872998d2d340af26179eade9b5b9e8b9688797085be968",
-    "branch": "main",
-    "runId": "29800952995",
-    "sourceHead": "a8825a5880eaadf986bea0202eeec4c281c5c1ed"
-  },
-  "planDigest": "f6c973ee57545a94def85aa031f9e561c09cbb253fe02a457944ed4bf0923679",
+  "claim": null,
+  "planDigest": "14f736a070debd0901565654a0ffbd2da39ecee27931f920e251f32c82394e89",
   "policy": {
     "platformCommit": "049aa34d8b6ea06316f126310ebc89a16b445e86",
     "policySha256": "5437a8de81b1f31bfc7dfc7a974314a22e5e8181ebcea24e6d67fc5cdb5a6a00",
@@ -89,7 +84,7 @@
     }
   ],
   "schemaVersion": 1,
-  "status": "publishing",
+  "status": "planned",
   "workspaceManifests": [
     {
       "name": "@hua-labs/dot",
