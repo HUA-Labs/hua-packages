@@ -59,6 +59,7 @@ interface DocYaml {
     { description: string; kind?: string; importFrom?: string }
   >;
   apiFilter?: "all" | "notes-only"; // 'notes-only' = only show exports in apiNotes
+  readmeApiProjection?: "include" | "omit";
   related?: string[];
   sections?: Array<{ title: string; content: string }>;
   subpathExports?: Array<{ path: string; description: string }>;
@@ -152,6 +153,7 @@ const DOC_YAML_KEYS = new Set([
   "detailedGuide",
   "apiNotes",
   "apiFilter",
+  "readmeApiProjection",
   "related",
   "sections",
   "subpathExports",
@@ -183,13 +185,6 @@ const PUBLIC_CORE_ENTRY_KEYS = new Set([
   "tsup",
 ]);
 const PUBLIC_CORE_TSUP_KEYS = new Set(["entry", "source", "output"]);
-const UI_PROFILE_RETAINED_PREFIX =
-  "Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ";
-const UI_PROFILE_DEFERRED_PREFIX =
-  "Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ";
-const UI_PROFILE_AUTHORITY_BOUNDARY =
-  "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven.";
-
 function assertExactKeys(
   value: unknown,
   allowed: ReadonlySet<string>,
@@ -311,7 +306,6 @@ function loadPublicCoreProfile(options: {
   packageName: string;
   packageEngine: unknown;
   manifestExports: unknown;
-  docFeatures: string[];
 }): {
   projection: PublicCoreProfileProjection;
   entries: PublicCoreProfileEntry[];
@@ -506,17 +500,6 @@ function loadPublicCoreProfile(options: {
       canonicalImport(options.packageName, entry.subpath),
     ),
   );
-  const requiredFeatures = [
-    `${UI_PROFILE_RETAINED_PREFIX}${retained.join(", ")}.`,
-    `${UI_PROFILE_DEFERRED_PREFIX}${deferred.join(", ")}.`,
-    UI_PROFILE_AUTHORITY_BOUNDARY,
-  ];
-  for (const feature of requiredFeatures) {
-    if (!options.docFeatures.includes(feature)) {
-      throw new Error("doc.yaml public-core profile projection is stale");
-    }
-  }
-
   return {
     entries,
     projection: {
@@ -544,7 +527,7 @@ function buildProfileDocumentationProjection(options: {
     guide.path !== "./DETAILED_GUIDE.md" ||
     guide.distribution !== "packed" ||
     guide.description !==
-      "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"
+      "Complete usage, API, styling, accessibility, and public-surface guidance"
   ) {
     throw new Error("profile-aware detailed guide authority must stay exact");
   }
@@ -712,6 +695,26 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     assertExactKeys(docYaml.readme, README_KEYS, `${dirName}: readme`);
   }
   if (
+    docYaml.readmeApiProjection !== undefined &&
+    docYaml.readmeApiProjection !== "include" &&
+    docYaml.readmeApiProjection !== "omit"
+  ) {
+    throw new Error(`${dirName}: readmeApiProjection must be include or omit`);
+  }
+  if (
+    docYaml.readmeApiProjection !== undefined &&
+    docYaml.readme?.hideApi !== undefined &&
+    (docYaml.readmeApiProjection === "omit") !== docYaml.readme.hideApi
+  ) {
+    throw new Error(
+      `${dirName}: readme API projection conflicts with readme.hideApi`,
+    );
+  }
+  const showReadmeApi =
+    docYaml.readmeApiProjection === undefined
+      ? docYaml.readme?.hideApi !== true
+      : docYaml.readmeApiProjection === "include";
+  if (
     docYaml.detailedGuide !== undefined &&
     docYaml.readme?.detailedGuide !== undefined
   ) {
@@ -734,7 +737,6 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     packageName: fullName,
     packageEngine: pkgJson.engines?.node,
     manifestExports: pkgJson.exports,
-    docFeatures: docYaml.features ?? [],
   });
   if (fullName === "@hua-labs/ui" && !publicCoreProfile) {
     throw new Error("hua-ui requires public-core-profile.json authority");
@@ -800,7 +802,7 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     reactMajor,
     exports,
     readmeFeatures,
-    showReadmeApi: docYaml.readme?.hideApi !== true,
+    showReadmeApi,
     showReadmeSections: docYaml.readme?.hideSections !== true,
     legacyDetailedGuide: docYaml.readme?.detailedGuide,
     detailedGuide:
@@ -869,7 +871,7 @@ function generateAiYaml(data: PackageData): string {
   }
   if (data.publicCoreProfile) {
     const profile = data.publicCoreProfile;
-    result += `\n\npublic_core_profile:\n  schema: ${yamlString(profile.schema)}\n  digest: ${yamlString(profile.digest)}\n  candidate_status: ${yamlString("source-ready")}\n  installed_engine_range: ${yamlString(profile.installedEngineRange)}\n  future_major_engine_stop: ${yamlString(profile.futureMajorEngineStop)}\n  release_selection: null\n  entry_count: ${profile.retained.length + profile.deferred.length}\n  retained_count: ${profile.retained.length}\n  deferred_count: ${profile.deferred.length}\n  javascript_count: ${profile.javascriptCount}\n  asset_count: ${profile.assetCount}\n  retained:\n${profile.retained.map((entry) => `    - ${yamlString(entry)}`).join("\n")}\n  deferred:\n${profile.deferred.map((entry) => `    - ${yamlString(entry)}`).join("\n")}`;
+    result += `\n\npublic_core_profile:\n  schema: ${yamlString(profile.schema)}\n  digest: ${yamlString(profile.digest)}\n  installed_engine_range: ${yamlString(profile.installedEngineRange)}\n  future_major_engine_stop: ${yamlString(profile.futureMajorEngineStop)}\n  release_selection: null\n  entry_count: ${profile.retained.length + profile.deferred.length}\n  retained_count: ${profile.retained.length}\n  deferred_count: ${profile.deferred.length}\n  javascript_count: ${profile.javascriptCount}\n  asset_count: ${profile.assetCount}\n  retained:\n${profile.retained.map((entry) => `    - ${yamlString(entry)}`).join("\n")}\n  deferred:\n${profile.deferred.map((entry) => `    - ${yamlString(entry)}`).join("\n")}`;
   }
   return `${result}\n`;
 }

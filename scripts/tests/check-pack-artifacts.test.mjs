@@ -330,6 +330,67 @@ test("admits only the exact UI retained profile tar boundary", async (t) => {
   });
 });
 
+test("binds packed UI description and ordered keywords to workspace authority", async (t) => {
+  const cases = [
+    {
+      name: "missing description",
+      mutateManifest(manifest) {
+        delete manifest.description;
+      },
+    },
+    {
+      name: "changed description",
+      mutateManifest(manifest) {
+        manifest.description = `${manifest.description}x`;
+      },
+    },
+    {
+      name: "missing keywords",
+      mutateManifest(manifest) {
+        delete manifest.keywords;
+      },
+    },
+    {
+      name: "extra keyword",
+      mutateManifest(manifest) {
+        manifest.keywords = [...manifest.keywords, "extra"];
+      },
+    },
+    {
+      name: "reordered keywords",
+      mutateManifest(manifest) {
+        manifest.keywords = [...manifest.keywords].reverse();
+      },
+    },
+    {
+      name: "duplicate keyword",
+      mutateManifest(manifest) {
+        manifest.keywords = [...manifest.keywords, manifest.keywords[0]];
+      },
+    },
+    {
+      name: "non-array keywords",
+      mutateManifest(manifest) {
+        manifest.keywords = manifest.keywords.join(",");
+      },
+    },
+  ];
+
+  for (const fixture of cases) {
+    await t.test(fixture.name, () => {
+      const { tarball } = createUiProfileFixture({
+        mutateManifest: fixture.mutateManifest,
+      });
+      const result = runChecker(tarball);
+      assert.equal(result.status, 1);
+      assert.match(
+        result.stdout,
+        /package manifest does not match UI public-core authority/u,
+      );
+    });
+  }
+});
+
 test("rejects packed UI files manifest drift while the guide payload remains", () => {
   const cases = [
     [

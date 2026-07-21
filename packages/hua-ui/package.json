@@ -1,7 +1,7 @@
 {
   "name": "@hua-labs/ui",
   "version": "2.4.0",
-  "description": "HUA Labs - Modern React UI Component Library - Beautiful, accessible, and customizable components for React applications",
+  "description": "TypeScript-first React UI components with modular Web and React Native entry points",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -204,17 +204,14 @@
   },
   "keywords": [
     "hua-labs",
-    "ui-library",
-    "react-components",
     "react",
-    "typescript",
+    "react-components",
+    "ui-library",
     "design-system",
+    "typescript",
     "accessibility",
-    "aria",
-    "dark-mode",
-    "tailwind",
-    "nextjs",
-    "ssr"
+    "react-native",
+    "cross-platform"
   ],
   "author": "HUA Labs",
   "license": "MIT",
