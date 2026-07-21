@@ -192,10 +192,10 @@ credential as exact `policy-credential-unavailable`, collapses unauthorized,
 malformed, partial, or inconsistent API authority to exact
 `external-policy-blocked`, and rechecks remote `main` before and after the read.
 GitHub REST omits `bypass_pull_request_allowances` when the classic allowance
-is empty, so the validator admits either that exact omission or a complete
+is empty, so the validator admits either that exact omission or the exact
 `users`/`teams`/`apps` object whose three arrays are empty. An explicit null,
-partial object, non-empty actor array, API error, or otherwise incomplete
-response never becomes an empty allowlist. For an exact
+partial or extended object, non-empty actor array, API error, or otherwise
+incomplete response never becomes an empty allowlist. For an exact
 planned set it resolves each selected package's `workspace:` dependencies and
 optional dependencies, builds that complete dependency-first closure once,
 then packs only the selected release rows. An eligible but unselected package

@@ -2168,6 +2168,12 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
           .bypass_pull_request_allowances.apps,
     ],
     [
+      "unknown classic bypass category",
+      (value) =>
+        (value.protection.required_pull_request_reviews.bypass_pull_request_allowances.deploy_keys =
+          [{ login: "private-bypass" }]),
+    ],
+    [
       "administrator bypass",
       (value) => (value.protection.enforce_admins.enabled = false),
     ],

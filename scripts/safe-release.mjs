@@ -2050,7 +2050,14 @@ function validateExternalPolicy(authority) {
   const classicBypass = reviews.bypass_pull_request_allowances;
   if (classicBypass !== undefined) {
     const classicBypassRecord = externalRecord(classicBypass);
-    for (const key of ["users", "teams", "apps"]) {
+    const classicBypassKeys = ["users", "teams", "apps"];
+    externalPolicyAssert(
+      Object.keys(classicBypassRecord).length === classicBypassKeys.length,
+    );
+    for (const key of classicBypassKeys) {
+      externalPolicyAssert(
+        Object.prototype.hasOwnProperty.call(classicBypassRecord, key),
+      );
       externalPolicyAssert(
         externalArray(classicBypassRecord[key]).length === 0,
       );
