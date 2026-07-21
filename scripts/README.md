@@ -191,11 +191,16 @@ fixed `/usr/bin/gh`, bounds every JSON response, reports a missing dedicated
 credential as exact `policy-credential-unavailable`, collapses unauthorized,
 malformed, partial, or inconsistent API authority to exact
 `external-policy-blocked`, and rechecks remote `main` before and after the read.
-GitHub REST omits `bypass_pull_request_allowances` when the classic allowance
-is empty, so the validator admits either that exact omission or the exact
-`users`/`teams`/`apps` object whose three arrays are empty. An explicit null,
-partial or extended object, non-empty actor array, API error, or otherwise
-incomplete response never becomes an empty allowlist. For an exact
+The protected branch requires the exact six GitHub Actions contexts
+`type-check`, `lint`, `test`, `doc-validation`, `publish-allowlist`, and
+`public-exposure` in strict mode, bound to the GitHub Actions App. Ordinary
+source PRs do not require a second operator-owned GitHub identity or resolution
+of advisory bot threads: canonical cross-agent CLEAN is the ordinary
+source-review authority. Classic approval counting must remain absent and
+conversation-resolution enforcement disabled. Claim and closure transitions
+still require their own exact human approval described below. An unexpected,
+partial, duplicate, differently sourced, or extra required check, API error, or
+otherwise incomplete response fails closed. For an exact
 planned set it resolves each selected package's `workspace:` dependencies and
 optional dependencies, builds that complete dependency-first closure once,
 then packs only the selected release rows. An eligible but unselected package
@@ -234,6 +239,10 @@ unique merged PR association, exact `main` base/source, exact deterministic
 and a latest exact-head approval from a human GitHub user distinct from the PR
 author. The transition PR author may be the exact `github-actions[bot]` actor,
 but bot reviewers and user/bot type mismatches fail closed.
+Historical stale review entries are admitted only as bounded input: the latest
+review ID per human actor owns that actor's state, so a fresh exact-head
+reapproval replaces an older stale approval while a later non-approval replaces
+an earlier approval.
 Zero, self-only, stale, wrong-head, wrong-branch, duplicate, or head-drifting
 associations fail closed. Any claim or PR failure happens before an
 OIDC-capable job, npm credentials, or publish.
@@ -375,24 +384,19 @@ only for an ordinary empty plan; planned, publishing, and exact
 closure-transition states require it. No policy secret or GitHub App was
 provisioned, read, rotated, or configured by this source change.
 
-The GitHub authority fixtures prove only the future protected/reviewed source
-contract. They are not current live GitHub authority and do not establish
-release readiness. Tower's pre-freeze readback found `main` protection absent,
-effective branch rules empty, Actions review approval enabled, and no
-separately provisioned policy credential. Therefore a release-bearing live
-path currently stops at exact `policy-credential-unavailable` or
-`external-policy-blocked`, before artifact download, claim, OIDC, npm auth,
-publish, or closure admission. Live release stays HOLD until Devin separately
-authorizes both the repository settings change and least-privilege policy
-credential provisioning, then tower verifies active PR-required protection,
-at least one exact-head approval from a GitHub identity distinct from the PR
-author, stale-review dismissal, last-push approval, administrator enforcement,
-zero classic bypass allowance, effective branch rules and repository/parent
+The GitHub authority fixtures prove the protected source and reviewed
+transition contracts but do not establish release readiness by themselves.
+The live source policy requires the exact six app-bound checks, administrator
+enforcement, linear history, force-push/deletion denial, no approval-count or
+conversation-resolution gate, effective branch rules and repository/parent
 ruleset summaries exactly empty, Actions review approval disabled, and the
-read-only credential's ability to read every required authority field. Shared
-agent display names and tap review artifacts are not GitHub approval authority.
-Source tests intentionally keep the positive protected state synthetic and
-require every live-negative shape to admit zero privileged release actions.
+read-only credential's ability to read every required authority field. A
+transition remains stricter than an ordinary source PR: the exact merged claim
+or closure head must retain a latest exact-head approval from a human GitHub
+identity distinct from its author. Agent review artifacts remain canonical HUA
+source-review evidence, while that transition approval is explicit publication
+authority. Source tests require every live-negative shape to admit zero
+privileged release actions.
 
 Canonical initial review
 `reviews/written/pr82/initial-findings-결-8276396e95e0.md` (SHA-256

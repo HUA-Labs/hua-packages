@@ -369,15 +369,27 @@ function githubTransition(kind = "claim") {
 
 function githubAuthorityFixture(transition = githubTransition()) {
   const pullRequestHead = kindHead(transition.kind);
+  const requiredChecks = [
+    "type-check",
+    "lint",
+    "test",
+    "doc-validation",
+    "publish-allowlist",
+    "public-exposure",
+  ];
   return {
     protection: {
-      required_pull_request_reviews: {
-        dismiss_stale_reviews: true,
-        require_last_push_approval: true,
-        required_approving_review_count: 1,
-        bypass_pull_request_allowances: { users: [], teams: [], apps: [] },
+      required_status_checks: {
+        strict: true,
+        contexts: requiredChecks,
+        checks: requiredChecks.map((context) => ({
+          context,
+          app_id: 15368,
+        })),
       },
+      required_conversation_resolution: { enabled: false },
       enforce_admins: { enabled: true },
+      required_linear_history: { enabled: true },
       allow_force_pushes: { enabled: false },
       allow_deletions: { enabled: false },
     },
@@ -2138,7 +2150,7 @@ test("workflow routes claim and closure through reviewed protected-main transiti
   );
   assert.match(
     documentation,
-    /tap review artifacts are not GitHub approval authority/,
+    /canonical cross-agent CLEAN is the ordinary\s+source-review authority/,
   );
   assert.match(
     documentation,
@@ -2157,6 +2169,49 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
   const cases = [
     ["absent protection", (value) => (value.protection = null)],
     [
+      "absent required status checks",
+      (value) => (value.protection.required_status_checks = null),
+    ],
+    [
+      "non-strict required status checks",
+      (value) => (value.protection.required_status_checks.strict = false),
+    ],
+    [
+      "missing required status context",
+      (value) => value.protection.required_status_checks.contexts.pop(),
+    ],
+    [
+      "extra required status context",
+      (value) =>
+        value.protection.required_status_checks.contexts.push("coderabbit"),
+    ],
+    [
+      "wrong required check app",
+      (value) => (value.protection.required_status_checks.checks[0].app_id = 1),
+    ],
+    [
+      "missing app-bound required check",
+      (value) => value.protection.required_status_checks.checks.pop(),
+    ],
+    [
+      "explicit null review gate field",
+      (value) => (value.protection.required_pull_request_reviews = null),
+    ],
+    [
+      "classic review gate restored",
+      (value) =>
+        (value.protection.required_pull_request_reviews = {
+          dismiss_stale_reviews: true,
+          require_last_push_approval: true,
+          required_approving_review_count: 1,
+        }),
+    ],
+    [
+      "conversation resolution gate restored",
+      (value) =>
+        (value.protection.required_conversation_resolution.enabled = true),
+    ],
+    [
       "effective ruleset rule present",
       (value) =>
         value.rules.push({
@@ -2169,33 +2224,12 @@ test("GitHub release authority fails closed before OIDC or publish on every unre
         }),
     ],
     [
-      "classic bypass actor",
-      (value) =>
-        value.protection.required_pull_request_reviews.bypass_pull_request_allowances.users.push(
-          { login: "bypass-user" },
-        ),
-    ],
-    [
-      "malformed classic bypass allowance",
-      (value) =>
-        (value.protection.required_pull_request_reviews.bypass_pull_request_allowances =
-          null),
-    ],
-    [
-      "partial classic bypass allowance",
-      (value) =>
-        delete value.protection.required_pull_request_reviews
-          .bypass_pull_request_allowances.apps,
-    ],
-    [
-      "unknown classic bypass category",
-      (value) =>
-        (value.protection.required_pull_request_reviews.bypass_pull_request_allowances.deploy_keys =
-          [{ login: "private-bypass" }]),
-    ],
-    [
       "administrator bypass",
       (value) => (value.protection.enforce_admins.enabled = false),
+    ],
+    [
+      "nonlinear merge history",
+      (value) => (value.protection.required_linear_history.enabled = false),
     ],
     [
       "repository ruleset summary present",
@@ -2427,11 +2461,67 @@ test("GitHub Actions bot claim authors require an exact human approval", () => {
   );
 });
 
-test("GitHub REST omission of an empty classic bypass allowance is accepted", () => {
+test("transition authority reduces stale review history to each actor's latest state", () => {
+  const transition = githubTransition("claim");
+
+  const sameActor = githubAuthorityFixture(transition);
+  sameActor.pullRequest.user = {
+    login: "github-actions[bot]",
+    type: "Bot",
+  };
+  sameActor.reviews[0].id = 2;
+  sameActor.reviews.unshift({
+    id: 1,
+    state: "APPROVED",
+    commit_id: "7".repeat(40),
+    user: { login: "independent-reviewer", type: "User" },
+  });
+  assert.equal(
+    validateGitHubReleaseAuthority(sameActor, transition).status,
+    "protected",
+  );
+
+  const differentActors = githubAuthorityFixture(transition);
+  differentActors.pullRequest.user = {
+    login: "github-actions[bot]",
+    type: "Bot",
+  };
+  differentActors.reviews[0].id = 2;
+  differentActors.reviews[0].user.login = "fresh-reviewer";
+  differentActors.reviews.unshift({
+    id: 1,
+    state: "APPROVED",
+    commit_id: "7".repeat(40),
+    user: { login: "stale-reviewer", type: "User" },
+  });
+  assert.equal(
+    validateGitHubReleaseAuthority(differentActors, transition).status,
+    "protected",
+  );
+
+  const laterComment = githubAuthorityFixture(transition);
+  laterComment.reviews.push({
+    id: 2,
+    state: "COMMENTED",
+    commit_id: kindHead("claim"),
+    user: { login: "independent-reviewer", type: "User" },
+  });
+  assertCode(
+    () => validateGitHubReleaseAuthority(laterComment, transition),
+    "external-policy-blocked",
+  );
+});
+
+test("solo-company source policy keeps GitHub review counting absent", () => {
   const transition = githubTransition("claim");
   const authority = githubAuthorityFixture(transition);
-  delete authority.protection.required_pull_request_reviews
-    .bypass_pull_request_allowances;
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(
+      authority.protection,
+      "required_pull_request_reviews",
+    ),
+    false,
+  );
 
   const result = validateGitHubReleaseAuthority(authority, transition);
   assert.equal(result.repository, TEST_RELEASE_REPOSITORY);
