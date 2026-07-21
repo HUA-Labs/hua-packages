@@ -3,6 +3,72 @@
 Complete technical reference for the modern React UI component library.
 모던 React UI 컴포넌트 라이브러리에 대한 완전한 기술 레퍼런스입니다.
 
+## Public 2.4 Core Candidate Boundary
+
+This guide documents the full platform workspace authority across all 37
+package entries. The public 2.4 core candidate is a narrower **source-ready**
+projection. Its copyable package-entry roster is exactly:
+
+```text
+@hua-labs/ui
+@hua-labs/ui/advanced
+@hua-labs/ui/advanced/dashboard
+@hua-labs/ui/advanced/emotion
+@hua-labs/ui/advanced/motion
+@hua-labs/ui/data
+@hua-labs/ui/feedback
+@hua-labs/ui/form
+@hua-labs/ui/icons
+@hua-labs/ui/icons-bold
+@hua-labs/ui/iconsax
+@hua-labs/ui/iconsax-extended
+@hua-labs/ui/interactive
+@hua-labs/ui/interactive/kanban
+@hua-labs/ui/landing
+@hua-labs/ui/native
+@hua-labs/ui/navigation
+@hua-labs/ui/overlay
+@hua-labs/ui/sdui
+@hua-labs/ui/styles/base.css
+@hua-labs/ui/styles/codeblock.css
+@hua-labs/ui/styles/landing.css
+@hua-labs/ui/styles/prose.css
+@hua-labs/ui/styles/recommended-theme.css
+@hua-labs/ui/styles/toast.css
+@hua-labs/ui/styles/utilities.css
+@hua-labs/ui/theme
+```
+
+The following full-workspace entries are deferred and unavailable in that
+public candidate. Do not copy them into candidate consumer code:
+
+- `@hua-labs/ui/ax` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/layout` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/lucide` — unavailable; the Lucide registrar is not shipped in the public candidate.
+- `@hua-labs/ui/motion` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/primitives` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/sdui/manifest` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/sdui/motion-core-validation` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/sdui/validation` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/theme/foundation` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/utils` — unavailable; deferred from the public candidate.
+
+The public core candidate does not ship the `@hua-labs/ui/lucide` registrar,
+so selecting the Lucide provider is not public-candidate guidance. The exact
+retained/deferred roster comes from `public-core-profile.json`; that profile is
+platform source authority and is not shipped in the package.
+
+이 가이드는 37개 패키지 엔트리를 모두 가진 플랫폼 워크스페이스 권위를
+설명합니다. 공개 2.4 core 후보는 위의 27개 엔트리만 유지하는
+**source-ready** 투영입니다. 나열된 10개 deferred 엔트리는 공개 후보에서
+사용할 수 없으며 소비자 코드에 복사하면 안 됩니다. 공개 core 후보는
+`@hua-labs/ui/lucide` registrar를 배포하지 않으므로 Lucide provider 선택은
+공개 후보 사용 지침이 아닙니다.
+
+Source-ready evidence does not prove final tarball or DTS bytes, installed
+consumer behavior, version or release-plan authority, npm publication, or
+deployment. Those remain later independently reviewed gates.
+
 ---
 
 ## English
@@ -28,26 +94,31 @@ Complete technical reference for the modern React UI component library.
 
 `@hua-labs/ui` is built on four core principles:
 
-1. **Atomic-First** - Root export contains only atomic components; composite components are organized into subpath exports for optimal tree-shaking
-2. **Zero-Config Design System** - Works out of the box with the dot style engine, optional theme customization
-3. **Accessibility First** - Full ARIA support, keyboard navigation, WCAG 2.1 AA compliant
+1. **Layered public surface** - The compatibility root and focused subpath exports provide explicit import boundaries
+2. **Runtime-first styling** - The dot style engine works without Tailwind; theme CSS is an optional integration
+3. **Evidence-backed accessibility** - ARIA, keyboard, and naming contracts are documented per component without package-wide certification
 4. **Developer Experience** - TypeScript-first with full type safety and IntelliSense support
 
 ### Package Structure
 
 ```
 @hua-labs/ui
-├── Core (atomic)       → Button, Input, Card, Badge, Alert, Avatar...
+├── Root compatibility  → Button, Input, Card, Badge, Alert, Avatar...
 ├── /form               → Form, Select, DatePicker, Autocomplete, Upload...
 ├── /overlay            → Modal, Popover, Dropdown, Drawer, BottomSheet...
 ├── /data               → Table, CodeBlock...
 ├── /interactive        → Accordion, Tabs, Menu, Command...
+├── /interactive/kanban → Optional-peer Kanban drag-and-drop components
 ├── /navigation         → Navigation, Breadcrumb, Pagination...
 ├── /feedback           → Toast, LoadingSpinner...
-├── /advanced           → Dashboard, Motion, Emotion components...
+├── /advanced/*         → Advanced, motion, emotion, dashboard compatibility
 ├── /sdui               → Server-Driven UI components
-├── /iconsax            → Iconsax icon set
-├── /icons              → Custom icon components
+├── /landing            → Landing-page components
+├── /native             → React Native Box, Text, Pressable primitives
+├── /theme              → Theme contract
+├── /icons, /icons-bold → Raw Iconsax line and bold component barrels
+├── /iconsax            → Essential project Iconsax registration
+├── /iconsax-extended   → Extended Iconsax registration and gallery
 └── /styles/*           → CSS files
 ```
 
@@ -88,6 +159,10 @@ Required:
 }
 ```
 
+The root `@hua-labs/ui` entry requires both `react` and `react-dom`. Focused
+subpaths that do not import portal-backed components can omit `react-dom`, but
+the root quick start cannot.
+
 Optional (for drag-and-drop components):
 
 ```json
@@ -100,7 +175,9 @@ Optional (for drag-and-drop components):
 
 ### Tailwind CSS Setup
 
-HUA UI requires Tailwind CSS v4. Configure your project:
+The component runtime does not require Tailwind CSS. The optional
+`recommended-theme.css` and `base.css` entries use Tailwind v4 directives, so
+run those files through a Tailwind v4 pipeline when you opt into them:
 
 ```css
 /* globals.css */
@@ -268,7 +345,7 @@ import { Toolbar } from "@hua-labs/ui/interactive";
 import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
 // deprecated barrel (backwards compat):
 // import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { GlowCard } from "@hua-labs/ui/advanced/motion";
 import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
@@ -343,7 +420,9 @@ import {
 
 ### Icon
 
-Universal icon component supporting multiple icon sets (Phosphor, Lucide, Iconsax).
+The full platform workspace Icon component supports Phosphor, Lucide, and
+Iconsax. The public core candidate retains Phosphor and Iconsax registration
+routes but defers the Lucide registrar described above.
 
 ```tsx
 import { Icon, IconProvider } from '@hua-labs/ui';
@@ -366,18 +445,19 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 - `name` - Icon name (auto-normalized across providers)
 - `size` - Icon size (number or string)
 - `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
-- `provider` - Override icon provider ("phosphor" | "lucide" | "iconsax")
+- `provider` - Override icon provider ("phosphor" | "lucide" | "iconsax"); `lucide` requires the deferred registrar and is unavailable in the public candidate
 - `weight` - Phosphor weight ("thin" | "light" | "regular" | "bold" | "fill" | "duotone")
 - `animated` - Smooth animation effect
 - `pulse` - Pulse animation
 - `spin` - Rotation animation
 - `bounce` - Bounce animation
 
-**Icon Sets:**
+**Icon catalog:**
 
-- **Phosphor** (default) - 6 weights, 1200+ icons
-- **Lucide** - Minimalist, 1000+ icons
-- **Iconsax** - 4 variants (line/bold/bulk/broken), 1000+ icons (requires `@hua-labs/ui/iconsax` import)
+The platform source SSOT is `docs/resources/packages/ui/icon-system.md`; its
+public projection and exact provider bindings are published in the
+[HUA Docs Icon guide](https://docs.hua-labs.com/docs/components/icon). Counts
+and provider support are generated from source instead of duplicated here.
 
 **Icon Aliases:**
 
@@ -398,7 +478,7 @@ import { Modal } from "@hua-labs/ui";
 const [open, setOpen] = useState(false);
 
 <Modal
-  open={open}
+  isOpen={open}
   onClose={() => setOpen(false)}
   title="Modal Title"
   description="Modal description"
@@ -410,21 +490,22 @@ const [open, setOpen] = useState(false);
 
 **Props:**
 
-- `open` - Controlled open state
+- `isOpen` - Controlled open state
 - `onClose` - Close handler
 - `title` - Modal title
 - `description` - Modal description (optional)
 - `children` - Modal content
-- `size` - "sm" | "md" | "lg" | "xl" | "full"
+- `size` - "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
 - `closeOnOverlayClick` - Close on overlay click (default: true)
-- `showCloseButton` - Show close button (default: true)
+- `closable` - Show the close button (default: true)
+- `showBackdrop` - Show the backdrop (default: true)
 
 **Accessibility:**
 
-- Traps focus within modal
 - Closes on Escape key
-- ARIA attributes for screen readers
-- Restores focus on close
+- Applies `role="dialog"`, `aria-modal`, and title/description linkage
+- Locks body scrolling while open
+- Does not trap or restore focus; provide a `title` so the dialog has an accessible name
 
 ### Input
 
@@ -643,10 +724,14 @@ import { dot } from '@hua-labs/dot';
 dot('p-4 rounded-lg bg-primary-500')
 // → { padding: '1rem', borderRadius: '0.5rem', backgroundColor: '#6366f1' }
 
-// Component dot prop (all hua-ui components support this)
+// Component dot prop (use only on components whose public contract documents it)
 <Button dot="px-4 py-2 text-lg">Submit</Button>
 <Card dot="p-6 rounded-xl shadow-lg">Content</Card>
 ```
+
+The generated package README is the public contract index. Its `native`
+subpath entry documents React Native style, event, ref, and accessibility
+composition; this broad guide does not maintain a second platform matrix.
 
 ### dotVariants and dotMap
 
@@ -739,119 +824,37 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // Hook-based
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>Click me</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      Click me
+    </button>
+  );
 }
 
-// Style-based
-const motionStyle = getMicroMotionClasses("hover-lift");
-<div style={motionStyle}>Hover me</div>;
+// Class-based
+const motionClassName = getMicroMotionClasses("springy");
+<div className={motionClassName}>Hover me</div>;
 
 // Available presets:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
+
+The hook's inline `style` carries the motion without Tailwind; its returned
+`className` is an optional `transform-gpu` utility. `getMicroMotionClasses`
+returns Tailwind utility tokens and injects no CSS. Compile the consuming source
+with Tailwind before using the class-only path.
 
 ---
 
 ## Icon System
 
-### Icon Providers
-
-HUA UI supports three icon providers:
-
-**1. Phosphor Icons (Default)**
-
-```tsx
-import { Icon, IconProvider } from "@hua-labs/ui";
-
-<IconProvider set="phosphor" weight="regular">
-  <Icon name="heart" />
-</IconProvider>;
-```
-
-Weights: `thin`, `light`, `regular`, `bold`, `fill`, `duotone`
-
-**2. Lucide Icons**
-
-```tsx
-<IconProvider set="lucide">
-  <Icon name="heart" />
-</IconProvider>
-```
-
-Minimalist design, consistent stroke width.
-
-**3. Iconsax Icons**
-
-```tsx
-// Must import iconsax entry first
-import "@hua-labs/ui/iconsax";
-
-<IconProvider set="iconsax" iconsaxVariant="bold">
-  <Icon name="heart" />
-</IconProvider>;
-```
-
-Variants: `line`, `bold`, `bulk`, `broken`
-
-### Icon Configuration
-
-```tsx
-import { IconProvider, defaultIconConfig } from "@hua-labs/ui";
-
-<IconProvider
-  set="phosphor" // Icon provider
-  size={24} // Default size
-  color="currentColor" // Default color
-  weight="regular" // Phosphor weight
-  strokeWidth={1.5} // Lucide stroke width
-  iconsaxVariant="line" // Iconsax variant
->
-  <App />
-</IconProvider>;
-```
-
-### Emotion & Status Icons
-
-Pre-configured semantic icons:
-
-```tsx
-import { EmotionIcon, StatusIcon } from '@hua-labs/ui';
-
-// Emotion icons
-<EmotionIcon emotion="happy" />
-<EmotionIcon emotion="sad" />
-<EmotionIcon emotion="angry" />
-
-// Status icons
-<StatusIcon status="success" />
-<StatusIcon status="error" />
-<StatusIcon status="warning" />
-<StatusIcon status="info" />
-```
-
-### Custom Icon Components
-
-```tsx
-import { HeartIcon, UserIcon, SettingsIcon } from '@hua-labs/ui/icons';
-import { HeartBold, UserBold, SettingsBold } from '@hua-labs/ui/icons-bold';
-
-<HeartIcon size={24} />
-<UserBold size={32} />
-```
-
-### Icon Aliases
-
-Common icon names are aliased across providers:
-
-```tsx
-// All resolve to correct provider-specific names
-<Icon name="trash" />      // Trash, Trash2, trash
-<Icon name="settings" />   // Gear, Settings, setting
-<Icon name="user" />       // User, User, profile
-<Icon name="search" />     // MagnifyingGlass, Search, search-normal
-<Icon name="close" />      // X, X, close-circle
-```
+The canonical catalog is generated from executable source. Its accepted exact
+names, provider roles, activation routes, and evidence limits are published in
+the [HUA Docs Icon guide](https://docs.hua-labs.com/docs/components/icon). This
+broad guide does not duplicate that catalog.
 
 ---
 
@@ -1111,7 +1114,8 @@ export default function ClientComponent() {
 ### Form Validation
 
 ```tsx
-import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
+import { Button } from "@hua-labs/ui";
+import { Form, FormControl, Input } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -1299,12 +1303,9 @@ function Component() {
 **Solution:** Use subpath imports to import only needed components:
 
 ```tsx
-// Bad: Imports entire package
-import { Form, Select, DatePicker } from "@hua-labs/ui";
-
-// Good: Tree-shakeable
+// Root components and form components use their declared public entries.
 import { Button, Card } from "@hua-labs/ui";
-import { Form, Select } from "@hua-labs/ui/form";
+import { Form, Select, DatePicker } from "@hua-labs/ui/form";
 ```
 
 Analyze bundle:
@@ -1357,26 +1358,31 @@ export default {
 
 `@hua-labs/ui`는 네 가지 핵심 원칙을 기반으로 합니다:
 
-1. **원자 우선** - 루트 export는 원자 컴포넌트만 포함하며, 복합 컴포넌트는 서브경로 export로 구성하여 최적의 트리쉐이킹 제공
-2. **무설정 디자인 시스템** - Tailwind CSS v4와 즉시 사용 가능, 선택적 테마 커스터마이징
-3. **접근성 우선** - 완전한 ARIA 지원, 키보드 내비게이션, WCAG 2.1 AA 준수
+1. **계층형 공개 표면** - 호환성 루트와 목적별 서브경로가 명시적인 import 경계를 제공
+2. **런타임 우선 스타일링** - dot 스타일 엔진은 Tailwind 없이 동작하며 테마 CSS는 선택적 통합
+3. **증거 기반 접근성** - 패키지 전체 인증 대신 컴포넌트별 ARIA, 키보드, 이름 계약을 문서화
 4. **개발자 경험** - 완전한 타입 안전성과 IntelliSense 지원을 제공하는 TypeScript 우선
 
 ### 패키지 구조
 
 ```
 @hua-labs/ui
-├── Core (원자)          → Button, Input, Card, Badge, Alert, Avatar...
+├── Root 호환성          → Button, Input, Card, Badge, Alert, Avatar...
 ├── /form               → Form, Select, DatePicker, Autocomplete, Upload...
 ├── /overlay            → Modal, Popover, Dropdown, Drawer, BottomSheet...
 ├── /data               → Table, CodeBlock...
 ├── /interactive        → Accordion, Tabs, Menu, Command...
+├── /interactive/kanban → 선택적 peer 기반 Kanban 드래그 앤 드롭
 ├── /navigation         → Navigation, Breadcrumb, Pagination...
 ├── /feedback           → Toast, LoadingSpinner...
-├── /advanced           → Dashboard, Motion, Emotion 컴포넌트...
+├── /advanced/*         → 고급, 모션, 감정, 대시보드 호환 엔트리
 ├── /sdui               → Server-Driven UI 컴포넌트
-├── /iconsax            → Iconsax 아이콘 세트
-├── /icons              → 커스텀 아이콘 컴포넌트
+├── /landing            → 랜딩 페이지 컴포넌트
+├── /native             → 명시적 React Native 프리미티브
+├── /theme              → 테마 계약
+├── /icons, /icons-bold → raw Iconsax line/bold 컴포넌트 배럴
+├── /iconsax            → essential 프로젝트 Iconsax 등록
+├── /iconsax-extended   → extended Iconsax 등록과 갤러리
 └── /styles/*           → CSS 파일
 ```
 
@@ -1417,6 +1423,10 @@ npm install @hua-labs/ui
 }
 ```
 
+루트 `@hua-labs/ui` 엔트리는 `react`와 `react-dom`을 모두 요구합니다. 포털
+컴포넌트를 import하지 않는 목적별 서브경로는 `react-dom`을 생략할 수 있지만,
+루트 빠른 시작에서는 생략할 수 없습니다.
+
 선택 (드래그 앤 드롭 컴포넌트용):
 
 ```json
@@ -1429,7 +1439,9 @@ npm install @hua-labs/ui
 
 ### Tailwind CSS 설정
 
-HUA UI는 Tailwind CSS v4가 필요합니다. 프로젝트 설정:
+컴포넌트 런타임에는 Tailwind CSS가 필수가 아닙니다. 선택 사항인
+`recommended-theme.css`와 `base.css`는 Tailwind v4 지시문을 사용하므로, 이
+파일을 사용할 때만 Tailwind v4 파이프라인으로 처리하세요:
 
 ```css
 /* globals.css */
@@ -1597,7 +1609,7 @@ import { Toolbar } from "@hua-labs/ui/interactive";
 import { KanbanBoard } from "@hua-labs/ui/interactive/kanban";
 // deprecated barrel (backwards compat):
 // import { Dashboard } from '@hua-labs/ui/advanced/dashboard';
-import { MotionCard } from "@hua-labs/ui/advanced/motion";
+import { GlowCard } from "@hua-labs/ui/advanced/motion";
 import { EmotionSelector } from "@hua-labs/ui/advanced/emotion";
 ```
 
@@ -1672,7 +1684,9 @@ import {
 
 ### Icon
 
-여러 아이콘 세트(Phosphor, Lucide, Iconsax)를 지원하는 범용 아이콘 컴포넌트.
+플랫폼 전체 워크스페이스의 Icon 컴포넌트는 Phosphor, Lucide, Iconsax를
+지원합니다. 공개 core 후보는 Phosphor와 Iconsax 등록 경로만 유지하며 위에서
+설명한 Lucide registrar는 deferred 상태입니다.
 
 ```tsx
 import { Icon, IconProvider } from '@hua-labs/ui';
@@ -1695,18 +1709,19 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 - `name` - 아이콘 이름 (프로바이더 간 자동 정규화)
 - `size` - 아이콘 크기 (숫자 또는 문자열)
 - `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
-- `provider` - 아이콘 프로바이더 오버라이드 ("phosphor" | "lucide" | "iconsax")
+- `provider` - 아이콘 프로바이더 오버라이드 ("phosphor" | "lucide" | "iconsax"); `lucide`는 deferred registrar가 필요하며 공개 후보에서는 사용할 수 없음
 - `weight` - Phosphor 굵기 ("thin" | "light" | "regular" | "bold" | "fill" | "duotone")
 - `animated` - 부드러운 애니메이션 효과
 - `pulse` - 펄스 애니메이션
 - `spin` - 회전 애니메이션
 - `bounce` - 바운스 애니메이션
 
-**아이콘 세트:**
+**아이콘 카탈로그:**
 
-- **Phosphor** (기본) - 6가지 굵기, 1200개 이상 아이콘
-- **Lucide** - 미니멀리스트, 1000개 이상 아이콘
-- **Iconsax** - 4가지 변형 (line/bold/bulk/broken), 1000개 이상 아이콘 (`@hua-labs/ui/iconsax` import 필요)
+exact 이름, 프로바이더별 지원 범위, essential/extended Iconsax 경계는
+[HUA Docs Icon 가이드](https://docs.hua-labs.com/docs/components/icon)에 공개된
+소스 기반 생성 계약을 따릅니다. 이 상세 가이드에는 변동 가능한 개수나 변형 수를
+중복해서 적지 않습니다.
 
 **아이콘 별칭:**
 
@@ -1727,7 +1742,7 @@ import { Modal } from "@hua-labs/ui";
 const [open, setOpen] = useState(false);
 
 <Modal
-  open={open}
+  isOpen={open}
   onClose={() => setOpen(false)}
   title="모달 제목"
   description="모달 설명"
@@ -1739,21 +1754,22 @@ const [open, setOpen] = useState(false);
 
 **Props:**
 
-- `open` - 제어된 열림 상태
+- `isOpen` - 제어된 열림 상태
 - `onClose` - 닫기 핸들러
 - `title` - 모달 제목
 - `description` - 모달 설명 (선택)
 - `children` - 모달 콘텐츠
-- `size` - "sm" | "md" | "lg" | "xl" | "full"
+- `size` - "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
 - `closeOnOverlayClick` - 오버레이 클릭 시 닫기 (기본값: true)
-- `showCloseButton` - 닫기 버튼 표시 (기본값: true)
+- `closable` - 닫기 버튼 표시 (기본값: true)
+- `showBackdrop` - 배경 오버레이 표시 (기본값: true)
 
 **접근성:**
 
-- 모달 내에서 포커스 트랩
 - Escape 키로 닫기
-- 스크린 리더를 위한 ARIA 속성
-- 닫을 때 포커스 복원
+- `role="dialog"`, `aria-modal`, 제목/설명 연결 적용
+- 열려 있는 동안 body 스크롤 잠금
+- 포커스를 가두거나 복원하지 않으므로 접근 가능한 이름을 위해 `title`을 제공
 
 ### Input
 
@@ -2084,119 +2100,37 @@ import { useMicroMotion, getMicroMotionClasses } from "@hua-labs/ui";
 
 // 훅 기반
 function Component() {
-  const motion = useMicroMotion("button-press");
-  return <button {...motion.props}>클릭하세요</button>;
+  const { handlers, style, className } = useMicroMotion({
+    preset: "springy",
+  });
+  return (
+    <button {...handlers} style={style} className={className}>
+      클릭하세요
+    </button>
+  );
 }
 
 // 클래스 기반
-const classes = getMicroMotionClasses("hover-lift");
+const classes = getMicroMotionClasses("springy");
 <div className={classes}>호버하세요</div>;
 
 // 사용 가능한 프리셋:
-// 'button-press', 'hover-lift', 'card-hover', 'fade-in', 'slide-up'
+// 'subtle', 'soft', 'springy', 'bouncy', 'snappy'
 ```
+
+훅의 인라인 `style`은 Tailwind 없이도 모션을 적용하고, 반환되는 `className`은
+선택적인 `transform-gpu` 유틸리티입니다. `getMicroMotionClasses`는 Tailwind
+유틸리티 토큰만 반환하며 CSS를 주입하지 않습니다. 클래스 전용 경로를 사용할
+때는 소비자 소스를 Tailwind로 컴파일하세요.
 
 ---
 
 ## 아이콘 시스템
 
-### 아이콘 프로바이더
-
-HUA UI는 세 가지 아이콘 프로바이더를 지원합니다:
-
-**1. Phosphor Icons (기본)**
-
-```tsx
-import { Icon, IconProvider } from "@hua-labs/ui";
-
-<IconProvider set="phosphor" weight="regular">
-  <Icon name="heart" />
-</IconProvider>;
-```
-
-굵기: `thin`, `light`, `regular`, `bold`, `fill`, `duotone`
-
-**2. Lucide Icons**
-
-```tsx
-<IconProvider set="lucide">
-  <Icon name="heart" />
-</IconProvider>
-```
-
-미니멀리스트 디자인, 일관된 선 굵기.
-
-**3. Iconsax Icons**
-
-```tsx
-// 먼저 iconsax entry를 import해야 함
-import "@hua-labs/ui/iconsax";
-
-<IconProvider set="iconsax" iconsaxVariant="bold">
-  <Icon name="heart" />
-</IconProvider>;
-```
-
-변형: `line`, `bold`, `bulk`, `broken`
-
-### 아이콘 설정
-
-```tsx
-import { IconProvider, defaultIconConfig } from "@hua-labs/ui";
-
-<IconProvider
-  set="phosphor" // 아이콘 프로바이더
-  size={24} // 기본 크기
-  color="currentColor" // 기본 색상
-  weight="regular" // Phosphor 굵기
-  strokeWidth={1.5} // Lucide 선 굵기
-  iconsaxVariant="line" // Iconsax 변형
->
-  <App />
-</IconProvider>;
-```
-
-### 감정 & 상태 아이콘
-
-사전 설정된 의미론적 아이콘:
-
-```tsx
-import { EmotionIcon, StatusIcon } from '@hua-labs/ui';
-
-// 감정 아이콘
-<EmotionIcon emotion="happy" />
-<EmotionIcon emotion="sad" />
-<EmotionIcon emotion="angry" />
-
-// 상태 아이콘
-<StatusIcon status="success" />
-<StatusIcon status="error" />
-<StatusIcon status="warning" />
-<StatusIcon status="info" />
-```
-
-### 커스텀 아이콘 컴포넌트
-
-```tsx
-import { HeartIcon, UserIcon, SettingsIcon } from '@hua-labs/ui/icons';
-import { HeartBold, UserBold, SettingsBold } from '@hua-labs/ui/icons-bold';
-
-<HeartIcon size={24} />
-<UserBold size={32} />
-```
-
-### 아이콘 별칭
-
-일반적인 아이콘 이름이 프로바이더 간에 별칭으로 지정됩니다:
-
-```tsx
-// 모두 올바른 프로바이더별 이름으로 해석됨
-<Icon name="trash" />      // Trash, Trash2, trash
-<Icon name="settings" />   // Gear, Settings, setting
-<Icon name="user" />       // User, User, profile
-<Icon name="search" />     // MagnifyingGlass, Search, search-normal
-<Icon name="close" />      // X, X, close-circle
-```
+canonical 카탈로그는 실행 가능한 소스에서 생성됩니다. 허용되는 exact 이름,
+프로바이더 역할, 활성화 경로, 증거 한계는
+[HUA Docs Icon 가이드](https://docs.hua-labs.com/docs/components/icon)에 공개하며,
+이 상세 가이드에는 같은 카탈로그를 중복하지 않습니다.
 
 ---
 
@@ -2456,7 +2390,8 @@ export default function ClientComponent() {
 ### 폼 유효성 검증
 
 ```tsx
-import { Form, FormControl, Input, Button } from "@hua-labs/ui/form";
+import { Button } from "@hua-labs/ui";
+import { Form, FormControl, Input } from "@hua-labs/ui/form";
 
 function LoginForm() {
   const [errors, setErrors] = useState({});
@@ -2644,12 +2579,9 @@ function Component() {
 **해결:** 서브경로 import를 사용하여 필요한 컴포넌트만 import:
 
 ```tsx
-// 나쁨: 전체 패키지를 import
-import { Form, Select, DatePicker } from "@hua-labs/ui";
-
-// 좋음: 트리쉐이킹 가능
+// 루트 컴포넌트와 폼 컴포넌트는 선언된 public entry를 사용합니다.
 import { Button, Card } from "@hua-labs/ui";
-import { Form, Select } from "@hua-labs/ui/form";
+import { Form, Select, DatePicker } from "@hua-labs/ui/form";
 ```
 
 번들 분석:

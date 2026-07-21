@@ -121,6 +121,7 @@
   },
   "files": [
     "dist",
+    "DETAILED_GUIDE.md",
     "src/styles",
     "src/components/icons",
     "src/components/icons-bold"
@@ -232,7 +233,7 @@
     "./dist/iconsax-extended.mjs"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.16.0"
   },
   "publishConfig": {
     "access": "public",

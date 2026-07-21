@@ -20,6 +20,7 @@ import {
   mkdirSync,
   realpathSync,
 } from "fs";
+import { createHash } from "crypto";
 import { join, resolve, dirname, sep } from "path";
 import { fileURLToPath } from "url";
 import Handlebars from "handlebars";
@@ -74,6 +75,26 @@ interface ExportInfo {
   description: string;
 }
 
+interface PublicCoreProfileEntry {
+  subpath: string;
+  disposition: "retained" | "deferred";
+  kind: "javascript" | "asset";
+  manifestTarget: unknown;
+  tsup: null | { entry: string; source: string; output: string };
+}
+
+interface PublicCoreProfileProjection {
+  schema: "hua-ui-public-core-profile.v1";
+  digest: string;
+  installedEngineRange: string;
+  futureMajorEngineStop: string;
+  releaseSelection: null;
+  retained: string[];
+  deferred: string[];
+  javascriptCount: number;
+  assetCount: number;
+}
+
 interface PackageData {
   dirName: string;
   shortName: string; // npm scope 제거한 이름
@@ -109,6 +130,7 @@ interface PackageData {
   related?: string[];
   sections?: Array<{ title: string; content: string }>;
   subpathExports?: Array<{ path: string; description: string }>;
+  publicCoreProfile?: PublicCoreProfileProjection;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────
@@ -145,6 +167,28 @@ const README_KEYS = new Set([
   "detailedGuide",
   "aiGuide",
 ]);
+const PUBLIC_CORE_PROFILE_KEYS = new Set([
+  "schema",
+  "package",
+  "installedEngineRange",
+  "futureMajorEngineStop",
+  "releaseSelection",
+  "entries",
+]);
+const PUBLIC_CORE_ENTRY_KEYS = new Set([
+  "subpath",
+  "disposition",
+  "kind",
+  "manifestTarget",
+  "tsup",
+]);
+const PUBLIC_CORE_TSUP_KEYS = new Set(["entry", "source", "output"]);
+const UI_PROFILE_RETAINED_PREFIX =
+  "Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ";
+const UI_PROFILE_DEFERRED_PREFIX =
+  "Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ";
+const UI_PROFILE_AUTHORITY_BOUNDARY =
+  "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven.";
 
 function assertExactKeys(
   value: unknown,
@@ -215,6 +259,321 @@ function assertRegularFile(path: string, label: string): void {
   if (!stats.isFile() || stats.isSymbolicLink()) {
     throw new Error(`${label} must be a regular file`);
   }
+}
+
+function utf8Sorted(values: string[]): string[] {
+  return [...values].sort((left, right) =>
+    Buffer.from(left).compare(Buffer.from(right)),
+  );
+}
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalJson).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map(
+        (key) =>
+          `${JSON.stringify(key)}:${canonicalJson((value as Record<string, unknown>)[key])}`,
+      )
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function canonicalImport(packageName: string, subpath: string): string {
+  return subpath === "." ? packageName : `${packageName}${subpath.slice(1)}`;
+}
+
+function collectManifestTargetStrings(
+  value: unknown,
+  targets = new Set<string>(),
+): Set<string> {
+  if (typeof value === "string") {
+    targets.add(value);
+    return targets;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(
+      "public-core-profile manifest targets must be strings or objects",
+    );
+  }
+  for (const child of Object.values(value)) {
+    collectManifestTargetStrings(child, targets);
+  }
+  return targets;
+}
+
+function loadPublicCoreProfile(options: {
+  packageDir: string;
+  packageName: string;
+  packageEngine: unknown;
+  manifestExports: unknown;
+  docFeatures: string[];
+}): {
+  projection: PublicCoreProfileProjection;
+  entries: PublicCoreProfileEntry[];
+} | null {
+  const profilePath = join(options.packageDir, "public-core-profile.json");
+  if (!existsSync(profilePath)) return null;
+  assertRegularFile(profilePath, "public-core-profile.json");
+  const profileBytes = readFileSync(profilePath);
+  if (profileBytes.length === 0 || profileBytes.length > 256 * 1024) {
+    throw new Error("public-core-profile.json must be bounded and non-empty");
+  }
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(profileBytes.toString("utf8"));
+  } catch {
+    throw new Error("public-core-profile.json must contain valid JSON");
+  }
+  assertExactKeys(raw, PUBLIC_CORE_PROFILE_KEYS, "public-core-profile.json");
+  if (raw.schema !== "hua-ui-public-core-profile.v1") {
+    throw new Error("public-core-profile.json has an unsupported schema");
+  }
+  if (raw.package !== options.packageName) {
+    throw new Error(
+      "public-core-profile.json package does not match package.json",
+    );
+  }
+  if (
+    typeof raw.installedEngineRange !== "string" ||
+    raw.installedEngineRange !== options.packageEngine
+  ) {
+    throw new Error(
+      "public-core-profile.json engine does not match package.json",
+    );
+  }
+  if (raw.futureMajorEngineStop !== ">=22.3.0") {
+    throw new Error(
+      "public-core-profile.json future major stop must stay exact",
+    );
+  }
+  if (raw.releaseSelection !== null) {
+    throw new Error("public-core-profile.json must not select a release");
+  }
+  if (!Array.isArray(raw.entries) || raw.entries.length > 128) {
+    throw new Error("public-core-profile.json entries must be a bounded array");
+  }
+  if (
+    !options.manifestExports ||
+    typeof options.manifestExports !== "object" ||
+    Array.isArray(options.manifestExports)
+  ) {
+    throw new Error("profile-aware package.json exports must be an object");
+  }
+
+  const manifestExports = options.manifestExports as Record<string, unknown>;
+  const entries: PublicCoreProfileEntry[] = [];
+  const seen = new Set<string>();
+  const seenTsupEntries = new Set<string>();
+  const packageRoot = realpathSync(options.packageDir);
+  for (const rawEntry of raw.entries) {
+    assertExactKeys(
+      rawEntry,
+      PUBLIC_CORE_ENTRY_KEYS,
+      "public-core-profile entry",
+    );
+    const subpath = rawEntry.subpath;
+    if (
+      typeof subpath !== "string" ||
+      (subpath !== "." &&
+        (!/^\.\/[A-Za-z0-9._/-]+$/u.test(subpath) ||
+          subpath.includes("..") ||
+          subpath.includes("//")))
+    ) {
+      throw new Error("public-core-profile entry has an unsafe subpath");
+    }
+    if (seen.has(subpath)) {
+      throw new Error("public-core-profile entry subpaths must be unique");
+    }
+    seen.add(subpath);
+    if (
+      rawEntry.disposition !== "retained" &&
+      rawEntry.disposition !== "deferred"
+    ) {
+      throw new Error("public-core-profile entry has an invalid disposition");
+    }
+    if (rawEntry.kind !== "javascript" && rawEntry.kind !== "asset") {
+      throw new Error("public-core-profile entry has an invalid kind");
+    }
+    if (rawEntry.kind === "asset") {
+      if (
+        rawEntry.tsup !== null ||
+        typeof rawEntry.manifestTarget !== "string"
+      ) {
+        throw new Error(
+          "public-core-profile asset entry must be scalar and tsup-free",
+        );
+      }
+    } else {
+      assertExactKeys(
+        rawEntry.tsup,
+        PUBLIC_CORE_TSUP_KEYS,
+        "public-core-profile tsup",
+      );
+      for (const key of PUBLIC_CORE_TSUP_KEYS) {
+        const value = rawEntry.tsup[key];
+        if (
+          typeof value !== "string" ||
+          value.length === 0 ||
+          value.length > 256 ||
+          value.includes("\0") ||
+          value.includes("\r") ||
+          value.includes("\n")
+        ) {
+          throw new Error(`public-core-profile tsup.${key} must be bounded`);
+        }
+      }
+      if (
+        !/^[A-Za-z0-9][A-Za-z0-9-]*$/u.test(rawEntry.tsup.entry) ||
+        seenTsupEntries.has(rawEntry.tsup.entry) ||
+        !/^src\/[A-Za-z0-9._/-]+\.[cm]?[jt]sx?$/u.test(rawEntry.tsup.source) ||
+        rawEntry.tsup.source.includes("..") ||
+        rawEntry.tsup.source.includes("//") ||
+        rawEntry.tsup.output !== `dist/${rawEntry.tsup.entry}.mjs` ||
+        !collectManifestTargetStrings(rawEntry.manifestTarget).has(
+          `./${rawEntry.tsup.output}`,
+        )
+      ) {
+        throw new Error("public-core-profile tsup authority is stale");
+      }
+      seenTsupEntries.add(rawEntry.tsup.entry);
+      if (rawEntry.disposition === "retained") {
+        const sourcePath = join(options.packageDir, rawEntry.tsup.source);
+        assertRegularFile(sourcePath, "public-core-profile tsup source");
+        if (!realpathSync(sourcePath).startsWith(`${packageRoot}${sep}`)) {
+          throw new Error(
+            "public-core-profile tsup source must stay inside package",
+          );
+        }
+      }
+    }
+
+    const manifestTarget = manifestExports[subpath];
+    if (rawEntry.disposition === "retained") {
+      if (
+        canonicalJson(manifestTarget) !== canonicalJson(rawEntry.manifestTarget)
+      ) {
+        throw new Error(
+          `retained profile entry does not match package exports: ${subpath}`,
+        );
+      }
+    } else if (manifestTarget !== undefined) {
+      throw new Error(
+        `deferred profile entry must be absent from package exports: ${subpath}`,
+      );
+    }
+    entries.push(rawEntry as unknown as PublicCoreProfileEntry);
+  }
+
+  const retainedEntries = entries.filter(
+    (entry) => entry.disposition === "retained",
+  );
+  const deferredEntries = entries.filter(
+    (entry) => entry.disposition === "deferred",
+  );
+  if (
+    entries.length !== 37 ||
+    retainedEntries.length !== 27 ||
+    deferredEntries.length !== 10 ||
+    entries.filter((entry) => entry.kind === "javascript").length !== 30 ||
+    entries.filter((entry) => entry.kind === "asset").length !== 7
+  ) {
+    throw new Error(
+      "public-core-profile.json must remain exact 37=27/10 and 30/7",
+    );
+  }
+  if (
+    Object.keys(manifestExports).length !== retainedEntries.length ||
+    Object.keys(manifestExports).some((subpath) => !seen.has(subpath))
+  ) {
+    throw new Error(
+      "package exports must equal the retained public-core profile",
+    );
+  }
+
+  const retained = utf8Sorted(
+    retainedEntries.map((entry) =>
+      canonicalImport(options.packageName, entry.subpath),
+    ),
+  );
+  const deferred = utf8Sorted(
+    deferredEntries.map((entry) =>
+      canonicalImport(options.packageName, entry.subpath),
+    ),
+  );
+  const requiredFeatures = [
+    `${UI_PROFILE_RETAINED_PREFIX}${retained.join(", ")}.`,
+    `${UI_PROFILE_DEFERRED_PREFIX}${deferred.join(", ")}.`,
+    UI_PROFILE_AUTHORITY_BOUNDARY,
+  ];
+  for (const feature of requiredFeatures) {
+    if (!options.docFeatures.includes(feature)) {
+      throw new Error("doc.yaml public-core profile projection is stale");
+    }
+  }
+
+  return {
+    entries,
+    projection: {
+      schema: raw.schema,
+      digest: createHash("sha256").update(profileBytes).digest("hex"),
+      installedEngineRange: raw.installedEngineRange,
+      futureMajorEngineStop: raw.futureMajorEngineStop,
+      releaseSelection: null,
+      retained,
+      deferred,
+      javascriptCount: 30,
+      assetCount: 7,
+    },
+  };
+}
+
+function buildProfileDocumentationProjection(options: {
+  detailedGuide: DocYaml["detailedGuide"];
+  packageDir: string;
+  packageFiles: unknown;
+}): NonNullable<PackageData["detailedGuide"]> {
+  const guide = options.detailedGuide;
+  if (
+    !guide ||
+    guide.path !== "./DETAILED_GUIDE.md" ||
+    guide.distribution !== "packed" ||
+    guide.description !==
+      "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"
+  ) {
+    throw new Error("profile-aware detailed guide authority must stay exact");
+  }
+  if (
+    !Array.isArray(options.packageFiles) ||
+    !options.packageFiles.includes("DETAILED_GUIDE.md") ||
+    options.packageFiles.includes("public-core-profile.json")
+  ) {
+    throw new Error(
+      "profile-aware package files must ship only the guide authority",
+    );
+  }
+  const guidePath = join(options.packageDir, "DETAILED_GUIDE.md");
+  assertRegularFile(guidePath, "profile-aware detailed guide");
+  const packageRoot = realpathSync(options.packageDir);
+  const realGuide = realpathSync(guidePath);
+  if (!realGuide.startsWith(`${packageRoot}${sep}`)) {
+    throw new Error(
+      "profile-aware detailed guide must stay inside the package",
+    );
+  }
+  return {
+    state: "shipped",
+    path: guide.path,
+    distribution: guide.distribution,
+    description: guide.description,
+    packed: true,
+    link: guide.path,
+  };
 }
 
 function assertWriterRoots(): void {
@@ -360,12 +719,6 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
       `${dirName}: detailedGuide authority cannot be declared twice`,
     );
   }
-  const documentationAx = buildDocumentationAxProjection({
-    detailedGuide: docYaml.detailedGuide,
-    packageDir: pkgDir,
-    packageDirName: dirName,
-  }) as PackageData["documentationAx"] &
-    Partial<NonNullable<PackageData["detailedGuide"]>>;
   const readmeFeatureLimit =
     typeof docYaml.readme?.featureLimit === "number"
       ? docYaml.readme.featureLimit
@@ -376,14 +729,49 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
       ? (docYaml.features ?? []).slice(0, readmeFeatureLimit)
       : (docYaml.features ?? []));
 
+  const publicCoreProfile = loadPublicCoreProfile({
+    packageDir: pkgDir,
+    packageName: fullName,
+    packageEngine: pkgJson.engines?.node,
+    manifestExports: pkgJson.exports,
+    docFeatures: docYaml.features ?? [],
+  });
+  if (fullName === "@hua-labs/ui" && !publicCoreProfile) {
+    throw new Error("hua-ui requires public-core-profile.json authority");
+  }
+  const documentationAx = publicCoreProfile
+    ? buildProfileDocumentationProjection({
+        detailedGuide: docYaml.detailedGuide,
+        packageDir: pkgDir,
+        packageFiles: pkgJson.files,
+      })
+    : (buildDocumentationAxProjection({
+        detailedGuide: docYaml.detailedGuide,
+        packageDir: pkgDir,
+        packageDirName: dirName,
+      }) as PackageData["documentationAx"] &
+        Partial<NonNullable<PackageData["detailedGuide"]>>);
+  const retainedProfileImports = new Set(
+    publicCoreProfile?.projection.retained ?? [],
+  );
+  const projectedApiNotes = publicCoreProfile
+    ? Object.fromEntries(
+        Object.entries(docYaml.apiNotes ?? {}).filter(([, note]) => {
+          if (!note.importFrom || note.importFrom === fullName) return true;
+          if (!note.importFrom.startsWith(`${fullName}/`)) return true;
+          return retainedProfileImports.has(note.importFrom);
+        }),
+      )
+    : docYaml.apiNotes;
+
   // Parse exports (filter to apiNotes-only when configured)
-  let exports = parseExports(indexPath, docYaml.apiNotes);
-  if (docYaml.apiFilter === "notes-only" && docYaml.apiNotes) {
-    const noteKeys = new Set(Object.keys(docYaml.apiNotes));
+  let exports = parseExports(indexPath, projectedApiNotes);
+  if (docYaml.apiFilter === "notes-only" && projectedApiNotes) {
+    const noteKeys = new Set(Object.keys(projectedApiNotes));
     const detectedNames = new Set(exports.map((e) => e.name));
     exports = exports.filter((e) => noteKeys.has(e.name));
     // Add apiNotes entries not found in auto-detected exports (e.g., subpath-only exports)
-    for (const [name, note] of Object.entries(docYaml.apiNotes)) {
+    for (const [name, note] of Object.entries(projectedApiNotes)) {
       if (!detectedNames.has(name)) {
         exports.push({
           name,
@@ -430,7 +818,18 @@ async function loadPackageData(dirName: string): Promise<PackageData | null> {
     docsUrl: docYaml.docsUrl,
     related: docYaml.related,
     sections: docYaml.sections,
-    subpathExports: docYaml.subpathExports,
+    subpathExports: publicCoreProfile
+      ? publicCoreProfile.entries
+          .filter(
+            (entry) =>
+              entry.disposition === "retained" && entry.subpath !== ".",
+          )
+          .map((entry) => ({
+            path: entry.subpath.slice(2),
+            description: `Retained public core ${entry.kind} entry.`,
+          }))
+      : docYaml.subpathExports,
+    publicCoreProfile: publicCoreProfile?.projection,
   };
 }
 
@@ -462,11 +861,17 @@ function generateAiYaml(data: PackageData): string {
       .replace(/\r\n/g, "\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim() + "\n";
-  if (!data.detailedGuide) return generated;
-
-  const guide = data.detailedGuide;
   const yamlString = (value: string) => JSON.stringify(value);
-  return `${generated.trimEnd()}\n\ndocumentation:\n  detailedGuide:\n    state: ${yamlString(guide.state)}\n    path: ${yamlString(guide.path)}\n    distribution: ${yamlString(guide.distribution)}\n    description: ${yamlString(guide.description)}\n    link: ${yamlString(guide.link)}\n`;
+  let result = generated.trimEnd();
+  if (data.detailedGuide) {
+    const guide = data.detailedGuide;
+    result += `\n\ndocumentation:\n  detailedGuide:\n    state: ${yamlString(guide.state)}\n    path: ${yamlString(guide.path)}\n    distribution: ${yamlString(guide.distribution)}\n    description: ${yamlString(guide.description)}\n    link: ${yamlString(guide.link)}`;
+  }
+  if (data.publicCoreProfile) {
+    const profile = data.publicCoreProfile;
+    result += `\n\npublic_core_profile:\n  schema: ${yamlString(profile.schema)}\n  digest: ${yamlString(profile.digest)}\n  candidate_status: ${yamlString("source-ready")}\n  installed_engine_range: ${yamlString(profile.installedEngineRange)}\n  future_major_engine_stop: ${yamlString(profile.futureMajorEngineStop)}\n  release_selection: null\n  entry_count: ${profile.retained.length + profile.deferred.length}\n  retained_count: ${profile.retained.length}\n  deferred_count: ${profile.deferred.length}\n  javascript_count: ${profile.javascriptCount}\n  asset_count: ${profile.assetCount}\n  retained:\n${profile.retained.map((entry) => `    - ${yamlString(entry)}`).join("\n")}\n  deferred:\n${profile.deferred.map((entry) => `    - ${yamlString(entry)}`).join("\n")}`;
+  }
+  return `${result}\n`;
 }
 
 // ─── AI-docs filename mapping ────────────────────────────────────────
