@@ -103,6 +103,15 @@ const MANIFEST_DEPENDENCY_FIELDS = Object.freeze([
   "optionalDependencies",
   "peerDependencies",
 ]);
+const REQUIRED_RELEASE_CHECK_CONTEXTS = Object.freeze([
+  "type-check",
+  "lint",
+  "test",
+  "doc-validation",
+  "publish-allowlist",
+  "public-exposure",
+]);
+const GITHUB_ACTIONS_APP_ID = 15368;
 const GITHUB_CLI = "/usr/bin/gh";
 
 export function compareUtf8(left, right) {
@@ -2051,30 +2060,43 @@ function externalBooleanField(record, key, expected) {
 
 function validateExternalPolicy(authority) {
   const protection = externalRecord(authority.protection);
-  const reviews = externalRecord(protection.required_pull_request_reviews);
-  externalPolicyAssert(reviews.dismiss_stale_reviews === true);
-  externalPolicyAssert(reviews.require_last_push_approval === true);
+  const statusChecks = externalRecord(protection.required_status_checks);
+  externalPolicyAssert(statusChecks.strict === true);
+  const contexts = externalArray(
+    statusChecks.contexts,
+    REQUIRED_RELEASE_CHECK_CONTEXTS.length,
+  ).map((value) => externalString(value, /^[a-z][a-z0-9-]{0,63}$/u, 64));
   externalPolicyAssert(
-    Number.isSafeInteger(reviews.required_approving_review_count) &&
-      reviews.required_approving_review_count >= 1,
+    contexts.length === REQUIRED_RELEASE_CHECK_CONTEXTS.length &&
+      JSON.stringify([...contexts].sort(compareUtf8)) ===
+        JSON.stringify([...REQUIRED_RELEASE_CHECK_CONTEXTS].sort(compareUtf8)),
   );
-  const classicBypass = reviews.bypass_pull_request_allowances;
-  if (classicBypass !== undefined) {
-    const classicBypassRecord = externalRecord(classicBypass);
-    const classicBypassKeys = ["users", "teams", "apps"];
+  const checks = externalArray(
+    statusChecks.checks,
+    REQUIRED_RELEASE_CHECK_CONTEXTS.length,
+  ).map((value) => {
+    const check = externalRecord(value);
     externalPolicyAssert(
-      Object.keys(classicBypassRecord).length === classicBypassKeys.length,
+      Object.keys(check).length === 2 &&
+        Number.isSafeInteger(check.app_id) &&
+        check.app_id === GITHUB_ACTIONS_APP_ID,
     );
-    for (const key of classicBypassKeys) {
-      externalPolicyAssert(
-        Object.prototype.hasOwnProperty.call(classicBypassRecord, key),
-      );
-      externalPolicyAssert(
-        externalArray(classicBypassRecord[key]).length === 0,
-      );
-    }
-  }
+    return externalString(check.context, /^[a-z][a-z0-9-]{0,63}$/u, 64);
+  });
+  externalPolicyAssert(
+    checks.length === REQUIRED_RELEASE_CHECK_CONTEXTS.length &&
+      JSON.stringify([...checks].sort(compareUtf8)) ===
+        JSON.stringify([...REQUIRED_RELEASE_CHECK_CONTEXTS].sort(compareUtf8)),
+  );
+  externalPolicyAssert(
+    !Object.prototype.hasOwnProperty.call(
+      protection,
+      "required_pull_request_reviews",
+    ),
+  );
+  externalBooleanField(protection, "required_conversation_resolution", false);
   externalBooleanField(protection, "enforce_admins", true);
+  externalBooleanField(protection, "required_linear_history", true);
   externalBooleanField(protection, "allow_force_pushes", false);
   externalBooleanField(protection, "allow_deletions", false);
 
