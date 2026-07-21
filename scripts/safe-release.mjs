@@ -2047,9 +2047,21 @@ function validateExternalPolicy(authority) {
     Number.isSafeInteger(reviews.required_approving_review_count) &&
       reviews.required_approving_review_count >= 1,
   );
-  const classicBypass = externalRecord(reviews.bypass_pull_request_allowances);
-  for (const key of ["users", "teams", "apps"]) {
-    externalPolicyAssert(externalArray(classicBypass[key]).length === 0);
+  const classicBypass = reviews.bypass_pull_request_allowances;
+  if (classicBypass !== undefined) {
+    const classicBypassRecord = externalRecord(classicBypass);
+    const classicBypassKeys = ["users", "teams", "apps"];
+    externalPolicyAssert(
+      Object.keys(classicBypassRecord).length === classicBypassKeys.length,
+    );
+    for (const key of classicBypassKeys) {
+      externalPolicyAssert(
+        Object.prototype.hasOwnProperty.call(classicBypassRecord, key),
+      );
+      externalPolicyAssert(
+        externalArray(classicBypassRecord[key]).length === 0,
+      );
+    }
   }
   externalBooleanField(protection, "enforce_admins", true);
   externalBooleanField(protection, "allow_force_pushes", false);
