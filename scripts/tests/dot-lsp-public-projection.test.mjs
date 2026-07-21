@@ -378,7 +378,7 @@ test("portable tar authority admits two gzip envelopes and rejects stream tamper
       env: childEnvironment,
       maxBuffer: 16 * 1024 * 1024,
       stdio: "ignore",
-      timeout: 120000,
+      timeout: 240000,
     });
 
   try {

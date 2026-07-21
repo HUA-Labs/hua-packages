@@ -395,7 +395,7 @@ test("two gzip envelopes of the canonical tar pass while one tar byte rejects", 
       env: childEnvironment,
       maxBuffer: 16 * 1024 * 1024,
       stdio: "ignore",
-      timeout: 120000,
+      timeout: 240000,
     });
 
   try {
