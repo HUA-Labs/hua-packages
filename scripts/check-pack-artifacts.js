@@ -138,6 +138,19 @@ const UI_PROFILE_ENTRY_KEYS = new Set([
   "tsup",
 ]);
 const UI_PROFILE_TSUP_KEYS = new Set(["entry", "source", "output"]);
+const UI_PACKAGE_DESCRIPTION =
+  "TypeScript-first React UI components with modular Web and React Native entry points";
+const UI_PACKAGE_KEYWORDS = [
+  "hua-labs",
+  "react",
+  "react-components",
+  "ui-library",
+  "design-system",
+  "typescript",
+  "accessibility",
+  "react-native",
+  "cross-platform",
+];
 
 function assertExactObjectKeys(value, expected, label) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -208,6 +221,9 @@ function loadUiPublicProfile(profilePath, workspaceManifest) {
     throw new Error("UI public-core profile header is invalid");
   }
   if (
+    workspaceManifest.description !== UI_PACKAGE_DESCRIPTION ||
+    canonicalJson(workspaceManifest.keywords) !==
+      canonicalJson(UI_PACKAGE_KEYWORDS) ||
     workspaceManifest.name !== profile.package ||
     workspaceManifest.engines?.node !== profile.installedEngineRange ||
     workspaceManifest.dependencies?.["@hua-labs/dot"] !== "workspace:*" ||
@@ -349,6 +365,9 @@ function loadUiPublicProfile(profilePath, workspaceManifest) {
 function verifyUiPublicProfileTarball(pkg, fileSet) {
   if (
     pkg.version !== uiWorkspaceManifest.version ||
+    pkg.description !== uiWorkspaceManifest.description ||
+    canonicalJson(pkg.keywords) !==
+      canonicalJson(uiWorkspaceManifest.keywords) ||
     pkg.engines?.node !== uiPublicProfile.installedEngineRange ||
     canonicalJson(pkg.exports) !== canonicalJson(uiWorkspaceManifest.exports) ||
     canonicalJson(pkg.files) !== canonicalJson(uiWorkspaceManifest.files)

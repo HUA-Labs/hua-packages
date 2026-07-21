@@ -1,4 +1,4 @@
-overview: "Platform workspace authority for all 37 package entries in the accessible, TypeScript-first React component library. The public 2.4 core candidate is a separate source-ready projection with exactly 27 retained entries and 10 explicitly deferred entries."
+overview: "TypeScript-first React UI components with modular Web and React Native entry points."
 
 features:
   - "70+ components — Buttons, forms, tables, modals, overlays, and more"
@@ -7,9 +7,6 @@ features:
   - "Dark mode — Built-in dark mode support"
   - "dot style engine — Cross-platform styling (Web CSSProperties / React Native StyleSheet) via dot prop"
   - "Modular ESM entries — CSS assets and provider-registration entries declare their side effects explicitly"
-  - "Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: @hua-labs/ui, @hua-labs/ui/advanced, @hua-labs/ui/advanced/dashboard, @hua-labs/ui/advanced/emotion, @hua-labs/ui/advanced/motion, @hua-labs/ui/data, @hua-labs/ui/feedback, @hua-labs/ui/form, @hua-labs/ui/icons, @hua-labs/ui/icons-bold, @hua-labs/ui/iconsax, @hua-labs/ui/iconsax-extended, @hua-labs/ui/interactive, @hua-labs/ui/interactive/kanban, @hua-labs/ui/landing, @hua-labs/ui/native, @hua-labs/ui/navigation, @hua-labs/ui/overlay, @hua-labs/ui/sdui, @hua-labs/ui/styles/base.css, @hua-labs/ui/styles/codeblock.css, @hua-labs/ui/styles/landing.css, @hua-labs/ui/styles/prose.css, @hua-labs/ui/styles/recommended-theme.css, @hua-labs/ui/styles/toast.css, @hua-labs/ui/styles/utilities.css, @hua-labs/ui/theme."
-  - "Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: @hua-labs/ui/ax, @hua-labs/ui/layout, @hua-labs/ui/lucide, @hua-labs/ui/motion, @hua-labs/ui/primitives, @hua-labs/ui/sdui/manifest, @hua-labs/ui/sdui/motion-core-validation, @hua-labs/ui/sdui/validation, @hua-labs/ui/theme/foundation, @hua-labs/ui/utils."
-  - "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven."
 
 quickStart: |
   import { Button, Card, CardHeader, CardTitle, CardContent } from '@hua-labs/ui';
@@ -32,13 +29,14 @@ quickStart: |
 detailedGuide:
   path: "./DETAILED_GUIDE.md"
   distribution: "packed"
-  description: "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"
+  description: "Complete usage, API, styling, accessibility, and public-surface guidance"
 
 related:
   - "dot"
   - "motion-core"
 
 apiFilter: notes-only
+readmeApiProjection: omit
 
 apiNotes:
   # Core components
@@ -352,7 +350,7 @@ apiNotes:
     description: "Frozen exact-name inventory derived from the executable icon catalog"
     kind: "variable"
   iconProviderMapping:
-    description: "Catalog-derived provider bindings for Phosphor, Lucide, and Iconsax in the full platform workspace; public-candidate availability follows the retained profile"
+    description: "Catalog-derived provider bindings for Phosphor, Lucide, and Iconsax in the full platform workspace; public availability follows the current public package boundary"
     kind: "variable"
   isValidIconName:
     description: "Exact-membership type guard for canonical icon IDs and aliases; it does not normalize arbitrary strings"
@@ -370,7 +368,7 @@ apiNotes:
     description: "Return the list of all registered icon alias strings"
     kind: "function"
   registerLucideResolver:
-    description: "Low-level resolver hook used by the platform @hua-labs/ui/lucide side-effect entry, which is deferred from the public core candidate"
+    description: "Low-level resolver hook used by the platform @hua-labs/ui/lucide side-effect entry, which is not shipped by the current public package"
     kind: "function"
 
   # Advanced hooks
@@ -392,24 +390,3 @@ apiNotes:
   resolveDot:
     description: "Resolve a dot-style string to a CSSProperties object at runtime"
     kind: "function"
-
-sections:
-  - title: "Kanban drag transaction evidence"
-    content: |
-      `@hua-labs/ui/interactive/kanban` is a Web route backed by the existing optional
-      `@dnd-kit/core`, `@dnd-kit/sortable`, and `@dnd-kit/utilities` peers. Mouse,
-      delayed-touch, and sortable-keyboard sensors feed a one-snapshot transaction:
-      hover is preview-only, one valid drop commits, and cancel, missing targets,
-      controlled drift, or WIP rejection remain callback-free.
-
-      Card metadata is admitted through bounded own-data descriptor traversal. A
-      transparent Proxy may run bounded reflection traps, but only a detached ordinary
-      plain-data snapshot and its canonical bytes can become transaction authority or
-      output. Throwing/revoked views fail closed and time-varying views cancel as drift;
-      this is transaction integrity, not a same-realm hostile-code sandbox. Every drag
-      terminal preserves the next independent click-only card activation.
-
-      Keyboard instructions and drag announcements are bounded and sanitized. Unit,
-      type/build, deterministic SSR placeholder, and packed peer-isolation evidence do
-      not prove physical touch behavior, browser live-region speech, or assistive-
-      technology output.

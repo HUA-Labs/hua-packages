@@ -3,11 +3,11 @@
 Complete technical reference for the modern React UI component library.
 모던 React UI 컴포넌트 라이브러리에 대한 완전한 기술 레퍼런스입니다.
 
-## Public 2.4 Core Candidate Boundary
+## Published 2.4 Family Public Package Boundary
 
 This guide documents the full platform workspace authority across all 37
-package entries. The public 2.4 core candidate is a narrower **source-ready**
-projection. Its copyable package-entry roster is exactly:
+package entries. The published `@hua-labs/ui` 2.4 family ships the following
+exact 27 package entries. This is the copyable public-package roster:
 
 ```text
 @hua-labs/ui
@@ -39,35 +39,32 @@ projection. Its copyable package-entry roster is exactly:
 @hua-labs/ui/theme
 ```
 
-The following full-workspace entries are deferred and unavailable in that
-public candidate. Do not copy them into candidate consumer code:
+The following 10 entries remain platform-workspace-only and are not shipped by
+the published 2.4 family. Do not copy them into public-package consumer code:
 
-- `@hua-labs/ui/ax` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/layout` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/lucide` — unavailable; the Lucide registrar is not shipped in the public candidate.
-- `@hua-labs/ui/motion` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/primitives` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/sdui/manifest` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/sdui/motion-core-validation` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/sdui/validation` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/theme/foundation` — unavailable; deferred from the public candidate.
-- `@hua-labs/ui/utils` — unavailable; deferred from the public candidate.
+- `@hua-labs/ui/ax` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/layout` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/lucide` — not shipped; the Lucide registrar remains platform-workspace-only.
+- `@hua-labs/ui/motion` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/primitives` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/sdui/manifest` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/sdui/motion-core-validation` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/sdui/validation` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/theme/foundation` — not shipped; platform-workspace-only.
+- `@hua-labs/ui/utils` — not shipped; platform-workspace-only.
 
-The public core candidate does not ship the `@hua-labs/ui/lucide` registrar,
-so selecting the Lucide provider is not public-candidate guidance. The exact
-retained/deferred roster comes from `public-core-profile.json`; that profile is
-platform source authority and is not shipped in the package.
+The current public package does not ship the `@hua-labs/ui/lucide` registrar,
+so selecting the Lucide provider is not current public-package guidance. The
+exact shipped/unshipped roster comes from `public-core-profile.json`; that
+profile is platform source authority and is not included in the package
+tarball.
 
 이 가이드는 37개 패키지 엔트리를 모두 가진 플랫폼 워크스페이스 권위를
-설명합니다. 공개 2.4 core 후보는 위의 27개 엔트리만 유지하는
-**source-ready** 투영입니다. 나열된 10개 deferred 엔트리는 공개 후보에서
-사용할 수 없으며 소비자 코드에 복사하면 안 됩니다. 공개 core 후보는
-`@hua-labs/ui/lucide` registrar를 배포하지 않으므로 Lucide provider 선택은
-공개 후보 사용 지침이 아닙니다.
-
-Source-ready evidence does not prove final tarball or DTS bytes, installed
-consumer behavior, version or release-plan authority, npm publication, or
-deployment. Those remain later independently reviewed gates.
+설명합니다. 공개 `@hua-labs/ui` 2.4 계열은 위의 27개 엔트리를 정확히
+배포합니다. 아래 10개 엔트리는 플랫폼 워크스페이스 전용이며 공개 2.4
+계열에서 사용할 수 없으므로 소비자 코드에 복사하면 안 됩니다. 현재 공개
+패키지는 `@hua-labs/ui/lucide` registrar를 배포하지 않으므로 Lucide
+provider 선택은 현재 공개 패키지 사용 지침이 아닙니다.
 
 ---
 
@@ -421,8 +418,8 @@ import {
 ### Icon
 
 The full platform workspace Icon component supports Phosphor, Lucide, and
-Iconsax. The public core candidate retains Phosphor and Iconsax registration
-routes but defers the Lucide registrar described above.
+Iconsax. The current public package ships Phosphor and Iconsax registration
+routes but does not ship the Lucide registrar described above.
 
 ```tsx
 import { Icon, IconProvider } from '@hua-labs/ui';
@@ -445,7 +442,7 @@ import { Icon, IconProvider } from '@hua-labs/ui';
 - `name` - Icon name (auto-normalized across providers)
 - `size` - Icon size (number or string)
 - `variant` - "default" | "primary" | "secondary" | "success" | "warning" | "error" | "muted" | "inherit"
-- `provider` - Override icon provider ("phosphor" | "lucide" | "iconsax"); `lucide` requires the deferred registrar and is unavailable in the public candidate
+- `provider` - Override icon provider ("phosphor" | "lucide" | "iconsax"); `lucide` requires the workspace-only registrar and is unavailable in the current public package
 - `weight` - Phosphor weight ("thin" | "light" | "regular" | "bold" | "fill" | "duotone")
 - `animated` - Smooth animation effect
 - `pulse` - Pulse animation

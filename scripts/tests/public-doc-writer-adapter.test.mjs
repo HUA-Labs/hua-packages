@@ -183,6 +183,41 @@ test("renders shipped, repository-only, and absent guide authority deterministic
   assert.match(stale.stdout, /hua-shipped\/README\.md/);
 });
 
+test("adapts the exact platform README API projection without weakening defaults", () => {
+  const root = makeRoot();
+  writePackage(root, "hua-default");
+  writePackage(root, "hua-omit", {
+    docExtra: "\nreadmeApiProjection: omit\n",
+  });
+
+  const result = runWriter(root);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(output(root, "hua-default").readme, /^## API$/mu);
+  assert.doesNotMatch(output(root, "hua-omit").readme, /^## API$/mu);
+
+  const invalidRoot = makeRoot();
+  writePackage(invalidRoot, "hua-invalid", {
+    docExtra: "\nreadmeApiProjection: hidden\n",
+  });
+  const invalid = runWriter(invalidRoot);
+  assert.equal(invalid.status, 1);
+  assert.match(
+    invalid.stderr + invalid.stdout,
+    /readmeApiProjection must be include or omit/u,
+  );
+
+  const contradictoryRoot = makeRoot();
+  writePackage(contradictoryRoot, "hua-contradictory", {
+    docExtra: "\nreadmeApiProjection: omit\nreadme:\n  hideApi: false\n",
+  });
+  const contradictory = runWriter(contradictoryRoot);
+  assert.equal(contradictory.status, 1);
+  assert.match(
+    contradictory.stderr + contradictory.stdout,
+    /readme API projection conflicts with readme\.hideApi/u,
+  );
+});
+
 test("projects the exact package Node engine with the platform fallback", () => {
   const root = makeRoot();
   writePackage(root, "hua-node-20", { nodeEngine: ">=20.16.0" });
@@ -206,33 +241,7 @@ test("projects the exact UI public-core profile and filters deferred API authori
   const retainedEntries = sourceProfile.entries.filter(
     (entry) => entry.disposition === "retained",
   );
-  const deferredEntries = sourceProfile.entries.filter(
-    (entry) => entry.disposition === "deferred",
-  );
-  const canonicalImport = (subpath) =>
-    subpath === "."
-      ? sourceProfile.package
-      : `${sourceProfile.package}${subpath.slice(1)}`;
-  const utf8Sorted = (values) =>
-    [...values].sort((left, right) =>
-      Buffer.from(left).compare(Buffer.from(right)),
-    );
-  const retained = utf8Sorted(
-    retainedEntries.map((entry) => canonicalImport(entry.subpath)),
-  );
-  const deferred = utf8Sorted(
-    deferredEntries.map((entry) => canonicalImport(entry.subpath)),
-  );
-  const features = [
-    `Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ${retained.join(", ")}.`,
-    `Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ${deferred.join(", ")}.`,
-    "Source-ready is not release-ready: final tarball, DTS, installed-consumer, version, release-plan, and npm authority remain unproven.",
-  ];
-  const docContent = `overview: "Profile projection"\nfeatures:\n${features
-    .map((feature) => `  - ${JSON.stringify(feature)}`)
-    .join(
-      "\n",
-    )}\nquickStart: "example();"\ndetailedGuide:\n  path: "./DETAILED_GUIDE.md"\n  distribution: "packed"\n  description: "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary"\napiFilter: notes-only\napiNotes:\n  retainedRoot:\n    description: "Retained root API"\n    kind: "function"\n  deferredAx:\n    description: "Deferred AX API"\n    kind: "function"\n    importFrom: "@hua-labs/ui/ax"\n`;
+  const docContent = `overview: "Profile projection"\nfeatures:\n  - "Profile-aware exports"\nquickStart: "example();"\ndetailedGuide:\n  path: "./DETAILED_GUIDE.md"\n  distribution: "packed"\n  description: "Complete usage, API, styling, accessibility, and public-surface guidance"\napiFilter: notes-only\napiNotes:\n  retainedRoot:\n    description: "Retained root API"\n    kind: "function"\n  deferredAx:\n    description: "Deferred AX API"\n    kind: "function"\n    importFrom: "@hua-labs/ui/ax"\n`;
   const exports = Object.fromEntries(
     retainedEntries.map((entry) => [entry.subpath, entry.manifestTarget]),
   );
@@ -246,7 +255,7 @@ test("projects the exact UI public-core profile and filters deferred API authori
         path: "./DETAILED_GUIDE.md",
         distribution: "packed",
         description:
-          "Full workspace usage plus the exact source-ready public 2.4 core-candidate boundary",
+          "Complete usage, API, styling, accessibility, and public-surface guidance",
       },
       exports,
       publicProfile: profile,
@@ -274,7 +283,7 @@ test("projects the exact UI public-core profile and filters deferred API authori
   assert.doesNotMatch(generated.readme, /Deferred AX API/u);
   assert.doesNotMatch(generated.ai, /name: "deferredAx"/u);
   assert.match(generated.ai, /public_core_profile:/u);
-  assert.match(generated.ai, /candidate_status: "source-ready"/u);
+  assert.doesNotMatch(generated.ai, /candidate_status:/u);
   assert.match(generated.ai, /release_selection: null/u);
   assert.match(generated.ai, /entry_count: 37/u);
   assert.match(generated.ai, /retained_count: 27/u);
@@ -559,9 +568,6 @@ test("current UI docs derive the exact retained profile without copyable deferre
   for (const values of Object.values(classified)) {
     values.sort((left, right) => Buffer.from(left).compare(Buffer.from(right)));
   }
-  const retainedFeature = `Public 2.4 core candidate (source-ready only) retains exactly 27 package entries: ${classified.retained.join(", ")}.`;
-  const deferredFeature = `Public 2.4 core candidate defers exactly 10 package entries and they are unavailable: ${classified.deferred.join(", ")}.`;
-
   assert.equal(profile.schema, "hua-ui-public-core-profile.v1");
   assert.equal(profile.package, manifest.name);
   assert.equal(profile.releaseSelection, null);
@@ -578,6 +584,21 @@ test("current UI docs derive the exact retained profile without copyable deferre
   );
   assert.equal(manifest.engines.node, ">=20.16.0");
   assert.equal(manifest.version, "2.4.0");
+  assert.equal(
+    manifest.description,
+    "TypeScript-first React UI components with modular Web and React Native entry points",
+  );
+  assert.deepEqual(manifest.keywords, [
+    "hua-labs",
+    "react",
+    "react-components",
+    "ui-library",
+    "design-system",
+    "typescript",
+    "accessibility",
+    "react-native",
+    "cross-platform",
+  ]);
   assert.ok(manifest.files.includes("DETAILED_GUIDE.md"));
   assert.ok(!manifest.files.includes("public-core-profile.json"));
   assert.deepEqual(
@@ -588,9 +609,30 @@ test("current UI docs derive the exact retained profile without copyable deferre
       .sort(),
   );
   for (const generated of [doc, readme, ai]) {
-    assert.ok(generated.includes(retainedFeature));
-    assert.ok(generated.includes(deferredFeature));
-    assert.match(generated, /Source-ready is not release-ready/u);
+    assert.doesNotMatch(
+      generated,
+      /source-ready|release-ready|core candidate|public candidate/iu,
+    );
+  }
+  assert.match(doc, /^readmeApiProjection: omit$/mu);
+  assert.ok(Buffer.byteLength(readme, "utf8") < 8 * 1024);
+  assert.ok(readme.trimEnd().split("\n").length < 80);
+  assert.doesNotMatch(readme, /^## API$/mu);
+  assert.doesNotMatch(readme, /^## Public Imports$/mu);
+  assert.doesNotMatch(readme, /^## Kanban drag transaction evidence$/mu);
+  assert.doesNotMatch(readme, /@hua-labs\/ui@2\.4\.0/u);
+  assert.match(
+    ai,
+    /description: "TypeScript-first React UI components with modular Web and React Native entry points"/u,
+  );
+  assert.match(ai, /public_core_profile:/u);
+  assert.doesNotMatch(ai, /candidate_status:/u);
+  for (const retainedImport of classified.retained) {
+    assert.ok(
+      ai.includes(`path: "${retainedImport}"`) ||
+        ai.includes(`    - "${retainedImport}"`),
+      `AI missing retained route ${retainedImport}`,
+    );
   }
   assert.match(
     ai,
@@ -634,7 +676,7 @@ test("current public package outputs remain byte-identical under validate", () =
 test("writer, AX adapter, and README template bytes are review-locked", () => {
   const expected = {
     "scripts/generate-docs.ts":
-      "914f6624aebdf3e8bb6d31aac6b55b535f2f2f4b2b58398132e4ddda77db4b01",
+      "22f53ae813b8c530df0ed353c2e186ca4fc1b1e2ca45611546efca6078a8fb95",
     "scripts/package-ax.mjs":
       "c8b07a3291e4733eba9c9689932586749333dc33e5f0ee3bc1ecfa69f954bcd6",
     "scripts/templates/ai-yaml.hbs":
