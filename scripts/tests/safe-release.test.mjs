@@ -2461,6 +2461,57 @@ test("GitHub Actions bot claim authors require an exact human approval", () => {
   );
 });
 
+test("transition authority reduces stale review history to each actor's latest state", () => {
+  const transition = githubTransition("claim");
+
+  const sameActor = githubAuthorityFixture(transition);
+  sameActor.pullRequest.user = {
+    login: "github-actions[bot]",
+    type: "Bot",
+  };
+  sameActor.reviews[0].id = 2;
+  sameActor.reviews.unshift({
+    id: 1,
+    state: "APPROVED",
+    commit_id: "7".repeat(40),
+    user: { login: "independent-reviewer", type: "User" },
+  });
+  assert.equal(
+    validateGitHubReleaseAuthority(sameActor, transition).status,
+    "protected",
+  );
+
+  const differentActors = githubAuthorityFixture(transition);
+  differentActors.pullRequest.user = {
+    login: "github-actions[bot]",
+    type: "Bot",
+  };
+  differentActors.reviews[0].id = 2;
+  differentActors.reviews[0].user.login = "fresh-reviewer";
+  differentActors.reviews.unshift({
+    id: 1,
+    state: "APPROVED",
+    commit_id: "7".repeat(40),
+    user: { login: "stale-reviewer", type: "User" },
+  });
+  assert.equal(
+    validateGitHubReleaseAuthority(differentActors, transition).status,
+    "protected",
+  );
+
+  const laterComment = githubAuthorityFixture(transition);
+  laterComment.reviews.push({
+    id: 2,
+    state: "COMMENTED",
+    commit_id: kindHead("claim"),
+    user: { login: "independent-reviewer", type: "User" },
+  });
+  assertCode(
+    () => validateGitHubReleaseAuthority(laterComment, transition),
+    "external-policy-blocked",
+  );
+});
+
 test("solo-company source policy keeps GitHub review counting absent", () => {
   const transition = githubTransition("claim");
   const authority = githubAuthorityFixture(transition);

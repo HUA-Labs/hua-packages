@@ -2170,16 +2170,14 @@ function validateTransitionAuthority(authority, transition) {
         review.state === "DISMISSED" ||
         review.state === "PENDING",
     );
-    if (review.state === "APPROVED") {
-      externalPolicyAssert(review.commit_id === pullRequestHead);
-    }
+    const commitId = externalString(review.commit_id, GIT_SHA_PATTERN);
     const previous = latestReviewByActor.get(actor.toLowerCase());
     if (previous === undefined || review.id > previous.id) {
       latestReviewByActor.set(actor.toLowerCase(), {
         id: review.id,
         actor,
         state: review.state,
-        commitId: review.commit_id,
+        commitId,
       });
     }
   }

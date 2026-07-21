@@ -239,6 +239,10 @@ unique merged PR association, exact `main` base/source, exact deterministic
 and a latest exact-head approval from a human GitHub user distinct from the PR
 author. The transition PR author may be the exact `github-actions[bot]` actor,
 but bot reviewers and user/bot type mismatches fail closed.
+Historical stale review entries are admitted only as bounded input: the latest
+review ID per human actor owns that actor's state, so a fresh exact-head
+reapproval replaces an older stale approval while a later non-approval replaces
+an earlier approval.
 Zero, self-only, stale, wrong-head, wrong-branch, duplicate, or head-drifting
 associations fail closed. Any claim or PR failure happens before an
 OIDC-capable job, npm credentials, or publish.
