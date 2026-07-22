@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload exact verified artifacts
         if: steps.release-plan.outputs.status == 'planned'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hua-release-${{ steps.artifact-pack.outputs.artifact_manifest_sha256 }}
           path: ${{ steps.artifact-pack.outputs.artifact_dir }}
@@ -181,7 +181,7 @@ jobs:
           echo "artifact_name=hua-published-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
 
       - name: Upload sanitized exact published set
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.safe-publish.outputs.artifact_name }}
           path: ${{ steps.safe-publish.outputs.published_path }}
