@@ -22,8 +22,12 @@
 pnpm add @hua-labs/{{shortName}}
 ```
 
+{{#if peerDependenciesNote}}
+> {{{peerDependenciesNote}}}
+{{else}}
 {{#if peerDepsList}}
 > Peer dependencies: {{peerDepsList}}
+{{/if}}
 {{/if}}
 
 ## Quick Start

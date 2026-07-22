@@ -8,7 +8,7 @@ package:
   description: "HUA Motion Core - Essential animation hooks for React developers"
   license: "MIT"
 
-overview: "A collection of 60+ React animation hooks built on a ref-based engine. Direct DOM manipulation for consistent performance with zero external dependencies. All hooks are TypeScript-native and SSR-compatible. React Native support via dedicated native hooks using the Animated API."
+overview: "React 19 motion hooks, motion profiles, easing and spring utilities, and a dedicated React Native entry point. Web and native surfaces are documented separately so consumers can verify the exact renderer contract they use."
 
 exports:
   main:
@@ -34,7 +34,7 @@ exports:
         description: "Multi-element page entrance orchestration"
       - name: "useSmartMotion"
         type: "hook"
-        description: "Adaptive motion based on device performance"
+        description: "Preset-based single-element entrance and interaction motion"
       - name: "useUnifiedMotion"
         type: "hook"
         description: "All-in-one motion hook with presets"
@@ -79,7 +79,7 @@ exports:
         description: "Scroll-triggered reveal animation"
       - name: "useScrollProgress"
         type: "hook"
-        description: "Scroll position as 0-1 progress value"
+        description: "Document scroll position as a clamped 0-100 progress value"
       - name: "useMotionState"
         type: "hook"
         description: "Animation state tracking (idle, running, complete)"
@@ -103,7 +103,7 @@ exports:
         description: "Detect prefers-reduced-motion setting"
       - name: "useReducedMotionObject"
         type: "hook"
-        description: "Returns { prefersReducedMotion } object (extended form of useReducedMotion)"
+        description: "Deprecated object-shaped wrapper around useReducedMotion"
       - name: "useWindowSize"
         type: "hook"
         description: "Responsive window size tracking"
@@ -329,18 +329,15 @@ exports:
 
   subpaths:
     - path: "@hua-labs/motion-core/native"
-      description: "React Native hooks using Animated API (useFadeIn, useSlide*, useScaleIn, useBounceIn, useSpringMotion, usePulse, useStagger)"
+      description: "React Native Animated hooks and target-specific style return types"
 
 features:
-  - "60+ animation hooks — Fade, slide, scale, scroll, interactions, gestures, orchestration"
-  - "Zero dependencies — Pure JavaScript motion engine"
-  - "Ref-based — Direct DOM manipulation for consistent performance"
-  - "SSR compatible — Works with Next.js, Remix, and SSR frameworks"
-  - "React Native — 10 native hooks via Animated API (separate entry point)"
-  - "Fully tested — Comprehensive test coverage"
-
-related_packages:
-  - "@hua-labs/hua"
+  - "Web entrance hooks — Ref, style, lifecycle state, and explicit controls"
+  - "Motion profiles — Neutral and expressive defaults with bounded overrides"
+  - "Reduced-motion signal — Browser preference tracking for application policy"
+  - "React Native entry — Animated-based hooks from the explicit /native route"
+  - "TypeScript declarations — Root and native entry-point types ship with the package"
+  - "Framework-neutral utilities — Motion engine, easing, and spring calculations"
 
 compatibility:
   react: ">=19.0.0"
