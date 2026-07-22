@@ -48,7 +48,6 @@ features:
   - "usePerformanceMonitor — Runtime FPS, frame time, and memory tracking"
 
 related_packages:
-  - "@hua-labs/hua"
   - "@hua-labs/ui"
 
 compatibility:

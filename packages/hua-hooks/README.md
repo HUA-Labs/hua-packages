@@ -57,9 +57,12 @@ function ChatView({ messages }: { messages: Message[] }) {
 | `PerformanceMonitorMetrics` | type |  |
 | `UsePerformanceMonitorOptions` | type |  |
 
+## Documentation
+
+- [Detailed Guide](./DETAILED_GUIDE.md)
+
 ## Related Packages
 
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
 - [`@hua-labs/ui`](https://www.npmjs.com/package/@hua-labs/ui)
 
 ## License

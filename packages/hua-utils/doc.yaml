@@ -1,4 +1,4 @@
-overview: "A comprehensive utility library for the hua ecosystem. Includes class name merging (Tailwind-safe), formatters, performance utilities, validation, string manipulation, and sanitization functions."
+overview: "A utility library for the hua ecosystem. Includes Tailwind-aware class merging, formatters, async helpers, validation, string manipulation, and bounded input-cleanup helpers."
 
 features:
   - "cn() class merging — Tailwind-safe class name merging via clsx + tailwind-merge"
@@ -6,7 +6,7 @@ features:
   - "Performance — debounce, throttle, memoize, delay, retry"
   - "Validation — Email, password, URL, phone number, range checks"
   - "String utils — UUID, slugify, truncate, case conversion (camel/pascal/snake/kebab)"
-  - "Sanitization — XSS prevention, HTML escaping, email masking"
+  - "Input cleanup — Basic tag/pattern removal, HTML escaping, and email masking; not a security boundary"
 
 quickStart: |
   import { cn, formatTimeAgo, debounce, validateEmail, sanitizeInput } from '@hua-labs/utils';
@@ -22,10 +22,12 @@ quickStart: |
 
   // Validation & sanitization
   validateEmail('test@example.com'); // true
-  sanitizeInput('<script>alert("xss")</script>'); // safe string
+  sanitizeInput('<b>Hello</b>'); // "Hello"
+
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
 
 related:
-  - "hua"
   - "hooks"
 
 apiNotes:
@@ -119,7 +121,7 @@ apiNotes:
 
   # Sanitization
   sanitizeInput:
-    description: "XSS prevention input sanitizer"
+    description: "Basic UI input cleanup that removes HTML tags and selected dangerous patterns; not a security boundary."
     kind: "function"
   sanitizeTitle:
     description: "Sanitize a title string — removes HTML tags and dangerous patterns, enforces optional maxLength (default: 100)."
@@ -131,7 +133,7 @@ apiNotes:
     description: "Sanitize a name string — removes HTML tags and XSS patterns."
     kind: "function"
   escapeHtml:
-    description: "Escape HTML special characters (&, <, >, \", '). Intended for email body rendering, not general React output."
+    description: "Escape ampersands, angle brackets, quotation marks, and apostrophes for HTML text. Intended for email body rendering, not general React output."
     kind: "function"
   maskEmailForLog:
     description: "Mask an email address for safe logging (GDPR/CCPA). Shows only the first N local-part characters (default: 3), e.g. 'use***@***'."

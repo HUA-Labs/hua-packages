@@ -1,6 +1,6 @@
 # @hua-labs/state
 
-Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications.
+Zustand-based state management wrapper for the hua ecosystem. Provides localStorage persistence with partialize support, persistence-rehydration status helpers, and an i18n store integration for React applications.
 
 [![npm version](https://img.shields.io/npm/v/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
 [![npm downloads](https://img.shields.io/npm/dm/@hua-labs/state.svg)](https://www.npmjs.com/package/@hua-labs/state)
@@ -11,7 +11,7 @@ Zustand-based state management wrapper optimized for the hua ecosystem. Provides
 ## Features
 
 - **Zustand-based — Lightweight, performant state management**
-- **SSR support — Automatic hydration handling for Next.js App Router**
+- **Hydration status — Observe completion of Zustand persistence rehydration**
 - **Persistence — Built-in localStorage with partialize support**
 - **i18n integration — Pre-configured store for language management**
 - **Type-safe — Full TypeScript support with strict typing**
@@ -40,7 +40,6 @@ const useAppStore = createHuaStore<AppState>((set) => ({
 }), {
   persist: true,
   persistKey: 'app-storage',
-  ssr: true,
 });
 
 function ThemeToggle() {
@@ -61,7 +60,7 @@ function ThemeToggle() {
 | `markStoreRehydrated` | function | Manually mark a store as rehydrated and fire all pending listeners. Use when integrating a Zustand store created outside of createHuaStore. |
 | `createI18nStore` | function | Create a pre-configured i18n language store |
 | `StoreCreator` | type | Type alias for the Zustand state creator function passed to createHuaStore. |
-| `StoreConfig` | type | Configuration object for createHuaStore — persist, persistKey, ssr, partialize. |
+| `StoreConfig` | type | Configuration object for createHuaStore — persist, persistKey, partialize, and a compatibility-only ssr field that currently has no runtime effect. |
 | `HuaStore` | type | Return type of createHuaStore — a bound Zustand store hook. |
 | `BaseStoreState` | type | Base constraint for store state — requires an object type. |
 | `UseBoundStore` | type | Re-exported Zustand UseBoundStore type for typed store hooks. |
@@ -72,12 +71,12 @@ function ThemeToggle() {
 
 ## Documentation
 
-[Full Documentation](https://docs.hua-labs.com)
+- [Detailed Guide](./DETAILED_GUIDE.md)
+- [Full Documentation](https://docs.hua-labs.com)
 
 ## Related Packages
 
 - [`@hua-labs/i18n-core-zustand`](https://www.npmjs.com/package/@hua-labs/i18n-core-zustand)
-- [`@hua-labs/hua`](https://www.npmjs.com/package/@hua-labs/hua)
 
 ## License
 

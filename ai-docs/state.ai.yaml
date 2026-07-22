@@ -8,7 +8,7 @@ package:
   description: "HUA State - Unified state management for hua framework with SSR support and integrations"
   license: "MIT"
 
-overview: "Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications."
+overview: "Zustand-based state management wrapper for the hua ecosystem. Provides localStorage persistence with partialize support, persistence-rehydration status helpers, and an i18n store integration for React applications."
 
 exports:
   main:
@@ -34,7 +34,7 @@ exports:
         description: "Type alias for the Zustand state creator function passed to createHuaStore."
       - name: "StoreConfig"
         type: "type"
-        description: "Configuration object for createHuaStore — persist, persistKey, ssr, partialize."
+        description: "Configuration object for createHuaStore — persist, persistKey, partialize, and a compatibility-only ssr field that currently has no runtime effect."
       - name: "HuaStore"
         type: "type"
         description: "Return type of createHuaStore — a bound Zustand store hook."
@@ -63,14 +63,13 @@ exports:
 
 features:
   - "Zustand-based — Lightweight, performant state management"
-  - "SSR support — Automatic hydration handling for Next.js App Router"
+  - "Hydration status — Observe completion of Zustand persistence rehydration"
   - "Persistence — Built-in localStorage with partialize support"
   - "i18n integration — Pre-configured store for language management"
   - "Type-safe — Full TypeScript support with strict typing"
 
 related_packages:
   - "@hua-labs/i18n-core-zustand"
-  - "@hua-labs/hua"
 
 compatibility:
   react: ">=19.0.0"

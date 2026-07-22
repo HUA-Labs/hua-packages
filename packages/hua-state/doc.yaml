@@ -1,9 +1,9 @@
-overview: "Zustand-based state management wrapper optimized for the hua ecosystem. Provides built-in SSR hydration handling, localStorage persistence with partialize support, and seamless i18n integration for React and Next.js applications."
+overview: "Zustand-based state management wrapper for the hua ecosystem. Provides localStorage persistence with partialize support, persistence-rehydration status helpers, and an i18n store integration for React applications."
 docsUrl: "https://docs.hua-labs.com"
 
 features:
   - "Zustand-based — Lightweight, performant state management"
-  - "SSR support — Automatic hydration handling for Next.js App Router"
+  - "Hydration status — Observe completion of Zustand persistence rehydration"
   - "Persistence — Built-in localStorage with partialize support"
   - "i18n integration — Pre-configured store for language management"
   - "Type-safe — Full TypeScript support with strict typing"
@@ -22,7 +22,6 @@ quickStart: |
   }), {
     persist: true,
     persistKey: 'app-storage',
-    ssr: true,
   });
 
   function ThemeToggle() {
@@ -31,9 +30,11 @@ quickStart: |
     return <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
   }
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "i18n-core-zustand"
-  - "hua"
 
 subpathExports:
   - path: "integrations/i18n"
@@ -64,7 +65,7 @@ apiNotes:
     description: "Type alias for the Zustand state creator function passed to createHuaStore."
     kind: "type"
   StoreConfig:
-    description: "Configuration object for createHuaStore — persist, persistKey, ssr, partialize."
+    description: "Configuration object for createHuaStore — persist, persistKey, partialize, and a compatibility-only ssr field that currently has no runtime effect."
     kind: "type"
   HuaStore:
     description: "Return type of createHuaStore — a bound Zustand store hook."
