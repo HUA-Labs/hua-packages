@@ -31,6 +31,9 @@ quickStart: |
     return <h1>{t('common:welcome')}</h1>;
   }
 
+readme:
+  detailedGuide: "./DETAILED_GUIDE.md"
+
 related:
   - "i18n-core"
   - "i18n-loaders"

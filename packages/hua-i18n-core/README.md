@@ -88,7 +88,8 @@ function Welcome() {
 
 ## Documentation
 
-[Full Documentation](https://docs.hua-labs.com)
+- [Detailed Guide](./DETAILED_GUIDE.md)
+- [Full Documentation](https://docs.hua-labs.com)
 
 ## Related Packages
 

@@ -81,7 +81,8 @@ function PriceCard({ date, amount }: { date: Date; amount: number }) {
 
 ## Documentation
 
-[Full Documentation](https://docs.hua-labs.com)
+- [Detailed Guide](./DETAILED_GUIDE.md)
+- [Full Documentation](https://docs.hua-labs.com)
 
 ## Related Packages
 
