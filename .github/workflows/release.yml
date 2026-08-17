@@ -66,7 +66,7 @@ jobs:
       - name: Create or update version PR without npm credentials
         id: changesets
         if: steps.plan-preflight.outputs.status == 'empty'
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           version: pnpm safe-release:version
         env:
