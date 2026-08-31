@@ -39,12 +39,12 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "eslint": "^10.6.0",
-    "react": "^19.2.7",
+    "@types/react": "^19.2.18",
+    "eslint": "^10.9.1",
+    "react": "^19.2.8",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   },
   "keywords": [
     "hua-labs",
