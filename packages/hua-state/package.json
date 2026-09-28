@@ -67,11 +67,11 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   }
 }
