@@ -143,12 +143,12 @@
     "generate:icon-snippets": "tsx scripts/generate-icon-snippets.ts"
   },
   "dependencies": {
-    "@floating-ui/react": "^0.27.19",
+    "@floating-ui/react": "^0.27.20",
     "@hua-labs/dot": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
     "clsx": "^2.1.1",
     "sugar-high": "^1.0.0",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
