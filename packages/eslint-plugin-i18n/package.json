@@ -27,13 +27,13 @@
     "test:watch": "vitest watch"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.29.7",
+    "@babel/eslint-parser": "^7.29.9",
     "@babel/preset-react": "^7.29.7",
     "@types/eslint": "^9.0.0",
     "@types/estree": "^1.0.9",
     "@types/node": "^25.9.3",
-    "@typescript-eslint/parser": "^8.62.0",
-    "eslint": "^10.6.0",
+    "@typescript-eslint/parser": "^8.70.1",
+    "eslint": "^10.11.0",
     "eslint-plugin-react": "^7.37.5",
     "espree": "^11.2.0",
     "tsup": "^8.5.1",
