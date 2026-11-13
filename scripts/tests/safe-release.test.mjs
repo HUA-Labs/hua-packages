@@ -982,6 +982,64 @@ test("workflow artifact handoffs remain exact across supported GitHub reruns", (
   );
 });
 
+test("workflow pairs archived artifacts with strict downloads and the accepted Node wrapper", () => {
+  const workflow = parseDocument(
+    readFileSync(join(CURRENT_ROOT, ".github/workflows/release.yml"), "utf8"),
+    { uniqueKeys: true },
+  ).toJS();
+  const steps = Object.values(workflow.jobs).flatMap((job) => job.steps);
+  const uploads = steps.filter((step) =>
+    step.uses?.startsWith("actions/upload-artifact@"),
+  );
+  const downloads = steps.filter((step) =>
+    step.uses?.startsWith("actions/download-artifact@"),
+  );
+  assert.equal(uploads.length, 2);
+  assert.equal(downloads.length, 2);
+  for (const step of uploads) {
+    assert.equal(
+      step.uses,
+      "actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f",
+    );
+    assert.equal(step.with.archive, true);
+    assert.equal(step.with["if-no-files-found"], "error");
+  }
+  for (const step of downloads) {
+    assert.equal(
+      step.uses,
+      "actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3",
+    );
+    assert.equal(step.with["skip-decompress"], false);
+    assert.equal(step.with["digest-mismatch"], "error");
+    assert.equal(step["continue-on-error"], undefined);
+  }
+  const checks = parseDocument(
+    readFileSync(join(CURRENT_ROOT, ".github/workflows/pr-checks.yml"), "utf8"),
+    { uniqueKeys: true },
+  ).toJS();
+  const nodeSteps = [
+    ...steps,
+    ...Object.values(checks.jobs).flatMap((job) => job.steps),
+  ].filter((step) => step.uses?.startsWith("actions/setup-node@"));
+  assert.equal(nodeSteps.length, 9);
+  for (const step of nodeSteps) {
+    assert.equal(
+      step.uses,
+      "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+    );
+    assert.equal(step.with["registry-url"], undefined);
+    assert.equal(step.env?.NODE_AUTH_TOKEN, undefined);
+  }
+  assert.equal(
+    steps.find((step) => step.uses?.startsWith("changesets/action@")).uses,
+    "changesets/action@v1",
+  );
+  assert.doesNotMatch(
+    readFileSync(join(CURRENT_ROOT, ".npmrc"), "utf8"),
+    /NODE_AUTH_TOKEN/,
+  );
+});
+
 test("release source binds checked tarballs and never publishes mutable package directories", () => {
   const source = readFileSync(
     join(CURRENT_ROOT, "scripts/safe-release.mjs"),
