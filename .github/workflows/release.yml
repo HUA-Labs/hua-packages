@@ -35,7 +35,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           cache: "pnpm"
@@ -89,8 +89,9 @@ jobs:
 
       - name: Upload exact verified artifacts
         if: steps.release-plan.outputs.status == 'planned'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
+          archive: true
           name: hua-release-${{ steps.artifact-pack.outputs.artifact_manifest_sha256 }}
           path: ${{ steps.artifact-pack.outputs.artifact_dir }}
           if-no-files-found: error
@@ -132,7 +133,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           cache: "pnpm"
@@ -146,8 +147,10 @@ jobs:
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download exact claimed artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
+          skip-decompress: false
+          digest-mismatch: error
           name: ${{ needs.prepare.outputs.artifact_name }}
           path: ${{ runner.temp }}/hua-release-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -181,8 +184,9 @@ jobs:
           echo "artifact_name=hua-published-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
 
       - name: Upload sanitized exact published set
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
+          archive: true
           name: ${{ steps.safe-publish.outputs.artifact_name }}
           path: ${{ steps.safe-publish.outputs.published_path }}
           if-no-files-found: error
@@ -207,7 +211,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           cache: "pnpm"
@@ -221,8 +225,10 @@ jobs:
         run: node scripts/safe-release.mjs authority --format=github
 
       - name: Download sanitized exact published set
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
+          skip-decompress: false
+          digest-mismatch: error
           name: ${{ needs.publish.outputs.published_artifact_name }}
           path: ${{ runner.temp }}/hua-published
 
