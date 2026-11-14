@@ -229,7 +229,7 @@ export async function promptAiContextOptions(): Promise<AiContextOptions> {
         ],
       },
       {
-        type: "list",
+        type: "select",
         name: "language",
         message: t("documentationLanguage"),
         choices: [
