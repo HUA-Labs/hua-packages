@@ -48,6 +48,8 @@ overrides:
   'eslint@10.14.0': 10.15.0
   'typescript-eslint@8.72.2': 8.73.0
   '@typescript-eslint/parser@8.72.2': 8.73.0
+  metro@0.82.5>image-size: 2.0.4
+  tsup@8.5.1>esbuild: 0.28.2
 
 allowBuilds:
   "@scarf/scarf": false
@@ -62,3 +64,4 @@ allowBuilds:
 
 patchedDependencies:
   "@phosphor-icons/react@2.1.10": patches/@phosphor-icons__react@2.1.10.patch
+  metro@0.82.5: patches/metro@0.82.5.patch
