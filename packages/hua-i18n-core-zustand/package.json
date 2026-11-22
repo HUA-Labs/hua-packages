@@ -29,7 +29,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.0.0"
   },
   "dependencies": {
     "@hua-labs/i18n-core": "workspace:*",
