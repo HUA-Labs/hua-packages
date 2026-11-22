@@ -49,7 +49,7 @@ related_packages:
   - "@hua-labs/dot-lsp"
 
 compatibility:
-  node: ">=20.16.0"
+  node: ">=24.0.0"
 
 documentation:
   detailedGuide:

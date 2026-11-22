@@ -58,4 +58,4 @@ related_packages:
   - "@hua-labs/dot"
 
 compatibility:
-  node: ">=20.16.0"
+  node: ">=24.0.0"
