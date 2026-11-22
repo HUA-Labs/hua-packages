@@ -90,7 +90,7 @@
   "homepage": "https://github.com/HUA-Labs/hua-packages#readme",
   "sideEffects": false,
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.0.0"
   },
   "publishConfig": {
     "access": "public",
