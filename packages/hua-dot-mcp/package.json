@@ -44,6 +44,6 @@
     "url": "https://github.com/HUA-Labs/hua-packages/issues"
   },
   "engines": {
-    "node": ">=20.16.0"
+    "node": ">=24.0.0"
   }
 }

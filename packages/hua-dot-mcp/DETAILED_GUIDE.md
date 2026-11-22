@@ -98,7 +98,7 @@ Use this in MCP client config when you prefer not to install globally or want to
 
 The installed binary is `dot-mcp` (set by the `bin` field in `package.json`). When referencing the command in MCP client configuration, use `dot-mcp` for a global install or use `npx` with `args: ["@hua-labs/dot-mcp"]` for the npx variant.
 
-**Requirements:** Node.js >= 20.16.0
+**Requirements:** Node.js >= 24.0.0
 
 ---
 
@@ -664,7 +664,7 @@ Discover available tokens in a category to replace dropped properties.
 
 - Verify `dot-mcp` is on your PATH: run `dot-mcp` in a terminal. If the command is not found, either install globally (`npm install -g @hua-labs/dot-mcp`) or switch to the `npx` config variant.
 - Check the MCP client logs. stdio transport errors (broken pipe, spawn failure) appear there, not in the terminal.
-- Ensure Node.js >= 20.16.0 is installed: `node --version`.
+- Ensure Node.js >= 24.0.0 is installed: `node --version`.
 
 ### Empty Responses or `{}`
 
